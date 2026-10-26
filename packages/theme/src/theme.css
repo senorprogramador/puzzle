@@ -1,0 +1,263 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root:has(style[data-theme="light"]) {
+    color-scheme: light;
+
+    --puzzle-color-background: #f7f4ea;
+    --puzzle-color-surface: #ffffff;
+    --puzzle-color-text: #171717;
+    --puzzle-color-text-muted: #666666;
+    --puzzle-color-border: #e5e0d6;
+}
+
+:root:has(style[data-theme="dark"]) {
+    color-scheme: dark;
+
+    --puzzle-color-background: #111518;
+    --puzzle-color-surface: #1c2226;
+    --puzzle-color-text: #f5f5f5;
+    --puzzle-color-text-muted: #a4adb3;
+    --puzzle-color-border: #343c42;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not(:has(style[data-theme="light"])) {
+        color-scheme: dark;
+        --puzzle-color-background: #111518;
+        --puzzle-color-surface: #1c2226;
+        --puzzle-color-text: #f5f5f5;
+        --puzzle-color-text-muted: #a4adb3;
+        --puzzle-color-border: #343c42;
+    }
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+:where(html, body) {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+
+    color-scheme: light;
+    color: var(--puzzle-color-text, #0f172a);
+    background: var(--puzzle-color-background, #f7f4ea);
+}
+
+@media (prefers-color-scheme: dark) {
+    :where(html, body) {
+        color-scheme: dark;
+        color: var(--puzzle-color-text, #f5f5f5);
+        background: var(--puzzle-color-background, #111518);
+    }
+}
+
+:where(body) {
+    margin: 0;
+    font-family: var(--puzzle-font-family-body1);
+    font-size: var(--puzzle-font-size-body1);
+    font-weight: var(--puzzle-font-weight-body1);
+    line-height: var(--puzzle-line-height-body1);
+    letter-spacing: var(--puzzle-letter-spacing-body1);
+}
+
+:where(h1, h2, h3, h4) {
+    margin-block: 0;
+}
+
+:where(h1) {
+    font-family: var(--puzzle-font-family-headline1);
+    font-size: var(--puzzle-font-size-headline1);
+    font-weight: var(--puzzle-font-weight-headline1);
+    line-height: var(--puzzle-line-height-headline1);
+    letter-spacing: var(--puzzle-letter-spacing-headline1);
+}
+:where(h2) {
+    font-family: var(--puzzle-font-family-headline2);
+    font-size: var(--puzzle-font-size-headline2);
+    font-weight: var(--puzzle-font-weight-headline2);
+    line-height: var(--puzzle-line-height-headline2);
+    letter-spacing: var(--puzzle-letter-spacing-headline2);
+}
+:where(h3) {
+    font-family: var(--puzzle-font-family-headline3);
+    font-size: var(--puzzle-font-size-headline3);
+    font-weight: var(--puzzle-font-weight-headline3);
+    line-height: var(--puzzle-line-height-headline3);
+    letter-spacing: var(--puzzle-letter-spacing-headline3);
+}
+:where(h4) {
+    font-family: var(--puzzle-font-family-headline4);
+    font-size: var(--puzzle-font-size-headline4);
+    font-weight: var(--puzzle-font-weight-headline4);
+    line-height: var(--puzzle-line-height-headline4);
+    letter-spacing: var(--puzzle-letter-spacing-headline4);
+}
+
+/*
+ * Text vertical rhythm. Use margins rather than padding because the spacing
+ * belongs between blocks, not inside them. Every relevant margin is reset and
+ * the gap is applied only to the following sibling, avoiding double spacing
+ * and margin-collapse surprises.
+ */
+:where(h1, h2, h3, h4, p) {
+    margin-block: 0;
+}
+:where(h1, h2, h3, h4) + :where(h1, h2, h3, h4) {
+    margin-block-start: var(--puzzle-font-gap-heading-stack-gap, 0.3em);
+}
+:where(h1, h2, h3, h4) + :where(p) {
+    margin-block-start: var(--puzzle-font-gap-heading-paragraph-gap, 0.65em);
+}
+:where(p) + :where(p) {
+    margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
+}
+:where(p) + :where(h1, h2, h3, h4) {
+    margin-block-start: var(--puzzle-font-gap-section-gap, 1.75em);
+}
+:where(input, textarea, select) {
+    font: inherit;
+}
+:where(button) {
+    cursor: pointer;
+    font-family: var(--puzzle-font-family-button);
+    font-size: var(--puzzle-font-size-button);
+    font-weight: var(--puzzle-font-weight-button);
+    line-height: var(--puzzle-line-height-button);
+    letter-spacing: var(--puzzle-letter-spacing-button);
+}
+:where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
+    cursor: not-allowed;
+}
+
+:where(a) {
+    color: var(--puzzle-color-primary, #2563eb);
+}
+
+:where(:focus-visible) {
+    outline: 2px solid var(--puzzle-color-ring, #2563eb);
+    outline-offset: 2px;
+}
+
+.puzzle-typography-display1 {
+    font-family: var(--puzzle-font-family-display1);
+    font-size: var(--puzzle-font-size-display1);
+    font-weight: var(--puzzle-font-weight-display1);
+    line-height: var(--puzzle-line-height-display1);
+    letter-spacing: var(--puzzle-letter-spacing-display1);
+}
+.puzzle-typography-display2 {
+    font-family: var(--puzzle-font-family-display2);
+    font-size: var(--puzzle-font-size-display2);
+    font-weight: var(--puzzle-font-weight-display2);
+    line-height: var(--puzzle-line-height-display2);
+    letter-spacing: var(--puzzle-letter-spacing-display2);
+}
+.puzzle-typography-headline1 {
+    font-family: var(--puzzle-font-family-headline1);
+    font-size: var(--puzzle-font-size-headline1);
+    font-weight: var(--puzzle-font-weight-headline1);
+    line-height: var(--puzzle-line-height-headline1);
+    letter-spacing: var(--puzzle-letter-spacing-headline1);
+}
+.puzzle-typography-headline2 {
+    font-family: var(--puzzle-font-family-headline2);
+    font-size: var(--puzzle-font-size-headline2);
+    font-weight: var(--puzzle-font-weight-headline2);
+    line-height: var(--puzzle-line-height-headline2);
+    letter-spacing: var(--puzzle-letter-spacing-headline2);
+}
+.puzzle-typography-headline3 {
+    font-family: var(--puzzle-font-family-headline3);
+    font-size: var(--puzzle-font-size-headline3);
+    font-weight: var(--puzzle-font-weight-headline3);
+    line-height: var(--puzzle-line-height-headline3);
+    letter-spacing: var(--puzzle-letter-spacing-headline3);
+}
+.puzzle-typography-headline4 {
+    font-family: var(--puzzle-font-family-headline4);
+    font-size: var(--puzzle-font-size-headline4);
+    font-weight: var(--puzzle-font-weight-headline4);
+    line-height: var(--puzzle-line-height-headline4);
+    letter-spacing: var(--puzzle-letter-spacing-headline4);
+}
+.puzzle-typography-subtitle1 {
+    font-family: var(--puzzle-font-family-subtitle1);
+    font-size: var(--puzzle-font-size-subtitle1);
+    font-weight: var(--puzzle-font-weight-subtitle1);
+    line-height: var(--puzzle-line-height-subtitle1);
+    letter-spacing: var(--puzzle-letter-spacing-subtitle1);
+}
+.puzzle-typography-subtitle2 {
+    font-family: var(--puzzle-font-family-subtitle2);
+    font-size: var(--puzzle-font-size-subtitle2);
+    font-weight: var(--puzzle-font-weight-subtitle2);
+    line-height: var(--puzzle-line-height-subtitle2);
+    letter-spacing: var(--puzzle-letter-spacing-subtitle2);
+}
+.puzzle-typography-body1 {
+    font-family: var(--puzzle-font-family-body1);
+    font-size: var(--puzzle-font-size-body1);
+    font-weight: var(--puzzle-font-weight-body1);
+    line-height: var(--puzzle-line-height-body1);
+    letter-spacing: var(--puzzle-letter-spacing-body1);
+}
+.puzzle-typography-body2 {
+    font-family: var(--puzzle-font-family-body2);
+    font-size: var(--puzzle-font-size-body2);
+    font-weight: var(--puzzle-font-weight-body2);
+    line-height: var(--puzzle-line-height-body2);
+    letter-spacing: var(--puzzle-letter-spacing-body2);
+}
+.puzzle-typography-button {
+    font-family: var(--puzzle-font-family-button);
+    font-size: var(--puzzle-font-size-button);
+    font-weight: var(--puzzle-font-weight-button);
+    line-height: var(--puzzle-line-height-button);
+    letter-spacing: var(--puzzle-letter-spacing-button);
+}
+.puzzle-typography-caption {
+    font-family: var(--puzzle-font-family-caption);
+    font-size: var(--puzzle-font-size-caption);
+    font-weight: var(--puzzle-font-weight-caption);
+    line-height: var(--puzzle-line-height-caption);
+    letter-spacing: var(--puzzle-letter-spacing-caption);
+}
+.puzzle-typography-overline {
+    font-family: var(--puzzle-font-family-overline);
+    font-size: var(--puzzle-font-size-overline);
+    font-weight: var(--puzzle-font-weight-overline);
+    line-height: var(--puzzle-line-height-overline);
+    letter-spacing: var(--puzzle-letter-spacing-overline);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+.puzzle-transition-fade-from {
+    opacity: 0;
+}
+.puzzle-transition-fade-active {
+    opacity: 1;
+    transition: opacity 300ms ease-out;
+}
+.puzzle-transition-fade-exit {
+    opacity: 0;
+    transition: opacity 300ms ease-out;
+}

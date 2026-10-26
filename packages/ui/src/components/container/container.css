@@ -1,0 +1,11 @@
+.puzzle-container {
+    --_container-max-width: var(--puzzle-container-max-width, 80rem);
+    --_container-gutter: var(--puzzle-container-gutter, clamp(1rem, 3vw, 2rem));
+
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--_container-max-width);
+    margin-inline: auto;
+    padding-inline: var(--_container-gutter);
+    min-width: 0;
+}

@@ -1,0 +1,29 @@
+.puzzle-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: var(--puzzle-color-secondary, #555);
+    border: 2px solid var(--puzzle-border-color, #e0e0e0);
+    color: var(--puzzle-color-secondary-foreground, #ffffff);
+    font-weight: bold;
+    container-type: inline-size;
+}
+
+.puzzle-avatar-square {
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-avatar-circle {
+    border-radius: 50%;
+}
+
+.puzzle-avatar-initials {
+    font-size: clamp(0.8rem, 32cqw, 4rem);
+    font-weight: 700;
+    line-height: 1;
+    font-synthesis: none;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@puzzle/theme": [
+        "../../packages/theme/src/index.ts"
+      ],
+      "@puzzle/theme/*": [
+        "../../packages/theme/src/*"
+      ],
+      "@puzzle/ui": [
+        "../../packages/ui/src/index.ts"
+      ],
+      "@puzzle/ui/*": [
+        "../../packages/ui/src/*"
+      ],
+      "@puzzle/icons": [
+        "../../packages/icons/src/index.ts"
+      ],
+      "@puzzle/icons/*": [
+        "../../packages/icons/src/*"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}

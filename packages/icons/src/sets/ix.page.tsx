@@ -1,0 +1,31 @@
+import { ALL_IX_ICONS } from "./ix.constants";
+import { IxIcon } from "./ix";
+type IxIconPageProps = {
+  filter?: string;
+  size?: number;
+  color?: string;
+};
+
+const prefix = "ix" as const;
+
+const IxIconPage = ({ filter = "", size = 42, color = "#302f41" }: IxIconPageProps) => {
+  const icons = filter === "" ? ALL_IX_ICONS.slice(0, 100) : ALL_IX_ICONS.filter(
+    (icon) => icon.toLowerCase().includes(filter.toLowerCase())
+  ).slice(0, 100);
+  if (icons.length === 0) {
+    return null;
+  }
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <h2>Ix Icons</h2>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(auto-fill, minmax(${size}px, 1fr))`, gap: "16px" }}>
+        {icons.map((icon) => (
+          <IxIcon key={icon} name={icon} size={size} color={color} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export { IxIconPage, type IxIconPageProps };

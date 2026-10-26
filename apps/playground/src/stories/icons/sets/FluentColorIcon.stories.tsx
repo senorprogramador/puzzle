@@ -1,0 +1,60 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
+
+import { FluentColorIcon } from "@puzzle/icons/sets/fluent-color";
+import { FluentColorIconPage } from "@puzzle/icons/sets/fluent-color.page";
+import { ALL_FLUENT_COLOR_ICONS } from "@puzzle/icons/sets/fluent-color.constants";
+
+const meta = {
+  title: "Icons/Sets/FluentColor",
+  component: FluentColorIcon,
+  tags: ["autodocs"],
+  argTypes: {
+    name: {
+      options: [ ...ALL_FLUENT_COLOR_ICONS ],
+      control: {
+        type: "select",
+      },
+    },
+    size: { control: { type: "range", min: 32, max: 100, step: 1 } },
+    color: { control: { type: "color" } },
+  },
+  parameters: {
+    layout: "centered",
+  },
+} satisfies Meta<typeof FluentColorIcon>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: {
+    name: "add-circle-16",
+    size: 64,
+    color: "#302f41",
+  },
+    render: (args) => <FluentColorIcon {...args} />,
+};
+
+export const AllIcons: Story = {
+  args: {
+    name: "add-circle-16",
+    size: 32,
+    color: "#302f41",
+  },
+  render: (args) => {
+    const [filter, setFilter] = useState("");
+    return (
+      <div style={{ width: "600px", maxWidth: "80vw", padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
+        <input
+          type="text"
+          placeholder="Search icons..."
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          style={{ marginBottom: "16px", padding: "8px", fontSize: "16px" }}
+        />
+        <FluentColorIconIconPage filter={filter} size={args.size} color={args.color} />
+      </div>
+    );
+  },
+}

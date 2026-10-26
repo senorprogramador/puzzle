@@ -1,0 +1,65 @@
+.puzzle-section-stack {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.puzzle-section {
+    --section-padding-y: var(--spacing-section, 4rem);
+    --section-background: inherit;
+    --section-color: inherit;
+
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+
+    padding-block: var(--section-padding-y);
+
+    background-color: var(--section-background);
+    color: var(--section-color);
+}
+
+/* Compacte overgang tussen twee sections met dezelfde theme. */
+.puzzle-section--compact-top {
+    padding-block-start: calc(var(--section-padding-y) / 2);
+}
+
+.puzzle-section--compact-bottom {
+    padding-block-end: calc(var(--section-padding-y) / 2);
+}
+
+/* Geen verticale padding, ongeacht de andere opties. */
+.puzzle-section--no-padding {
+    padding-block: 0;
+}
+
+.puzzle-section[data-theme="normal"] {
+    --section-background: var(--puzzle-color-background, #f7f4ea);
+    --section-color: var(--puzzle-color-text, #171717);
+}
+
+/* Voorbeeldthemes: koppel deze aan je eigen Puzzle theme tokens. */
+.puzzle-section[data-theme="light"] {
+    --section-background: var(--puzzle-color-surface, #f7f4ef);
+    --section-color: var(--color-text, #1f1c19);
+}
+
+.puzzle-section[data-theme="dark"] {
+    --section-background: var(--puzzle-color-surface-inverse, #1f1c19);
+    --section-color: var(--color-text-inverse, #f7f4ef);
+}
+
+.puzzle-section[data-theme="primary"] {
+    --section-background: var(--puzzle-color-primary, #1f1c19);
+    --section-color: var(--puzzle-color-primary-foreground, #ffffff);
+}
+
+.puzzle-section[data-theme="secondary"] {
+    --section-background: var(--puzzle-color-secondary, #1f1c19);
+    --section-color: var(--puzzle-color-secondary-foreground, #ffffff);
+}
+
+.puzzle-section[data-theme="accent"] {
+    --section-background: var(--puzzle-color-accent, #b66a4d);
+    --section-color: var(--puzzle-color-accent-foreground, #ffffff);
+}

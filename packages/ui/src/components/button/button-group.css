@@ -1,0 +1,36 @@
+.puzzle-button-group {
+    display: flex;
+    gap: 1px;
+}
+
+.puzzle-button-group--row button:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+.puzzle-button-group--row button:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.puzzle-button-group--row button:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.puzzle-button-group--column {
+    flex-direction: column;
+}
+
+.puzzle-button-group--column button:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+.puzzle-button-group--column button:first-child {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.puzzle-button-group--column button:last-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
