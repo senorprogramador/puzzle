@@ -29,3 +29,7 @@
     width: 100%;
     max-height: calc(100% - 40px);
 }
+
+.puzzle-drawer__content {
+    overflow-y: auto;
+}

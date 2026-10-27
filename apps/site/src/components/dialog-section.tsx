@@ -38,7 +38,11 @@ const DialogSection = ({}: DialogSectionProps) => {
           onOpenChange={setIsDrawerOpen}
           position="bottom"
         >
-          Drawer Content Can be very long, so we have to limit it's width
+          Drawer Content Can be very long, so we have to limit it's width.
+          Puzzle is a modern React UI framework designed to help developers
+          build accessible, responsive, and visually appealing user interfaces
+          with ease. It is open source and provides a set of reusable
+          components, theming capabilities, and a focus on developer experience.
         </Drawer>
       </Stack>
     </Section>

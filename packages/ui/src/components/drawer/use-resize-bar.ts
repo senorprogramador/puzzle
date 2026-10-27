@@ -14,18 +14,25 @@ const useResizeBar = (
 
     if (!resizeElement) return;
 
+    let offset = 0;
+
     document.body.style.userSelect = "none";
+    document.body.style.touchAction = "none";
 
     const handleMouseMove = (e: MouseEvent | TouchEvent) => {
       e.stopPropagation();
+      const elementOffset =
+        direction === "vertical"
+          ? resizeElement.offsetTop
+          : resizeElement.offsetLeft;
       setDimension(
         direction === "vertical"
           ? "touches" in e
-            ? e.touches[0].clientY
-            : e.clientY
+            ? e.touches[0].clientY - offset - elementOffset
+            : e.clientY - offset - elementOffset
           : "touches" in e
-            ? e.touches[0].clientX
-            : e.clientX,
+            ? e.touches[0].clientX - offset - elementOffset
+            : e.clientX - offset - elementOffset,
       );
     };
 
@@ -38,6 +45,18 @@ const useResizeBar = (
 
     const handleMouseDown = (e: MouseEvent | TouchEvent) => {
       e.stopPropagation();
+      const elementPosition =
+        direction === "vertical"
+          ? resizeElement.getBoundingClientRect().top
+          : resizeElement.getBoundingClientRect().left;
+      offset =
+        direction === "vertical"
+          ? "touches" in e
+            ? e.touches[0].clientY - elementPosition
+            : e.clientY - elementPosition
+          : "touches" in e
+            ? e.touches[0].clientX - elementPosition
+            : e.clientX - elementPosition;
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
       document.addEventListener("touchmove", handleMouseMove);
@@ -51,6 +70,7 @@ const useResizeBar = (
       resizeElement.removeEventListener("mousedown", handleMouseDown);
       resizeElement.removeEventListener("touchstart", handleMouseDown);
       document.body.style.removeProperty("user-select");
+      document.body.style.removeProperty("touch-action");
     };
   }, [direction, resizeRef.current, active]);
 

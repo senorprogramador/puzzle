@@ -1,5 +1,5 @@
 import { cn } from "@puzzle/core";
-import type { ComponentPropsWithRef } from "react";
+import { useEffect, type ComponentPropsWithRef } from "react";
 import { Transition, type TransitionTemplate } from "../transition/transition";
 import { Backdrop } from "../backdrop/backdrop";
 import { Stack } from "../stack/stack";
@@ -62,7 +62,12 @@ const DrawerContent = ({
     ["left", "right"].includes(position) ? "horizontal" : "vertical",
     open,
   );
-  console.log(dimension);
+
+  useEffect(() => {
+    if ((dimension ?? 0) > window.innerHeight - 100) {
+      onOpenChange(false);
+    }
+  }, [dimension]);
 
   return (
     <Stack
@@ -83,6 +88,8 @@ const DrawerContent = ({
         ref={resizeRef}
         style={{
           height: "3px",
+          minHeight: "3px",
+          flexShrink: 0,
           width: "128px",
           margin: "0 auto",
           borderRadius: "2px",
