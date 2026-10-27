@@ -18,4 +18,5 @@ export type SectionProps = {
   /** Internal: set by SectionStack. */
   compactTop?: boolean;
   compactBottom?: boolean;
+  divider?: boolean;
 };

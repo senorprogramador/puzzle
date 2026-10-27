@@ -5,9 +5,10 @@ import { type SectionProps } from "./types";
 type SectionStackProps = {
   children: ReactNode;
   className?: string;
+  divideY?: boolean;
 };
 
-const SectionStack = ({ children, className }: SectionStackProps) => {
+const SectionStack = ({ children, className, divideY }: SectionStackProps) => {
   const sections = Children.toArray(children);
 
   const enhancedSections = sections.map((child, index) => {
@@ -30,6 +31,7 @@ const SectionStack = ({ children, className }: SectionStackProps) => {
     return cloneElement(child, {
       compactTop: previousTheme === theme && index > 0,
       compactBottom: nextTheme === theme && index < sections.length - 1,
+      divider: divideY && index < sections.length - 1,
     });
   });
 

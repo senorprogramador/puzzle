@@ -1,0 +1,31 @@
+.puzzle-drawer {
+    position: fixed;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 40;
+    padding: var(--puzzle-space-6, 1.5rem);
+}
+.puzzle-drawer--left {
+    top: 0;
+    left: 0;
+    height: 100%;
+    max-width: calc(100% - 40px);
+}
+.puzzle-drawer--right {
+    top: 0;
+    right: 0;
+    height: 100%;
+    max-width: calc(100% - 40px);
+}
+.puzzle-drawer--top {
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-height: calc(100% - 40px);
+}
+.puzzle-drawer--bottom {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: calc(100% - 40px);
+}

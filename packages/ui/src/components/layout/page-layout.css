@@ -1,0 +1,133 @@
+.puzzle-page-layout {
+    display: flex;
+    flex-direction: column;
+
+    min-height: var(--puzzle-page-min-height, 100vh);
+    min-height: var(--puzzle-page-min-height, 100svh);
+
+    box-sizing: border-box;
+}
+
+.puzzle-page-layout__header,
+.puzzle-page-layout__footer {
+    display: flex;
+    flex: 0 0 auto;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.puzzle-page-layout__content {
+    display: grid;
+
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "main";
+
+    gap: var(--puzzle-page-gap, 0);
+    row-gap: var(--puzzle-page-row-gap, var(--puzzle-page-gap, 0));
+    column-gap: var(--puzzle-page-column-gap, var(--puzzle-page-gap, 0));
+
+    width: 100%;
+
+    flex: 1 0 auto;
+    align-content: start;
+    box-sizing: border-box;
+}
+
+.puzzle-page-layout__main {
+    grid-area: main;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.puzzle-page-layout__sidebar {
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.puzzle-page-layout__sidebar--left {
+    grid-area: left;
+}
+
+.puzzle-page-layout__sidebar--right {
+    grid-area: right;
+}
+
+/* Mobile: main content precedes supplementary sidebars. */
+
+.puzzle-page-layout[data-layout="left-main"] .puzzle-page-layout__content {
+    grid-template-areas:
+        "main"
+        "left";
+}
+
+.puzzle-page-layout[data-layout="main-right"] .puzzle-page-layout__content {
+    grid-template-areas:
+        "main"
+        "right";
+}
+
+.puzzle-page-layout[data-layout="left-main-right"] .puzzle-page-layout__content {
+    grid-template-areas:
+        "main"
+        "left"
+        "right";
+}
+
+/* Desktop: sidebars sit beside the main content. */
+
+@media (min-width: 64rem) {
+    .puzzle-page-layout[data-layout="left-main"] .puzzle-page-layout__content {
+        grid-template-columns:
+            minmax(0, var(--puzzle-page-left-width, 16rem))
+            minmax(0, 1fr);
+
+        grid-template-areas: "left main";
+    }
+
+    .puzzle-page-layout[data-layout="main-right"] .puzzle-page-layout__content {
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, var(--puzzle-page-right-width, 16rem));
+
+        grid-template-areas: "main right";
+    }
+
+    .puzzle-page-layout[data-layout="left-main-right"] .puzzle-page-layout__content {
+        grid-template-columns:
+            minmax(0, var(--puzzle-page-left-width, 16rem))
+            minmax(0, 1fr)
+            minmax(0, var(--puzzle-page-right-width, 16rem));
+
+        grid-template-areas: "left main right";
+    }
+}
+
+/* Accessible skip link: hidden visually until keyboard focus. */
+
+.puzzle-page-layout__skip-link {
+    position: absolute;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+
+    transform: translateY(-150%);
+    padding: 0.75rem 1rem;
+    margin: 0.5rem;
+
+    color: var(--puzzle-color-text, #111);
+    background: var(--puzzle-color-background, #fff);
+    border: 2px solid currentColor;
+    border-radius: 0.25rem;
+
+    font: inherit;
+    text-decoration: none;
+}
+
+.puzzle-page-layout__skip-link:focus {
+    transform: translateY(0);
+}
+
+.puzzle-page-layout__skip-link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}

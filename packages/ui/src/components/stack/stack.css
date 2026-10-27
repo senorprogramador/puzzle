@@ -1,0 +1,352 @@
+.puzzle-stack {
+    display: flex;
+    gap: var(--puzzle-space-4, 1rem);
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+/* Wrapping */
+.puzzle-stack.nowrap {
+    flex-wrap: nowrap;
+}
+.puzzle-stack.wrap {
+    flex-wrap: wrap;
+}
+.puzzle-stack.wrap-reverse {
+    flex-wrap: wrap-reverse;
+}
+
+/* Gap sizes */
+.puzzle-stack.gap-0 {
+    gap: 0;
+}
+.puzzle-stack.gap-xs {
+    gap: var(--puzzle-space-1, 0.25rem);
+}
+.puzzle-stack.gap-sm {
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+.puzzle-stack.gap-md {
+    gap: var(--puzzle-space-3, 0.75rem);
+}
+.puzzle-stack.gap-lg {
+    gap: var(--puzzle-space-4, 1rem);
+}
+.puzzle-stack.gap-xl {
+    gap: var(--puzzle-space-5, 1.25rem);
+}
+
+/* Mobile: default direction */
+.puzzle-stack.direction-mobile-row {
+    flex-direction: row;
+}
+
+.puzzle-stack.direction-mobile-row.reverse {
+    flex-direction: row-reverse;
+}
+
+.puzzle-stack.direction-mobile-col {
+    flex-direction: column;
+}
+
+.puzzle-stack.direction-mobile-col.reverse {
+    flex-direction: column-reverse;
+}
+
+/* Mobile: main-axis alignment */
+.puzzle-stack.direction-mobile-row.align-h-start,
+.puzzle-stack.direction-mobile-col.align-v-start {
+    justify-content: flex-start;
+}
+
+.puzzle-stack.direction-mobile-row.align-h-center,
+.puzzle-stack.direction-mobile-col.align-v-center {
+    justify-content: center;
+}
+
+.puzzle-stack.direction-mobile-row.align-h-end,
+.puzzle-stack.direction-mobile-col.align-v-end {
+    justify-content: flex-end;
+}
+
+.puzzle-stack.direction-mobile-row.align-h-stretch,
+.puzzle-stack.direction-mobile-col.align-v-stretch {
+    justify-content: stretch;
+}
+
+.puzzle-stack.direction-mobile-row.align-h-around,
+.puzzle-stack.direction-mobile-col.align-v-around {
+    justify-content: space-around;
+}
+
+.puzzle-stack.direction-mobile-row.align-h-between,
+.puzzle-stack.direction-mobile-col.align-v-between {
+    justify-content: space-between;
+}
+
+.puzzle-stack.direction-mobile-row.align-h-evenly,
+.puzzle-stack.direction-mobile-col.align-v-evenly {
+    justify-content: space-evenly;
+}
+
+/* Mobile: cross-axis alignment */
+.puzzle-stack.direction-mobile-row.align-v-start,
+.puzzle-stack.direction-mobile-col.align-h-start {
+    align-items: flex-start;
+}
+
+.puzzle-stack.direction-mobile-row.align-v-center,
+.puzzle-stack.direction-mobile-col.align-h-center {
+    align-items: center;
+}
+
+.puzzle-stack.direction-mobile-row.align-v-end,
+.puzzle-stack.direction-mobile-col.align-h-end {
+    align-items: flex-end;
+}
+
+.puzzle-stack.direction-mobile-row.align-v-stretch,
+.puzzle-stack.direction-mobile-col.align-h-stretch {
+    align-items: stretch;
+}
+
+/* Tablet: min-width 768px */
+@media (min-width: 768px) {
+    .puzzle-stack.direction-tablet-row {
+        flex-direction: row;
+    }
+
+    .puzzle-stack.direction-tablet-row.reverse {
+        flex-direction: row-reverse;
+    }
+
+    .puzzle-stack.direction-tablet-col {
+        flex-direction: column;
+    }
+
+    .puzzle-stack.direction-tablet-col.reverse {
+        flex-direction: column-reverse;
+    }
+
+    /* Reset alignment from the previous breakpoint */
+    .puzzle-stack.direction-tablet-row.has-alignment,
+    .puzzle-stack.direction-tablet-col.has-alignment {
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-h-start,
+    .puzzle-stack.direction-tablet-col.align-v-start {
+        justify-content: flex-start;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-h-center,
+    .puzzle-stack.direction-tablet-col.align-v-center {
+        justify-content: center;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-h-end,
+    .puzzle-stack.direction-tablet-col.align-v-end {
+        justify-content: flex-end;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-h-stretch,
+    .puzzle-stack.direction-tablet-col.align-v-stretch {
+        justify-content: stretch;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-h-around,
+    .puzzle-stack.direction-tablet-col.align-v-around {
+        justify-content: space-around;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-h-between,
+    .puzzle-stack.direction-tablet-col.align-v-between {
+        justify-content: space-between;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-h-evenly,
+    .puzzle-stack.direction-tablet-col.align-v-evenly {
+        justify-content: space-evenly;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-v-start,
+    .puzzle-stack.direction-tablet-col.align-h-start {
+        align-items: flex-start;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-v-center,
+    .puzzle-stack.direction-tablet-col.align-h-center {
+        align-items: center;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-v-end,
+    .puzzle-stack.direction-tablet-col.align-h-end {
+        align-items: flex-end;
+    }
+
+    .puzzle-stack.direction-tablet-row.align-v-stretch,
+    .puzzle-stack.direction-tablet-col.align-h-stretch {
+        align-items: stretch;
+    }
+}
+
+/* Desktop: min-width 1024px */
+@media (min-width: 1024px) {
+    .puzzle-stack.direction-desktop-row {
+        flex-direction: row;
+    }
+
+    .puzzle-stack.direction-desktop-row.reverse {
+        flex-direction: row-reverse;
+    }
+
+    .puzzle-stack.direction-desktop-col {
+        flex-direction: column;
+    }
+
+    .puzzle-stack.direction-desktop-col.reverse {
+        flex-direction: column-reverse;
+    }
+
+    .puzzle-stack.direction-desktop-row.has-alignment,
+    .puzzle-stack.direction-desktop-col.has-alignment {
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-h-start,
+    .puzzle-stack.direction-desktop-col.align-v-start {
+        justify-content: flex-start;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-h-center,
+    .puzzle-stack.direction-desktop-col.align-v-center {
+        justify-content: center;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-h-end,
+    .puzzle-stack.direction-desktop-col.align-v-end {
+        justify-content: flex-end;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-h-stretch,
+    .puzzle-stack.direction-desktop-col.align-v-stretch {
+        justify-content: stretch;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-h-around,
+    .puzzle-stack.direction-desktop-col.align-v-around {
+        justify-content: space-around;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-h-between,
+    .puzzle-stack.direction-desktop-col.align-v-between {
+        justify-content: space-between;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-h-evenly,
+    .puzzle-stack.direction-desktop-col.align-v-evenly {
+        justify-content: space-evenly;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-v-start,
+    .puzzle-stack.direction-desktop-col.align-h-start {
+        align-items: flex-start;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-v-center,
+    .puzzle-stack.direction-desktop-col.align-h-center {
+        align-items: center;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-v-end,
+    .puzzle-stack.direction-desktop-col.align-h-end {
+        align-items: flex-end;
+    }
+
+    .puzzle-stack.direction-desktop-row.align-v-stretch,
+    .puzzle-stack.direction-desktop-col.align-h-stretch {
+        align-items: stretch;
+    }
+}
+
+/* HD: min-width 1440px */
+@media (min-width: 1440px) {
+    .puzzle-stack.direction-hd-row {
+        flex-direction: row;
+    }
+
+    .puzzle-stack.direction-hd-row.reverse {
+        flex-direction: row-reverse;
+    }
+
+    .puzzle-stack.direction-hd-col {
+        flex-direction: column;
+    }
+
+    .puzzle-stack.direction-hd-col.reverse {
+        flex-direction: column-reverse;
+    }
+
+    .puzzle-stack.direction-hd-row.has-alignment,
+    .puzzle-stack.direction-hd-col.has-alignment {
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+
+    .puzzle-stack.direction-hd-row.align-h-start,
+    .puzzle-stack.direction-hd-col.align-v-start {
+        justify-content: flex-start;
+    }
+
+    .puzzle-stack.direction-hd-row.align-h-center,
+    .puzzle-stack.direction-hd-col.align-v-center {
+        justify-content: center;
+    }
+
+    .puzzle-stack.direction-hd-row.align-h-end,
+    .puzzle-stack.direction-hd-col.align-v-end {
+        justify-content: flex-end;
+    }
+
+    .puzzle-stack.direction-hd-row.align-h-stretch,
+    .puzzle-stack.direction-hd-col.align-v-stretch {
+        justify-content: stretch;
+    }
+
+    .puzzle-stack.direction-hd-row.align-h-around,
+    .puzzle-stack.direction-hd-col.align-v-around {
+        justify-content: space-around;
+    }
+
+    .puzzle-stack.direction-hd-row.align-h-between,
+    .puzzle-stack.direction-hd-col.align-v-between {
+        justify-content: space-between;
+    }
+
+    .puzzle-stack.direction-hd-row.align-h-evenly,
+    .puzzle-stack.direction-hd-col.align-v-evenly {
+        justify-content: space-evenly;
+    }
+
+    .puzzle-stack.direction-hd-row.align-v-start,
+    .puzzle-stack.direction-hd-col.align-h-start {
+        align-items: flex-start;
+    }
+
+    .puzzle-stack.direction-hd-row.align-v-center,
+    .puzzle-stack.direction-hd-col.align-h-center {
+        align-items: center;
+    }
+
+    .puzzle-stack.direction-hd-row.align-v-end,
+    .puzzle-stack.direction-hd-col.align-h-end {
+        align-items: flex-end;
+    }
+
+    .puzzle-stack.direction-hd-row.align-v-stretch,
+    .puzzle-stack.direction-hd-col.align-h-stretch {
+        align-items: stretch;
+    }
+}

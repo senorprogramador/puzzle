@@ -1,0 +1,40 @@
+.puzzle-paper {
+    background: var(--puzzle-color-surface);
+    border-radius: 4px;
+}
+
+.puzzle-paper.elevation-1 {
+    box-shadow: var(--puzzle-elevation-1);
+}
+
+.puzzle-paper.elevation-2 {
+    box-shadow: var(--puzzle-elevation-2);
+}
+
+.puzzle-paper.elevation-3 {
+    box-shadow: var(--puzzle-elevation-3);
+}
+
+.puzzle-paper.elevation-4 {
+    box-shadow: var(--puzzle-elevation-4);
+}
+
+.puzzle-paper.elevation-6 {
+    box-shadow: var(--puzzle-elevation-6);
+}
+
+.puzzle-paper.elevation-8 {
+    box-shadow: var(--puzzle-elevation-8);
+}
+
+.puzzle-paper.elevation-12 {
+    box-shadow: var(--puzzle-elevation-12);
+}
+
+.puzzle-paper.elevation-16 {
+    box-shadow: var(--puzzle-elevation-16);
+}
+
+.puzzle-paper.elevation-24 {
+    box-shadow: var(--puzzle-elevation-24);
+}

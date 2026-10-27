@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@puzzle/core": "workspace:*",
+    "@puzzle/hooks": "workspace:*",
     "@puzzle/theme": "workspace:*"
   },
   "peerDependencies": {

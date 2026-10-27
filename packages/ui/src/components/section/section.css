@@ -5,18 +5,23 @@
 }
 
 .puzzle-section {
-    --section-padding-y: var(--spacing-section, 4rem);
+    --section-padding-y: var(--puzzle-container-gutter, clamp(1rem, 3vw, 3rem));
     --section-background: inherit;
     --section-color: inherit;
 
     box-sizing: border-box;
     width: 100%;
-    min-width: 0;
 
     padding-block: var(--section-padding-y);
 
     background-color: var(--section-background);
     color: var(--section-color);
+}
+
+.puzzle-section--divider {
+    border: none;
+    border-top: 1px solid var(--puzzle-color-text, #171717);
+    margin-top: var(--section-padding-y);
 }
 
 /* Compacte overgang tussen twee sections met dezelfde theme. */
@@ -37,16 +42,19 @@
     --section-background: var(--puzzle-color-background, #f7f4ea);
     --section-color: var(--puzzle-color-text, #171717);
 }
+.puzzle-section[data-theme="normal"] .puzzle-section--divider {
+    border-top-color: var(--puzzle-color-text);
+}
 
 /* Voorbeeldthemes: koppel deze aan je eigen Puzzle theme tokens. */
 .puzzle-section[data-theme="light"] {
     --section-background: var(--puzzle-color-surface, #f7f4ef);
-    --section-color: var(--color-text, #1f1c19);
+    --section-color: var(--puzzle-color-text, #1f1c19);
 }
 
 .puzzle-section[data-theme="dark"] {
     --section-background: var(--puzzle-color-surface-inverse, #1f1c19);
-    --section-color: var(--color-text-inverse, #f7f4ef);
+    --section-color: var(--puzzle-color-text-inverse, #f7f4ef);
 }
 
 .puzzle-section[data-theme="primary"] {

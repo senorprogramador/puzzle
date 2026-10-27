@@ -1,4 +1,4 @@
-import { ThemeTokens } from "./types";
+import type { ThemeTokens } from "./types";
 
 export const GENERIC_FAMILIES = new Set([
   "serif",

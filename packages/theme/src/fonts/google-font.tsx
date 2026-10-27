@@ -3,7 +3,7 @@ import {
   resolveThemeTokens,
 } from "../create-theme-variables";
 import { resolveFontStylesheets } from "./resolve-font-stylesheets";
-import { FontConfig } from "./types";
+import type { FontConfig } from "./types";
 
 /** Standalone font loader; Theme is recommended when you want the full token system. */
 const GoogleFont = ({

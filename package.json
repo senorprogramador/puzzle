@@ -2,6 +2,7 @@
   "name": "puzzle",
   "private": true,
   "scripts": {
+    "site": "bun run --filter '@puzzle/site' dev",
     "dev": "bun run --filter '@puzzle/playground' dev",
     "build": "bun run --filter './packages/*' build",
     "test": "bun run --filter './packages/*' test",
@@ -9,6 +10,7 @@
   },
   "workspaces": [
     "apps/playground",
+    "apps/site",
     "packages/*"
   ],
   "devDependencies": {

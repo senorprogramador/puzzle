@@ -1,12 +1,12 @@
 import {
   assertSafeCssValue,
-  DeepPartial,
+  type DeepPartial,
   stringWithCasing,
 } from "@puzzle/core";
-import { ThemeFonts } from "./fonts";
+import type { ThemeFonts } from "./fonts";
 import { resolveFontConfig } from "./fonts/resolve-font-config";
 import { DEFAULT_FONT_FALLBACKS } from "./fonts/constants";
-import { ThemeTokens } from "./types";
+import type { ThemeTokens } from "./types";
 import { DEFAULT_TOKENS, GENERIC_FAMILIES } from "./constants";
 import { createFluidFontSize, typographyDefaults } from "./fonts/typography";
 

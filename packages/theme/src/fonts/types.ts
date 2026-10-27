@@ -1,4 +1,4 @@
-import { GoogleFontFamily } from "./google-font-familiy";
+import type { GoogleFontFamily } from "./google-font-familiy";
 
 export type FontRole = "heading" | "body" | "accent";
 export type FontStyle = "normal" | "italic";

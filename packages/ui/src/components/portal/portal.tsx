@@ -8,12 +8,13 @@ type PortalProps = PropsWithChildren<{
 }>;
 
 const Portal = ({ targetId, children }: PortalProps) => {
-  return createPortal(
-    children,
-    targetId
-      ? document.getElementById(targetId) || document.body
-      : document.body,
-  );
+  if (typeof document === "undefined") {
+    return children;
+  }
+  const target = targetId
+    ? document.getElementById(targetId) || document.body
+    : document.body;
+  return children ? createPortal(children, target) : null;
 };
 
 export { Portal, type PortalProps };

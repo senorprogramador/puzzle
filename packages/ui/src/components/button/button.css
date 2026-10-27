@@ -84,6 +84,13 @@
     background: var(--puzzle-color-surface-muted, #f0ede7);
 }
 
+@media (prefers-color-scheme: dark) {
+    :root:not(:has(style[data-theme="light"])) .puzzle-button--ghost:hover:not(:disabled):not([aria-disabled="true"]) {
+        background: var(--puzzle-color-surface-muted, #1f1f1f);
+        color: var(--puzzle-color-text, #ffffff);
+    }
+}
+
 .puzzle-button--danger {
     color: var(--puzzle-button-danger-fg, #ffffff);
     background: var(--puzzle-button-danger-bg, var(--puzzle-color-danger, #b23a3a));

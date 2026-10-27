@@ -1,14 +1,19 @@
 "use client";
 
 import { cn } from "@puzzle/core";
-import { type ComponentPropsWithRef, type ElementType } from "react";
+import {
+  type ComponentPropsWithRef,
+  type ElementType,
+  type MouseEvent,
+  type KeyboardEvent,
+} from "react";
 import "./backdrop.css";
 import { Transition } from "../transition/transition";
 
 type BackdropOwnProps<C extends ElementType> = {
   as?: C;
   open?: boolean;
-  onClick?: () => void;
+  onClose?: (e: MouseEvent<HTMLElement> | KeyboardEvent) => void;
 };
 
 type BackdropProps<C extends ElementType = "div"> = BackdropOwnProps<C> &
@@ -17,7 +22,7 @@ type BackdropProps<C extends ElementType = "div"> = BackdropOwnProps<C> &
 const Backdrop = <C extends ElementType = "div">({
   as,
   open = true,
-  onClick,
+  onClose,
   className,
   children,
   ...props
@@ -27,7 +32,22 @@ const Backdrop = <C extends ElementType = "div">({
 
   return (
     <Transition visible={open} template="fade">
-      <Component className={classes} {...props} onClick={onClick}>
+      <Component
+        className={classes}
+        {...props}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            e.stopPropagation();
+            onClose?.(e);
+          }
+        }}
+        onKeyUp={(e) => {
+          if (e.key === "Escape") {
+            e.stopPropagation();
+            onClose?.(e);
+          }
+        }}
+      >
         {children}
       </Component>
     </Transition>

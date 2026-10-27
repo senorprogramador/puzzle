@@ -35,6 +35,7 @@ export { Backdrop, type BackdropProps } from "./components/backdrop/backdrop";
 export {
   Transition,
   type TransitionProps,
+  type TransitionPhase,
 } from "./components/transition/transition";
 
 export {
@@ -47,3 +48,13 @@ export {
   PortalTarget,
   type PortalTargetProps,
 } from "./components/portal/portal-target";
+
+export {
+  PageLayout,
+  type PageLayoutProps,
+} from "./components/layout/page-layout";
+
+export { Stack, type StackProps } from "./components/stack/stack";
+export { Paper, type PaperProps } from "./components/paper/paper";
+export { Dialog, type DialogProps } from "./components/dialog/dialog";
+export { Drawer, type DrawerProps } from "./components/drawer/drawer";

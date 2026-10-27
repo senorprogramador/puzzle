@@ -1,5 +1,5 @@
 import { DEFAULT_FONT_FALLBACKS } from "./constants";
-import { FontConfig } from "./types";
+import type { FontConfig } from "./types";
 
 const validateFamilyName = (value: string) => {
   const family = value.trim();

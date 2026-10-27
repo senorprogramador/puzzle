@@ -27,6 +27,12 @@
             ],
             "@puzzle/theme/*": [
                 "../theme/src/*"
+            ],
+            "@puzzle/hooks": [
+                "../hooks/src/index.ts"
+            ],
+            "@puzzle/hooks/*": [
+                "../hooks/src/*"
             ]
         }
     },
