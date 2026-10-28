@@ -58,3 +58,20 @@ export { Stack, type StackProps } from "./components/stack/stack";
 export { Paper, type PaperProps } from "./components/paper/paper";
 export { Dialog, type DialogProps } from "./components/dialog/dialog";
 export { Drawer, type DrawerProps } from "./components/drawer/drawer";
+
+export {
+  Carousel,
+  type CarouselProps,
+  type CarouselAlignment,
+  type CarouselButtonAlignment,
+  type CarouselPagerAlignment,
+  type CarouselAlignmentConfig,
+  type PagerAlignmentConfig,
+} from "./components/carousel/carousel";
+
+export {
+  CarouselController,
+  useCarouselContext,
+  type CarouselContextValue,
+  type CarouselControllerProps,
+} from "./components/carousel/carousel-controller";
