@@ -36,7 +36,7 @@ const DialogSection = ({}: DialogSectionProps) => {
         <Drawer
           open={isDrawerOpen}
           onOpenChange={setIsDrawerOpen}
-          position="bottom"
+          position="left"
         >
           Drawer Content Can be very long, so we have to limit it's width.
           Puzzle is a modern React UI framework designed to help developers

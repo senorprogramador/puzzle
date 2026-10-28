@@ -16,7 +16,6 @@
 .puzzle-drawer__resize-bar-inner {
     display: block;
     border-radius: var(--puzzle-radius, 4px);
-    background-color: var(--puzzle-color-border-strong, rgba(0, 0, 0, 0.5));
 }
 .puzzle-drawer--top .puzzle-drawer__resize-bar,
 .puzzle-drawer--bottom .puzzle-drawer__resize-bar {
@@ -29,6 +28,7 @@
     height: 4px;
     min-height: 4px;
     width: 100%;
+    background-color: var(--puzzle-color-border-strong, rgba(0, 0, 0, 0.5));
 }
 
 .puzzle-drawer--left .puzzle-drawer__resize-bar,
@@ -36,6 +36,12 @@
     cursor: col-resize;
     height: 100%;
     padding: 0;
+}
+.puzzle-drawer--left .puzzle-drawer__resize-bar {
+    border-right: 2px solid var(--puzzle-color-border-strong, rgba(0, 0, 0, 0.5));
+}
+.puzzle-drawer--right .puzzle-drawer__resize-bar {
+    border-left: 2px solid var(--puzzle-color-border-strong, rgba(0, 0, 0, 0.5));
 }
 .puzzle-drawer--left .puzzle-drawer__resize-bar-inner,
 .puzzle-drawer--right .puzzle-drawer__resize-bar-inner {
