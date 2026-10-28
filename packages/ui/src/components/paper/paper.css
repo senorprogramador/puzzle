@@ -1,6 +1,6 @@
 .puzzle-paper {
-    background: var(--puzzle-color-surface);
-    border-radius: 4px;
+    background: var(--puzzle-color-surface, #ffffff);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
 }
 
 .puzzle-paper.elevation-1 {

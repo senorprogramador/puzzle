@@ -48,6 +48,19 @@ const Drawer = ({
   );
 };
 
+const calculateDimension = (position: DrawerPosition, dimension: number) => {
+  switch (position) {
+    case "left":
+      return `${dimension}px`;
+    case "right":
+      return `${window.innerWidth - dimension}px`;
+    case "top":
+      return `${dimension}px`;
+    case "bottom":
+      return `${window.innerHeight - dimension}px`;
+  }
+};
+
 const DrawerContent = ({
   children,
   className,
@@ -58,47 +71,44 @@ const DrawerContent = ({
 }: DrawerProps) => {
   const classes = cn("puzzle-drawer", `puzzle-drawer--${position}`, className);
 
-  const { dimension, resizeRef } = useResizeBar(
-    ["left", "right"].includes(position) ? "horizontal" : "vertical",
-    open,
-  );
+  const { dimension, resizeRef } = useResizeBar(position, open);
+  const resolvedDimension = dimension
+    ? calculateDimension(position, dimension)
+    : undefined;
 
   useEffect(() => {
-    if ((dimension ?? 0) > window.innerHeight - 100) {
+    if (resolvedDimension !== undefined && parseInt(resolvedDimension) < 100) {
       onOpenChange(false);
     }
-  }, [dimension]);
+  }, [resolvedDimension]);
 
   return (
     <Stack
       {...props}
-      direction="col"
+      direction={["left", "right"].includes(position) ? "row" : "col"}
+      reverse={["top", "left"].includes(position)}
+      gap="0"
       className={classes}
       style={
-        dimension
+        resolvedDimension
           ? {
-              [position === "left" || position === "right"
-                ? "width"
-                : "height"]: `${window.innerHeight - dimension}px`,
+              [["left", "right"].includes(position) ? "width" : "height"]:
+                resolvedDimension,
             }
-          : {}
+          : undefined
       }
     >
       <button
         ref={resizeRef}
-        style={{
-          height: "3px",
-          minHeight: "3px",
-          flexShrink: 0,
-          width: "128px",
-          margin: "0 auto",
-          borderRadius: "2px",
-          backgroundColor: "rgba(0, 0, 0, 0.25)",
-        }}
+        className="puzzle-drawer__resize-bar"
         onMouseDown={(e) => e.stopPropagation()}
-      />
-      <Stack direction="col" className="puzzle-drawer__content">
-        {children}
+      >
+        <span className="puzzle-drawer__resize-bar-inner" />
+      </button>
+      <Stack direction="col" className="puzzle-drawer__content-wrapper">
+        <Stack direction="col" className="puzzle-drawer__content">
+          {children}
+        </Stack>
       </Stack>
     </Stack>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const useResizeBar = (
-  direction: "horizontal" | "vertical",
+  position: "left" | "right" | "top" | "bottom",
   active: boolean,
 ) => {
   const resizeRef = useRef<HTMLButtonElement | null>(null);
@@ -21,19 +21,33 @@ const useResizeBar = (
 
     const handleMouseMove = (e: MouseEvent | TouchEvent) => {
       e.stopPropagation();
-      const elementOffset =
-        direction === "vertical"
-          ? resizeElement.offsetTop
-          : resizeElement.offsetLeft;
-      setDimension(
-        direction === "vertical"
-          ? "touches" in e
-            ? e.touches[0].clientY - offset - elementOffset
-            : e.clientY - offset - elementOffset
-          : "touches" in e
-            ? e.touches[0].clientX - offset - elementOffset
-            : e.clientX - offset - elementOffset,
-      );
+
+      switch (position) {
+        case "top":
+          setDimension(
+            "touches" in e ? e.touches[0].clientY + offset : e.clientY + offset,
+          );
+          break;
+        case "bottom":
+          setDimension(
+            "touches" in e
+              ? e.touches[0].clientY - offset - resizeElement.offsetTop
+              : e.clientY - offset - resizeElement.offsetTop,
+          );
+          break;
+        case "left":
+          setDimension(
+            "touches" in e ? e.touches[0].clientX + offset : e.clientX + offset,
+          );
+          break;
+        case "right":
+          setDimension(
+            "touches" in e
+              ? e.touches[0].clientX - offset - resizeElement.offsetLeft
+              : e.clientX - offset - resizeElement.offsetLeft,
+          );
+          break;
+      }
     };
 
     const handleMouseUp = () => {
@@ -45,18 +59,16 @@ const useResizeBar = (
 
     const handleMouseDown = (e: MouseEvent | TouchEvent) => {
       e.stopPropagation();
-      const elementPosition =
-        direction === "vertical"
-          ? resizeElement.getBoundingClientRect().top
-          : resizeElement.getBoundingClientRect().left;
-      offset =
-        direction === "vertical"
-          ? "touches" in e
-            ? e.touches[0].clientY - elementPosition
-            : e.clientY - elementPosition
-          : "touches" in e
-            ? e.touches[0].clientX - elementPosition
-            : e.clientX - elementPosition;
+      const elementPosition = ["top", "bottom"].includes(position)
+        ? resizeElement.getBoundingClientRect().top
+        : resizeElement.getBoundingClientRect().left;
+      offset = ["top", "bottom"].includes(position)
+        ? "touches" in e
+          ? e.touches[0].clientY - elementPosition
+          : e.clientY - elementPosition
+        : "touches" in e
+          ? e.touches[0].clientX - elementPosition
+          : e.clientX - elementPosition;
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
       document.addEventListener("touchmove", handleMouseMove);
@@ -72,7 +84,7 @@ const useResizeBar = (
       document.body.style.removeProperty("user-select");
       document.body.style.removeProperty("touch-action");
     };
-  }, [direction, resizeRef.current, active]);
+  }, [position, resizeRef.current, active]);
 
   return { dimension, resizeRef };
 };

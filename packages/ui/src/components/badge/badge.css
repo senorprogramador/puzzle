@@ -8,34 +8,40 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
-    font-weight: 400;
-    line-height: 0.8;
+
+    aspect-ratio: 1 / 1;
     padding: 0.25em;
+    border-radius: var(--puzzle-radius-full, 50%);
+
+    font-weight: var(--puzzle-font-weight-normal, 400);
+    line-height: var(--puzzle-font-line-height-none, 1);
     text-align: center;
     vertical-align: middle;
-    aspect-ratio: 1 / 1;
 }
 
 .puzzle-badge-primary > span {
-    background-color: var(--puzzle-color-primary, #2563eb);
-    color: var(--puzzle-color-primary-foreground, #ffffff);
+    background-color: var(--puzzle-color-primary);
+    color: var(--puzzle-color-primary-foreground);
 }
+
 .puzzle-badge-secondary > span {
-    background-color: var(--puzzle-color-secondary, #64748b);
-    color: var(--puzzle-color-secondary-foreground, #ffffff);
+    background-color: var(--puzzle-color-secondary);
+    color: var(--puzzle-color-secondary-foreground);
 }
+
 .puzzle-badge-accent > span {
-    background-color: var(--puzzle-color-accent, #7c3aed);
-    color: var(--puzzle-color-accent-foreground, #ffffff);
+    background-color: var(--puzzle-color-accent);
+    color: var(--puzzle-color-accent-foreground);
 }
+
 .puzzle-badge-danger > span {
-    background-color: var(--puzzle-color-danger, #b91c1c);
-    color: var(--puzzle-color-danger-foreground, #ffffff);
+    background-color: var(--puzzle-color-danger);
+    color: var(--puzzle-color-danger-foreground);
 }
+
 .puzzle-badge-info > span {
-    background-color: var(--puzzle-color-info, #0369a1);
-    color: var(--puzzle-color-info-foreground, #ffffff);
+    background-color: var(--puzzle-color-info);
+    color: var(--puzzle-color-info-foreground);
 }
 
 .puzzle-badge.rectangular.top.left > span {
@@ -43,16 +49,19 @@
     left: 0;
     transform: translate(-50%, -50%);
 }
+
 .puzzle-badge.rectangular.bottom.left > span {
     bottom: 0;
     left: 0;
     transform: translate(-50%, 50%);
 }
+
 .puzzle-badge.rectangular.top.right > span {
     top: 0;
     right: 0;
     transform: translate(50%, -50%);
 }
+
 .puzzle-badge.rectangular.bottom.right > span {
     bottom: 0;
     right: 0;
@@ -64,6 +73,7 @@
     left: calc(50% + cos(135deg) * 50%);
     transform: translate(-50%, -50%);
 }
+
 .puzzle-badge.circular.top.right > span {
     top: calc(50% - sin(45deg) * 50%);
     left: calc(50% + cos(45deg) * 50%);

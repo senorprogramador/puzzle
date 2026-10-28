@@ -3,10 +3,14 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background-color: var(--puzzle-color-secondary, #555);
-    border: 2px solid var(--puzzle-border-color, #e0e0e0);
-    color: var(--puzzle-color-secondary-foreground, #ffffff);
-    font-weight: bold;
+
+    background-color: var(--puzzle-color-secondary);
+    border: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-full, 50%);
+
+    color: var(--puzzle-color-secondary-foreground);
+    font-weight: var(--puzzle-font-weight-bold, 700);
+
     container-type: inline-size;
 }
 
@@ -15,13 +19,13 @@
 }
 
 .puzzle-avatar-circle {
-    border-radius: 50%;
+    border-radius: var(--puzzle-radius-full, 9999px);
 }
 
 .puzzle-avatar-initials {
     font-size: clamp(0.8rem, 32cqw, 4rem);
-    font-weight: 700;
-    line-height: 1;
+    font-weight: var(--puzzle-font-weight-bold, 700);
+    line-height: var(--puzzle-font-line-height-none, 1);
     font-synthesis: none;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;

@@ -1,10 +1,12 @@
 .puzzle-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 30;
+
+    z-index: var(--puzzle-z-index-overlay, 1200);
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(2px);
+
+    background-color: var(--puzzle-overlay-backdrop, rgb(0 0 0 / 0.35));
+    backdrop-filter: blur(var(--puzzle-overlay-backdrop-blur, 2px));
 }

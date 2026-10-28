@@ -4,15 +4,16 @@
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    gap: var(--puzzle-button-gap, 0.5rem);
+    gap: var(--puzzle-button-gap, var(--puzzle-space-2, 0.5rem));
 
     border: 1px solid transparent;
     border-radius: var(--puzzle-radius-md, 0.5rem);
 
-    font-family: var(--puzzle-font-body, inherit);
-    font-size: 0.875rem;
-    font-weight: 600;
-    line-height: 1.2;
+    font-family: var(--puzzle-font-family-button, inherit);
+    font-size: var(--puzzle-font-size-button, 0.875rem);
+    font-weight: var(--puzzle-font-weight-button, 600);
+    line-height: var(--puzzle-font-line-height-button, 1.2);
+    letter-spacing: var(--puzzle-font-letter-spacing-button, 0);
     text-decoration: none;
     white-space: nowrap;
 
@@ -21,16 +22,16 @@
     touch-action: manipulation;
 
     transition:
-        background-color 150ms ease,
-        border-color 150ms ease,
-        color 150ms ease,
-        box-shadow 150ms ease,
-        filter 150ms ease;
+        background-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        box-shadow var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        filter var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
 }
 
 /* Accessibility */
 .puzzle-button:focus-visible {
-    outline: 2px solid var(--puzzle-color-focus, var(--puzzle-color-primary, #b38200));
+    outline: 2px solid var(--puzzle-color-ring);
     outline-offset: 2px;
 }
 
@@ -46,10 +47,9 @@
 }
 
 /* Variants */
-
 .puzzle-button--primary {
-    color: var(--puzzle-button-primary-fg, #ffffff);
-    background: var(--puzzle-button-primary-bg, var(--puzzle-color-primary, #b38200));
+    color: var(--puzzle-color-primary-foreground);
+    background: var(--puzzle-color-primary);
 }
 
 .puzzle-button--primary:hover:not(:disabled):not([aria-disabled="true"]) {
@@ -57,8 +57,8 @@
 }
 
 .puzzle-button--secondary {
-    color: var(--puzzle-color-text, #111518);
-    background: var(--puzzle-button-secondary-bg, #f0ede7);
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface-sunken);
 }
 
 .puzzle-button--secondary:hover:not(:disabled):not([aria-disabled="true"]) {
@@ -66,34 +66,27 @@
 }
 
 .puzzle-button--outline {
-    color: var(--puzzle-color-text, #111518);
+    color: var(--puzzle-color-text);
     background: transparent;
-    border-color: var(--puzzle-color-border, #d1d5db);
+    border-color: var(--puzzle-color-border);
 }
 
 .puzzle-button--outline:hover:not(:disabled):not([aria-disabled="true"]) {
-    background: var(--puzzle-color-surface-muted, #f0ede7);
+    background: var(--puzzle-color-surface-sunken);
 }
 
 .puzzle-button--ghost {
-    color: var(--puzzle-color-text, #111518);
+    color: var(--puzzle-color-text);
     background: transparent;
 }
 
 .puzzle-button--ghost:hover:not(:disabled):not([aria-disabled="true"]) {
-    background: var(--puzzle-color-surface-muted, #f0ede7);
-}
-
-@media (prefers-color-scheme: dark) {
-    :root:not(:has(style[data-theme="light"])) .puzzle-button--ghost:hover:not(:disabled):not([aria-disabled="true"]) {
-        background: var(--puzzle-color-surface-muted, #1f1f1f);
-        color: var(--puzzle-color-text, #ffffff);
-    }
+    background: var(--puzzle-color-surface-sunken);
 }
 
 .puzzle-button--danger {
-    color: var(--puzzle-button-danger-fg, #ffffff);
-    background: var(--puzzle-button-danger-bg, var(--puzzle-color-danger, #b23a3a));
+    color: var(--puzzle-color-danger-foreground);
+    background: var(--puzzle-color-danger);
 }
 
 .puzzle-button--danger:hover:not(:disabled):not([aria-disabled="true"]) {
@@ -105,7 +98,7 @@
     padding-inline: 0;
     border-color: transparent;
     border-radius: 0;
-    color: var(--puzzle-color-primary, #b38200);
+    color: var(--puzzle-color-primary);
     background: transparent;
     text-decoration: underline;
     text-underline-offset: 0.2em;
@@ -116,9 +109,9 @@
 }
 
 .puzzle-button--toggle {
-    color: var(--puzzle-color-text, #111518);
+    color: var(--puzzle-color-text);
     background: transparent;
-    border: 1px solid var(--puzzle-color-border, #d1d5db);
+    border: 1px solid var(--puzzle-color-border);
 }
 
 .puzzle-button--toggle:hover:not(:disabled):not([aria-disabled="true"]) {
@@ -126,35 +119,34 @@
 }
 
 .puzzle-button--toggle-active {
-    color: var(--puzzle-color-primary, #b38200);
-    background-color: color-mix(in srgb, var(--puzzle-color-primary, #b38200), transparent 90%);
-    border: 1px solid var(--puzzle-color-border, #d1d5db);
+    color: var(--puzzle-color-primary);
+    background-color: color-mix(in srgb, var(--puzzle-color-primary), transparent 90%);
+    border: 1px solid var(--puzzle-color-border);
 }
 
 /* Sizes */
-
 .puzzle-button--xs {
     min-height: 1.75rem;
-    padding-inline: 0.5rem;
-    font-size: 0.75rem;
+    padding-inline: var(--puzzle-space-2, 0.5rem);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
 }
 
 .puzzle-button--sm {
     min-height: 2rem;
-    padding-inline: 0.75rem;
-    font-size: 0.8125rem;
+    padding-inline: var(--puzzle-space-3, 0.75rem);
+    font-size: var(--puzzle-font-size-sm, 0.8125rem);
 }
 
 .puzzle-button--md {
     min-height: 2.5rem;
-    padding-inline: 1rem;
-    font-size: 0.875rem;
+    padding-inline: var(--puzzle-space-4, 1rem);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
 }
 
 .puzzle-button--lg {
     min-height: 3rem;
-    padding-inline: 1.25rem;
-    font-size: 1rem;
+    padding-inline: var(--puzzle-space-5, 1.25rem);
+    font-size: var(--puzzle-font-size-base, 1rem);
 }
 
 .puzzle-button--icon {
@@ -166,7 +158,6 @@
 }
 
 /* Layout */
-
 .puzzle-button--full-width {
     display: flex;
     width: 100%;
@@ -183,7 +174,6 @@
 }
 
 .puzzle-button__content {
-    /* Preserve normal text wrapping rules at the component level. */
     flex: 0 1 auto;
 }
 
@@ -194,7 +184,6 @@
 }
 
 /* Loading indicator */
-
 .puzzle-button__spinner svg {
     display: block;
     width: 1em;

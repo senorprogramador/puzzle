@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import type { FontRole, FontConfig } from "./fonts";
-import type { ThemeTokens } from "./types";
+import type { ThemeMode, ThemeTokenOverrides } from "./types";
 import { resolveFontStylesheets } from "./fonts/resolve-font-stylesheets";
 import { createThemeVariables } from "./create-theme-variables";
 import { createThemeCss } from "./create-theme-css";
@@ -9,9 +9,14 @@ import "./theme.css";
 type ThemeProps = {
   /** Nonce for the generated style element when using a strict CSP. */
   nonce?: string;
-  theme?: "light" | "dark" | "system";
+
+  /** Active color scheme. */
+  theme?: ThemeMode;
+
   fonts?: Partial<Record<FontRole, FontConfig>>;
-  tokens?: Partial<ThemeTokens>;
+
+  /** Deeply partial overrides of the default design tokens. */
+  tokens?: ThemeTokenOverrides;
 };
 
 const Theme = ({

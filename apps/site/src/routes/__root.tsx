@@ -6,6 +6,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import appCss from "../styles/app.css?url";
+import { Theme } from "@puzzle/theme";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -73,7 +74,25 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html>
       <head>
-        <HeadContent />
+        <Theme
+          theme="light"
+          fonts={{
+            heading: {
+              family: "Geist",
+              weights: [600, 700],
+            },
+            body: {
+              family: "Inter",
+              weights: [400, 600],
+            },
+            accent: {
+              family: "Geist",
+              weights: [400, 500],
+            },
+          }}
+        >
+          <HeadContent />
+        </Theme>
       </head>
       <body>
         {children}

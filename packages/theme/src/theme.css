@@ -1,169 +1,244 @@
+/* Box model */
 *,
 *::before,
 *::after {
     box-sizing: border-box;
 }
 
+/* Layout defaults and light-scheme semantic aliases */
 :root {
+    color-scheme: light;
+
     --puzzle-container-gutter: clamp(1rem, 3vw, 3rem);
     --puzzle-container-max-width: 105ch;
+
     --puzzle-breakpoint-tablet: 768px;
     --puzzle-breakpoint-desktop: 1024px;
     --puzzle-breakpoint-hd: 1440px;
+
+    --puzzle-color-background: var(--puzzle-color-scheme-light-background, #f7f4ea);
+    --puzzle-color-surface: var(--puzzle-color-scheme-light-surface, #ffffff);
+    --puzzle-color-surface-elevated: var(--puzzle-color-scheme-light-surface-elevated, #ffffff);
+    --puzzle-color-surface-sunken: var(--puzzle-color-scheme-light-surface-sunken, #f1eee6);
+
+    --puzzle-color-text: var(--puzzle-color-scheme-light-text, #171717);
+    --puzzle-color-text-muted: var(--puzzle-color-scheme-light-text-muted, #666666);
+    --puzzle-color-text-subtle: var(--puzzle-color-scheme-light-text-subtle, #737373);
+
+    --puzzle-color-border: var(--puzzle-color-scheme-light-border, #e5e0d6);
+    --puzzle-color-border-strong: var(--puzzle-color-scheme-light-border-strong, #c9c2b6);
+
+    --puzzle-color-primary: var(--puzzle-color-scheme-light-primary, #2563eb);
+    --puzzle-color-primary-foreground: var(--puzzle-color-scheme-light-primary-foreground, #ffffff);
+
+    --puzzle-color-secondary: var(--puzzle-color-scheme-light-secondary, #64748b);
+    --puzzle-color-secondary-foreground: var(--puzzle-color-scheme-light-secondary-foreground, #ffffff);
+
+    --puzzle-color-accent: var(--puzzle-color-scheme-light-accent, #7c3aed);
+    --puzzle-color-accent-foreground: var(--puzzle-color-scheme-light-accent-foreground, #ffffff);
+
+    --puzzle-color-ring: var(--puzzle-color-scheme-light-ring, #2563eb);
+
+    --puzzle-color-success: var(--puzzle-color-scheme-light-success, #15803d);
+    --puzzle-color-success-foreground: var(--puzzle-color-scheme-light-success-foreground, #ffffff);
+
+    --puzzle-color-warning: var(--puzzle-color-scheme-light-warning, #a16207);
+    --puzzle-color-warning-foreground: var(--puzzle-color-scheme-light-warning-foreground, #ffffff);
+
+    --puzzle-color-danger: var(--puzzle-color-scheme-light-danger, #b91c1c);
+    --puzzle-color-danger-foreground: var(--puzzle-color-scheme-light-danger-foreground, #ffffff);
+
+    --puzzle-color-info: var(--puzzle-color-scheme-light-info, #0369a1);
+    --puzzle-color-info-foreground: var(--puzzle-color-scheme-light-info-foreground, #ffffff);
 }
 
-:root:has(style[data-theme="light"]) {
-    color-scheme: light;
-
-    --puzzle-color-background: #f7f4ea;
-    --puzzle-color-surface: #ffffff;
-    --puzzle-color-text: #171717;
-    --puzzle-color-text-muted: #666666;
-    --puzzle-color-border: #e5e0d6;
-    --puzzle-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --puzzle-elevation-2: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --puzzle-elevation-3: 0 4px 8px rgba(0, 0, 0, 0.15);
-    --puzzle-elevation-4: 0 8px 16px rgba(0, 0, 0, 0.2);
-    --puzzle-elevation-6: 0 32px 64px rgba(0, 0, 0, 0.3);
-    --puzzle-elevation-8: 0 64px 128px rgba(0, 0, 0, 0.35);
-    --puzzle-elevation-12: 0 128px 256px rgba(0, 0, 0, 0.4);
-    --puzzle-elevation-16: 0 256px 512px rgba(0, 0, 0, 0.45);
-    --puzzle-elevation-24: 0 512px 1024px rgba(0, 0, 0, 0.5);
-}
-
-:root:has(style[data-theme="dark"]) {
+/*
+ * Explicit dark mode.
+ *
+ * Theme.tsx renders a style element with data-puzzle-theme="true"
+ * and data-theme="dark". :has() lets us react to that signal without
+ * mutating the document element from JavaScript.
+ */
+:root:has(style[data-puzzle-theme="true"][data-theme="dark"]) {
     color-scheme: dark;
 
-    --puzzle-color-background: #111518;
-    --puzzle-color-surface: #1c2226;
-    --puzzle-color-text: #f5f5f5;
-    --puzzle-color-text-muted: #a4adb3;
-    --puzzle-color-border: #343c42;
-    --puzzle-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --puzzle-elevation-2: 0 2px 4px rgba(0, 0, 0, 0.1);
-    --puzzle-elevation-3: 0 4px 8px rgba(0, 0, 0, 0.15);
-    --puzzle-elevation-4: 0 8px 16px rgba(0, 0, 0, 0.2);
-    --puzzle-elevation-6: 0 32px 64px rgba(0, 0, 0, 0.3);
-    --puzzle-elevation-8: 0 64px 128px rgba(0, 0, 0, 0.35);
-    --puzzle-elevation-12: 0 128px 256px rgba(0, 0, 0, 0.4);
-    --puzzle-elevation-16: 0 256px 512px rgba(0, 0, 0, 0.45);
-    --puzzle-elevation-24: 0 512px 1024px rgba(0, 0, 0, 0.5);
+    --puzzle-color-background: var(--puzzle-color-scheme-dark-background, #111518);
+    --puzzle-color-surface: var(--puzzle-color-scheme-dark-surface, #1c2226);
+    --puzzle-color-surface-elevated: var(--puzzle-color-scheme-dark-surface-elevated, #242c31);
+    --puzzle-color-surface-sunken: var(--puzzle-color-scheme-dark-surface-sunken, #0d1113);
+
+    --puzzle-color-text: var(--puzzle-color-scheme-dark-text, #f5f5f5);
+    --puzzle-color-text-muted: var(--puzzle-color-scheme-dark-text-muted, #a4adb3);
+    --puzzle-color-text-subtle: var(--puzzle-color-scheme-dark-text-subtle, #8c969d);
+
+    --puzzle-color-border: var(--puzzle-color-scheme-dark-border, #343c42);
+    --puzzle-color-border-strong: var(--puzzle-color-scheme-dark-border-strong, #4a555d);
+
+    --puzzle-color-primary: var(--puzzle-color-scheme-dark-primary, #60a5fa);
+    --puzzle-color-primary-foreground: var(--puzzle-color-scheme-dark-primary-foreground, #0b1220);
+
+    --puzzle-color-secondary: var(--puzzle-color-scheme-dark-secondary, #94a3b8);
+    --puzzle-color-secondary-foreground: var(--puzzle-color-scheme-dark-secondary-foreground, #0f172a);
+
+    --puzzle-color-accent: var(--puzzle-color-scheme-dark-accent, #c4b5fd);
+    --puzzle-color-accent-foreground: var(--puzzle-color-scheme-dark-accent-foreground, #1e1b4b);
+
+    --puzzle-color-ring: var(--puzzle-color-scheme-dark-ring, #93c5fd);
+
+    --puzzle-color-success: var(--puzzle-color-scheme-dark-success, #4ade80);
+    --puzzle-color-success-foreground: var(--puzzle-color-scheme-dark-success-foreground, #052e16);
+
+    --puzzle-color-warning: var(--puzzle-color-scheme-dark-warning, #fbbf24);
+    --puzzle-color-warning-foreground: var(--puzzle-color-scheme-dark-warning-foreground, #422006);
+
+    --puzzle-color-danger: var(--puzzle-color-scheme-dark-danger, #f87171);
+    --puzzle-color-danger-foreground: var(--puzzle-color-scheme-dark-danger-foreground, #450a0a);
+
+    --puzzle-color-info: var(--puzzle-color-scheme-dark-info, #38bdf8);
+    --puzzle-color-info-foreground: var(--puzzle-color-scheme-dark-info-foreground, #082f49);
 }
 
+/*
+ * System mode.
+ *
+ * An explicit light or dark mode must win over the system preference.
+ * The Theme component's "system" value intentionally matches neither
+ * explicit selector above, so this media query applies in system mode.
+ */
 @media (prefers-color-scheme: dark) {
-    :root:not(:has(style[data-theme="light"])) {
+    :root:not(
+        :has(style[data-puzzle-theme="true"][data-theme="light"], style[data-puzzle-theme="true"][data-theme="dark"])
+    ) {
         color-scheme: dark;
-        --puzzle-color-background: #111518;
-        --puzzle-color-surface: #1c2226;
-        --puzzle-color-text: #f5f5f5;
-        --puzzle-color-text-muted: #a4adb3;
-        --puzzle-color-border: #343c42;
+
+        --puzzle-color-background: var(--puzzle-color-scheme-dark-background, #111518);
+        --puzzle-color-surface: var(--puzzle-color-scheme-dark-surface, #1c2226);
+        --puzzle-color-surface-elevated: var(--puzzle-color-scheme-dark-surface-elevated, #242c31);
+        --puzzle-color-surface-sunken: var(--puzzle-color-scheme-dark-surface-sunken, #0d1113);
+
+        --puzzle-color-text: var(--puzzle-color-scheme-dark-text, #f5f5f5);
+        --puzzle-color-text-muted: var(--puzzle-color-scheme-dark-text-muted, #a4adb3);
+        --puzzle-color-text-subtle: var(--puzzle-color-scheme-dark-text-subtle, #8c969d);
+
+        --puzzle-color-border: var(--puzzle-color-scheme-dark-border, #343c42);
+        --puzzle-color-border-strong: var(--puzzle-color-scheme-dark-border-strong, #4a555d);
+
+        --puzzle-color-primary: var(--puzzle-color-scheme-dark-primary, #60a5fa);
+        --puzzle-color-primary-foreground: var(--puzzle-color-scheme-dark-primary-foreground, #0b1220);
+
+        --puzzle-color-secondary: var(--puzzle-color-scheme-dark-secondary, #94a3b8);
+        --puzzle-color-secondary-foreground: var(--puzzle-color-scheme-dark-secondary-foreground, #0f172a);
+
+        --puzzle-color-accent: var(--puzzle-color-scheme-dark-accent, #c4b5fd);
+        --puzzle-color-accent-foreground: var(--puzzle-color-scheme-dark-accent-foreground, #1e1b4b);
+
+        --puzzle-color-ring: var(--puzzle-color-scheme-dark-ring, #93c5fd);
+
+        --puzzle-color-success: var(--puzzle-color-scheme-dark-success, #4ade80);
+        --puzzle-color-success-foreground: var(--puzzle-color-scheme-dark-success-foreground, #052e16);
+
+        --puzzle-color-warning: var(--puzzle-color-scheme-dark-warning, #fbbf24);
+        --puzzle-color-warning-foreground: var(--puzzle-color-scheme-dark-warning-foreground, #422006);
+
+        --puzzle-color-danger: var(--puzzle-color-scheme-dark-danger, #f87171);
+        --puzzle-color-danger-foreground: var(--puzzle-color-scheme-dark-danger-foreground, #450a0a);
+
+        --puzzle-color-info: var(--puzzle-color-scheme-dark-info, #38bdf8);
+        --puzzle-color-info-foreground: var(--puzzle-color-scheme-dark-info-foreground, #082f49);
     }
 }
 
-:root[data-theme="light"] {
-    color-scheme: light;
-}
-
-:root[data-theme="dark"] {
-    color-scheme: dark;
-}
-
+/* Global document defaults */
 :where(html, body) {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-
-    color-scheme: light;
-    color: var(--puzzle-color-text, #0f172a);
+    color-scheme: inherit;
+    color: var(--puzzle-color-text, #171717);
     background: var(--puzzle-color-background, #f7f4ea);
-}
-
-@media (prefers-color-scheme: dark) {
-    :where(html, body) {
-        color-scheme: dark;
-        color: var(--puzzle-color-text, #f5f5f5);
-        background: var(--puzzle-color-background, #111518);
-    }
 }
 
 :where(body) {
     margin: 0;
-    font-family: var(--puzzle-font-family-body1);
-    font-size: var(--puzzle-font-size-body1);
-    font-weight: var(--puzzle-font-weight-body1);
-    line-height: var(--puzzle-line-height-body1);
-    letter-spacing: var(--puzzle-letter-spacing-body1);
+    font-family: var(--puzzle-font-family-body1, system-ui, sans-serif);
+    font-size: var(--puzzle-font-size-body1, 1rem);
+    font-weight: var(--puzzle-font-weight-body1, 400);
+    line-height: var(--puzzle-font-line-height-body1, 1.5);
+    letter-spacing: var(--puzzle-font-letter-spacing-body1, 0);
 }
 
-:where(h1, h2, h3, h4) {
-    margin-block: 0;
-}
-
-:where(h1) {
-    font-family: var(--puzzle-font-family-headline1);
-    font-size: var(--puzzle-font-size-headline1);
-    font-weight: var(--puzzle-font-weight-headline1);
-    line-height: var(--puzzle-line-height-headline1);
-    letter-spacing: var(--puzzle-letter-spacing-headline1);
-}
-:where(h2) {
-    font-family: var(--puzzle-font-family-headline2);
-    font-size: var(--puzzle-font-size-headline2);
-    font-weight: var(--puzzle-font-weight-headline2);
-    line-height: var(--puzzle-line-height-headline2);
-    letter-spacing: var(--puzzle-letter-spacing-headline2);
-}
-:where(h3) {
-    font-family: var(--puzzle-font-family-headline3);
-    font-size: var(--puzzle-font-size-headline3);
-    font-weight: var(--puzzle-font-weight-headline3);
-    line-height: var(--puzzle-line-height-headline3);
-    letter-spacing: var(--puzzle-letter-spacing-headline3);
-}
-:where(h4) {
-    font-family: var(--puzzle-font-family-headline4);
-    font-size: var(--puzzle-font-size-headline4);
-    font-weight: var(--puzzle-font-weight-headline4);
-    line-height: var(--puzzle-line-height-headline4);
-    letter-spacing: var(--puzzle-letter-spacing-headline4);
-}
-
-/*
- * Text vertical rhythm. Use margins rather than padding because the spacing
- * belongs between blocks, not inside them. Every relevant margin is reset and
- * the gap is applied only to the following sibling, avoiding double spacing
- * and margin-collapse surprises.
- */
-:where(h1, h2, h3, h4, p) {
-    margin-block: 0;
-}
-:where(h1, h2, h3, h4) + :where(h1, h2, h3, h4) {
-    margin-block-start: var(--puzzle-font-gap-heading-stack-gap, 0.3em);
-}
-:where(h1, h2, h3, h4) + :where(p) {
-    margin-block-start: var(--puzzle-font-gap-heading-paragraph-gap, 0.65em);
-}
-:where(p) + :where(p) {
-    margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
-}
-:where(p) + :where(h1, h2, h3, h4) {
-    margin-block-start: var(--puzzle-font-gap-section-gap, 1.75em);
-}
-:where(input, textarea, select) {
+/* Browser form controls should follow the theme typography. */
+:where(input, textarea, select, button) {
     font: inherit;
 }
+
 :where(button) {
     cursor: pointer;
-    font-family: var(--puzzle-font-family-button);
-    font-size: var(--puzzle-font-size-button);
-    font-weight: var(--puzzle-font-weight-button);
-    line-height: var(--puzzle-line-height-button);
-    letter-spacing: var(--puzzle-letter-spacing-button);
+    font-family: var(--puzzle-font-family-button, inherit);
+    font-size: var(--puzzle-font-size-button, inherit);
+    font-weight: var(--puzzle-font-weight-button, inherit);
+    line-height: var(--puzzle-font-line-height-button, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-button, inherit);
 }
+
 :where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
     cursor: not-allowed;
 }
 
+/* Headings */
+:where(h1, h2, h3, h4, p) {
+    margin-block: 0;
+}
+
+:where(h1) {
+    font-family: var(--puzzle-font-family-headline1, inherit);
+    font-size: var(--puzzle-font-size-headline1, 2.25rem);
+    font-weight: var(--puzzle-font-weight-headline1, 700);
+    line-height: var(--puzzle-font-line-height-headline1, 1.15);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline1, -0.025em);
+}
+
+:where(h2) {
+    font-family: var(--puzzle-font-family-headline2, inherit);
+    font-size: var(--puzzle-font-size-headline2, 1.875rem);
+    font-weight: var(--puzzle-font-weight-headline2, 700);
+    line-height: var(--puzzle-font-line-height-headline2, 1.2);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline2, -0.025em);
+}
+
+:where(h3) {
+    font-family: var(--puzzle-font-family-headline3, inherit);
+    font-size: var(--puzzle-font-size-headline3, 1.5rem);
+    font-weight: var(--puzzle-font-weight-headline3, 600);
+    line-height: var(--puzzle-font-line-height-headline3, 1.3);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline3, 0);
+}
+
+:where(h4) {
+    font-family: var(--puzzle-font-family-headline4, inherit);
+    font-size: var(--puzzle-font-size-headline4, 1.25rem);
+    font-weight: var(--puzzle-font-weight-headline4, 600);
+    line-height: var(--puzzle-font-line-height-headline4, 1.3);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline4, 0);
+}
+
+/* Text vertical rhythm */
+:where(h1, h2, h3, h4) + :where(h1, h2, h3, h4) {
+    margin-block-start: var(--puzzle-font-gap-heading-stack-gap, 0.3em);
+}
+
+:where(h1, h2, h3, h4) + :where(p) {
+    margin-block-start: var(--puzzle-font-gap-heading-paragraph-gap, 0.65em);
+}
+
+:where(p) + :where(p) {
+    margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
+}
+
+:where(p) + :where(h1, h2, h3, h4) {
+    margin-block-start: var(--puzzle-font-gap-section-gap, 1.5em);
+}
+
+/* Links and focus */
 :where(a) {
     color: var(--puzzle-color-primary, #2563eb);
 }
@@ -173,98 +248,117 @@
     outline-offset: 2px;
 }
 
+/*
+ * Typography utilities.
+ *
+ * The font role variables use the --puzzle-font-line-height-* and
+ * --puzzle-font-letter-spacing-* names emitted by createThemeVariables.
+ */
 .puzzle-typography-display1 {
-    font-family: var(--puzzle-font-family-display1);
-    font-size: var(--puzzle-font-size-display1);
-    font-weight: var(--puzzle-font-weight-display1);
-    line-height: var(--puzzle-line-height-display1);
-    letter-spacing: var(--puzzle-letter-spacing-display1);
-}
-.puzzle-typography-display2 {
-    font-family: var(--puzzle-font-family-display2);
-    font-size: var(--puzzle-font-size-display2);
-    font-weight: var(--puzzle-font-weight-display2);
-    line-height: var(--puzzle-line-height-display2);
-    letter-spacing: var(--puzzle-letter-spacing-display2);
-}
-.puzzle-typography-headline1 {
-    font-family: var(--puzzle-font-family-headline1);
-    font-size: var(--puzzle-font-size-headline1);
-    font-weight: var(--puzzle-font-weight-headline1);
-    line-height: var(--puzzle-line-height-headline1);
-    letter-spacing: var(--puzzle-letter-spacing-headline1);
-}
-.puzzle-typography-headline2 {
-    font-family: var(--puzzle-font-family-headline2);
-    font-size: var(--puzzle-font-size-headline2);
-    font-weight: var(--puzzle-font-weight-headline2);
-    line-height: var(--puzzle-line-height-headline2);
-    letter-spacing: var(--puzzle-letter-spacing-headline2);
-}
-.puzzle-typography-headline3 {
-    font-family: var(--puzzle-font-family-headline3);
-    font-size: var(--puzzle-font-size-headline3);
-    font-weight: var(--puzzle-font-weight-headline3);
-    line-height: var(--puzzle-line-height-headline3);
-    letter-spacing: var(--puzzle-letter-spacing-headline3);
-}
-.puzzle-typography-headline4 {
-    font-family: var(--puzzle-font-family-headline4);
-    font-size: var(--puzzle-font-size-headline4);
-    font-weight: var(--puzzle-font-weight-headline4);
-    line-height: var(--puzzle-line-height-headline4);
-    letter-spacing: var(--puzzle-letter-spacing-headline4);
-}
-.puzzle-typography-subtitle1 {
-    font-family: var(--puzzle-font-family-subtitle1);
-    font-size: var(--puzzle-font-size-subtitle1);
-    font-weight: var(--puzzle-font-weight-subtitle1);
-    line-height: var(--puzzle-line-height-subtitle1);
-    letter-spacing: var(--puzzle-letter-spacing-subtitle1);
-}
-.puzzle-typography-subtitle2 {
-    font-family: var(--puzzle-font-family-subtitle2);
-    font-size: var(--puzzle-font-size-subtitle2);
-    font-weight: var(--puzzle-font-weight-subtitle2);
-    line-height: var(--puzzle-line-height-subtitle2);
-    letter-spacing: var(--puzzle-letter-spacing-subtitle2);
-}
-.puzzle-typography-body1 {
-    font-family: var(--puzzle-font-family-body1);
-    font-size: var(--puzzle-font-size-body1);
-    font-weight: var(--puzzle-font-weight-body1);
-    line-height: var(--puzzle-line-height-body1);
-    letter-spacing: var(--puzzle-letter-spacing-body1);
-}
-.puzzle-typography-body2 {
-    font-family: var(--puzzle-font-family-body2);
-    font-size: var(--puzzle-font-size-body2);
-    font-weight: var(--puzzle-font-weight-body2);
-    line-height: var(--puzzle-line-height-body2);
-    letter-spacing: var(--puzzle-letter-spacing-body2);
-}
-.puzzle-typography-button {
-    font-family: var(--puzzle-font-family-button);
-    font-size: var(--puzzle-font-size-button);
-    font-weight: var(--puzzle-font-weight-button);
-    line-height: var(--puzzle-line-height-button);
-    letter-spacing: var(--puzzle-letter-spacing-button);
-}
-.puzzle-typography-caption {
-    font-family: var(--puzzle-font-family-caption);
-    font-size: var(--puzzle-font-size-caption);
-    font-weight: var(--puzzle-font-weight-caption);
-    line-height: var(--puzzle-line-height-caption);
-    letter-spacing: var(--puzzle-letter-spacing-caption);
-}
-.puzzle-typography-overline {
-    font-family: var(--puzzle-font-family-overline);
-    font-size: var(--puzzle-font-size-overline);
-    font-weight: var(--puzzle-font-weight-overline);
-    line-height: var(--puzzle-line-height-overline);
-    letter-spacing: var(--puzzle-letter-spacing-overline);
+    font-family: var(--puzzle-font-family-display1, inherit);
+    font-size: var(--puzzle-font-size-display1, inherit);
+    font-weight: var(--puzzle-font-weight-display1, inherit);
+    line-height: var(--puzzle-font-line-height-display1, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-display1, inherit);
 }
 
+.puzzle-typography-display2 {
+    font-family: var(--puzzle-font-family-display2, inherit);
+    font-size: var(--puzzle-font-size-display2, inherit);
+    font-weight: var(--puzzle-font-weight-display2, inherit);
+    line-height: var(--puzzle-font-line-height-display2, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-display2, inherit);
+}
+
+.puzzle-typography-headline1 {
+    font-family: var(--puzzle-font-family-headline1, inherit);
+    font-size: var(--puzzle-font-size-headline1, inherit);
+    font-weight: var(--puzzle-font-weight-headline1, inherit);
+    line-height: var(--puzzle-font-line-height-headline1, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline1, inherit);
+}
+
+.puzzle-typography-headline2 {
+    font-family: var(--puzzle-font-family-headline2, inherit);
+    font-size: var(--puzzle-font-size-headline2, inherit);
+    font-weight: var(--puzzle-font-weight-headline2, inherit);
+    line-height: var(--puzzle-font-line-height-headline2, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline2, inherit);
+}
+
+.puzzle-typography-headline3 {
+    font-family: var(--puzzle-font-family-headline3, inherit);
+    font-size: var(--puzzle-font-size-headline3, inherit);
+    font-weight: var(--puzzle-font-weight-headline3, inherit);
+    line-height: var(--puzzle-font-line-height-headline3, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline3, inherit);
+}
+
+.puzzle-typography-headline4 {
+    font-family: var(--puzzle-font-family-headline4, inherit);
+    font-size: var(--puzzle-font-size-headline4, inherit);
+    font-weight: var(--puzzle-font-weight-headline4, inherit);
+    line-height: var(--puzzle-font-line-height-headline4, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline4, inherit);
+}
+
+.puzzle-typography-subtitle1 {
+    font-family: var(--puzzle-font-family-subtitle1, inherit);
+    font-size: var(--puzzle-font-size-subtitle1, inherit);
+    font-weight: var(--puzzle-font-weight-subtitle1, inherit);
+    line-height: var(--puzzle-font-line-height-subtitle1, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-subtitle1, inherit);
+}
+
+.puzzle-typography-subtitle2 {
+    font-family: var(--puzzle-font-family-subtitle2, inherit);
+    font-size: var(--puzzle-font-size-subtitle2, inherit);
+    font-weight: var(--puzzle-font-weight-subtitle2, inherit);
+    line-height: var(--puzzle-font-line-height-subtitle2, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-subtitle2, inherit);
+}
+
+.puzzle-typography-body1 {
+    font-family: var(--puzzle-font-family-body1, inherit);
+    font-size: var(--puzzle-font-size-body1, inherit);
+    font-weight: var(--puzzle-font-weight-body1, inherit);
+    line-height: var(--puzzle-font-line-height-body1, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-body1, inherit);
+}
+
+.puzzle-typography-body2 {
+    font-family: var(--puzzle-font-family-body2, inherit);
+    font-size: var(--puzzle-font-size-body2, inherit);
+    font-weight: var(--puzzle-font-weight-body2, inherit);
+    line-height: var(--puzzle-font-line-height-body2, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-body2, inherit);
+}
+
+.puzzle-typography-button {
+    font-family: var(--puzzle-font-family-button, inherit);
+    font-size: var(--puzzle-font-size-button, inherit);
+    font-weight: var(--puzzle-font-weight-button, inherit);
+    line-height: var(--puzzle-font-line-height-button, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-button, inherit);
+}
+
+.puzzle-typography-caption {
+    font-family: var(--puzzle-font-family-caption, inherit);
+    font-size: var(--puzzle-font-size-caption, inherit);
+    font-weight: var(--puzzle-font-weight-caption, inherit);
+    line-height: var(--puzzle-font-line-height-caption, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-caption, inherit);
+}
+
+.puzzle-typography-overline {
+    font-family: var(--puzzle-font-family-overline, inherit);
+    font-size: var(--puzzle-font-size-overline, inherit);
+    font-weight: var(--puzzle-font-weight-overline, inherit);
+    line-height: var(--puzzle-font-line-height-overline, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-overline, inherit);
+}
+
+/* Respect reduced-motion preferences. */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

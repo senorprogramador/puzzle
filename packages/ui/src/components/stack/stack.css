@@ -111,7 +111,7 @@
 }
 
 /* Tablet: min-width 768px */
-@media (min-width: 768px) {
+@media (min-width: var(--puzzle-breakpoint-tablet, 768px)) {
     .puzzle-stack.direction-tablet-row {
         flex-direction: row;
     }
@@ -192,7 +192,7 @@
 }
 
 /* Desktop: min-width 1024px */
-@media (min-width: 1024px) {
+@media (min-width: var(--puzzle-breakpoint-desktop, 1024px)) {
     .puzzle-stack.direction-desktop-row {
         flex-direction: row;
     }
@@ -272,7 +272,7 @@
 }
 
 /* HD: min-width 1440px */
-@media (min-width: 1440px) {
+@media (min-width: var(--puzzle-breakpoint-hd, 1440px)) {
     .puzzle-stack.direction-hd-row {
         flex-direction: row;
     }

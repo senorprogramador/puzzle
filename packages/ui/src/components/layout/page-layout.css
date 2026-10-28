@@ -75,7 +75,7 @@
 
 /* Desktop: sidebars sit beside the main content. */
 
-@media (min-width: 64rem) {
+@media (min-width: var(--puzzle-breakpoint-desktop, 1024px)) {
     .puzzle-page-layout[data-layout="left-main"] .puzzle-page-layout__content {
         grid-template-columns:
             minmax(0, var(--puzzle-page-left-width, 16rem))
@@ -103,21 +103,20 @@
 }
 
 /* Accessible skip link: hidden visually until keyboard focus. */
-
 .puzzle-page-layout__skip-link {
     position: absolute;
-    z-index: 1000;
+    z-index: var(--puzzle-z-index-tooltip, 1000);
     top: 0;
     left: 0;
 
     transform: translateY(-150%);
-    padding: 0.75rem 1rem;
-    margin: 0.5rem;
+    padding: var(--puzzle-space-3, 0.75rem) var(--puzzle-space-4, 1rem);
+    margin: var(--puzzle-space-2, 0.5rem);
 
-    color: var(--puzzle-color-text, #111);
-    background: var(--puzzle-color-background, #fff);
-    border: 2px solid currentColor;
-    border-radius: 0.25rem;
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-background);
+    border: var(--puzzle-border-width-strong, 2px) solid currentColor;
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
 
     font: inherit;
     text-decoration: none;
@@ -128,6 +127,6 @@
 }
 
 .puzzle-page-layout__skip-link:focus-visible {
-    outline: 2px solid currentColor;
+    outline: 2px solid var(--puzzle-color-ring);
     outline-offset: 2px;
 }

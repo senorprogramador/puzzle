@@ -17,31 +17,80 @@ export const GENERIC_FAMILIES = new Set([
 ]);
 
 export const DEFAULT_TOKENS: ThemeTokens = {
-  colors: {
-    darkForeground: "#0f172a",
-    lightForeground: "#ffffff",
-    primary: "#2563eb",
-    primaryForeground: "#ffffff",
-    secondary: "#64748b",
-    secondaryForeground: "#ffffff",
-    accent: "#7c3aed",
-    accentForeground: "#ffffff",
-    //background: "#ffffff",
-    surface: "#f8fafc",
-    surfaceElevated: "#ffffff",
-    //text: "#0f172a",
-    textMuted: "#64748b",
-    border: "#e2e8f0",
-    borderStrong: "#cbd5e1",
-    ring: "#2563eb",
-    success: "#15803d",
-    successForeground: "#ffffff",
-    warning: "#a16207",
-    warningForeground: "#ffffff",
-    danger: "#b91c1c",
-    dangerForeground: "#ffffff",
-    info: "#0369a1",
-    infoForeground: "#ffffff",
+  colorSchemes: {
+    light: {
+      background: "#f7f4ea",
+      surface: "#ffffff",
+      surfaceElevated: "#ffffff",
+      surfaceSunken: "#f1eee6",
+
+      text: "#171717",
+      textMuted: "#666666",
+      textSubtle: "#737373",
+
+      border: "#e5e0d6",
+      borderStrong: "#c9c2b6",
+
+      primary: "#2563eb",
+      primaryForeground: "#ffffff",
+
+      secondary: "#64748b",
+      secondaryForeground: "#ffffff",
+
+      accent: "#7c3aed",
+      accentForeground: "#ffffff",
+
+      ring: "#2563eb",
+
+      success: "#15803d",
+      successForeground: "#ffffff",
+
+      warning: "#a16207",
+      warningForeground: "#ffffff",
+
+      danger: "#b91c1c",
+      dangerForeground: "#ffffff",
+
+      info: "#0369a1",
+      infoForeground: "#ffffff",
+    },
+
+    dark: {
+      background: "#111518",
+      surface: "#1c2226",
+      surfaceElevated: "#242c31",
+      surfaceSunken: "#0d1113",
+
+      text: "#f5f5f5",
+      textMuted: "#a4adb3",
+      textSubtle: "#8c969d",
+
+      border: "#343c42",
+      borderStrong: "#4a555d",
+
+      primary: "#60a5fa",
+      primaryForeground: "#0b1220",
+
+      secondary: "#94a3b8",
+      secondaryForeground: "#0f172a",
+
+      accent: "#c4b5fd",
+      accentForeground: "#1e1b4b",
+
+      ring: "#93c5fd",
+
+      success: "#4ade80",
+      successForeground: "#052e16",
+
+      warning: "#fbbf24",
+      warningForeground: "#422006",
+
+      danger: "#f87171",
+      dangerForeground: "#450a0a",
+
+      info: "#38bdf8",
+      infoForeground: "#082f49",
+    },
   },
   typography: {
     fontSize: {
@@ -127,10 +176,30 @@ export const DEFAULT_TOKENS: ThemeTokens = {
     widthStrong: "2px",
     style: "solid",
   },
+  breakpoints: {
+    tablet: "768px",
+    desktop: "1024px",
+    hd: "1440px",
+  },
   layout: {
     container: "80rem",
     content: "64rem",
     prose: "65ch",
+  },
+  overlays: {
+    backdrop: "rgb(0 0 0 / 0.35)",
+    backdropBlur: "2px",
+  },
+  elevation: {
+    1: "0 1px 2px rgb(0 0 0 / 0.05)",
+    2: "0 1px 3px rgb(0 0 0 / 0.10), 0 1px 2px rgb(0 0 0 / 0.06)",
+    3: "0 4px 6px -1px rgb(0 0 0 / 0.10), 0 2px 4px -2px rgb(0 0 0 / 0.10)",
+    4: "0 10px 15px -3px rgb(0 0 0 / 0.10), 0 4px 6px -4px rgb(0 0 0 / 0.10)",
+    6: "0 20px 25px -5px rgb(0 0 0 / 0.12), 0 8px 10px -6px rgb(0 0 0 / 0.10)",
+    8: "0 25px 50px -12px rgb(0 0 0 / 0.20)",
+    12: "0 35px 60px -15px rgb(0 0 0 / 0.22)",
+    16: "0 45px 80px -20px rgb(0 0 0 / 0.25)",
+    24: "0 60px 100px -25px rgb(0 0 0 / 0.30)",
   },
   motion: {
     fast: "120ms",
@@ -142,12 +211,13 @@ export const DEFAULT_TOKENS: ThemeTokens = {
   },
   zIndex: {
     base: "0",
-    dropdown: "1000",
-    sticky: "1100",
-    overlay: "1200",
-    modal: "1300",
-    popover: "1400",
-    toast: "1500",
-    tooltip: "1600",
+    dropdown: "100",
+    sticky: "200",
+    navigation: "250",
+    overlay: "300",
+    modal: "400",
+    popover: "500",
+    toast: "600",
+    tooltip: "700",
   },
 };
