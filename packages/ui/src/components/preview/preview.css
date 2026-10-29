@@ -67,7 +67,7 @@
 .puzzle-preview__stage {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     min-width: 0;
     min-height: 20rem;
     max-height: 75vh;

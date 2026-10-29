@@ -66,6 +66,9 @@ const Preview = ({
   const [device, setDevice] = useState<PreviewDevice>(defaultDevice);
   const [frameRoot, setFrameRoot] = useState<HTMLElement | null>(null);
   const [scale, setScale] = useState(1);
+  const [contentHeight, setContentHeight] = useState(
+    PREVIEW_DEVICES[defaultDevice].height,
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -109,6 +112,7 @@ const Preview = ({
     frameDocument.body.style.cssText = document.body.style.cssText;
   }, []);
 
+  // Keep the preview scaled to the available width.
   useEffect(() => {
     const container = containerRef.current;
 
@@ -128,6 +132,7 @@ const Preview = ({
     return () => observer.disconnect();
   }, [config.width]);
 
+  // Copy application styles into the iframe.
   useEffect(() => {
     const observer = new MutationObserver(syncStyles);
 
@@ -157,29 +162,55 @@ const Preview = ({
 
     if (!iframe) return;
 
-    const handleLoad = () => {
-      initializeFrame();
-    };
-
-    iframe.addEventListener("load", handleLoad);
-
-    // Vangt ook het geval op waarin het iframe al geladen is.
+    iframe.addEventListener("load", initializeFrame);
     initializeFrame();
 
     return () => {
-      iframe.removeEventListener("load", handleLoad);
+      iframe.removeEventListener("load", initializeFrame);
     };
   }, [initializeFrame]);
 
+  // Measure the rendered content and cap it at the selected device height.
+  useEffect(() => {
+    if (!frameRoot) return;
+
+    const measureContent = () => {
+      const nextHeight = Math.ceil(
+        Math.max(
+          frameRoot.scrollHeight,
+          frameRoot.getBoundingClientRect().height,
+        ),
+      );
+
+      if (nextHeight > 0) {
+        setContentHeight(nextHeight);
+      }
+    };
+
+    const observer = new ResizeObserver(measureContent);
+
+    observer.observe(frameRoot);
+
+    // Also measure after the initial layout and style application.
+    measureContent();
+
+    return () => observer.disconnect();
+  }, [frameRoot, config.width]);
+
+  // Use the device height as the maximum, not as a fixed height.
+  const frameHeight = Math.min(contentHeight, config.height);
+  const isContentOverflowing = contentHeight > config.height;
+
   const frameStyle: CSSProperties = {
     width: config.width,
-    height: config.height,
+    height: frameHeight,
     transform: `scale(${scale})`,
+    transformOrigin: "top left",
   };
 
   const viewportStyle: CSSProperties = {
     width: config.width * scale,
-    height: config.height * scale,
+    height: frameHeight * scale,
   };
 
   return (
@@ -211,7 +242,8 @@ const Preview = ({
         </div>
 
         <span className="puzzle-preview__dimensions">
-          {config.width} × {config.height}
+          {config.width} × {frameHeight}
+          {isContentOverflowing ? "+" : ""}
         </span>
       </div>
 
@@ -225,6 +257,7 @@ const Preview = ({
             onLoad={initializeFrame}
             style={frameStyle}
           />
+
           {frameRoot && createPortal(children, frameRoot)}
         </div>
       </div>

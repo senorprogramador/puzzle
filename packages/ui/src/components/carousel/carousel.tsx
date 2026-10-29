@@ -236,6 +236,10 @@ const getItemBasis = (itemsPerPage: number, gap: string): string => {
     return "100%";
   }
 
+  if (gap === "" || gap === "0px" || gap === "0") {
+    return `calc((100% / ${count}) - (1px / ${count}))`;
+  }
+
   const gapTerms = Array.from({ length: count - 1 }, () => `(${gap})`).join(
     " + ",
   );

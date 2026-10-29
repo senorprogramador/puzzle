@@ -74,7 +74,9 @@ function Home() {
           <Preview defaultDevice="mobile">
             <Section>
               <Heading variant="headline2">Carousel</Heading>
-              <CarouselController items={[1, 2, 3, 4, 5, 6]}>
+              <CarouselController
+                items={Array.from({ length: 10 }, (_, i) => i + 1)}
+              >
                 <Carousel<number>
                   renderItem={(item) => (
                     <div className="flex items-center justify-center p-4 border border-orange-500 bg-orange-100">
