@@ -123,8 +123,8 @@ function Home() {
               <Accordion
                 items={accordionItems}
                 //type="single"
-                scrollIntoView={false}
-                unMountOnClose={false}
+                scrollIntoView={true}
+                unMountOnClose={true}
                 //initialOpenItemIndexes={[0]}
               />
             </Section>

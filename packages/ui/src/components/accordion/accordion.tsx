@@ -65,7 +65,7 @@ type AccordionProps = Omit<
   /** Class applied to the panel content wrapper. */
   contentClassName?: string;
 
-  /** Unmount panel content after its closing animation completes. */
+  /** Unmount panel content after its closing animation completes. Defaults to false. */
   unMountOnClose?: boolean;
 
   /** Scroll the activated trigger into view using nearest-edge behavior. */
@@ -105,13 +105,14 @@ const Accordion = ({
   triggerClassName,
   panelClassName,
   contentClassName,
-  unMountOnClose,
-  scrollIntoView,
+  unMountOnClose = false,
+  scrollIntoView = false,
   ...rootProps
 }: AccordionProps) => {
   const generatedId = useId();
   const isControlled = openItemIndexes !== undefined;
   const triggerRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const [uncontrolledOpenItemIndexes, setUncontrolledOpenItemIndexes] =
     useState<number[]>(() =>
@@ -163,14 +164,6 @@ const Accordion = ({
     }
 
     onChange?.(nextOpenItemIndexes);
-
-    if (!isOpen && scrollIntoView) {
-      triggerRefs.current[index]?.scrollIntoView({
-        block: "nearest",
-        inline: "nearest",
-        behavior: "auto",
-      });
-    }
   };
 
   return (
@@ -208,19 +201,36 @@ const Accordion = ({
               template="accordion"
               duration={300}
               unmountOnExit={unMountOnClose}
-              className={cn("puzzle-accordion__panel", panelClassName)}
+              className={panelClassName}
               id={panelId}
               role={useRegions ? "region" : undefined}
               aria-labelledby={useRegions ? triggerId : undefined}
               aria-hidden={!isOpen}
               inert={!isOpen}
               data-state={isOpen ? "open" : "closed"}
+              onEntered={() =>
+                contentRefs.current[index]?.scrollIntoView({
+                  block: "end",
+                  inline: "center",
+                  behavior: "auto",
+                })
+              }
             >
-              <div className="puzzle-accordion__panel-inner">
-                <div
-                  className={cn("puzzle-accordion__content", contentClassName)}
-                >
-                  {item.content}
+              <div
+                ref={(node) => {
+                  contentRefs.current[index] = node;
+                }}
+                className="puzzle-accordion__panel"
+              >
+                <div className="puzzle-accordion__panel-inner">
+                  <div
+                    className={cn(
+                      "puzzle-accordion__content",
+                      contentClassName,
+                    )}
+                  >
+                    {item.content}
+                  </div>
                 </div>
               </div>
             </Transition>

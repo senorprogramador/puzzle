@@ -114,9 +114,9 @@ const Transition = <T extends ElementType = "div">({
   onExited,
   ...props
 }: TransitionProps<T>) => {
-  const Component = as ?? "div";
-
-  const [mounted, setMounted] = useState(visible);
+  const [mounted, setMounted] = useState(
+    () => visible || forceMount || !unmountOnExit,
+  );
 
   const { enterFrom, enterTo, exitTo } = resolveTemplate(
     template,
@@ -125,12 +125,13 @@ const Transition = <T extends ElementType = "div">({
     exitToProp,
   );
 
-  const [phase, setPhase] = useState<TransitionPhase>(
-    visible || forceMount ? "enterFrom" : "exitTo",
+  const [phase, setPhase] = useState<TransitionPhase>(() =>
+    visible || forceMount || !unmountOnExit ? "enterFrom" : "exitTo",
   );
 
   const frameRef = useRef<number | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInitialRenderRef = useRef(true);
 
   const clearTimers = () => {
     if (frameRef.current !== null) {
@@ -147,32 +148,58 @@ const Transition = <T extends ElementType = "div">({
   useEffect(() => {
     clearTimers();
 
+    /*
+     * A permanently mounted, initially hidden transition should start in its
+     * closed phase without firing onExit or starting an exit timer.
+     */
+    if (isInitialRenderRef.current) {
+      isInitialRenderRef.current = false;
+
+      if (!visible) {
+        if (forceMount || !unmountOnExit) {
+          setMounted(true);
+          setPhase("enterFrom");
+        }
+
+        return clearTimers;
+      }
+    }
+
+    /*
+     * Keep the child mounted whenever exit unmounting is disabled.
+     * This also covers changing unmountOnExit dynamically.
+     */
+    if (!unmountOnExit || forceMount) {
+      setMounted(true);
+    }
+
     if (visible) {
       setMounted(true);
       setPhase("enterFrom");
 
       onEnter?.();
 
-      // Zorg dat de browser eerst de beginstatus kan toepassen.
+      // Ensure the browser applies the initial phase before entering.
       frameRef.current = requestAnimationFrame(() => {
         frameRef.current = requestAnimationFrame(() => {
           setPhase("enterTo");
         });
       });
     } else {
-      if (!mounted) {
-        return;
+      if (!mounted && unmountOnExit && !forceMount) {
+        return clearTimers;
       }
 
       setPhase("exitTo");
 
       onExit?.();
 
-      // Fallback wanneer transitionend/animationend niet afgaat.
+      // Fallback when transitionend/animationend does not fire.
       timeoutRef.current = setTimeout(() => {
         if (unmountOnExit && !forceMount) {
           setMounted(false);
         }
+
         setPhase("enterFrom");
         onExited?.();
       }, duration);
@@ -192,9 +219,11 @@ const Transition = <T extends ElementType = "div">({
 
     if (phase === "exitTo" && !visible) {
       clearTimers();
+
       if (unmountOnExit && !forceMount) {
         setMounted(false);
       }
+
       setPhase("enterFrom");
       onExited?.();
     }
@@ -211,9 +240,11 @@ const Transition = <T extends ElementType = "div">({
 
     if (phase === "exitTo" && !visible) {
       clearTimers();
+
       if (unmountOnExit && !forceMount) {
         setMounted(false);
       }
+
       setPhase("enterFrom");
       onExited?.();
     }
@@ -234,6 +265,7 @@ const Transition = <T extends ElementType = "div">({
     if (!isValidElement<PropsWithoutRef<HTMLElement>>(child)) {
       return child;
     }
+
     return cloneElement(child, {
       ...child.props,
       ...props,

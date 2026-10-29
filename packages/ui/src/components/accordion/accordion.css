@@ -84,51 +84,46 @@
     transform: translateY(0.125em) rotate(225deg);
 }
 
-/* 
- * Animate intrinsic content size with CSS Grid.
- * No measured height, inline styles, timers or animation dependency.
+/*
+ * Transition adds its phase classes to this outer panel.
+ * The accordion template in transition.css animates its grid track.
  */
 .puzzle-accordion__panel {
-    display: grid;
-    grid-template-rows: 0fr;
     min-height: 0;
     overflow: hidden;
-    opacity: 0;
-}
-.puzzle-accordion__panel.puzzle-transition-accordion-active {
-    grid-template-rows: 1fr;
-    opacity: 1;
 }
 
-.puzzle-accordion__panel.puzzle-transition-accordion-exit,
-.puzzle-accordion__panel.puzzle-transition-accordion-active {
-    transition:
-        grid-template-rows var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out),
-        opacity var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
-}
-
+/*
+ * This must be the direct grid child of the animated panel.
+ * min-height: 0 allows the 0fr track to collapse despite intrinsic content size.
+ */
 .puzzle-accordion__panel-inner {
     min-height: 0;
     overflow: hidden;
 }
 
 /*
- * This wrapper is required for the grid track to collapse correctly.
- * Vertical padding is added only while open, so it does not prevent
- * the panel from reaching zero height.
+ * Vertical padding is animated separately from the grid track.
+ * Keeping it at zero while closed ensures the panel can collapse completely.
  */
 .puzzle-accordion__content {
-    padding-block: 0;
-    padding-inline: var(--puzzle-space-4, 1rem);
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-inline: var(--puzzle-accordion-content-padding-inline);
     color: var(--puzzle-color-text-muted);
+
+    transition:
+        padding-top var(--puzzle-accordion-duration) var(--puzzle-accordion-easing),
+        padding-bottom var(--puzzle-accordion-duration) var(--puzzle-accordion-easing);
 }
 
 .puzzle-accordion__panel.puzzle-transition-accordion-active .puzzle-accordion__content {
-    padding-block: var(--puzzle-space-4, 1rem);
+    padding-top: var(--puzzle-accordion-content-padding-top);
+    padding-bottom: var(--puzzle-accordion-content-padding-bottom);
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .puzzle-accordion__panel {
+    .puzzle-accordion__content {
         transition: none;
     }
 }
