@@ -2,6 +2,8 @@ import * as fs from "node:fs";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import {
+  Breadcrumbs,
+  BreadcrumbsProps,
   Carousel,
   CarouselController,
   PageLayout,
@@ -12,6 +14,23 @@ import {
 import { Heading, Text } from "@puzzle/ui";
 import { Header } from "@/components/layout/header";
 import { DialogSection } from "@/components/dialog-section";
+import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
+
+const breadcrumbs = [
+  {
+    label: "Home",
+    href: "/",
+    leadingIcon: <FlowbiteIcon name="home-solid" size={16} />,
+  },
+  {
+    label: "Projects",
+    href: "/projects",
+    leadingIcon: <FlowbiteIcon name="folder-solid" size={16} />,
+  },
+  {
+    label: "Puzzle",
+  },
+] satisfies BreadcrumbsProps["items"];
 
 const filePath = "count.txt";
 
@@ -43,8 +62,12 @@ function Home() {
   return (
     <PageLayout
       header={<Header />}
-      headerClassName="sticky top-0 p-2 bg-white/10 border-b border-gray-200/10 shadow-sm"
+      headerClassName="sticky top-0 z-(--puzzle-z-index-navigation) p-2 bg-(--puzzle-color-background) shadow-sm border-b border-gray-200/10 shadow-sm"
     >
+      <Breadcrumbs
+        items={breadcrumbs}
+        className="p-2 sticky top-16.25 bg-(--puzzle-color-background)"
+      />
       <SectionStack divideY>
         <DialogSection />
         <Section>

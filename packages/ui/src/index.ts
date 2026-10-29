@@ -75,3 +75,9 @@ export {
   type CarouselContextValue,
   type CarouselControllerProps,
 } from "./components/carousel/carousel-controller";
+
+export {
+  Breadcrumbs,
+  type BreadcrumbsProps,
+  type BreadcrumbItem,
+} from "./components/breadcrumbs/breadcrumbs";
