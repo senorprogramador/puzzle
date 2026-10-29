@@ -1,0 +1,139 @@
+.puzzle-text-renderer,
+.puzzle-text-editor {
+    min-width: 0;
+    color: var(--puzzle-color-text, #171717);
+}
+
+.puzzle-text-renderer__block,
+.puzzle-text-editor__block {
+    margin: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.puzzle-text-renderer__block + .puzzle-text-renderer__block,
+.puzzle-text-editor__block + .puzzle-text-editor__block {
+    margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
+}
+
+:where(
+    .puzzle-typography-display1,
+    .puzzle-typography-display2,
+    .puzzle-typography-headline1,
+    .puzzle-typography-headline2,
+    .puzzle-typography-headline3,
+    .puzzle-typography-headline4
+) + :where(
+    .puzzle-text-renderer__block.puzzle-typography-display1,
+    .puzzle-text-renderer__block.puzzle-typography-display2,
+    .puzzle-text-renderer__block.puzzle-typography-headline1,
+    .puzzle-text-renderer__block.puzzle-typography-headline2,
+    .puzzle-text-renderer__block.puzzle-typography-headline3,
+    .puzzle-text-renderer__block.puzzle-typography-headline4,
+    .puzzle-text-editor__block.puzzle-typography-display1,
+    .puzzle-text-editor__block.puzzle-typography-display2,
+    .puzzle-text-editor__block.puzzle-typography-headline1,
+    .puzzle-text-editor__block.puzzle-typography-headline2,
+    .puzzle-text-editor__block.puzzle-typography-headline3,
+    .puzzle-text-editor__block.puzzle-typography-headline4
+) {
+    margin-block-start: var(--puzzle-font-gap-heading-stack-gap, 0.3em);
+}
+
+:where(
+    .puzzle-typography-display1,
+    .puzzle-typography-display2,
+    .puzzle-typography-headline1,
+    .puzzle-typography-headline2,
+    .puzzle-typography-headline3,
+    .puzzle-typography-headline4
+) + :where(
+    .puzzle-text-renderer__block.puzzle-typography-body1,
+    .puzzle-text-renderer__block.puzzle-typography-body2,
+    .puzzle-text-editor__block.puzzle-typography-body1,
+    .puzzle-text-editor__block.puzzle-typography-body2
+) {
+    margin-block-start: var(--puzzle-font-gap-heading-paragraph-gap, 0.65em);
+}
+
+:where(
+    .puzzle-text-renderer__block.puzzle-typography-body1,
+    .puzzle-text-renderer__block.puzzle-typography-body2,
+    .puzzle-text-editor__block.puzzle-typography-body1,
+    .puzzle-text-editor__block.puzzle-typography-body2
+) + :where(
+    .puzzle-text-renderer__block.puzzle-typography-display1,
+    .puzzle-text-renderer__block.puzzle-typography-display2,
+    .puzzle-text-renderer__block.puzzle-typography-headline1,
+    .puzzle-text-renderer__block.puzzle-typography-headline2,
+    .puzzle-text-renderer__block.puzzle-typography-headline3,
+    .puzzle-text-renderer__block.puzzle-typography-headline4,
+    .puzzle-text-editor__block.puzzle-typography-display1,
+    .puzzle-text-editor__block.puzzle-typography-display2,
+    .puzzle-text-editor__block.puzzle-typography-headline1,
+    .puzzle-text-editor__block.puzzle-typography-headline2,
+    .puzzle-text-editor__block.puzzle-typography-headline3,
+    .puzzle-text-editor__block.puzzle-typography-headline4
+) {
+    margin-block-start: var(--puzzle-font-gap-section-gap, 1.5em);
+}
+
+.puzzle-text-editor {
+    position: relative;
+    min-height: 8rem;
+    padding: var(--puzzle-space-4, 1rem);
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border, #e5e0d6);
+    border-radius: var(--puzzle-radius-lg, 0.5rem);
+    background: var(--puzzle-color-surface, #ffffff);
+    color: var(--puzzle-color-text, #171717);
+    caret-color: var(--puzzle-color-primary, #2563eb);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    outline: none;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.puzzle-text-editor:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring, #2563eb);
+    outline-offset: 2px;
+}
+
+.puzzle-text-editor[aria-readonly="true"] {
+    cursor: text;
+}
+
+.puzzle-text-editor[data-empty="true"]::before {
+    position: absolute;
+    inset-block-start: var(--puzzle-space-4, 1rem);
+    inset-inline-start: var(--puzzle-space-4, 1rem);
+    color: var(--puzzle-color-text-subtle, #737373);
+    content: attr(data-placeholder);
+    pointer-events: none;
+    user-select: none;
+}
+
+.puzzle-text-editor__block:focus {
+    outline: none;
+}
+
+.puzzle-text-editor strong,
+.puzzle-text-renderer strong {
+    font-weight: var(--puzzle-font-weight-bold, 700);
+}
+
+.puzzle-text-editor u,
+.puzzle-text-renderer u {
+    text-underline-offset: 0.15em;
+}
+
+.puzzle-text-editor s,
+.puzzle-text-renderer s {
+    text-decoration-thickness: from-font;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-text-editor {
+        scroll-behavior: auto;
+    }
+}

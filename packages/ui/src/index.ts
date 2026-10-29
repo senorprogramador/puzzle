@@ -107,3 +107,49 @@ export {
   type AccordionItemData,
   type AccordionType,
 } from "./components/accordion/accordion";
+
+export {
+  BottomNavigation,
+  BottomNavigationItem,
+  type BottomNavigationProps,
+  type BottomNavigationItemProps,
+} from "./components/bottom-navigation/bottom-navigation";
+
+export {
+  TextEditor,
+  type TextEditorHandle,
+  type TextEditorProps,
+} from "./components/text-editor/text-editor";
+export {
+  TextRenderer,
+  type TextRendererProps,
+} from "./components/text-editor/text-renderer";
+export {
+  parseHtmlToDocument,
+  parseMarkdownToDocument,
+} from "./components/text-editor/text-parser";
+export {
+  applyMark,
+  createTextDocument,
+  createTextSelection,
+  getBlockLength,
+  getBlockText,
+  getOrderedSelection,
+  insertDocumentAtSelection,
+  insertTextAtSelection,
+  isCollapsedSelection,
+  isHeadingVariant,
+  normalizeInlines,
+  normalizeTextDocument,
+  setTextVariant,
+} from "./components/text-editor/text-document";
+export type {
+  TextBlock,
+  TextBlockVariant,
+  TextBlockType,
+  TextDocument,
+  TextInline,
+  TextMark,
+  TextPoint,
+  TextSelection,
+} from "./components/text-editor/text-editor.types";

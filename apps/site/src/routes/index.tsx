@@ -5,6 +5,8 @@ import {
   Accordion,
   AppBar,
   Avatar,
+  BottomNavigation,
+  BottomNavigationItem,
   Breadcrumbs,
   BreadcrumbsProps,
   Button,
@@ -15,10 +17,15 @@ import {
   SectionStack,
   Skeleton,
   Stack,
+  TextDocument,
+  TextEditor,
+  TextEditorHandle,
+  TextRenderer,
 } from "@puzzle/ui";
 import { Heading, Text, Preview } from "@puzzle/ui";
 import { DialogSection } from "@/components/dialog-section";
 import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
+import { useRef, useState } from "react";
 
 const breadcrumbs = [
   {
@@ -81,6 +88,28 @@ const accordionItems = [
 ];
 
 function Home() {
+  const editorRef = useRef<TextEditorHandle>(null);
+  const [document, setDocument] = useState<TextDocument>({
+    type: "doc",
+    content: [
+      {
+        type: "heading",
+        variant: "headline1",
+        children: [{ text: "Hallo", marks: ["bold"] }],
+      },
+      {
+        type: "paragraph",
+        variant: "body1",
+        children: [
+          { text: "Dit is gewone tekst met " },
+          {
+            text: "opmaak",
+            marks: ["italic", "underline"],
+          },
+        ],
+      },
+    ],
+  });
   return (
     <PageLayout
       header={
@@ -115,7 +144,34 @@ function Home() {
         className="p-2 sticky top-16.25 bg-(--puzzle-color-background)"
       />
       <SectionStack divideY>
+        <Section>
+          <Button
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => editorRef.current?.toggleMark("bold")}
+          >
+            Bold
+          </Button>
+
+          <TextEditor ref={editorRef} value={document} onChange={setDocument} />
+
+          <TextRenderer document={document} />
+        </Section>
         <DialogSection />
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Heading variant="headline2">Bottom Navigation</Heading>
+              <BottomNavigation>
+                <BottomNavigationItem icon={<span>🏠</span>} label="Home" />
+                <BottomNavigationItem
+                  icon={<span>📦</span>}
+                  label="Components"
+                />
+                <BottomNavigationItem icon={<span>📄</span>} label="Docs" />
+              </BottomNavigation>
+            </Section>
+          </Preview>
+        </Section>
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
