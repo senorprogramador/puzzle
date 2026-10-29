@@ -2,6 +2,7 @@ import * as fs from "node:fs";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import {
+  Accordion,
   AppBar,
   Avatar,
   Breadcrumbs,
@@ -61,6 +62,24 @@ export const Route = createFileRoute("/")({
   loader: async () => await getCount(),
 });
 
+const accordionItems = [
+  {
+    id: "shipping",
+    title: "Shipping information",
+    content: <p>Orders are shipped within 1–2 business days.</p>,
+  },
+  {
+    id: "returns",
+    title: "Returns and refunds",
+    content: <p>You can return eligible items within 30 days.</p>,
+  },
+  {
+    id: "payment",
+    title: "Payment methods",
+    content: <p>We accept the major credit cards.</p>,
+  },
+];
+
 function Home() {
   return (
     <PageLayout
@@ -97,6 +116,20 @@ function Home() {
       />
       <SectionStack divideY>
         <DialogSection />
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Heading variant="headline2">Accordion</Heading>
+              <Accordion
+                items={accordionItems}
+                //type="single"
+                scrollIntoView={false}
+                unMountOnClose={false}
+                //initialOpenItemIndexes={[0]}
+              />
+            </Section>
+          </Preview>
+        </Section>
         <Section>
           <Preview defaultDevice="mobile">
             <Section>

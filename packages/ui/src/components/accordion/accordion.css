@@ -1,0 +1,134 @@
+.puzzle-accordion {
+    --puzzle-accordion-border-color: var(--puzzle-color-border, #e5e0d6);
+    --puzzle-accordion-trigger-padding-block: var(--puzzle-space-4, 1rem);
+    --puzzle-accordion-trigger-padding-inline: var(--puzzle-space-4, 1rem);
+    --puzzle-accordion-content-padding-inline: var(--puzzle-space-4, 1rem);
+    --puzzle-accordion-content-padding-top: var(--puzzle-space-2, 0.5rem);
+    --puzzle-accordion-content-padding-bottom: var(--puzzle-space-4, 1rem);
+    --puzzle-accordion-duration: var(--puzzle-duration-normal, 300ms);
+    --puzzle-accordion-easing: var(--puzzle-easing-standard, ease);
+
+    color: var(--puzzle-color-text, #171717);
+    border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-accordion-border-color);
+}
+
+.puzzle-accordion:empty {
+    border-block-end: 0;
+}
+
+/* Semantic heading: the native button is its only child. */
+.puzzle-accordion__heading {
+    margin: 0;
+    border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-accordion-border-color);
+}
+
+/* Trigger */
+.puzzle-accordion__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--puzzle-space-3, 0.75rem);
+
+    width: 100%;
+    padding: var(--puzzle-accordion-trigger-padding-block) var(--puzzle-accordion-trigger-padding-inline);
+
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+
+    font-family: var(--puzzle-font-family-subtitle1, inherit);
+    font-size: var(--puzzle-font-size-subtitle1, 1rem);
+    font-weight: var(--puzzle-font-weight-subtitle1, 600);
+    line-height: var(--puzzle-font-line-height-subtitle1, 1.35);
+    letter-spacing: var(--puzzle-font-letter-spacing-subtitle1, 0);
+
+    text-align: start;
+    cursor: pointer;
+    touch-action: manipulation;
+
+    transition: background-color var(--puzzle-accordion-duration) var(--puzzle-accordion-easing);
+}
+
+.puzzle-accordion__trigger:hover:not(:disabled) {
+    background-color: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-accordion__trigger:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: -3px;
+}
+
+.puzzle-accordion__trigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+/* CSS-only chevron: no extra DOM node or icon dependency. */
+.puzzle-accordion__trigger::after {
+    content: "";
+    flex: 0 0 auto;
+
+    width: var(--puzzle-space-2, 0.5rem);
+    height: var(--puzzle-space-2, 0.5rem);
+
+    border-inline-end: var(--puzzle-border-width-strong, 2px) solid currentColor;
+    border-block-end: var(--puzzle-border-width-strong, 2px) solid currentColor;
+
+    transform: translateY(-0.125em) rotate(45deg);
+
+    transition: transform var(--puzzle-accordion-duration) var(--puzzle-accordion-easing);
+}
+
+.puzzle-accordion__trigger[aria-expanded="true"]::after {
+    transform: translateY(0.125em) rotate(225deg);
+}
+
+/* 
+ * Animate intrinsic content size with CSS Grid.
+ * No measured height, inline styles, timers or animation dependency.
+ */
+.puzzle-accordion__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    min-height: 0;
+    overflow: hidden;
+    opacity: 0;
+}
+.puzzle-accordion__panel.puzzle-transition-accordion-active {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.puzzle-accordion__panel.puzzle-transition-accordion-exit,
+.puzzle-accordion__panel.puzzle-transition-accordion-active {
+    transition:
+        grid-template-rows var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out),
+        opacity var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
+}
+
+.puzzle-accordion__panel-inner {
+    min-height: 0;
+    overflow: hidden;
+}
+
+/*
+ * This wrapper is required for the grid track to collapse correctly.
+ * Vertical padding is added only while open, so it does not prevent
+ * the panel from reaching zero height.
+ */
+.puzzle-accordion__content {
+    padding-block: 0;
+    padding-inline: var(--puzzle-space-4, 1rem);
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-accordion__panel.puzzle-transition-accordion-active .puzzle-accordion__content {
+    padding-block: var(--puzzle-space-4, 1rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-accordion__panel {
+        transition: none;
+    }
+}

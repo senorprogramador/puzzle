@@ -100,3 +100,10 @@ export {
   ScrollLock,
   type ScrollLockProps,
 } from "./components/scroll-lock/scroll-lock";
+
+export {
+  Accordion,
+  type AccordionProps,
+  type AccordionItemData,
+  type AccordionType,
+} from "./components/accordion/accordion";

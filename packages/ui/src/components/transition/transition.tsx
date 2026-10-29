@@ -22,7 +22,8 @@ type TransitionTemplate =
   | "slide-in-up"
   | "slide-in-down"
   | "slide-in-left"
-  | "slide-in-right";
+  | "slide-in-right"
+  | "accordion";
 
 type TransitionProps<T extends ElementType = "div"> = {
   visible: boolean;
@@ -78,6 +79,12 @@ const resolveTemplate = (
         enterFrom: enterFromProp ?? "puzzle-transition-slide-in-right-from",
         enterTo: enterToProp ?? "puzzle-transition-slide-in-right-active",
         exitTo: exitToProp ?? "puzzle-transition-slide-in-right-exit",
+      };
+    case "accordion":
+      return {
+        enterFrom: enterFromProp ?? "puzzle-transition-accordion-from",
+        enterTo: enterToProp ?? "puzzle-transition-accordion-active",
+        exitTo: exitToProp ?? "puzzle-transition-accordion-exit",
       };
     case "fade":
     default:

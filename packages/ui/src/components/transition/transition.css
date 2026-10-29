@@ -117,3 +117,28 @@
         transition: none;
     }
 }
+
+.puzzle-transition-accordion-from,
+.puzzle-transition-accordion-exit {
+    grid-template-rows: 0fr;
+    opacity: 0;
+}
+
+.puzzle-transition-accordion-active {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.puzzle-transition-accordion-active,
+.puzzle-transition-accordion-exit {
+    transition:
+        grid-template-rows var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out),
+        opacity var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-transition-accordion-active,
+    .puzzle-transition-accordion-exit {
+        transition: none;
+    }
+}
