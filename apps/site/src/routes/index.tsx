@@ -2,8 +2,11 @@ import * as fs from "node:fs";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import {
+  AppBar,
+  Avatar,
   Breadcrumbs,
   BreadcrumbsProps,
+  Button,
   Carousel,
   CarouselController,
   PageLayout,
@@ -13,7 +16,6 @@ import {
   Stack,
 } from "@puzzle/ui";
 import { Heading, Text, Preview } from "@puzzle/ui";
-import { Header } from "@/components/layout/header";
 import { DialogSection } from "@/components/dialog-section";
 import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
 
@@ -62,8 +64,32 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <PageLayout
-      header={<Header />}
-      headerClassName="sticky top-0 z-(--puzzle-z-index-navigation) p-2 bg-(--puzzle-color-background) shadow-sm border-b border-gray-200/10 shadow-sm"
+      header={
+        <AppBar
+          logo={
+            <img
+              src="/favicon.svg"
+              width="48"
+              height="48"
+              alt="Logo"
+              className="h-12 w-12"
+            />
+          }
+          title="Puzzle"
+          navigationItems={[
+            { label: "Home", href: "/", current: true },
+            { label: "Components", href: "/components" },
+            { label: "Docs", href: "/docs" },
+          ]}
+          trailingComponents={
+            <>
+              <Button variant="ghost">Settings</Button>
+              <Avatar alt="Sjoerd van den Berg" />
+            </>
+          }
+          sticky
+        />
+      }
     >
       <Breadcrumbs
         items={breadcrumbs}
@@ -71,6 +97,38 @@ function Home() {
       />
       <SectionStack divideY>
         <DialogSection />
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Heading variant="headline2">App Bar</Heading>
+              <AppBar
+                logo={
+                  <img
+                    src="/favicon.svg"
+                    width="48"
+                    height="48"
+                    alt="Logo"
+                    className="h-12 w-12"
+                  />
+                }
+                title="Puzzle"
+                navigationItems={[
+                  { label: "Home", href: "/", current: true },
+                  { label: "Components", href: "/components" },
+                  { label: "Docs", href: "/docs" },
+                ]}
+                trailingComponents={
+                  <>
+                    <Button variant="ghost">Settings</Button>
+                    <Avatar alt="Sjoerd van den Berg" />
+                  </>
+                }
+                sticky
+              />
+            </Section>
+            <div className="h-128" />
+          </Preview>
+        </Section>
         <Section>
           <Preview defaultDevice="mobile">
             <Section>

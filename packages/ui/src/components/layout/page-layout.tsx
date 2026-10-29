@@ -24,7 +24,6 @@ type PageLayoutProps = {
   /**
    * Semantic element overrides.
    */
-  headerAs?: ElementType;
   leftSidebarAs?: ElementType;
   rightSidebarAs?: ElementType;
   footerAs?: ElementType;
@@ -38,7 +37,6 @@ type PageLayoutProps = {
   /**
    * Attributes for individual page regions.
    */
-  headerProps?: PageLayoutElementProps;
   leftSidebarProps?: PageLayoutElementProps;
   mainProps?: PageLayoutElementProps;
   rightSidebarProps?: PageLayoutElementProps;
@@ -48,7 +46,6 @@ type PageLayoutProps = {
    * Styling.
    */
   className?: string;
-  headerClassName?: string;
   contentClassName?: string;
   leftSidebarClassName?: string;
   mainClassName?: string;
@@ -99,7 +96,6 @@ const PageLayout = ({
   rightSidebar,
   footer,
 
-  headerAs,
   leftSidebarAs,
   rightSidebarAs,
   footerAs,
@@ -107,14 +103,12 @@ const PageLayout = ({
   leftSidebarLabel,
   rightSidebarLabel,
 
-  headerProps,
   leftSidebarProps,
   mainProps,
   rightSidebarProps,
   footerProps,
 
   className,
-  headerClassName,
   contentClassName,
   leftSidebarClassName,
   mainClassName,
@@ -140,7 +134,6 @@ const PageLayout = ({
   const mainId =
     mainProps?.id ?? `puzzle-main-${reactId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
-  const Header = headerAs ?? "header";
   const LeftSidebar = leftSidebarAs ?? "aside";
   const RightSidebar = rightSidebarAs ?? "aside";
   const Footer = footerAs ?? "footer";
@@ -187,18 +180,7 @@ const PageLayout = ({
         </a>
       )}
 
-      {hasHeader && (
-        <Header
-          {...headerProps}
-          className={cx(
-            "puzzle-page-layout__header",
-            headerClassName,
-            headerProps?.className,
-          )}
-        >
-          {header}
-        </Header>
-      )}
+      {hasHeader && header}
 
       <div className={cx("puzzle-page-layout__content", contentClassName)}>
         {/* Main first in the DOM for content-first reading order. */}

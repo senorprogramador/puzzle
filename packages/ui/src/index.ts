@@ -89,3 +89,14 @@ export {
 } from "./components/preview/preview";
 
 export { Skeleton, type SkeletonProps } from "./components/skeleton/skeleton";
+
+export {
+  AppBar,
+  type AppBarProps,
+  type AppBarNavigationItem,
+} from "./components/app-bar/app-bar";
+
+export {
+  ScrollLock,
+  type ScrollLockProps,
+} from "./components/scroll-lock/scroll-lock";

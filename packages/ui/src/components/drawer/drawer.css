@@ -89,32 +89,32 @@
 }
 
 .puzzle-drawer--top .puzzle-drawer__content-wrapper {
-    padding: var(--puzzle-space-6, 1.5rem) var(--puzzle-space-3, 0.75rem) 0;
+    padding: var(--puzzle-space-4, 1.5rem) var(--puzzle-space-2, 0.75rem) 0;
 }
 .puzzle-drawer--top .puzzle-drawer__content {
-    padding: 0 var(--puzzle-space-3, 0.75rem);
+    padding: 0 var(--puzzle-space-2, 0.75rem);
 }
 
 .puzzle-drawer--bottom .puzzle-drawer__content-wrapper {
-    padding: 0 var(--puzzle-space-3, 0.75rem) var(--puzzle-space-6, 1.5rem);
+    padding: 0 var(--puzzle-space-2, 0.75rem) var(--puzzle-space-4, 1.5rem);
 }
 .puzzle-drawer--bottom .puzzle-drawer__content {
-    padding: 0 var(--puzzle-space-3, 0.75rem);
+    padding: 0 var(--puzzle-space-2, 0.75rem);
 }
 
 .puzzle-drawer--left .puzzle-drawer__content-wrapper {
-    padding: var(--puzzle-space-6, 1.5rem) var(--puzzle-space-3, 0.75rem) var(--puzzle-space-6, 1.5rem)
-        var(--puzzle-space-6, 1.5rem);
+    padding: var(--puzzle-space-4, 1.5rem) var(--puzzle-space-2, 0.75rem) var(--puzzle-space-4, 1.5rem)
+        var(--puzzle-space-4, 1.5rem);
     overflow-x: hidden;
 }
 .puzzle-drawer--left .puzzle-drawer__content {
-    padding: 0 var(--puzzle-space-3, 0.75rem);
+    padding: 0 var(--puzzle-space-2, 0.75rem);
     min-width: 96px;
 }
 .puzzle-drawer--right .puzzle-drawer__content-wrapper {
-    padding: var(--puzzle-space-6, 1.5rem) var(--puzzle-space-3, 0.75rem) var(--puzzle-space-6, 1.5rem)
-        var(--puzzle-space-3, 0.75rem);
+    padding: var(--puzzle-space-4, 1.5rem) var(--puzzle-space-2, 0.75rem) var(--puzzle-space-4, 1.5rem)
+        var(--puzzle-space-2, 0.75rem);
 }
 .puzzle-drawer--right .puzzle-drawer__content {
-    padding: 0 var(--puzzle-space-3, 0.75rem);
+    padding: 0 var(--puzzle-space-2, 0.75rem);
 }

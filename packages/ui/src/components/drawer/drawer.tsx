@@ -5,6 +5,7 @@ import { Backdrop } from "../backdrop/backdrop";
 import { Stack } from "../stack/stack";
 import "./drawer.css";
 import { useResizeBar } from "./use-resize-bar";
+import { ScrollLock } from "../scroll-lock/scroll-lock";
 
 const TRANSITION_MAP: Record<DrawerPosition, TransitionTemplate> = {
   left: "slide-in-right",
@@ -33,6 +34,7 @@ const Drawer = ({
 }: DrawerProps) => {
   return (
     <Backdrop open={open} onClose={() => onOpenChange(false)}>
+      <ScrollLock enabled={open} />
       <Transition visible={open} template={TRANSITION_MAP[position]} forceMount>
         <DrawerContent
           position={position}
