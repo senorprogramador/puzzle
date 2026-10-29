@@ -11,7 +11,7 @@ import {
   SectionStack,
   Stack,
 } from "@puzzle/ui";
-import { Heading, Text } from "@puzzle/ui";
+import { Heading, Text, Preview } from "@puzzle/ui";
 import { Header } from "@/components/layout/header";
 import { DialogSection } from "@/components/dialog-section";
 import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
@@ -71,54 +71,60 @@ function Home() {
       <SectionStack divideY>
         <DialogSection />
         <Section>
-          <Heading variant="headline2">Carousel</Heading>
-          <CarouselController items={[1, 2, 3, 4, 5, 6]}>
-            <Carousel<number>
-              renderItem={(item) => (
-                <div className="flex items-center justify-center p-4 border border-orange-500 bg-orange-100">
-                  {item}
-                </div>
-              )}
-              panelsPerView={{
-                mobile: 1,
-                tablet: 3,
-                desktop: 4,
-              }}
-              singlePageAlignment="center"
-              buttonAlignment="aside"
-              backButton={
-                <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
-                  &lt;
-                </button>
-              }
-              nextButton={
-                <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
-                  &gt;
-                </button>
-              }
-              pagerAlignment="under"
-              renderPager={(currentPage, numberOfPages) => (
-                <Stack
-                  direction="row"
-                  alignH="center"
-                  alignV="center"
-                  gap="sm"
-                  className="mt-2"
-                >
-                  {Array.from({ length: numberOfPages }).map((_, i) => (
-                    <span
-                      key={i}
-                      className={
-                        i === currentPage ? "font-bold text-2xl my-auto" : ""
-                      }
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Heading variant="headline2">Carousel</Heading>
+              <CarouselController items={[1, 2, 3, 4, 5, 6]}>
+                <Carousel<number>
+                  renderItem={(item) => (
+                    <div className="flex items-center justify-center p-4 border border-orange-500 bg-orange-100">
+                      {item}
+                    </div>
+                  )}
+                  panelsPerView={{
+                    mobile: 1,
+                    tablet: 3,
+                    desktop: 4,
+                  }}
+                  singlePageAlignment="center"
+                  buttonAlignment="aside"
+                  backButton={
+                    <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
+                      &lt;
+                    </button>
+                  }
+                  nextButton={
+                    <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
+                      &gt;
+                    </button>
+                  }
+                  pagerAlignment="under"
+                  renderPager={(currentPage, numberOfPages) => (
+                    <Stack
+                      direction="row"
+                      alignH="center"
+                      alignV="center"
+                      gap="sm"
+                      className="mt-2"
                     >
-                      {i === currentPage ? "•" : "○"}
-                    </span>
-                  ))}
-                </Stack>
-              )}
-            />
-          </CarouselController>
+                      {Array.from({ length: numberOfPages }).map((_, i) => (
+                        <span
+                          key={i}
+                          className={
+                            i === currentPage
+                              ? "font-bold text-2xl my-auto"
+                              : ""
+                          }
+                        >
+                          {i === currentPage ? "•" : "○"}
+                        </span>
+                      ))}
+                    </Stack>
+                  )}
+                />
+              </CarouselController>
+            </Section>
+          </Preview>
         </Section>
         <Section>
           <Stack

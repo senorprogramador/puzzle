@@ -1,0 +1,111 @@
+.puzzle-preview {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--puzzle-color-text, #171717);
+    background: var(--puzzle-color-surface, #ffffff);
+    border: 1px solid var(--puzzle-color-border, #e5e0d6);
+    border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-preview__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.5rem;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--puzzle-color-border, #e5e0d6);
+}
+
+.puzzle-preview__devices {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.puzzle-preview__device {
+    appearance: none;
+    border: 1px solid transparent;
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+    padding: 0.5rem 0.75rem;
+    color: var(--puzzle-color-text-muted, #666666);
+    background: transparent;
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition:
+        color 150ms ease,
+        background-color 150ms ease,
+        border-color 150ms ease;
+}
+
+.puzzle-preview__device:hover {
+    color: var(--puzzle-color-text, #171717);
+    background: var(--puzzle-color-surface-sunken, #f1eee6);
+}
+
+.puzzle-preview__device--active {
+    color: var(--puzzle-color-text, #171717);
+    background: var(--puzzle-color-surface-sunken, #f1eee6);
+    border-color: var(--puzzle-color-border, #e5e0d6);
+}
+
+.puzzle-preview__device:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring, #2563eb);
+    outline-offset: 2px;
+}
+
+.puzzle-preview__dimensions {
+    flex-shrink: 0;
+    color: var(--puzzle-color-text-muted, #666666);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.puzzle-preview__stage {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-width: 0;
+    min-height: 20rem;
+    max-height: 75vh;
+    overflow: auto;
+    padding: 1.5rem;
+    background: var(--puzzle-color-surface-sunken, #f1eee6);
+}
+
+.puzzle-preview__viewport {
+    flex: 0 0 auto;
+    overflow: hidden;
+    background: var(--puzzle-color-background, #ffffff);
+    box-shadow: 0 2px 12px rgb(0 0 0 / 10%);
+}
+
+.puzzle-preview__frame {
+    display: block;
+    max-width: none;
+    border: 0;
+    transform-origin: top left;
+    background: var(--puzzle-color-background, #ffffff);
+}
+
+@media (max-width: 480px) {
+    .puzzle-preview__toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .puzzle-preview__stage {
+        justify-content: flex-start;
+        padding: 1rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-preview__device {
+        transition: none;
+    }
+}

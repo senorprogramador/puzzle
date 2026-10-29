@@ -111,7 +111,8 @@ const rubberBandOffset = (
 };
 
 const readRenderedOffset = (element: HTMLElement, fallback: number): number => {
-  const transform = window.getComputedStyle(element).transform;
+  const ownerWindow = element.ownerDocument.defaultView ?? window;
+  const transform = ownerWindow.getComputedStyle(element).transform;
 
   if (!transform || transform === "none") {
     return fallback;
@@ -361,7 +362,8 @@ const Carousel = <T,>({
       return;
     }
 
-    const viewportWidth = viewport.clientWidth;
+    const viewportRect = viewport.getBoundingClientRect();
+    const viewportWidth = viewportRect.width;
     const itemNodes = itemRefs.current
       .slice(0, items.length)
       .filter((item): item is HTMLDivElement => item !== null);
@@ -370,14 +372,19 @@ const Carousel = <T,>({
       return;
     }
 
-    const itemOffsets = itemNodes.map((item) => item.offsetLeft);
+    // Relative positions preserve fractional CSS pixels and cancel the
+    // track's current translate transform.
+    const trackRect = track.getBoundingClientRect();
+    const itemRects = itemNodes.map((item) => item.getBoundingClientRect());
+
+    const itemOffsets = itemRects.map((rect) => rect.left - trackRect.left);
 
     let itemsPerPage = 0;
 
-    for (const item of itemNodes) {
-      const itemEnd = item.offsetLeft + item.offsetWidth;
+    for (const rect of itemRects) {
+      const itemEnd = rect.right - trackRect.left;
 
-      if (itemEnd <= viewportWidth + 1) {
+      if (itemEnd <= viewportWidth + 0.01) {
         itemsPerPage += 1;
       } else {
         break;
@@ -388,7 +395,8 @@ const Carousel = <T,>({
 
     const numberOfPages = Math.ceil(items.length / itemsPerPage);
     const maxStartIndex = Math.max(0, items.length - itemsPerPage);
-    const maxOffset = Math.max(0, track.scrollWidth - track.clientWidth);
+    const lastItemEnd = itemRects[itemRects.length - 1].right - trackRect.left;
+    const maxOffset = Math.max(0, lastItemEnd - viewportWidth);
 
     setLayout((previous) => {
       const unchanged =
@@ -423,13 +431,15 @@ const Carousel = <T,>({
       return;
     }
 
+    const ownerWindow = viewport.ownerDocument.defaultView ?? window;
+
     measureLayout();
 
     if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", measureLayout);
+      ownerWindow.addEventListener("resize", measureLayout);
 
       return () => {
-        window.removeEventListener("resize", measureLayout);
+        ownerWindow.removeEventListener("resize", measureLayout);
       };
     }
 
@@ -608,12 +618,13 @@ const Carousel = <T,>({
       }
 
       const track = trackRef.current;
-
+      const ownerWindow =
+        viewportRef.current?.ownerDocument.defaultView ?? window;
       const targetOffset = clampOffset(layout.itemOffsets[targetPanel] ?? 0);
 
       if (
         !track ||
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ownerWindow.matchMedia("(prefers-reduced-motion: reduce)").matches
       ) {
         writeTrackOffset(targetOffset);
         track?.style.removeProperty("transition");
@@ -703,8 +714,9 @@ const Carousel = <T,>({
 
       const track = trackRef.current;
       const viewport = viewportRef.current;
+      const ownerWindow = viewport?.ownerDocument.defaultView ?? window;
 
-      if (!track || !viewport) {
+      if (!track || !viewport || !ownerWindow) {
         return;
       }
 
@@ -785,13 +797,13 @@ const Carousel = <T,>({
       };
 
       const cleanup = () => {
-        window.removeEventListener("pointermove", handleWindowPointerMove);
-
-        window.removeEventListener("pointerup", handleWindowPointerUp);
-
-        window.removeEventListener("pointercancel", handleWindowPointerCancel);
-
-        window.removeEventListener("blur", handleWindowBlur);
+        ownerWindow.removeEventListener("pointermove", handleWindowPointerMove);
+        ownerWindow.removeEventListener("pointerup", handleWindowPointerUp);
+        ownerWindow.removeEventListener(
+          "pointercancel",
+          handleWindowPointerCancel,
+        );
+        ownerWindow.removeEventListener("blur", handleWindowBlur);
 
         if (pointerCleanupRef.current === cleanup) {
           pointerCleanupRef.current = null;
@@ -851,7 +863,7 @@ const Carousel = <T,>({
 
         suppressClickRef.current = true;
 
-        window.setTimeout(() => {
+        ownerWindow.setTimeout(() => {
           suppressClickRef.current = false;
         }, 0);
 
@@ -886,13 +898,10 @@ const Carousel = <T,>({
        * Listen on window instead of relying on events staying inside the
        * viewport. Releasing outside the carousel still completes the drag.
        */
-      window.addEventListener("pointermove", handleWindowPointerMove);
-
-      window.addEventListener("pointerup", handleWindowPointerUp);
-
-      window.addEventListener("pointercancel", handleWindowPointerCancel);
-
-      window.addEventListener("blur", handleWindowBlur);
+      ownerWindow.addEventListener("pointermove", handleWindowPointerMove);
+      ownerWindow.addEventListener("pointerup", handleWindowPointerUp);
+      ownerWindow.addEventListener("pointercancel", handleWindowPointerCancel);
+      ownerWindow.addEventListener("blur", handleWindowBlur);
     },
     [
       animateToPanel,

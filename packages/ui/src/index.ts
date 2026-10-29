@@ -81,3 +81,9 @@ export {
   type BreadcrumbsProps,
   type BreadcrumbItem,
 } from "./components/breadcrumbs/breadcrumbs";
+
+export {
+  Preview,
+  type PreviewProps,
+  type PreviewDevice,
+} from "./components/preview/preview";

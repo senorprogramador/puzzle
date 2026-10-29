@@ -33,6 +33,7 @@
 .puzzle-carousel__item {
     box-sizing: border-box;
     min-width: 0;
+    max-width: 100%;
 }
 
 /* Responsive item widths: panelsPerView mode */
