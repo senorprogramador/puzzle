@@ -9,6 +9,7 @@ import {
   PageLayout,
   Section,
   SectionStack,
+  Skeleton,
   Stack,
 } from "@puzzle/ui";
 import { Heading, Text, Preview } from "@puzzle/ui";
@@ -70,6 +71,19 @@ function Home() {
       />
       <SectionStack divideY>
         <DialogSection />
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Heading variant="headline2">Skeleton</Heading>
+              <Skeleton width="75%" height={16} />
+              <Skeleton width="75%" height={16} radius="none" />
+              <Skeleton width="100%" height={180} />
+              <Skeleton width={48} height={48} radius="full" />
+              <Skeleton width={64} height={64} radius="full" />
+              <Skeleton width={120} height={40} radius="full" />
+            </Section>
+          </Preview>
+        </Section>
         <Section>
           <Preview defaultDevice="mobile">
             <Section>

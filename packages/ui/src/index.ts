@@ -87,3 +87,5 @@ export {
   type PreviewProps,
   type PreviewDevice,
 } from "./components/preview/preview";
+
+export { Skeleton, type SkeletonProps } from "./components/skeleton/skeleton";
