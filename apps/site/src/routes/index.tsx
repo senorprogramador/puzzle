@@ -146,12 +146,13 @@ function Home() {
           <Preview defaultDevice="mobile">
             <Section>
               <Heading variant="headline2">Tabs</Heading>
-              <Tabs tabBarPosition="top">
+              <Tabs tabBarPosition="left">
                 <Tabs.Tab id="tab-1" tab={<div>Tab 1</div>}>
-                  <div>Content for Tab 1</div>
+                  <Text>Content for Tab 1</Text>
+                  <Text>Lorum ipsum dolor sit amet</Text>
                 </Tabs.Tab>
                 <Tabs.Tab id="tab-2" tab={<div>Tab 2</div>}>
-                  <div>Content for Tab 2</div>
+                  <Text>Content for Tab 2</Text>
                 </Tabs.Tab>
               </Tabs>
             </Section>

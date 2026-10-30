@@ -5,6 +5,7 @@ import {
   Children,
   isValidElement,
   useId,
+  useRef,
   useState,
   type ComponentPropsWithoutRef,
   type KeyboardEvent,
@@ -85,6 +86,29 @@ const TabsRoot = ({
 
   const isVertical = tabBarPosition === "left" || tabBarPosition === "right";
 
+  const previousActiveIndex = useRef(
+    Math.max(
+      0,
+      tabs.findIndex((tab) => tab.props.id === currentActiveId),
+    ),
+  );
+
+  const currentActiveIndex = Math.max(
+    0,
+    tabs.findIndex((tab) => tab.props.id === currentActiveId),
+  );
+
+  const slideDirection =
+    currentActiveIndex > previousActiveIndex.current
+      ? 1
+      : currentActiveIndex < previousActiveIndex.current
+        ? -1
+        : 0;
+
+  if (currentActiveId !== tabs[previousActiveIndex.current]?.props.id) {
+    previousActiveIndex.current = currentActiveIndex;
+  }
+
   const activateTab = (tabId: string) => {
     if (!tabs.some((tab) => tab.props.id === tabId)) {
       return;
@@ -161,6 +185,7 @@ const TabsRoot = ({
       {...rootProps}
       className={cn("puzzle-tabs", `puzzle-tabs--${tabBarPosition}`, className)}
       data-orientation={isVertical ? "vertical" : "horizontal"}
+      data-position={tabBarPosition}
     >
       <div
         className="puzzle-tabs__list"
@@ -191,7 +216,11 @@ const TabsRoot = ({
         })}
       </div>
 
-      <div className="puzzle-tabs__content">
+      <div
+        className="puzzle-tabs__content"
+        data-direction={slideDirection}
+        data-position={tabBarPosition}
+      >
         {tabs.map((tab) => {
           const { id, children: content } = tab.props;
           const isActive = id === currentActiveId;
