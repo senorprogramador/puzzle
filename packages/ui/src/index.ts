@@ -171,3 +171,11 @@ export {
   type TooltipProps,
   type TooltipArrowSide,
 } from "./components/tooltip/tooltip";
+
+export {
+  Tabs,
+  TabsTab,
+  type TabsProps,
+  type TabsTabProps,
+  type TabsPosition,
+} from "./components/tabs/tabs";

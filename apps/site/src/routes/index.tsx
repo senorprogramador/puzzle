@@ -16,6 +16,7 @@ import {
   SectionStack,
   Skeleton,
   Stack,
+  Tabs,
   TextDocument,
   TextEditor,
   TextEditorToolbar,
@@ -142,6 +143,19 @@ function Home() {
     >
       <SectionStack divideY>
         <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Heading variant="headline2">Tabs</Heading>
+              <Tabs tabBarPosition="top">
+                <Tabs.Tab id="tab-1" tab={<div>Tab 1</div>}>
+                  <div>Content for Tab 1</div>
+                </Tabs.Tab>
+                <Tabs.Tab id="tab-2" tab={<div>Tab 2</div>}>
+                  <div>Content for Tab 2</div>
+                </Tabs.Tab>
+              </Tabs>
+            </Section>
+          </Preview>
           <Preview defaultDevice="mobile">
             <Section>
               <Heading variant="headline2">Tooltip</Heading>
