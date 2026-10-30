@@ -42,6 +42,10 @@ export {
   CircularProgress,
   type CircularProgressProps,
 } from "./components/progress/circular-progress";
+export {
+  LinearProgress,
+  type LinearProgressProps,
+} from "./components/progress/linear-progress";
 
 export { Portal, type PortalProps } from "./components/portal/portal";
 export {

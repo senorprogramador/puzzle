@@ -11,6 +11,8 @@ import {
   Button,
   Carousel,
   CarouselController,
+  CircularProgress,
+  LinearProgress,
   PageLayout,
   Section,
   SectionStack,
@@ -145,6 +147,18 @@ function Home() {
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
+              <Heading variant="headline2">Linear Progress</Heading>
+              <LinearProgress />
+            </Section>
+            <Section>
+              <Heading variant="headline2">Circular Progress</Heading>
+              <CircularProgress />
+            </Section>
+          </Preview>
+        </Section>
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
               <Heading variant="headline2">Tabs</Heading>
               <Tabs tabBarPosition="left">
                 <Tabs.Tab id="tab-1" tab={<div>Tab 1</div>}>
@@ -251,7 +265,7 @@ function Home() {
                 sticky
               />
             </Section>
-            <div className="h-128" />
+            <div className="h-96" />
           </Preview>
         </Section>
         <Section>

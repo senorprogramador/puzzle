@@ -1,22 +1,17 @@
 import { type ComponentPropsWithRef } from "react";
 import "./circular-progress.css";
 import { cn } from "@puzzle/core";
+import type { ProgressProps } from "./types";
 
-type CircularProgressOwnProps = {
-  color?: string;
-  value?: number;
-  showTrack?: boolean;
-};
-
-type CircularProgressProps = CircularProgressOwnProps &
-  Omit<ComponentPropsWithRef<"svg">, keyof CircularProgressOwnProps>;
+type CircularProgressProps = ProgressProps &
+  Omit<ComponentPropsWithRef<"svg">, keyof ProgressProps>;
 
 const CircularProgress = ({
   color,
   className,
   "aria-label": ariaLabel = "Loading...",
   value,
-  showTrack = false,
+  showTrack = true,
   ...props
 }: CircularProgressProps) => {
   const classes = cn(
