@@ -157,3 +157,17 @@ export {
   TextEditorToolbar,
   type TextEditorToolbarProps,
 } from "./components/text-editor/text-editor-toolbar";
+
+export {
+  Popout,
+  type PopoutProps,
+  type PopoutPosition,
+  type PopoutAction,
+  type PopoutTriggerProps,
+} from "./components/popout/popout";
+
+export {
+  Tooltip,
+  type TooltipProps,
+  type TooltipArrowSide,
+} from "./components/tooltip/tooltip";

@@ -1,0 +1,54 @@
+.puzzle-tooltip {
+    position: relative;
+    width: max-content;
+    max-width: min(320px, calc(100vw - 32px));
+    padding: 8px 12px;
+
+    border-radius: 6px;
+
+    background: var(--puzzle-tooltip-background, var(--puzzle-color-text, #1f1c19));
+
+    color: var(--puzzle-tooltip-color, var(--puzzle-color-background, #ffffff));
+
+    font-size: var(--puzzle-font-size-sm, 0.8125rem);
+    line-height: 1.4;
+
+    overflow-wrap: break-word;
+}
+
+.puzzle-tooltip__content.puzzle-popout__content {
+    background: inherit;
+    border: inherit;
+    box-shadow: none;
+}
+
+.puzzle-tooltip__arrow {
+    position: absolute;
+    z-index: 1;
+
+    width: 12px;
+    height: 12px;
+
+    background: inherit;
+    pointer-events: none;
+}
+
+.puzzle-tooltip__arrow--top {
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.puzzle-tooltip__arrow--bottom {
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.puzzle-tooltip__arrow--left {
+    clip-path: polygon(0 50%, 100% 0, 100% 100%);
+}
+
+.puzzle-tooltip__arrow--right {
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.puzzle-tooltip__close {
+    align-self: flex-start;
+}

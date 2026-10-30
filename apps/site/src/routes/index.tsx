@@ -20,6 +20,7 @@ import {
   TextEditor,
   TextEditorToolbar,
   TextRenderer,
+  Tooltip,
 } from "@puzzle/ui";
 import { Heading, Text, Preview } from "@puzzle/ui";
 import { DialogSection } from "@/components/dialog-section";
@@ -109,6 +110,7 @@ function Home() {
       },
     ],
   });
+  const [isTooltipOpen, setIsTooltipOpen] = useState(true);
   return (
     <PageLayout
       header={
@@ -139,6 +141,29 @@ function Home() {
       }
     >
       <SectionStack divideY>
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Heading variant="headline2">Tooltip</Heading>
+              <Stack direction="row" alignH="start">
+                <Tooltip
+                  position="bottom"
+                  align="start"
+                  action="hover"
+                  closable={true}
+                  open={isTooltipOpen}
+                  trigger={<Button>Hover me</Button>}
+                  onOpenChange={setIsTooltipOpen}
+                >
+                  <Stack direction="col" gap="sm">
+                    <Text>This is a tooltip</Text>
+                    <Text>And it looks awesome</Text>
+                  </Stack>
+                </Tooltip>
+              </Stack>
+            </Section>
+          </Preview>
+        </Section>
         <Section>
           <TextEditor
             value={document}

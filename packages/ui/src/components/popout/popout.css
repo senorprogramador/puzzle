@@ -1,0 +1,23 @@
+.puzzle-popout__content {
+    position: fixed;
+    z-index: var(--puzzle-z-index-popover, 1400);
+
+    box-sizing: border-box;
+
+    max-width: calc(100vw - 1rem);
+    max-height: calc(100vh - 1rem);
+    max-height: calc(100dvh - 1rem);
+
+    overflow: auto;
+    overscroll-behavior: contain;
+
+    color: var(--puzzle-color-text, #171717);
+    background-color: var(--puzzle-color-surface, #ffffff);
+
+    border: 1px solid var(--puzzle-color-border, #e5e5e5);
+    border-radius: var(--puzzle-radius-md, 8px);
+
+    box-shadow: var(--puzzle-elevation-8, 0 12px 32px rgb(0 0 0 / 0.16));
+
+    padding: var(--puzzle-space-3, 0.75rem);
+}
