@@ -137,3 +137,44 @@
         scroll-behavior: auto;
     }
 }
+
+
+.puzzle-text-renderer__list {
+    margin: 0;
+    padding-inline-start: 1.5em;
+}
+
+.puzzle-text-renderer__list + .puzzle-text-renderer__list,
+.puzzle-text-renderer__list + .puzzle-text-renderer__block,
+.puzzle-text-renderer__block + .puzzle-text-renderer__list {
+    margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
+}
+
+.puzzle-text-editor__block[data-puzzle-list-type="bullet"]::before {
+    content: "•";
+    display: inline-block;
+    width: 1.5em;
+    margin-inline-start: -1.5em;
+    padding-inline-start: 0.25em;
+}
+
+.puzzle-text-editor__block[data-puzzle-list-type="ordered"] {
+    counter-increment: puzzle-editor-list;
+}
+
+.puzzle-text-editor__block[data-puzzle-list-type="ordered"]::before {
+    content: counter(puzzle-editor-list) ".";
+    display: inline-block;
+    width: 1.5em;
+    margin-inline-start: -1.5em;
+    padding-inline-start: 0.1em;
+}
+
+.puzzle-text-editor:has(.puzzle-text-editor__block[data-puzzle-list-type]) {
+    counter-reset: puzzle-editor-list;
+}
+
+.puzzle-text-editor__block:not([data-puzzle-list-type="ordered"]) +
+.puzzle-text-editor__block[data-puzzle-list-type="ordered"] {
+    counter-reset: puzzle-editor-list;
+}

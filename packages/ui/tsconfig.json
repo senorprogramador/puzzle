@@ -33,6 +33,12 @@
             ],
             "@puzzle/hooks/*": [
                 "../hooks/src/*"
+            ],
+            "@puzzle/icons": [
+                "../icons/src/index.ts"
+            ],
+            "@puzzle/icons/*": [
+                "../icons/src/*"
             ]
         }
     },

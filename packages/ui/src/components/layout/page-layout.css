@@ -1,9 +1,17 @@
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
 .puzzle-page-layout {
     display: flex;
     flex-direction: column;
 
-    min-height: var(--puzzle-page-min-height, 100vh);
-    min-height: var(--puzzle-page-min-height, 100svh);
+    /*min-height: var(--puzzle-page-min-height, 100vh);
+    min-height: var(--puzzle-page-min-height, 100svh);*/
+    height: 100vh;
+    height: 100svh;
 
     box-sizing: border-box;
 }
@@ -27,10 +35,12 @@
     column-gap: var(--puzzle-page-column-gap, var(--puzzle-page-gap, 0));
 
     width: 100%;
-
-    flex: 1 0 auto;
     align-content: start;
     box-sizing: border-box;
+
+    flex-grow: 1;
+    overflow-y: auto;
+    position: relative;
 }
 
 .puzzle-page-layout__main {

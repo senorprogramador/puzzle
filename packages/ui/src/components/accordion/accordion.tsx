@@ -67,9 +67,6 @@ type AccordionProps = Omit<
 
   /** Unmount panel content after its closing animation completes. Defaults to false. */
   unMountOnClose?: boolean;
-
-  /** Scroll the activated trigger into view using nearest-edge behavior. */
-  scrollIntoView?: boolean;
 };
 
 const normalizeOpenItemIndexes = (
@@ -106,7 +103,6 @@ const Accordion = ({
   panelClassName,
   contentClassName,
   unMountOnClose = false,
-  scrollIntoView = false,
   ...rootProps
 }: AccordionProps) => {
   const generatedId = useId();
@@ -208,13 +204,6 @@ const Accordion = ({
               aria-hidden={!isOpen}
               inert={!isOpen}
               data-state={isOpen ? "open" : "closed"}
-              onEntered={() =>
-                contentRefs.current[index]?.scrollIntoView({
-                  block: "end",
-                  inline: "center",
-                  behavior: "auto",
-                })
-              }
             >
               <div
                 ref={(node) => {

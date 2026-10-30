@@ -115,9 +115,9 @@ export {
   type BottomNavigationItemProps,
 } from "./components/bottom-navigation/bottom-navigation";
 
+export type { TextEditorHandle } from "./components/text-editor/editor";
 export {
   TextEditor,
-  type TextEditorHandle,
   type TextEditorProps,
 } from "./components/text-editor/text-editor";
 export {
@@ -153,3 +153,7 @@ export type {
   TextPoint,
   TextSelection,
 } from "./components/text-editor/text-editor.types";
+export {
+  TextEditorToolbar,
+  type TextEditorToolbarProps,
+} from "./components/text-editor/text-editor-toolbar";

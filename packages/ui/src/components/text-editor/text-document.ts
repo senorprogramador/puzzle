@@ -6,6 +6,8 @@ import type {
   TextPoint,
   TextSelection,
   TextBlockVariant,
+  TextAlign,
+  TextListType,
 } from "./text-editor.types";
 
 const HEADING_VARIANTS = new Set<TextBlockVariant>([
@@ -33,10 +35,7 @@ export const createTextDocument = (text = ""): TextDocument => ({
   ],
 });
 
-export const createTextSelection = (
-  block = 0,
-  offset = 0,
-): TextSelection => ({
+export const createTextSelection = (block = 0, offset = 0): TextSelection => ({
   anchor: { block, offset },
   focus: { block, offset },
 });
@@ -137,14 +136,29 @@ export const normalizeTextDocument = (input: TextDocument): TextDocument => {
           }),
         );
 
+        const listType =
+          candidate.listType === "bullet" || candidate.listType === "ordered"
+            ? candidate.listType
+            : undefined;
+        const align =
+          candidate.align === "left" ||
+          candidate.align === "center" ||
+          candidate.align === "right" ||
+          candidate.align === "justify"
+            ? (candidate.align as TextAlign)
+            : undefined;
+
         return [
           {
-            type:
-              candidate.type === "heading" && isHeadingVariant(variant)
+            type: listType
+              ? "listItem"
+              : candidate.type === "heading" && isHeadingVariant(variant)
                 ? "heading"
                 : "paragraph",
             variant,
             children,
+            ...(listType ? { listType } : {}),
+            ...(align ? { align } : {}),
           } satisfies TextBlock,
         ];
       })
@@ -204,14 +218,20 @@ const transformInlineRange = (
     const end = start + inline.text.length;
 
     if (end <= from || start >= to) {
-      result.push({ ...inline, ...(inline.marks ? { marks: [...inline.marks] } : {}) });
+      result.push({
+        ...inline,
+        ...(inline.marks ? { marks: [...inline.marks] } : {}),
+      });
     } else {
       const leftLength = Math.max(0, from - start);
       const rightStart = Math.max(0, to - start);
       const marks = inline.marks ?? [];
 
       if (leftLength > 0) {
-        result.push({ text: inline.text.slice(0, leftLength), ...(marks.length ? { marks: [...marks] } : {}) });
+        result.push({
+          text: inline.text.slice(0, leftLength),
+          ...(marks.length ? { marks: [...marks] } : {}),
+        });
       }
 
       const middleEnd = Math.min(inline.text.length, to - start);
@@ -301,7 +321,11 @@ export const setTextVariant = (
       if (index < start.block || index > lastBlock) return block;
       return {
         ...block,
-        type: isHeadingVariant(variant) ? "heading" : "paragraph",
+        type: block.listType
+          ? "listItem"
+          : isHeadingVariant(variant)
+            ? "heading"
+            : "paragraph",
         variant,
       };
     }),
@@ -313,7 +337,11 @@ const inlineWithOffset = (
   offset: number,
 ): { before: TextInline[]; after: TextInline[] } => ({
   before: sliceInlines(inlines, 0, offset),
-  after: sliceInlines(inlines, offset, inlines.reduce((sum, item) => sum + item.text.length, 0)),
+  after: sliceInlines(
+    inlines,
+    offset,
+    inlines.reduce((sum, item) => sum + item.text.length, 0),
+  ),
 });
 
 export const insertDocumentAtSelection = (
@@ -324,11 +352,20 @@ export const insertDocumentAtSelection = (
   const source = normalizeTextDocument(document);
   const inserted = normalizeTextDocument(insertedDocument);
   const { start, end } = getOrderedSelection(selection);
-  const startIndex = Math.max(0, Math.min(start.block, source.content.length - 1));
-  const endIndex = Math.max(startIndex, Math.min(end.block, source.content.length - 1));
+  const startIndex = Math.max(
+    0,
+    Math.min(start.block, source.content.length - 1),
+  );
+  const endIndex = Math.max(
+    startIndex,
+    Math.min(end.block, source.content.length - 1),
+  );
   const startBlock = source.content[startIndex];
   const endBlock = source.content[endIndex];
-  const startOffset = Math.max(0, Math.min(start.offset, getBlockLength(startBlock)));
+  const startOffset = Math.max(
+    0,
+    Math.min(start.offset, getBlockLength(startBlock)),
+  );
   const endOffset = Math.max(0, Math.min(end.offset, getBlockLength(endBlock)));
   const prefix = inlineWithOffset(startBlock.children, startOffset).before;
   const suffix = inlineWithOffset(endBlock.children, endOffset).after;
@@ -341,7 +378,8 @@ export const insertDocumentAtSelection = (
   }));
 
   const leftSurvives = prefix.length > 0 || startOffset > 0;
-  const rightSurvives = suffix.length > 0 || endOffset < getBlockLength(endBlock);
+  const rightSurvives =
+    suffix.length > 0 || endOffset < getBlockLength(endBlock);
   const first = insertedBlocks[0];
   const last = insertedBlocks[insertedBlocks.length - 1];
   const separatePrefix = leftSurvives && first.type === "heading";
@@ -360,7 +398,8 @@ export const insertDocumentAtSelection = (
       replacement.push({
         ...first,
         type: separatePrefix || !leftSurvives ? first.type : startBlock.type,
-        variant: separatePrefix || !leftSurvives ? first.variant : startBlock.variant,
+        variant:
+          separatePrefix || !leftSurvives ? first.variant : startBlock.variant,
         children: separatePrefix
           ? first.children
           : normalizeInlines([...prefix, ...first.children]),
@@ -371,12 +410,16 @@ export const insertDocumentAtSelection = (
         const finalIndex = replacement.length - 1;
         replacement[finalIndex] = {
           ...replacement[finalIndex],
-          children: normalizeInlines([...replacement[finalIndex].children, ...suffix]),
+          children: normalizeInlines([
+            ...replacement[finalIndex].children,
+            ...suffix,
+          ]),
         };
       }
     } else {
       const useInsertedStyle = !leftSurvives && !rightSurvives;
       replacement.push({
+        ...(useInsertedStyle ? first : startBlock),
         type: useInsertedStyle ? first.type : startBlock.type,
         variant: useInsertedStyle ? first.variant : startBlock.variant,
         children: normalizeInlines([...prefix, ...first.children, ...suffix]),
@@ -384,8 +427,10 @@ export const insertDocumentAtSelection = (
     }
   } else {
     replacement.push({
+      ...(separatePrefix || !leftSurvives ? first : startBlock),
       type: separatePrefix || !leftSurvives ? first.type : startBlock.type,
-      variant: separatePrefix || !leftSurvives ? first.variant : startBlock.variant,
+      variant:
+        separatePrefix || !leftSurvives ? first.variant : startBlock.variant,
       children: separatePrefix
         ? first.children
         : normalizeInlines([...prefix, ...first.children]),
@@ -400,6 +445,7 @@ export const insertDocumentAtSelection = (
       replacement.push({ ...endBlock, children: suffix });
     } else {
       replacement.push({
+        ...(rightSurvives ? endBlock : last),
         type: rightSurvives ? endBlock.type : last.type,
         variant: rightSurvives ? endBlock.variant : last.variant,
         children: normalizeInlines([...last.children, ...suffix]),
@@ -416,7 +462,10 @@ export const insertDocumentAtSelection = (
     ? replacement.length - 2
     : replacement.length - 1;
   const caretBlock = replacement[Math.max(0, caretReplacementIndex)];
-  const suffixLength = suffix.reduce((total, inline) => total + inline.text.length, 0);
+  const suffixLength = suffix.reduce(
+    (total, inline) => total + inline.text.length,
+    0,
+  );
   const caretOffset = separateSuffix
     ? getBlockLength(caretBlock)
     : Math.max(0, getBlockLength(caretBlock) - suffixLength);
@@ -445,8 +494,100 @@ export const insertTextAtSelection = (
     content: text.split("\n").map((line) => ({
       type: "paragraph",
       variant: "body1",
-      children: line ? [{ text: line, ...(marks.length ? { marks: [...marks] } : {}) }] : [],
+      children: line
+        ? [{ text: line, ...(marks.length ? { marks: [...marks] } : {}) }]
+        : [],
     })),
   };
   return insertDocumentAtSelection(document, selection, inserted);
+};
+
+/** Apply text alignment to every block touched by the current selection. */
+export const setTextAlign = (
+  document: TextDocument,
+  selection: TextSelection,
+  align: TextAlign,
+): TextDocument => {
+  const { start, end } = getOrderedSelection(selection);
+  const lastBlock = isCollapsedSelection(selection)
+    ? start.block
+    : end.offset === 0 && end.block > start.block
+      ? end.block - 1
+      : end.block;
+  return {
+    type: "doc",
+    content: document.content.map((block, index) => {
+      if (index < start.block || index > lastBlock) return block;
+      return { ...block, align };
+    }),
+  };
+};
+
+export const getTextAlign = (
+  document: TextDocument,
+  selection: TextSelection,
+): TextAlign | null => {
+  const { start, end } = getOrderedSelection(selection);
+  const lastBlock = isCollapsedSelection(selection)
+    ? start.block
+    : end.offset === 0 && end.block > start.block
+      ? end.block - 1
+      : end.block;
+  const selected = document.content.slice(start.block, lastBlock + 1);
+  if (selected.length === 0) return null;
+  const align = selected[0].align ?? null;
+  return selected.every((block) => (block.align ?? null) === align)
+    ? align
+    : null;
+};
+
+/** Toggle a list type for the selected blocks; null removes list formatting. */
+export const setListType = (
+  document: TextDocument,
+  selection: TextSelection,
+  listType: TextListType | null,
+): TextDocument => {
+  const { start, end } = getOrderedSelection(selection);
+  const lastBlock = isCollapsedSelection(selection)
+    ? start.block
+    : end.offset === 0 && end.block > start.block
+      ? end.block - 1
+      : end.block;
+  const selected = document.content.slice(start.block, lastBlock + 1);
+  const remove =
+    listType != null &&
+    selected.length > 0 &&
+    selected.every((block) => block.listType === listType);
+  return {
+    type: "doc",
+    content: document.content.map((block, index) => {
+      if (index < start.block || index > lastBlock) return block;
+      if (remove || listType == null) {
+        const { listType: _listType, ...rest } = block;
+        return {
+          ...rest,
+          type: block.type === "listItem" ? "paragraph" : block.type,
+        };
+      }
+      return { ...block, type: "listItem", listType };
+    }),
+  };
+};
+
+export const getListType = (
+  document: TextDocument,
+  selection: TextSelection,
+  listType: TextListType,
+): boolean => {
+  const { start, end } = getOrderedSelection(selection);
+  const lastBlock = isCollapsedSelection(selection)
+    ? start.block
+    : end.offset === 0 && end.block > start.block
+      ? end.block - 1
+      : end.block;
+  const selected = document.content.slice(start.block, lastBlock + 1);
+  return (
+    selected.length > 0 &&
+    selected.every((block) => block.listType === listType)
+  );
 };

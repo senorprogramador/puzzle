@@ -127,25 +127,25 @@
 /* Sizes */
 .puzzle-button--xs {
     min-height: 1.75rem;
-    padding-inline: var(--puzzle-space-2, 0.5rem);
+    padding-inline: var(--puzzle-space-1, 0.5rem);
     font-size: var(--puzzle-font-size-xs, 0.75rem);
 }
 
 .puzzle-button--sm {
     min-height: 2rem;
-    padding-inline: var(--puzzle-space-3, 0.75rem);
+    padding-inline: var(--puzzle-space-2, 0.75rem);
     font-size: var(--puzzle-font-size-sm, 0.8125rem);
 }
 
 .puzzle-button--md {
     min-height: 2.5rem;
-    padding-inline: var(--puzzle-space-4, 1rem);
+    padding-inline: var(--puzzle-space-3, 1rem);
     font-size: var(--puzzle-font-size-sm, 0.875rem);
 }
 
 .puzzle-button--lg {
     min-height: 3rem;
-    padding-inline: var(--puzzle-space-5, 1.25rem);
+    padding-inline: var(--puzzle-space-4, 1.25rem);
     font-size: var(--puzzle-font-size-base, 1rem);
 }
 

@@ -1,5 +1,5 @@
 import { createTextDocument, isHeadingVariant, normalizeInlines, normalizeTextDocument } from "./text-document";
-import type { TextBlock, TextDocument, TextInline, TextMark, TextBlockVariant } from "./text-editor.types";
+import type { TextBlock, TextDocument, TextInline, TextMark, TextBlockVariant, TextAlign, TextListType } from "./text-editor.types";
 
 const VARIANTS = new Set<TextBlockVariant>([
   "display1", "display2", "headline1", "headline2", "headline3", "headline4",
@@ -78,11 +78,22 @@ const createBlock = (
   variant: TextBlockVariant,
   children: TextInline[],
   forceHeading?: boolean,
+  align?: TextAlign,
+  listType?: TextListType,
 ): TextBlock => ({
-  type: forceHeading || isHeadingVariant(variant) ? "heading" : "paragraph",
+  type: listType ? "listItem" : forceHeading || isHeadingVariant(variant) ? "heading" : "paragraph",
   variant,
   children: normalizeInlines(children),
+  ...(align ? { align } : {}),
+  ...(listType ? { listType } : {}),
 });
+
+const getBlockAlign = (element: Element): TextAlign | undefined => {
+  const align = element.getAttribute("data-puzzle-align") ?? element.style.textAlign;
+  return align === "left" || align === "center" || align === "right" || align === "justify"
+    ? align
+    : undefined;
+};
 
 const getBlockVariant = (element: Element): TextBlockVariant | undefined => {
   const provided = element.getAttribute("data-puzzle-variant");
@@ -133,13 +144,17 @@ const readHtmlBlocks = (nodes: NodeListOf<ChildNode> | ChildNode[]): TextBlock[]
       flushLoose();
       const variant = getBlockVariant(node) ?? "body1";
       const forceHeading = Boolean(HEADING_VARIANTS[tag]);
-      blocks.push(createBlock(variant, readInlineNodes(Array.from(node.childNodes)), forceHeading));
+      const dataListType = node.getAttribute("data-puzzle-list-type");
+      const listType: TextListType | undefined = dataListType === "bullet" || dataListType === "ordered" ? dataListType : undefined;
+      blocks.push(createBlock(variant, readInlineNodes(Array.from(node.childNodes)), forceHeading, getBlockAlign(node), listType));
       return;
     }
 
     if (tag === "li") {
       flushLoose();
-      blocks.push(createBlock("body1", readInlineNodes(Array.from(node.childNodes))));
+      const parentTag = node.parentElement?.tagName.toLowerCase();
+      const listType: TextListType | undefined = parentTag === "ul" ? "bullet" : parentTag === "ol" ? "ordered" : undefined;
+      blocks.push(createBlock("body1", readInlineNodes(Array.from(node.childNodes)), false, getBlockAlign(node), listType));
       return;
     }
 
@@ -224,7 +239,7 @@ const parseInlineMarkdown = (input: string): TextInline[] => {
 
 /**
  * Parse a small Markdown subset without a dependency. Unsupported constructs
- * (links, images, lists, quotes and code fences) are flattened to readable text.
+ * are flattened to readable text; supported inline marks, headings and lists remain semantic.
  */
 export const parseMarkdownToDocument = (markdown: string): TextDocument => {
   const normalized = markdown.replace(/\r\n?/g, "\n");
@@ -267,12 +282,11 @@ export const parseMarkdownToDocument = (markdown: string): TextDocument => {
         continue;
       }
 
-      // Lists and block quotes are not part of this document model. Strip only
-      // their Markdown markers while preserving their content as paragraphs.
-      const listItem = line.match(/^\s{0,3}(?:[-+*]|\d+[.)])\s+(.+)$/);
+      const listItem = line.match(/^\s{0,3}([-+*]|\d+[.)])\s+(.+)$/);
       if (listItem) {
         flushParagraph();
-        blocks.push(createBlock("body1", parseInlineMarkdown(listItem[1])));
+        const listType: TextListType = /^\d/.test(listItem[1]) ? "ordered" : "bullet";
+        blocks.push(createBlock("body1", parseInlineMarkdown(listItem[2]), false, undefined, listType));
         continue;
       }
 

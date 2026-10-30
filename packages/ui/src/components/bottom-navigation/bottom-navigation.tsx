@@ -28,7 +28,7 @@ const BottomNavigationItem = ({
       direction="col"
       alignH="center"
       alignV="center"
-      gap="sm"
+      gap="xs"
       className={classes}
       style={style}
     >

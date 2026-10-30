@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ComponentPropsWithRef, ReactNode } from "react";
 import { cn } from "@puzzle/core";
 import "./breadcrumbs.css";
 
@@ -16,23 +16,25 @@ type BreadcrumbCurrentItem = {
   href?: never;
 };
 
-export type BreadcrumbItem = BreadcrumbLinkItem | BreadcrumbCurrentItem;
+type BreadcrumbItem = BreadcrumbLinkItem | BreadcrumbCurrentItem;
 
-export type BreadcrumbsProps = {
+type BreadcrumbsOwnProps = {
   items: [...BreadcrumbLinkItem[], BreadcrumbCurrentItem];
-  className?: string;
-  style?: React.CSSProperties;
-  "aria-label"?: string;
 };
+
+type BreadcrumbsProps = BreadcrumbsOwnProps &
+  Omit<ComponentPropsWithRef<"nav">, keyof BreadcrumbsOwnProps>;
 
 const Breadcrumbs = ({
   items,
   className,
   style,
-  "aria-label": ariaLabel = "Breadcrumb",
+  "aria-label": ariaLabel = "Breadcrumbs",
+  ...navProps
 }: BreadcrumbsProps) => {
   return (
     <nav
+      {...navProps}
       aria-label={ariaLabel}
       className={cn("puzzle-breadcrumbs", className)}
       style={style}
@@ -71,4 +73,4 @@ const Breadcrumbs = ({
   );
 };
 
-export { Breadcrumbs };
+export { Breadcrumbs, type BreadcrumbItem, type BreadcrumbsProps };

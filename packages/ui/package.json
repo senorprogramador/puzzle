@@ -28,6 +28,7 @@
   "dependencies": {
     "@puzzle/core": "workspace:*",
     "@puzzle/hooks": "workspace:*",
+    "@puzzle/icons": "workspace:*",
     "@puzzle/theme": "workspace:*"
   },
   "peerDependencies": {

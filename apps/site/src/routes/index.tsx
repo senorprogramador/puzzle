@@ -7,7 +7,6 @@ import {
   Avatar,
   BottomNavigation,
   BottomNavigationItem,
-  Breadcrumbs,
   BreadcrumbsProps,
   Button,
   Carousel,
@@ -19,13 +18,14 @@ import {
   Stack,
   TextDocument,
   TextEditor,
-  TextEditorHandle,
+  TextEditorToolbar,
   TextRenderer,
 } from "@puzzle/ui";
 import { Heading, Text, Preview } from "@puzzle/ui";
 import { DialogSection } from "@/components/dialog-section";
 import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { Icon } from "@puzzle/icons";
 
 const breadcrumbs = [
   {
@@ -88,7 +88,6 @@ const accordionItems = [
 ];
 
 function Home() {
-  const editorRef = useRef<TextEditorHandle>(null);
   const [document, setDocument] = useState<TextDocument>({
     type: "doc",
     content: [
@@ -139,21 +138,13 @@ function Home() {
         />
       }
     >
-      <Breadcrumbs
-        items={breadcrumbs}
-        className="p-2 sticky top-16.25 bg-(--puzzle-color-background)"
-      />
       <SectionStack divideY>
         <Section>
-          <Button
-            onMouseDown={(event) => event.preventDefault()}
-            onClick={() => editorRef.current?.toggleMark("bold")}
-          >
-            Bold
-          </Button>
-
-          <TextEditor ref={editorRef} value={document} onChange={setDocument} />
-
+          <TextEditor
+            value={document}
+            onChange={setDocument}
+            toolbar={<TextEditorToolbar />}
+          />
           <TextRenderer document={document} />
         </Section>
         <DialogSection />
@@ -162,12 +153,18 @@ function Home() {
             <Section>
               <Heading variant="headline2">Bottom Navigation</Heading>
               <BottomNavigation>
-                <BottomNavigationItem icon={<span>🏠</span>} label="Home" />
                 <BottomNavigationItem
-                  icon={<span>📦</span>}
+                  icon={<Icon name="bxs:home" size={24} />}
+                  label="Home"
+                />
+                <BottomNavigationItem
+                  icon={<Icon name="bxs:package" size={24} />}
                   label="Components"
                 />
-                <BottomNavigationItem icon={<span>📄</span>} label="Docs" />
+                <BottomNavigationItem
+                  icon={<Icon name="bxs:file-blank" size={24} />}
+                  label="Docs"
+                />
               </BottomNavigation>
             </Section>
           </Preview>
@@ -176,13 +173,7 @@ function Home() {
           <Preview defaultDevice="mobile">
             <Section>
               <Heading variant="headline2">Accordion</Heading>
-              <Accordion
-                items={accordionItems}
-                //type="single"
-                scrollIntoView={true}
-                unMountOnClose={true}
-                //initialOpenItemIndexes={[0]}
-              />
+              <Accordion items={accordionItems} unMountOnClose={true} />
             </Section>
           </Preview>
         </Section>

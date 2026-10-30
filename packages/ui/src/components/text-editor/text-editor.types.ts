@@ -7,12 +7,16 @@ export type TextInline = {
   marks?: TextMark[];
 };
 
-export type TextBlockType = "paragraph" | "heading";
+export type TextBlockType = "paragraph" | "heading" | "listItem";
+export type TextAlign = "left" | "center" | "right" | "justify";
+export type TextListType = "bullet" | "ordered";
 
 export type TextBlock = {
   type: TextBlockType;
   variant: TypographyStyle;
   children: TextInline[];
+  align?: TextAlign;
+  listType?: TextListType;
 };
 
 /**
