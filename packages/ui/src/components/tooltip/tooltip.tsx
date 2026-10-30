@@ -20,8 +20,8 @@ import {
   type PopoutAlignment,
   type PopoutPosition,
 } from "../popout/popout";
-import "./tooltip.css";
 import { Stack } from "../stack/stack";
+import "./tooltip.css";
 
 type TooltipTriggerProps = HTMLAttributes<HTMLElement> &
   RefAttributes<HTMLElement>;
@@ -51,9 +51,8 @@ type TooltipProps = {
 
 type TooltipContentProps = {
   anchorRef: React.RefObject<HTMLElement | null>;
-  closable?: boolean;
   position: PopoutPosition;
-  align?: PopoutAlignment;
+  closable?: boolean;
   onOpenChange?: (open: boolean) => void;
   children: ReactNode;
   className?: string;
@@ -87,10 +86,13 @@ const getArrowSide = (
   switch (position) {
     case "top":
       return "bottom";
+
     case "right":
       return "left";
+
     case "bottom":
       return "top";
+
     case "left":
       return "right";
   }
@@ -142,7 +144,6 @@ const setRef = <T,>(ref: Ref<T> | undefined, value: T | null): void => {
 const TooltipContent = ({
   anchorRef,
   position,
-  align,
   closable,
   onOpenChange,
   children,
@@ -181,39 +182,57 @@ const TooltipContent = ({
       side,
       style: getArrowStyle(side, anchorRect, contentRect),
     });
-  }, [anchorRef, position, align]);
+  }, [anchorRef, position]);
 
   useLayoutEffect(() => {
-    updateArrowPosition();
-
     const anchor = anchorRef.current;
     const content = contentRef.current;
+    const ownerDocument = anchor?.ownerDocument;
+    const ownerWindow = ownerDocument?.defaultView;
 
-    if (!anchor || !content) {
+    if (
+      !anchor ||
+      !content ||
+      !ownerDocument ||
+      !ownerWindow ||
+      content.ownerDocument !== ownerDocument
+    ) {
       return;
     }
 
-    const resizeObserver = new ResizeObserver(updateArrowPosition);
+    let animationFrame = 0;
+
+    const scheduleArrowUpdate = () => {
+      ownerWindow.cancelAnimationFrame(animationFrame);
+      animationFrame = ownerWindow.requestAnimationFrame(updateArrowPosition);
+    };
+
+    updateArrowPosition();
+
+    const ResizeObserverConstructor =
+      ownerWindow.ResizeObserver ?? ResizeObserver;
+    const resizeObserver = new ResizeObserverConstructor(scheduleArrowUpdate);
 
     resizeObserver.observe(anchor);
     resizeObserver.observe(content);
 
-    const handleResize = () => updateArrowPosition();
-    const handleScroll = () => updateArrowPosition();
+    const handleResize = () => scheduleArrowUpdate();
+    const handleScroll = () => scheduleArrowUpdate();
 
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("scroll", handleScroll, true);
+    ownerWindow.addEventListener("resize", handleResize);
+    ownerWindow.addEventListener("scroll", handleScroll, true);
 
-    const visualViewport = window.visualViewport;
+    const visualViewport = ownerWindow.visualViewport;
 
     visualViewport?.addEventListener("resize", handleResize);
     visualViewport?.addEventListener("scroll", handleScroll);
 
     return () => {
+      ownerWindow.cancelAnimationFrame(animationFrame);
       resizeObserver.disconnect();
 
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleScroll, true);
+      ownerWindow.removeEventListener("resize", handleResize);
+      ownerWindow.removeEventListener("scroll", handleScroll, true);
 
       visualViewport?.removeEventListener("resize", handleResize);
       visualViewport?.removeEventListener("scroll", handleScroll);
@@ -229,6 +248,7 @@ const TooltipContent = ({
       role="tooltip"
     >
       {children}
+
       {closable && (
         <button
           type="button"
@@ -240,6 +260,7 @@ const TooltipContent = ({
           &times;
         </button>
       )}
+
       <span
         aria-hidden="true"
         className={cn(
@@ -303,7 +324,6 @@ const Tooltip = ({
       <TooltipContent
         anchorRef={anchorRef}
         position={position}
-        align={align}
         closable={closable}
         onOpenChange={onOpenChange}
         className={className}

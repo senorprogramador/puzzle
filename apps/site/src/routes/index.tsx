@@ -145,10 +145,15 @@ function Home() {
           <Preview defaultDevice="mobile">
             <Section>
               <Heading variant="headline2">Tooltip</Heading>
-              <Stack direction="row" alignH="start">
+              <Stack
+                className="w-full h-64"
+                direction="row"
+                alignV="center"
+                alignH="center"
+              >
                 <Tooltip
                   position="bottom"
-                  align="start"
+                  align="center"
                   action="hover"
                   closable={true}
                   open={isTooltipOpen}

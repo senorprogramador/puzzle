@@ -122,10 +122,13 @@ const getOppositePosition = (position: PopoutPosition): PopoutPosition => {
   switch (position) {
     case "top":
       return "bottom";
+
     case "right":
       return "left";
+
     case "bottom":
       return "top";
+
     case "left":
       return "right";
   }
@@ -164,7 +167,6 @@ const clampPosition = (
   padding: number,
 ): PositionCoordinates => {
   const maxLeft = Math.max(padding, viewportWidth - content.width - padding);
-
   const maxTop = Math.max(padding, viewportHeight - content.height - padding);
 
   return {
@@ -180,10 +182,9 @@ const calculatePosition = (
   align: PopoutAlignment,
   offset: number,
   collisionPadding: number,
+  viewportWidth: number,
+  viewportHeight: number,
 ): PopoutPlacement => {
-  const viewportWidth = document.documentElement.clientWidth;
-  const viewportHeight = document.documentElement.clientHeight;
-
   const positions = getFallbackPositions(position);
 
   for (const candidate of positions) {
@@ -258,6 +259,9 @@ const Popout = ({
 }: PopoutProps) => {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const [mounted, setMounted] = useState(false);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
+    null,
+  );
   const [contentElement, setContentElement] = useState<HTMLDivElement | null>(
     null,
   );
@@ -267,6 +271,7 @@ const Popout = ({
 
   const anchorRef = useRef<HTMLElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
+  const pointerDocumentRef = useRef<Document | null>(null);
 
   const isOpen = open ?? internalOpen;
 
@@ -298,6 +303,24 @@ const Popout = ({
     }
   }, [debouncedClose, exitDelay, changeOpenState]);
 
+  const removePointerListeners = useCallback(() => {
+    const ownerDocument = pointerDocumentRef.current;
+
+    if (!ownerDocument) {
+      return;
+    }
+
+    ownerDocument.removeEventListener("pointerup", handleDocumentPointerUp);
+    ownerDocument.removeEventListener("pointercancel", handleDocumentPointerUp);
+
+    pointerDocumentRef.current = null;
+  }, []);
+
+  const handleDocumentPointerUp = useCallback(() => {
+    removePointerListeners();
+    debouncedClose();
+  }, [debouncedClose, removePointerListeners]);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -305,8 +328,19 @@ const Popout = ({
   useEffect(() => {
     return () => {
       debouncedClose.cancel();
+      removePointerListeners();
     };
-  }, [debouncedClose]);
+  }, [debouncedClose, removePointerListeners]);
+
+  // Keep the portal in the same document as the trigger.
+  const handleTriggerRef = useCallback(
+    (node: HTMLElement | null) => {
+      anchorRef.current = node;
+      setPortalContainer(node?.ownerDocument.body ?? null);
+      setRef(trigger.props.ref, node);
+    },
+    [trigger],
+  );
 
   // Track the content while Transition mounts and unmounts it.
   const handleContentRef = useCallback((node: HTMLDivElement | null) => {
@@ -316,24 +350,34 @@ const Popout = ({
 
   // Positioning
   useLayoutEffect(() => {
-    if (!mounted || !isOpen || !contentElement) {
+    if (!mounted || !isOpen || !contentElement || !portalContainer) {
+      return;
+    }
+
+    const anchor = anchorRef.current;
+    const ownerDocument = anchor?.ownerDocument;
+    const ownerWindow = ownerDocument?.defaultView;
+
+    if (!anchor || !ownerDocument || !ownerWindow) {
       return;
     }
 
     const updatePosition = () => {
-      const anchor = anchorRef.current;
+      const currentAnchor = anchorRef.current;
       const content = contentRef.current;
 
       if (
-        !anchor?.isConnected ||
+        !currentAnchor?.isConnected ||
         !content?.isConnected ||
-        anchor.getClientRects().length === 0 ||
+        currentAnchor.ownerDocument !== ownerDocument ||
+        content.ownerDocument !== ownerDocument ||
+        currentAnchor.getClientRects().length === 0 ||
         content.getClientRects().length === 0
       ) {
         return;
       }
 
-      const anchorRect = anchor.getBoundingClientRect();
+      const anchorRect = currentAnchor.getBoundingClientRect();
       const contentRect = content.getBoundingClientRect();
 
       if (contentRect.width === 0 && contentRect.height === 0) {
@@ -347,6 +391,8 @@ const Popout = ({
         align,
         offset,
         collisionPadding,
+        ownerDocument.documentElement.clientWidth,
+        ownerDocument.documentElement.clientHeight,
       );
 
       setPositionStyle({
@@ -356,17 +402,12 @@ const Popout = ({
       });
     };
 
-    // Reset the previous position before measuring.
     setPositionStyle(null);
     updatePosition();
 
-    const anchor = anchorRef.current;
-
-    if (!anchor) {
-      return;
-    }
-
-    const resizeObserver = new ResizeObserver(updatePosition);
+    const ResizeObserverConstructor =
+      ownerWindow.ResizeObserver ?? ResizeObserver;
+    const resizeObserver = new ResizeObserverConstructor(updatePosition);
 
     resizeObserver.observe(anchor);
     resizeObserver.observe(contentElement);
@@ -374,10 +415,10 @@ const Popout = ({
     const handleResize = () => updatePosition();
     const handleScroll = () => updatePosition();
 
-    window.addEventListener("resize", handleResize);
-    window.addEventListener("scroll", handleScroll, true);
+    ownerWindow.addEventListener("resize", handleResize);
+    ownerWindow.addEventListener("scroll", handleScroll, true);
 
-    const visualViewport = window.visualViewport;
+    const visualViewport = ownerWindow.visualViewport;
 
     visualViewport?.addEventListener("resize", handleResize);
     visualViewport?.addEventListener("scroll", handleScroll);
@@ -385,8 +426,8 @@ const Popout = ({
     return () => {
       resizeObserver.disconnect();
 
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleScroll, true);
+      ownerWindow.removeEventListener("resize", handleResize);
+      ownerWindow.removeEventListener("scroll", handleScroll, true);
 
       visualViewport?.removeEventListener("resize", handleResize);
       visualViewport?.removeEventListener("scroll", handleScroll);
@@ -395,6 +436,7 @@ const Popout = ({
     mounted,
     isOpen,
     contentElement,
+    portalContainer,
     position,
     align,
     offset,
@@ -404,14 +446,21 @@ const Popout = ({
 
   // Outside click
   useEffect(() => {
-    if (!isOpen || !closeOnOutsideClick) {
+    if (!isOpen || !closeOnOutsideClick || !portalContainer) {
+      return;
+    }
+
+    const ownerDocument = anchorRef.current?.ownerDocument;
+    const ownerWindow = ownerDocument?.defaultView;
+
+    if (!ownerDocument || !ownerWindow) {
       return;
     }
 
     const handlePointerDown = (event: globalThis.PointerEvent) => {
       const target = event.target;
 
-      if (!(target instanceof Node)) {
+      if (!(target instanceof ownerWindow.Node)) {
         return;
       }
 
@@ -426,16 +475,28 @@ const Popout = ({
       changeOpenState(false);
     };
 
-    document.addEventListener("pointerdown", handlePointerDown);
+    ownerDocument.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
+      ownerDocument.removeEventListener("pointerdown", handlePointerDown);
     };
-  }, [isOpen, closeOnOutsideClick, cancelDebouncedClose, changeOpenState]);
+  }, [
+    isOpen,
+    closeOnOutsideClick,
+    portalContainer,
+    cancelDebouncedClose,
+    changeOpenState,
+  ]);
 
   // Escape
   useEffect(() => {
-    if (!isOpen || !closeOnEscape) {
+    if (!isOpen || !closeOnEscape || !portalContainer) {
+      return;
+    }
+
+    const ownerDocument = anchorRef.current?.ownerDocument;
+
+    if (!ownerDocument) {
       return;
     }
 
@@ -448,12 +509,18 @@ const Popout = ({
       changeOpenState(false);
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    ownerDocument.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      ownerDocument.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, closeOnEscape, cancelDebouncedClose, changeOpenState]);
+  }, [
+    isOpen,
+    closeOnEscape,
+    portalContainer,
+    cancelDebouncedClose,
+    changeOpenState,
+  ]);
 
   const handlePointerEnter = (event: PointerEvent<HTMLElement>) => {
     trigger.props.onPointerEnter?.(event);
@@ -476,15 +543,8 @@ const Popout = ({
     scheduleClose();
   };
 
-  const handlePointerUp = (
-    event: PointerEvent<HTMLElement> | globalThis.PointerEvent,
-  ) => {
-    trigger.props.onPointerUp?.(event as PointerEvent<HTMLElement>);
-
-    if (action !== "down" || event.defaultPrevented) {
-      return;
-    }
-    debouncedClose();
+  const handlePointerUp = (event: PointerEvent<HTMLElement>) => {
+    trigger.props.onPointerUp?.(event);
   };
 
   const handlePointerDown = (event: PointerEvent<HTMLElement>) => {
@@ -496,7 +556,13 @@ const Popout = ({
 
     changeOpenState(true);
 
-    document.addEventListener("pointerup", handlePointerUp, { once: true });
+    const ownerDocument = event.currentTarget.ownerDocument;
+
+    removePointerListeners();
+    pointerDocumentRef.current = ownerDocument;
+
+    ownerDocument.addEventListener("pointerup", handleDocumentPointerUp);
+    ownerDocument.addEventListener("pointercancel", handleDocumentPointerUp);
   };
 
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -510,10 +576,7 @@ const Popout = ({
   };
 
   const triggerElement = cloneElement(trigger, {
-    ref: (node: HTMLElement | null) => {
-      anchorRef.current = node;
-      setRef(trigger.props.ref, node);
-    },
+    ref: handleTriggerRef,
     className: cn(trigger.props.className, className),
     onPointerEnter: handlePointerEnter,
     onPointerLeave: handlePointerLeave,
@@ -530,31 +593,32 @@ const Popout = ({
     <>
       {triggerElement}
 
-      {createPortal(
-        <Transition
-          visible={isOpen}
-          template="fade"
-          duration={200}
-          unmountOnExit
-        >
-          <div
-            ref={handleContentRef}
-            className={cn("puzzle-popout__content", contentClassName)}
-            style={{
-              ...positionStyle,
-              visibility: positionStyle ? "visible" : "hidden",
-              pointerEvents: isOpen ? "auto" : "none",
-            }}
-            onPointerEnter={
-              action === "hover" ? cancelDebouncedClose : undefined
-            }
-            onPointerLeave={action === "hover" ? scheduleClose : undefined}
+      {portalContainer &&
+        createPortal(
+          <Transition
+            visible={isOpen}
+            template="fade"
+            duration={200}
+            unmountOnExit
           >
-            {children}
-          </div>
-        </Transition>,
-        document.body,
-      )}
+            <div
+              ref={handleContentRef}
+              className={cn("puzzle-popout__content", contentClassName)}
+              style={{
+                ...positionStyle,
+                visibility: positionStyle ? "visible" : "hidden",
+                pointerEvents: isOpen ? "auto" : "none",
+              }}
+              onPointerEnter={
+                action === "hover" ? cancelDebouncedClose : undefined
+              }
+              onPointerLeave={action === "hover" ? scheduleClose : undefined}
+            >
+              {children}
+            </div>
+          </Transition>,
+          portalContainer,
+        )}
     </>
   );
 };
