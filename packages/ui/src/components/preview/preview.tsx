@@ -28,31 +28,27 @@ type PreviewProps = {
 };
 
 const PREVIEW_DEVICES: Record<PreviewDevice, DeviceConfig> = {
-  mobile: {
-    label: "Mobile",
-    width: 390,
-    height: 844,
-  },
-  tablet: {
-    label: "Tablet",
-    width: 768,
-    height: 1024,
-  },
-  desktop: {
-    label: "Desktop",
-    width: 1024,
-    height: 768,
-  },
+  mobile: { label: "Mobile", width: 390, height: 844 },
+  tablet: { label: "Tablet", width: 768, height: 1024 },
+  desktop: { label: "Desktop", width: 1024, height: 768 },
 };
 
 const PREVIEW_DOCUMENT = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html,
+      body {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <div id="puzzle-preview-root"></div>
@@ -73,7 +69,6 @@ const Preview = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const initializationRef = useRef(0);
 
   const config = PREVIEW_DEVICES[device];
 
@@ -96,6 +91,27 @@ const Preview = ({
         frameHead.appendChild(clone);
       });
 
+    // Hide the iframe's document scrollbar without disabling scrolling.
+    const scrollbarStyle = frameDocument.createElement("style");
+
+    scrollbarStyle.setAttribute("data-puzzle-preview-style", "");
+    scrollbarStyle.textContent = `
+    html,
+    body {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+  `;
+
+    frameHead.appendChild(scrollbarStyle);
+
     const sourceRoot = document.documentElement;
     const targetRoot = frameDocument.documentElement;
 
@@ -114,28 +130,41 @@ const Preview = ({
     frameDocument.body.style.cssText = document.body.style.cssText;
   }, []);
 
-  const updateScale = useCallback(() => {
-    const container = containerRef.current;
+  const updateScale = useCallback(
+    (availableWidth: number) => {
+      const nextScale = Math.min(1, Math.max(0, availableWidth) / config.width);
 
-    if (!container) return;
+      setScale((current) =>
+        Math.abs(current - nextScale) < 0.001 ? current : nextScale,
+      );
+    },
+    [config.width],
+  );
 
-    const availableWidth = container.clientWidth;
-    const nextScale = Math.min(1, availableWidth / config.width);
-
-    setScale((current) =>
-      Math.abs(current - nextScale) < 0.001 ? current : nextScale,
-    );
-  }, [config.width]);
-
-  // Determine the initial scale before the browser paints.
+  // Calculate the initial scale and keep it synchronized with the container.
   useIsomorphicLayoutEffect(() => {
-    updateScale();
-
     const container = containerRef.current;
 
     if (!container) return;
 
-    const observer = new ResizeObserver(updateScale);
+    const measure = () => {
+      const styles = window.getComputedStyle(container);
+      const horizontalPadding =
+        parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+
+      updateScale(container.clientWidth - horizontalPadding);
+    };
+
+    measure();
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+
+      if (entry) {
+        updateScale(entry.contentRect.width);
+      }
+    });
+
     observer.observe(container);
 
     return () => observer.disconnect();
@@ -155,81 +184,21 @@ const Preview = ({
     return () => observer.disconnect();
   }, [syncStyles]);
 
-  // Wait until copied stylesheets and fonts are ready.
-  const initializeFrame = useCallback(async () => {
+  // Initialize the iframe without blocking the React portal on stylesheets.
+  const initializeFrame = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
     const root = frameDocument?.getElementById("puzzle-preview-root");
 
-    if (!frameDocument || !root) return;
-
-    const initialization = ++initializationRef.current;
+    if (!root) return;
 
     syncStyles();
-
-    const stylesheets = Array.from(
-      frameDocument.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
-    );
-
-    await Promise.all(
-      stylesheets.map(
-        (stylesheet) =>
-          new Promise<void>((resolve) => {
-            if (stylesheet.sheet) {
-              resolve();
-              return;
-            }
-
-            stylesheet.addEventListener("load", () => resolve(), {
-              once: true,
-            });
-
-            stylesheet.addEventListener("error", () => resolve(), {
-              once: true,
-            });
-          }),
-      ),
-    );
-
-    await frameDocument.fonts.ready;
-
-    if (initialization !== initializationRef.current) return;
-
-    setFrameRoot((currentRoot) => (currentRoot === root ? currentRoot : root));
+    setFrameRoot(root);
   }, [syncStyles]);
 
+  // Handle both initial loading and an already-loaded iframe.
   useEffect(() => {
-    const iframe = iframeRef.current;
-
-    if (!iframe) return;
-
-    iframe.addEventListener("load", initializeFrame);
-
-    return () => {
-      iframe.removeEventListener("load", initializeFrame);
-      initializationRef.current++;
-    };
+    initializeFrame();
   }, [initializeFrame]);
-
-  // Keep the iframe content synchronized when the viewport changes.
-  useEffect(() => {
-    if (!frameRoot) return;
-
-    const frameDocument = iframeRef.current?.contentDocument;
-
-    if (!frameDocument) return;
-
-    const measure = () => {
-      // Reading the dimensions forces the browser to resolve layout.
-      frameRoot.getBoundingClientRect();
-    };
-
-    const observer = new ResizeObserver(measure);
-
-    observer.observe(frameRoot);
-    observer.observe(frameDocument.documentElement);
-
-    return () => observer.disconnect();
-  }, [frameRoot, config.width]);
 
   const frameStyle: CSSProperties = {
     width: config.width,
