@@ -30,9 +30,7 @@
     width: 100%;
     min-width: 0;
 
-    padding-inline: var(--puzzle-page-padding-inline, 0);
-    padding-block: var(--puzzle-page-padding-block, 0);
-
+    overflow: visible;
     box-sizing: border-box;
 }
 

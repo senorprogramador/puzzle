@@ -1,4 +1,25 @@
 .puzzle-sidebar {
+    position: sticky;
+    top: var(--puzzle-sticky-offset, 0px);
+
+    align-self: flex-start;
+
+    flex: 0 1 16rem;
+    width: 16rem;
+    min-width: 0;
+    max-width: 100%;
+
+    height: 100vh;
+    height: 100svh;
+
+    max-height: calc(100vh - var(--puzzle-page-sidebar-top, 0px));
+    max-height: calc(100svh - var(--puzzle-page-sidebar-top, 0px));
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+
+    box-sizing: border-box;
+
     display: flex;
     flex-direction: column;
     gap: var(--puzzle-space-2, 0.5rem);
