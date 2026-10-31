@@ -1,6 +1,7 @@
 import { cn } from "@puzzle/core";
 import {
   useEffect,
+  useLayoutEffect,
   useId,
   useRef,
   useState,
@@ -10,6 +11,9 @@ import {
 import { Drawer } from "../drawer/drawer";
 import "./app-bar.css";
 import { Stack } from "../stack/stack";
+
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 type AppBarNavigationItem = {
   label: string;
@@ -57,7 +61,7 @@ const AppBar = <T,>({
     "--puzzle-app-bar-sticky": sticky ? "sticky" : "relative",
   } as CSSProperties;
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (!sticky) return;
 
     const appBar = appBarRef.current;

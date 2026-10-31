@@ -12,8 +12,8 @@
     height: 100vh;
     height: 100svh;
 
-    max-height: calc(100vh - var(--puzzle-page-sidebar-top, 0px));
-    max-height: calc(100svh - var(--puzzle-page-sidebar-top, 0px));
+    max-height: calc(100vh - var(--puzzle-sticky-offset, 0px));
+    max-height: calc(100svh - var(--puzzle-sticky-offset, 0px));
 
     overflow-y: auto;
     overscroll-behavior: contain;
