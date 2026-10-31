@@ -1,13 +1,20 @@
-import { useId } from "react";
+import { cloneElement } from "react";
 import type {
+  ReactElement,
   ReactNode,
   HTMLAttributes,
-  ElementType,
   CSSProperties,
 } from "react";
+import { resolveResponsiveValue, type ResponsiveValue } from "@puzzle/core";
 import "./page-layout.css";
 
 type CSSSize = string | number;
+
+type SidebarPlacement = "beside" | "below";
+
+type PageLayoutElement = ReactElement<{
+  className?: string;
+}>;
 
 type PageLayoutElementProps = HTMLAttributes<HTMLElement>;
 
@@ -16,20 +23,13 @@ type PageLayoutProps = {
    * Page regions.
    */
   header?: ReactNode;
-  leftSidebar?: ReactNode;
+  leftSidebar?: PageLayoutElement;
   children: ReactNode;
-  rightSidebar?: ReactNode;
-  footer?: ReactNode;
+  rightSidebar?: PageLayoutElement;
+  footer?: PageLayoutElement;
 
   /**
-   * Semantic element overrides.
-   */
-  leftSidebarAs?: ElementType;
-  rightSidebarAs?: ElementType;
-  footerAs?: ElementType;
-
-  /**
-   * Accessible names for sidebar landmarks.
+   * Accessible names for sidebar elements.
    */
   leftSidebarLabel?: string;
   rightSidebarLabel?: string;
@@ -47,19 +47,13 @@ type PageLayoutProps = {
    */
   className?: string;
   contentClassName?: string;
-  leftSidebarClassName?: string;
   mainClassName?: string;
-  rightSidebarClassName?: string;
-  footerClassName?: string;
   style?: CSSProperties;
 
   /**
    * Layout configuration.
-   * Numeric sizes are interpreted as pixels.
    */
   maxWidth?: CSSSize;
-  leftSidebarWidth?: CSSSize;
-  rightSidebarWidth?: CSSSize;
   gap?: CSSSize;
   rowGap?: CSSSize;
   columnGap?: CSSSize;
@@ -68,26 +62,42 @@ type PageLayoutProps = {
   minHeight?: CSSSize;
 
   /**
-   * Set false to disable the skip link.
-   * Supply localized text or other accessible content to customize it.
+   * Sidebar positioning.
+   *
+   * Defaults to below on mobile/tablet
+   * and beside on desktop.
    */
-  skipLink?: ReactNode | false;
-  skipLinkClassName?: string;
+  sidebarPlacement?: ResponsiveValue<SidebarPlacement>;
 };
 
-function cx(...values: Array<string | undefined | false>): string {
-  return values.filter(Boolean).join(" ");
-}
+const cx = (...values: Array<string | undefined | false>): string =>
+  values.filter(Boolean).join(" ");
 
-function toCSSSize(value: CSSSize | undefined): string | undefined {
-  if (value === undefined) return undefined;
+const toCSSSize = (value: CSSSize | undefined): string | undefined =>
+  value === undefined
+    ? undefined
+    : typeof value === "number"
+      ? `${value}px`
+      : value;
 
-  return typeof value === "number" ? `${value}px` : value;
-}
+const hasContent = (value: ReactNode): boolean =>
+  value !== undefined && value !== null && value !== false;
 
-function hasContent(value: ReactNode): boolean {
-  return value !== undefined && value !== null && value !== false;
-}
+/**
+ * Adds layout classes and optional HTML attributes
+ * to an existing React element.
+ *
+ * The original className is always preserved.
+ */
+const withClassName = <P extends { className?: string }>(
+  element: ReactElement<P>,
+  className: string,
+  props?: PageLayoutElementProps,
+): ReactElement<P> =>
+  cloneElement(element, {
+    ...props,
+    className: cx(element.props.className, className, props?.className),
+  } as Partial<P>);
 
 const PageLayout = ({
   header,
@@ -95,10 +105,6 @@ const PageLayout = ({
   children,
   rightSidebar,
   footer,
-
-  leftSidebarAs,
-  rightSidebarAs,
-  footerAs,
 
   leftSidebarLabel,
   rightSidebarLabel,
@@ -110,15 +116,10 @@ const PageLayout = ({
 
   className,
   contentClassName,
-  leftSidebarClassName,
   mainClassName,
-  rightSidebarClassName,
-  footerClassName,
   style,
 
   maxWidth,
-  leftSidebarWidth,
-  rightSidebarWidth,
   gap,
   rowGap,
   columnGap,
@@ -126,35 +127,18 @@ const PageLayout = ({
   contentPaddingBlock,
   minHeight,
 
-  skipLink = "Skip to main content",
-  skipLinkClassName,
+  sidebarPlacement,
 }: PageLayoutProps) => {
-  const reactId = useId();
-
-  const mainId =
-    mainProps?.id ?? `puzzle-main-${reactId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
-
-  const LeftSidebar = leftSidebarAs ?? "aside";
-  const RightSidebar = rightSidebarAs ?? "aside";
-  const Footer = footerAs ?? "footer";
-
-  const hasHeader = hasContent(header);
-  const hasLeftSidebar = hasContent(leftSidebar);
-  const hasRightSidebar = hasContent(rightSidebar);
-  const hasFooter = hasContent(footer);
-
-  const layout = hasLeftSidebar
-    ? hasRightSidebar
-      ? "left-main-right"
-      : "left-main"
-    : hasRightSidebar
-      ? "main-right"
-      : "main";
+  const placement = resolveResponsiveValue<SidebarPlacement>(
+    sidebarPlacement ?? {
+      mobile: "below",
+      tablet: "below",
+      desktop: "beside",
+    },
+  );
 
   const layoutStyle = {
     "--puzzle-page-max-width": toCSSSize(maxWidth),
-    "--puzzle-page-left-width": toCSSSize(leftSidebarWidth),
-    "--puzzle-page-right-width": toCSSSize(rightSidebarWidth),
     "--puzzle-page-gap": toCSSSize(gap),
     "--puzzle-page-row-gap": toCSSSize(rowGap),
     "--puzzle-page-column-gap": toCSSSize(columnGap),
@@ -164,30 +148,50 @@ const PageLayout = ({
     ...style,
   } as CSSProperties;
 
+  const leftSidebarNode = leftSidebar
+    ? withClassName(
+        leftSidebar,
+        "puzzle-page-layout__sidebar puzzle-page-layout__sidebar--left",
+        {
+          ...leftSidebarProps,
+          ...(leftSidebarLabel !== undefined
+            ? { "aria-label": leftSidebarLabel }
+            : {}),
+        },
+      )
+    : null;
+
+  const rightSidebarNode = rightSidebar
+    ? withClassName(
+        rightSidebar,
+        "puzzle-page-layout__sidebar puzzle-page-layout__sidebar--right",
+        {
+          ...rightSidebarProps,
+          ...(rightSidebarLabel !== undefined
+            ? { "aria-label": rightSidebarLabel }
+            : {}),
+        },
+      )
+    : null;
+
+  const footerNode = footer
+    ? withClassName(footer, "puzzle-page-layout__footer", footerProps)
+    : null;
+
   return (
     <div
       className={cx("puzzle-page-layout", className)}
       style={layoutStyle}
       data-puzzle-page-layout=""
-      data-layout={layout}
+      data-sidebar-placement-mobile={placement.mobile}
+      data-sidebar-placement-tablet={placement.tablet}
+      data-sidebar-placement-desktop={placement.desktop}
     >
-      {skipLink !== false && (
-        <a
-          className={cx("puzzle-page-layout__skip-link", skipLinkClassName)}
-          href={`#${mainId}`}
-        >
-          {skipLink ?? "Skip to main content"}
-        </a>
-      )}
-
-      {hasHeader && header}
+      {hasContent(header) && header}
 
       <div className={cx("puzzle-page-layout__content", contentClassName)}>
-        {/* Main first in the DOM for content-first reading order. */}
         <main
           {...mainProps}
-          id={mainId}
-          tabIndex={mainProps?.tabIndex ?? -1}
           className={cx(
             "puzzle-page-layout__main",
             mainClassName,
@@ -197,49 +201,12 @@ const PageLayout = ({
           {children}
         </main>
 
-        {hasLeftSidebar && (
-          <LeftSidebar
-            {...leftSidebarProps}
-            aria-label={leftSidebarLabel ?? leftSidebarProps?.["aria-label"]}
-            className={cx(
-              "puzzle-page-layout__sidebar",
-              "puzzle-page-layout__sidebar--left",
-              leftSidebarClassName,
-              leftSidebarProps?.className,
-            )}
-          >
-            {leftSidebar}
-          </LeftSidebar>
-        )}
+        {leftSidebarNode}
 
-        {hasRightSidebar && (
-          <RightSidebar
-            {...rightSidebarProps}
-            aria-label={rightSidebarLabel ?? rightSidebarProps?.["aria-label"]}
-            className={cx(
-              "puzzle-page-layout__sidebar",
-              "puzzle-page-layout__sidebar--right",
-              rightSidebarClassName,
-              rightSidebarProps?.className,
-            )}
-          >
-            {rightSidebar}
-          </RightSidebar>
-        )}
+        {rightSidebarNode}
       </div>
 
-      {hasFooter && (
-        <Footer
-          {...footerProps}
-          className={cx(
-            "puzzle-page-layout__footer",
-            footerClassName,
-            footerProps?.className,
-          )}
-        >
-          {footer}
-        </Footer>
-      )}
+      {footerNode}
     </div>
   );
 };

@@ -1,5 +1,6 @@
 .puzzle-app-bar {
-    position: relative;
+    top: 0;
+    position: var(--puzzle-app-bar-sticky, sticky);
     flex-shrink: 0;
     z-index: var(--puzzle-z-index-navigation, 250);
     width: 100%;
