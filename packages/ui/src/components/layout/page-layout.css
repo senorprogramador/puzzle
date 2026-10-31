@@ -1,4 +1,5 @@
 .puzzle-page-layout {
+    --puzzle-sticky-offset: 0px;
     --puzzle-page-content-direction: column;
     --puzzle-page-main-flex: 0 0 auto;
     --puzzle-page-sidebar-flex: 0 1 auto;

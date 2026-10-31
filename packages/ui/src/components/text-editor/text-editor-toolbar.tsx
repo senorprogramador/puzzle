@@ -2,10 +2,14 @@ import { Button } from "../button/button";
 import { Stack } from "../stack/stack";
 import { Icon } from "@puzzle/icons";
 import { useTextEditor } from "./text-editor";
+import { cn } from "@puzzle/core";
+import "./text-editor-toolbar.css";
 
-type TextEditorToolbarProps = {};
+type TextEditorToolbarProps = {
+  className?: string;
+};
 
-const TextEditorToolbar = ({}: TextEditorToolbarProps) => {
+const TextEditorToolbar = ({ className }: TextEditorToolbarProps) => {
   const {
     toggleMark,
     isActive,
@@ -19,10 +23,10 @@ const TextEditorToolbar = ({}: TextEditorToolbarProps) => {
     canRedo,
   } = useTextEditor();
   const iconSize = 20;
+  const classes = cn("text-editor-toolbar", className);
   return (
     <Stack
-      id="text-editor-toolbar"
-      style={{ position: "sticky", top: 0, zIndex: 1 }}
+      className={classes}
       direction="row"
       alignH="start"
       alignV="stretch"

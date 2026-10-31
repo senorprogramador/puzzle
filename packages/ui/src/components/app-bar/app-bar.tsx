@@ -1,5 +1,12 @@
 import { cn } from "@puzzle/core";
-import { useId, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { Drawer } from "../drawer/drawer";
 import "./app-bar.css";
 import { Stack } from "../stack/stack";
@@ -37,6 +44,8 @@ const AppBar = <T,>({
   className,
 }: AppBarProps<T>) => {
   const [open, setOpen] = useState(false);
+  const appBarRef = useRef<HTMLElement | null>(null);
+
   const navigationId = `puzzle-app-bar-nav-${useId()}`;
 
   const hasBrand = logo != null || title != null;
@@ -47,6 +56,46 @@ const AppBar = <T,>({
   const style = {
     "--puzzle-app-bar-sticky": sticky ? "sticky" : "relative",
   } as CSSProperties;
+
+  useEffect(() => {
+    if (!sticky) return;
+
+    const appBar = appBarRef.current;
+    if (!appBar) return;
+
+    const pageLayout = appBar.closest<HTMLElement>("[data-puzzle-page-layout]");
+
+    // AppBars inside previews must not overwrite the page offset.
+    if (pageLayout && appBar.parentElement !== pageLayout) return;
+
+    const scope = pageLayout ?? document.documentElement;
+    const property = "--puzzle-sticky-offset";
+
+    const previousValue = scope.style.getPropertyValue(property);
+    const previousPriority = scope.style.getPropertyPriority(property);
+
+    const updateOffset = () => {
+      scope.style.setProperty(
+        property,
+        `${appBar.getBoundingClientRect().height}px`,
+      );
+    };
+
+    updateOffset();
+
+    const observer = new ResizeObserver(updateOffset);
+    observer.observe(appBar);
+
+    return () => {
+      observer.disconnect();
+
+      if (previousValue) {
+        scope.style.setProperty(property, previousValue, previousPriority);
+      } else {
+        scope.style.removeProperty(property);
+      }
+    };
+  }, [sticky]);
 
   const renderNavigationItems = () => (
     <ul className="puzzle-app-bar__list">
@@ -77,7 +126,11 @@ const AppBar = <T,>({
   );
 
   return (
-    <header className={cn("puzzle-app-bar", className)} style={style}>
+    <header
+      ref={appBarRef}
+      className={cn("puzzle-app-bar", className)}
+      style={style}
+    >
       <div className="puzzle-app-bar__inner">
         {hasBrand && (
           <a

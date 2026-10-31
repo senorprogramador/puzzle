@@ -1,0 +1,9 @@
+.text-editor-toolbar {
+    position: sticky;
+    background-color: var(--puzzle-color-elevation, #fff);
+    padding: var(--puzzle-spacing-sm, 8px);
+    border: 1px solid var(--puzzle-color-border, #ccc);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+    top: calc(var(--puzzle-sticky-offset, 0px) + var(--puzzle-spacing-sm, 8px));
+    z-index: 1;
+}
