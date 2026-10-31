@@ -193,3 +193,10 @@ export {
 } from "./components/checkbox/checkbox";
 
 export { Switch, type SwitchProps } from "./components/switch/switch";
+
+export {
+  Stepper,
+  type StepperProps,
+  type StepperOrientation,
+  type StepperResponsiveValue,
+} from "./components/stepper/stepper";

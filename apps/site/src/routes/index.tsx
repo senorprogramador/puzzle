@@ -20,6 +20,7 @@ import {
   SectionStack,
   Skeleton,
   Stack,
+  Stepper,
   Switch,
   Tabs,
   TextDocument,
@@ -125,7 +126,9 @@ function Home() {
       },
     ],
   });
-  const [isTooltipOpen, setIsTooltipOpen] = useState(true);
+  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
+
   return (
     <PageLayout
       header={
@@ -156,6 +159,74 @@ function Home() {
       }
     >
       <SectionStack divideY>
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Stepper
+                activeStep={activeStep}
+                onStepChange={setActiveStep}
+                orientation={{
+                  mobile: "vertical",
+                  tablet: "horizontal",
+                  desktop: "horizontal",
+                }}
+                linear={false}
+                clickable
+              >
+                <Stepper.Step
+                  label="Account"
+                  description="Create your account"
+                />
+                <Stepper.Step
+                  label="Details"
+                  description="Personal information"
+                />
+                <Stepper.Step
+                  label="Confirmation"
+                  description="Review your information"
+                />
+              </Stepper>
+              <>
+                {activeStep === 0 && (
+                  <Stack>
+                    <Heading variant="headline3">Account</Heading>
+                    <Text>Please enter your account information.</Text>
+                    <Button disabled onClick={() => setActiveStep(0)}>
+                      Back
+                    </Button>
+                    <Button onClick={() => setActiveStep(1)}>Next</Button>
+                  </Stack>
+                )}
+                {activeStep === 1 && (
+                  <Stack>
+                    <Heading variant="headline3">Details</Heading>
+                    <Text>Please enter your personal details.</Text>
+                    <Button onClick={() => setActiveStep(0)}>Back</Button>
+                    <Button onClick={() => setActiveStep(2)}>Next</Button>
+                  </Stack>
+                )}
+                {activeStep === 2 && (
+                  <Stack>
+                    <Heading variant="headline3">Confirmation</Heading>
+                    <Text>
+                      Please review your information before confirming.
+                    </Text>
+                    <Button onClick={() => setActiveStep(1)}>Back</Button>
+                    <Button onClick={() => setActiveStep(3)}>Confirm</Button>
+                  </Stack>
+                )}
+                {activeStep === 3 && (
+                  <Stack>
+                    <Heading variant="headline3">Success</Heading>
+                    <Text>You did it!</Text>
+                    <Button onClick={() => setActiveStep(2)}>Back</Button>
+                    <Button onClick={() => setActiveStep(0)}>Restart</Button>
+                  </Stack>
+                )}
+              </>
+            </Section>
+          </Preview>
+        </Section>
         <Section>
           <Preview defaultDevice="mobile">
             <Section>

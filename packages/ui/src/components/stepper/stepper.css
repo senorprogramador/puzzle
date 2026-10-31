@@ -1,0 +1,281 @@
+.puzzle-stepper {
+    --puzzle-stepper-indicator-size: 2rem;
+
+    display: flex;
+    flex-direction: var(--puzzle-stepper-direction, row);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.puzzle-stepper__item {
+    position: relative;
+    display: flex;
+    flex: var(--puzzle-stepper-item-flex, 1 1 0);
+    min-width: 0;
+    padding-block-end: var(--puzzle-stepper-item-padding, 0);
+}
+
+/* Connectors are drawn between the indicators without extra elements. */
+
+.puzzle-stepper__item:not(:last-child)::after {
+    position: absolute;
+    z-index: 0;
+    content: "";
+    background: var(--puzzle-color-border);
+
+    inset-block-start: var(
+        --puzzle-stepper-connector-block-start,
+        calc(var(--puzzle-stepper-indicator-size) / 2 - 1px)
+    );
+    inset-block-end: var(--puzzle-stepper-connector-block-end, auto);
+    inset-inline-start: var(
+        --puzzle-stepper-connector-inline-start,
+        calc(50% + var(--puzzle-stepper-indicator-size) / 2)
+    );
+    inset-inline-end: var(--puzzle-stepper-connector-inline-end, calc(-50% + var(--puzzle-stepper-indicator-size) / 2));
+
+    inline-size: var(--puzzle-stepper-connector-inline-size, auto);
+    block-size: var(--puzzle-stepper-connector-block-size, 2px);
+}
+
+.puzzle-stepper__item[data-state="completed"]::after {
+    background: var(--puzzle-color-success);
+}
+
+/* Step content */
+
+.puzzle-stepper__step {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    flex-direction: var(--puzzle-stepper-step-direction, column);
+    align-items: var(--puzzle-stepper-step-align, center);
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+
+    font: inherit;
+    text-align: var(--puzzle-stepper-step-text-align, center);
+}
+
+/* Indicator */
+
+.puzzle-stepper__indicator {
+    display: grid;
+    flex: 0 0 var(--puzzle-stepper-indicator-size);
+    place-items: center;
+
+    width: var(--puzzle-stepper-indicator-size);
+    height: var(--puzzle-stepper-indicator-size);
+
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border-strong, var(--puzzle-color-border));
+    border-radius: var(--puzzle-radius-full, 9999px);
+
+    background: var(--puzzle-color-surface);
+    color: var(--puzzle-color-text-muted);
+
+    font-size: var(--puzzle-font-size-body2, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: 1;
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) ease,
+        border-color var(--puzzle-duration-fast, 150ms) ease,
+        color var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-stepper__item[data-state="active"] .puzzle-stepper__indicator {
+    border-color: var(--puzzle-color-primary);
+    background: var(--puzzle-color-primary);
+    color: var(--puzzle-color-primary-foreground);
+}
+
+.puzzle-stepper__item[data-state="completed"] .puzzle-stepper__indicator {
+    border-color: var(--puzzle-color-success);
+    background: var(--puzzle-color-success);
+    color: var(--puzzle-color-success-foreground);
+}
+
+.puzzle-stepper__item[data-state="error"] .puzzle-stepper__indicator {
+    border-color: var(--puzzle-color-danger);
+    background: var(--puzzle-color-danger);
+    color: var(--puzzle-color-danger-foreground);
+}
+
+/* Completed check and error mark, without SVG or icon dependencies. */
+
+.puzzle-stepper__item[data-state="completed"] .puzzle-stepper__indicator[data-has-icon="false"]::after {
+    width: 0.375rem;
+    height: 0.625rem;
+    border-inline-end: 2px solid currentColor;
+    border-block-end: 2px solid currentColor;
+    content: "";
+    transform: translateY(-0.1rem) rotate(45deg);
+}
+
+.puzzle-stepper__item[data-state="error"] .puzzle-stepper__indicator[data-has-icon="false"]::after {
+    content: "!";
+    font-weight: 700;
+}
+
+/* Labels */
+
+.puzzle-stepper__label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+    min-width: 0;
+}
+
+.puzzle-stepper__label-text {
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-body2, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+}
+
+.puzzle-stepper__item[data-state="active"] .puzzle-stepper__label-text {
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-stepper__item[data-state="upcoming"] .puzzle-stepper__label-text {
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-stepper__item[data-state="error"] .puzzle-stepper__label-text {
+    color: var(--puzzle-color-danger);
+}
+
+.puzzle-stepper__description,
+.puzzle-stepper__optional {
+    color: var(--puzzle-color-text-subtle);
+    font-size: var(--puzzle-font-size-caption, 0.75rem);
+    line-height: var(--puzzle-font-line-height-caption, 1.4);
+}
+
+.puzzle-stepper__item[data-disabled="true"] .puzzle-stepper__label {
+    opacity: 0.6;
+}
+
+/* Interactive steps */
+
+button.puzzle-stepper__step {
+    cursor: pointer;
+}
+
+button.puzzle-stepper__step:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+button.puzzle-stepper__step:not(:disabled):hover .puzzle-stepper__label-text {
+    color: var(--puzzle-color-primary);
+}
+
+button.puzzle-stepper__step:focus-visible {
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 4px;
+}
+
+/* Vertical orientation */
+
+.puzzle-stepper[data-orientation-mobile="vertical"] {
+    --puzzle-stepper-direction: column;
+    --puzzle-stepper-item-flex: 0 0 auto;
+    --puzzle-stepper-item-padding: var(--puzzle-space-6, 1.5rem);
+    --puzzle-stepper-step-direction: row;
+    --puzzle-stepper-step-align: flex-start;
+    --puzzle-stepper-step-text-align: start;
+
+    --puzzle-stepper-connector-block-start: var(--puzzle-stepper-indicator-size);
+    --puzzle-stepper-connector-block-end: calc(var(--puzzle-stepper-indicator-size) / -2);
+    --puzzle-stepper-connector-inline-start: calc(var(--puzzle-stepper-indicator-size) / 2 - 1px);
+    --puzzle-stepper-connector-inline-end: auto;
+    --puzzle-stepper-connector-inline-size: 2px;
+    --puzzle-stepper-connector-block-size: auto;
+}
+
+/* Tablet: 768px and wider */
+
+@media (min-width: 768px) {
+    .puzzle-stepper:not([data-orientation-tablet="vertical"]) {
+        --puzzle-stepper-direction: initial;
+        --puzzle-stepper-item-flex: initial;
+        --puzzle-stepper-item-padding: initial;
+        --puzzle-stepper-step-direction: initial;
+        --puzzle-stepper-step-align: initial;
+        --puzzle-stepper-step-text-align: initial;
+        --puzzle-stepper-connector-block-start: initial;
+        --puzzle-stepper-connector-block-end: initial;
+        --puzzle-stepper-connector-inline-start: initial;
+        --puzzle-stepper-connector-inline-end: initial;
+        --puzzle-stepper-connector-inline-size: initial;
+        --puzzle-stepper-connector-block-size: initial;
+    }
+
+    .puzzle-stepper[data-orientation-tablet="vertical"] {
+        --puzzle-stepper-direction: column;
+        --puzzle-stepper-item-flex: 0 0 auto;
+        --puzzle-stepper-item-padding: var(--puzzle-space-6, 1.5rem);
+        --puzzle-stepper-step-direction: row;
+        --puzzle-stepper-step-align: flex-start;
+        --puzzle-stepper-step-text-align: start;
+
+        --puzzle-stepper-connector-block-start: var(--puzzle-stepper-indicator-size);
+        --puzzle-stepper-connector-block-end: calc(var(--puzzle-stepper-indicator-size) / -2);
+        --puzzle-stepper-connector-inline-start: calc(var(--puzzle-stepper-indicator-size) / 2 - 1px);
+        --puzzle-stepper-connector-inline-end: auto;
+        --puzzle-stepper-connector-inline-size: 2px;
+        --puzzle-stepper-connector-block-size: auto;
+    }
+}
+
+/* Desktop: 1024px and wider */
+
+@media (min-width: 1024px) {
+    .puzzle-stepper:not([data-orientation-desktop="vertical"]) {
+        --puzzle-stepper-direction: initial;
+        --puzzle-stepper-item-flex: initial;
+        --puzzle-stepper-item-padding: initial;
+        --puzzle-stepper-step-direction: initial;
+        --puzzle-stepper-step-align: initial;
+        --puzzle-stepper-step-text-align: initial;
+        --puzzle-stepper-connector-block-start: initial;
+        --puzzle-stepper-connector-block-end: initial;
+        --puzzle-stepper-connector-inline-start: initial;
+        --puzzle-stepper-connector-inline-end: initial;
+        --puzzle-stepper-connector-inline-size: initial;
+        --puzzle-stepper-connector-block-size: initial;
+    }
+
+    .puzzle-stepper[data-orientation-desktop="vertical"] {
+        --puzzle-stepper-direction: column;
+        --puzzle-stepper-item-flex: 0 0 auto;
+        --puzzle-stepper-item-padding: var(--puzzle-space-6, 1.5rem);
+        --puzzle-stepper-step-direction: row;
+        --puzzle-stepper-step-align: flex-start;
+        --puzzle-stepper-step-text-align: start;
+
+        --puzzle-stepper-connector-block-start: var(--puzzle-stepper-indicator-size);
+        --puzzle-stepper-connector-block-end: calc(var(--puzzle-stepper-indicator-size) / -2);
+        --puzzle-stepper-connector-inline-start: calc(var(--puzzle-stepper-indicator-size) / 2 - 1px);
+        --puzzle-stepper-connector-inline-end: auto;
+        --puzzle-stepper-connector-inline-size: 2px;
+        --puzzle-stepper-connector-block-size: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-stepper__indicator {
+        transition: none;
+    }
+}
