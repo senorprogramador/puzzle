@@ -1,0 +1,196 @@
+/* Base input */
+
+.puzzle-input {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 2.5rem;
+
+    gap: var(--puzzle-space-2, 0.5rem);
+    padding: 0 var(--puzzle-space-3, 0.75rem);
+
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    background: var(--puzzle-color-surface);
+    color: var(--puzzle-color-text);
+
+    transition:
+        border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        box-shadow var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        background-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+.puzzle-input:focus-within {
+    border-color: var(--puzzle-color-ring);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--puzzle-color-ring), transparent 82%);
+}
+
+.puzzle-input[data-disabled="true"] {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Native input */
+
+.puzzle-input__control {
+    box-sizing: border-box;
+    display: block;
+    flex: 1 1 auto;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 2.375rem;
+
+    padding: 0;
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+    color: inherit;
+
+    font: inherit;
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-input__control::placeholder,
+.puzzle-input--textarea::placeholder {
+    color: var(--puzzle-color-text-subtle, var(--puzzle-color-text-muted));
+    opacity: 1;
+}
+
+.puzzle-input__control:disabled {
+    cursor: not-allowed;
+}
+
+/* Prefix and suffix */
+
+.puzzle-input__affix {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-input__affix > svg {
+    width: 1.125em;
+    height: 1.125em;
+}
+
+/* Icon buttons */
+
+.puzzle-input__icon-button,
+.puzzle-input__stepper {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    border: 0;
+
+    background: transparent;
+    color: var(--puzzle-color-text-muted);
+
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+.puzzle-input__icon-button {
+    width: 2rem;
+    height: 2rem;
+
+    border-radius: var(--puzzle-radius-sm, 0.375rem);
+}
+
+.puzzle-input__icon-button:hover:not(:disabled),
+.puzzle-input__stepper:hover:not(:disabled) {
+    color: var(--puzzle-color-text);
+}
+
+.puzzle-input__icon-button:focus-visible,
+.puzzle-input__stepper:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-input__icon-button:disabled,
+.puzzle-input__stepper:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Textarea */
+
+.puzzle-input--textarea {
+    display: block;
+
+    width: 100%;
+    min-height: 0;
+
+    padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+
+    font: inherit;
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface);
+
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    outline: 0;
+
+    transition:
+        border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        box-shadow var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+.puzzle-input--textarea:focus {
+    border-color: var(--puzzle-color-ring);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--puzzle-color-ring), transparent 82%);
+}
+
+.puzzle-input--textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Number input */
+
+.puzzle-input--number {
+    gap: var(--puzzle-space-2, 0.5rem);
+    padding-inline: 0.1rem;
+}
+
+.puzzle-input--number .puzzle-input__control {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.puzzle-input__stepper {
+    width: 2rem;
+    height: 2rem;
+
+    border-radius: var(--puzzle-radius-sm, 0.375rem);
+
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.puzzle-input__stepper svg {
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-input,
+    .puzzle-input--textarea {
+        transition: none;
+    }
+}

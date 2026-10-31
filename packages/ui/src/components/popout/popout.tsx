@@ -53,6 +53,8 @@ type PopoutProps = {
   onOpenChange?: (open: boolean) => void;
   closeOnOutsideClick?: boolean;
   closeOnEscape?: boolean;
+  toggleOnClick?: boolean;
+  matchTriggerWidth?: boolean;
   className?: string;
   contentClassName?: string;
 };
@@ -254,6 +256,8 @@ const Popout = ({
   onOpenChange,
   closeOnOutsideClick = true,
   closeOnEscape = true,
+  toggleOnClick = false,
+  matchTriggerWidth = false,
   className,
   contentClassName,
 }: PopoutProps) => {
@@ -399,6 +403,7 @@ const Popout = ({
         position: "fixed",
         top: result.coordinates.top,
         left: result.coordinates.left,
+        ...(matchTriggerWidth ? { minWidth: anchorRect.width } : {}),
       });
     };
 
@@ -572,7 +577,7 @@ const Popout = ({
       return;
     }
 
-    changeOpenState(true);
+    changeOpenState(toggleOnClick ? !isOpen : true);
   };
 
   const triggerElement = cloneElement(trigger, {

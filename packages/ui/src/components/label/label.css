@@ -1,0 +1,25 @@
+.puzzle-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    color: var(--puzzle-color-text);
+    font-family: var(--puzzle-font-family-label, inherit);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+
+    cursor: pointer;
+}
+
+.puzzle-label__required {
+    color: var(--puzzle-color-danger);
+}
+
+.puzzle-label__optional {
+    margin-inline-start: var(--puzzle-space-1, 0.25rem);
+
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    font-weight: var(--puzzle-font-weight-normal, 400);
+}

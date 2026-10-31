@@ -1,4 +1,4 @@
-import { withSafeCharacters } from "./safe-characters";
+import { withSafeCharacters } from "./normalize";
 
 /**
  * Represents the casing options for strings.

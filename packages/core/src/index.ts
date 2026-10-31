@@ -9,12 +9,16 @@ export {
 } from "./responsive";
 
 /** String utilities */
-export { cn, type ClassnameArg } from "./string/class-names";
-export { withSafeCharacters } from "./string/safe-characters";
-export { stringWithCasing, type StringCasing } from "./string/casing";
-export { escapeCssString } from "./string/escape-css-string";
-export { assertSafeCssValue } from "./string/assert-safe-css-value";
-export { nameToInitials } from "./string/name-to-initials";
+export {
+  assertSafeCssValue,
+  stringWithCasing,
+  normalizeSearchString,
+  withSafeCharacters,
+  escapeCssString,
+  cn,
+  type ClassnameArg,
+  nameToInitials,
+} from "./string";
 
 /** Color utilities */
 export { isHexColor, isDarkColor } from "./color/is-color";

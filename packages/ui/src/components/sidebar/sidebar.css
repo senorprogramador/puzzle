@@ -1,0 +1,8 @@
+.puzzle-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-2, 0.5rem);
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface);
+    padding: var(--puzzle-space-4, 1rem);
+}

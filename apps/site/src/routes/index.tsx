@@ -18,6 +18,9 @@ import {
   PageLayout,
   Section,
   SectionStack,
+  Select,
+  SelectOption,
+  Sidebar,
   Skeleton,
   Stack,
   Stepper,
@@ -42,6 +45,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@puzzle/ui/components/card/card";
+import { Label, TextInput, TextAreaInput, NumberInput } from "@puzzle/ui";
 
 const breadcrumbs = [
   {
@@ -157,8 +161,131 @@ function Home() {
           sticky
         />
       }
+      leftSidebar={
+        <Sidebar>
+          <p>Sidebar content</p>
+        </Sidebar>
+      }
     >
       <SectionStack divideY>
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Label htmlFor="email" required>
+                Email address
+              </Label>
+
+              <TextInput
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+              />
+
+              <Label htmlFor="password">Password</Label>
+
+              <TextInput
+                id="password"
+                type="password"
+                placeholder="Your password"
+              />
+
+              <Label htmlFor="description">Description</Label>
+
+              <TextAreaInput
+                id="description"
+                placeholder="Write something..."
+              />
+
+              <Label htmlFor="quantity">Quantity</Label>
+
+              <NumberInput
+                id="quantity"
+                initialValue={1.25}
+                min={0}
+                max={10}
+                step={0.25}
+                fractionDigits={2}
+              />
+            </Section>
+          </Preview>
+        </Section>
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Select
+                label="Country"
+                options={[
+                  { value: "nl", label: "Netherlands" },
+                  { value: "es", label: "Spain" },
+                  { value: "de", label: "Germany" },
+                ]}
+                placeholder="Select a country"
+              />
+
+              <Select
+                label="Technologies"
+                multiple
+                options={[
+                  { value: "react", label: "React" },
+                  { value: "next", label: "Next.js" },
+                  { value: "solid", label: "SolidJS" },
+                  { value: "vue", label: "Vue" },
+                ]}
+                placeholder="Choose technologies"
+                maxSelected={3}
+              />
+
+              <Select
+                label="Employees"
+                options={[
+                  {
+                    value: "sjoerd",
+                    label: "Sjoerd van den Berg",
+                    description: "Senior Software Engineer",
+                    group: "Engineering",
+                  },
+                  {
+                    value: "anouk",
+                    label: "Anouk",
+                    description: "Business Owner",
+                    group: "Management",
+                  },
+                ]}
+              />
+
+              <Select
+                multiple
+                label="Team members"
+                maxSelected={3}
+                options={[
+                  {
+                    value: "sjoerd",
+                    label: "Sjoerd van den Berg",
+                    description: "Senior Software Engineer",
+                    group: "Engineering",
+                  },
+                  {
+                    value: "anouk",
+                    label: "Anouk",
+                    description: "Business Owner",
+                    group: "Management",
+                  },
+                ]}
+                renderValue={(selected) => (
+                  <span>
+                    {(selected as readonly SelectOption[]).length} employees
+                    selected
+                  </span>
+                )}
+                renderOption={(option, { selected }) => (
+                  <div className={selected ? "bg-blue-100" : ""}>
+                    {option.label}
+                  </div>
+                )}
+              />
+            </Section>
+          </Preview>
+        </Section>
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
