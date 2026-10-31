@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -56,7 +57,10 @@ const PREVIEW_DOCUMENT = `<!doctype html>
   <body>
     <div id="puzzle-preview-root"></div>
   </body>
-</html>` as const;
+</html>`;
+
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 const Preview = ({
   children,
@@ -66,12 +70,10 @@ const Preview = ({
   const [device, setDevice] = useState<PreviewDevice>(defaultDevice);
   const [frameRoot, setFrameRoot] = useState<HTMLElement | null>(null);
   const [scale, setScale] = useState(1);
-  const [contentHeight, setContentHeight] = useState(
-    PREVIEW_DEVICES[defaultDevice].height,
-  );
 
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const initializationRef = useRef(0);
 
   const config = PREVIEW_DEVICES[device];
 
@@ -112,27 +114,34 @@ const Preview = ({
     frameDocument.body.style.cssText = document.body.style.cssText;
   }, []);
 
-  // Keep the preview scaled to the available width.
-  useEffect(() => {
+  const updateScale = useCallback(() => {
     const container = containerRef.current;
 
     if (!container) return;
 
-    const observer = new ResizeObserver(([entry]) => {
-      if (!entry) return;
+    const availableWidth = container.clientWidth;
+    const nextScale = Math.min(1, availableWidth / config.width);
 
-      const availableWidth = entry.contentRect.width;
-      const nextScale = Math.min(1, availableWidth / config.width);
+    setScale((current) =>
+      Math.abs(current - nextScale) < 0.001 ? current : nextScale,
+    );
+  }, [config.width]);
 
-      setScale(nextScale);
-    });
+  // Determine the initial scale before the browser paints.
+  useIsomorphicLayoutEffect(() => {
+    updateScale();
 
+    const container = containerRef.current;
+
+    if (!container) return;
+
+    const observer = new ResizeObserver(updateScale);
     observer.observe(container);
 
     return () => observer.disconnect();
-  }, [config.width]);
+  }, [updateScale]);
 
-  // Copy application styles into the iframe.
+  // Keep application styles synchronized with the iframe.
   useEffect(() => {
     const observer = new MutationObserver(syncStyles);
 
@@ -146,13 +155,44 @@ const Preview = ({
     return () => observer.disconnect();
   }, [syncStyles]);
 
-  const initializeFrame = useCallback(() => {
+  // Wait until copied stylesheets and fonts are ready.
+  const initializeFrame = useCallback(async () => {
     const frameDocument = iframeRef.current?.contentDocument;
     const root = frameDocument?.getElementById("puzzle-preview-root");
 
-    if (!root) return;
+    if (!frameDocument || !root) return;
+
+    const initialization = ++initializationRef.current;
 
     syncStyles();
+
+    const stylesheets = Array.from(
+      frameDocument.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
+    );
+
+    await Promise.all(
+      stylesheets.map(
+        (stylesheet) =>
+          new Promise<void>((resolve) => {
+            if (stylesheet.sheet) {
+              resolve();
+              return;
+            }
+
+            stylesheet.addEventListener("load", () => resolve(), {
+              once: true,
+            });
+
+            stylesheet.addEventListener("error", () => resolve(), {
+              once: true,
+            });
+          }),
+      ),
+    );
+
+    await frameDocument.fonts.ready;
+
+    if (initialization !== initializationRef.current) return;
 
     setFrameRoot((currentRoot) => (currentRoot === root ? currentRoot : root));
   }, [syncStyles]);
@@ -163,54 +203,44 @@ const Preview = ({
     if (!iframe) return;
 
     iframe.addEventListener("load", initializeFrame);
-    initializeFrame();
 
     return () => {
       iframe.removeEventListener("load", initializeFrame);
+      initializationRef.current++;
     };
   }, [initializeFrame]);
 
-  // Measure the rendered content and cap it at the selected device height.
+  // Keep the iframe content synchronized when the viewport changes.
   useEffect(() => {
     if (!frameRoot) return;
 
-    const measureContent = () => {
-      const nextHeight = Math.ceil(
-        Math.max(
-          frameRoot.scrollHeight,
-          frameRoot.getBoundingClientRect().height,
-        ),
-      );
+    const frameDocument = iframeRef.current?.contentDocument;
 
-      if (nextHeight > 0) {
-        setContentHeight(nextHeight);
-      }
+    if (!frameDocument) return;
+
+    const measure = () => {
+      // Reading the dimensions forces the browser to resolve layout.
+      frameRoot.getBoundingClientRect();
     };
 
-    const observer = new ResizeObserver(measureContent);
+    const observer = new ResizeObserver(measure);
 
     observer.observe(frameRoot);
-
-    // Also measure after the initial layout and style application.
-    measureContent();
+    observer.observe(frameDocument.documentElement);
 
     return () => observer.disconnect();
   }, [frameRoot, config.width]);
 
-  // Use the device height as the maximum, not as a fixed height.
-  const frameHeight = Math.min(contentHeight, config.height);
-  const isContentOverflowing = contentHeight > config.height;
-
   const frameStyle: CSSProperties = {
     width: config.width,
-    height: frameHeight,
+    height: config.height,
     transform: `scale(${scale})`,
     transformOrigin: "top left",
   };
 
   const viewportStyle: CSSProperties = {
     width: config.width * scale,
-    height: frameHeight * scale,
+    aspectRatio: `${config.width} / ${config.height}`,
   };
 
   return (
@@ -242,8 +272,7 @@ const Preview = ({
         </div>
 
         <span className="puzzle-preview__dimensions">
-          {config.width} × {frameHeight}
-          {isContentOverflowing ? "+" : ""}
+          {config.width} × {config.height}
         </span>
       </div>
 
