@@ -9,8 +9,10 @@ import {
   BottomNavigationItem,
   BreadcrumbsProps,
   Button,
+  Card,
   Carousel,
   CarouselController,
+  Checkbox,
   CircularProgress,
   LinearProgress,
   PageLayout,
@@ -18,6 +20,7 @@ import {
   SectionStack,
   Skeleton,
   Stack,
+  Switch,
   Tabs,
   TextDocument,
   TextEditor,
@@ -30,6 +33,14 @@ import { DialogSection } from "@/components/dialog-section";
 import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
 import { useState } from "react";
 import { Icon } from "@puzzle/icons";
+import {
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@puzzle/ui/components/card/card";
 
 const breadcrumbs = [
   {
@@ -92,6 +103,7 @@ const accordionItems = [
 ];
 
 function Home() {
+  const [accepted, setAccepted] = useState(false);
   const [document, setDocument] = useState<TextDocument>({
     type: "doc",
     content: [
@@ -144,6 +156,41 @@ function Home() {
       }
     >
       <SectionStack divideY>
+        <Section>
+          <Preview defaultDevice="mobile">
+            <Section>
+              <Heading variant="headline2">Card</Heading>
+              <Card variant="outlined" size="lg">
+                <CardHeader>
+                  <CardTitle>Card title</CardTitle>
+                  <CardDescription>
+                    A short description of this card.
+                  </CardDescription>
+                  <CardAction>
+                    <Button variant="ghost" size="sm">
+                      Edit
+                    </Button>
+                  </CardAction>
+                </CardHeader>
+
+                <CardContent>
+                  <Checkbox
+                    label="I agree to the terms and conditions"
+                    size="sm"
+                    checked={accepted}
+                    onChange={(event) => setAccepted(event.target.checked)}
+                  />
+                  <Switch defaultChecked label="Dark mode" />
+                </CardContent>
+
+                <CardFooter>
+                  <Button>Save changes</Button>
+                  <Button variant="outline">Cancel</Button>
+                </CardFooter>
+              </Card>
+            </Section>
+          </Preview>
+        </Section>
         <Section>
           <Preview defaultDevice="mobile">
             <Section>

@@ -7,7 +7,7 @@
 .puzzle-section {
     --section-padding-y: var(--puzzle-container-gutter, clamp(1rem, 3vw, 3rem));
 
-    --section-gap: var(--puzzle-spacing-4, 1rem);
+    --section-gap: var(--puzzle-space-4, 1rem);
 
     display: flex;
     flex-direction: column;

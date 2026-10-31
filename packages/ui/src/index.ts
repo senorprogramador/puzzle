@@ -183,3 +183,13 @@ export {
   type TabsTabProps,
   type TabsPosition,
 } from "./components/tabs/tabs";
+
+export { Card, type CardProps } from "./components/card/card";
+
+export {
+  Checkbox,
+  type CheckboxProps,
+  type CheckboxSize,
+} from "./components/checkbox/checkbox";
+
+export { Switch, type SwitchProps } from "./components/switch/switch";

@@ -1,0 +1,178 @@
+.puzzle-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--puzzle-space-3, 0.5rem);
+    width: fit-content;
+
+    color: var(--puzzle-color-text);
+    font-family: var(--puzzle-font-family-body, inherit);
+
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Control */
+
+.puzzle-checkbox__control {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+
+    width: var(--puzzle-checkbox-size, 1.125rem);
+    height: var(--puzzle-checkbox-size, 1.125rem);
+    margin-top: var(--puzzle-checkbox-offset, 0.125rem);
+}
+
+.puzzle-checkbox__control input {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+
+    width: 100%;
+    height: 100%;
+    margin: 0;
+
+    opacity: 0;
+    cursor: inherit;
+}
+
+/* Indicator */
+
+.puzzle-checkbox__indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+
+    border: 1.5px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+
+    color: var(--puzzle-color-primary-foreground);
+    background: var(--puzzle-color-surface);
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        box-shadow var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+.puzzle-checkbox__indicator svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0.125rem;
+    box-sizing: border-box;
+}
+
+/* Checked and indeterminate */
+
+.puzzle-checkbox__control input:checked + .puzzle-checkbox__indicator,
+.puzzle-checkbox__control input:indeterminate + .puzzle-checkbox__indicator {
+    background: var(--puzzle-color-primary);
+    border-color: var(--puzzle-color-primary);
+    stroke: var(--puzzle-color-primary);
+}
+
+.puzzle-checkbox .puzzle-checkbox__check,
+.puzzle-checkbox .puzzle-checkbox__mixed {
+    transform-origin: center;
+    transform: scale(0.8);
+}
+
+.puzzle-checkbox--checked .puzzle-checkbox__check {
+    display: block;
+    fill: currentColor;
+}
+.puzzle-checkbox--checked .puzzle-checkbox__mixed {
+    display: none;
+}
+
+.puzzle-checkbox--indeterminate .puzzle-checkbox__indicator .puzzle-checkbox__check {
+    display: none;
+}
+.puzzle-checkbox--indeterminate .puzzle-checkbox__indicator .puzzle-checkbox__mixed {
+    display: block;
+    fill: currentColor;
+}
+
+/* Hover */
+
+.puzzle-checkbox:hover:not([data-disabled]) .puzzle-checkbox__indicator {
+    border-color: var(--puzzle-color-primary);
+}
+
+/* Focus */
+
+.puzzle-checkbox__control input:focus-visible + .puzzle-checkbox__indicator {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+/* Disabled */
+
+.puzzle-checkbox--disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.puzzle-checkbox--disabled .puzzle-checkbox__indicator {
+    background: var(--puzzle-color-surface-sunken);
+}
+
+/* Content */
+
+.puzzle-checkbox__content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-checkbox__label {
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-checkbox__description {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-checkbox__required {
+    margin-left: 0.2em;
+    color: var(--puzzle-color-danger);
+}
+
+/* Sizes */
+
+.puzzle-checkbox--sm {
+    --puzzle-checkbox-size: 0.875rem;
+    --puzzle-checkbox-offset: 0.125rem;
+}
+
+.puzzle-checkbox--md {
+    --puzzle-checkbox-size: 1.125rem;
+    --puzzle-checkbox-offset: 0.125rem;
+}
+
+.puzzle-checkbox--lg {
+    --puzzle-checkbox-size: 1.375rem;
+    --puzzle-checkbox-offset: 0.0625rem;
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-checkbox__indicator {
+        transition: none;
+    }
+}

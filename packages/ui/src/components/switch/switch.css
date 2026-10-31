@@ -1,0 +1,173 @@
+.puzzle-switch {
+    --puzzle-switch-width: 2.5rem;
+    --puzzle-switch-height: 1.375rem;
+    --puzzle-switch-thumb-size: 1rem;
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--puzzle-space-3, 0.75rem);
+
+    width: fit-content;
+
+    color: var(--puzzle-color-text);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.puzzle-switch--sm {
+    --puzzle-switch-width: 2rem;
+    --puzzle-switch-height: 1.125rem;
+    --puzzle-switch-thumb-size: 0.75rem;
+}
+
+.puzzle-switch--disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Native input */
+
+.puzzle-switch__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Switch control */
+
+.puzzle-switch__control {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+
+    box-sizing: border-box;
+    width: var(--puzzle-switch-width);
+    height: var(--puzzle-switch-height);
+    padding: 2px;
+
+    border: 1px solid var(--puzzle-color-border-strong);
+    border-radius: var(--puzzle-radius-full, 9999px);
+
+    background-color: var(--puzzle-color-surface-sunken);
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+.puzzle-switch__control::after {
+    display: block;
+    width: var(--puzzle-switch-thumb-size);
+    height: var(--puzzle-switch-thumb-size);
+
+    border-radius: 50%;
+    background-color: var(--puzzle-color-surface);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.18);
+
+    content: "";
+
+    transition:
+        transform var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        background-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+/* Checked */
+
+.puzzle-switch__input:checked + .puzzle-switch__control {
+    border-color: var(--puzzle-color-primary);
+    background-color: var(--puzzle-color-primary);
+}
+
+.puzzle-switch__input:checked + .puzzle-switch__control::after {
+    background-color: var(--puzzle-color-primary-foreground);
+
+    /* Account for the border and padding on both sides. */
+    transform: translateX(calc(var(--puzzle-switch-width) - var(--puzzle-switch-thumb-size) - 6px));
+}
+
+/* Focus */
+
+.puzzle-switch__input:focus-visible + .puzzle-switch__control {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+/* Content */
+
+.puzzle-switch__content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 0.125rem;
+
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-body2, 1.5);
+}
+
+.puzzle-switch__description,
+.puzzle-switch__content--description-only {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    font-weight: var(--puzzle-font-weight-normal, 400);
+    line-height: var(--puzzle-font-line-height-body2, 1.5);
+}
+
+/* High contrast / forced colors */
+
+@media (forced-colors: active) {
+    .puzzle-switch--disabled {
+        opacity: 1;
+        color: GrayText;
+    }
+
+    .puzzle-switch--disabled .puzzle-switch__content,
+    .puzzle-switch--disabled .puzzle-switch__description {
+        color: GrayText;
+    }
+
+    .puzzle-switch__control {
+        border-color: CanvasText;
+        background-color: Canvas;
+    }
+
+    .puzzle-switch__control::after {
+        background-color: CanvasText;
+        box-shadow: none;
+    }
+
+    .puzzle-switch__input:checked + .puzzle-switch__control {
+        border-color: Highlight;
+        background-color: Highlight;
+    }
+
+    .puzzle-switch__input:checked + .puzzle-switch__control::after {
+        background-color: HighlightText;
+    }
+
+    .puzzle-switch__input:disabled + .puzzle-switch__control,
+    .puzzle-switch__input:disabled:checked + .puzzle-switch__control {
+        border-color: GrayText;
+        background-color: Canvas;
+    }
+
+    .puzzle-switch__input:disabled + .puzzle-switch__control::after {
+        background-color: GrayText;
+    }
+
+    .puzzle-switch__input:focus-visible + .puzzle-switch__control {
+        outline-color: Highlight;
+    }
+}
