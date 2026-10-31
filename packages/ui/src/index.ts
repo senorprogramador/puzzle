@@ -198,5 +198,4 @@ export {
   Stepper,
   type StepperProps,
   type StepperOrientation,
-  type StepperResponsiveValue,
 } from "./components/stepper/stepper";

@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@puzzle/core";
+import { cn, resolveResponsiveValue, type ResponsiveValue } from "@puzzle/core";
 import {
   Children,
   isValidElement,
@@ -12,14 +12,6 @@ import {
 import "./stepper.css";
 
 export type StepperOrientation = "horizontal" | "vertical";
-
-export type StepperResponsiveConfig<T> = {
-  mobile: T;
-  tablet?: T;
-  desktop?: T;
-};
-
-export type StepperResponsiveValue<T> = T | StepperResponsiveConfig<T>;
 
 export type StepperStepProps = {
   /** Stable identifier, useful when steps are reordered. */
@@ -61,7 +53,7 @@ export type StepperProps = Omit<ComponentPropsWithoutRef<"ol">, "children"> & {
   onStepChange?: (step: number) => void;
 
   /** Layout direction, optionally responsive. */
-  orientation?: StepperResponsiveValue<StepperOrientation>;
+  orientation?: ResponsiveValue<StepperOrientation>;
 
   /** Allows users to select steps. Defaults to false. */
   clickable?: boolean;
@@ -78,26 +70,6 @@ type StepperStepElement = ReactElement<StepperStepProps, typeof StepperStep>;
 
 const isStepperStep = (child: ReactNode): child is StepperStepElement =>
   isValidElement<StepperStepProps>(child) && child.type === StepperStep;
-
-const resolveResponsiveValue = <T,>(
-  value: StepperResponsiveValue<T>,
-): Required<StepperResponsiveConfig<T>> => {
-  if (typeof value !== "object" || value === null || !("mobile" in value)) {
-    return {
-      mobile: value as T,
-      tablet: value as T,
-      desktop: value as T,
-    };
-  }
-
-  const tablet = value.tablet ?? value.mobile;
-
-  return {
-    mobile: value.mobile,
-    tablet,
-    desktop: value.desktop ?? tablet,
-  };
-};
 
 const StepperRoot = ({
   activeStep,

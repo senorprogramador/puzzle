@@ -1,4 +1,4 @@
-import { cn } from "@puzzle/core";
+import { cn, resolveResponsiveValue } from "@puzzle/core";
 import {
   cloneElement,
   useCallback,
@@ -14,14 +14,7 @@ import {
 } from "react";
 import { useCarouselContext } from "./carousel-controller";
 import "./carousel.css";
-
-type ResponsiveConfig<T> = {
-  mobile: T;
-  tablet?: T;
-  desktop?: T;
-};
-
-type ResponsiveValue<T> = T | ResponsiveConfig<T>;
+import type { ResponsiveValue } from "@puzzle/core";
 
 type CarouselAlignment = "left" | "center" | "right";
 
@@ -157,68 +150,6 @@ const estimatePointerVelocity = (samples: DragSample[]): number => {
   return -(end.x - start.x) / elapsedSeconds;
 };
 
-const resolveResponsiveValue = <T,>(
-  value: ResponsiveValue<T> | undefined,
-  fallback: T,
-): ResponsiveConfig<T> => {
-  if (value === undefined) {
-    return {
-      mobile: fallback,
-      tablet: fallback,
-      desktop: fallback,
-    };
-  }
-
-  if (typeof value === "object" && value !== null && "mobile" in value) {
-    const responsive = value as ResponsiveConfig<T>;
-    const mobile = responsive.mobile ?? fallback;
-    const tablet = responsive.tablet ?? mobile;
-
-    return {
-      mobile,
-      tablet,
-      desktop: responsive.desktop ?? tablet,
-    };
-  }
-
-  return {
-    mobile: value as T,
-    tablet: value as T,
-    desktop: value as T,
-  };
-};
-
-const resolveAlignmentConfig = <T,>(
-  config: ResponsiveValue<T> | undefined,
-  fallback: T,
-): ResponsiveConfig<T> => {
-  if (config === undefined) {
-    return {
-      mobile: fallback,
-      tablet: fallback,
-      desktop: fallback,
-    };
-  }
-
-  if (typeof config === "object" && config !== null && "mobile" in config) {
-    const responsive = config as ResponsiveConfig<T>;
-    const mobile = responsive.mobile ?? fallback;
-    const tablet = responsive.tablet ?? mobile;
-
-    return {
-      mobile,
-      tablet,
-      desktop: responsive.desktop ?? tablet,
-    };
-  }
-
-  return {
-    mobile: config as T,
-    tablet: config as T,
-    desktop: config as T,
-  };
-};
-
 const toCssLength = (
   value: CSSProperties["width"] | CSSProperties["gap"] | undefined,
 ): string => {
@@ -320,12 +251,12 @@ const Carousel = <T,>({
   const itemWidths = resolveResponsiveValue(itemWidth, "100%");
   const gaps = resolveResponsiveValue(gap, 0);
 
-  const buttonAlignments = resolveAlignmentConfig<CarouselButtonAlignment>(
+  const buttonAlignments = resolveResponsiveValue<CarouselButtonAlignment>(
     buttonAlignment,
     "over",
   );
 
-  const pagerAlignments = resolveAlignmentConfig<CarouselPagerAlignment>(
+  const pagerAlignments = resolveResponsiveValue<CarouselPagerAlignment>(
     pagerAlignment,
     "under",
   );
@@ -334,7 +265,6 @@ const Carousel = <T,>({
     "--puzzle-carousel-gap-mobile": toCssLength(gaps.mobile),
     "--puzzle-carousel-gap-tablet": toCssLength(gaps.tablet),
     "--puzzle-carousel-gap-desktop": toCssLength(gaps.desktop),
-
     "--puzzle-carousel-basis-mobile": getItemBasis(
       panelCounts.mobile,
       toCssLength(gaps.mobile),
@@ -347,7 +277,6 @@ const Carousel = <T,>({
       panelCounts.desktop ?? panelCounts.tablet ?? panelCounts.mobile,
       toCssLength(gaps.desktop),
     ),
-
     "--puzzle-carousel-item-width-mobile": toCssLength(itemWidths.mobile),
     "--puzzle-carousel-item-width-tablet": toCssLength(itemWidths.tablet),
     "--puzzle-carousel-item-width-desktop": toCssLength(itemWidths.desktop),

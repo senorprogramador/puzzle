@@ -1,4 +1,12 @@
 export { type DeepPartial } from "./types";
+export {
+  BREAKPOINTS,
+  resolveResponsiveValue,
+  resolveResponsiveValueForBreakpoint,
+  type ResponsiveConfig,
+  type ResponsiveValue,
+  type Breakpoint,
+} from "./responsive";
 
 /** String utilities */
 export { cn, type ClassnameArg } from "./string/class-names";

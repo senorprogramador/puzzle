@@ -1,4 +1,4 @@
-import { cn } from "@puzzle/core";
+import { BREAKPOINTS, cn } from "@puzzle/core";
 import {
   Children,
   cloneElement,
@@ -7,13 +7,11 @@ import {
   type ElementType,
   type ReactNode,
 } from "react";
+import type { ResponsiveValue } from "@puzzle/core";
 import "./stack.css";
 
 type StackDirection = "row" | "col";
-
-type StackBreakpoint = "mobile" | "tablet" | "desktop" | "hd";
-
-type ResponsiveDirection = Partial<Record<StackBreakpoint, StackDirection>>;
+type ResponsiveDirection = ResponsiveValue<StackDirection>;
 
 type StackMainAlignment =
   | "start"
@@ -55,13 +53,6 @@ type StackOwnProps<C extends ElementType> = {
 type StackProps<C extends ElementType = "div"> = StackOwnProps<C> &
   Omit<ComponentPropsWithRef<C>, keyof StackOwnProps<C> | "as">;
 
-const STACK_BREAKPOINTS: StackBreakpoint[] = [
-  "mobile",
-  "tablet",
-  "desktop",
-  "hd",
-];
-
 const Stack = ({
   as: Component = "div",
   direction = "col",
@@ -83,7 +74,7 @@ const Stack = ({
           mobile: direction.mobile ?? "col",
         };
 
-  const directionClasses = STACK_BREAKPOINTS.flatMap((breakpoint) => {
+  const directionClasses = BREAKPOINTS.flatMap((breakpoint) => {
     const value = directions[breakpoint];
 
     return value ? [`direction-${breakpoint}-${value}`] : [];
