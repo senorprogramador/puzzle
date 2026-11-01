@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@puzzle/core";
 import {
   useEffect,

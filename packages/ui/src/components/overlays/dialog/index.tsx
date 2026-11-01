@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useId,
   type ComponentPropsWithoutRef,
   type ReactNode,
@@ -94,10 +95,10 @@ const Dialog = ({
   const titleId = useId();
   const descriptionId = useId();
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     onOpenChange(false);
     onClose?.();
-  };
+  }, [onOpenChange, onClose]);
 
   const handleClick: MouseEventHandler<HTMLElement> = (event) => {
     onClick?.(event);

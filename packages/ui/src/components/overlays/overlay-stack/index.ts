@@ -1,23 +1,49 @@
+import {
+  createContext,
+  createElement,
+  useContext,
+  type PropsWithChildren,
+} from "react";
+
 type OverlayEntry = {
   onEscape: () => void;
+  priority: number;
+  order: number;
 };
 
 type OverlayStack = {
   entries: OverlayEntry[];
+  nextOrder: number;
   handleKeyDown: (event: KeyboardEvent) => void;
 };
+
+const OverlayPriorityContext = createContext(0);
 
 const overlayStacks = new WeakMap<Document, OverlayStack>();
 
 const createOverlayStack = (ownerDocument: Document): OverlayStack => {
   const stack: OverlayStack = {
     entries: [],
+    nextOrder: 0,
     handleKeyDown: (event) => {
       if (event.key !== "Escape") {
         return;
       }
 
-      const topOverlay = stack.entries.at(-1);
+      const topOverlay = stack.entries.reduce<OverlayEntry | undefined>(
+        (top, entry) => {
+          if (
+            !top ||
+            entry.priority > top.priority ||
+            (entry.priority === top.priority && entry.order > top.order)
+          ) {
+            return entry;
+          }
+
+          return top;
+        },
+        undefined,
+      );
 
       if (!topOverlay) {
         return;
@@ -25,6 +51,7 @@ const createOverlayStack = (ownerDocument: Document): OverlayStack => {
 
       event.preventDefault();
       event.stopPropagation();
+
       topOverlay.onEscape();
     },
   };
@@ -37,13 +64,18 @@ const createOverlayStack = (ownerDocument: Document): OverlayStack => {
 const registerOverlay = (
   ownerDocument: Document,
   onEscape: () => void,
+  priority = 0,
 ): (() => void) => {
   const stack =
     overlayStacks.get(ownerDocument) ?? createOverlayStack(ownerDocument);
 
   overlayStacks.set(ownerDocument, stack);
 
-  const entry: OverlayEntry = { onEscape };
+  const entry: OverlayEntry = {
+    onEscape,
+    priority,
+    order: stack.nextOrder++,
+  };
 
   stack.entries.push(entry);
 
@@ -61,4 +93,21 @@ const registerOverlay = (
   };
 };
 
-export { registerOverlay };
+type OverlayStackProviderProps = PropsWithChildren<{
+  priority: number;
+}>;
+
+const OverlayStackProvider = ({
+  priority,
+  children,
+}: OverlayStackProviderProps) => {
+  return createElement(
+    OverlayPriorityContext.Provider,
+    { value: priority },
+    children,
+  );
+};
+
+const useOverlayPriority = () => useContext(OverlayPriorityContext);
+
+export { OverlayStackProvider, registerOverlay, useOverlayPriority };

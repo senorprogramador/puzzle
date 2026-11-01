@@ -1,3 +1,5 @@
+"use client";
+
 import { cn, resolveResponsiveValue } from "@puzzle/core";
 import {
   cloneElement,

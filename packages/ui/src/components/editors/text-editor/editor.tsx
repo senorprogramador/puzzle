@@ -38,7 +38,7 @@ import type {
 } from "./text-editor.types";
 import "./text-editor.css";
 
-export type TextEditorHandle = {
+type TextEditorHandle = {
   focus: () => void;
   getDocument: () => TextDocument;
   getSelection: () => TextSelection;
@@ -60,7 +60,7 @@ export type TextEditorHandle = {
   canRedo: () => boolean;
 };
 
-export type EditorProps = {
+type EditorProps = {
   /** Controlled document. Use the same object emitted by onChange when updating it. */
   value?: TextDocument;
   /** Initial document for uncontrolled use. */
@@ -1032,4 +1032,4 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
 
 Editor.displayName = "Editor";
 
-export { Editor };
+export { Editor, type TextEditorHandle, type EditorProps };
