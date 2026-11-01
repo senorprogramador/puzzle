@@ -18,10 +18,12 @@ const TRANSITION_MAP: Record<DrawerPosition, TransitionTemplate> = {
 };
 
 type DrawerPosition = "left" | "right" | "top" | "bottom";
+
 type DrawerOwnProps = {
   position?: DrawerPosition;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  closeOnEscape?: boolean;
 };
 
 type DrawerProps = DrawerOwnProps &
@@ -31,13 +33,19 @@ const Drawer = ({
   position = "left",
   open,
   onOpenChange,
+  closeOnEscape = true,
   className,
   children,
   ...props
 }: DrawerProps) => {
   return (
-    <Backdrop open={open} onClose={() => onOpenChange(false)}>
+    <Backdrop
+      open={open}
+      closeOnEscape={closeOnEscape}
+      onClose={() => onOpenChange(false)}
+    >
       <ScrollLock enabled={open} />
+
       <Transition visible={open} template={TRANSITION_MAP[position]} forceMount>
         <DrawerContent
           position={position}
@@ -57,10 +65,13 @@ const calculateDimension = (position: DrawerPosition, dimension: number) => {
   switch (position) {
     case "left":
       return `${dimension}px`;
+
     case "right":
       return `${window.innerWidth - dimension}px`;
+
     case "top":
       return `${dimension}px`;
+
     case "bottom":
       return `${window.innerHeight - dimension}px`;
   }
@@ -77,6 +88,7 @@ const DrawerContent = ({
   const classes = cn("puzzle-drawer", `puzzle-drawer--${position}`, className);
 
   const { dimension, resizeRef } = useResizeBar(position, open);
+
   const resolvedDimension = dimension
     ? calculateDimension(position, dimension)
     : undefined;
@@ -106,10 +118,11 @@ const DrawerContent = ({
       <button
         ref={resizeRef}
         className="puzzle-drawer__resize-bar"
-        onMouseDown={(e) => e.stopPropagation()}
+        onMouseDown={(event) => event.stopPropagation()}
       >
         <span className="puzzle-drawer__resize-bar-inner" />
       </button>
+
       <Stack direction="col" className="puzzle-drawer__content-wrapper">
         <Stack direction="col" className="puzzle-drawer__content">
           {children}

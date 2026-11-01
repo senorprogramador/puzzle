@@ -1,11 +1,10 @@
 "use client";
+
 import {
   useId,
   type ComponentPropsWithoutRef,
   type ReactNode,
   type MouseEventHandler,
-  type MouseEvent,
-  type KeyboardEvent,
 } from "react";
 import { cn } from "@puzzle/core";
 import "./dialog.css";
@@ -67,7 +66,7 @@ type DialogProps = NativeDialogProps & {
   /** Optional native click handler. */
   onClick?: MouseEventHandler<HTMLElement>;
 
-  /** Called when the native dialog fires its close event. */
+  /** Called when the dialog is closed. */
   onClose?: () => void;
 
   /** Additional IDs describing the dialog. */
@@ -95,21 +94,13 @@ const Dialog = ({
   const titleId = useId();
   const descriptionId = useId();
 
-  const handleClick: MouseEventHandler<HTMLElement> = (event) => {
-    if (closeOnBackdrop && event.target === event.currentTarget) {
-      event.stopPropagation();
-      onOpenChange(false);
-    }
-    onClick?.(event);
+  const handleClose = () => {
+    onOpenChange(false);
+    onClose?.();
   };
 
-  const handleBackdropClick = (
-    event: MouseEvent<HTMLElement> | KeyboardEvent,
-  ) => {
-    if (closeOnBackdrop) {
-      event.stopPropagation();
-      onOpenChange(false);
-    }
+  const handleClick: MouseEventHandler<HTMLElement> = (event) => {
+    onClick?.(event);
   };
 
   const describedBy =
@@ -119,11 +110,18 @@ const Dialog = ({
 
   return (
     <Portal>
-      <Backdrop open={open} onClose={handleBackdropClick}>
+      <Backdrop
+        open={open}
+        closeOnBackdrop={closeOnBackdrop}
+        closeOnEscape={closeOnEscape}
+        onClose={handleClose}
+      >
         <Transition template="slide-in-up" visible={open}>
           <div
             {...props}
             className={cn("puzzle-dialog", `puzzle-dialog--${size}`, className)}
+            role="dialog"
+            aria-modal="true"
             aria-labelledby={titleId}
             aria-describedby={describedBy}
             onClick={handleClick}
@@ -146,7 +144,7 @@ const Dialog = ({
                   type="button"
                   className="puzzle-dialog__close"
                   aria-label={closeLabel}
-                  onClick={() => onOpenChange(false)}
+                  onClick={handleClose}
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>

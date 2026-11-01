@@ -1,19 +1,17 @@
 "use client";
 
 import { cn } from "@puzzle/core";
-import {
-  type ComponentPropsWithRef,
-  type ElementType,
-  type MouseEvent,
-  type KeyboardEvent,
-} from "react";
+import { useEffect, type ComponentPropsWithRef, type ElementType } from "react";
 import "./backdrop.css";
 import { Transition } from "../../utilities/transition";
+import { registerOverlay } from "../overlay-stack";
 
 type BackdropOwnProps<C extends ElementType> = {
   as?: C;
   open?: boolean;
-  onClose?: (e: MouseEvent<HTMLElement> | KeyboardEvent) => void;
+  closeOnBackdrop?: boolean;
+  closeOnEscape?: boolean;
+  onClose?: () => void;
 };
 
 type BackdropProps<C extends ElementType = "div"> = BackdropOwnProps<C> &
@@ -22,29 +20,40 @@ type BackdropProps<C extends ElementType = "div"> = BackdropOwnProps<C> &
 const Backdrop = <C extends ElementType = "div">({
   as,
   open = true,
+  closeOnBackdrop = true,
+  closeOnEscape = true,
   onClose,
   className,
   children,
+  onClick,
   ...props
 }: BackdropProps<C>) => {
   const Component = as ?? "div";
   const classes = cn("puzzle-backdrop", className);
+
+  useEffect(() => {
+    if (!open || !onClose) {
+      return;
+    }
+
+    return registerOverlay(document, () => {
+      if (closeOnEscape) {
+        onClose();
+      }
+    });
+  }, [open, closeOnEscape, onClose]);
 
   return (
     <Transition visible={open} template="fade">
       <Component
         className={classes}
         {...props}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            e.stopPropagation();
-            onClose?.(e);
-          }
-        }}
-        onKeyUp={(e) => {
-          if (e.key === "Escape") {
-            e.stopPropagation();
-            onClose?.(e);
+        onClick={(event) => {
+          onClick?.(event);
+
+          if (closeOnBackdrop && event.target === event.currentTarget) {
+            event.stopPropagation();
+            onClose?.();
           }
         }}
       >

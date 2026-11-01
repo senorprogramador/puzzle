@@ -20,6 +20,7 @@ import {
 import { createPortal } from "react-dom";
 import { cn, debounce } from "@puzzle/core";
 import { Transition } from "../../utilities/transition";
+import { registerOverlay } from "../overlay-stack";
 import "./popout.css";
 
 type PopoutPosition = "top" | "right" | "bottom" | "left";
@@ -446,7 +447,7 @@ const Popout = ({
     align,
     offset,
     collisionPadding,
-    children,
+    matchTriggerWidth,
   ]);
 
   // Outside click
@@ -493,9 +494,9 @@ const Popout = ({
     changeOpenState,
   ]);
 
-  // Escape
+  // Escape: only the topmost registered overlay handles the key.
   useEffect(() => {
-    if (!isOpen || !closeOnEscape || !portalContainer) {
+    if (!isOpen || !portalContainer) {
       return;
     }
 
@@ -505,24 +506,18 @@ const Popout = ({
       return;
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") {
+    return registerOverlay(ownerDocument, () => {
+      if (!closeOnEscape) {
         return;
       }
 
       cancelDebouncedClose();
       changeOpenState(false);
-    };
-
-    ownerDocument.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      ownerDocument.removeEventListener("keydown", handleKeyDown);
-    };
+    });
   }, [
     isOpen,
-    closeOnEscape,
     portalContainer,
+    closeOnEscape,
     cancelDebouncedClose,
     changeOpenState,
   ]);

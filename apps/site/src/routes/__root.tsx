@@ -75,7 +75,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
     <html lang="en">
       <head>
         <Theme
-          theme="system"
+          theme="light"
           fonts={{
             heading: {
               family: "Geist",
