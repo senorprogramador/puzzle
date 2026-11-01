@@ -19,7 +19,7 @@ import {
   Section,
   SectionStack,
   Select,
-  SelectOption,
+  type SelectOption,
   Sidebar,
   Skeleton,
   Stack,
@@ -31,21 +31,24 @@ import {
   TextEditorToolbar,
   TextRenderer,
   Tooltip,
-} from "@puzzle/ui";
-import { Heading, Text, Preview } from "@puzzle/ui";
-import { DialogSection } from "@/components/dialog-section";
-import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
-import { useState } from "react";
-import { Icon } from "@puzzle/icons";
-import {
+  Heading,
+  Text,
+  Preview,
+  Label,
+  TextInput,
+  TextAreaInput,
+  NumberInput,
   CardAction,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@puzzle/ui/components/card/card";
-import { Label, TextInput, TextAreaInput, NumberInput } from "@puzzle/ui";
+} from "@puzzle/ui";
+import { DialogSection } from "@/components/dialog-section";
+import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
+import { useState } from "react";
+import { Icon } from "@puzzle/icons";
 
 const breadcrumbs = [
   {
@@ -316,7 +319,7 @@ function Home() {
               <>
                 {activeStep === 0 && (
                   <Stack>
-                    <Heading variant="headline3">Account</Heading>
+                    <Heading level="headline3">Account</Heading>
                     <Text>Please enter your account information.</Text>
                     <Button disabled onClick={() => setActiveStep(0)}>
                       Back
@@ -326,7 +329,7 @@ function Home() {
                 )}
                 {activeStep === 1 && (
                   <Stack>
-                    <Heading variant="headline3">Details</Heading>
+                    <Heading level="headline3">Details</Heading>
                     <Text>Please enter your personal details.</Text>
                     <Button onClick={() => setActiveStep(0)}>Back</Button>
                     <Button onClick={() => setActiveStep(2)}>Next</Button>
@@ -334,7 +337,7 @@ function Home() {
                 )}
                 {activeStep === 2 && (
                   <Stack>
-                    <Heading variant="headline3">Confirmation</Heading>
+                    <Heading level="headline3">Confirmation</Heading>
                     <Text>
                       Please review your information before confirming.
                     </Text>
@@ -344,7 +347,7 @@ function Home() {
                 )}
                 {activeStep === 3 && (
                   <Stack>
-                    <Heading variant="headline3">Success</Heading>
+                    <Heading level="headline3">Success</Heading>
                     <Text>You did it!</Text>
                     <Button onClick={() => setActiveStep(2)}>Back</Button>
                     <Button onClick={() => setActiveStep(0)}>Restart</Button>
@@ -357,7 +360,7 @@ function Home() {
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
-              <Heading variant="headline2">Card</Heading>
+              <Heading level="headline2">Card</Heading>
               <Card variant="outlined" size="lg">
                 <CardHeader>
                   <CardTitle>Card title</CardTitle>
@@ -392,11 +395,11 @@ function Home() {
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
-              <Heading variant="headline2">Linear Progress</Heading>
+              <Heading level="headline2">Linear Progress</Heading>
               <LinearProgress />
             </Section>
             <Section>
-              <Heading variant="headline2">Circular Progress</Heading>
+              <Heading level="headline2">Circular Progress</Heading>
               <CircularProgress />
             </Section>
           </Preview>
@@ -404,7 +407,7 @@ function Home() {
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
-              <Heading variant="headline2">Tabs</Heading>
+              <Heading level="headline2">Tabs</Heading>
               <Tabs tabBarPosition="left">
                 <Tabs.Tab id="tab-1" tab={<div>Tab 1</div>}>
                   <Text>Content for Tab 1</Text>
@@ -418,7 +421,7 @@ function Home() {
           </Preview>
           <Preview defaultDevice="mobile">
             <Section>
-              <Heading variant="headline2">Tooltip</Heading>
+              <Heading level="headline2">Tooltip</Heading>
               <Stack
                 className="w-full h-64"
                 direction="row"
@@ -455,7 +458,7 @@ function Home() {
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
-              <Heading variant="headline2">Bottom Navigation</Heading>
+              <Heading level="headline2">Bottom Navigation</Heading>
               <BottomNavigation>
                 <BottomNavigationItem
                   icon={<Icon name="bxs:home" size={24} />}
@@ -476,7 +479,7 @@ function Home() {
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
-              <Heading variant="headline2">Accordion</Heading>
+              <Heading level="headline2">Accordion</Heading>
               <Accordion items={accordionItems} unMountOnClose={true} />
             </Section>
           </Preview>
@@ -484,7 +487,7 @@ function Home() {
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
-              <Heading variant="headline2">App Bar</Heading>
+              <Heading level="headline2">App Bar</Heading>
               <AppBar
                 logo={
                   <img
@@ -516,7 +519,7 @@ function Home() {
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
-              <Heading variant="headline2">Skeleton</Heading>
+              <Heading level="headline2">Skeleton</Heading>
               <Skeleton width="75%" height={16} />
               <Skeleton width="75%" height={16} radius="none" />
               <Skeleton width="100%" height={180} />
@@ -529,7 +532,7 @@ function Home() {
         <Section>
           <Preview defaultDevice="mobile">
             <Section>
-              <Heading variant="headline2">Carousel</Heading>
+              <Heading level="headline2">Carousel</Heading>
               <CarouselController
                 items={Array.from({ length: 10 }, (_, i) => i + 1)}
               >
@@ -597,7 +600,7 @@ function Home() {
             <li>C</li>
             <li>D</li>
           </Stack>
-          <Heading variant="headline2">What is Puzzle?</Heading>
+          <Heading level="headline2">What is Puzzle?</Heading>
           <Text>
             Puzzle is a modern React UI framework designed to help developers
             build accessible, responsive, and visually appealing user interfaces
@@ -607,7 +610,7 @@ function Home() {
           </Text>
         </Section>
         <Section>
-          <Heading variant="headline2">Why another UI framework?</Heading>
+          <Heading level="headline2">Why another UI framework?</Heading>
           <Text>
             While there are many React UI frameworks available, Puzzle aims to
             provide a complete and developer-friendly solution. It focuses on
@@ -617,7 +620,7 @@ function Home() {
           </Text>
         </Section>
         <Section>
-          <Heading variant="headline2">CSS framework agnostic</Heading>
+          <Heading level="headline2">CSS framework agnostic</Heading>
           <Text>
             Puzzle is designed to be CSS framework agnostic, allowing developers
             to integrate it seamlessly with their preferred CSS solutions. This
@@ -626,7 +629,7 @@ function Home() {
           </Text>
         </Section>
         <Section>
-          <Heading variant="headline2">Fluid components</Heading>
+          <Heading level="headline2">Fluid components</Heading>
           <Text>
             Puzzle components are designed to be fluid and adaptable, allowing
             developers to create responsive layouts that work across different
