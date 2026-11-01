@@ -1,17 +1,20 @@
 import {
-  type ReactNode,
-  type PropsWithChildren,
   Children,
   isValidElement,
   type CSSProperties,
+  type MouseEventHandler,
+  type ReactNode,
 } from "react";
+import { cn } from "@puzzle/core";
 import { Stack } from "../stack";
-import { cn } from "@puzzle/core/string/class-names";
 import "./bottom-navigation.css";
 
 type BottomNavigationItemProps = {
   icon: ReactNode;
   label?: string;
+  href?: string;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+  active?: boolean;
   className?: string;
   style?: CSSProperties;
 };
@@ -19,64 +22,97 @@ type BottomNavigationItemProps = {
 const BottomNavigationItem = ({
   icon,
   label,
+  href,
+  onClick,
+  active = false,
   className,
   style,
 }: BottomNavigationItemProps) => {
-  const classes = cn("puzzle-bottom-navigation-item", className);
-  return (
+  const classes = cn(
+    "puzzle-bottom-navigation-item",
+    active && "active",
+    className,
+  );
+
+  const content = (
     <Stack
       direction="col"
       alignH="center"
       alignV="center"
       gap="xs"
+      className="puzzle-bottom-navigation-item__content"
+    >
+      <span className="puzzle-bottom-navigation-item__icon" aria-hidden="true">
+        {icon}
+      </span>
+
+      {label && (
+        <span className="puzzle-bottom-navigation-item__label">{label}</span>
+      )}
+    </Stack>
+  );
+
+  if (href !== undefined) {
+    return (
+      <a
+        href={href}
+        className={classes}
+        style={style}
+        aria-current={active ? "page" : undefined}
+        data-active={active || undefined}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      type="button"
       className={classes}
       style={style}
+      onClick={onClick}
+      aria-pressed={active}
+      data-active={active || undefined}
     >
-      {icon}
-      {label && <span>{label}</span>}
-    </Stack>
+      {content}
+    </button>
   );
 };
 
-type BottomNavigationProps = PropsWithChildren<{
-  showLabels?: boolean;
-  selectedIndex?: number;
-  onSelect?: (index: number) => void;
+type BottomNavigationProps = {
+  children: ReactNode;
   className?: string;
   style?: CSSProperties;
-}>;
+  ariaLabel?: string;
+};
 
 const BottomNavigation = ({
-  showLabels,
-  selectedIndex,
-  onSelect,
   children,
   className,
   style,
+  ariaLabel = "Bottom navigation",
 }: BottomNavigationProps) => {
   const invalidChildren = Children.toArray(children).filter(
     (child) =>
       !isValidElement<BottomNavigationItemProps>(child) ||
       child.type !== BottomNavigationItem,
   );
+
   if (invalidChildren.length > 0) {
     console.warn(
       "BottomNavigation only accepts BottomNavigationItem as children.",
     );
   }
 
-  const classes = cn("puzzle-bottom-navigation", className);
   return (
-    <Stack
-      direction="row"
-      alignH="center"
-      alignV="center"
-      gap="md"
-      className={classes}
+    <nav
+      className={cn("puzzle-bottom-navigation", className)}
       style={style}
+      aria-label={ariaLabel}
     >
-      {children}
-    </Stack>
+      <div className="puzzle-bottom-navigation__track">{children}</div>
+    </nav>
   );
 };
 

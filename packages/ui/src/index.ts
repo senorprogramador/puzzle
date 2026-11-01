@@ -159,6 +159,16 @@ export {
   type BreadcrumbItem,
 } from "./components/layout/breadcrumbs";
 
+export {
+  CollapsableSidebar,
+  type CollapsableSidebarProps,
+  type CollapsableSidebarItem,
+  type CollapsableSidebarExpansion,
+  type SidebarItemBase,
+  type WithLink,
+  type WithClickHandler,
+} from "./components/layout/collapsable-sidebar";
+
 export { Container, type ContainerProps } from "./components/layout/container";
 
 export {

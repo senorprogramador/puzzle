@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "test": "vitest run",
+    "test": "vitest run --reporter=verbose 2>&1",
     "test:watch": "vitest",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run build"
@@ -36,8 +36,12 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "jsdom": "^26.1.0",
     "tsdown": "^0.20.0",
     "typescript": "^7.0.2",
     "vitest": "latest"

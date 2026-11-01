@@ -48,16 +48,22 @@ describe("text document operations", () => {
     const document = documentWithText("Hello world");
     const inserted: TextDocument = {
       type: "doc",
-      content: [{
-        type: "paragraph",
-        variant: "body1",
-        children: [{ text: "Puzzle", marks: ["italic"] }],
-      }],
+      content: [
+        {
+          type: "paragraph",
+          variant: "body1",
+          children: [{ text: "Puzzle", marks: ["italic"] }],
+        },
+      ],
     };
-    const result = insertDocumentAtSelection(document, {
-      anchor: { block: 0, offset: 6 },
-      focus: { block: 0, offset: 11 },
-    }, inserted);
+    const result = insertDocumentAtSelection(
+      document,
+      {
+        anchor: { block: 0, offset: 6 },
+        focus: { block: 0, offset: 11 },
+      },
+      inserted,
+    );
 
     expect(getBlockText(result.document.content[0])).toBe("Hello Puzzle");
     expect(result.document.content[0].children[1]).toEqual({
@@ -65,8 +71,8 @@ describe("text document operations", () => {
       marks: ["italic"],
     });
     expect(result.selection).toEqual({
-      anchor: { block: 0, offset: 11 },
-      focus: { block: 0, offset: 11 },
+      anchor: { block: 0, offset: 12 },
+      focus: { block: 0, offset: 12 },
     });
   });
 
@@ -77,13 +83,19 @@ describe("text document operations", () => {
       {
         type: "doc",
         content: [
-          { type: "heading", variant: "headline2", children: [{ text: "Title" }] },
+          {
+            type: "heading",
+            variant: "headline2",
+            children: [{ text: "Title" }],
+          },
           { type: "paragraph", variant: "body1", children: [{ text: "Body" }] },
         ],
       },
     );
 
-    expect(result.document.content.map((block) => [block.type, getBlockText(block)])).toEqual([
+    expect(
+      result.document.content.map((block) => [block.type, getBlockText(block)]),
+    ).toEqual([
       ["paragraph", "Before "],
       ["heading", "Title"],
       ["paragraph", "Bodyafter"],
@@ -107,10 +119,18 @@ describe("text document operations", () => {
       focus: { block: 1, offset: 6 },
     };
     const aligned = setTextAlign(document, selection, "center");
-    expect(aligned.content.every((block) => block.align === "center")).toBe(true);
+    expect(aligned.content.every((block) => block.align === "center")).toBe(
+      true,
+    );
     const listed = setListType(aligned, selection, "ordered");
-    expect(listed.content.map((block) => block.listType)).toEqual(["ordered", "ordered"]);
-    expect(listed.content.map((block) => block.type)).toEqual(["listItem", "listItem"]);
+    expect(listed.content.map((block) => block.listType)).toEqual([
+      "ordered",
+      "ordered",
+    ]);
+    expect(listed.content.map((block) => block.type)).toEqual([
+      "listItem",
+      "listItem",
+    ]);
     const unlisted = setListType(listed, selection, "ordered");
     expect(unlisted.content.every((block) => !block.listType)).toBe(true);
   });
