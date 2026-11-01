@@ -369,3 +369,32 @@
         transition-duration: 0.01ms !important;
     }
 }
+
+/* Respect Windows High Contrast / forced-colors mode. */
+@media (forced-colors: active) {
+    :where(:focus-visible) {
+        outline: 2px solid Highlight;
+        outline-offset: 2px;
+    }
+
+    :where(a) {
+        color: LinkText;
+    }
+
+    :where(button, input, textarea, select, [role="button"], [role="option"]) {
+        forced-color-adjust: auto;
+    }
+
+    :where(input, textarea, select) {
+        border-color: ButtonText;
+    }
+
+    :where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
+        color: GrayText;
+        border-color: GrayText;
+    }
+
+    :where([aria-invalid="true"], [data-invalid="true"]) {
+        outline-color: Mark;
+    }
+}
