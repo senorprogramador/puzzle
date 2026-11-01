@@ -38,17 +38,6 @@ const PREVIEW_DOCUMENT = `<!doctype html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      html,
-      body {
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-      }
-
-      ::-webkit-scrollbar {
-        display: none;
-      }
-    </style>
   </head>
   <body>
     <div id="puzzle-preview-root"></div>
@@ -79,6 +68,7 @@ const Preview = ({
 
     const frameHead = frameDocument.head;
 
+    // Synchronize application stylesheets.
     frameHead
       .querySelectorAll("[data-puzzle-preview-style]")
       .forEach((element) => element.remove());
@@ -87,31 +77,12 @@ const Preview = ({
       .querySelectorAll('link[rel="stylesheet"], style')
       .forEach((element) => {
         const clone = element.cloneNode(true) as HTMLElement;
+
         clone.setAttribute("data-puzzle-preview-style", "");
         frameHead.appendChild(clone);
       });
 
-    // Hide the iframe's document scrollbar without disabling scrolling.
-    const scrollbarStyle = frameDocument.createElement("style");
-
-    scrollbarStyle.setAttribute("data-puzzle-preview-style", "");
-    scrollbarStyle.textContent = `
-    html,
-    body {
-      scrollbar-width: none !important;
-      -ms-overflow-style: none !important;
-    }
-
-    html::-webkit-scrollbar,
-    body::-webkit-scrollbar {
-      display: none !important;
-      width: 0 !important;
-      height: 0 !important;
-    }
-  `;
-
-    frameHead.appendChild(scrollbarStyle);
-
+    // Synchronize document attributes.
     const sourceRoot = document.documentElement;
     const targetRoot = frameDocument.documentElement;
 
@@ -126,8 +97,52 @@ const Preview = ({
       targetRoot.setAttribute(attribute.name, attribute.value);
     });
 
-    frameDocument.body.className = document.body.className;
-    frameDocument.body.style.cssText = document.body.style.cssText;
+    const body = frameDocument.body;
+
+    body.className = document.body.className;
+    body.style.cssText = document.body.style.cssText;
+
+    // Reset the document layout.
+    targetRoot.style.setProperty("box-sizing", "border-box", "important");
+    targetRoot.style.setProperty("width", "100%", "important");
+    targetRoot.style.setProperty("height", "100%", "important");
+    targetRoot.style.setProperty("min-height", "0", "important");
+    targetRoot.style.setProperty("margin", "0", "important");
+    targetRoot.style.setProperty("overflow", "hidden", "important");
+
+    // The body must not inherit the application's flex layout.
+    body.style.setProperty("display", "block", "important");
+    body.style.setProperty("position", "relative", "important");
+    body.style.setProperty("box-sizing", "border-box", "important");
+    body.style.setProperty("width", "100%", "important");
+    body.style.setProperty("height", "100%", "important");
+    body.style.setProperty("min-height", "0", "important");
+    body.style.setProperty("margin", "0", "important");
+    body.style.setProperty("overflow-x", "hidden", "important");
+    body.style.setProperty("overflow-y", "auto", "important");
+    body.style.setProperty("scrollbar-width", "none", "important");
+    body.style.setProperty("-ms-overflow-style", "none", "important");
+
+    // Let the content root grow naturally with its contents.
+    const root = frameDocument.getElementById("puzzle-preview-root");
+
+    root?.style.setProperty("min-height", "100%", "important");
+
+    // Hide WebKit scrollbars without disabling scrolling.
+    const scrollbarStyle = frameDocument.createElement("style");
+
+    scrollbarStyle.setAttribute("data-puzzle-preview-style", "");
+    scrollbarStyle.textContent = `
+      html::-webkit-scrollbar,
+      body::-webkit-scrollbar,
+      #puzzle-preview-root::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+    `;
+
+    frameHead.appendChild(scrollbarStyle);
   }, []);
 
   const updateScale = useCallback(
