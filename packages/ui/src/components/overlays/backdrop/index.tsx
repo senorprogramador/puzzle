@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useRef,
+  useState,
   type ComponentPropsWithRef,
   type ElementType,
   type Ref,
@@ -49,42 +51,41 @@ const Backdrop = <C extends ElementType = "div">({
   const Component = as ?? "div";
 
   const rootRef = useRef<HTMLElement | null>(null);
-
   const registrationRef = useRef<OverlayRegistration | null>(null);
 
-  const parentPriority = useOverlayPriority();
+  // Track the actual mounted element. Transition may mount it
+  // after the initial render when open changes from false to true.
+  const [rootElement, setRootElement] = useState<HTMLElement | null>(null);
 
+  const parentPriority = useOverlayPriority();
   const classes = cn("puzzle-backdrop", className);
 
   const forwardedRef = (props as { ref?: Ref<HTMLElement> }).ref;
-
   const componentProps = { ...props };
 
   delete (componentProps as { ref?: Ref<HTMLElement> }).ref;
 
-  const setRootRef = (node: HTMLElement | null) => {
-    rootRef.current = node;
+  const setRootRef = useCallback(
+    (node: HTMLElement | null) => {
+      rootRef.current = node;
+      setRootElement(node);
 
-    if (typeof forwardedRef === "function") {
-      forwardedRef(node);
-    } else if (forwardedRef) {
-      forwardedRef.current = node;
-    }
-  };
+      if (typeof forwardedRef === "function") {
+        forwardedRef(node);
+      } else if (forwardedRef) {
+        forwardedRef.current = node;
+      }
+    },
+    [forwardedRef],
+  );
 
   useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    const root = rootRef.current;
-
-    if (!root) {
+    if (!open || !rootElement) {
       return;
     }
 
     const unregister = registerOverlay(
-      root.ownerDocument,
+      rootElement.ownerDocument,
       () => {
         if (closeOnEscape) {
           onClose?.();
@@ -93,12 +94,10 @@ const Backdrop = <C extends ElementType = "div">({
       parentPriority,
       {
         modal,
-
         getContent: () =>
           rootRef.current?.querySelector<HTMLElement>(
             "[data-overlay-content]",
           ) ?? rootRef.current,
-
         getLayer: () => rootRef.current,
       },
     );
@@ -112,7 +111,7 @@ const Backdrop = <C extends ElementType = "div">({
         registrationRef.current = null;
       }
     };
-  }, [open, modal, closeOnEscape, onClose, parentPriority]);
+  }, [open, rootElement, modal, closeOnEscape, onClose, parentPriority]);
 
   return (
     <OverlayStackProvider priority={parentPriority + 1}>
