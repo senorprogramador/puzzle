@@ -1,16 +1,20 @@
 "use client";
 
 import { cn } from "@puzzle/core";
-import { useEffect, type ComponentPropsWithRef } from "react";
+
+import { useCallback, useEffect, type ComponentPropsWithRef } from "react";
+
 import {
   Transition,
   type TransitionTemplate,
 } from "../../utilities/transition";
+
 import { Backdrop } from "../backdrop";
 import { Stack } from "../../layout/stack";
+
 import "./drawer.css";
+
 import { useResizeBar } from "./use-resize-bar";
-import { ScrollLock } from "../../utilities/scroll-lock";
 
 const TRANSITION_MAP: Record<DrawerPosition, TransitionTemplate> = {
   left: "slide-in-right",
@@ -40,14 +44,17 @@ const Drawer = ({
   children,
   ...props
 }: DrawerProps) => {
+  const handleClose = useCallback(() => {
+    onOpenChange(false);
+  }, [onOpenChange]);
+
   return (
     <Backdrop
       open={open}
+      modal
       closeOnEscape={closeOnEscape}
-      onClose={() => onOpenChange(false)}
+      onClose={handleClose}
     >
-      <ScrollLock enabled={open} />
-
       <Transition visible={open} template={TRANSITION_MAP[position]} forceMount>
         <DrawerContent
           position={position}
@@ -85,6 +92,8 @@ const DrawerContent = ({
   position = "left",
   open,
   onOpenChange,
+  "aria-label": ariaLabel = "Drawer",
+  "aria-labelledby": ariaLabelledBy,
   ...props
 }: DrawerProps) => {
   const classes = cn("puzzle-drawer", `puzzle-drawer--${position}`, className);
@@ -96,10 +105,13 @@ const DrawerContent = ({
     : undefined;
 
   useEffect(() => {
-    if (resolvedDimension !== undefined && parseInt(resolvedDimension) < 100) {
+    if (
+      resolvedDimension !== undefined &&
+      Number.parseInt(resolvedDimension, 10) < 100
+    ) {
       onOpenChange(false);
     }
-  }, [resolvedDimension]);
+  }, [resolvedDimension, onOpenChange]);
 
   return (
     <Stack
@@ -108,6 +120,12 @@ const DrawerContent = ({
       reverse={["top", "left"].includes(position)}
       gap="0"
       className={classes}
+      data-overlay-content=""
+      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+      aria-label={ariaLabelledBy ? undefined : ariaLabel}
+      aria-labelledby={ariaLabelledBy}
       style={
         resolvedDimension
           ? {
@@ -119,7 +137,9 @@ const DrawerContent = ({
     >
       <button
         ref={resizeRef}
+        type="button"
         className="puzzle-drawer__resize-bar"
+        aria-label="Resize drawer"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <span className="puzzle-drawer__resize-bar-inner" />

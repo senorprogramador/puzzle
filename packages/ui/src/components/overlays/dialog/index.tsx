@@ -7,8 +7,11 @@ import {
   type ReactNode,
   type MouseEventHandler,
 } from "react";
+
 import { cn } from "@puzzle/core";
+
 import "./dialog.css";
+
 import { Transition } from "../../utilities/transition";
 import { Backdrop } from "../backdrop";
 import { Portal } from "../portal";
@@ -40,13 +43,13 @@ type DialogProps = NativeDialogProps & {
   /** Required accessible heading for the dialog. */
   title: ReactNode;
 
-  /** Short, optional description of the dialog. */
+  /** Short, optional description. */
   description?: string;
 
   /** Main dialog content. */
   children?: ReactNode;
 
-  /** Optional footer, typically containing action buttons. */
+  /** Optional footer. */
   footer?: ReactNode;
 
   /** Maximum dialog width preset. */
@@ -113,6 +116,7 @@ const Dialog = ({
     <Portal>
       <Backdrop
         open={open}
+        modal
         closeOnBackdrop={closeOnBackdrop}
         closeOnEscape={closeOnEscape}
         onClose={handleClose}
@@ -120,6 +124,8 @@ const Dialog = ({
         <Transition template="slide-in-up" visible={open}>
           <div
             {...props}
+            data-overlay-content=""
+            tabIndex={-1}
             className={cn("puzzle-dialog", `puzzle-dialog--${size}`, className)}
             role="dialog"
             aria-modal="true"
