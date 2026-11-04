@@ -76,11 +76,11 @@ const Theme = ({
         <link key={href} rel="stylesheet" href={href} precedence="default" />
       ))}
 
-      {content}
-
       <style nonce={nonce} data-theme={theme} data-puzzle-theme="true">
         {css}
       </style>
+
+      {content}
     </>
   );
 };

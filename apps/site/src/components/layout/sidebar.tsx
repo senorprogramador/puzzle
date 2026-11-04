@@ -1,16 +1,12 @@
+import { useState } from "react";
 import { Sidebar as PuzzleSidebar } from "@puzzle/ui/components/layout/sidebar";
 import {
   TreeView,
-  TreeViewItem,
+  type TreeViewItem,
 } from "@puzzle/ui/components/navigation/tree-view";
-import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMatchRoute } from "@tanstack/react-router";
 
-type TreeViewItemData = {
-  href?: string;
-};
-
-const items: TreeViewItem<TreeViewItemData>[] = [
+const items: TreeViewItem[] = [
   {
     id: "components",
     label: "Components",
@@ -22,12 +18,12 @@ const items: TreeViewItem<TreeViewItemData>[] = [
           {
             id: "button",
             label: "Button",
-            data: { href: "/components/actions/button" },
+            href: "/components/actions/button",
           },
           {
             id: "button-group",
             label: "Button Group",
-            data: { href: "/components/actions/button-group" },
+            href: "/components/actions/button-group",
           },
         ],
       },
@@ -37,42 +33,24 @@ const items: TreeViewItem<TreeViewItemData>[] = [
 
 const Sidebar = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
   return (
     <PuzzleSidebar>
       <TreeView
         aria-label="Navigation"
         items={items}
         selectionMode="single"
-        defaultExpandedIds={["components"]}
+        defaultExpandedIds={["components", "actions"]}
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
-        renderItem={(item, state) => {
-          if (!item.data?.href) {
-            return null;
-          }
-          return (
-            <Link
-              className="puzzle-tree__row"
-              to={item.data.href}
-              tabIndex={-1}
-            >
-              <span className="puzzle-tree__label">{item.label}</span>
-            </Link>
-          );
-        }}
-        renderLabel={(item) => {
-          if (!item.data?.href) {
-            return item.label;
-          }
-
-          return (
-            <Link
-              onClick={() => setSelectedIds([item.id])}
-              to={item.data.href}
-              tabIndex={-1}
-            >
-              {item.label}
-            </Link>
+        getItemActive={(item) => {
+          const matchRoute = useMatchRoute();
+          return Boolean(
+            item.href &&
+            matchRoute({
+              to: item.href,
+              fuzzy: false,
+            }),
           );
         }}
       />

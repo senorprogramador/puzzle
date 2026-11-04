@@ -10,7 +10,7 @@ import { Theme } from "@puzzle/theme";
 import { PageLayout } from "@puzzle/ui/components/layout/page-layout";
 import { AppBar } from "@puzzle/ui/components/layout/app-bar";
 import { Sidebar } from "@/components/layout/sidebar";
-import { TanStackLink } from "./components/navigation/link/link";
+import { TanStackLink } from "../components/navigation/link/link";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -74,10 +74,18 @@ function RootComponent() {
   );
 }
 
-function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+function RootDocument({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
   return (
     <html lang="en">
       <head>
+        <HeadContent />
+      </head>
+
+      <body>
         <Theme
           theme="light"
           fonts={{
@@ -101,37 +109,37 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             },
           }}
         >
-          <HeadContent />
+          <PageLayout>
+            <PageLayout.Header>
+              <AppBar
+                logo={
+                  <img
+                    src="/favicon.svg"
+                    width="48"
+                    height="48"
+                    alt="Logo"
+                    className="h-12 w-12"
+                  />
+                }
+                title="Puzzle"
+                navigationItems={[
+                  { label: "Home", href: "/", current: true },
+                  { label: "Components", href: "/components" },
+                  { label: "Docs", href: "/docs" },
+                ]}
+                sticky
+              />
+            </PageLayout.Header>
+
+            <PageLayout.LeftSidebar>
+              <Sidebar />
+            </PageLayout.LeftSidebar>
+
+            <PageLayout.Main>{children}</PageLayout.Main>
+          </PageLayout>
+
+          <Scripts />
         </Theme>
-      </head>
-      <body>
-        <PageLayout>
-          <PageLayout.Header>
-            <AppBar
-              logo={
-                <img
-                  src="/favicon.svg"
-                  width="48"
-                  height="48"
-                  alt="Logo"
-                  className="h-12 w-12"
-                />
-              }
-              title="Puzzle"
-              navigationItems={[
-                { label: "Home", href: "/", current: true },
-                { label: "Components", href: "/components" },
-                { label: "Docs", href: "/docs" },
-              ]}
-              sticky
-            />
-          </PageLayout.Header>
-          <PageLayout.LeftSidebar>
-            <Sidebar />
-          </PageLayout.LeftSidebar>
-          <PageLayout.Main>{children}</PageLayout.Main>
-        </PageLayout>
-        <Scripts />
       </body>
     </html>
   );

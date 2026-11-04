@@ -1,646 +1,558 @@
-import * as fs from "node:fs";
-import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import {
-  Accordion,
-  AppBar,
-  Avatar,
-  BottomNavigation,
-  BottomNavigationItem,
-  BreadcrumbsProps,
-  Button,
-  Card,
-  Carousel,
-  CarouselController,
-  Checkbox,
-  CircularProgress,
-  LinearProgress,
-  PageLayout,
-  Section,
-  SectionStack,
-  Select,
-  type SelectOption,
-  Skeleton,
-  Stack,
-  Stepper,
-  Switch,
-  Tabs,
-  TextDocument,
-  TextEditor,
-  TextEditorToolbar,
-  TextRenderer,
-  Tooltip,
-  Heading,
-  Text,
-  Preview,
-  Label,
-  TextInput,
-  TextAreaInput,
-  NumberInput,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  CollapsableSidebar,
-  CollapsableSidebarEntry,
-} from "@puzzle/ui";
-import { DialogSection } from "@/components/dialog-section";
-import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
 import { useState } from "react";
-import { Icon } from "@puzzle/icons";
+import { createFileRoute } from "@tanstack/react-router";
+import { Button, Preview, Section } from "@puzzle/ui";
 
-const breadcrumbs = [
-  {
-    label: "Home",
-    href: "/",
-    leadingIcon: <FlowbiteIcon name="home-solid" size={16} />,
-  },
-  {
-    label: "Projects",
-    href: "/projects",
-    leadingIcon: <FlowbiteIcon name="folder-solid" size={16} />,
-  },
-  {
-    label: "Puzzle",
-  },
-] satisfies BreadcrumbsProps["items"];
+export const Route = createFileRoute("/")({
+  component: RouteComponent,
+});
 
-const filePath = "count.txt";
+const variants = [
+  "primary",
+  "secondary",
+  "outline",
+  "ghost",
+  "danger",
+  "link",
+] as const;
 
-async function readCount() {
-  return parseInt(
-    await fs.promises.readFile(filePath, "utf-8").catch(() => "0"),
+const sizes = ["xs", "sm", "md", "lg"] as const;
+
+const variantCode = `<Button variant="primary">Primary</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="danger">Delete</Button>
+<Button variant="link">Learn more</Button>`;
+
+const sizeCode = `<Button size="xs">Extra small</Button>
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>
+<Button size="lg">Large</Button>
+<Button size="icon" aria-label="Settings">
+  <SettingsIcon />
+</Button>`;
+
+const linkCode = `<Button as="a" href="/docs">
+  Documentation
+</Button>
+
+<Button as="a" href="https://example.com" target="_blank" rel="noopener noreferrer">
+  External link
+</Button>`;
+
+const loadingCode = `<Button loading>Saving...</Button>
+<Button disabled>Unavailable</Button>`;
+
+const iconCode = `<Button leading={<SaveIcon />}>
+  Save changes
+</Button>
+
+<Button trailing={<ArrowRightIcon />}>
+  Continue
+</Button>`;
+
+function ToggleExample() {
+  const [active, setActive] = useState(false);
+
+  return (
+    <Button
+      variant={active ? "toggle-active" : "toggle"}
+      aria-pressed={active}
+      onClick={() => setActive((value) => !value)}
+    >
+      {active ? "Enabled" : "Disabled"}
+    </Button>
   );
 }
 
-const getCount = createServerFn({
-  method: "GET",
-}).handler(() => {
-  return readCount();
-});
-
-const updateCount = createServerFn({ method: "POST" })
-  .validator((d: number) => d)
-  .handler(async ({ data }) => {
-    const count = await readCount();
-    await fs.promises.writeFile(filePath, `${count + data}`);
-  });
-
-export const Route = createFileRoute("/")({
-  component: Home,
-  loader: async () => await getCount(),
-});
-
-const accordionItems = [
-  {
-    id: "shipping",
-    title: "Shipping information",
-    content: <p>Orders are shipped within 1–2 business days.</p>,
-  },
-  {
-    id: "returns",
-    title: "Returns and refunds",
-    content: <p>You can return eligible items within 30 days.</p>,
-  },
-  {
-    id: "payment",
-    title: "Payment methods",
-    content: <p>We accept the major credit cards.</p>,
-  },
-];
-
-const collapsableSidebarItems: CollapsableSidebarEntry[] = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    icon: <Icon name="ant-design:home-filled" size={24} />,
-    href: "/dashboard",
-  },
-  {
-    id: "settings",
-    label: "Settings",
-    icon: <Icon name="ant-design:setting-filled" size={24} />,
-    href: "/settings",
-  },
-  {
-    id: "management",
-    label: "Management",
-    items: [
-      {
-        id: "users",
-        icon: <Icon name="ant-design:user-outlined" size={24} />,
-        label: "Users",
-        href: "/users",
-      },
-      {
-        id: "analytics",
-        icon: <Icon name="ant-design:bar-chart-outlined" size={24} />,
-        label: "Analytics",
-        href: "/analytics",
-      },
-    ],
-  },
-];
-
-function Home() {
-  const [accepted, setAccepted] = useState(false);
-  const [document, setDocument] = useState<TextDocument>({
-    type: "doc",
-    content: [
-      {
-        type: "heading",
-        variant: "headline1",
-        children: [{ text: "Hallo", marks: ["bold"] }],
-      },
-      {
-        type: "paragraph",
-        variant: "body1",
-        children: [
-          { text: "Dit is gewone tekst met " },
-          {
-            text: "opmaak",
-            marks: ["italic", "underline"],
-          },
-        ],
-      },
-    ],
-  });
-  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
-
+function RouteComponent() {
   return (
-    <SectionStack divideY>
+    <div className="space-y-12">
       <Section>
-        <Preview defaultDevice="desktop">
-          <PageLayout
-            leftSidebar={
-              <CollapsableSidebar
-                items={collapsableSidebarItems}
-                expand="over"
-                defaultCollapsed
-              />
-            }
-          >
-            <Section>
-              <p>Normal content goes here.</p>
-            </Section>
-          </PageLayout>
-        </Preview>
+        <div className="space-y-4">
+          <p className="text-sm font-semibold text-[var(--puzzle-color-primary)]">
+            Actions
+          </p>
+          <h1 className="text-4xl font-bold">Button</h1>
+          <p className="max-w-3xl text-lg text-[var(--puzzle-color-text-muted)]">
+            Buttons allow users to trigger actions, submit forms, navigate
+            between pages, and interact with your application.
+          </p>
+        </div>
       </Section>
+
       <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Label htmlFor="email" required>
-              Email address
-            </Label>
-
-            <TextInput id="email" type="email" placeholder="you@example.com" />
-
-            <Label htmlFor="password">Password</Label>
-
-            <TextInput
-              id="password"
-              type="password"
-              placeholder="Your password"
-            />
-
-            <Label htmlFor="description">Description</Label>
-
-            <TextAreaInput id="description" placeholder="Write something..." />
-
-            <Label htmlFor="quantity">Quantity</Label>
-
-            <NumberInput
-              id="quantity"
-              initialValue={1.25}
-              min={0}
-              max={10}
-              step={0.25}
-              fractionDigits={2}
-            />
-          </Section>
-        </Preview>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Import</h2>
+          <pre className="overflow-x-auto rounded-lg bg-[var(--puzzle-color-surface-sunken)] p-4 text-sm">
+            <code>{`import { Button } from "@puzzle/ui";`}</code>
+          </pre>
+          <p>
+            Button is available as a named export from the Puzzle UI package.
+            The <code>ButtonProps</code>, <code>ButtonVariant</code>, and{" "}
+            <code>ButtonSize</code> types are also exported.
+          </p>
+        </div>
       </Section>
+
       <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Select
-              label="Country"
-              options={[
-                { value: "nl", label: "Netherlands" },
-                { value: "es", label: "Spain" },
-                { value: "de", label: "Germany" },
-              ]}
-              placeholder="Select a country"
-            />
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Variants</h2>
+          <p>
+            Use the <code>variant</code> property to communicate the purpose and
+            visual importance of an action.
+          </p>
 
-            <Select
-              label="Technologies"
-              multiple
-              options={[
-                { value: "react", label: "React" },
-                { value: "next", label: "Next.js" },
-                { value: "solid", label: "SolidJS" },
-                { value: "vue", label: "Vue" },
-              ]}
-              placeholder="Choose technologies"
-              maxSelected={3}
-            />
+          <Preview code={variantCode}>
+            <div className="flex flex-wrap items-center gap-3">
+              {variants.map((variant) => (
+                <Button key={variant} variant={variant}>
+                  {variant === "danger"
+                    ? "Delete"
+                    : variant === "link"
+                      ? "Learn more"
+                      : variant.charAt(0).toUpperCase() + variant.slice(1)}
+                </Button>
+              ))}
+            </div>
+          </Preview>
 
-            <Select
-              label="Employees"
-              options={[
-                {
-                  value: "sjoerd",
-                  label: "Sjoerd van den Berg",
-                  description: "Senior Software Engineer",
-                  group: "Engineering",
-                },
-                {
-                  value: "anouk",
-                  label: "Anouk",
-                  description: "Business Owner",
-                  group: "Management",
-                },
-              ]}
-            />
-
-            <Select
-              multiple
-              label="Team members"
-              maxSelected={3}
-              options={[
-                {
-                  value: "sjoerd",
-                  label: "Sjoerd van den Berg",
-                  description: "Senior Software Engineer",
-                  group: "Engineering",
-                },
-                {
-                  value: "anouk",
-                  label: "Anouk",
-                  description: "Business Owner",
-                  group: "Management",
-                },
-              ]}
-              renderValue={(selected) => (
-                <span>
-                  {(selected as readonly SelectOption[]).length} employees
-                  selected
-                </span>
-              )}
-              renderOption={(option, { selected }) => (
-                <div className={selected ? "bg-blue-100" : ""}>
-                  {option.label}
-                </div>
-              )}
-            />
-          </Section>
-        </Preview>
+          <ul className="list-disc space-y-2 pl-6">
+            <li>
+              <strong>primary</strong> – The main action. Use sparingly for the
+              most important action in a context.
+            </li>
+            <li>
+              <strong>secondary</strong> – A less prominent alternative action.
+            </li>
+            <li>
+              <strong>outline</strong> – A bordered action with a transparent
+              background.
+            </li>
+            <li>
+              <strong>ghost</strong> – A subtle action without a visible border.
+            </li>
+            <li>
+              <strong>danger</strong> – An action that performs a potentially
+              destructive operation.
+            </li>
+            <li>
+              <strong>link</strong> – An action styled like a text link.
+            </li>
+          </ul>
+        </div>
       </Section>
-      <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Stepper
-              activeStep={activeStep}
-              onStepChange={setActiveStep}
-              orientation={{
-                mobile: "vertical",
-                tablet: "horizontal",
-                desktop: "horizontal",
-              }}
-              linear={false}
-              clickable
-            >
-              <Stepper.Step label="Account" description="Create your account" />
-              <Stepper.Step
-                label="Details"
-                description="Personal information"
-              />
-              <Stepper.Step
-                label="Confirmation"
-                description="Review your information"
-              />
-            </Stepper>
-            <>
-              {activeStep === 0 && (
-                <Stack>
-                  <Heading level="headline3">Account</Heading>
-                  <Text>Please enter your account information.</Text>
-                  <Button disabled onClick={() => setActiveStep(0)}>
-                    Back
-                  </Button>
-                  <Button onClick={() => setActiveStep(1)}>Next</Button>
-                </Stack>
-              )}
-              {activeStep === 1 && (
-                <Stack>
-                  <Heading level="headline3">Details</Heading>
-                  <Text>Please enter your personal details.</Text>
-                  <Button onClick={() => setActiveStep(0)}>Back</Button>
-                  <Button onClick={() => setActiveStep(2)}>Next</Button>
-                </Stack>
-              )}
-              {activeStep === 2 && (
-                <Stack>
-                  <Heading level="headline3">Confirmation</Heading>
-                  <Text>Please review your information before confirming.</Text>
-                  <Button onClick={() => setActiveStep(1)}>Back</Button>
-                  <Button onClick={() => setActiveStep(3)}>Confirm</Button>
-                </Stack>
-              )}
-              {activeStep === 3 && (
-                <Stack>
-                  <Heading level="headline3">Success</Heading>
-                  <Text>You did it!</Text>
-                  <Button onClick={() => setActiveStep(2)}>Back</Button>
-                  <Button onClick={() => setActiveStep(0)}>Restart</Button>
-                </Stack>
-              )}
-            </>
-          </Section>
-        </Preview>
-      </Section>
-      <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Heading level="headline2">Card</Heading>
-            <Card variant="outlined" size="lg">
-              <CardHeader>
-                <CardTitle>Card title</CardTitle>
-                <CardDescription>
-                  A short description of this card.
-                </CardDescription>
-                <CardAction>
-                  <Button variant="ghost" size="sm">
-                    Edit
-                  </Button>
-                </CardAction>
-              </CardHeader>
 
-              <CardContent>
-                <Checkbox
-                  label="I agree to the terms and conditions"
-                  size="sm"
-                  checked={accepted}
-                  onChange={(event) => setAccepted(event.target.checked)}
-                />
-                <Switch defaultChecked label="Dark mode" />
-              </CardContent>
+      <Section>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Sizes</h2>
+          <p>
+            The <code>size</code> property controls the dimensions and
+            typography of the button.
+          </p>
 
-              <CardFooter>
-                <Button>Save changes</Button>
-                <Button variant="outline">Cancel</Button>
-              </CardFooter>
-            </Card>
-          </Section>
-        </Preview>
+          <Preview code={sizeCode}>
+            <div className="flex flex-wrap items-center gap-3">
+              {sizes.map((size) => (
+                <Button key={size} size={size}>
+                  {size.toUpperCase()}
+                </Button>
+              ))}
+              <Button size="icon" aria-label="Settings">
+                ⚙
+              </Button>
+            </div>
+          </Preview>
+
+          <ul className="list-disc space-y-2 pl-6">
+            <li>
+              <strong>xs</strong> – Extra small, for compact interfaces.
+            </li>
+            <li>
+              <strong>sm</strong> – Small, for secondary or dense layouts.
+            </li>
+            <li>
+              <strong>md</strong> – Medium, the default size.
+            </li>
+            <li>
+              <strong>lg</strong> – Large, for prominent actions.
+            </li>
+            <li>
+              <strong>icon</strong> – Square button intended for icons.
+            </li>
+          </ul>
+
+          <p>
+            When using <code>size="icon"</code>, provide an accessible name
+            through <code>aria-label</code> if the button has no visible text.
+          </p>
+        </div>
       </Section>
+
       <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Heading level="headline2">Linear Progress</Heading>
-            <LinearProgress />
-          </Section>
-          <Section>
-            <Heading level="headline2">Circular Progress</Heading>
-            <CircularProgress />
-          </Section>
-        </Preview>
-      </Section>
-      <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Heading level="headline2">Tabs</Heading>
-            <Tabs tabBarPosition="left">
-              <Tabs.Tab id="tab-1" tab={<div>Tab 1</div>}>
-                <Text>Content for Tab 1</Text>
-                <Text>Lorum ipsum dolor sit amet</Text>
-              </Tabs.Tab>
-              <Tabs.Tab id="tab-2" tab={<div>Tab 2</div>}>
-                <Text>Content for Tab 2</Text>
-              </Tabs.Tab>
-            </Tabs>
-          </Section>
-        </Preview>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Heading level="headline2">Tooltip</Heading>
-            <Stack
-              className="w-full h-64"
-              direction="row"
-              alignV="center"
-              alignH="center"
-            >
-              <Tooltip
-                position="bottom"
-                align="center"
-                action="hover"
-                closable={true}
-                open={isTooltipOpen}
-                trigger={<Button>Hover me</Button>}
-                onOpenChange={setIsTooltipOpen}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Links</h2>
+          <p>
+            Button supports polymorphic rendering through the <code>as</code>{" "}
+            property. Use it to render an anchor instead of a native button. The
+            properties of the selected element are inferred by TypeScript.
+          </p>
+
+          <Preview code={linkCode}>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button as="a" href="/docs">
+                Documentation
+              </Button>
+              <Button
+                as="a"
+                href="https://example.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="outline"
               >
-                <Stack direction="col" gap="sm">
-                  <Text>This is a tooltip</Text>
-                  <Text>And it looks awesome</Text>
-                </Stack>
-              </Tooltip>
-            </Stack>
-          </Section>
-        </Preview>
+                External link
+              </Button>
+            </div>
+          </Preview>
+
+          <p>
+            When rendering an anchor, use <code>href</code> and the appropriate
+            navigation component for your routing framework when necessary. For
+            example, Next.js applications can use their own Link component
+            through <code>as</code>.
+          </p>
+        </div>
       </Section>
+
       <Section>
-        <TextEditor
-          value={document}
-          onChange={setDocument}
-          toolbar={<TextEditorToolbar />}
-        />
-        <TextRenderer document={document} />
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">
+            Leading and trailing content
+          </h2>
+          <p>
+            Add icons or other React elements before or after the button label
+            using <code>leading</code> and <code>trailing</code>.
+          </p>
+
+          <Preview code={iconCode}>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button leading={<span aria-hidden="true">↓</span>}>
+                Download
+              </Button>
+              <Button
+                trailing={<span aria-hidden="true">→</span>}
+                variant="secondary"
+              >
+                Continue
+              </Button>
+            </div>
+          </Preview>
+
+          <p>
+            Both properties accept any <code>ReactNode</code>, so you can use
+            Puzzle icons, custom SVGs, or other React components.
+          </p>
+        </div>
       </Section>
-      <DialogSection />
+
       <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Heading level="headline2">Bottom Navigation</Heading>
-            <BottomNavigation>
-              <BottomNavigationItem
-                icon={<Icon name="bxs:home" size={24} />}
-                label="Home"
-              />
-              <BottomNavigationItem
-                icon={<Icon name="bxs:package" size={24} />}
-                label="Components"
-              />
-              <BottomNavigationItem
-                icon={<Icon name="bxs:file-blank" size={24} />}
-                label="Docs"
-              />
-            </BottomNavigation>
-          </Section>
-        </Preview>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">
+            Loading and disabled states
+          </h2>
+          <p>
+            Use <code>loading</code> to indicate that an action is being
+            processed. The button displays a spinner and prevents further
+            interaction while loading.
+          </p>
+
+          <Preview code={loadingCode}>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button loading>Saving...</Button>
+              <Button disabled variant="secondary">
+                Unavailable
+              </Button>
+            </div>
+          </Preview>
+
+          <p>
+            A loading button automatically receives <code>aria-busy</code> and
+            behaves as disabled. You can also explicitly disable a button using{" "}
+            <code>disabled</code>.
+          </p>
+        </div>
       </Section>
+
       <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Heading level="headline2">Accordion</Heading>
-            <Accordion items={accordionItems} unMountOnClose={true} />
-          </Section>
-        </Preview>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Full width</h2>
+          <p>
+            Set <code>fullWidth</code> to make the button fill the available
+            width of its container.
+          </p>
+
+          <Preview code={`<Button fullWidth>Continue</Button>`}>
+            <div className="w-full max-w-md">
+              <Button fullWidth>Continue</Button>
+            </div>
+          </Preview>
+        </div>
       </Section>
+
       <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Heading level="headline2">App Bar</Heading>
-            <AppBar
-              logo={
-                <img
-                  src="/favicon.svg"
-                  width="48"
-                  height="48"
-                  alt="Logo"
-                  className="h-12 w-12"
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Toggle buttons</h2>
+          <p>
+            The <code>toggle</code> and <code>toggle-active</code> variants
+            provide visual styles for toggle-like actions. Manage the active
+            state in your application and expose it with{" "}
+            <code>aria-pressed</code>.
+          </p>
+
+          <Preview
+            code={`const [active, setActive] = useState(false);
+
+<Button
+  variant={active ? "toggle-active" : "toggle"}
+  aria-pressed={active}
+  onClick={() => setActive((value) => !value)}
+>
+  Toggle
+</Button>`}
+          >
+            <ToggleExample />
+          </Preview>
+        </div>
+      </Section>
+
+      <Section>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">Form buttons</h2>
+          <p>
+            Buttons render as native HTML buttons by default. Use the{" "}
+            <code>type</code> property to specify their behavior inside forms.
+          </p>
+
+          <Preview
+            code={`<form onSubmit={handleSubmit}>
+  <Button type="submit">Save</Button>
+  <Button type="reset" variant="outline">Reset</Button>
+  <Button type="button" variant="ghost">Cancel</Button>
+</form>`}
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              <Button type="submit">Submit</Button>
+              <Button type="reset" variant="outline">
+                Reset
+              </Button>
+              <Button type="button" variant="ghost">
+                Cancel
+              </Button>
+            </div>
+          </Preview>
+
+          <p>
+            The default type is <code>button</code>, preventing accidental form
+            submissions when a button is used inside a form.
+          </p>
+        </div>
+      </Section>
+
+      <Section>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">API</h2>
+          <p>
+            Button accepts the following component-specific properties.
+            Additional properties are inherited from the HTML element selected
+            through <code>as</code>.
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-sm">
+              <thead>
+                <tr className="border-b border-[var(--puzzle-color-border)]">
+                  <th className="px-3 py-3">Property</th>
+                  <th className="px-3 py-3">Type</th>
+                  <th className="px-3 py-3">Default</th>
+                  <th className="px-3 py-3">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ApiRow
+                  name="as"
+                  type="ElementType"
+                  defaultValue='"button"'
+                  description="The HTML element or React component to render."
                 />
-              }
-              title="Puzzle"
-              navigationItems={[
-                { label: "Home", href: "/", current: true },
-                { label: "Components", href: "/components" },
-                { label: "Docs", href: "/docs" },
-              ]}
-              trailingComponents={
-                <>
-                  <Button variant="ghost">Settings</Button>
-                  <Avatar alt="Sjoerd van den Berg" />
-                </>
-              }
-              sticky
-            />
-          </Section>
-          <div className="h-96" />
-        </Preview>
+                <ApiRow
+                  name="variant"
+                  type="ButtonVariant"
+                  defaultValue='"primary"'
+                  description="Visual style of the button."
+                />
+                <ApiRow
+                  name="size"
+                  type="ButtonSize"
+                  defaultValue='"md"'
+                  description="Controls the button dimensions."
+                />
+                <ApiRow
+                  name="leading"
+                  type="ReactNode"
+                  defaultValue="—"
+                  description="Content displayed before the label."
+                />
+                <ApiRow
+                  name="trailing"
+                  type="ReactNode"
+                  defaultValue="—"
+                  description="Content displayed after the label."
+                />
+                <ApiRow
+                  name="loading"
+                  type="boolean"
+                  defaultValue="false"
+                  description="Displays a loading indicator and prevents interaction."
+                />
+                <ApiRow
+                  name="disabled"
+                  type="boolean"
+                  defaultValue="false"
+                  description="Disables the button."
+                />
+                <ApiRow
+                  name="fullWidth"
+                  type="boolean"
+                  defaultValue="false"
+                  description="Makes the button fill its container width."
+                />
+                <ApiRow
+                  name="className"
+                  type="string"
+                  defaultValue="—"
+                  description="Additional CSS class names."
+                />
+                <ApiRow
+                  name="children"
+                  type="ReactNode"
+                  defaultValue="—"
+                  description="The button content."
+                />
+                <ApiRow
+                  name="type"
+                  type='"button" | "submit" | "reset"'
+                  defaultValue='"button"'
+                  description="Native button type. Only applied when rendering a native button."
+                />
+                <ApiRow
+                  name="tabIndex"
+                  type="number"
+                  defaultValue="—"
+                  description="Controls the element's position in sequential keyboard navigation."
+                />
+                <ApiRow
+                  name="aria-label"
+                  type="string"
+                  defaultValue="—"
+                  description="Accessible name, especially useful for icon-only buttons."
+                />
+                <ApiRow
+                  name="aria-busy"
+                  type="boolean"
+                  defaultValue="—"
+                  description="Indicates that the element is being updated."
+                />
+                <ApiRow
+                  name="aria-disabled"
+                  type="boolean"
+                  defaultValue="—"
+                  description="Exposes the disabled state through ARIA."
+                />
+                <ApiRow
+                  name="onClick"
+                  type="ElementProp<C, 'onClick'>"
+                  defaultValue="—"
+                  description="Click handler, typed according to the rendered element."
+                />
+                <ApiRow
+                  name="onKeyDown"
+                  type="ElementProp<C, 'onKeyDown'>"
+                  defaultValue="—"
+                  description="Keyboard event handler, typed according to the rendered element."
+                />
+              </tbody>
+            </table>
+          </div>
+        </div>
       </Section>
+
       <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Heading level="headline2">Skeleton</Heading>
-            <Skeleton width="75%" height={16} />
-            <Skeleton width="75%" height={16} radius="none" />
-            <Skeleton width="100%" height={180} />
-            <Skeleton width={48} height={48} radius="full" />
-            <Skeleton width={64} height={64} radius="full" />
-            <Skeleton width={120} height={40} radius="full" />
-          </Section>
-        </Preview>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold">TypeScript types</h2>
+
+          <h3 className="text-lg font-semibold">ButtonVariant</h3>
+          <pre className="overflow-x-auto rounded-lg bg-[var(--puzzle-color-surface-sunken)] p-4 text-sm">
+            <code>{`type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "danger"
+  | "link"
+  | "toggle"
+  | "toggle-active";`}</code>
+          </pre>
+
+          <h3 className="text-lg font-semibold">ButtonSize</h3>
+          <pre className="overflow-x-auto rounded-lg bg-[var(--puzzle-color-surface-sunken)] p-4 text-sm">
+            <code>{`type ButtonSize =
+  | "xs"
+  | "sm"
+  | "md"
+  | "lg"
+  | "icon";`}</code>
+          </pre>
+
+          <h3 className="text-lg font-semibold">ButtonProps</h3>
+          <pre className="overflow-x-auto rounded-lg bg-[var(--puzzle-color-surface-sunken)] p-4 text-sm">
+            <code>{`type ButtonProps<C extends ElementType = "button"> =
+  ButtonOwnProps<C> &
+  Omit<
+    ComponentPropsWithRef<C>,
+    keyof ButtonOwnProps<C> | "as"
+  >;`}</code>
+          </pre>
+
+          <p>
+            The generic <code>C</code> determines the rendered element.
+            Consequently, native attributes and event handlers are automatically
+            inferred. For example, <code>href</code> is available when using{" "}
+            <code>as="a"</code>.
+          </p>
+        </div>
       </Section>
-      <Section>
-        <Preview defaultDevice="mobile">
-          <Section>
-            <Heading level="headline2">Carousel</Heading>
-            <CarouselController
-              items={Array.from({ length: 10 }, (_, i) => i + 1)}
-            >
-              <Carousel<number>
-                renderItem={(item) => (
-                  <div className="flex items-center justify-center p-4 border border-orange-500 bg-orange-100">
-                    {item}
-                  </div>
-                )}
-                panelsPerView={{
-                  mobile: 1,
-                  tablet: 3,
-                  desktop: 4,
-                }}
-                singlePageAlignment="center"
-                buttonAlignment="aside"
-                backButton={
-                  <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
-                    &lt;
-                  </button>
-                }
-                nextButton={
-                  <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
-                    &gt;
-                  </button>
-                }
-                pagerAlignment="under"
-                renderPager={(currentPage, numberOfPages) => (
-                  <Stack
-                    direction="row"
-                    alignH="center"
-                    alignV="center"
-                    gap="sm"
-                    className="mt-2"
-                  >
-                    {Array.from({ length: numberOfPages }).map((_, i) => (
-                      <span
-                        key={i}
-                        className={
-                          i === currentPage ? "font-bold text-2xl my-auto" : ""
-                        }
-                      >
-                        {i === currentPage ? "•" : "○"}
-                      </span>
-                    ))}
-                  </Stack>
-                )}
-              />
-            </CarouselController>
-          </Section>
-        </Preview>
-      </Section>
-      <Section>
-        <Stack
-          as="ul"
-          direction="row"
-          alignH="center"
-          alignV="center"
-          divider={<li role="separator">-</li>}
-        >
-          <li>A</li>
-          <li>B</li>
-          <li>C</li>
-          <li>D</li>
-        </Stack>
-        <Heading level="headline2">What is Puzzle?</Heading>
-        <Text>
-          Puzzle is a modern React UI framework designed to help developers
-          build accessible, responsive, and visually appealing user interfaces
-          with ease. It is open source and provides a set of reusable
-          components, theming capabilities, and a focus on developer experience.
-        </Text>
-      </Section>
-      <Section>
-        <Heading level="headline2">Why another UI framework?</Heading>
-        <Text>
-          While there are many React UI frameworks available, Puzzle aims to
-          provide a complete and developer-friendly solution. It focuses on ease
-          of use, theming capabilities, and a set of reusable components that
-          help developers build consistent and visually appealing interfaces
-          efficiently.
-        </Text>
-      </Section>
-      <Section>
-        <Heading level="headline2">CSS framework agnostic</Heading>
-        <Text>
-          Puzzle is designed to be CSS framework agnostic, allowing developers
-          to integrate it seamlessly with their preferred CSS solutions. This
-          flexibility ensures that Puzzle can be used in a wide range of
-          projects without imposing specific styling constraints.
-        </Text>
-      </Section>
-      <Section>
-        <Heading level="headline2">Fluid components</Heading>
-        <Text>
-          Puzzle components are designed to be fluid and adaptable, allowing
-          developers to create responsive layouts that work across different
-          screen sizes and devices. This ensures that applications built with
-          Puzzle maintain a consistent and visually appealing design regardless
-          of the user's environment.
-        </Text>
-      </Section>
-    </SectionStack>
+    </div>
+  );
+}
+
+type ApiRowProps = {
+  name: string;
+  type: string;
+  defaultValue: string;
+  description: string;
+};
+
+function ApiRow({ name, type, defaultValue, description }: ApiRowProps) {
+  return (
+    <tr className="border-b border-[var(--puzzle-color-border)] align-top">
+      <td className="px-3 py-3 font-mono font-medium whitespace-nowrap">
+        {name}
+      </td>
+      <td className="px-3 py-3 font-mono text-[var(--puzzle-color-text-muted)]">
+        {type}
+      </td>
+      <td className="px-3 py-3 font-mono">{defaultValue}</td>
+      <td className="px-3 py-3">{description}</td>
+    </tr>
   );
 }
