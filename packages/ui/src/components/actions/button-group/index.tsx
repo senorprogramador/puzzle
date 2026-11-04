@@ -13,7 +13,7 @@ import {
 } from "react";
 import type { ButtonVariant } from "../button/button.types";
 import "./button-group.css";
-import { type ButtonProps } from "../button";
+import type { ButtonNativeProps } from "../button/button.types";
 
 type ButtonGroupOwnProps<C extends ElementType> = {
   as?: C;
@@ -56,7 +56,10 @@ const ButtonGroup = <C extends ElementType = "div">({
   );
 
   const clonedChildren = Children.map(children, (child, index) => {
-    if (!isValidElement<ButtonProps>(child)) {
+    if (
+      !isValidElement<ButtonNativeProps>(child) ||
+      child.props.href !== undefined
+    ) {
       return child;
     }
     const isActive = activeIndices.has(index);

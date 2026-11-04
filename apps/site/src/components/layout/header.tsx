@@ -18,7 +18,7 @@ const Header = ({}: HeaderProps) => {
           alt="Logo"
           className="h-12 w-12"
         />
-        <Heading variant="headline4" as="h1" className="ml-4">
+        <Heading level="headline4" as="h1" className="ml-4">
           Puzzle
         </Heading>
       </Stack>
@@ -29,10 +29,10 @@ const Header = ({}: HeaderProps) => {
         divider={<div role="separator">|</div>}
         className="desktop:hidden"
       >
-        <Button as="a" variant="ghost" href="/">
+        <Button variant="ghost" href="/">
           Home
         </Button>
-        <Button as="a" variant="ghost" href="/about">
+        <Button variant="ghost" href="/about">
           About
         </Button>
       </Stack>

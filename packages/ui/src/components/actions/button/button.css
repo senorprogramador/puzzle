@@ -203,6 +203,6 @@
     }
 
     .puzzle-button__spinner svg {
-        animation-duration: 1.8s;
+        animation: none;
     }
 }

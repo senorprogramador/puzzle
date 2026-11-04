@@ -102,7 +102,6 @@ export const StyledAsLink: Story = {
   args: {
     children: "Link",
     href: "https://senorprogramador.com",
-    as: "a",
     target: "_blank",
     variant: "link",
   },
@@ -117,7 +116,6 @@ export const ButtonAsLink: Story = {
   args: {
     children: "Link",
     href: "https://senorprogramador.com",
-    as: "a",
     target: "_blank",
   },
   render: (args) => (
