@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -42,11 +42,9 @@ describe("Popout", () => {
   });
 
   it("does not open on click when action is hover", async () => {
-    const user = userEvent.setup();
-
     renderPopout({ action: "hover" });
 
-    await user.click(screen.getByRole("button", { name: "Trigger" }));
+    fireEvent.click(screen.getByRole("button", { name: "Trigger" }));
 
     expect(screen.queryByTestId("popout-content")).not.toBeInTheDocument();
   });
@@ -56,12 +54,7 @@ describe("Popout", () => {
 
     const trigger = screen.getByRole("button", { name: "Trigger" });
 
-    trigger.dispatchEvent(
-      new PointerEvent("pointerenter", {
-        bubbles: true,
-        pointerType: "mouse",
-      }),
-    );
+    fireEvent.pointerEnter(trigger, { pointerType: "mouse" });
 
     expect(await screen.findByTestId("popout-content")).toBeInTheDocument();
   });

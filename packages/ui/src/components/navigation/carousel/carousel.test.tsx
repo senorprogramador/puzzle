@@ -119,6 +119,32 @@ describe("Carousel", () => {
   });
 
   it("supports custom pager rendering", () => {
+    // jsdom performs no layout, so supply item and viewport geometry.
+    vi.spyOn(Element.prototype, "getBoundingClientRect").mockImplementation(
+      function (this: Element) {
+        const siblings = Array.from(this.parentElement?.children ?? []);
+        const isItem = this.classList.contains("puzzle-carousel__item");
+        const left = isItem ? siblings.indexOf(this) * 100 : 0;
+        const width = this.classList.contains("puzzle-carousel__viewport")
+          ? 200
+          : isItem
+            ? 100
+            : 500;
+
+        return {
+          x: left,
+          y: 0,
+          top: 0,
+          left,
+          right: left + width,
+          bottom: 20,
+          width,
+          height: 20,
+          toJSON: () => ({}),
+        } as DOMRect;
+      },
+    );
+
     renderCarousel({
       renderPager: (currentPage, numberOfPages) => (
         <span>
@@ -127,7 +153,7 @@ describe("Carousel", () => {
       ),
     });
 
-    expect(screen.getByText(/Page 1 of/)).toBeInTheDocument();
+    expect(screen.getByText("Page 1 of 3")).toBeInTheDocument();
   });
 
   it("does not allow the previous button to navigate before the first page", async () => {

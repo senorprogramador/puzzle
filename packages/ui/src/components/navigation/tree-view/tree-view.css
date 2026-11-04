@@ -45,6 +45,20 @@
         color var(--puzzle-tree-duration) var(--puzzle-tree-easing);
 }
 
+/*
+ * Puzzle Link supplies its own global link styles.
+ * A linked TreeView row should retain the appearance of a normal tree row.
+ */
+.puzzle-tree__row.puzzle-link,
+.puzzle-tree__row.puzzle-link:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.puzzle-tree__row.puzzle-link:active {
+    opacity: 1;
+}
+
 .puzzle-tree__item:not([aria-disabled="true"]) > .puzzle-tree__row {
     cursor: pointer;
 }
@@ -236,4 +250,35 @@
 
 :dir(rtl) .puzzle-tree__toggle[data-expanded="true"]::before {
     transform: translateY(-0.125rem) rotate(225deg);
+}
+
+/* Puzzle Link inside TreeView should behave like a normal tree row. */
+.puzzle-tree__row.puzzle-link,
+.puzzle-tree__row.puzzle-link:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.puzzle-tree__row.puzzle-link:active {
+    opacity: 1;
+}
+
+/* Active route is distinct from ARIA selection. */
+.puzzle-tree__item[data-active="true"] > .puzzle-tree__row,
+.puzzle-tree__item:has(> .puzzle-tree__row[aria-current="page"]) > .puzzle-tree__row {
+    background: color-mix(in srgb, var(--puzzle-color-primary) 12%, transparent);
+    color: var(--puzzle-color-text);
+}
+
+.puzzle-tree__item[data-active="true"] > .puzzle-tree__row .puzzle-tree__label,
+.puzzle-tree__item:has(> .puzzle-tree__row[aria-current="page"]) > .puzzle-tree__row .puzzle-tree__label {
+    font-weight: bold;
+}
+
+@media (forced-colors: active) {
+    .puzzle-tree__item[data-active="true"] > .puzzle-tree__row,
+    .puzzle-tree__item:has(> .puzzle-tree__row[aria-current="page"]) > .puzzle-tree__row {
+        outline: 1px solid Highlight;
+        outline-offset: -1px;
+    }
 }

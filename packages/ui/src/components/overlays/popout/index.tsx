@@ -513,6 +513,11 @@ const Popout = ({
 
       cancelDebouncedClose();
       changeOpenState(false);
+
+      // Escape is handled in the capture phase, so content-level handlers never see it.
+      if (contentRef.current?.contains(ownerDocument.activeElement)) {
+        anchorRef.current?.focus({ preventScroll: true });
+      }
     });
   }, [
     isOpen,

@@ -14,6 +14,7 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "@puzzle/core";
+import { Link } from "../link";
 import "./tree-view.css";
 
 type TreeViewSelectionMode = "none" | "single" | "multiple";
@@ -25,6 +26,9 @@ type TreeViewItem<TData = unknown> = {
 
   /** Visible node label. Supply textValue when the label is not plain text. */
   label: ReactNode;
+
+  /** Optional destination. When supplied, the complete row renders as a Puzzle Link. */
+  href?: string;
 
   /** Plain-text value used by typeahead when label is not a string or number. */
   textValue?: string;
@@ -115,6 +119,9 @@ type TreeViewProps<TData = unknown> = Omit<
     /** Called when a node is activated with Enter. */
     onItemActivate?: (item: TreeViewItem<TData>) => void;
 
+    /** Determines whether an item matches the current route. */
+    getItemActive?: (item: TreeViewItem<TData>) => boolean;
+
     /** Custom node renderer. */
     renderItem?: (
       item: TreeViewItem<TData>,
@@ -164,9 +171,11 @@ const normalizeIds = (ids: string[] | undefined) =>
 
 const getTextValue = <TData,>(item: TreeViewItem<TData>) => {
   if (item.textValue !== undefined) return item.textValue;
+
   if (typeof item.label === "string" || typeof item.label === "number") {
     return String(item.label);
   }
+
   return "";
 };
 
@@ -190,6 +199,7 @@ const TreeView = <TData,>({
   loadChildren,
   onLoadChildrenError,
   onItemActivate,
+  getItemActive,
   renderIcon,
   renderLabel,
   expandOnItemClick = false,
@@ -211,9 +221,11 @@ const TreeView = <TData,>({
   const [uncontrolledExpandedIds, setUncontrolledExpandedIds] = useState(() =>
     normalizeIds(defaultExpandedIds),
   );
+
   const [uncontrolledSelectedIds, setUncontrolledSelectedIds] = useState(() =>
     normalizeIds(defaultSelectedIds),
   );
+
   const [focusedId, setFocusedId] = useState<string | undefined>(
     () =>
       defaultFocusedId ??
@@ -226,7 +238,9 @@ const TreeView = <TData,>({
   const [loadedChildren, setLoadedChildren] = useState<
     Map<string, TreeViewItem<TData>[]>
   >(() => new Map());
+
   const [loadingIds, setLoadingIds] = useState<string[]>([]);
+
   const [loadErrors, setLoadErrors] = useState<Map<string, unknown>>(
     () => new Map(),
   );
@@ -241,9 +255,11 @@ const TreeView = <TData,>({
   const currentExpandedIds = isExpandedControlled
     ? (expandedIds ?? [])
     : uncontrolledExpandedIds;
+
   const requestedSelectedIds = isSelectionControlled
     ? (selectedIds ?? [])
     : uncontrolledSelectedIds;
+
   const currentSelectedIds =
     selectionMode === "single"
       ? requestedSelectedIds.slice(0, 1)
@@ -253,10 +269,12 @@ const TreeView = <TData,>({
     () => new Set(normalizeIds(currentExpandedIds)),
     [currentExpandedIds],
   );
+
   const selectedSet = useMemo(
     () => new Set(normalizeIds(currentSelectedIds)),
     [currentSelectedIds],
   );
+
   const loadingSet = useMemo(() => new Set(loadingIds), [loadingIds]);
 
   const getChildren = useCallback(
@@ -284,6 +302,7 @@ const TreeView = <TData,>({
         result.push(item);
 
         const children = getChildren(item);
+
         if (
           expandedSet.has(item.id) &&
           hasChildren(item) &&
@@ -295,6 +314,7 @@ const TreeView = <TData,>({
     };
 
     visit(items);
+
     return result;
   }, [items, expandedSet, getChildren, hasChildren]);
 
@@ -303,12 +323,16 @@ const TreeView = <TData,>({
 
     const visit = (nodes: TreeViewItem<TData>[], parentId?: string) => {
       nodes.forEach((item) => {
-        if (parentId !== undefined) result.set(item.id, parentId);
+        if (parentId !== undefined) {
+          result.set(item.id, parentId);
+        }
+
         visit(getChildren(item), item.id);
       });
     };
 
     visit(items);
+
     return result;
   }, [items, getChildren]);
 
@@ -369,13 +393,17 @@ const TreeView = <TData,>({
 
   const loadNodeChildren = useCallback(
     async (item: TreeViewItem<TData>) => {
-      if (!loadChildren || !item.hasChildren || item.children !== undefined)
+      if (!loadChildren || !item.hasChildren || item.children !== undefined) {
         return;
-      if (loadedChildren.has(item.id) || inFlightLoads.current.has(item.id))
+      }
+
+      if (loadedChildren.has(item.id) || inFlightLoads.current.has(item.id)) {
         return;
+      }
 
       inFlightLoads.current.add(item.id);
       setLoadingIds((current) => [...current, item.id]);
+
       setLoadErrors((current) => {
         const next = new Map(current);
         next.delete(item.id);
@@ -384,6 +412,7 @@ const TreeView = <TData,>({
 
       try {
         const children = await loadChildren(item);
+
         setLoadedChildren((current) => {
           const next = new Map(current);
           next.set(item.id, children);
@@ -395,6 +424,7 @@ const TreeView = <TData,>({
           next.set(item.id, error);
           return next;
         });
+
         onLoadChildrenError?.(item, error);
       } finally {
         inFlightLoads.current.delete(item.id);
@@ -408,6 +438,7 @@ const TreeView = <TData,>({
   // Tracking newly expanded IDs avoids retrying a failed request on unrelated renders.
   useEffect(() => {
     const previous = new Set(previousExpandedIds.current ?? []);
+
     const newlyExpandedIds = currentExpandedIds.filter(
       (id) => !previous.has(id),
     );
@@ -482,9 +513,11 @@ const TreeView = <TData,>({
 
   const expandSiblings = (itemId: string) => {
     const parentId = parentIds.get(itemId);
+
     const parentItem = parentId
       ? findItemById(items, parentId, getChildren)
       : undefined;
+
     const siblings = parentItem ? getChildren(parentItem) : items;
     const next = new Set(currentExpandedIds);
     let changed = false;
@@ -497,7 +530,9 @@ const TreeView = <TData,>({
       }
     });
 
-    if (changed) commitExpandedIds(Array.from(next));
+    if (changed) {
+      commitExpandedIds(Array.from(next));
+    }
   };
 
   const handleKeyDown = (
@@ -507,8 +542,9 @@ const TreeView = <TData,>({
   ) => {
     const eventTarget = event.target as HTMLElement;
 
-    if (eventTarget.closest('[role="treeitem"]') !== event.currentTarget)
+    if (eventTarget.closest('[role="treeitem"]') !== event.currentTarget) {
       return;
+    }
 
     if (
       eventTarget.closest(
@@ -521,11 +557,14 @@ const TreeView = <TData,>({
     const index = visibleItems.findIndex(
       (visibleItem) => visibleItem.id === item.id,
     );
+
     const inheritedDirection = event.currentTarget
       .closest("[dir]")
       ?.getAttribute("dir");
+
     const isRtl =
       dir === "rtl" || (dir === undefined && inheritedDirection === "rtl");
+
     const openKey = isRtl ? "ArrowLeft" : "ArrowRight";
     const closeKey = isRtl ? "ArrowRight" : "ArrowLeft";
     let handled = false;
@@ -535,6 +574,7 @@ const TreeView = <TData,>({
         if (index < visibleItems.length - 1) {
           focusItem(visibleItems[index + 1].id);
         }
+
         handled = true;
         break;
 
@@ -542,11 +582,15 @@ const TreeView = <TData,>({
         if (index > 0) {
           focusItem(visibleItems[index - 1].id);
         }
+
         handled = true;
         break;
 
       case "Home":
-        if (visibleItems[0]) focusItem(visibleItems[0].id);
+        if (visibleItems[0]) {
+          focusItem(visibleItems[0].id);
+        }
+
         handled = true;
         break;
 
@@ -554,16 +598,27 @@ const TreeView = <TData,>({
         if (visibleItems.length > 0) {
           focusItem(visibleItems[visibleItems.length - 1].id);
         }
+
         handled = true;
         break;
 
       case "Enter":
-        if (hasChildren(item)) {
+        if (item.href) {
+          if (!item.disabled) {
+            event.currentTarget
+              .querySelector<HTMLAnchorElement>("a.puzzle-tree__row")
+              ?.click();
+
+            onItemActivate?.(item);
+          }
+        } else if (hasChildren(item)) {
           toggleExpanded(item);
+          if (!item.disabled) onItemActivate?.(item);
         } else {
           selectItem(item);
+          if (!item.disabled) onItemActivate?.(item);
         }
-        if (!item.disabled) onItemActivate?.(item);
+
         handled = true;
         break;
 
@@ -592,29 +647,39 @@ const TreeView = <TData,>({
           const previousValue = isExpired ? "" : typeaheadState.current.value;
           const normalizedPrevious = normalizeSearchText(previousValue);
           const normalizedKey = normalizeSearchText(event.key);
+
           const isRepeatedCharacter =
             normalizedPrevious.length > 0 &&
             [...normalizedPrevious].every(
               (character) => character === normalizedKey,
             );
+
           const searchValue = isRepeatedCharacter
             ? event.key
             : `${previousValue}${event.key}`;
 
-          typeaheadState.current = { value: searchValue, time: currentTime };
+          typeaheadState.current = {
+            value: searchValue,
+            time: currentTime,
+          };
 
           const normalizedSearch = normalizeSearchText(searchValue);
+
           const orderedItems = [
             ...visibleItems.slice(index + 1),
             ...visibleItems.slice(0, index + 1),
           ];
+
           const match = orderedItems.find((candidate) =>
             normalizeSearchText(getTextValue(candidate)).startsWith(
               normalizedSearch,
             ),
           );
 
-          if (match) focusItem(match.id);
+          if (match) {
+            focusItem(match.id);
+          }
+
           handled = true;
         }
     }
@@ -628,6 +693,7 @@ const TreeView = <TData,>({
           if (firstChild) focusItem(firstChild.id);
         }
       }
+
       handled = true;
     } else if (event.key === closeKey) {
       if (hasChildren(item) && expandedSet.has(item.id)) {
@@ -635,10 +701,13 @@ const TreeView = <TData,>({
       } else if (parentId) {
         focusItem(parentId);
       }
+
       handled = true;
     }
 
-    if (handled) event.preventDefault();
+    if (handled) {
+      event.preventDefault();
+    }
   };
 
   const handleItemClick = (
@@ -650,6 +719,7 @@ const TreeView = <TData,>({
 
     // Ignore bubbled clicks from descendants and clicks on custom interactive adornments.
     if (targetTreeItem !== event.currentTarget) return;
+
     if (
       target.closest(
         "button, a, input, select, textarea, [data-tree-stop-selection]",
@@ -671,6 +741,38 @@ const TreeView = <TData,>({
     selectItem(item);
   };
 
+  /**
+   * Handles pointer activation of a linked row.
+   *
+   * The row link is the navigation target, but the tree item remains the
+   * roving-focus element. Clicking the expansion affordance is the exception:
+   * it expands the branch and deliberately does not navigate.
+   */
+  const handleItemLinkClick = (
+    event: MouseEvent<HTMLAnchorElement>,
+    item: TreeViewItem<TData>,
+  ) => {
+    const target = event.target as Element;
+
+    if (target.closest("[data-tree-toggle]")) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      focusItem(item.id);
+      toggleExpanded(item);
+      return;
+    }
+
+    if (item.disabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    focusItem(item.id);
+    selectItem(item);
+  };
+
   const renderItems = (
     nodes: TreeViewItem<TData>[],
     depth = 0,
@@ -681,13 +783,17 @@ const TreeView = <TData,>({
       const itemHasChildren = hasChildren(item);
       const expanded = itemHasChildren && expandedSet.has(item.id);
       const disabled = Boolean(item.disabled);
+      const active = Boolean(getItemActive?.(item));
+
       const selected =
         selectionMode !== "none" &&
         selectedSet.has(item.id) &&
         item.selectable !== false &&
         !disabled;
+
       const loading = loadingSet.has(item.id);
       const focused = effectiveFocusedId === item.id;
+
       const itemState: TreeViewItemState = {
         expanded,
         selected,
@@ -696,18 +802,70 @@ const TreeView = <TData,>({
         disabled,
         hasChildren: itemHasChildren,
       };
+
       const iconContent = renderIcon ? renderIcon(item, itemState) : item.icon;
       const itemId = `${generatedId}-item-${encodeURIComponent(item.id)}`;
+
       const selectable =
         selectionMode !== "none" && item.selectable !== false && !disabled;
+
       const hasLoadError = loadErrors.has(item.id);
+
+      const rowContent = (
+        <>
+          {itemHasChildren ? (
+            <span
+              className="puzzle-tree__toggle"
+              data-tree-toggle="true"
+              data-expanded={expanded || undefined}
+              aria-hidden="true"
+            />
+          ) : (
+            <span className="puzzle-tree__toggle-spacer" aria-hidden="true" />
+          )}
+
+          {iconContent != null && (
+            <span className="puzzle-tree__icon" aria-hidden="true">
+              {iconContent}
+            </span>
+          )}
+
+          <span className="puzzle-tree__label">
+            {renderLabel ? renderLabel(item, itemState) : item.label}
+          </span>
+
+          {item.endAdornment != null && (
+            <span className="puzzle-tree__adornment">{item.endAdornment}</span>
+          )}
+        </>
+      );
+
+      const row =
+        item.href !== undefined ? (
+          <Link
+            href={item.href}
+            className="puzzle-tree__row"
+            tabIndex={-1}
+            aria-current={active ? "page" : undefined}
+            aria-disabled={disabled || undefined}
+            data-tree-row-link="true"
+            onClick={(event) => handleItemLinkClick(event, item)}
+          >
+            {rowContent}
+          </Link>
+        ) : (
+          <div className="puzzle-tree__row">{rowContent}</div>
+        );
 
       return (
         <li
           key={item.id}
           ref={(element) => {
-            if (element) itemRefs.current.set(item.id, element);
-            else itemRefs.current.delete(item.id);
+            if (element) {
+              itemRefs.current.set(item.id, element);
+            } else {
+              itemRefs.current.delete(item.id);
+            }
           }}
           id={itemId}
           role="treeitem"
@@ -721,6 +879,7 @@ const TreeView = <TData,>({
           tabIndex={focused ? 0 : -1}
           className={cn("puzzle-tree__item", itemClassName)}
           data-tree-item-id={item.id}
+          data-active={active || undefined}
           data-selected={selected || undefined}
           data-disabled={disabled || undefined}
           data-expanded={itemHasChildren ? expanded : undefined}
@@ -735,31 +894,7 @@ const TreeView = <TData,>({
           onClick={(event) => handleItemClick(event, item)}
           onKeyDown={(event) => handleKeyDown(event, item, parentId)}
         >
-          <div className="puzzle-tree__row">
-            {itemHasChildren ? (
-              <span
-                className="puzzle-tree__toggle"
-                data-tree-toggle="true"
-                data-expanded={expanded || undefined}
-                aria-hidden="true"
-              />
-            ) : (
-              <span className="puzzle-tree__toggle-spacer" aria-hidden="true" />
-            )}
-            {iconContent != null && (
-              <span className="puzzle-tree__icon" aria-hidden="true">
-                {iconContent}
-              </span>
-            )}
-            <span className="puzzle-tree__label">
-              {renderLabel ? renderLabel(item, itemState) : item.label}
-            </span>
-            {item.endAdornment != null && (
-              <span className="puzzle-tree__adornment">
-                {item.endAdornment}
-              </span>
-            )}
-          </div>
+          {row}
 
           {itemHasChildren && expanded && (
             <ul className="puzzle-tree__group" role="group">
@@ -778,6 +913,7 @@ const TreeView = <TData,>({
                   </span>
                 </li>
               ) : null}
+
               {renderItems(itemChildren, depth + 1, item.id)}
             </ul>
           )}

@@ -11,9 +11,11 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@puzzle/core";
+import { Icon } from "@puzzle/icons";
 import "./preview.css";
 
 type PreviewDevice = "mobile" | "tablet" | "desktop";
+type PreviewTab = "preview" | "code";
 
 type DeviceConfig = {
   label: string;
@@ -25,6 +27,7 @@ type PreviewProps = {
   children: ReactNode;
   className?: string;
   defaultDevice?: PreviewDevice;
+  code?: string;
 };
 
 const PREVIEW_DEVICES: Record<PreviewDevice, DeviceConfig> = {
@@ -51,15 +54,20 @@ const Preview = ({
   children,
   className,
   defaultDevice = "desktop",
+  code,
 }: PreviewProps) => {
   const [device, setDevice] = useState<PreviewDevice>(defaultDevice);
+  const [activeTab, setActiveTab] = useState<PreviewTab>("preview");
   const [frameRoot, setFrameRoot] = useState<HTMLElement | null>(null);
   const [scale, setScale] = useState(1);
+  const [copied, setCopied] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const config = PREVIEW_DEVICES[device];
+  const hasCode = code !== undefined;
 
   const syncStyles = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
@@ -130,19 +138,19 @@ const Preview = ({
 
     scrollbarStyle.setAttribute("data-puzzle-preview-style", "");
     scrollbarStyle.textContent = `
-    html,
-    body {
-      scrollbar-width: none !important;
-      -ms-overflow-style: none !important;
-    }
+      html,
+      body {
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+      }
 
-    html::-webkit-scrollbar,
-    body::-webkit-scrollbar {
-      display: none !important;
-      width: 0 !important;
-      height: 0 !important;
-    }
-  `;
+      html::-webkit-scrollbar,
+      body::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+    `;
 
     frameHead.appendChild(scrollbarStyle);
   }, []);
@@ -217,6 +225,42 @@ const Preview = ({
     initializeFrame();
   }, [initializeFrame]);
 
+  // Copy the provided code to the clipboard.
+  const handleCopyCode = useCallback(async () => {
+    if (code === undefined) return;
+
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+
+      copyTimeoutRef.current = setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch {
+      setCopied(false);
+    }
+  }, [code]);
+
+  useEffect(
+    () => () => {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
+  // If code is removed while selected, return to the preview.
+  useEffect(() => {
+    if (!hasCode && activeTab === "code") {
+      setActiveTab("preview");
+    }
+  }, [activeTab, hasCode]);
+
   const frameStyle: CSSProperties = {
     width: config.width,
     height: config.height,
@@ -231,51 +275,130 @@ const Preview = ({
 
   return (
     <section className={cn("puzzle-preview", className)}>
-      <div
-        className="puzzle-preview__toolbar"
-        role="toolbar"
-        aria-label="Preview device"
-      >
+      <div className="puzzle-preview__toolbar">
         <div
-          className="puzzle-preview__devices"
-          role="group"
-          aria-label="Device size"
+          className="puzzle-preview__tabs"
+          role="tablist"
+          aria-label="Preview view"
         >
-          {(Object.keys(PREVIEW_DEVICES) as PreviewDevice[]).map((item) => (
+          <button
+            type="button"
+            role="tab"
+            id="puzzle-preview-tab-preview"
+            aria-selected={activeTab === "preview"}
+            aria-controls="puzzle-preview-panel"
+            className={cn(
+              "puzzle-preview__tab",
+              activeTab === "preview" && "puzzle-preview__tab--active",
+            )}
+            onClick={() => setActiveTab("preview")}
+          >
+            Preview
+          </button>
+
+          {hasCode && (
             <button
-              key={item}
               type="button"
+              role="tab"
+              id="puzzle-preview-tab-code"
+              aria-selected={activeTab === "code"}
+              aria-controls="puzzle-preview-panel"
               className={cn(
-                "puzzle-preview__device",
-                device === item && "puzzle-preview__device--active",
+                "puzzle-preview__tab",
+                activeTab === "code" && "puzzle-preview__tab--active",
               )}
-              aria-pressed={device === item}
-              onClick={() => setDevice(item)}
+              onClick={() => setActiveTab("code")}
             >
-              {PREVIEW_DEVICES[item].label}
+              Code
             </button>
-          ))}
+          )}
         </div>
 
-        <span className="puzzle-preview__dimensions">
-          {config.width} × {config.height}
-        </span>
+        {activeTab === "preview" ? (
+          <div className="puzzle-preview__toolbar-actions">
+            <div
+              className="puzzle-preview__devices"
+              role="group"
+              aria-label="Device size"
+            >
+              {(Object.keys(PREVIEW_DEVICES) as PreviewDevice[]).map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={cn(
+                    "puzzle-preview__device",
+                    device === item && "puzzle-preview__device--active",
+                  )}
+                  aria-pressed={device === item}
+                  onClick={() => setDevice(item)}
+                >
+                  {PREVIEW_DEVICES[item].label}
+                </button>
+              ))}
+            </div>
+
+            <span className="puzzle-preview__dimensions">
+              {config.width} × {config.height}
+            </span>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="puzzle-preview__copy"
+            onClick={handleCopyCode}
+            aria-label={copied ? "Code copied" : "Copy code"}
+          >
+            <Icon
+              name={copied ? "tabler:check" : "tabler:copy"}
+              size={16}
+              aria-hidden="true"
+            />
+            <span>{copied ? "Copied" : "Copy code"}</span>
+          </button>
+        )}
       </div>
 
-      <div ref={containerRef} className="puzzle-preview__stage">
-        <div className="puzzle-preview__viewport" style={viewportStyle}>
-          <iframe
-            ref={iframeRef}
-            className="puzzle-preview__frame"
-            srcDoc={PREVIEW_DOCUMENT}
-            title={`${config.label} component preview`}
-            onLoad={initializeFrame}
-            style={frameStyle}
-          />
+      <div
+        id="puzzle-preview-panel"
+        role="tabpanel"
+        aria-labelledby={
+          activeTab === "preview"
+            ? "puzzle-preview-tab-preview"
+            : "puzzle-preview-tab-code"
+        }
+        className="puzzle-preview__panel"
+      >
+        {activeTab === "preview" ? (
+          <div ref={containerRef} className="puzzle-preview__stage">
+            <div className="puzzle-preview__viewport" style={viewportStyle}>
+              <iframe
+                ref={iframeRef}
+                className="puzzle-preview__frame"
+                srcDoc={PREVIEW_DOCUMENT}
+                title={`${config.label} component preview`}
+                onLoad={initializeFrame}
+                style={frameStyle}
+              />
 
-          {frameRoot && createPortal(children, frameRoot)}
-        </div>
+              {frameRoot && createPortal(children, frameRoot)}
+            </div>
+          </div>
+        ) : (
+          <div className="puzzle-preview__code">
+            <pre>
+              <code className="language-tsx">{code}</code>
+            </pre>
+          </div>
+        )}
       </div>
+
+      <span
+        className="puzzle-preview__copy-status"
+        role="status"
+        aria-live="polite"
+      >
+        {copied ? "Code copied to clipboard." : ""}
+      </span>
     </section>
   );
 };
