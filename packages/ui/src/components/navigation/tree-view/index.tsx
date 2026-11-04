@@ -69,91 +69,96 @@ type TreeViewProps<TData = unknown> = Omit<
   | "role"
   | "tabIndex"
   | "aria-multiselectable"
-> & (
-  | { "aria-label": string; "aria-labelledby"?: string }
-  | { "aria-labelledby": string; "aria-label"?: string }
-) & {
-  /** Hierarchical data rendered by the tree. Node IDs must be unique. */
-  items: TreeViewItem<TData>[];
+> &
+  (
+    | { "aria-label": string; "aria-labelledby"?: string }
+    | { "aria-labelledby": string; "aria-label"?: string }
+  ) & {
+    /** Hierarchical data rendered by the tree. Node IDs must be unique. */
+    items: TreeViewItem<TData>[];
 
-  /** Selection behavior. Defaults to single selection. */
-  selectionMode?: TreeViewSelectionMode;
+    /** Selection behavior. Defaults to single selection. */
+    selectionMode?: TreeViewSelectionMode;
 
-  /** Initial expanded node IDs for uncontrolled usage. Defaults to []. */
-  defaultExpandedIds?: string[];
+    /** Initial expanded node IDs for uncontrolled usage. Defaults to []. */
+    defaultExpandedIds?: string[];
 
-  /** Expanded node IDs for controlled usage. */
-  expandedIds?: string[];
+    /** Expanded node IDs for controlled usage. */
+    expandedIds?: string[];
 
-  /** Called with the next expanded node IDs. */
-  onExpandedChange?: (expandedIds: string[]) => void;
+    /** Called with the next expanded node IDs. */
+    onExpandedChange?: (expandedIds: string[]) => void;
 
-  /** Initial selected node IDs for uncontrolled usage. Defaults to []. */
-  defaultSelectedIds?: string[];
+    /** Initial selected node IDs for uncontrolled usage. Defaults to []. */
+    defaultSelectedIds?: string[];
 
-  /** Selected node IDs for controlled usage. */
-  selectedIds?: string[];
+    /** Selected node IDs for controlled usage. */
+    selectedIds?: string[];
 
-  /** Called with the next selected node IDs. */
-  onSelectionChange?: (selectedIds: string[]) => void;
+    /** Called with the next selected node IDs. */
+    onSelectionChange?: (selectedIds: string[]) => void;
 
-  /** Initial roving-focus target. Defaults to the first selected node, then the first root node. */
-  defaultFocusedId?: string;
+    /** Initial roving-focus target. Defaults to the first selected node, then the first root node. */
+    defaultFocusedId?: string;
 
-  /** Called when keyboard or pointer interaction moves focus to another node. */
-  onFocusedChange?: (focusedId: string) => void;
+    /** Called when keyboard or pointer interaction moves focus to another node. */
+    onFocusedChange?: (focusedId: string) => void;
 
-  /** Loads the children of a node marked with hasChildren when it is first expanded. */
-  loadChildren?: (
-    item: TreeViewItem<TData>,
-  ) => Promise<TreeViewItem<TData>[]>;
+    /** Loads the children of a node marked with hasChildren when it is first expanded. */
+    loadChildren?: (
+      item: TreeViewItem<TData>,
+    ) => Promise<TreeViewItem<TData>[]>;
 
-  /** Called when lazy loading fails. Re-collapse and re-expand the node to retry. */
-  onLoadChildrenError?: (item: TreeViewItem<TData>, error: unknown) => void;
+    /** Called when lazy loading fails. Re-collapse and re-expand the node to retry. */
+    onLoadChildrenError?: (item: TreeViewItem<TData>, error: unknown) => void;
 
-  /** Called when a node is activated with Enter. */
-  onItemActivate?: (item: TreeViewItem<TData>) => void;
+    /** Called when a node is activated with Enter. */
+    onItemActivate?: (item: TreeViewItem<TData>) => void;
 
-  /** Custom node-icon renderer. */
-  renderIcon?: (
-    item: TreeViewItem<TData>,
-    state: TreeViewItemState,
-  ) => ReactNode;
+    /** Custom node renderer. */
+    renderItem?: (
+      item: TreeViewItem<TData>,
+      state: TreeViewItemState,
+    ) => ReactNode;
 
-  /** Custom label renderer. Keep its contents non-interactive. */
-  renderLabel?: (
-    item: TreeViewItem<TData>,
-    state: TreeViewItemState,
-  ) => ReactNode;
+    /** Custom node-icon renderer. */
+    renderIcon?: (
+      item: TreeViewItem<TData>,
+      state: TreeViewItemState,
+    ) => ReactNode;
 
-  /** Clicking the label of a branch toggles it instead of selecting it. Defaults to false. */
-  expandOnItemClick?: boolean;
+    /** Custom label renderer. Keep its contents non-interactive. */
+    renderLabel?: (
+      item: TreeViewItem<TData>,
+      state: TreeViewItemState,
+    ) => ReactNode;
 
-  /** Visual density. Defaults to md. */
-  size?: TreeViewSize;
+    /** Clicking the label of a branch toggles it instead of selecting it. Defaults to false. */
+    expandOnItemClick?: boolean;
 
-  /** Indentation between hierarchy levels, in CSS units. Defaults to the theme spacing token. */
-  indentation?: string | number;
+    /** Visual density. Defaults to md. */
+    size?: TreeViewSize;
 
-  /** Enables character-based typeahead navigation. Defaults to true. */
-  typeahead?: boolean;
+    /** Indentation between hierarchy levels, in CSS units. Defaults to the theme spacing token. */
+    indentation?: string | number;
 
-  /** Text announced and displayed while lazy children are loading. */
-  loadingLabel?: string;
+    /** Enables character-based typeahead navigation. Defaults to true. */
+    typeahead?: boolean;
 
-  /** Text displayed when lazy loading fails. */
-  loadErrorLabel?: string;
+    /** Text announced and displayed while lazy children are loading. */
+    loadingLabel?: string;
 
-  /** Class applied to each tree item. */
-  itemClassName?: string;
-};
+    /** Text displayed when lazy loading fails. */
+    loadErrorLabel?: string;
+
+    /** Class applied to each tree item. */
+    itemClassName?: string;
+  };
 
 const normalizeIds = (ids: string[] | undefined) =>
   Array.from(
     new Set(
-      (ids ?? []).filter(
-        (id) => typeof id === "string" && id.length > 0,
-      ),
+      (ids ?? []).filter((id) => typeof id === "string" && id.length > 0),
     ),
   );
 
@@ -166,7 +171,10 @@ const getTextValue = <TData,>(item: TreeViewItem<TData>) => {
 };
 
 const normalizeSearchText = (value: string) =>
-  value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase();
+  value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase();
 
 const TreeView = <TData,>({
   items,
@@ -206,12 +214,13 @@ const TreeView = <TData,>({
   const [uncontrolledSelectedIds, setUncontrolledSelectedIds] = useState(() =>
     normalizeIds(defaultSelectedIds),
   );
-  const [focusedId, setFocusedId] = useState<string | undefined>(() =>
-    defaultFocusedId ??
-    (selectionMode === "none"
-      ? undefined
-      : normalizeIds(selectedIds ?? defaultSelectedIds)[0]) ??
-    items[0]?.id,
+  const [focusedId, setFocusedId] = useState<string | undefined>(
+    () =>
+      defaultFocusedId ??
+      (selectionMode === "none"
+        ? undefined
+        : normalizeIds(selectedIds ?? defaultSelectedIds)[0]) ??
+      items[0]?.id,
   );
 
   const [loadedChildren, setLoadedChildren] = useState<
@@ -360,8 +369,10 @@ const TreeView = <TData,>({
 
   const loadNodeChildren = useCallback(
     async (item: TreeViewItem<TData>) => {
-      if (!loadChildren || !item.hasChildren || item.children !== undefined) return;
-      if (loadedChildren.has(item.id) || inFlightLoads.current.has(item.id)) return;
+      if (!loadChildren || !item.hasChildren || item.children !== undefined)
+        return;
+      if (loadedChildren.has(item.id) || inFlightLoads.current.has(item.id))
+        return;
 
       inFlightLoads.current.add(item.id);
       setLoadingIds((current) => [...current, item.id]);
@@ -397,7 +408,9 @@ const TreeView = <TData,>({
   // Tracking newly expanded IDs avoids retrying a failed request on unrelated renders.
   useEffect(() => {
     const previous = new Set(previousExpandedIds.current ?? []);
-    const newlyExpandedIds = currentExpandedIds.filter((id) => !previous.has(id));
+    const newlyExpandedIds = currentExpandedIds.filter(
+      (id) => !previous.has(id),
+    );
 
     previousExpandedIds.current = normalizeIds(currentExpandedIds);
 
@@ -432,7 +445,10 @@ const TreeView = <TData,>({
     }
 
     if (selectionMode === "single") {
-      if (currentSelectedIds.length === 1 && currentSelectedIds[0] === item.id) {
+      if (
+        currentSelectedIds.length === 1 &&
+        currentSelectedIds[0] === item.id
+      ) {
         if (toggleSingle) commitSelectedIds([]);
         return;
       }
@@ -466,7 +482,9 @@ const TreeView = <TData,>({
 
   const expandSiblings = (itemId: string) => {
     const parentId = parentIds.get(itemId);
-    const parentItem = parentId ? findItemById(items, parentId, getChildren) : undefined;
+    const parentItem = parentId
+      ? findItemById(items, parentId, getChildren)
+      : undefined;
     const siblings = parentItem ? getChildren(parentItem) : items;
     const next = new Set(currentExpandedIds);
     let changed = false;
@@ -489,7 +507,8 @@ const TreeView = <TData,>({
   ) => {
     const eventTarget = event.target as HTMLElement;
 
-    if (eventTarget.closest('[role="treeitem"]') !== event.currentTarget) return;
+    if (eventTarget.closest('[role="treeitem"]') !== event.currentTarget)
+      return;
 
     if (
       eventTarget.closest(
@@ -499,9 +518,14 @@ const TreeView = <TData,>({
       return;
     }
 
-    const index = visibleItems.findIndex((visibleItem) => visibleItem.id === item.id);
-    const inheritedDirection = event.currentTarget.closest("[dir]")?.getAttribute("dir");
-    const isRtl = dir === "rtl" || (dir === undefined && inheritedDirection === "rtl");
+    const index = visibleItems.findIndex(
+      (visibleItem) => visibleItem.id === item.id,
+    );
+    const inheritedDirection = event.currentTarget
+      .closest("[dir]")
+      ?.getAttribute("dir");
+    const isRtl =
+      dir === "rtl" || (dir === undefined && inheritedDirection === "rtl");
     const openKey = isRtl ? "ArrowLeft" : "ArrowRight";
     const closeKey = isRtl ? "ArrowRight" : "ArrowLeft";
     let handled = false;
@@ -570,7 +594,9 @@ const TreeView = <TData,>({
           const normalizedKey = normalizeSearchText(event.key);
           const isRepeatedCharacter =
             normalizedPrevious.length > 0 &&
-            [...normalizedPrevious].every((character) => character === normalizedKey);
+            [...normalizedPrevious].every(
+              (character) => character === normalizedKey,
+            );
           const searchValue = isRepeatedCharacter
             ? event.key
             : `${previousValue}${event.key}`;
@@ -634,7 +660,10 @@ const TreeView = <TData,>({
 
     focusItem(item.id);
 
-    if (hasChildren(item) && (target.closest("[data-tree-toggle]") || expandOnItemClick)) {
+    if (
+      hasChildren(item) &&
+      (target.closest("[data-tree-toggle]") || expandOnItemClick)
+    ) {
       toggleExpanded(item);
       return;
     }
@@ -717,23 +746,19 @@ const TreeView = <TData,>({
             ) : (
               <span className="puzzle-tree__toggle-spacer" aria-hidden="true" />
             )}
-
             {iconContent != null && (
               <span className="puzzle-tree__icon" aria-hidden="true">
                 {iconContent}
               </span>
             )}
-
             <span className="puzzle-tree__label">
               {renderLabel ? renderLabel(item, itemState) : item.label}
             </span>
-
             {item.endAdornment != null && (
               <span className="puzzle-tree__adornment">
                 {item.endAdornment}
               </span>
             )}
-
           </div>
 
           {itemHasChildren && expanded && (
@@ -743,7 +768,9 @@ const TreeView = <TData,>({
                   role="none"
                   className={cn(
                     "puzzle-tree__status-row",
-                    hasLoadError && !loading && "puzzle-tree__status-row--error",
+                    hasLoadError &&
+                      !loading &&
+                      "puzzle-tree__status-row--error",
                   )}
                 >
                   <span role="status" aria-live="polite">

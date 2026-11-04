@@ -1,0 +1,35 @@
+.puzzle-link {
+    color: var(--puzzle-color-primary, #2563eb);
+
+    text-decoration-line: underline;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: max(1px, 0.06em);
+    text-underline-offset: 0.16em;
+    text-decoration-skip-ink: auto;
+
+    cursor: pointer;
+
+    transition:
+        color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        text-decoration-thickness var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+.puzzle-link:hover {
+    text-decoration-thickness: max(2px, 0.09em);
+}
+
+.puzzle-link:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring, currentColor);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.puzzle-link:active {
+    opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-link {
+        transition: none;
+    }
+}

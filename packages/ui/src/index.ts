@@ -226,6 +226,8 @@ export {
   type CarouselContextValue,
 } from "./components/navigation/carousel/controller";
 
+export { Link, type LinkProps } from "./components/navigation/link";
+
 export {
   Tabs,
   TabsTab,

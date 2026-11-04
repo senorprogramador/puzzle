@@ -1,4 +1,5 @@
 export { createGoogleFontUrl, GoogleFont } from "./fonts";
+
 export type {
   FontRole,
   FontStyle,
@@ -19,3 +20,9 @@ export type {
   ThemeTokenOverrides,
   ThemeColorSchemeTokens,
 } from "./types";
+
+export type {
+  ThemeComponents,
+  ThemeLinkComponent,
+  ThemeLinkComponentConfig,
+} from "./components.types";

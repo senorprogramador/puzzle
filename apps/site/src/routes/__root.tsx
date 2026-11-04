@@ -10,6 +10,7 @@ import { Theme } from "@puzzle/theme";
 import { PageLayout } from "@puzzle/ui/components/layout/page-layout";
 import { AppBar } from "@puzzle/ui/components/layout/app-bar";
 import { Sidebar } from "@/components/layout/sidebar";
+import { TanStackLink } from "./components/navigation/link/link";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -91,6 +92,12 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             accent: {
               family: "Geist",
               weights: [400, 500],
+            },
+          }}
+          components={{
+            link: {
+              component: TanStackLink,
+              hrefProp: "to",
             },
           }}
         >

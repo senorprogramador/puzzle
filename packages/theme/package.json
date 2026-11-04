@@ -13,6 +13,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
+    },
+    "./components-context": {
+      "types": "./dist/components-context.d.ts",
+      "import": "./dist/components-context.js",
+      "require": "./dist/components-context.cjs"
     }
   },
   "files": [
