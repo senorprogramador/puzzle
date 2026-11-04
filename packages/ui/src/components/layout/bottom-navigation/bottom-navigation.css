@@ -8,8 +8,6 @@
 
     color: var(--puzzle-color-text);
     background: var(--puzzle-color-surface);
-
-    border-top: 1px solid var(--puzzle-color-border);
 }
 
 .puzzle-bottom-navigation__track {
@@ -21,6 +19,10 @@
     min-width: 0;
 
     gap: var(--puzzle-space-2, 0.5rem);
+
+    padding: var(--puzzle-space-2, 0.5rem);
+
+    box-sizing: border-box;
 
     overflow-x: auto;
     overflow-y: hidden;
@@ -48,9 +50,15 @@
     border-radius: var(--puzzle-radius-full, 999px);
 }
 
+/* Items */
+
 .puzzle-bottom-navigation-item {
     display: flex;
     flex: 1 0 auto;
+
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+
     align-items: center;
     justify-content: center;
 
@@ -58,6 +66,7 @@
     min-height: 3.5rem;
 
     box-sizing: border-box;
+
     padding: var(--puzzle-space-1, 0.25rem);
 
     border: 0;
@@ -68,6 +77,7 @@
 
     font: inherit;
     text-decoration: none;
+
     cursor: pointer;
 
     scroll-snap-align: center;
@@ -88,17 +98,14 @@
     color: var(--puzzle-color-primary, var(--puzzle-color-text));
 }
 
-.puzzle-bottom-navigation-item__content {
-    width: 100%;
-    min-width: 0;
-}
+/* Icon */
 
 .puzzle-bottom-navigation-item__icon {
     display: inline-flex;
+    flex: 0 0 auto;
+
     align-items: center;
     justify-content: center;
-
-    flex: 0 0 auto;
 
     width: 1.5rem;
     height: 1.5rem;
@@ -108,6 +115,8 @@
     max-width: 100%;
     max-height: 100%;
 }
+
+/* Label */
 
 .puzzle-bottom-navigation-item__label {
     display: block;

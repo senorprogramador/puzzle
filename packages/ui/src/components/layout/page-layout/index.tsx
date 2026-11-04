@@ -1,58 +1,29 @@
-import { cloneElement } from "react";
-import type {
-  ReactElement,
-  ReactNode,
-  HTMLAttributes,
-  CSSProperties,
+import {
+  Children,
+  isValidElement,
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactElement,
+  type ReactNode,
 } from "react";
 import { resolveResponsiveValue, type ResponsiveValue } from "@puzzle/core";
+
 import "./page-layout.css";
 
 type CSSSize = string | number;
-
 type SidebarPlacement = "beside" | "below";
 
-type PageLayoutElement = ReactElement<{
-  className?: string;
-}>;
-
-type PageLayoutElementProps = HTMLAttributes<HTMLElement>;
+type RegionProps = HTMLAttributes<HTMLElement> & {
+  children?: ReactNode;
+};
 
 type PageLayoutProps = {
-  /**
-   * Page regions.
-   */
-  header?: ReactNode;
-  leftSidebar?: PageLayoutElement;
   children: ReactNode;
-  rightSidebar?: PageLayoutElement;
-  footer?: PageLayoutElement;
 
-  /**
-   * Accessible names for sidebar elements.
-   */
-  leftSidebarLabel?: string;
-  rightSidebarLabel?: string;
-
-  /**
-   * Attributes for individual page regions.
-   */
-  leftSidebarProps?: PageLayoutElementProps;
-  mainProps?: PageLayoutElementProps;
-  rightSidebarProps?: PageLayoutElementProps;
-  footerProps?: PageLayoutElementProps;
-
-  /**
-   * Styling.
-   */
   className?: string;
   contentClassName?: string;
-  mainClassName?: string;
   style?: CSSProperties;
 
-  /**
-   * Layout configuration.
-   */
   maxWidth?: CSSSize;
   gap?: CSSSize;
   rowGap?: CSSSize;
@@ -61,13 +32,13 @@ type PageLayoutProps = {
   contentPaddingBlock?: CSSSize;
   minHeight?: CSSSize;
 
-  /**
-   * Sidebar positioning.
-   *
-   * Defaults to below on mobile/tablet
-   * and beside on desktop.
-   */
   sidebarPlacement?: ResponsiveValue<SidebarPlacement>;
+};
+
+type RegionType = "header" | "main" | "leftSidebar" | "rightSidebar" | "footer";
+
+type PageLayoutRegion = ReactElement<RegionProps> & {
+  type: RegionType;
 };
 
 const cx = (...values: Array<string | undefined | false>): string =>
@@ -80,45 +51,25 @@ const toCSSSize = (value: CSSSize | undefined): string | undefined =>
       ? `${value}px`
       : value;
 
-const hasContent = (value: ReactNode): boolean =>
-  value !== undefined && value !== null && value !== false;
+const createRegion = (type: RegionType) => {
+  const Region = (_props: RegionProps) => null;
 
-/**
- * Adds layout classes and optional HTML attributes
- * to an existing React element.
- *
- * The original className is always preserved.
- */
-const withClassName = <P extends { className?: string }>(
-  element: ReactElement<P>,
-  className: string,
-  props?: PageLayoutElementProps,
-): ReactElement<P> =>
-  cloneElement(element, {
-    ...props,
-    className: cx(element.props.className, className, props?.className),
-  } as Partial<P>);
+  Region.displayName = `PageLayout.${type}`;
 
-const PageLayout = ({
-  header,
-  leftSidebar,
+  return Object.assign(Region, { regionType: type });
+};
+
+const Header = createRegion("header");
+const Main = createRegion("main");
+const LeftSidebar = createRegion("leftSidebar");
+const RightSidebar = createRegion("rightSidebar");
+const Footer = createRegion("footer");
+
+const PageLayoutBase = ({
   children,
-  rightSidebar,
-  footer,
-
-  leftSidebarLabel,
-  rightSidebarLabel,
-
-  leftSidebarProps,
-  mainProps,
-  rightSidebarProps,
-  footerProps,
-
   className,
   contentClassName,
-  mainClassName,
   style,
-
   maxWidth,
   gap,
   rowGap,
@@ -126,7 +77,6 @@ const PageLayout = ({
   contentPaddingInline,
   contentPaddingBlock,
   minHeight,
-
   sidebarPlacement,
 }: PageLayoutProps) => {
   const placement = resolveResponsiveValue<SidebarPlacement>(
@@ -136,6 +86,49 @@ const PageLayout = ({
       desktop: "beside",
     },
   );
+
+  const regions: Partial<Record<RegionType, ReactElement<RegionProps>>> = {};
+
+  Children.forEach(children, (child) => {
+    if (!isValidElement(child)) {
+      return;
+    }
+
+    const type = child.type as typeof Header;
+
+    if (type.regionType) {
+      regions[type.regionType] = child as ReactElement<RegionProps>;
+    }
+  });
+
+  const renderRegion = (
+    region: ReactElement<RegionProps> | undefined,
+    className: string,
+    tag: "header" | "main" | "aside" | "footer",
+    ariaLabel?: string,
+  ) => {
+    if (!region) {
+      return null;
+    }
+
+    const {
+      children: content,
+      className: regionClassName,
+      ...props
+    } = region.props;
+
+    const Component = tag;
+
+    return (
+      <Component
+        {...props}
+        className={cx(className, regionClassName)}
+        aria-label={ariaLabel ?? props["aria-label"]}
+      >
+        {content}
+      </Component>
+    );
+  };
 
   const layoutStyle = {
     "--puzzle-page-max-width": toCSSSize(maxWidth),
@@ -148,36 +141,6 @@ const PageLayout = ({
     ...style,
   } as CSSProperties;
 
-  const leftSidebarNode = leftSidebar
-    ? withClassName(
-        leftSidebar,
-        "puzzle-page-layout__sidebar puzzle-page-layout__sidebar--left",
-        {
-          ...leftSidebarProps,
-          ...(leftSidebarLabel !== undefined
-            ? { "aria-label": leftSidebarLabel }
-            : {}),
-        },
-      )
-    : null;
-
-  const rightSidebarNode = rightSidebar
-    ? withClassName(
-        rightSidebar,
-        "puzzle-page-layout__sidebar puzzle-page-layout__sidebar--right",
-        {
-          ...rightSidebarProps,
-          ...(rightSidebarLabel !== undefined
-            ? { "aria-label": rightSidebarLabel }
-            : {}),
-        },
-      )
-    : null;
-
-  const footerNode = footer
-    ? withClassName(footer, "puzzle-page-layout__footer", footerProps)
-    : null;
-
   return (
     <div
       className={cx("puzzle-page-layout", className)}
@@ -187,28 +150,43 @@ const PageLayout = ({
       data-sidebar-placement-tablet={placement.tablet}
       data-sidebar-placement-desktop={placement.desktop}
     >
-      {hasContent(header) && header}
+      {renderRegion(regions.header, "puzzle-page-layout__header", "header")}
 
       <div className={cx("puzzle-page-layout__content", contentClassName)}>
-        <main
-          {...mainProps}
-          className={cx(
-            "puzzle-page-layout__main",
-            mainClassName,
-            mainProps?.className,
-          )}
-        >
-          {children}
-        </main>
+        {renderRegion(regions.main, "puzzle-page-layout__main", "main")}
 
-        {leftSidebarNode}
+        {renderRegion(
+          regions.leftSidebar,
+          "puzzle-page-layout__sidebar puzzle-page-layout__sidebar--left",
+          "aside",
+        )}
 
-        {rightSidebarNode}
+        {renderRegion(
+          regions.rightSidebar,
+          "puzzle-page-layout__sidebar puzzle-page-layout__sidebar--right",
+          "aside",
+        )}
       </div>
 
-      {footerNode}
+      {renderRegion(regions.footer, "puzzle-page-layout__footer", "footer")}
     </div>
   );
 };
+
+type PageLayoutComponent = ((props: PageLayoutProps) => ReactElement) & {
+  Header: typeof Header;
+  Main: typeof Main;
+  LeftSidebar: typeof LeftSidebar;
+  RightSidebar: typeof RightSidebar;
+  Footer: typeof Footer;
+};
+
+const PageLayout = Object.assign(PageLayoutBase, {
+  Header,
+  Main,
+  LeftSidebar,
+  RightSidebar,
+  Footer,
+}) as PageLayoutComponent;
 
 export { PageLayout, type PageLayoutProps, type SidebarPlacement };

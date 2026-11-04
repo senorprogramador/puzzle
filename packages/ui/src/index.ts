@@ -163,6 +163,8 @@ export {
   CollapsableSidebar,
   type CollapsableSidebarProps,
   type CollapsableSidebarItem,
+  type CollapsableSidebarGroup,
+  type CollapsableSidebarEntry,
   type CollapsableSidebarExpansion,
   type SidebarItemBase,
   type WithLink,
@@ -231,6 +233,15 @@ export {
   type TabsTabProps,
   type TabsPosition,
 } from "./components/navigation/tabs";
+
+export {
+  TreeView,
+  type TreeViewProps,
+  type TreeViewItem,
+  type TreeViewItemState,
+  type TreeViewSelectionMode,
+  type TreeViewSize,
+} from "./components/navigation/tree-view";
 
 // #endregion Navigation
 

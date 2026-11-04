@@ -7,6 +7,9 @@ import {
 } from "@tanstack/react-router";
 import appCss from "../styles/app.css?url";
 import { Theme } from "@puzzle/theme";
+import { PageLayout } from "@puzzle/ui/components/layout/page-layout";
+import { AppBar } from "@puzzle/ui/components/layout/app-bar";
+import { Sidebar } from "@/components/layout/sidebar";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -95,7 +98,32 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         </Theme>
       </head>
       <body>
-        {children}
+        <PageLayout>
+          <PageLayout.Header>
+            <AppBar
+              logo={
+                <img
+                  src="/favicon.svg"
+                  width="48"
+                  height="48"
+                  alt="Logo"
+                  className="h-12 w-12"
+                />
+              }
+              title="Puzzle"
+              navigationItems={[
+                { label: "Home", href: "/", current: true },
+                { label: "Components", href: "/components" },
+                { label: "Docs", href: "/docs" },
+              ]}
+              sticky
+            />
+          </PageLayout.Header>
+          <PageLayout.LeftSidebar>
+            <Sidebar />
+          </PageLayout.LeftSidebar>
+          <PageLayout.Main>{children}</PageLayout.Main>
+        </PageLayout>
         <Scripts />
       </body>
     </html>

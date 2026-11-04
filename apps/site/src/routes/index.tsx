@@ -20,7 +20,6 @@ import {
   SectionStack,
   Select,
   type SelectOption,
-  Sidebar,
   Skeleton,
   Stack,
   Stepper,
@@ -44,6 +43,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CollapsableSidebar,
+  CollapsableSidebarEntry,
 } from "@puzzle/ui";
 import { DialogSection } from "@/components/dialog-section";
 import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
@@ -110,6 +111,39 @@ const accordionItems = [
   },
 ];
 
+const collapsableSidebarItems: CollapsableSidebarEntry[] = [
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: <Icon name="ant-design:home-filled" size={24} />,
+    href: "/dashboard",
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    icon: <Icon name="ant-design:setting-filled" size={24} />,
+    href: "/settings",
+  },
+  {
+    id: "management",
+    label: "Management",
+    items: [
+      {
+        id: "users",
+        icon: <Icon name="ant-design:user-outlined" size={24} />,
+        label: "Users",
+        href: "/users",
+      },
+      {
+        id: "analytics",
+        icon: <Icon name="ant-design:bar-chart-outlined" size={24} />,
+        label: "Analytics",
+        href: "/analytics",
+      },
+    ],
+  },
+];
+
 function Home() {
   const [accepted, setAccepted] = useState(false);
   const [document, setDocument] = useState<TextDocument>({
@@ -137,508 +171,476 @@ function Home() {
   const [activeStep, setActiveStep] = useState(0);
 
   return (
-    <PageLayout
-      header={
-        <AppBar
-          logo={
-            <img
-              src="/favicon.svg"
-              width="48"
-              height="48"
-              alt="Logo"
-              className="h-12 w-12"
-            />
-          }
-          title="Puzzle"
-          navigationItems={[
-            { label: "Home", href: "/", current: true },
-            { label: "Components", href: "/components" },
-            { label: "Docs", href: "/docs" },
-          ]}
-          trailingComponents={
-            <>
-              <Button variant="ghost">Settings</Button>
-              <Avatar alt="Sjoerd van den Berg" />
-            </>
-          }
-          sticky
-        />
-      }
-      leftSidebar={
-        <Sidebar>
-          <p>Sidebar content</p>
-        </Sidebar>
-      }
-    >
-      <SectionStack divideY>
-        <Section>
-          <Preview defaultDevice="mobile">
+    <SectionStack divideY>
+      <Section>
+        <Preview defaultDevice="desktop">
+          <PageLayout
+            leftSidebar={
+              <CollapsableSidebar
+                items={collapsableSidebarItems}
+                expand="over"
+                defaultCollapsed
+              />
+            }
+          >
             <Section>
-              <Label htmlFor="email" required>
-                Email address
-              </Label>
-
-              <TextInput
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-              />
-
-              <Label htmlFor="password">Password</Label>
-
-              <TextInput
-                id="password"
-                type="password"
-                placeholder="Your password"
-              />
-
-              <Label htmlFor="description">Description</Label>
-
-              <TextAreaInput
-                id="description"
-                placeholder="Write something..."
-              />
-
-              <Label htmlFor="quantity">Quantity</Label>
-
-              <NumberInput
-                id="quantity"
-                initialValue={1.25}
-                min={0}
-                max={10}
-                step={0.25}
-                fractionDigits={2}
-              />
+              <p>Normal content goes here.</p>
             </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Select
-                label="Country"
-                options={[
-                  { value: "nl", label: "Netherlands" },
-                  { value: "es", label: "Spain" },
-                  { value: "de", label: "Germany" },
-                ]}
-                placeholder="Select a country"
-              />
+          </PageLayout>
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Label htmlFor="email" required>
+              Email address
+            </Label>
 
-              <Select
-                label="Technologies"
-                multiple
-                options={[
-                  { value: "react", label: "React" },
-                  { value: "next", label: "Next.js" },
-                  { value: "solid", label: "SolidJS" },
-                  { value: "vue", label: "Vue" },
-                ]}
-                placeholder="Choose technologies"
-                maxSelected={3}
-              />
+            <TextInput id="email" type="email" placeholder="you@example.com" />
 
-              <Select
-                label="Employees"
-                options={[
-                  {
-                    value: "sjoerd",
-                    label: "Sjoerd van den Berg",
-                    description: "Senior Software Engineer",
-                    group: "Engineering",
-                  },
-                  {
-                    value: "anouk",
-                    label: "Anouk",
-                    description: "Business Owner",
-                    group: "Management",
-                  },
-                ]}
-              />
+            <Label htmlFor="password">Password</Label>
 
-              <Select
-                multiple
-                label="Team members"
-                maxSelected={3}
-                options={[
-                  {
-                    value: "sjoerd",
-                    label: "Sjoerd van den Berg",
-                    description: "Senior Software Engineer",
-                    group: "Engineering",
-                  },
-                  {
-                    value: "anouk",
-                    label: "Anouk",
-                    description: "Business Owner",
-                    group: "Management",
-                  },
-                ]}
-                renderValue={(selected) => (
-                  <span>
-                    {(selected as readonly SelectOption[]).length} employees
-                    selected
-                  </span>
-                )}
-                renderOption={(option, { selected }) => (
-                  <div className={selected ? "bg-blue-100" : ""}>
-                    {option.label}
+            <TextInput
+              id="password"
+              type="password"
+              placeholder="Your password"
+            />
+
+            <Label htmlFor="description">Description</Label>
+
+            <TextAreaInput id="description" placeholder="Write something..." />
+
+            <Label htmlFor="quantity">Quantity</Label>
+
+            <NumberInput
+              id="quantity"
+              initialValue={1.25}
+              min={0}
+              max={10}
+              step={0.25}
+              fractionDigits={2}
+            />
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Select
+              label="Country"
+              options={[
+                { value: "nl", label: "Netherlands" },
+                { value: "es", label: "Spain" },
+                { value: "de", label: "Germany" },
+              ]}
+              placeholder="Select a country"
+            />
+
+            <Select
+              label="Technologies"
+              multiple
+              options={[
+                { value: "react", label: "React" },
+                { value: "next", label: "Next.js" },
+                { value: "solid", label: "SolidJS" },
+                { value: "vue", label: "Vue" },
+              ]}
+              placeholder="Choose technologies"
+              maxSelected={3}
+            />
+
+            <Select
+              label="Employees"
+              options={[
+                {
+                  value: "sjoerd",
+                  label: "Sjoerd van den Berg",
+                  description: "Senior Software Engineer",
+                  group: "Engineering",
+                },
+                {
+                  value: "anouk",
+                  label: "Anouk",
+                  description: "Business Owner",
+                  group: "Management",
+                },
+              ]}
+            />
+
+            <Select
+              multiple
+              label="Team members"
+              maxSelected={3}
+              options={[
+                {
+                  value: "sjoerd",
+                  label: "Sjoerd van den Berg",
+                  description: "Senior Software Engineer",
+                  group: "Engineering",
+                },
+                {
+                  value: "anouk",
+                  label: "Anouk",
+                  description: "Business Owner",
+                  group: "Management",
+                },
+              ]}
+              renderValue={(selected) => (
+                <span>
+                  {(selected as readonly SelectOption[]).length} employees
+                  selected
+                </span>
+              )}
+              renderOption={(option, { selected }) => (
+                <div className={selected ? "bg-blue-100" : ""}>
+                  {option.label}
+                </div>
+              )}
+            />
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Stepper
+              activeStep={activeStep}
+              onStepChange={setActiveStep}
+              orientation={{
+                mobile: "vertical",
+                tablet: "horizontal",
+                desktop: "horizontal",
+              }}
+              linear={false}
+              clickable
+            >
+              <Stepper.Step label="Account" description="Create your account" />
+              <Stepper.Step
+                label="Details"
+                description="Personal information"
+              />
+              <Stepper.Step
+                label="Confirmation"
+                description="Review your information"
+              />
+            </Stepper>
+            <>
+              {activeStep === 0 && (
+                <Stack>
+                  <Heading level="headline3">Account</Heading>
+                  <Text>Please enter your account information.</Text>
+                  <Button disabled onClick={() => setActiveStep(0)}>
+                    Back
+                  </Button>
+                  <Button onClick={() => setActiveStep(1)}>Next</Button>
+                </Stack>
+              )}
+              {activeStep === 1 && (
+                <Stack>
+                  <Heading level="headline3">Details</Heading>
+                  <Text>Please enter your personal details.</Text>
+                  <Button onClick={() => setActiveStep(0)}>Back</Button>
+                  <Button onClick={() => setActiveStep(2)}>Next</Button>
+                </Stack>
+              )}
+              {activeStep === 2 && (
+                <Stack>
+                  <Heading level="headline3">Confirmation</Heading>
+                  <Text>Please review your information before confirming.</Text>
+                  <Button onClick={() => setActiveStep(1)}>Back</Button>
+                  <Button onClick={() => setActiveStep(3)}>Confirm</Button>
+                </Stack>
+              )}
+              {activeStep === 3 && (
+                <Stack>
+                  <Heading level="headline3">Success</Heading>
+                  <Text>You did it!</Text>
+                  <Button onClick={() => setActiveStep(2)}>Back</Button>
+                  <Button onClick={() => setActiveStep(0)}>Restart</Button>
+                </Stack>
+              )}
+            </>
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Heading level="headline2">Card</Heading>
+            <Card variant="outlined" size="lg">
+              <CardHeader>
+                <CardTitle>Card title</CardTitle>
+                <CardDescription>
+                  A short description of this card.
+                </CardDescription>
+                <CardAction>
+                  <Button variant="ghost" size="sm">
+                    Edit
+                  </Button>
+                </CardAction>
+              </CardHeader>
+
+              <CardContent>
+                <Checkbox
+                  label="I agree to the terms and conditions"
+                  size="sm"
+                  checked={accepted}
+                  onChange={(event) => setAccepted(event.target.checked)}
+                />
+                <Switch defaultChecked label="Dark mode" />
+              </CardContent>
+
+              <CardFooter>
+                <Button>Save changes</Button>
+                <Button variant="outline">Cancel</Button>
+              </CardFooter>
+            </Card>
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Heading level="headline2">Linear Progress</Heading>
+            <LinearProgress />
+          </Section>
+          <Section>
+            <Heading level="headline2">Circular Progress</Heading>
+            <CircularProgress />
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Heading level="headline2">Tabs</Heading>
+            <Tabs tabBarPosition="left">
+              <Tabs.Tab id="tab-1" tab={<div>Tab 1</div>}>
+                <Text>Content for Tab 1</Text>
+                <Text>Lorum ipsum dolor sit amet</Text>
+              </Tabs.Tab>
+              <Tabs.Tab id="tab-2" tab={<div>Tab 2</div>}>
+                <Text>Content for Tab 2</Text>
+              </Tabs.Tab>
+            </Tabs>
+          </Section>
+        </Preview>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Heading level="headline2">Tooltip</Heading>
+            <Stack
+              className="w-full h-64"
+              direction="row"
+              alignV="center"
+              alignH="center"
+            >
+              <Tooltip
+                position="bottom"
+                align="center"
+                action="hover"
+                closable={true}
+                open={isTooltipOpen}
+                trigger={<Button>Hover me</Button>}
+                onOpenChange={setIsTooltipOpen}
+              >
+                <Stack direction="col" gap="sm">
+                  <Text>This is a tooltip</Text>
+                  <Text>And it looks awesome</Text>
+                </Stack>
+              </Tooltip>
+            </Stack>
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <TextEditor
+          value={document}
+          onChange={setDocument}
+          toolbar={<TextEditorToolbar />}
+        />
+        <TextRenderer document={document} />
+      </Section>
+      <DialogSection />
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Heading level="headline2">Bottom Navigation</Heading>
+            <BottomNavigation>
+              <BottomNavigationItem
+                icon={<Icon name="bxs:home" size={24} />}
+                label="Home"
+              />
+              <BottomNavigationItem
+                icon={<Icon name="bxs:package" size={24} />}
+                label="Components"
+              />
+              <BottomNavigationItem
+                icon={<Icon name="bxs:file-blank" size={24} />}
+                label="Docs"
+              />
+            </BottomNavigation>
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Heading level="headline2">Accordion</Heading>
+            <Accordion items={accordionItems} unMountOnClose={true} />
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Heading level="headline2">App Bar</Heading>
+            <AppBar
+              logo={
+                <img
+                  src="/favicon.svg"
+                  width="48"
+                  height="48"
+                  alt="Logo"
+                  className="h-12 w-12"
+                />
+              }
+              title="Puzzle"
+              navigationItems={[
+                { label: "Home", href: "/", current: true },
+                { label: "Components", href: "/components" },
+                { label: "Docs", href: "/docs" },
+              ]}
+              trailingComponents={
+                <>
+                  <Button variant="ghost">Settings</Button>
+                  <Avatar alt="Sjoerd van den Berg" />
+                </>
+              }
+              sticky
+            />
+          </Section>
+          <div className="h-96" />
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Heading level="headline2">Skeleton</Heading>
+            <Skeleton width="75%" height={16} />
+            <Skeleton width="75%" height={16} radius="none" />
+            <Skeleton width="100%" height={180} />
+            <Skeleton width={48} height={48} radius="full" />
+            <Skeleton width={64} height={64} radius="full" />
+            <Skeleton width={120} height={40} radius="full" />
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <Preview defaultDevice="mobile">
+          <Section>
+            <Heading level="headline2">Carousel</Heading>
+            <CarouselController
+              items={Array.from({ length: 10 }, (_, i) => i + 1)}
+            >
+              <Carousel<number>
+                renderItem={(item) => (
+                  <div className="flex items-center justify-center p-4 border border-orange-500 bg-orange-100">
+                    {item}
                   </div>
                 )}
-              />
-            </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Stepper
-                activeStep={activeStep}
-                onStepChange={setActiveStep}
-                orientation={{
-                  mobile: "vertical",
-                  tablet: "horizontal",
-                  desktop: "horizontal",
+                panelsPerView={{
+                  mobile: 1,
+                  tablet: 3,
+                  desktop: 4,
                 }}
-                linear={false}
-                clickable
-              >
-                <Stepper.Step
-                  label="Account"
-                  description="Create your account"
-                />
-                <Stepper.Step
-                  label="Details"
-                  description="Personal information"
-                />
-                <Stepper.Step
-                  label="Confirmation"
-                  description="Review your information"
-                />
-              </Stepper>
-              <>
-                {activeStep === 0 && (
-                  <Stack>
-                    <Heading level="headline3">Account</Heading>
-                    <Text>Please enter your account information.</Text>
-                    <Button disabled onClick={() => setActiveStep(0)}>
-                      Back
-                    </Button>
-                    <Button onClick={() => setActiveStep(1)}>Next</Button>
-                  </Stack>
-                )}
-                {activeStep === 1 && (
-                  <Stack>
-                    <Heading level="headline3">Details</Heading>
-                    <Text>Please enter your personal details.</Text>
-                    <Button onClick={() => setActiveStep(0)}>Back</Button>
-                    <Button onClick={() => setActiveStep(2)}>Next</Button>
-                  </Stack>
-                )}
-                {activeStep === 2 && (
-                  <Stack>
-                    <Heading level="headline3">Confirmation</Heading>
-                    <Text>
-                      Please review your information before confirming.
-                    </Text>
-                    <Button onClick={() => setActiveStep(1)}>Back</Button>
-                    <Button onClick={() => setActiveStep(3)}>Confirm</Button>
-                  </Stack>
-                )}
-                {activeStep === 3 && (
-                  <Stack>
-                    <Heading level="headline3">Success</Heading>
-                    <Text>You did it!</Text>
-                    <Button onClick={() => setActiveStep(2)}>Back</Button>
-                    <Button onClick={() => setActiveStep(0)}>Restart</Button>
-                  </Stack>
-                )}
-              </>
-            </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Heading level="headline2">Card</Heading>
-              <Card variant="outlined" size="lg">
-                <CardHeader>
-                  <CardTitle>Card title</CardTitle>
-                  <CardDescription>
-                    A short description of this card.
-                  </CardDescription>
-                  <CardAction>
-                    <Button variant="ghost" size="sm">
-                      Edit
-                    </Button>
-                  </CardAction>
-                </CardHeader>
-
-                <CardContent>
-                  <Checkbox
-                    label="I agree to the terms and conditions"
-                    size="sm"
-                    checked={accepted}
-                    onChange={(event) => setAccepted(event.target.checked)}
-                  />
-                  <Switch defaultChecked label="Dark mode" />
-                </CardContent>
-
-                <CardFooter>
-                  <Button>Save changes</Button>
-                  <Button variant="outline">Cancel</Button>
-                </CardFooter>
-              </Card>
-            </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Heading level="headline2">Linear Progress</Heading>
-              <LinearProgress />
-            </Section>
-            <Section>
-              <Heading level="headline2">Circular Progress</Heading>
-              <CircularProgress />
-            </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Heading level="headline2">Tabs</Heading>
-              <Tabs tabBarPosition="left">
-                <Tabs.Tab id="tab-1" tab={<div>Tab 1</div>}>
-                  <Text>Content for Tab 1</Text>
-                  <Text>Lorum ipsum dolor sit amet</Text>
-                </Tabs.Tab>
-                <Tabs.Tab id="tab-2" tab={<div>Tab 2</div>}>
-                  <Text>Content for Tab 2</Text>
-                </Tabs.Tab>
-              </Tabs>
-            </Section>
-          </Preview>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Heading level="headline2">Tooltip</Heading>
-              <Stack
-                className="w-full h-64"
-                direction="row"
-                alignV="center"
-                alignH="center"
-              >
-                <Tooltip
-                  position="bottom"
-                  align="center"
-                  action="hover"
-                  closable={true}
-                  open={isTooltipOpen}
-                  trigger={<Button>Hover me</Button>}
-                  onOpenChange={setIsTooltipOpen}
-                >
-                  <Stack direction="col" gap="sm">
-                    <Text>This is a tooltip</Text>
-                    <Text>And it looks awesome</Text>
-                  </Stack>
-                </Tooltip>
-              </Stack>
-            </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <TextEditor
-            value={document}
-            onChange={setDocument}
-            toolbar={<TextEditorToolbar />}
-          />
-          <TextRenderer document={document} />
-        </Section>
-        <DialogSection />
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Heading level="headline2">Bottom Navigation</Heading>
-              <BottomNavigation>
-                <BottomNavigationItem
-                  icon={<Icon name="bxs:home" size={24} />}
-                  label="Home"
-                />
-                <BottomNavigationItem
-                  icon={<Icon name="bxs:package" size={24} />}
-                  label="Components"
-                />
-                <BottomNavigationItem
-                  icon={<Icon name="bxs:file-blank" size={24} />}
-                  label="Docs"
-                />
-              </BottomNavigation>
-            </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Heading level="headline2">Accordion</Heading>
-              <Accordion items={accordionItems} unMountOnClose={true} />
-            </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Heading level="headline2">App Bar</Heading>
-              <AppBar
-                logo={
-                  <img
-                    src="/favicon.svg"
-                    width="48"
-                    height="48"
-                    alt="Logo"
-                    className="h-12 w-12"
-                  />
+                singlePageAlignment="center"
+                buttonAlignment="aside"
+                backButton={
+                  <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
+                    &lt;
+                  </button>
                 }
-                title="Puzzle"
-                navigationItems={[
-                  { label: "Home", href: "/", current: true },
-                  { label: "Components", href: "/components" },
-                  { label: "Docs", href: "/docs" },
-                ]}
-                trailingComponents={
-                  <>
-                    <Button variant="ghost">Settings</Button>
-                    <Avatar alt="Sjoerd van den Berg" />
-                  </>
+                nextButton={
+                  <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
+                    &gt;
+                  </button>
                 }
-                sticky
+                pagerAlignment="under"
+                renderPager={(currentPage, numberOfPages) => (
+                  <Stack
+                    direction="row"
+                    alignH="center"
+                    alignV="center"
+                    gap="sm"
+                    className="mt-2"
+                  >
+                    {Array.from({ length: numberOfPages }).map((_, i) => (
+                      <span
+                        key={i}
+                        className={
+                          i === currentPage ? "font-bold text-2xl my-auto" : ""
+                        }
+                      >
+                        {i === currentPage ? "•" : "○"}
+                      </span>
+                    ))}
+                  </Stack>
+                )}
               />
-            </Section>
-            <div className="h-96" />
-          </Preview>
-        </Section>
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Heading level="headline2">Skeleton</Heading>
-              <Skeleton width="75%" height={16} />
-              <Skeleton width="75%" height={16} radius="none" />
-              <Skeleton width="100%" height={180} />
-              <Skeleton width={48} height={48} radius="full" />
-              <Skeleton width={64} height={64} radius="full" />
-              <Skeleton width={120} height={40} radius="full" />
-            </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <Preview defaultDevice="mobile">
-            <Section>
-              <Heading level="headline2">Carousel</Heading>
-              <CarouselController
-                items={Array.from({ length: 10 }, (_, i) => i + 1)}
-              >
-                <Carousel<number>
-                  renderItem={(item) => (
-                    <div className="flex items-center justify-center p-4 border border-orange-500 bg-orange-100">
-                      {item}
-                    </div>
-                  )}
-                  panelsPerView={{
-                    mobile: 1,
-                    tablet: 3,
-                    desktop: 4,
-                  }}
-                  singlePageAlignment="center"
-                  buttonAlignment="aside"
-                  backButton={
-                    <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
-                      &lt;
-                    </button>
-                  }
-                  nextButton={
-                    <button className="disabled:opacity-50 select-none disabled:pointer-events-none w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-full">
-                      &gt;
-                    </button>
-                  }
-                  pagerAlignment="under"
-                  renderPager={(currentPage, numberOfPages) => (
-                    <Stack
-                      direction="row"
-                      alignH="center"
-                      alignV="center"
-                      gap="sm"
-                      className="mt-2"
-                    >
-                      {Array.from({ length: numberOfPages }).map((_, i) => (
-                        <span
-                          key={i}
-                          className={
-                            i === currentPage
-                              ? "font-bold text-2xl my-auto"
-                              : ""
-                          }
-                        >
-                          {i === currentPage ? "•" : "○"}
-                        </span>
-                      ))}
-                    </Stack>
-                  )}
-                />
-              </CarouselController>
-            </Section>
-          </Preview>
-        </Section>
-        <Section>
-          <Stack
-            as="ul"
-            direction="row"
-            alignH="center"
-            alignV="center"
-            divider={<li role="separator">-</li>}
-          >
-            <li>A</li>
-            <li>B</li>
-            <li>C</li>
-            <li>D</li>
-          </Stack>
-          <Heading level="headline2">What is Puzzle?</Heading>
-          <Text>
-            Puzzle is a modern React UI framework designed to help developers
-            build accessible, responsive, and visually appealing user interfaces
-            with ease. It is open source and provides a set of reusable
-            components, theming capabilities, and a focus on developer
-            experience.
-          </Text>
-        </Section>
-        <Section>
-          <Heading level="headline2">Why another UI framework?</Heading>
-          <Text>
-            While there are many React UI frameworks available, Puzzle aims to
-            provide a complete and developer-friendly solution. It focuses on
-            ease of use, theming capabilities, and a set of reusable components
-            that help developers build consistent and visually appealing
-            interfaces efficiently.
-          </Text>
-        </Section>
-        <Section>
-          <Heading level="headline2">CSS framework agnostic</Heading>
-          <Text>
-            Puzzle is designed to be CSS framework agnostic, allowing developers
-            to integrate it seamlessly with their preferred CSS solutions. This
-            flexibility ensures that Puzzle can be used in a wide range of
-            projects without imposing specific styling constraints.
-          </Text>
-        </Section>
-        <Section>
-          <Heading level="headline2">Fluid components</Heading>
-          <Text>
-            Puzzle components are designed to be fluid and adaptable, allowing
-            developers to create responsive layouts that work across different
-            screen sizes and devices. This ensures that applications built with
-            Puzzle maintain a consistent and visually appealing design
-            regardless of the user's environment.
-          </Text>
-        </Section>
-      </SectionStack>
-    </PageLayout>
+            </CarouselController>
+          </Section>
+        </Preview>
+      </Section>
+      <Section>
+        <Stack
+          as="ul"
+          direction="row"
+          alignH="center"
+          alignV="center"
+          divider={<li role="separator">-</li>}
+        >
+          <li>A</li>
+          <li>B</li>
+          <li>C</li>
+          <li>D</li>
+        </Stack>
+        <Heading level="headline2">What is Puzzle?</Heading>
+        <Text>
+          Puzzle is a modern React UI framework designed to help developers
+          build accessible, responsive, and visually appealing user interfaces
+          with ease. It is open source and provides a set of reusable
+          components, theming capabilities, and a focus on developer experience.
+        </Text>
+      </Section>
+      <Section>
+        <Heading level="headline2">Why another UI framework?</Heading>
+        <Text>
+          While there are many React UI frameworks available, Puzzle aims to
+          provide a complete and developer-friendly solution. It focuses on ease
+          of use, theming capabilities, and a set of reusable components that
+          help developers build consistent and visually appealing interfaces
+          efficiently.
+        </Text>
+      </Section>
+      <Section>
+        <Heading level="headline2">CSS framework agnostic</Heading>
+        <Text>
+          Puzzle is designed to be CSS framework agnostic, allowing developers
+          to integrate it seamlessly with their preferred CSS solutions. This
+          flexibility ensures that Puzzle can be used in a wide range of
+          projects without imposing specific styling constraints.
+        </Text>
+      </Section>
+      <Section>
+        <Heading level="headline2">Fluid components</Heading>
+        <Text>
+          Puzzle components are designed to be fluid and adaptable, allowing
+          developers to create responsive layouts that work across different
+          screen sizes and devices. This ensures that applications built with
+          Puzzle maintain a consistent and visually appealing design regardless
+          of the user's environment.
+        </Text>
+      </Section>
+    </SectionStack>
   );
 }

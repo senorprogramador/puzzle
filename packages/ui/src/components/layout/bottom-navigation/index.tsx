@@ -6,12 +6,11 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "@puzzle/core";
-import { Stack } from "../stack";
 import "./bottom-navigation.css";
 
 type BottomNavigationItemProps = {
   icon: ReactNode;
-  label?: string;
+  label: string;
   href?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   active?: boolean;
@@ -35,21 +34,13 @@ const BottomNavigationItem = ({
   );
 
   const content = (
-    <Stack
-      direction="col"
-      alignH="center"
-      alignV="center"
-      gap="xs"
-      className="puzzle-bottom-navigation-item__content"
-    >
+    <>
       <span className="puzzle-bottom-navigation-item__icon" aria-hidden="true">
         {icon}
       </span>
 
-      {label && (
-        <span className="puzzle-bottom-navigation-item__label">{label}</span>
-      )}
-    </Stack>
+      <span className="puzzle-bottom-navigation-item__label">{label}</span>
+    </>
   );
 
   if (href !== undefined) {
@@ -58,6 +49,7 @@ const BottomNavigationItem = ({
         href={href}
         className={classes}
         style={style}
+        aria-label={label}
         aria-current={active ? "page" : undefined}
         data-active={active || undefined}
       >
@@ -72,7 +64,8 @@ const BottomNavigationItem = ({
       className={classes}
       style={style}
       onClick={onClick}
-      aria-pressed={active}
+      aria-label={label}
+      aria-current={active ? "page" : undefined}
       data-active={active || undefined}
     >
       {content}

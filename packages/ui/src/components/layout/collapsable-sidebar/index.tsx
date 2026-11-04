@@ -2,6 +2,7 @@
 
 import { cn } from "@puzzle/core";
 import {
+  useId,
   useState,
   type CSSProperties,
   type MouseEventHandler,
@@ -29,10 +30,18 @@ type WithClickHandler = {
 
 type CollapsableSidebarItem = SidebarItemBase & (WithLink | WithClickHandler);
 
+type CollapsableSidebarGroup = {
+  id: string;
+  label?: string;
+  items: CollapsableSidebarItem[];
+};
+
+type CollapsableSidebarEntry = CollapsableSidebarItem | CollapsableSidebarGroup;
+
 type CollapsableSidebarExpansion = "inline" | "over";
 
 type CollapsableSidebarProps = {
-  items: CollapsableSidebarItem[];
+  items: CollapsableSidebarEntry[];
   expand?: CollapsableSidebarExpansion;
   collapsed?: boolean;
   defaultCollapsed?: boolean;
@@ -40,6 +49,101 @@ type CollapsableSidebarProps = {
   ariaLabel?: string;
   className?: string;
   style?: CSSProperties;
+};
+
+const isSidebarGroup = (
+  entry: CollapsableSidebarEntry,
+): entry is CollapsableSidebarGroup => "items" in entry;
+
+const getSidebarItems = (
+  entries: CollapsableSidebarEntry[],
+): CollapsableSidebarItem[] =>
+  entries.flatMap((entry) => (isSidebarGroup(entry) ? entry.items : [entry]));
+
+type SidebarItemRendererProps = {
+  item: CollapsableSidebarItem;
+  collapsed: boolean;
+};
+
+const SidebarItemRenderer = ({ item, collapsed }: SidebarItemRendererProps) => {
+  const className = cn(
+    "puzzle-collapsable-sidebar__item",
+    item.active && "active",
+  );
+
+  const content = (
+    <>
+      <span className="puzzle-collapsable-sidebar__icon" aria-hidden="true">
+        {item.icon}
+      </span>
+
+      <span className="puzzle-collapsable-sidebar__label">{item.label}</span>
+    </>
+  );
+
+  if ("href" in item && item.href !== undefined) {
+    return (
+      <a
+        className={className}
+        href={item.href}
+        aria-current={item.active ? "page" : undefined}
+        title={collapsed ? item.label : undefined}
+        data-active={item.active || undefined}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      className={className}
+      onClick={item.onClick}
+      aria-current={item.active ? "page" : undefined}
+      title={collapsed ? item.label : undefined}
+      data-active={item.active || undefined}
+    >
+      {content}
+    </button>
+  );
+};
+
+type SidebarGroupRendererProps = {
+  group: CollapsableSidebarGroup;
+  collapsed: boolean;
+  idPrefix: string;
+};
+
+const SidebarGroupRenderer = ({
+  group,
+  collapsed,
+  idPrefix,
+}: SidebarGroupRendererProps) => {
+  const headingId = `${idPrefix}-${group.id}`;
+
+  return (
+    <section
+      className="puzzle-collapsable-sidebar__group"
+      aria-labelledby={group.label ? headingId : undefined}
+    >
+      {group.label && (
+        <h2 id={headingId} className="puzzle-collapsable-sidebar__group-label">
+          {group.label}
+        </h2>
+      )}
+
+      <div className="puzzle-collapsable-sidebar__group-items">
+        {group.items.map((item) => (
+          <SidebarItemRenderer
+            key={item.id}
+            item={item}
+            collapsed={collapsed}
+          />
+        ))}
+      </div>
+    </section>
+  );
 };
 
 const CollapsableSidebar = ({
@@ -54,7 +158,10 @@ const CollapsableSidebar = ({
 }: CollapsableSidebarProps) => {
   const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);
 
+  const idPrefix = `puzzle-sidebar-${useId()}`;
+
   const isControlled = controlledCollapsed !== undefined;
+
   const collapsed = isControlled ? controlledCollapsed : internalCollapsed;
 
   const toggleCollapsed = () => {
@@ -66,6 +173,8 @@ const CollapsableSidebar = ({
 
     onCollapsedChange?.(nextCollapsed);
   };
+
+  const allItems = getSidebarItems(items);
 
   const classes = cn(
     "puzzle-collapsable-sidebar",
@@ -81,64 +190,6 @@ const CollapsableSidebar = ({
       data-expand={expand}
       style={style}
     >
-      <nav
-        className="puzzle-collapsable-sidebar__navigation"
-        aria-label={ariaLabel}
-      >
-        <div className="puzzle-collapsable-sidebar__items">
-          {items.map((item) => {
-            const content = (
-              <>
-                <span
-                  className="puzzle-collapsable-sidebar__icon"
-                  aria-hidden="true"
-                >
-                  {item.icon}
-                </span>
-
-                <span className="puzzle-collapsable-sidebar__label">
-                  {item.label}
-                </span>
-              </>
-            );
-
-            const itemClassName = cn(
-              "puzzle-collapsable-sidebar__item",
-              item.active && "active",
-            );
-
-            if ("href" in item && item.href) {
-              return (
-                <a
-                  key={item.id}
-                  className={itemClassName}
-                  href={item.href}
-                  aria-current={item.active ? "page" : undefined}
-                  title={collapsed ? item.label : undefined}
-                  data-active={item.active || undefined}
-                >
-                  {content}
-                </a>
-              );
-            }
-
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={itemClassName}
-                onClick={item.onClick}
-                aria-pressed={item.active}
-                title={collapsed ? item.label : undefined}
-                data-active={item.active || undefined}
-              >
-                {content}
-              </button>
-            );
-          })}
-        </div>
-      </nav>
-
       <button
         type="button"
         className="puzzle-collapsable-sidebar__toggle"
@@ -149,11 +200,36 @@ const CollapsableSidebar = ({
         <span aria-hidden="true">{collapsed ? "›" : "‹"}</span>
       </button>
 
+      <nav
+        className="puzzle-collapsable-sidebar__navigation"
+        aria-label={ariaLabel}
+      >
+        <div className="puzzle-collapsable-sidebar__sections">
+          {items.map((entry) =>
+            isSidebarGroup(entry) ? (
+              <SidebarGroupRenderer
+                key={entry.id}
+                group={entry}
+                collapsed={collapsed}
+                idPrefix={idPrefix}
+              />
+            ) : (
+              <div
+                key={entry.id}
+                className="puzzle-collapsable-sidebar__group-items"
+              >
+                <SidebarItemRenderer item={entry} collapsed={collapsed} />
+              </div>
+            ),
+          )}
+        </div>
+      </nav>
+
       <BottomNavigation
         className="puzzle-collapsable-sidebar__mobile"
         ariaLabel={ariaLabel}
       >
-        {items.map((item) => (
+        {allItems.map((item) => (
           <BottomNavigationItem
             key={item.id}
             icon={item.icon}
@@ -172,6 +248,8 @@ export {
   CollapsableSidebar,
   type CollapsableSidebarProps,
   type CollapsableSidebarItem,
+  type CollapsableSidebarGroup,
+  type CollapsableSidebarEntry,
   type CollapsableSidebarExpansion,
   type SidebarItemBase,
   type WithLink,

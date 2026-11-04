@@ -1,20 +1,26 @@
 .puzzle-collapsable-sidebar {
     --puzzle-sidebar-collapsed-width: 4.5rem;
+    --puzzle-sidebar-expanded-max-width: 20rem;
 
     position: sticky;
     top: var(--puzzle-sticky-offset, 0px);
     z-index: var(--puzzle-z-index-navigation, 250);
 
     display: flex;
-    flex-direction: column;
-
     flex: 0 0 auto;
+    flex-direction: column;
     align-self: flex-start;
 
     width: var(--puzzle-sidebar-collapsed-width);
     min-width: 0;
 
-    height: calc(100svh - var(--puzzle-sticky-offset, 0px));
+    /*
+     * Keep the sidebar anchored to the viewport.
+     * Use min-height rather than a height that changes
+     * whenever the sticky offset is recalculated.
+     */
+    height: auto;
+    min-height: calc(100svh - var(--puzzle-sticky-offset, 0px));
     max-height: calc(100svh - var(--puzzle-sticky-offset, 0px));
 
     box-sizing: border-box;
@@ -29,34 +35,113 @@
         box-shadow var(--puzzle-duration-normal, 250ms) var(--puzzle-easing-standard, ease);
 }
 
-.puzzle-collapsable-sidebar__navigation {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    padding: var(--puzzle-space-2, 0.5rem);
-
-    overscroll-behavior: contain;
+.puzzle-collapsable-sidebar:not(.collapsed) {
+    max-width: min(var(--puzzle-sidebar-expanded-max-width), 40vw);
 }
 
-.puzzle-collapsable-sidebar__items {
+/* Navigation */
+
+.puzzle-collapsable-sidebar__navigation {
+    flex: 1 1 auto;
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    overscroll-behavior: contain;
+
+    padding: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-collapsable-sidebar__sections {
     display: flex;
     flex-direction: column;
-    gap: var(--puzzle-space-1, 0.25rem);
 
     width: max-content;
     min-width: 100%;
+
+    gap: var(--puzzle-space-3, 0.75rem);
 }
+
+.puzzle-collapsable-sidebar__group {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.puzzle-collapsable-sidebar__group + .puzzle-collapsable-sidebar__group {
+    padding-top: var(--puzzle-space-2, 0.5rem);
+    border-top: 1px solid var(--puzzle-color-border);
+}
+
+/* Group labels */
+
+.puzzle-collapsable-sidebar__group-label {
+    display: block;
+
+    box-sizing: border-box;
+
+    width: max-content;
+    max-width: 20rem;
+
+    margin: 0;
+    padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-2, 0.5rem);
+
+    overflow: hidden;
+
+    color: var(--puzzle-color-text-muted);
+
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+
+    letter-spacing: var(--puzzle-font-letter-spacing-wide, 0.025em);
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    opacity: 1;
+
+    transition:
+        max-width var(--puzzle-duration-normal, 250ms) var(--puzzle-easing-standard, ease),
+        opacity var(--puzzle-duration-fast, 150ms) ease,
+        padding var(--puzzle-duration-normal, 250ms) ease;
+}
+
+.puzzle-collapsable-sidebar.collapsed .puzzle-collapsable-sidebar__group-label {
+    max-width: 0;
+    padding-inline: 0;
+    opacity: 0;
+}
+
+/* Group items */
+
+.puzzle-collapsable-sidebar__group-items {
+    display: flex;
+    flex-direction: column;
+
+    width: max-content;
+    min-width: 100%;
+
+    gap: var(--puzzle-space-1, 0.25rem);
+}
+
+/* Navigation items */
 
 .puzzle-collapsable-sidebar__item {
     display: flex;
     align-items: center;
-    gap: var(--puzzle-space-3, 0.75rem);
 
     box-sizing: border-box;
+
     width: 100%;
+    min-width: 0;
     min-height: 2.75rem;
+
+    gap: var(--puzzle-space-3, 0.75rem);
 
     padding: var(--puzzle-space-2, 0.5rem);
 
@@ -68,10 +153,11 @@
 
     font: inherit;
     font-size: var(--puzzle-font-size-sm, 0.875rem);
+
     text-align: left;
     text-decoration: none;
-
     white-space: nowrap;
+
     cursor: pointer;
 
     transition:
@@ -92,10 +178,10 @@
 
 .puzzle-collapsable-sidebar__icon {
     display: inline-flex;
+    flex: 0 0 1.5rem;
+
     align-items: center;
     justify-content: center;
-
-    flex: 0 0 1.5rem;
 
     width: 1.5rem;
     height: 1.5rem;
@@ -106,10 +192,13 @@
     max-height: 100%;
 }
 
+/* Labels */
+
 .puzzle-collapsable-sidebar__label {
     display: inline-block;
 
     flex: 0 0 auto;
+
     width: max-content;
     max-width: 0;
 
@@ -126,25 +215,30 @@
 .puzzle-collapsable-sidebar:not(.collapsed) .puzzle-collapsable-sidebar__label {
     max-width: 20rem;
     opacity: 1;
+
     transition-delay: 0ms, 75ms;
 }
 
+/* Toggle */
+
 .puzzle-collapsable-sidebar__toggle {
     display: flex;
+    flex: 0 0 auto;
+
     align-items: center;
     justify-content: center;
-
-    flex: 0 0 auto;
 
     width: 2.75rem;
     height: 2.75rem;
 
     margin: var(--puzzle-space-2, 0.5rem) auto;
 
+    padding: 0;
+
     border: 0;
     border-radius: var(--puzzle-radius-md, 0.5rem);
 
-    color: var(--puzzle-color-text-muted);
+    color: var(--puzzle-color-text-muted, var(--puzzle-color-text));
     background: transparent;
 
     font: inherit;
@@ -158,73 +252,106 @@
     background: var(--puzzle-color-surface-elevated);
 }
 
+/* Inline expansion */
+
+.puzzle-collapsable-sidebar.expand-inline:not(.collapsed) {
+    flex-basis: auto;
+}
+
+/* Overlay expansion */
+
+.puzzle-collapsable-sidebar.expand-over {
+    overflow: visible;
+}
+
+.puzzle-collapsable-sidebar.expand-over:not(.collapsed) {
+    z-index: calc(var(--puzzle-z-index-navigation, 250) + 1);
+
+    box-shadow: var(--puzzle-shadow-lg, 4px 0 16px rgb(0 0 0 / 10%));
+}
+
+/* Focus */
+
 .puzzle-collapsable-sidebar a:focus-visible,
 .puzzle-collapsable-sidebar button:focus-visible {
     outline: 2px solid var(--puzzle-color-ring);
     outline-offset: 2px;
 }
 
-/* Collapsed */
-
-.puzzle-collapsable-sidebar.collapsed {
+.puzzle-collapsable-sidebar.expand-over {
     width: var(--puzzle-sidebar-collapsed-width);
+    max-width: var(--puzzle-sidebar-collapsed-width);
+    overflow: visible;
 }
 
-/* Expanded inline */
+.puzzle-collapsable-sidebar.expand-over .puzzle-collapsable-sidebar__navigation {
+    position: absolute;
+    inset: 0 auto 0 0;
 
-.puzzle-collapsable-sidebar.expand-inline:not(.collapsed) {
     width: max-content;
-    max-width: min(20rem, 40vw);
+    max-width: var(--puzzle-sidebar-collapsed-width);
+
+    background: var(--puzzle-color-surface);
+    box-shadow: none;
+
+    transition:
+        max-width var(--puzzle-duration-normal, 250ms) var(--puzzle-easing-standard, ease),
+        box-shadow var(--puzzle-duration-normal, 250ms) ease;
 }
 
-.puzzle-collapsable-sidebar.expand-inline:not(.collapsed) .puzzle-collapsable-sidebar__items {
-    width: max-content;
-}
-
-/* Expanded over content */
-
-.puzzle-collapsable-sidebar.expand-over:not(.collapsed) {
-    width: max-content;
-    max-width: min(20rem, 40vw);
+.puzzle-collapsable-sidebar.expand-over:not(.collapsed) .puzzle-collapsable-sidebar__navigation {
+    max-width: min(var(--puzzle-sidebar-expanded-max-width), 40vw);
 
     box-shadow: var(--puzzle-shadow-lg, 4px 0 16px rgb(0 0 0 / 10%));
 }
 
-.puzzle-collapsable-sidebar.expand-over:not(.collapsed) {
-    position: sticky;
+.puzzle-collapsable-sidebar.expand-over .puzzle-collapsable-sidebar__toggle {
+    position: relative;
+    z-index: 1;
 }
 
-/* The mobile bottom navigation is hidden on larger screens. */
+@media (max-width: 767px) {
+    .puzzle-collapsable-sidebar.expand-over {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Mobile */
 
 .puzzle-collapsable-sidebar__mobile {
     display: none;
 }
 
-.puzzle-collapsable-sidebar.expand-over:not(.collapsed) {
-    flex-basis: var(--puzzle-sidebar-collapsed-width);
-}
-
-/* Mobile */
-
 @media (max-width: 767px) {
     .puzzle-collapsable-sidebar {
         position: fixed;
-        z-index: var(--puzzle-z-index-navigation, 250);
 
         top: auto;
         right: 0;
         bottom: 0;
         left: 0;
 
+        z-index: var(--puzzle-z-index-navigation, 250);
+
+        display: block;
+
         width: 100%;
         max-width: 100%;
+
         height: auto;
         max-height: none;
+
+        overflow: visible;
 
         border-top: 1px solid var(--puzzle-color-border);
         border-right: 0;
 
         background: var(--puzzle-color-surface);
+
+        box-shadow: var(--puzzle-shadow-lg, 0 -2px 12px rgb(0 0 0 / 5%));
+
+        transition: none;
     }
 
     .puzzle-collapsable-sidebar__navigation,
@@ -233,22 +360,15 @@
     }
 
     .puzzle-collapsable-sidebar__mobile {
-        display: flex;
-
-        width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-
-        padding: var(--puzzle-space-2, 0.5rem) max(var(--puzzle-space-2, 0.5rem), env(safe-area-inset-right))
-            calc(var(--puzzle-space-2, 0.5rem) + env(safe-area-inset-bottom))
-            max(var(--puzzle-space-2, 0.5rem), env(safe-area-inset-left));
+        display: block;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .puzzle-collapsable-sidebar,
     .puzzle-collapsable-sidebar__item,
-    .puzzle-collapsable-sidebar__label {
+    .puzzle-collapsable-sidebar__label,
+    .puzzle-collapsable-sidebar__group-label {
         transition: none;
     }
 }
