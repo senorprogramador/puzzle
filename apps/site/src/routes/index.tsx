@@ -70,11 +70,11 @@ function RouteComponent() {
     <div className="space-y-12">
       <Section>
         <div className="space-y-4">
-          <p className="text-sm font-semibold text-[var(--puzzle-color-primary)]">
+          <p className="text-sm font-semibold text-(--puzzle-color-primary)">
             Actions
           </p>
           <h1 className="text-4xl font-bold">Button</h1>
-          <p className="max-w-3xl text-lg text-[var(--puzzle-color-text-muted)]">
+          <p className="max-w-3xl text-lg text-(--puzzle-color-text-muted)">
             Buttons allow users to trigger actions, submit forms, navigate
             between pages, and interact with your application.
           </p>
@@ -84,7 +84,7 @@ function RouteComponent() {
       <Section>
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">Import</h2>
-          <pre className="overflow-x-auto rounded-lg bg-[var(--puzzle-color-surface-sunken)] p-4 text-sm">
+          <pre className="overflow-x-auto rounded-lg bg-(--puzzle-color-surface-sunken) p-4 text-sm">
             <code>{`import { Button } from "@puzzle/ui";`}</code>
           </pre>
           <p>

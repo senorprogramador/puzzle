@@ -1,0 +1,235 @@
+---
+title: Toggle Group
+description: Toggle groups let users select one or more options from a related set.
+---
+
+Use the ToggleGroup component to present a set of related toggle buttons. Choose single selection for mutually exclusive options or multiple selection when users can choose several.
+
+## Import
+
+```tsx
+import { ToggleGroup } from "@puzzle/ui";
+```
+
+## Basic usage
+
+Add a `ToggleGroup.Item` for each option. In single-selection mode, the default, selecting an item deselects the previously selected item. Selecting the active item again clears the selection.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <ToggleGroup defaultValue="left" aria-label="Text alignment">
+      <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+      <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+      <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+    </ToggleGroup>
+`}
+>
+  <ToggleGroup defaultValue="left" aria-label="Text alignment">
+    <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+    <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+    <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+  </ToggleGroup>
+</Preview>
+
+Each item is rendered as a Button and exposes its selected state with `aria-pressed`.
+
+## Selection modes
+
+Use the default `type="single"` mode when only one option can be active. Set `type="multiple"` to let users toggle options independently.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+  <ToggleGroup
+    type="multiple"
+    defaultValue={["bold"]}
+    aria-label="Text formatting"
+  >
+    <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+    <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
+    <ToggleGroup.Item value="underline">Underline</ToggleGroup.Item>
+  </ToggleGroup>
+`}
+>
+  <ToggleGroup
+    type="multiple"
+    defaultValue={["bold"]}
+    aria-label="Text formatting"
+  >
+    <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+    <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
+    <ToggleGroup.Item value="underline">Underline</ToggleGroup.Item>
+  </ToggleGroup>
+</Preview>
+
+## Controlled and uncontrolled state
+
+Use `defaultValue` to set the initial selection and let the group manage subsequent changes. Use `value` with `onValueChange` when the parent needs to control selection.
+
+```tsx
+const [alignment, setAlignment] = useState<string | undefined>("left");
+
+return (
+  <ToggleGroup
+    value={alignment}
+    onValueChange={setAlignment}
+    aria-label="Text alignment"
+  >
+    <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+    <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+    <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+  </ToggleGroup>
+);
+```
+
+In single mode, `onValueChange` receives the selected value or `undefined` when the selection is cleared. In multiple mode, it receives the full array of selected values.
+
+```tsx
+<ToggleGroup
+  type="multiple"
+  value={formats}
+  onValueChange={setFormats}
+  aria-label="Text formatting"
+>
+  <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+  <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
+</ToggleGroup>
+```
+
+## Required selection
+
+Use `required` to prevent users from clearing the final selected value. It does not create an initial selection; provide `defaultValue` or `value` if an option must start selected.
+
+```tsx
+<ToggleGroup required defaultValue="monthly" aria-label="Billing period">
+  <ToggleGroup.Item value="monthly">Monthly</ToggleGroup.Item>
+  <ToggleGroup.Item value="yearly">Yearly</ToggleGroup.Item>
+</ToggleGroup>
+```
+
+## Orientation and layout
+
+Use `orientation` to arrange items horizontally or vertically. The default is `horizontal`.
+
+<Preview
+  height={260}
+  align="center"
+  justify="center"
+  code={`\
+  <ToggleGroup
+    orientation="vertical"
+    defaultValue="list"
+    aria-label="View mode"
+  >
+    <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
+    <ToggleGroup.Item value="list">List</ToggleGroup.Item>
+    <ToggleGroup.Item value="compact">Compact</ToggleGroup.Item>
+  </ToggleGroup>
+`}
+>
+  <ToggleGroup
+    orientation="vertical"
+    defaultValue="list"
+    aria-label="View mode"
+  >
+    <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
+    <ToggleGroup.Item value="list">List</ToggleGroup.Item>
+    <ToggleGroup.Item value="compact">Compact</ToggleGroup.Item>
+  </ToggleGroup>
+</Preview>
+
+Set `attached` to join adjacent items, or `fullWidth` to make the group fill its container and let the items share the available width.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+  <ToggleGroup attached fullWidth aria-label="Text alignment">
+    <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+    <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+    <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+  </ToggleGroup>
+`}
+>
+  <ToggleGroup attached fullWidth aria-label="Text alignment">
+    <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+    <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+    <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+  </ToggleGroup>
+</Preview>
+
+Use `spacing` to set the gap between items. Numbers are interpreted as pixels; strings are passed as CSS values. The default is the Puzzle spacing token (with a `0.5rem` fallback). Spacing has no effect when `attached` is enabled.
+
+## Disabled
+
+Set `disabled` on the group to disable all items, or set it on an individual item to disable only that option. Disabled items are skipped during keyboard navigation.
+
+```tsx
+<ToggleGroup defaultValue="read" aria-label="Permission">
+  <ToggleGroup.Item value="read">Read</ToggleGroup.Item>
+  <ToggleGroup.Item value="write">Write</ToggleGroup.Item>
+  <ToggleGroup.Item value="admin" disabled>
+    Admin
+  </ToggleGroup.Item>
+</ToggleGroup>
+```
+
+## API
+
+### Group props
+
+| Prop            | Type                                                                                    | Default              | Description                                                                             |
+| --------------- | --------------------------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------- |
+| `type`          | `"single" \| "multiple"`                                                                | `"single"`           | Whether one or multiple items can be selected.                                          |
+| `value`         | `string \| null` (single); `string[]` (multiple)                                        | —                    | Controlled selection. Use `onValueChange` to update it.                                 |
+| `defaultValue`  | `string` (single); `string[]` (multiple)                                                | —                    | Initial selection for an uncontrolled group.                                            |
+| `onValueChange` | `(value: string \| undefined) => void` (single); `(value: string[]) => void` (multiple) | —                    | Called when the selection changes.                                                      |
+| `orientation`   | `"horizontal" \| "vertical"`                                                            | `"horizontal"`       | Layout direction and arrow-key navigation direction.                                    |
+| `dir`           | `"ltr" \| "rtl"`                                                                        | `"ltr"`              | Text direction; reverses horizontal arrow-key navigation in RTL.                        |
+| `disabled`      | `boolean`                                                                               | `false`              | Disables all items in the group.                                                        |
+| `loop`          | `boolean`                                                                               | `true`               | Wraps arrow-key focus navigation from the last item to the first and vice versa.        |
+| `required`      | `boolean`                                                                               | `false`              | Prevents clearing the final selected item; does not force an initial selection.         |
+| `attached`      | `boolean`                                                                               | `false`              | Joins adjacent item borders and removes inner corner radii.                             |
+| `fullWidth`     | `boolean`                                                                               | `false`              | Makes the group fill its container and lets its items flex to fill the available space. |
+| `spacing`       | `number \| string`                                                                      | Puzzle spacing token | Gap between items. Numbers are interpreted as pixels.                                   |
+| `className`     | `string`                                                                                | —                    | Additional CSS class names.                                                             |
+| `children`      | `ReactNode`                                                                             | —                    | `ToggleGroup.Item` elements displayed in the group.                                     |
+
+The group also accepts standard `<div>` props, including `aria-*` and `data-*` attributes. Its `role` defaults to `"group"` and can be overridden.
+
+### Item props
+
+| Prop        | Type        | Default | Description                                         |
+| ----------- | ----------- | ------- | --------------------------------------------------- |
+| `value`     | `string`    | —       | Unique value identifying the item within its group. |
+| `disabled`  | `boolean`   | `false` | Disables this item.                                 |
+| `children`  | `ReactNode` | —       | Item label or content.                              |
+| `className` | `string`    | —       | Additional CSS class names.                         |
+
+Items also accept standard native Button props, such as `aria-label`, `onClick`, and `data-*` attributes. The group manages the Button's `type`, `variant`, `disabled`, `tabIndex`, and `aria-pressed` props.
+
+### TypeScript types
+
+The component exports `ToggleGroupProps`, `ToggleGroupSingleProps`, `ToggleGroupMultipleProps`, `ToggleGroupItemProps`, and `ToggleGroupOrientation`. `ToggleGroupProps` is a discriminated union: `type="multiple"` selects the array-based value and callback types; single selection is the default.
+
+## Accessibility
+
+### Group and item semantics
+
+ToggleGroup uses the `group` role by default. Give each group an accessible name with `aria-label` or `aria-labelledby`. Each item is a native Button with `aria-pressed` reflecting its selected state.
+
+### Keyboard interaction
+
+Only one item in the group is in the tab order at a time. Use the arrow keys to move focus between enabled items: Left and Right for horizontal groups, Up and Down for vertical groups. In right-to-left horizontal groups, Left and Right navigation is reversed. `Home` and `End` move focus to the first and last enabled items. Navigation wraps by default; set `loop={false}` to stop at the ends. Enter or Space activates the focused item using native Button behavior.
+
+Moving focus does not change the selection. Selection changes when an item is activated.
+
+### Disabled state
+
+Disabled items cannot be activated and are skipped during keyboard navigation. Disabling the group disables every item.

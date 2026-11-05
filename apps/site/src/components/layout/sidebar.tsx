@@ -18,12 +18,17 @@ const items: TreeViewItem[] = [
           {
             id: "button-group",
             label: "Button Group",
-            href: "/docs/components/actions/button-group",
+            href: "/docs/components/ui/actions/button-group",
           },
           {
             id: "button",
             label: "Button",
-            href: "/docs/components/actions/button",
+            href: "/docs/components/ui/actions/button",
+          },
+          {
+            id: "toggle-group",
+            label: "Toggle Group",
+            href: "/docs/components/ui/actions/toggle-group",
           },
         ],
       },
