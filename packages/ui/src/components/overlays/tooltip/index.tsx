@@ -3,10 +3,12 @@
 import {
   cloneElement,
   useCallback,
+  useId,
   useLayoutEffect,
   useRef,
   useState,
   type CSSProperties,
+  type FocusEvent,
   type HTMLAttributes,
   type ReactElement,
   type ReactNode,
@@ -50,6 +52,7 @@ type TooltipProps = {
 };
 
 type TooltipContentProps = {
+  id?: string;
   anchorRef: React.RefObject<HTMLElement | null>;
   position: PopoutPosition;
   closable?: boolean;
@@ -142,6 +145,7 @@ const setRef = <T,>(ref: Ref<T> | undefined, value: T | null): void => {
 };
 
 const TooltipContent = ({
+  id,
   anchorRef,
   position,
   closable,
@@ -246,6 +250,7 @@ const TooltipContent = ({
       gap="sm"
       className={cn("puzzle-tooltip", className)}
       role="tooltip"
+      id={id}
     >
       {children}
 
@@ -292,6 +297,20 @@ const Tooltip = ({
   triggerClassName,
 }: TooltipProps) => {
   const anchorRef = useRef<HTMLElement | null>(null);
+  const tooltipId = useId();
+  const [internalOpen, setInternalOpen] = useState(defaultOpen ?? false);
+  const isOpen = open ?? internalOpen;
+
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      if (open === undefined) {
+        setInternalOpen(nextOpen);
+      }
+
+      onOpenChange?.(nextOpen);
+    },
+    [open, onOpenChange],
+  );
 
   const handleTriggerRef = useCallback(
     (node: HTMLElement | null) => {
@@ -301,8 +320,38 @@ const Tooltip = ({
     [trigger],
   );
 
+  // Keyboard users get the same tooltip as pointer users on hover tooltips.
+  const opensOnFocus = action === "hover";
+
+  const handleFocus = (event: FocusEvent<HTMLElement>) => {
+    trigger.props.onFocus?.(event);
+
+    if (opensOnFocus && !event.defaultPrevented) {
+      handleOpenChange(true);
+    }
+  };
+
+  const handleBlur = (event: FocusEvent<HTMLElement>) => {
+    trigger.props.onBlur?.(event);
+
+    if (
+      opensOnFocus &&
+      !event.defaultPrevented &&
+      !event.currentTarget.contains(event.relatedTarget as Node | null)
+    ) {
+      handleOpenChange(false);
+    }
+  };
+
+  const describedBy = [trigger.props["aria-describedby"], isOpen && tooltipId]
+    .filter(Boolean)
+    .join(" ");
+
   const triggerElement = cloneElement(trigger, {
     ref: handleTriggerRef,
+    onFocus: handleFocus,
+    onBlur: handleBlur,
+    "aria-describedby": describedBy || undefined,
   });
 
   return (
@@ -313,19 +362,19 @@ const Tooltip = ({
       action={action}
       offset={offset}
       exitDelay={exitDelay}
-      open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={onOpenChange}
+      open={isOpen}
+      onOpenChange={handleOpenChange}
       closeOnOutsideClick
       closeOnEscape
       className={triggerClassName}
       contentClassName="puzzle-tooltip__content"
     >
       <TooltipContent
+        id={tooltipId}
         anchorRef={anchorRef}
         position={position}
         closable={closable}
-        onOpenChange={onOpenChange}
+        onOpenChange={handleOpenChange}
         className={className}
       >
         {children}

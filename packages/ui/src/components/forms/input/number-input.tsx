@@ -30,10 +30,19 @@ type NumberInputProps = Omit<
   max?: number;
   step?: number;
 
+  /** Amount applied by PageUp and PageDown. Defaults to ten times `step`. */
+  largeStep?: number;
+
   fractionDigits?: number;
 
   longPressDelay?: number;
   repeatInterval?: number;
+
+  /** Accessible label of the decrement button. */
+  decrementLabel?: string;
+
+  /** Accessible label of the increment button. */
+  incrementLabel?: string;
 };
 
 type Direction = -1 | 1;
@@ -59,11 +68,15 @@ const NumberInput = ({
   min,
   max,
   step = 1,
+  largeStep,
 
   fractionDigits = getPrecision(step),
 
   longPressDelay = 450,
   repeatInterval = 120,
+
+  decrementLabel = "Decrease value",
+  incrementLabel = "Increase value",
 
   disabled,
   readOnly,
@@ -71,6 +84,7 @@ const NumberInput = ({
 
   onBlur,
   onFocus,
+  onKeyDown,
 
   ...inputProps
 }: NumberInputProps) => {
@@ -81,6 +95,13 @@ const NumberInput = ({
   const factor = 10 ** digits;
 
   const safeStep = Number.isFinite(step) && step > 0 ? step : 1;
+
+  const safeLargeStep =
+    largeStep !== undefined && Number.isFinite(largeStep) && largeStep > 0
+      ? largeStep
+      : safeStep * 10;
+
+  const allowsNegative = min === undefined || min < 0;
 
   const [internalValue, setInternalValue] = useState(() =>
     clamp(Number.isFinite(initialValue) ? initialValue : 0, min, max),
@@ -132,9 +153,9 @@ const NumberInput = ({
   );
 
   const changeBy = useCallback(
-    (direction: Direction) => {
+    (direction: Direction, amount = safeStep) => {
       const next =
-        Math.round((currentValueRef.current + direction * safeStep) * factor) /
+        Math.round((currentValueRef.current + direction * amount) * factor) /
         factor;
 
       commit(next);
@@ -198,6 +219,41 @@ const NumberInput = ({
       changeBy(direction);
     };
 
+  const handleInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
+    onKeyDown?.(event);
+
+    if (event.defaultPrevented || disabled || readOnly) {
+      return;
+    }
+
+    switch (event.key) {
+      case "ArrowUp":
+        changeBy(1);
+        break;
+      case "ArrowDown":
+        changeBy(-1);
+        break;
+      case "PageUp":
+        changeBy(1, safeLargeStep);
+        break;
+      case "PageDown":
+        changeBy(-1, safeLargeStep);
+        break;
+      case "Home":
+        if (min === undefined) return;
+        commit(min);
+        break;
+      case "End":
+        if (max === undefined) return;
+        commit(max);
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+  };
+
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const nextDraft = event.target.value;
 
@@ -242,6 +298,20 @@ const NumberInput = ({
 
   const atMaximum = max !== undefined && currentValue >= max;
 
+  const trimmedDraft = draft.trim();
+  const draftIsIncomplete =
+    trimmedDraft === "" ||
+    trimmedDraft === "-" ||
+    trimmedDraft === "." ||
+    trimmedDraft === "-.";
+  const draftValue = Number(trimmedDraft.replace(",", "."));
+
+  const draftIsInvalid =
+    !draftIsIncomplete &&
+    (!Number.isFinite(draftValue) ||
+      (min !== undefined && draftValue < min) ||
+      (max !== undefined && draftValue > max));
+
   const stepperDisabled = disabled || readOnly;
 
   return (
@@ -252,7 +322,8 @@ const NumberInput = ({
       <button
         type="button"
         className="puzzle-input__stepper"
-        aria-label="Decrease value"
+        aria-label={decrementLabel}
+        tabIndex={-1}
         disabled={stepperDisabled || atMinimum}
         onPointerDown={startHold(-1)}
         onPointerUp={stopHold}
@@ -266,8 +337,13 @@ const NumberInput = ({
       <input
         {...inputProps}
         type="text"
-        inputMode={digits > 0 ? "decimal" : "numeric"}
-        pattern={digits > 0 ? "[0-9]*[.,]?[0-9]*" : "[0-9]*"}
+        role="spinbutton"
+        aria-valuenow={currentValue}
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-invalid={draftIsInvalid || inputProps["aria-invalid"]}
+        inputMode={allowsNegative ? "text" : digits > 0 ? "decimal" : "numeric"}
+        pattern={`${allowsNegative ? "-?" : ""}[0-9]*${digits > 0 ? "[.,]?[0-9]*" : ""}`}
         disabled={disabled}
         readOnly={readOnly}
         value={draft}
@@ -277,13 +353,15 @@ const NumberInput = ({
           onFocus?.(event);
         }}
         onChange={handleInputChange}
+        onKeyDown={handleInputKeyDown}
         onBlur={handleBlur}
       />
 
       <button
         type="button"
         className="puzzle-input__stepper"
-        aria-label="Increase value"
+        aria-label={incrementLabel}
+        tabIndex={-1}
         disabled={stepperDisabled || atMaximum}
         onPointerDown={startHold(1)}
         onPointerUp={stopHold}

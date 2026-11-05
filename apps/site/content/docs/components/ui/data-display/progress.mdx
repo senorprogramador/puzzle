@@ -137,7 +137,7 @@ Use `size` (`sm`, `md`, `lg`) to scale the spinner. The default is `md`.
 
 ### LinearProgress props
 
-LinearProgress accepts the shared props and the props of `<div>`, which are passed to the track element.
+LinearProgress accepts the shared props and the props of `<div>`, which are passed to the track element. `className` and `style` are merged with the component's own; your `style` takes precedence.
 
 ### CircularProgress props
 
@@ -157,6 +157,8 @@ Both indicators default to `--puzzle-color-primary`, so they follow light, dark,
 
 ## Accessibility
 
-- Neither component sets `role="progressbar"` or `aria-valuenow` for you. For a determinate bar, pass them yourself, for example `role="progressbar" aria-valuenow={60} aria-valuemin={0} aria-valuemax={100}`, along with an `aria-label` or `aria-labelledby`.
+- Both components render `role="progressbar"` with `aria-valuemin="0"` and `aria-valuemax="100"`. Determinate indicators also set `aria-valuenow`; indeterminate ones omit it, as the specification requires.
+- `value` is clamped to `0`–`100`; non-finite values are treated as indeterminate.
+- Always provide an accessible name with `aria-label` or `aria-labelledby`.
 - CircularProgress sets `aria-label="Loading..."` by default; override it with a more specific label, such as the task being performed.
 - For long-running or important operations, also announce completion in a live region so assistive technology users know when work finishes.

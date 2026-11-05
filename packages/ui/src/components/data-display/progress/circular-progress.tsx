@@ -2,6 +2,7 @@ import { type ComponentPropsWithRef } from "react";
 import "./circular-progress.css";
 import { cn } from "@puzzle/core";
 import type { ProgressProps } from "./types";
+import { getProgressAriaProps, normalizeProgressValue } from "./utils";
 
 type CircularProgressSize = "sm" | "md" | "lg";
 
@@ -64,11 +65,12 @@ const CircularProgress = ({
   color,
   className,
   "aria-label": ariaLabel = "Loading...",
-  value,
+  value: rawValue,
   size = "md",
   showTrack = true,
   ...props
 }: CircularProgressProps) => {
+  const value = normalizeProgressValue(rawValue);
   const classes = cn(
     "puzzle-circular-progress",
     value === undefined && "puzzle-circular-progress-indeterminate",
@@ -77,6 +79,7 @@ const CircularProgress = ({
   return (
     <svg
       {...props}
+      {...getProgressAriaProps(value)}
       className={classes}
       aria-label={ariaLabel}
       color={color ?? "var(--puzzle-color-primary)"}
@@ -98,7 +101,6 @@ const CircularProgress = ({
       )}
       <circle
         className="puzzle-circular-progress-circle"
-        aria-label={value !== undefined ? `${value}%` : undefined}
         cx={getCenter(size)}
         cy={getCenter(size)}
         r={getHalfDimension(size)}

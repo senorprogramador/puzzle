@@ -722,4 +722,28 @@ describe("TreeView", () => {
       HTMLDivElement,
     );
   });
+  it("renders custom item content with state and does not leak renderItem to the DOM", () => {
+    const renderItem = vi.fn((item: TreeViewItem, state) => (
+      <span data-testid={`custom-${item.id}`}>
+        {String(item.label)}:{state.expanded ? "open" : "closed"}
+      </span>
+    ));
+
+    render(
+      <TreeView
+        aria-label="Files"
+        items={items}
+        defaultExpandedIds={["src"]}
+        renderItem={renderItem}
+      />,
+    );
+
+    expect(screen.getByTestId("custom-src").textContent).toBe("src:open");
+    expect(screen.getByTestId("custom-readme").textContent).toBe(
+      "README.md:closed",
+    );
+    expect(getTreeItem("src").getAttribute("role")).toBe("treeitem");
+    expect(getToggle(getTreeItem("src"))).toBeTruthy();
+    expect(screen.getByRole("tree").hasAttribute("renderitem")).toBe(false);
+  });
 });

@@ -2,19 +2,24 @@ import type { ComponentPropsWithRef } from "react";
 import type { ProgressProps } from "./types";
 import "./linear-progress.css";
 import { cn } from "@puzzle/core";
+import { getProgressAriaProps, normalizeProgressValue } from "./utils";
 
 type LinearProgressProps = ProgressProps &
   Omit<ComponentPropsWithRef<"div">, keyof ProgressProps>;
 
 const LinearProgress = ({
   color,
-  value,
+  value: rawValue,
   showTrack = true,
+  className,
+  style,
   ...props
 }: LinearProgressProps) => {
+  const value = normalizeProgressValue(rawValue);
   const classes = cn(
     "puzzle-linear-progress-track",
     showTrack && "puzzle-linear-progress-show-track",
+    className,
   );
 
   const indicatorClasses = cn(
@@ -24,10 +29,12 @@ const LinearProgress = ({
   return (
     <div
       {...props}
-      style={{ color: color ?? "var(--puzzle-color-primary)" }}
+      {...getProgressAriaProps(value)}
+      style={{ color: color ?? "var(--puzzle-color-primary)", ...style }}
       className={classes}
     >
       <div
+        aria-hidden="true"
         className={indicatorClasses}
         style={{
           backgroundColor: color ?? "var(--puzzle-color-primary)",

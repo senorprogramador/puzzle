@@ -4,11 +4,14 @@ import { cn } from "@puzzle/core";
 import {
   Children,
   cloneElement,
+  type AnimationEventHandler,
   type ComponentPropsWithoutRef,
+  createElement,
   type ElementType,
   isValidElement,
   type PropsWithoutRef,
   type ReactNode,
+  type TransitionEventHandler,
   useEffect,
   useRef,
   useState,
@@ -29,6 +32,11 @@ type TransitionProps<T extends ElementType = "div"> = {
   visible: boolean;
   children: ReactNode;
 
+  /**
+   * Element rendered around the children, which receives the transition
+   * classes, handlers and remaining props. When omitted, the single child
+   * element is animated directly and receives those props instead.
+   */
   as?: T;
 
   enterFrom?: string;
@@ -96,6 +104,11 @@ const resolveTemplate = (
   }
 };
 
+type ChildProps = PropsWithoutRef<HTMLElement> & {
+  onAnimationEnd?: AnimationEventHandler<HTMLElement>;
+  onTransitionEnd?: TransitionEventHandler<HTMLElement>;
+};
+
 const Transition = <T extends ElementType = "div">({
   visible,
   children,
@@ -112,8 +125,17 @@ const Transition = <T extends ElementType = "div">({
   onEntered,
   onExit,
   onExited,
-  ...props
+  ...restProps
 }: TransitionProps<T>) => {
+  const {
+    onAnimationEnd: propsOnAnimationEnd,
+    onTransitionEnd: propsOnTransitionEnd,
+    ...props
+  } = restProps as {
+    onAnimationEnd?: AnimationEventHandler<HTMLElement>;
+    onTransitionEnd?: TransitionEventHandler<HTMLElement>;
+  } & Record<string, unknown>;
+
   const [mounted, setMounted] = useState(
     () => visible || forceMount || !unmountOnExit,
   );
@@ -260,18 +282,45 @@ const Transition = <T extends ElementType = "div">({
     exitTo,
   }[phase];
 
+  if (as) {
+    return createElement(
+      as,
+      {
+        ...props,
+        className: cn(className, phaseClass),
+        onAnimationEnd: (event: React.AnimationEvent<HTMLElement>) => {
+          propsOnAnimationEnd?.(event);
+          handleAnimationEnd(event);
+        },
+        onTransitionEnd: (event: React.TransitionEvent<HTMLElement>) => {
+          propsOnTransitionEnd?.(event);
+          handleTransitionEnd(event);
+        },
+      },
+      children,
+    );
+  }
+
   const clonedChildren = Children.map(children, (child) => {
-    // TODO: validate child as a React element that can accept className prop
-    if (!isValidElement<PropsWithoutRef<HTMLElement>>(child)) {
+    if (!isValidElement<ChildProps>(child)) {
       return child;
     }
 
+    // Preserve handlers already set on the child or passed to Transition.
     return cloneElement(child, {
       ...child.props,
       ...props,
       className: cn(child.props?.className, className, phaseClass),
-      onAnimationEnd: handleAnimationEnd,
-      onTransitionEnd: handleTransitionEnd,
+      onAnimationEnd: (event: React.AnimationEvent<HTMLElement>) => {
+        child.props.onAnimationEnd?.(event);
+        propsOnAnimationEnd?.(event);
+        handleAnimationEnd(event);
+      },
+      onTransitionEnd: (event: React.TransitionEvent<HTMLElement>) => {
+        child.props.onTransitionEnd?.(event);
+        propsOnTransitionEnd?.(event);
+        handleTransitionEnd(event);
+      },
     });
   });
 

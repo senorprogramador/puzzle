@@ -122,7 +122,10 @@ type TreeViewProps<TData = unknown> = Omit<
     /** Determines whether an item matches the current route. */
     getItemActive?: (item: TreeViewItem<TData>) => boolean;
 
-    /** Custom node renderer. */
+    /**
+     * Custom node renderer. Replaces the icon, label and adornment of a row; the
+     * expand indicator, row element and tree semantics are kept. Keep its contents non-interactive.
+     */
     renderItem?: (
       item: TreeViewItem<TData>,
       state: TreeViewItemState,
@@ -200,6 +203,7 @@ const TreeView = <TData,>({
   onLoadChildrenError,
   onItemActivate,
   getItemActive,
+  renderItem,
   renderIcon,
   renderLabel,
   expandOnItemClick = false,
@@ -824,18 +828,26 @@ const TreeView = <TData,>({
             <span className="puzzle-tree__toggle-spacer" aria-hidden="true" />
           )}
 
-          {iconContent != null && (
-            <span className="puzzle-tree__icon" aria-hidden="true">
-              {iconContent}
-            </span>
-          )}
+          {renderItem ? (
+            renderItem(item, itemState)
+          ) : (
+            <>
+              {iconContent != null && (
+                <span className="puzzle-tree__icon" aria-hidden="true">
+                  {iconContent}
+                </span>
+              )}
 
-          <span className="puzzle-tree__label">
-            {renderLabel ? renderLabel(item, itemState) : item.label}
-          </span>
+              <span className="puzzle-tree__label">
+                {renderLabel ? renderLabel(item, itemState) : item.label}
+              </span>
 
-          {item.endAdornment != null && (
-            <span className="puzzle-tree__adornment">{item.endAdornment}</span>
+              {item.endAdornment != null && (
+                <span className="puzzle-tree__adornment">
+                  {item.endAdornment}
+                </span>
+              )}
+            </>
           )}
         </>
       );
