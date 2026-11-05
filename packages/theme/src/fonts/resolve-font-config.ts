@@ -1,17 +1,21 @@
 import { DEFAULT_FONT_FALLBACKS } from "./constants";
-import type { FontConfig } from "./types";
+import type { FontConfig, ResolvedFontConfig } from "./types";
 
-const validateFamilyName = (value: string) => {
+const validateFamilyName = (
+  value: FontConfig["family"],
+): FontConfig["family"] => {
   const family = value.trim();
   if (!family || /[\u0000-\u001f\u007f<>;]/.test(family)) {
     throw new TypeError(
       `fontFamily '${family}' must be non-empty and must not contain control characters, angle brackets, or semicolons.`,
     );
   }
-  return family;
+  return family as FontConfig["family"];
 };
 
-export const resolveFontConfig = (input: FontConfig) => {
+export const resolveFontConfig = (
+  input: FontConfig,
+): ResolvedFontConfig => {
   const family = validateFamilyName(input.family);
   const rawWeights = input.weights ?? [400, 700];
   const rawStyles = input.styles ?? ["normal"];

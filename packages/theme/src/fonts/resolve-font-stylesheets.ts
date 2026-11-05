@@ -16,7 +16,9 @@ export const resolveFontStylesheets = (
   const resolved: ResolvedFontConfig[] = [];
   for (const role of ["heading", "body", "accent"] as const) {
     const font = fonts[role];
-    if (font !== undefined) resolved.push(resolveFontConfig({ ...font, role }));
+    if (font !== undefined) {
+      resolved.push(resolveFontConfig({ ...font, role }));
+    }
   }
 
   // Merge requests for the same family and display mode. This avoids loading
@@ -24,7 +26,7 @@ export const resolveFontStylesheets = (
   const groups = new Map<
     string,
     {
-      family: string;
+      family: ResolvedFontConfig["family"];
       display: FontDisplay;
       weights: Set<number>;
       styles: Set<FontStyle>;

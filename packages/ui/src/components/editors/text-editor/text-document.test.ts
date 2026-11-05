@@ -9,7 +9,24 @@ import {
   setTextAlign,
   setListType,
 } from "./text-document";
+import { parseHtmlToDocument } from "./text-parser";
 import type { TextDocument } from "./text-editor.types";
+
+describe("text HTML parsing", () => {
+  it("preserves inline text alignment", () => {
+    expect(parseHtmlToDocument('<p style="text-align: center">Hello</p>')).toEqual({
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          variant: "body1",
+          children: [{ text: "Hello" }],
+          align: "center",
+        },
+      ],
+    });
+  });
+});
 
 const documentWithText = (text: string): TextDocument => ({
   type: "doc",

@@ -89,7 +89,9 @@ const createBlock = (
 });
 
 const getBlockAlign = (element: Element): TextAlign | undefined => {
-  const align = element.getAttribute("data-puzzle-align") ?? element.style.textAlign;
+  const align =
+    element.getAttribute("data-puzzle-align") ??
+    (element as HTMLElement).style.textAlign;
   return align === "left" || align === "center" || align === "right" || align === "justify"
     ? align
     : undefined;
