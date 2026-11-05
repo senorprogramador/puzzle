@@ -1,5 +1,6 @@
 "use client";
 
+import { useRovingFocus } from "@puzzle/hooks";
 import { cn } from "@puzzle/core";
 import {
   Children,
@@ -85,6 +86,7 @@ const TabsRoot = ({
     : firstTabId;
 
   const isVertical = tabBarPosition === "left" || tabBarPosition === "right";
+  const dir = rootProps.dir === "rtl" ? "rtl" : "ltr";
 
   const previousActiveIndex = useRef(
     Math.max(
@@ -109,6 +111,17 @@ const TabsRoot = ({
     previousActiveIndex.current = currentActiveIndex;
   }
 
+  const rovingFocus = useRovingFocus<HTMLButtonElement>({
+    items: tabs.map((tab) => ({
+      id: tab.props.id,
+    })),
+    orientation: isVertical ? "vertical" : "horizontal",
+    dir,
+    initialActiveId: currentActiveId,
+  });
+
+  const isKeyboardNavigation = useRef(false);
+
   const activateTab = (tabId: string) => {
     if (!tabs.some((tab) => tab.props.id === tabId)) {
       return;
@@ -129,55 +142,30 @@ const TabsRoot = ({
 
   const handleKeyDown = (
     event: KeyboardEvent<HTMLButtonElement>,
-    index: number,
+    id: string,
   ) => {
-    let nextIndex: number | undefined;
+    isKeyboardNavigation.current = true;
 
-    switch (event.key) {
-      case "ArrowRight":
-        if (!isVertical) {
-          nextIndex = (index + 1) % tabs.length;
-        }
-        break;
-
-      case "ArrowLeft":
-        if (!isVertical) {
-          nextIndex = (index - 1 + tabs.length) % tabs.length;
-        }
-        break;
-
-      case "ArrowDown":
-        if (isVertical) {
-          nextIndex = (index + 1) % tabs.length;
-        }
-        break;
-
-      case "ArrowUp":
-        if (isVertical) {
-          nextIndex = (index - 1 + tabs.length) % tabs.length;
-        }
-        break;
-
-      case "Home":
-        nextIndex = 0;
-        break;
-
-      case "End":
-        nextIndex = tabs.length - 1;
-        break;
+    try {
+      rovingFocus.onItemKeyDown(event, id);
+    } finally {
+      isKeyboardNavigation.current = false;
     }
+  };
 
-    if (nextIndex === undefined || tabs.length === 0) {
-      return;
+  const handleFocus = (id: string) => {
+    rovingFocus.onItemFocus(id);
+
+    // Tabs use automatic activation: moving keyboard focus also activates
+    // the newly focused tab.
+    if (isKeyboardNavigation.current) {
+      activateTab(id);
     }
+  };
 
-    event.preventDefault();
-
-    const nextTab = tabs[nextIndex];
-
-    activateTab(nextTab.props.id);
-
-    document.getElementById(getTabId(nextTab.props.id))?.focus();
+  const handleClick = (id: string) => {
+    rovingFocus.onItemFocus(id);
+    activateTab(id);
   };
 
   return (
@@ -192,13 +180,14 @@ const TabsRoot = ({
         role="tablist"
         aria-orientation={isVertical ? "vertical" : "horizontal"}
       >
-        {tabs.map((tab, index) => {
+        {tabs.map((tab) => {
           const { id, tab: tabContent } = tab.props;
           const isActive = id === currentActiveId;
 
           return (
             <button
               key={id}
+              ref={rovingFocus.getItemRef(id)}
               id={getTabId(id)}
               type="button"
               role="tab"
@@ -207,8 +196,9 @@ const TabsRoot = ({
               aria-controls={getPanelId(id)}
               tabIndex={isActive ? 0 : -1}
               data-state={isActive ? "active" : "inactive"}
-              onClick={() => activateTab(id)}
-              onKeyDown={(event) => handleKeyDown(event, index)}
+              onClick={() => handleClick(id)}
+              onFocus={() => handleFocus(id)}
+              onKeyDown={(event) => handleKeyDown(event, id)}
             >
               {tabContent}
             </button>
