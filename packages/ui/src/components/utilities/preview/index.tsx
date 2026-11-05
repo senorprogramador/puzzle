@@ -383,8 +383,6 @@ const Preview = ({
         : "puzzle-preview-tab-code",
   };
 
-  const PanelComponent = activeTab === "preview" ? PreviewBackground : "div";
-
   return (
     <section className={cn("puzzle-preview", className)}>
       <div className="puzzle-preview__toolbar">
@@ -472,27 +470,28 @@ const Preview = ({
         )}
       </div>
 
-      <PanelComponent
-        {...panelProps}
-        className="puzzle-preview__panel"
-      >
-        {activeTab === "preview" ? (
-          <div ref={containerRef} className="puzzle-preview__stage">
-            <div className="puzzle-preview__viewport" style={viewportStyle}>
-              <iframe
-                ref={iframeRef}
-                className="puzzle-preview__frame"
-                srcDoc={PREVIEW_DOCUMENT}
-                title={`${config.label} component preview`}
-                onLoad={initializeFrame}
-                style={frameStyle}
-              />
+      <PreviewBackground {...panelProps} className="puzzle-preview__panel">
+        <div
+          ref={containerRef}
+          className="puzzle-preview__stage"
+          hidden={activeTab !== "preview"}
+        >
+          <div className="puzzle-preview__viewport" style={viewportStyle}>
+            <iframe
+              ref={iframeRef}
+              className="puzzle-preview__frame"
+              srcDoc={PREVIEW_DOCUMENT}
+              title={`${config.label} component preview`}
+              onLoad={initializeFrame}
+              style={frameStyle}
+            />
 
-              {frameRoot &&
-                createPortal(<div style={contentStyle}>{children}</div>, frameRoot)}
-            </div>
+            {frameRoot &&
+              createPortal(<div style={contentStyle}>{children}</div>, frameRoot)}
           </div>
-        ) : (
+        </div>
+
+        {activeTab === "code" && (
           <div className="puzzle-preview__code">
             <pre>
               <code className="language-tsx">
@@ -501,7 +500,7 @@ const Preview = ({
             </pre>
           </div>
         )}
-      </PanelComponent>
+      </PreviewBackground>
 
       <span
         className="puzzle-preview__copy-status"

@@ -101,6 +101,29 @@ In single mode, `onValueChange` receives the selected value or `undefined` when 
 </ToggleGroup>
 ```
 
+## Size
+
+Use the `size` prop to set the size of every item in the group. It accepts the same values as Button: `xs`, `sm`, `md`, `lg`, and `icon`. The default is `md`.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+  <ToggleGroup size="sm" defaultValue="left" aria-label="Text alignment">
+    <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+    <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+    <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+  </ToggleGroup>
+`}
+>
+  <ToggleGroup size="sm" defaultValue="left" aria-label="Text alignment">
+    <ToggleGroup.Item value="left">Left</ToggleGroup.Item>
+    <ToggleGroup.Item value="center">Center</ToggleGroup.Item>
+    <ToggleGroup.Item value="right">Right</ToggleGroup.Item>
+  </ToggleGroup>
+</Preview>
+
 ## Required selection
 
 Use `required` to prevent users from clearing the final selected value. It does not create an initial selection; provide `defaultValue` or `value` if an option must start selected.
@@ -191,7 +214,8 @@ Set `disabled` on the group to disable all items, or set it on an individual ite
 | `defaultValue`  | `string` (single); `string[]` (multiple)                                                | —                    | Initial selection for an uncontrolled group.                                            |
 | `onValueChange` | `(value: string \| undefined) => void` (single); `(value: string[]) => void` (multiple) | —                    | Called when the selection changes.                                                      |
 | `orientation`   | `"horizontal" \| "vertical"`                                                            | `"horizontal"`       | Layout direction and arrow-key navigation direction.                                    |
-| `dir`           | `"ltr" \| "rtl"`                                                                        | `"ltr"`              | Text direction; reverses horizontal arrow-key navigation in RTL.                        |
+| `size`          | `"xs" \| "sm" \| "md" \| "lg" \| "icon"`                                        | `"md"`               | Size applied to every item in the group.                                                  |
+| `dir`           | `"ltr" \| "rtl"`                                                                    | `"ltr"`               | Text direction; reverses horizontal arrow-key navigation in RTL.                          |
 | `disabled`      | `boolean`                                                                               | `false`              | Disables all items in the group.                                                        |
 | `loop`          | `boolean`                                                                               | `true`               | Wraps arrow-key focus navigation from the last item to the first and vice versa.        |
 | `required`      | `boolean`                                                                               | `false`              | Prevents clearing the final selected item; does not force an initial selection.         |
@@ -212,11 +236,11 @@ The group also accepts standard `<div>` props, including `aria-*` and `data-*` a
 | `children`  | `ReactNode` | —       | Item label or content.                              |
 | `className` | `string`    | —       | Additional CSS class names.                         |
 
-Items also accept standard native Button props, such as `aria-label`, `onClick`, and `data-*` attributes. The group manages the Button's `type`, `variant`, `disabled`, `tabIndex`, and `aria-pressed` props.
+Items also accept standard native Button props, such as `aria-label`, `onClick`, and `data-*` attributes. The group manages the Button's `type`, `variant`, `size`, `disabled`, `tabIndex`, and `aria-pressed` props.
 
 ### TypeScript types
 
-The component exports `ToggleGroupProps`, `ToggleGroupSingleProps`, `ToggleGroupMultipleProps`, `ToggleGroupItemProps`, and `ToggleGroupOrientation`. `ToggleGroupProps` is a discriminated union: `type="multiple"` selects the array-based value and callback types; single selection is the default.
+The component exports `ToggleGroupProps`, `ToggleGroupSingleProps`, `ToggleGroupMultipleProps`, `ToggleGroupItemProps`, `ToggleGroupOrientation`, and `ToggleGroupSize`. `ToggleGroupSize` is the same type as `ButtonSize`. `ToggleGroupProps` is a discriminated union: `type="multiple"` selects the array-based value and callback types; single selection is the default.
 
 ## Accessibility
 

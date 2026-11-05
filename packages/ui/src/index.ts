@@ -17,6 +17,7 @@ export {
   type ToggleGroupSingleProps,
   type ToggleGroupMultipleProps,
   type ToggleGroupItemProps,
+  type ToggleGroupSize,
   type ToggleGroupOrientation,
 } from "./components/actions/toggle-group";
 

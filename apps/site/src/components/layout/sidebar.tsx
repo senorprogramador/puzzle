@@ -12,23 +12,29 @@ const items: TreeViewItem[] = [
     label: "Components",
     children: [
       {
-        id: "actions",
-        label: "Actions",
+        id: "ui",
+        label: "UI",
         children: [
           {
-            id: "button-group",
-            label: "Button Group",
-            href: "/docs/components/ui/actions/button-group",
-          },
-          {
-            id: "button",
-            label: "Button",
-            href: "/docs/components/ui/actions/button",
-          },
-          {
-            id: "toggle-group",
-            label: "Toggle Group",
-            href: "/docs/components/ui/actions/toggle-group",
+            id: "actions",
+            label: "Actions",
+            children: [
+              {
+                id: "button-group",
+                label: "Button Group",
+                href: "/docs/components/ui/actions/button-group",
+              },
+              {
+                id: "button",
+                label: "Button",
+                href: "/docs/components/ui/actions/button",
+              },
+              {
+                id: "toggle-group",
+                label: "Toggle Group",
+                href: "/docs/components/ui/actions/toggle-group",
+              },
+            ],
           },
         ],
       },
@@ -45,7 +51,7 @@ const Sidebar = () => {
         aria-label="Navigation"
         items={items}
         selectionMode="single"
-        defaultExpandedIds={["components", "actions"]}
+        defaultExpandedIds={["components", "ui", "actions"]}
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
         getItemActive={(item) => {

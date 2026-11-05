@@ -27,6 +27,7 @@ import type {
   ToggleGroupProps,
   ToggleGroupSingleProps,
   ToggleGroupOrientation,
+  ToggleGroupSize,
 } from "./toggle-group.types";
 
 import "./toggle-group.css";
@@ -34,6 +35,7 @@ import "./toggle-group.css";
 type ToggleGroupContextValue = {
   selectedValues: string[];
   disabled: boolean;
+  size: ToggleGroupSize;
   toggleValue: (value: string) => void;
   rovingFocus: UseRovingFocusReturn<HTMLButtonElement>;
 };
@@ -90,6 +92,7 @@ const ToggleGroupItem = ({
       {...buttonProps}
       ref={context.rovingFocus.getItemRef(value)}
       type="button"
+      size={context.size}
       variant={isSelected ? "toggle-active" : "toggle"}
       disabled={isDisabled}
       tabIndex={context.rovingFocus.getItemTabIndex(value, isDisabled)}
@@ -132,6 +135,7 @@ const ToggleGroupRoot = (props: ToggleGroupProps): ReactElement => {
     defaultValue,
     onValueChange,
     orientation = "horizontal",
+    size = "md",
     dir = "ltr",
     disabled = false,
     loop = true,
@@ -235,6 +239,7 @@ const ToggleGroupRoot = (props: ToggleGroupProps): ReactElement => {
   const contextValue: ToggleGroupContextValue = {
     selectedValues,
     disabled,
+    size,
     toggleValue,
     rovingFocus,
   };
@@ -283,5 +288,6 @@ export {
   type ToggleGroupSingleProps,
   type ToggleGroupMultipleProps,
   type ToggleGroupItemProps,
+  type ToggleGroupSize,
   type ToggleGroupOrientation,
 };

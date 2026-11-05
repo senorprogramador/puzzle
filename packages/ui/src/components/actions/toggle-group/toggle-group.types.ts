@@ -6,9 +6,10 @@ import type {
   ReactNode,
 } from "react";
 
-import type { ButtonNativeProps } from "../button/button.types";
+import type { ButtonNativeProps, ButtonSize } from "../button/button.types";
 
 type ToggleGroupOrientation = "horizontal" | "vertical";
+type ToggleGroupSize = ButtonSize;
 
 type ToggleGroupBaseProps = Omit<
   ComponentPropsWithoutRef<"div">,
@@ -16,6 +17,9 @@ type ToggleGroupBaseProps = Omit<
 > & {
   /** Layout direction of the items. Defaults to horizontal. */
   orientation?: ToggleGroupOrientation;
+
+  /** Size of every item. Defaults to medium. */
+  size?: ToggleGroupSize;
 
   /** Text direction, used to interpret horizontal arrow keys. */
   dir?: "ltr" | "rtl";
@@ -68,6 +72,7 @@ type ToggleGroupItemProps = Omit<
   | "value"
   | "variant"
   | "disabled"
+  | "size"
   | "onClick"
   | "onFocus"
   | "onKeyDown"
@@ -89,6 +94,7 @@ type ToggleGroupItemProps = Omit<
 
 export type {
   ToggleGroupOrientation,
+  ToggleGroupSize,
   ToggleGroupBaseProps,
   ToggleGroupSingleProps,
   ToggleGroupMultipleProps,

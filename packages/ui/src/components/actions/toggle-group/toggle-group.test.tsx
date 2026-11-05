@@ -15,6 +15,30 @@ const renderSingleGroup = (props: Partial<ToggleGroupSingleProps> = {}) =>
   );
 
 describe("ToggleGroup", () => {
+  it("applies the group size to every item", () => {
+    render(
+      <ToggleGroup size="lg">
+        <ToggleGroup.Item value="first">First</ToggleGroup.Item>
+        <ToggleGroup.Item value="second">Second</ToggleGroup.Item>
+      </ToggleGroup>,
+    );
+
+    expect(screen.getByRole("button", { name: "First" })).toHaveClass(
+      "puzzle-button--lg",
+    );
+    expect(screen.getByRole("button", { name: "Second" })).toHaveClass(
+      "puzzle-button--lg",
+    );
+  });
+
+  it("defaults to the medium button size", () => {
+    renderSingleGroup();
+
+    expect(screen.getByRole("button", { name: "Bold" })).toHaveClass(
+      "puzzle-button--md",
+    );
+  });
+
   it("renders an accessible group and exposes the selected item", () => {
     renderSingleGroup({ defaultValue: "italic" });
 

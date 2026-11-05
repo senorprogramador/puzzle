@@ -154,6 +154,10 @@
     -ms-overflow-style: none;
 }
 
+.puzzle-preview__stage[hidden] {
+    display: none;
+}
+
 .puzzle-preview__stage::-webkit-scrollbar {
     display: none;
     width: 0;
