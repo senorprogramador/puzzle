@@ -16,14 +16,14 @@ const items: TreeViewItem[] = [
         label: "Actions",
         children: [
           {
-            id: "button",
-            label: "Button",
-            href: "/components/actions/button",
-          },
-          {
             id: "button-group",
             label: "Button Group",
-            href: "/components/actions/button-group",
+            href: "/docs/components/actions/button-group",
+          },
+          {
+            id: "button",
+            label: "Button",
+            href: "/docs/components/actions/button",
           },
         ],
       },

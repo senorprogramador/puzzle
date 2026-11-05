@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as DocsSplatRouteImport } from './routes/docs/$'
-import { Route as ComponentsActionsButtonIndexRouteImport } from './routes/components/actions/button/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,46 +28,35 @@ const DocsSplatRoute = DocsSplatRouteImport.update({
   path: '/docs/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComponentsActionsButtonIndexRoute =
-  ComponentsActionsButtonIndexRouteImport.update({
-    id: '/components/actions/button/',
-    path: '/components/actions/button/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/search': typeof ApiSearchRoute
   '/docs/$': typeof DocsSplatRoute
-  '/components/actions/button/': typeof ComponentsActionsButtonIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/search': typeof ApiSearchRoute
   '/docs/$': typeof DocsSplatRoute
-  '/components/actions/button': typeof ComponentsActionsButtonIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/search': typeof ApiSearchRoute
   '/docs/$': typeof DocsSplatRoute
-  '/components/actions/button/': typeof ComponentsActionsButtonIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/search' | '/docs/$' | '/components/actions/button/'
+  fullPaths: '/' | '/api/search' | '/docs/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/search' | '/docs/$' | '/components/actions/button'
-  id:
-    '__root__' | '/' | '/api/search' | '/docs/$' | '/components/actions/button/'
+  to: '/' | '/api/search' | '/docs/$'
+  id: '__root__' | '/' | '/api/search' | '/docs/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiSearchRoute: typeof ApiSearchRoute
   DocsSplatRoute: typeof DocsSplatRoute
-  ComponentsActionsButtonIndexRoute: typeof ComponentsActionsButtonIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -94,13 +82,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/components/actions/button/': {
-      id: '/components/actions/button/'
-      path: '/components/actions/button'
-      fullPath: '/components/actions/button/'
-      preLoaderRoute: typeof ComponentsActionsButtonIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -108,7 +89,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiSearchRoute: ApiSearchRoute,
   DocsSplatRoute: DocsSplatRoute,
-  ComponentsActionsButtonIndexRoute: ComponentsActionsButtonIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

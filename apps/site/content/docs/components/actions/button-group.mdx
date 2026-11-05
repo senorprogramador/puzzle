@@ -1,0 +1,165 @@
+---
+title: Button Group
+description: Button groups organize related actions into a single, coherent control.
+---
+
+Use the ButtonGroup component to visually group related buttons. It arranges its children together without changing their individual behavior or appearance.
+
+## Import
+
+```tsx
+import { ButtonGroup } from "@puzzle/ui";
+```
+
+## Basic usage
+
+Place related Button components inside a ButtonGroup.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <ButtonGroup aria-label="Document actions">
+      <Button variant="secondary">Save draft</Button>
+      <Button>Publish</Button>
+    </ButtonGroup>
+`}
+>
+  <ButtonGroup aria-label="Document actions">
+    <Button variant="secondary">Save draft</Button>
+    <Button>Publish</Button>
+  </ButtonGroup>
+</Preview>
+
+ButtonGroup renders a `<div>` by default and gives it the `group` role. Provide an accessible name with `aria-label` or `aria-labelledby` so assistive technology can identify the related actions.
+
+## Orientation
+
+Use the `orientation` prop to arrange buttons horizontally or vertically. The default orientation is `horizontal`.
+
+<Preview
+  height={300}
+  align="center"
+  justify="center"
+  code={`\
+  <ButtonGroup orientation="vertical" aria-label="File actions">
+    <Button variant="secondary">Open</Button>
+    <Button variant="secondary">Rename</Button>
+    <Button variant="danger">Delete</Button>
+  </ButtonGroup>
+`}
+>
+  <ButtonGroup orientation="vertical" aria-label="File actions">
+    <Button variant="secondary">Open</Button>
+    <Button variant="secondary">Rename</Button>
+    <Button variant="danger">Delete</Button>
+  </ButtonGroup>
+</Preview>
+
+Orientation changes the visual layout only; it does not change the buttons' keyboard behavior.
+
+## Attached buttons
+
+Set `attached` to remove the space between buttons and visually join them.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+  <ButtonGroup attached aria-label="Text alignment">
+    <Button variant="secondary">Left</Button>
+    <Button variant="secondary">Center</Button>
+    <Button variant="secondary">Right</Button>
+  </ButtonGroup>
+`}
+>
+  <ButtonGroup attached aria-label="Text alignment">
+    <Button variant="secondary">Left</Button>
+    <Button variant="secondary">Center</Button>
+    <Button variant="secondary">Right</Button>
+  </ButtonGroup>
+</Preview>
+
+## Full width
+
+Use `fullWidth` to make the group fill its container and let its children flex to fill the available space.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+  <ButtonGroup fullWidth aria-label="Form actions">
+    <Button variant="secondary">Cancel</Button>
+    <Button>Continue</Button>
+  </ButtonGroup>
+`}
+>
+  <ButtonGroup fullWidth aria-label="Form actions">
+    <Button variant="secondary">Cancel</Button>
+    <Button>Continue</Button>
+  </ButtonGroup>
+</Preview>
+
+## Spacing
+
+Use `spacing` to set the gap between buttons. A number is interpreted as pixels; a string can be any valid CSS gap value. The default gap is `0.5rem`. Spacing has no effect when `attached` is enabled.
+
+```tsx
+<ButtonGroup spacing={12} aria-label="Page navigation">
+  <Button variant="secondary">Previous</Button>
+  <Button>Next</Button>
+</ButtonGroup>
+```
+
+## Disabled
+
+Use `disabled` to mark the group as unavailable to assistive technology.
+
+```tsx
+<ButtonGroup disabled aria-label="Unavailable actions">
+  <Button disabled>Save</Button>
+  <Button disabled>Publish</Button>
+</ButtonGroup>
+```
+
+The group receives `aria-disabled="true"`, but this does not disable its child buttons. Disable each child separately when its action must not be available.
+
+## API
+
+### Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `as` | `ElementType` | `"div"` | Element type used to render the group. |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Visual direction of the group. |
+| `attached` | `boolean` | `false` | Removes the gap and visually joins adjacent children. |
+| `fullWidth` | `boolean` | `false` | Makes the group fill its container and lets its children flex to fill the available space. |
+| `disabled` | `boolean` | `false` | Marks the group with `aria-disabled`; does not disable children. |
+| `spacing` | `number \| string` | — | Gap between children. Numbers are interpreted as pixels; strings are passed as CSS values. |
+| `className` | `string` | — | Additional CSS class names. |
+| `children` | `ReactNode` | — | Content displayed inside the group. |
+
+### Element props
+
+ButtonGroup accepts the props of the element selected by `as`. By default, standard `<div>` props are supported and passed through, including `aria-*` and `data-*` attributes. Its `role` defaults to `"group"` and can be overridden.
+
+### TypeScript types
+
+The component exports `ButtonGroupProps<C extends ElementType = "div">`. The generic follows the element selected by `as`, which defaults to `"div"`.
+
+## Accessibility
+
+### Group semantics
+
+ButtonGroup uses the `group` role by default. Give each group an accessible name with `aria-label` or `aria-labelledby`, especially when a page contains multiple groups.
+
+### Keyboard interaction
+
+The group does not add custom keyboard behavior. Each child control retains its standard keyboard interaction and focus behavior.
+
+### Disabled state
+
+`disabled` sets `aria-disabled` on the group but does not prevent interaction with its children. Apply each child control's disabled state as needed.
