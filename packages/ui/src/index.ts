@@ -236,6 +236,8 @@ export {
   type AccordionProps,
   type AccordionItemData,
   type AccordionType,
+  type AccordionItemId,
+  type AccordionValue,
 } from "./components/navigation/accordion";
 
 export {

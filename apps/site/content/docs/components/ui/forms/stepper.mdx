@@ -1,0 +1,20 @@
+---
+title: Stepper
+description: Show progress through a sequence of steps.
+---
+
+Set a stable `id` on each step and use `activeStepId` or `defaultActiveStepId` to keep selection with the same step after reordering. ID-based selection requires unique IDs on every step, and the active ID must match one of them. The index-based `activeStep` and `defaultActiveStep` props remain supported; out-of-range indices are clamped to an available step.
+
+```tsx
+<Stepper
+  clickable
+  defaultActiveStepId="shipping"
+  onStepIdChange={(id) => console.log(id)}
+>
+  <Stepper.Step id="details" label="Details" />
+  <Stepper.Step id="shipping" label="Shipping" />
+  <Stepper.Step id="payment" label="Payment" />
+</Stepper>
+```
+
+Clickable steps use roving focus: arrow keys move focus (in either orientation), Home and End move to the first and last selectable step, and Enter or Space activates the focused step. With the default `linear` behavior, steps ahead of the active step cannot be selected.

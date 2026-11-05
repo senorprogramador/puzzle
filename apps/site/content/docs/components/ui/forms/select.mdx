@@ -1,0 +1,19 @@
+---
+title: Select
+description: Choose one or more options from a popup list.
+---
+
+Select exposes a select-only combobox with a listbox popup. Prefer a visible `label`; when it is omitted, provide an accessible name with `aria-label` or `aria-labelledby`.
+
+```tsx
+<Select
+  label="Fruit"
+  options={[
+    { value: "apple", label: "Apple" },
+    { value: "pear", label: "Pear" },
+  ]}
+  placeholder="Choose a fruit"
+/>
+```
+
+The combobox keeps DOM focus while its popup is open and exposes the active option with `aria-activedescendant`. It supports arrow-key navigation, Home and End, typeahead, and Enter or Space to open or select. Escape closes the list.

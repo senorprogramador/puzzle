@@ -238,45 +238,6 @@ const groupOptions = <T,>(
   return Array.from(groups.values());
 };
 
-const getTabbableElements = (
-  trigger: HTMLElement,
-  excludedElement: HTMLElement | null,
-): HTMLElement[] => {
-  const ownerDocument = trigger.ownerDocument;
-  const ownerWindow = ownerDocument.defaultView;
-
-  const elements = Array.from(
-    ownerDocument.querySelectorAll<HTMLElement>(
-      [
-        "a[href]",
-        "area[href]",
-        "button:not([disabled])",
-        "input:not([disabled])",
-        "select:not([disabled])",
-        "textarea:not([disabled])",
-        "iframe",
-        "[tabindex]",
-        '[contenteditable="true"]',
-      ].join(","),
-    ),
-  );
-
-  return elements.filter((element) => {
-    if (
-      !element.isConnected ||
-      element.tabIndex < 0 ||
-      element.matches(":disabled") ||
-      element.getClientRects().length === 0 ||
-      excludedElement?.contains(element) ||
-      element.closest('[aria-hidden="true"]')
-    ) {
-      return false;
-    }
-
-    return ownerWindow?.getComputedStyle(element).visibility !== "hidden";
-  });
-};
-
 const Select = <T,>(props: SelectProps<T>) => {
   const {
     options,
@@ -335,7 +296,6 @@ const Select = <T,>(props: SelectProps<T>) => {
   const descriptionId = `${baseId}-description`;
   const errorId = `${baseId}-error`;
   const listboxId = `${baseId}-listbox`;
-  const valueId = `${baseId}-value`;
 
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const listboxRef = useRef<HTMLDivElement | null>(null);
@@ -534,10 +494,6 @@ const Select = <T,>(props: SelectProps<T>) => {
 
   const handleListboxRef = useCallback((node: HTMLDivElement | null) => {
     listboxRef.current = node;
-
-    // Popout mounts the content only when opening.
-    // Focus the listbox as soon as it enters the DOM.
-    node?.focus({ preventScroll: true });
   }, []);
 
   const handleTriggerClick = (event: ReactMouseEvent<HTMLButtonElement>) => {
@@ -564,6 +520,11 @@ const Select = <T,>(props: SelectProps<T>) => {
     onKeyDown?.(event);
 
     if (event.defaultPrevented || disabled) {
+      return;
+    }
+
+    if (isOpen) {
+      handleComboboxKeyDown(event);
       return;
     }
 
@@ -633,7 +594,9 @@ const Select = <T,>(props: SelectProps<T>) => {
     }
   };
 
-  const handleListboxKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+  const handleComboboxKeyDown = (
+    event: ReactKeyboardEvent<HTMLElement>,
+  ) => {
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
@@ -683,33 +646,9 @@ const Select = <T,>(props: SelectProps<T>) => {
         focusTrigger();
         return;
 
-      case "Tab": {
-        const trigger = triggerRef.current;
-
-        if (!trigger) {
-          changeOpenState(false);
-          return;
-        }
-
-        const popup =
-          listboxRef.current?.closest<HTMLElement>(".puzzle-popout__content") ??
-          null;
-
-        const tabbableElements = getTabbableElements(trigger, popup);
-
-        const triggerIndex = tabbableElements.indexOf(trigger);
-        const direction = event.shiftKey ? -1 : 1;
-        const nextElement = tabbableElements[triggerIndex + direction];
-
+      case "Tab":
         changeOpenState(false);
-
-        if (nextElement) {
-          event.preventDefault();
-          nextElement.focus();
-        }
-
         return;
-      }
 
       default:
         break;
@@ -809,8 +748,7 @@ const Select = <T,>(props: SelectProps<T>) => {
       : undefined;
 
   const resolvedLabelledBy =
-    ariaLabelledBy ??
-    [label != null ? labelId : undefined, valueId].filter(Boolean).join(" ");
+    ariaLabelledBy ?? (label != null ? labelId : undefined);
 
   const resolvedDescribedBy =
     [
@@ -842,6 +780,7 @@ const Select = <T,>(props: SelectProps<T>) => {
       ref={handleTriggerRef}
       id={triggerId}
       type="button"
+      role="combobox"
       disabled={disabled}
       className={cn("puzzle-select__trigger", className)}
       onClick={handleTriggerClick}
@@ -850,14 +789,15 @@ const Select = <T,>(props: SelectProps<T>) => {
       aria-label={ariaLabel}
       aria-labelledby={resolvedLabelledBy}
       aria-describedby={resolvedDescribedBy}
+      aria-autocomplete="none"
       aria-haspopup="listbox"
       aria-expanded={isOpen}
       aria-controls={isOpen ? listboxId : undefined}
+      aria-activedescendant={isOpen ? activeOptionId : undefined}
       aria-required={required || undefined}
       aria-invalid={hasError || undefined}
     >
       <span
-        id={valueId}
         className={cn(
           "puzzle-select__value",
           !hasSelection && "puzzle-select__placeholder",
@@ -971,12 +911,13 @@ const Select = <T,>(props: SelectProps<T>) => {
             id={listboxId}
             className={cn("puzzle-select__listbox", menuClassName)}
             role="listbox"
-            tabIndex={0}
-            aria-label={label != null ? undefined : ariaLabel}
-            aria-labelledby={label != null ? labelId : undefined}
+            aria-label={
+              label == null && ariaLabelledBy == null ? ariaLabel : undefined
+            }
+            aria-labelledby={
+              ariaLabelledBy ?? (label != null ? labelId : undefined)
+            }
             aria-multiselectable={multiple || undefined}
-            aria-activedescendant={activeOptionId}
-            onKeyDown={handleListboxKeyDown}
             style={listboxStyle}
           >
             {options.length === 0 ? (

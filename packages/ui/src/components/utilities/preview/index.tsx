@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useRef,
   useState,
@@ -72,14 +73,14 @@ const JUSTIFY_VALUES: Record<PreviewJustify, string> = {
   evenly: "space-evenly",
 };
 
-const PREVIEW_DOCUMENT = `<!doctype html>
+const createPreviewDocument = (rootId: string) => `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <div id="puzzle-preview-root"></div>
+    <div id="${rootId}"></div>
   </body>
 </html>`;
 
@@ -107,6 +108,11 @@ const Preview = ({
   justify,
   hideDevices = false,
 }: PreviewProps) => {
+  const generatedId = useId();
+  const frameRootId = `${generatedId}-root`;
+  const previewTabId = `${generatedId}-tab-preview`;
+  const codeTabId = `${generatedId}-tab-code`;
+  const panelId = `${generatedId}-panel`;
   const [device, setDevice] = useState<PreviewDevice>(defaultDevice);
   const [activeTab, setActiveTab] = useState<PreviewTab>("preview");
   const [frameRoot, setFrameRoot] = useState<HTMLElement | null>(null);
@@ -186,7 +192,7 @@ const Preview = ({
     body.style.setProperty("overflow", "visible", "important");
 
     // Remove the previous artificial minimum height.
-    const previewRoot = frameDocument.getElementById("puzzle-preview-root");
+    const previewRoot = frameDocument.getElementById(frameRootId);
 
     previewRoot?.style.removeProperty("min-height");
 
@@ -209,7 +215,7 @@ const Preview = ({
     `;
 
     frameHead.appendChild(scrollbarStyle);
-  }, []);
+  }, [frameRootId]);
 
   const updateScale = useCallback(
     (availableWidth: number) => {
@@ -304,13 +310,13 @@ const Preview = ({
   // Initialize the iframe without blocking the React portal on stylesheets.
   const initializeFrame = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
-    const root = frameDocument?.getElementById("puzzle-preview-root");
+    const root = frameDocument?.getElementById(frameRootId);
 
     if (!root) return;
 
     syncStyles();
     setFrameRoot(root);
-  }, [syncStyles]);
+  }, [frameRootId, syncStyles]);
 
   // Handle both initial loading and an already-loaded iframe.
   useEffect(() => {
@@ -375,12 +381,12 @@ const Preview = ({
   };
 
   const panelProps = {
-    id: "puzzle-preview-panel",
+    id: panelId,
     role: "tabpanel",
     "aria-labelledby":
       activeTab === "preview"
-        ? "puzzle-preview-tab-preview"
-        : "puzzle-preview-tab-code",
+        ? previewTabId
+        : codeTabId,
   };
 
   return (
@@ -394,9 +400,9 @@ const Preview = ({
           <button
             type="button"
             role="tab"
-            id="puzzle-preview-tab-preview"
+            id={previewTabId}
             aria-selected={activeTab === "preview"}
-            aria-controls="puzzle-preview-panel"
+            aria-controls={panelId}
             className={cn(
               "puzzle-preview__tab",
               activeTab === "preview" && "puzzle-preview__tab--active",
@@ -410,9 +416,9 @@ const Preview = ({
             <button
               type="button"
               role="tab"
-              id="puzzle-preview-tab-code"
+              id={codeTabId}
               aria-selected={activeTab === "code"}
-              aria-controls="puzzle-preview-panel"
+              aria-controls={panelId}
               className={cn(
                 "puzzle-preview__tab",
                 activeTab === "code" && "puzzle-preview__tab--active",
@@ -480,7 +486,7 @@ const Preview = ({
             <iframe
               ref={iframeRef}
               className="puzzle-preview__frame"
-              srcDoc={PREVIEW_DOCUMENT}
+              srcDoc={createPreviewDocument(frameRootId)}
               title={`${config.label} component preview`}
               onLoad={initializeFrame}
               style={frameStyle}

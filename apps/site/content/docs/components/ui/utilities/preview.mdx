@@ -1,0 +1,14 @@
+---
+title: Preview
+description: Preview content in a resizable device frame.
+---
+
+Use `Preview` to display a component in an isolated iframe, with optional source code and device-size controls.
+
+```tsx
+<Preview code="<Button>Save</Button>" defaultDevice="mobile">
+  <Button>Save</Button>
+</Preview>
+```
+
+Each instance generates its own tab, panel, and iframe-root IDs, so multiple previews can be rendered on the same page without conflicting accessibility relationships.

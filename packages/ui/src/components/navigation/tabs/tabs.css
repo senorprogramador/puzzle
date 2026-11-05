@@ -55,8 +55,13 @@
         background-color var(--puzzle-tabs-duration) var(--puzzle-tabs-easing);
 }
 
-.puzzle-tabs__trigger:hover {
+.puzzle-tabs__trigger:hover:not(:disabled) {
     color: var(--puzzle-color-text);
+}
+
+.puzzle-tabs__trigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
 }
 
 .puzzle-tabs__trigger:focus-visible {

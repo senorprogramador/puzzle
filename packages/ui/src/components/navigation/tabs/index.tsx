@@ -26,6 +26,9 @@ type TabsTabProps = {
   /** Unique identifier of the tab. */
   id: string;
 
+  /** Prevents this tab from being selected or focused. */
+  disabled?: boolean;
+
   /** Content rendered inside the tab trigger. */
   tab: ReactNode;
 
@@ -72,18 +75,19 @@ const TabsRoot = ({
 
   const tabs = Children.toArray(children).filter(isTabElement);
 
-  const firstTabId = tabs[0]?.props.id;
+  const firstEnabledTabId = tabs.find((tab) => !tab.props.disabled)?.props.id;
 
   const [uncontrolledActiveId, setUncontrolledActiveId] = useState<
     string | undefined
-  >(() => initialActiveId ?? firstTabId);
+  >(() => initialActiveId ?? firstEnabledTabId);
 
   const requestedActiveId = isControlled ? activeId : uncontrolledActiveId;
 
-  // Always resolve to a valid tab, even when tabs change dynamically.
-  const currentActiveId = tabs.some((tab) => tab.props.id === requestedActiveId)
+  const currentActiveId = tabs.some(
+    (tab) => tab.props.id === requestedActiveId && !tab.props.disabled,
+  )
     ? requestedActiveId
-    : firstTabId;
+    : firstEnabledTabId;
 
   const isVertical = tabBarPosition === "left" || tabBarPosition === "right";
   const dir = rootProps.dir === "rtl" ? "rtl" : "ltr";
@@ -114,6 +118,7 @@ const TabsRoot = ({
   const rovingFocus = useRovingFocus<HTMLButtonElement>({
     items: tabs.map((tab) => ({
       id: tab.props.id,
+      disabled: tab.props.disabled,
     })),
     orientation: isVertical ? "vertical" : "horizontal",
     dir,
@@ -123,7 +128,9 @@ const TabsRoot = ({
   const isKeyboardNavigation = useRef(false);
 
   const activateTab = (tabId: string) => {
-    if (!tabs.some((tab) => tab.props.id === tabId)) {
+    if (
+      !tabs.some((tab) => tab.props.id === tabId && !tab.props.disabled)
+    ) {
       return;
     }
 
@@ -181,7 +188,7 @@ const TabsRoot = ({
         aria-orientation={isVertical ? "vertical" : "horizontal"}
       >
         {tabs.map((tab) => {
-          const { id, tab: tabContent } = tab.props;
+          const { id, tab: tabContent, disabled = false } = tab.props;
           const isActive = id === currentActiveId;
 
           return (
@@ -192,9 +199,10 @@ const TabsRoot = ({
               type="button"
               role="tab"
               className="puzzle-tabs__trigger"
+              disabled={disabled}
               aria-selected={isActive}
               aria-controls={getPanelId(id)}
-              tabIndex={isActive ? 0 : -1}
+              tabIndex={disabled ? -1 : isActive ? 0 : -1}
               data-state={isActive ? "active" : "inactive"}
               onClick={() => handleClick(id)}
               onFocus={() => handleFocus(id)}

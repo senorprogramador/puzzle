@@ -1,6 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useState } from "react";
 
 import { Carousel } from "./index";
 import { CarouselController } from "./controller";
@@ -60,6 +61,30 @@ afterEach(() => {
 });
 
 describe("Carousel", () => {
+  it("keeps item component state attached to stable keys after reordering", async () => {
+    const user = userEvent.setup();
+    const renderItems = (currentItems: string[]) => (
+      <CarouselController<string> items={currentItems}>
+        <Carousel<string>
+          getItemKey={(item) => item}
+          renderItem={(item) => <StatefulSlide item={item} />}
+          panelsPerView={2}
+        />
+      </CarouselController>
+    );
+    const { rerender } = render(renderItems(["A", "B"]));
+
+    await user.click(screen.getByRole("button", { name: "Count A: 0" }));
+    rerender(renderItems(["C", "A", "B"]));
+
+    expect(
+      screen.getByRole("button", { name: "Count A: 1" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Count C: 0" }),
+    ).toBeInTheDocument();
+  });
+
   it("renders all supplied items", () => {
     renderCarousel();
 
@@ -205,3 +230,13 @@ describe("Carousel", () => {
     expect(screen.getByRole("button", { name: "Next" })).toBeDisabled();
   });
 });
+
+const StatefulSlide = ({ item }: { item: string }) => {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button type="button" onClick={() => setCount((value) => value + 1)}>
+      Count {item}: {count}
+    </button>
+  );
+};

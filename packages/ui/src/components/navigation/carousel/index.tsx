@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type Key,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactElement,
@@ -54,6 +55,9 @@ type DragState = {
 
 type CarouselProps<T> = {
   renderItem: (item: T, index: number) => ReactNode;
+
+  /** Returns a stable React key when items may be inserted, removed, or reordered. */
+  getItemKey?: (item: T, index: number) => Key;
 
   panelsPerView?: ResponsiveValue<number>;
   itemWidth?: ResponsiveValue<CSSProperties["width"]>;
@@ -216,6 +220,7 @@ const cloneNavigationButton = (
 
 const Carousel = <T,>({
   renderItem,
+  getItemKey,
   panelsPerView,
   itemWidth,
   gap = 0,
@@ -915,7 +920,7 @@ const Carousel = <T,>({
           >
             {items.map((item, index) => (
               <div
-                key={index}
+                key={getItemKey ? getItemKey(item, index) : index}
                 ref={(node) => {
                   itemRefs.current[index] = node;
                 }}

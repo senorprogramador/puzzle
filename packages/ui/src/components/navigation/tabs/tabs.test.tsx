@@ -108,6 +108,37 @@ describe("Tabs", () => {
     expect(profile).toHaveAttribute("aria-selected", "true");
   });
 
+  it("skips disabled tabs during focus and activation", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <Tabs>
+        <TabsTab id="overview" tab="Overview">
+          Overview content
+        </TabsTab>
+        <TabsTab id="settings" tab="Settings" disabled>
+          Settings content
+        </TabsTab>
+        <TabsTab id="profile" tab="Profile">
+          Profile content
+        </TabsTab>
+      </Tabs>,
+    );
+
+    const overview = screen.getByRole("tab", { name: "Overview" });
+    const settings = screen.getByRole("tab", { name: "Settings" });
+    const profile = screen.getByRole("tab", { name: "Profile" });
+
+    expect(settings).toBeDisabled();
+
+    overview.focus();
+    await user.keyboard("{ArrowRight}");
+
+    expect(profile).toHaveFocus();
+    expect(profile).toHaveAttribute("aria-selected", "true");
+    expect(settings).toHaveAttribute("aria-selected", "false");
+  });
+
   it("supports Home and End navigation", async () => {
     const user = userEvent.setup();
 

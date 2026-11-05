@@ -1,0 +1,22 @@
+---
+title: Tabs
+description: Switch between related panels of content.
+---
+
+Tabs use automatic activation: keyboard focus changes the selected panel. Disabled tabs are skipped during arrow-key navigation. Horizontal arrow keys follow the text direction, including RTL; Home and End move to the first and last enabled tab.
+
+```tsx
+<Tabs dir="rtl" initialActiveId="details">
+  <Tabs.Tab id="overview" tab="Overview">
+    Overview content
+  </Tabs.Tab>
+  <Tabs.Tab id="details" tab="Details">
+    Details content
+  </Tabs.Tab>
+  <Tabs.Tab id="settings" tab="Settings" disabled>
+    Settings content
+  </Tabs.Tab>
+</Tabs>
+```
+
+Use `activeId` with `onActivate` for controlled selection. `initialActiveId` sets the initial tab for uncontrolled usage. Each tab needs a unique `id`.

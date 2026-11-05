@@ -1,0 +1,16 @@
+---
+title: Carousel
+description: Browse a collection of items with carousel navigation.
+---
+
+Provide `getItemKey` when items can be inserted, removed, or reordered. Stable keys keep each item's component state attached to that item. If omitted, the carousel continues to use each item's index.
+
+```tsx
+<CarouselController items={products}>
+  <Carousel
+    getItemKey={(product) => product.id}
+    renderItem={(product) => <ProductCard product={product} />}
+    panelsPerView={3}
+  />
+</CarouselController>
+```

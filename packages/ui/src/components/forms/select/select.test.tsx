@@ -41,11 +41,27 @@ describe("Select", () => {
       <Select label="Fruit" options={options} placeholder="Choose fruit" />,
     );
 
-    const trigger = screen.getByRole("button", { name: /fruit/i });
+    const trigger = screen.getByRole("combobox", { name: /fruit/i });
 
     expect(trigger).toHaveAttribute("aria-haspopup", "listbox");
     expect(trigger).toHaveAttribute("aria-expanded", "false");
     expect(trigger).toHaveAttribute("aria-labelledby");
+    expect(trigger).not.toHaveAttribute("aria-controls");
+    expect(trigger).not.toHaveAttribute("aria-activedescendant");
+  });
+
+  it("uses aria-label as the accessible name when there is no visible label", () => {
+    render(
+      <Select
+        aria-label="Choose a fruit"
+        options={options}
+        defaultValue="apple"
+      />,
+    );
+
+    expect(
+      screen.getByRole("combobox", { name: "Choose a fruit" }),
+    ).toHaveAttribute("aria-autocomplete", "none");
   });
 
   it("opens with ArrowDown", async () => {
@@ -53,13 +69,14 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} />);
 
-    const trigger = screen.getByRole("button", { name: /fruit/i });
+    const trigger = screen.getByRole("combobox", { name: /fruit/i });
 
     trigger.focus();
     await user.keyboard("{ArrowDown}");
 
     expect(await screen.findByRole("listbox")).toBeInTheDocument();
     expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(trigger).toHaveAttribute("aria-controls");
   });
 
   it("opens with Enter", async () => {
@@ -67,7 +84,7 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} />);
 
-    screen.getByRole("button", { name: /fruit/i }).focus();
+    screen.getByRole("combobox", { name: /fruit/i }).focus();
 
     await user.keyboard("{Enter}");
 
@@ -79,7 +96,7 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} />);
 
-    screen.getByRole("button", { name: /fruit/i }).focus();
+    screen.getByRole("combobox", { name: /fruit/i }).focus();
 
     await user.keyboard(" ");
 
@@ -91,15 +108,16 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} />);
 
-    screen.getByRole("button", { name: /fruit/i }).focus();
+    screen.getByRole("combobox", { name: /fruit/i }).focus();
 
     await user.keyboard("{ArrowDown}");
 
-    const listbox = await screen.findByRole("listbox");
+    await screen.findByRole("listbox");
+    const combobox = screen.getByRole("combobox", { name: /fruit/i });
 
     await user.keyboard("{ArrowDown}");
 
-    expect(listbox).toHaveAttribute(
+    expect(combobox).toHaveAttribute(
       "aria-activedescendant",
       expect.stringContaining("option-1"),
     );
@@ -110,16 +128,17 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} />);
 
-    screen.getByRole("button", { name: /fruit/i }).focus();
+    screen.getByRole("combobox", { name: /fruit/i }).focus();
 
     await user.keyboard("{ArrowDown}");
 
-    const listbox = await screen.findByRole("listbox");
+    await screen.findByRole("listbox");
+    const combobox = screen.getByRole("combobox", { name: /fruit/i });
 
     await user.keyboard("{ArrowDown}");
     await user.keyboard("{ArrowDown}");
 
-    expect(listbox).toHaveAttribute(
+    expect(combobox).toHaveAttribute(
       "aria-activedescendant",
       expect.stringContaining("option-3"),
     );
@@ -130,22 +149,23 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} />);
 
-    screen.getByRole("button", { name: /fruit/i }).focus();
+    screen.getByRole("combobox", { name: /fruit/i }).focus();
 
     await user.keyboard("{ArrowDown}");
 
-    const listbox = await screen.findByRole("listbox");
+    await screen.findByRole("listbox");
+    const combobox = screen.getByRole("combobox", { name: /fruit/i });
 
     await user.keyboard("{End}");
 
-    expect(listbox).toHaveAttribute(
+    expect(combobox).toHaveAttribute(
       "aria-activedescendant",
       expect.stringContaining("option-3"),
     );
 
     await user.keyboard("{Home}");
 
-    expect(listbox).toHaveAttribute(
+    expect(combobox).toHaveAttribute(
       "aria-activedescendant",
       expect.stringContaining("option-0"),
     );
@@ -156,13 +176,13 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} />);
 
-    screen.getByRole("button", { name: /fruit/i }).focus();
+    screen.getByRole("combobox", { name: /fruit/i }).focus();
 
     await user.keyboard("d");
 
-    const listbox = await screen.findByRole("listbox");
+    await screen.findByRole("listbox");
 
-    expect(listbox).toHaveAttribute(
+    expect(screen.getByRole("combobox", { name: /fruit/i })).toHaveAttribute(
       "aria-activedescendant",
       expect.stringContaining("option-3"),
     );
@@ -174,7 +194,7 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} onChange={onChange} />);
 
-    await user.click(screen.getByRole("button", { name: /fruit/i }));
+    await user.click(screen.getByRole("combobox", { name: /fruit/i }));
 
     await user.click(await screen.findByRole("option", { name: "Banana" }));
 
@@ -207,13 +227,13 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} />);
 
-    const trigger = screen.getByRole("button", { name: /fruit/i });
+    const trigger = screen.getByRole("combobox", { name: /fruit/i });
 
     await user.click(trigger);
 
-    const listbox = await screen.findByRole("listbox");
+    await screen.findByRole("listbox");
 
-    expect(listbox).toHaveFocus();
+    expect(trigger).toHaveFocus();
 
     await user.keyboard("{Escape}");
 
@@ -231,7 +251,7 @@ describe("Select", () => {
       <Select label="Fruit" multiple options={options} onChange={onChange} />,
     );
 
-    await user.click(screen.getByRole("button", { name: /fruit/i }));
+    await user.click(screen.getByRole("combobox", { name: /fruit/i }));
 
     const listbox = await screen.findByRole("listbox");
 
@@ -269,7 +289,7 @@ describe("Select", () => {
 
     render(<Select label="Fruit" options={options} disabled />);
 
-    const trigger = screen.getByRole("button", { name: /fruit/i });
+    const trigger = screen.getByRole("combobox", { name: /fruit/i });
 
     expect(trigger).toBeDisabled();
 
@@ -307,7 +327,7 @@ describe("Select", () => {
       />,
     );
 
-    const trigger = screen.getByRole("button", { name: /fruit/i });
+    const trigger = screen.getByRole("combobox", { name: /fruit/i });
 
     expect(trigger).toHaveAttribute("aria-describedby");
     expect(trigger).toHaveAttribute("aria-invalid", "true");

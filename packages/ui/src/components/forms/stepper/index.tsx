@@ -1,6 +1,11 @@
 "use client";
 
-import { cn, resolveResponsiveValue, type ResponsiveValue } from "@puzzle/core";
+import {
+  cn,
+  resolveResponsiveValue,
+  type ResponsiveValue,
+} from "@puzzle/core";
+import { useRovingFocus } from "@puzzle/hooks";
 import {
   Children,
   isValidElement,
@@ -43,14 +48,23 @@ type StepperStepProps = {
 };
 
 type StepperProps = Omit<ComponentPropsWithoutRef<"ol">, "children"> & {
-  /** Active step index. Enables controlled usage. Defaults to 0. */
+  /** Active step index. Values are clamped to available steps. Defaults to 0. */
   activeStep?: number;
+
+  /** Active step ID. Enables controlled ID-based selection. */
+  activeStepId?: string | number;
 
   /** Initial active step for uncontrolled usage. Defaults to 0. */
   defaultActiveStep?: number;
 
+  /** Initial active step ID for uncontrolled ID-based selection. */
+  defaultActiveStepId?: string | number;
+
   /** Called when the active step changes. */
   onStepChange?: (step: number) => void;
+
+  /** Called when an ID-based active step changes. */
+  onStepIdChange?: (stepId: string | number) => void;
 
   /** Layout direction, optionally responsive. */
   orientation?: ResponsiveValue<StepperOrientation>;
@@ -73,8 +87,11 @@ const isStepperStep = (child: ReactNode): child is StepperStepElement =>
 
 const StepperRoot = ({
   activeStep,
+  activeStepId,
   defaultActiveStep = 0,
+  defaultActiveStepId,
   onStepChange,
+  onStepIdChange,
   orientation = "horizontal",
   clickable = false,
   linear = true,
@@ -82,21 +99,89 @@ const StepperRoot = ({
   className,
   ...rootProps
 }: StepperProps) => {
-  const isControlled = activeStep !== undefined;
-
   const [uncontrolledActiveStep, setUncontrolledActiveStep] =
     useState(defaultActiveStep);
-
-  const requestedActiveStep = isControlled
-    ? activeStep
-    : uncontrolledActiveStep;
-
-  const currentActiveStep = Number.isFinite(requestedActiveStep)
-    ? Math.max(-1, Math.trunc(requestedActiveStep))
-    : 0;
+  const [uncontrolledActiveStepId, setUncontrolledActiveStepId] =
+    useState(defaultActiveStepId);
 
   const orientations = resolveResponsiveValue(orientation);
   const steps = Children.toArray(children).filter(isStepperStep);
+  const isIdSelection =
+    activeStepId !== undefined || defaultActiveStepId !== undefined;
+  const requestedActiveStepId = activeStepId ?? uncontrolledActiveStepId;
+
+  if (isIdSelection) {
+    const stepIds = new Set<string>();
+
+    for (const step of steps) {
+      const id = step.props.id;
+
+      if (id === undefined) {
+        throw new Error(
+          "Stepper ID-based selection requires an id on every step.",
+        );
+      }
+
+      const key = `${typeof id}:${id}`;
+
+      if (stepIds.has(key)) {
+        throw new Error("Stepper step IDs must be unique.");
+      }
+
+      stepIds.add(key);
+    }
+  }
+
+  const requestedActiveStep = activeStep ?? uncontrolledActiveStep;
+  const requestedActiveStepIndex = isIdSelection
+    ? steps.findIndex((step) => step.props.id === requestedActiveStepId)
+    : undefined;
+
+  if (
+    isIdSelection &&
+    steps.length > 0 &&
+    requestedActiveStepIndex === -1
+  ) {
+    throw new Error("Stepper activeStepId must match an available step ID.");
+  }
+
+  const currentActiveStep = isIdSelection
+    ? (requestedActiveStepIndex ?? -1)
+    : steps.length === 0
+      ? -1
+      : Number.isFinite(requestedActiveStep)
+        ? Math.min(
+            steps.length - 1,
+            Math.max(0, Math.trunc(requestedActiveStep)),
+          )
+        : 0;
+  const direction = rootProps.dir === "rtl" ? "rtl" : "ltr";
+
+  const focusItems = steps.map((step, index) => {
+    const selectable =
+      clickable &&
+      !step.props.disabled &&
+      (!linear || index <= currentActiveStep);
+
+    return {
+      id:
+        step.props.id === undefined
+          ? `index:${index}`
+          : `${typeof step.props.id}:${step.props.id}`,
+      disabled: !selectable,
+    };
+  });
+
+  const activeFocusId =
+    currentActiveStep >= 0
+      ? focusItems[currentActiveStep]?.id
+      : undefined;
+  const rovingFocus = useRovingFocus<HTMLButtonElement>({
+    items: focusItems,
+    orientation: "both",
+    dir: direction,
+    initialActiveId: activeFocusId,
+  });
 
   return (
     <ol
@@ -130,17 +215,26 @@ const StepperRoot = ({
               : "upcoming";
 
         const selectable = !disabled && (!linear || index <= currentActiveStep);
+        const focusId =
+          id === undefined ? `index:${index}` : `${typeof id}:${id}`;
 
         const handleClick = () => {
           if (!selectable || index === currentActiveStep) {
             return;
           }
 
-          if (!isControlled) {
+          if (isIdSelection) {
+            if (activeStepId === undefined) {
+              setUncontrolledActiveStepId(id);
+            }
+          } else if (activeStep === undefined) {
             setUncontrolledActiveStep(index);
           }
 
           onStepChange?.(index);
+          if (isIdSelection && id !== undefined) {
+            onStepIdChange?.(id);
+          }
         };
 
         const content = (
@@ -172,7 +266,9 @@ const StepperRoot = ({
 
         return (
           <li
-            key={id ?? step.key ?? index}
+            key={
+              id === undefined ? (step.key ?? index) : `${typeof id}:${id}`
+            }
             className={cn("puzzle-stepper__item", stepClassName)}
             data-state={state}
             data-disabled={
@@ -185,6 +281,12 @@ const StepperRoot = ({
                 type="button"
                 className="puzzle-stepper__step"
                 disabled={!selectable}
+                ref={rovingFocus.getItemRef(focusId)}
+                tabIndex={rovingFocus.getItemTabIndex(focusId, !selectable)}
+                onFocus={() => rovingFocus.onItemFocus(focusId)}
+                onKeyDown={(event) =>
+                  rovingFocus.onItemKeyDown(event, focusId)
+                }
                 onClick={handleClick}
               >
                 {content}

@@ -1,0 +1,22 @@
+---
+title: Accordion
+description: Show and hide related sections of content.
+---
+
+Use stable item IDs with `defaultValue` or `value` so open sections stay associated with the same items when the list is reordered. ID-based selection requires every item to have a unique `id`.
+
+```tsx
+const items = [
+  { id: "shipping", title: "Shipping", content: "Shipping details" },
+  { id: "returns", title: "Returns", content: "Return details" },
+];
+
+<Accordion
+  items={items}
+  type="single"
+  defaultValue="shipping"
+  onValueChange={(id) => console.log(id)}
+/>
+```
+
+In `multiple` mode, pass an array of IDs. The existing `initialOpenItemIndexes`, `openItemIndexes`, and `onChange` index API remains available for compatibility.

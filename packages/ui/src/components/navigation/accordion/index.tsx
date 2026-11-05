@@ -13,6 +13,11 @@ import { Transition } from "../../utilities/transition";
 import "./accordion.css";
 
 type AccordionType = "single" | "multiple";
+type AccordionItemId = string | number;
+type AccordionValue =
+  | AccordionItemId
+  | readonly AccordionItemId[]
+  | null;
 
 type AccordionItemData = {
   /** Stable key for the item when the list is reordered. */
@@ -43,6 +48,15 @@ type AccordionProps = Omit<
 
   /** Called with the next expanded indexes after user interaction. */
   onChange?: (openItemIndexes: number[]) => void;
+
+  /** Expanded item ID(s). Requires an ID on every item. */
+  value?: AccordionValue;
+
+  /** Initially expanded item ID(s). Requires an ID on every item. */
+  defaultValue?: AccordionValue;
+
+  /** Called with the next expanded item ID(s). */
+  onValueChange?: (value: AccordionItemId | AccordionItemId[] | null) => void;
 
   /** Whether multiple items can be expanded simultaneously. */
   type?: AccordionType;
@@ -89,11 +103,25 @@ const normalizeOpenItemIndexes = (
   return validIndexes.sort((a, b) => a - b);
 };
 
+const normalizeOpenItemIds = (
+  value: AccordionValue | undefined,
+  type: AccordionType,
+): AccordionItemId[] => {
+  const ids =
+    value == null ? [] : Array.isArray(value) ? [...value] : [value];
+  const uniqueIds = Array.from(new Set(ids));
+
+  return type === "single" ? uniqueIds.slice(0, 1) : uniqueIds;
+};
+
 const Accordion = ({
   items,
   initialOpenItemIndexes,
   openItemIndexes,
   onChange,
+  value,
+  defaultValue,
+  onValueChange,
   type = "multiple",
   collapsible = true,
   headingLevel = 3,
@@ -106,20 +134,53 @@ const Accordion = ({
   ...rootProps
 }: AccordionProps) => {
   const generatedId = useId();
-  const isControlled = openItemIndexes !== undefined;
+  const isValueMode = value !== undefined || defaultValue !== undefined;
+  const isValueControlled = value !== undefined;
   const triggerRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  if (isValueMode) {
+    const itemIds = new Set<string>();
+
+    for (const item of items) {
+      if (item.id === undefined) {
+        throw new Error(
+          "Accordion value and defaultValue require an id on every item.",
+        );
+      }
+
+      const key = `${typeof item.id}:${item.id}`;
+
+      if (itemIds.has(key)) {
+        throw new Error("Accordion item IDs must be unique.");
+      }
+
+      itemIds.add(key);
+    }
+  }
 
   const [uncontrolledOpenItemIndexes, setUncontrolledOpenItemIndexes] =
     useState<number[]>(() =>
       normalizeOpenItemIndexes(initialOpenItemIndexes, items.length, type),
     );
 
-  const currentOpenItemIndexes = normalizeOpenItemIndexes(
-    isControlled ? openItemIndexes : uncontrolledOpenItemIndexes,
-    items.length,
+  const [uncontrolledOpenItemIds, setUncontrolledOpenItemIds] = useState<
+    AccordionItemId[]
+  >(() => normalizeOpenItemIds(defaultValue, type));
+
+  const requestedOpenItemIds = normalizeOpenItemIds(
+    isValueControlled ? value : uncontrolledOpenItemIds,
     type,
   );
+  const currentOpenItemIndexes = isValueMode
+    ? items.flatMap((item, index) =>
+        requestedOpenItemIds.includes(item.id as AccordionItemId) ? [index] : [],
+      )
+    : normalizeOpenItemIndexes(
+        openItemIndexes ?? uncontrolledOpenItemIndexes,
+        items.length,
+        type,
+      );
 
   const HeadingTag = `h${headingLevel}` as
     | "h1"
@@ -155,7 +216,19 @@ const Accordion = ({
       type,
     );
 
-    if (!isControlled) {
+    if (isValueMode) {
+      const nextIds = nextOpenItemIndexes.map(
+        (openIndex) => items[openIndex].id as AccordionItemId,
+      );
+
+      if (!isValueControlled) {
+        setUncontrolledOpenItemIds(nextIds);
+      }
+
+      onValueChange?.(
+        type === "single" ? (nextIds[0] ?? null) : nextIds,
+      );
+    } else if (openItemIndexes === undefined) {
       setUncontrolledOpenItemIndexes(nextOpenItemIndexes);
     }
 
@@ -172,7 +245,13 @@ const Accordion = ({
         const panelId = `${generatedId}-panel-${index}`;
 
         return (
-          <Fragment key={item.id ?? index}>
+          <Fragment
+            key={
+              item.id === undefined
+                ? index
+                : `${typeof item.id}:${item.id}`
+            }
+          >
             <HeadingTag className="puzzle-accordion__heading">
               <button
                 ref={(node) => {
@@ -235,4 +314,6 @@ export {
   type AccordionProps,
   type AccordionItemData,
   type AccordionType,
+  type AccordionItemId,
+  type AccordionValue,
 };
