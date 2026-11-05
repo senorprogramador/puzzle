@@ -6,5 +6,7 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ["react", "@puzzle/core"],
+  deps: {
+    neverBundle: ["react", "@puzzle/core"],
+  },
 });
