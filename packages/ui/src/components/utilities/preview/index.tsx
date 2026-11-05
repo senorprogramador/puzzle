@@ -140,8 +140,11 @@ const Preview = ({
       .querySelectorAll("[data-puzzle-preview-style]")
       .forEach((element) => element.remove());
 
-    document.head
-      .querySelectorAll('link[rel="stylesheet"], style')
+    // Theme renders its <style> where it is mounted (often inside <body>).
+    document
+      .querySelectorAll(
+        'head link[rel="stylesheet"], head style, style[data-puzzle-theme]',
+      )
       .forEach((element) => {
         const clone = element.cloneNode(true) as HTMLElement;
 
@@ -265,16 +268,52 @@ const Preview = ({
 
   // Keep application styles synchronized with the iframe.
   useEffect(() => {
-    const observer = new MutationObserver(syncStyles);
+    const isStyleNode = (node: Node) =>
+      node instanceof Element &&
+      (node.matches("style, link[rel='stylesheet']") ||
+        node.querySelector("style, link[rel='stylesheet']") !== null);
 
-    observer.observe(document.head, {
+    const headObserver = new MutationObserver(syncStyles);
+
+    headObserver.observe(document.head, {
       childList: true,
       subtree: true,
       characterData: true,
       attributes: true,
     });
 
-    return () => observer.disconnect();
+    // Only react to style changes in the body, not to all page updates.
+    const bodyObserver = new MutationObserver((mutations) => {
+      const affectsStyles = mutations.some((mutation) => {
+        const target =
+          mutation.target instanceof Element
+            ? mutation.target
+            : mutation.target.parentElement;
+
+        return (
+          target?.closest("style[data-puzzle-theme]") != null ||
+          Array.from(mutation.addedNodes).some(isStyleNode) ||
+          Array.from(mutation.removedNodes).some(isStyleNode)
+        );
+      });
+
+      if (affectsStyles) {
+        syncStyles();
+      }
+    });
+
+    bodyObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    return () => {
+      headObserver.disconnect();
+      bodyObserver.disconnect();
+    };
   }, [syncStyles]);
 
   // Initialize the iframe without blocking the React portal on stylesheets.

@@ -19,6 +19,7 @@ export type {
   ThemeTokens,
   ThemeTokenOverrides,
   ThemeColorSchemeTokens,
+  ColorTheme,
 } from "./types";
 
 export type {

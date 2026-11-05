@@ -1,36 +1,64 @@
 .puzzle-button-group {
-    display: flex;
-    gap: 1px;
+    display: inline-flex;
+    align-items: stretch;
+    gap: var(--puzzle-button-group-gap, 0.5rem);
+    min-width: 0;
 }
 
-.puzzle-button-group--row button:not(:first-child):not(:last-child) {
-    border-radius: 0;
+.puzzle-button-group--horizontal {
+    flex-direction: row;
 }
 
-.puzzle-button-group--row button:first-child {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.puzzle-button-group--row button:last-child {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.puzzle-button-group--column {
+.puzzle-button-group--vertical {
     flex-direction: column;
 }
 
-.puzzle-button-group--column button:not(:first-child):not(:last-child) {
+.puzzle-button-group--full-width {
+    display: flex;
+    width: 100%;
+}
+
+.puzzle-button-group--full-width > * {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.puzzle-button-group--attached {
+    gap: 0;
+}
+
+.puzzle-button-group--attached > *:not(:first-child) {
+    margin-inline-start: -1px;
+}
+
+.puzzle-button-group--horizontal .puzzle-button-group--attached {
+    border-radius: inherit;
+}
+
+.puzzle-button-group--attached > *:not(:first-child):not(:last-child) {
     border-radius: 0;
 }
 
-.puzzle-button-group--column button:first-child {
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
+.puzzle-button-group--horizontal .puzzle-button-group--attached > *:first-child {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
 }
 
-.puzzle-button-group--column button:last-child {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+.puzzle-button-group--horizontal .puzzle-button-group--attached > *:last-child {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+}
+
+.puzzle-button-group--vertical .puzzle-button-group--attached > *:first-child {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+}
+
+.puzzle-button-group--vertical .puzzle-button-group--attached > *:last-child {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+}
+
+.puzzle-button-group--disabled {
+    cursor: not-allowed;
 }

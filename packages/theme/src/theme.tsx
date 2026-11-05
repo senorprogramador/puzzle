@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import type { FontRole, FontConfig } from "./fonts";
-import type { ThemeMode, ThemeTokenOverrides } from "./types";
+import type { ColorThemes, ThemeMode, ThemeTokenOverrides } from "./types";
 import type { ThemeComponents } from "./components.types";
 import { ThemeComponentsProvider } from "./components-context";
 import { resolveFontStylesheets } from "./fonts/resolve-font-stylesheets";
@@ -21,6 +21,9 @@ type ThemeProps = {
   /** Deeply partial overrides of the default design tokens. */
   tokens?: ThemeTokenOverrides;
 
+  /** Color theme selection. */
+  colorTheme?: ColorThemes;
+
   /**
    * Global component overrides.
    *
@@ -35,11 +38,12 @@ const Theme = ({
   fonts,
   theme = "system",
   tokens,
+  colorTheme, // = "electric-indigo",
   components,
   children,
 }: PropsWithChildren<ThemeProps>) => {
   const fontStylesheets = resolveFontStylesheets(fonts);
-  const cssVariables = createThemeVariables(fonts, tokens, theme);
+  const cssVariables = createThemeVariables(fonts, tokens, theme, colorTheme);
   const css = `:root {\n${createThemeCss(cssVariables)}\n}`;
 
   /*

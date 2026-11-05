@@ -2,8 +2,13 @@ import { assertSafeCssValue, stringWithCasing } from "@puzzle/core";
 import type { ThemeFonts } from "./fonts";
 import { resolveFontConfig } from "./fonts/resolve-font-config";
 import { DEFAULT_FONT_FALLBACKS } from "./fonts/constants";
-import type { ThemeMode, ThemeTokenOverrides, ThemeTokens } from "./types";
-import { DEFAULT_TOKENS, GENERIC_FAMILIES } from "./constants";
+import type {
+  ColorThemes,
+  ThemeMode,
+  ThemeTokenOverrides,
+  ThemeTokens,
+} from "./types";
+import { COLOR_THEMES, DEFAULT_TOKENS, GENERIC_FAMILIES } from "./constants";
 import { createFluidFontSize, typographyDefaults } from "./fonts/typography";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => {
@@ -81,9 +86,24 @@ const buildFontFamilyValue = (family: string, fallback: readonly string[]) => {
 
 export const resolveThemeTokens = (
   overrides?: ThemeTokenOverrides,
+  colorTheme?: ColorThemes,
 ): ThemeTokens => {
+  let defaultTokens = DEFAULT_TOKENS;
+  if (colorTheme) {
+    defaultTokens = {
+      ...DEFAULT_TOKENS,
+      colorSchemes: {
+        ...DEFAULT_TOKENS.colorSchemes,
+        light: COLOR_THEMES[colorTheme].light,
+        dark: {
+          ...COLOR_THEMES[colorTheme].light,
+          ...COLOR_THEMES[colorTheme].dark,
+        },
+      },
+    };
+  }
   return mergeKnownShape(
-    DEFAULT_TOKENS,
+    defaultTokens,
     overrides,
     "tokens",
   ) as unknown as ThemeTokens;
@@ -95,10 +115,11 @@ export const createThemeVariables = (
   // Kept to preserve the existing function signature.
   // The active mode is selected by theme.css using data-theme.
   _theme: ThemeMode = "system",
+  colorTheme?: ColorThemes,
   customVariables?: Record<string, string | number>,
 ): Record<string, string> => {
   const output: Record<string, string> = {};
-  const resolvedTokens = resolveThemeTokens(tokens);
+  const resolvedTokens = resolveThemeTokens(tokens, colorTheme);
 
   /*
    * Color schemes

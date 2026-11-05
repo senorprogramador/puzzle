@@ -6,14 +6,23 @@ export type {
 } from "./components/actions/button/button.types";
 export { Button, type ButtonProps } from "./components/actions/button";
 
-// #endregion Actions
-
-// #region Data Display
 export {
   ButtonGroup,
   type ButtonGroupProps,
 } from "./components/actions/button-group";
 
+export {
+  ToggleGroup,
+  type ToggleGroupProps,
+  type ToggleGroupSingleProps,
+  type ToggleGroupMultipleProps,
+  type ToggleGroupItemProps,
+  type ToggleGroupOrientation,
+} from "./components/actions/toggle-group";
+
+// #endregion Actions
+
+// #region Data Display
 export {
   Avatar,
   type AvatarProps,
@@ -145,6 +154,12 @@ export {
   type AppBarProps,
   type AppBarNavigationItem,
 } from "./components/layout/app-bar";
+
+export {
+  Background,
+  type BackgroundProps,
+  type BackgroundPattern,
+} from "./components/layout/background";
 
 export {
   BottomNavigation,

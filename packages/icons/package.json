@@ -20,8 +20,8 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "vitest": "bunx vitest run",
+    "vitest:watch": "bunx vitest",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run build"
   },

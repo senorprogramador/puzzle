@@ -1,0 +1,118 @@
+.puzzle-background {
+    position: relative;
+    isolation: isolate;
+}
+
+/* Background layers */
+
+.puzzle-background::before,
+.puzzle-background::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.puzzle-background::before {
+    z-index: -2;
+    background-color: var(--_background-color, transparent);
+}
+
+.puzzle-background::after {
+    z-index: -1;
+}
+
+/* Grid */
+
+.puzzle-background--grid::after {
+    opacity: var(--_pattern-opacity, 0.5);
+
+    background-image:
+        linear-gradient(
+            to right,
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_background-line-width, 1px),
+            transparent var(--_background-line-width, 1px)
+        ),
+        linear-gradient(
+            to bottom,
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_background-line-width, 1px),
+            transparent var(--_background-line-width, 1px)
+        );
+
+    background-size: var(--_background-size, 24px) var(--_background-size, 24px);
+}
+
+/* Dots */
+
+.puzzle-background--dots::after {
+    opacity: var(--_pattern-opacity, 0.6);
+
+    background-image: radial-gradient(
+        circle,
+        var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_background-dot-size, 2px),
+        transparent calc(var(--_background-dot-size, 2px) + 0.5px)
+    );
+
+    background-size: var(--_background-size, 24px) var(--_background-size, 24px);
+}
+
+/* Checkerboard */
+
+.puzzle-background--checkerboard::after {
+    opacity: var(--_pattern-opacity, 0.2);
+
+    background-image: conic-gradient(
+        var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) 25%,
+        transparent 0 50%,
+        var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) 0 75%,
+        transparent 0
+    );
+
+    background-size: calc(var(--_background-size, 24px) + var(--_background-size, 24px))
+        calc(var(--_background-size, 24px) + var(--_background-size, 24px));
+}
+
+/* Diagonal stripes */
+
+.puzzle-background--stripes::after {
+    opacity: var(--_pattern-opacity, 0.5);
+
+    background-image: repeating-linear-gradient(
+        var(--_background-angle, 45deg),
+        var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) 0 var(--_background-line-width, 1px),
+        transparent var(--_background-line-width, 1px) var(--_background-size, 24px)
+    );
+}
+
+/* Crosshatch */
+
+.puzzle-background--crosshatch::after {
+    opacity: var(--_pattern-opacity, 0.35);
+
+    background-image:
+        repeating-linear-gradient(
+            var(--_background-angle, 45deg),
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) 0 var(--_background-line-width, 1px),
+            transparent var(--_background-line-width, 1px) var(--_background-size, 24px)
+        ),
+        repeating-linear-gradient(
+            calc(180deg - var(--_background-angle, 45deg)),
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) 0 var(--_background-line-width, 1px),
+            transparent var(--_background-line-width, 1px) var(--_background-size, 24px)
+        );
+}
+
+/* Radial glow */
+
+.puzzle-background--glow::after {
+    opacity: var(--_pattern-opacity, 0.28);
+
+    background-image: radial-gradient(
+        ellipse at 50% 0%,
+        var(--_pattern-color, var(--puzzle-color-primary, #2563eb)) 0%,
+        transparent 70%
+    );
+
+    background-size: 100% 100%;
+}

@@ -20,7 +20,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsdown",
-    "test": "bun test"
+    "vitest": "bunx vitest run",
+    "vitest:watch": "bunx vitest"
   },
   "devDependencies": {
     "tsup": "latest",

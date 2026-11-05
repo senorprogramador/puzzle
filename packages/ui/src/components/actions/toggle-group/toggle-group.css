@@ -1,0 +1,75 @@
+.puzzle-toggle-group {
+    display: inline-flex;
+    align-items: stretch;
+    gap: var(--puzzle-toggle-group-gap, var(--puzzle-space-2, 0.5rem));
+    min-width: 0;
+    vertical-align: middle;
+}
+
+.puzzle-toggle-group > .puzzle-button {
+    flex: 0 0 auto;
+}
+
+/* Orientation */
+
+.puzzle-toggle-group[data-orientation="horizontal"] {
+    flex-direction: row;
+}
+
+.puzzle-toggle-group[data-orientation="vertical"] {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* Full width */
+
+.puzzle-toggle-group[data-full-width="true"] {
+    display: flex;
+    width: 100%;
+}
+
+.puzzle-toggle-group[data-full-width="true"] > .puzzle-button {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* Attached items */
+
+.puzzle-toggle-group[data-attached="true"] {
+    gap: 0;
+}
+
+.puzzle-toggle-group[data-attached="true"][data-orientation="horizontal"] > .puzzle-button:not(:first-child) {
+    margin-inline-start: -1px;
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+}
+
+.puzzle-toggle-group[data-attached="true"][data-orientation="horizontal"] > .puzzle-button:not(:last-child) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+}
+
+.puzzle-toggle-group[data-attached="true"][data-orientation="vertical"] > .puzzle-button:not(:first-child) {
+    margin-block-start: -1px;
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+}
+
+.puzzle-toggle-group[data-attached="true"][data-orientation="vertical"] > .puzzle-button:not(:last-child) {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+}
+
+/* High contrast */
+
+@media (forced-colors: active) {
+    .puzzle-toggle-group > .puzzle-button {
+        border-color: ButtonText;
+    }
+
+    .puzzle-toggle-group > .puzzle-button[aria-pressed="true"] {
+        outline: 1px solid Highlight;
+        outline-offset: -3px;
+    }
+}

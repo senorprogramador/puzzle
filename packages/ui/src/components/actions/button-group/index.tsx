@@ -1,31 +1,23 @@
 "use client";
 
-import { cn } from "@puzzle/core";
 import {
-  type MouseEvent,
+  Children,
   type ComponentPropsWithRef,
   type ElementType,
   type ReactNode,
-  Children,
-  isValidElement,
-  cloneElement,
-  useState,
 } from "react";
-import type { ButtonVariant } from "../button/button.types";
+
+import { cn } from "@puzzle/core";
+
 import "./button-group.css";
-import type { ButtonNativeProps } from "../button/button.types";
 
 type ButtonGroupOwnProps<C extends ElementType> = {
   as?: C;
-  variant?: ButtonVariant;
-  exclusive?: boolean;
-  direction?: "row" | "column";
-  initialActiveIndices?: number[];
-  onClick?: (
-    clickedIndex: number,
-    active: boolean,
-    e: MouseEvent<HTMLButtonElement>,
-  ) => void;
+  orientation?: "horizontal" | "vertical";
+  attached?: boolean;
+  fullWidth?: boolean;
+  disabled?: boolean;
+  spacing?: number | string;
   className?: string;
   children?: ReactNode;
 };
@@ -35,62 +27,46 @@ type ButtonGroupProps<C extends ElementType = "div"> = ButtonGroupOwnProps<C> &
 
 const ButtonGroup = <C extends ElementType = "div">({
   as,
+  orientation = "horizontal",
+  attached = false,
+  fullWidth = false,
+  disabled = false,
+  spacing,
   className,
-  variant,
-  direction = "row",
-  exclusive = false,
-  initialActiveIndices = [],
-  onClick,
   children,
+  style,
   ...props
 }: ButtonGroupProps<C>) => {
-  const [activeIndices, setActiveIndices] = useState<Set<number>>(
-    new Set(initialActiveIndices),
-  );
+  const Component = as ?? "div";
 
-  const Component = (as ?? "div") as ElementType;
   const classes = cn(
     "puzzle-button-group",
-    `puzzle-button-group--${direction}`,
+    `puzzle-button-group--${orientation}`,
+    attached && "puzzle-button-group--attached",
+    fullWidth && "puzzle-button-group--full-width",
+    disabled && "puzzle-button-group--disabled",
     className,
   );
 
-  const clonedChildren = Children.map(children, (child, index) => {
-    if (
-      !isValidElement<ButtonNativeProps>(child) ||
-      child.props.href !== undefined
-    ) {
-      return child;
-    }
-    const isActive = activeIndices.has(index);
-    const resolvedVariant =
-      variant === "toggle" && isActive ? "toggle-active" : variant;
-    const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-      setActiveIndices((prev) => {
-        const newSet = new Set(prev);
-        if (newSet.has(index)) {
-          newSet.delete(index);
-        } else {
-          if (exclusive) {
-            newSet.clear();
-          }
-          newSet.add(index);
+  const groupStyle = {
+    ...style,
+    ...(spacing !== undefined
+      ? {
+          "--puzzle-button-group-gap":
+            typeof spacing === "number" ? `${spacing}px` : spacing,
         }
-        const active = newSet.has(index);
-        onClick?.(index, active, e);
-        return newSet;
-      });
-    };
-    return cloneElement(child, {
-      ...child.props,
-      variant: resolvedVariant,
-      onClick: handleClick,
-    });
-  });
+      : {}),
+  } as ComponentPropsWithRef<C>["style"];
 
   return (
-    <Component className={classes} {...props}>
-      {clonedChildren}
+    <Component
+      {...props}
+      className={classes}
+      style={groupStyle}
+      role={props.role ?? "group"}
+      aria-disabled={disabled || undefined}
+    >
+      {Children.map(children, (child) => child)}
     </Component>
   );
 };

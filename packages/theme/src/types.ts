@@ -1,4 +1,5 @@
 import type { DeepPartial } from "@puzzle/core";
+import type { COLOR_THEMES } from "./constants";
 
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -241,6 +242,21 @@ export type ThemeTokens = {
     tooltip: string;
   };
 };
+
+export type ColorTheme = {
+  light: ThemeTokens["colorSchemes"]["light"];
+  dark: Pick<
+    ThemeTokens["colorSchemes"]["dark"],
+    | "primary"
+    | "primaryForeground"
+    | "secondary"
+    | "secondaryForeground"
+    | "accent"
+    | "accentForeground"
+  >;
+};
+
+export type ColorThemes = keyof typeof COLOR_THEMES;
 
 /**
  * Deeply partial overrides are supported throughout the token tree.
