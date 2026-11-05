@@ -116,3 +116,135 @@
 
     background-size: 100% 100%;
 }
+
+/* Blueprint */
+
+.puzzle-background--blueprint::after {
+    opacity: var(--_pattern-opacity, 0.55);
+
+    --_blueprint-major-size: var(
+        --_background-major-size,
+        calc(
+            var(--_background-size, 24px) + var(--_background-size, 24px) + var(--_background-size, 24px) +
+                var(--_background-size, 24px) + var(--_background-size, 24px)
+        )
+    );
+
+    --_blueprint-major-width: calc(var(--_background-line-width, 1px) + var(--_background-line-width, 1px));
+
+    background-image:
+        linear-gradient(
+            to right,
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_blueprint-major-width),
+            transparent var(--_blueprint-major-width)
+        ),
+        linear-gradient(
+            to bottom,
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_blueprint-major-width),
+            transparent var(--_blueprint-major-width)
+        ),
+        linear-gradient(
+            to right,
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_background-line-width, 1px),
+            transparent var(--_background-line-width, 1px)
+        ),
+        linear-gradient(
+            to bottom,
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_background-line-width, 1px),
+            transparent var(--_background-line-width, 1px)
+        );
+
+    background-size:
+        var(--_blueprint-major-size) var(--_blueprint-major-size),
+        var(--_blueprint-major-size) var(--_blueprint-major-size),
+        var(--_background-size, 24px) var(--_background-size, 24px),
+        var(--_background-size, 24px) var(--_background-size, 24px);
+}
+
+/* Topographic */
+
+.puzzle-background--topographic::after {
+    opacity: var(--_pattern-opacity, 0.3);
+
+    background-image:
+        repeating-radial-gradient(
+            ellipse at 18% 30%,
+            transparent 0,
+            transparent calc(var(--_background-size, 32px) - var(--_background-line-width, 1px)),
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6))
+                calc(var(--_background-size, 32px) - var(--_background-line-width, 1px)),
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_background-size, 32px)
+        ),
+        repeating-radial-gradient(
+            ellipse at 82% 65%,
+            transparent 0,
+            transparent calc(var(--_background-size, 32px) - var(--_background-line-width, 1px)),
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6))
+                calc(var(--_background-size, 32px) - var(--_background-line-width, 1px)),
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_background-size, 32px)
+        ),
+        repeating-radial-gradient(
+            ellipse at 85% 10%,
+            transparent 0,
+            transparent calc(var(--_background-size, 32px) - var(--_background-line-width, 1px)),
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6))
+                calc(var(--_background-size, 32px) - var(--_background-line-width, 1px)),
+            var(--_pattern-color, var(--puzzle-color-border, #e5e0d6)) var(--_background-size, 32px)
+        );
+
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+/* Mesh gradient */
+
+.puzzle-background--mesh::after {
+    opacity: var(--_pattern-opacity, 0.55);
+
+    background-image:
+        radial-gradient(
+            ellipse 70% 65% at 15% 20%,
+            var(--_mesh-color-1, var(--_pattern-color, var(--puzzle-color-primary, #2563eb))) 0%,
+            transparent 70%
+        ),
+        radial-gradient(
+            ellipse 65% 70% at 85% 15%,
+            var(--_mesh-color-2, var(--_pattern-color, var(--puzzle-color-accent, #7c3aed))) 0%,
+            transparent 70%
+        ),
+        radial-gradient(
+            ellipse 75% 65% at 80% 90%,
+            var(--_mesh-color-3, var(--_pattern-color, var(--puzzle-color-info, #0369a1))) 0%,
+            transparent 72%
+        ),
+        radial-gradient(
+            ellipse 65% 70% at 10% 85%,
+            var(--_mesh-color-4, var(--_pattern-color, var(--puzzle-color-success, #15803d))) 0%,
+            transparent 68%
+        );
+
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+/* Fade modifiers */
+
+.puzzle-background[data-fade="bottom"]::after {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
+}
+
+.puzzle-background[data-fade="top"]::after {
+    -webkit-mask-image: linear-gradient(to top, #000 0%, #000 35%, transparent 100%);
+    mask-image: linear-gradient(to top, #000 0%, #000 35%, transparent 100%);
+}
+
+.puzzle-background[data-fade="right"]::after {
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 35%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 0%, #000 35%, transparent 100%);
+}
+
+.puzzle-background[data-fade="left"]::after {
+    -webkit-mask-image: linear-gradient(to left, #000 0%, #000 35%, transparent 100%);
+    mask-image: linear-gradient(to left, #000 0%, #000 35%, transparent 100%);
+}

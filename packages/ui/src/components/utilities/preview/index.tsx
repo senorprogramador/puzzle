@@ -6,12 +6,14 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type ComponentProps,
   type CSSProperties,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@puzzle/core";
 import { Icon } from "@puzzle/icons";
+import { Background } from "../../layout/background";
 import { highlightCode } from "./highlight";
 import "./preview.css";
 
@@ -44,6 +46,8 @@ type PreviewProps = {
   align?: PreviewAlign;
   /** Horizontal distribution of the content within the frame. */
   justify?: PreviewJustify;
+  /** Hides the device selector. The default device is still used. */
+  hideDevices?: boolean;
 };
 
 const PREVIEW_DEVICES: Record<PreviewDevice, DeviceConfig> = {
@@ -68,27 +72,6 @@ const JUSTIFY_VALUES: Record<PreviewJustify, string> = {
   evenly: "space-evenly",
 };
 
-const applyContentLayout = (
-  root: HTMLElement,
-  align?: PreviewAlign,
-  justify?: PreviewJustify,
-) => {
-  if (align === undefined && justify === undefined) {
-    root.style.removeProperty("display");
-    root.style.removeProperty("min-height");
-    root.style.removeProperty("align-items");
-    root.style.removeProperty("justify-content");
-    return;
-  }
-
-  root.style.display = "flex";
-  // The frame height is the iframe's viewport height.
-  root.style.minHeight = "100vh";
-  root.style.boxSizing = "border-box";
-  root.style.alignItems = align ? ALIGN_VALUES[align] : "";
-  root.style.justifyContent = justify ? JUSTIFY_VALUES[justify] : "";
-};
-
 const PREVIEW_DOCUMENT = `<!doctype html>
 <html lang="en">
   <head>
@@ -103,6 +86,17 @@ const PREVIEW_DOCUMENT = `<!doctype html>
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
 
+const PreviewBackground = (props: ComponentProps<"div">) => (
+  <Background
+    pattern="blueprint"
+    size={20}
+    majorSize={100}
+    lineWidth={1}
+    patternOpacity={0.25}
+    {...props}
+  />
+);
+
 const Preview = ({
   children,
   className,
@@ -111,6 +105,7 @@ const Preview = ({
   height,
   align,
   justify,
+  hideDevices = false,
 }: PreviewProps) => {
   const [device, setDevice] = useState<PreviewDevice>(defaultDevice);
   const [activeTab, setActiveTab] = useState<PreviewTab>("preview");
@@ -126,8 +121,6 @@ const Preview = ({
   const frameHeight = height ?? config.height;
   const hasCode = code !== undefined;
 
-  const layoutRef = useRef({ align, justify });
-  layoutRef.current = { align, justify };
 
   const syncStyles = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
@@ -196,14 +189,6 @@ const Preview = ({
     const previewRoot = frameDocument.getElementById("puzzle-preview-root");
 
     previewRoot?.style.removeProperty("min-height");
-
-    if (previewRoot) {
-      applyContentLayout(
-        previewRoot,
-        layoutRef.current.align,
-        layoutRef.current.justify,
-      );
-    }
 
     const scrollbarStyle = frameDocument.createElement("style");
 
@@ -327,12 +312,6 @@ const Preview = ({
     setFrameRoot(root);
   }, [syncStyles]);
 
-  useEffect(() => {
-    if (frameRoot) {
-      applyContentLayout(frameRoot, align, justify);
-    }
-  }, [frameRoot, align, justify]);
-
   // Handle both initial loading and an already-loaded iframe.
   useEffect(() => {
     initializeFrame();
@@ -381,10 +360,30 @@ const Preview = ({
     transformOrigin: "top left",
   };
 
+  const contentStyle: CSSProperties = {
+    display: "flex",
+    boxSizing: "border-box",
+    // The frame height is the iframe's viewport height.
+    minHeight: "100vh",
+    alignItems: align ? ALIGN_VALUES[align] : undefined,
+    justifyContent: justify ? JUSTIFY_VALUES[justify] : undefined,
+  };
+
   const viewportStyle: CSSProperties = {
     width: config.width * scale,
     aspectRatio: `${config.width} / ${frameHeight}`,
   };
+
+  const panelProps = {
+    id: "puzzle-preview-panel",
+    role: "tabpanel",
+    "aria-labelledby":
+      activeTab === "preview"
+        ? "puzzle-preview-tab-preview"
+        : "puzzle-preview-tab-code",
+  };
+
+  const PanelComponent = activeTab === "preview" ? PreviewBackground : "div";
 
   return (
     <section className={cn("puzzle-preview", className)}>
@@ -429,26 +428,28 @@ const Preview = ({
 
         {activeTab === "preview" ? (
           <div className="puzzle-preview__toolbar-actions">
-            <div
-              className="puzzle-preview__devices"
-              role="group"
-              aria-label="Device size"
-            >
-              {(Object.keys(PREVIEW_DEVICES) as PreviewDevice[]).map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={cn(
-                    "puzzle-preview__device",
-                    device === item && "puzzle-preview__device--active",
-                  )}
-                  aria-pressed={device === item}
-                  onClick={() => setDevice(item)}
-                >
-                  {PREVIEW_DEVICES[item].label}
-                </button>
-              ))}
-            </div>
+            {!hideDevices && (
+              <div
+                className="puzzle-preview__devices"
+                role="group"
+                aria-label="Device size"
+              >
+                {(Object.keys(PREVIEW_DEVICES) as PreviewDevice[]).map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    className={cn(
+                      "puzzle-preview__device",
+                      device === item && "puzzle-preview__device--active",
+                    )}
+                    aria-pressed={device === item}
+                    onClick={() => setDevice(item)}
+                  >
+                    {PREVIEW_DEVICES[item].label}
+                  </button>
+                ))}
+              </div>
+            )}
 
             <span className="puzzle-preview__dimensions">
               {config.width} × {frameHeight}
@@ -471,14 +472,8 @@ const Preview = ({
         )}
       </div>
 
-      <div
-        id="puzzle-preview-panel"
-        role="tabpanel"
-        aria-labelledby={
-          activeTab === "preview"
-            ? "puzzle-preview-tab-preview"
-            : "puzzle-preview-tab-code"
-        }
+      <PanelComponent
+        {...panelProps}
         className="puzzle-preview__panel"
       >
         {activeTab === "preview" ? (
@@ -493,7 +488,8 @@ const Preview = ({
                 style={frameStyle}
               />
 
-              {frameRoot && createPortal(children, frameRoot)}
+              {frameRoot &&
+                createPortal(<div style={contentStyle}>{children}</div>, frameRoot)}
             </div>
           </div>
         ) : (
@@ -505,7 +501,7 @@ const Preview = ({
             </pre>
           </div>
         )}
-      </div>
+      </PanelComponent>
 
       <span
         className="puzzle-preview__copy-status"

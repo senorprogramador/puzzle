@@ -159,6 +159,8 @@ export {
   Background,
   type BackgroundProps,
   type BackgroundPattern,
+  type BackgroundFade,
+  type BackgroundMeshColors,
 } from "./components/layout/background";
 
 export {

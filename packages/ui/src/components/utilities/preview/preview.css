@@ -144,8 +144,6 @@
 
 .puzzle-preview__stage {
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
     min-width: 0;
     min-height: 20rem;
     max-height: 75vh;
@@ -154,7 +152,6 @@
     padding: 1.5rem;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    background: var(--puzzle-color-surface-sunken, #f1eee6);
 }
 
 .puzzle-preview__stage::-webkit-scrollbar {
@@ -166,6 +163,8 @@
 .puzzle-preview__viewport {
     position: relative;
     flex: 0 1 auto;
+    /* Auto margins center without clipping the top when the stage scrolls. */
+    margin: auto;
     min-width: 0;
     max-width: 100%;
     box-sizing: border-box;
@@ -262,7 +261,6 @@
     }
 
     .puzzle-preview__stage {
-        justify-content: flex-start;
         padding: 1rem;
     }
 

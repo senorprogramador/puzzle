@@ -140,7 +140,6 @@ function RootDocument({
               <RootProvider theme={{ enabled: false }}>{children}</RootProvider>
             </PageLayout.Main>
           </PageLayout>
-
           <Scripts />
         </Theme>
       </body>
