@@ -11,6 +11,7 @@ import { PageLayout } from "@puzzle/ui/components/layout/page-layout";
 import { AppBar } from "@puzzle/ui/components/layout/app-bar";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TanStackLink } from "../components/navigation/link/link";
+import { RootProvider } from "fumadocs-ui/provider/tanstack";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -135,7 +136,9 @@ function RootDocument({
               <Sidebar />
             </PageLayout.LeftSidebar>
 
-            <PageLayout.Main>{children}</PageLayout.Main>
+            <PageLayout.Main>
+              <RootProvider theme={{ enabled: false }}>{children}</RootProvider>
+            </PageLayout.Main>
           </PageLayout>
 
           <Scripts />

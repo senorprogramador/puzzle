@@ -12,6 +12,7 @@ import {
 import { createPortal } from "react-dom";
 import { cn } from "@puzzle/core";
 import { Icon } from "@puzzle/icons";
+import { highlightCode } from "./highlight";
 import "./preview.css";
 
 type PreviewDevice = "mobile" | "tablet" | "desktop";
@@ -23,17 +24,69 @@ type DeviceConfig = {
   height: number;
 };
 
+type PreviewAlign = "start" | "center" | "end" | "stretch";
+type PreviewJustify =
+  | "start"
+  | "center"
+  | "end"
+  | "between"
+  | "around"
+  | "evenly";
+
 type PreviewProps = {
   children: ReactNode;
   className?: string;
   defaultDevice?: PreviewDevice;
   code?: string;
+  /** Frame height in pixels. Defaults to the selected device's height. */
+  height?: number;
+  /** Vertical alignment of the content within the frame. */
+  align?: PreviewAlign;
+  /** Horizontal distribution of the content within the frame. */
+  justify?: PreviewJustify;
 };
 
 const PREVIEW_DEVICES: Record<PreviewDevice, DeviceConfig> = {
   mobile: { label: "Mobile", width: 390, height: 844 },
   tablet: { label: "Tablet", width: 768, height: 1024 },
   desktop: { label: "Desktop", width: 1024, height: 768 },
+};
+
+const ALIGN_VALUES: Record<PreviewAlign, string> = {
+  start: "flex-start",
+  center: "center",
+  end: "flex-end",
+  stretch: "stretch",
+};
+
+const JUSTIFY_VALUES: Record<PreviewJustify, string> = {
+  start: "flex-start",
+  center: "center",
+  end: "flex-end",
+  between: "space-between",
+  around: "space-around",
+  evenly: "space-evenly",
+};
+
+const applyContentLayout = (
+  root: HTMLElement,
+  align?: PreviewAlign,
+  justify?: PreviewJustify,
+) => {
+  if (align === undefined && justify === undefined) {
+    root.style.removeProperty("display");
+    root.style.removeProperty("min-height");
+    root.style.removeProperty("align-items");
+    root.style.removeProperty("justify-content");
+    return;
+  }
+
+  root.style.display = "flex";
+  // The frame height is the iframe's viewport height.
+  root.style.minHeight = "100vh";
+  root.style.boxSizing = "border-box";
+  root.style.alignItems = align ? ALIGN_VALUES[align] : "";
+  root.style.justifyContent = justify ? JUSTIFY_VALUES[justify] : "";
 };
 
 const PREVIEW_DOCUMENT = `<!doctype html>
@@ -53,8 +106,11 @@ const useIsomorphicLayoutEffect =
 const Preview = ({
   children,
   className,
-  defaultDevice = "desktop",
+  defaultDevice = "mobile",
   code,
+  height,
+  align,
+  justify,
 }: PreviewProps) => {
   const [device, setDevice] = useState<PreviewDevice>(defaultDevice);
   const [activeTab, setActiveTab] = useState<PreviewTab>("preview");
@@ -67,7 +123,11 @@ const Preview = ({
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const config = PREVIEW_DEVICES[device];
+  const frameHeight = height ?? config.height;
   const hasCode = code !== undefined;
+
+  const layoutRef = useRef({ align, justify });
+  layoutRef.current = { align, justify };
 
   const syncStyles = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
@@ -130,9 +190,17 @@ const Preview = ({
     body.style.setProperty("overflow", "visible", "important");
 
     // Remove the previous artificial minimum height.
-    frameDocument
-      .getElementById("puzzle-preview-root")
-      ?.style.removeProperty("min-height");
+    const previewRoot = frameDocument.getElementById("puzzle-preview-root");
+
+    previewRoot?.style.removeProperty("min-height");
+
+    if (previewRoot) {
+      applyContentLayout(
+        previewRoot,
+        layoutRef.current.align,
+        layoutRef.current.justify,
+      );
+    }
 
     const scrollbarStyle = frameDocument.createElement("style");
 
@@ -220,6 +288,12 @@ const Preview = ({
     setFrameRoot(root);
   }, [syncStyles]);
 
+  useEffect(() => {
+    if (frameRoot) {
+      applyContentLayout(frameRoot, align, justify);
+    }
+  }, [frameRoot, align, justify]);
+
   // Handle both initial loading and an already-loaded iframe.
   useEffect(() => {
     initializeFrame();
@@ -263,14 +337,14 @@ const Preview = ({
 
   const frameStyle: CSSProperties = {
     width: config.width,
-    height: config.height,
+    height: frameHeight,
     transform: `scale(${scale})`,
     transformOrigin: "top left",
   };
 
   const viewportStyle: CSSProperties = {
     width: config.width * scale,
-    aspectRatio: `${config.width} / ${config.height}`,
+    aspectRatio: `${config.width} / ${frameHeight}`,
   };
 
   return (
@@ -338,7 +412,7 @@ const Preview = ({
             </div>
 
             <span className="puzzle-preview__dimensions">
-              {config.width} × {config.height}
+              {config.width} × {frameHeight}
             </span>
           </div>
         ) : (
@@ -386,7 +460,9 @@ const Preview = ({
         ) : (
           <div className="puzzle-preview__code">
             <pre>
-              <code className="language-tsx">{code}</code>
+              <code className="language-tsx">
+                {code === undefined ? null : highlightCode(code)}
+              </code>
             </pre>
           </div>
         )}
@@ -403,4 +479,10 @@ const Preview = ({
   );
 };
 
-export { Preview, type PreviewProps, type PreviewDevice };
+export {
+  Preview,
+  type PreviewProps,
+  type PreviewDevice,
+  type PreviewAlign,
+  type PreviewJustify,
+};

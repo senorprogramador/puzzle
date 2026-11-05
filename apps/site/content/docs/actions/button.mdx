@@ -1,0 +1,430 @@
+---
+title: Button
+description: Buttons allow users to perform actions and navigate through your application.
+---
+
+They provide clear visual feedback and communicate the importance and intent of an action.
+
+The Puzzle Button component supports both native buttons and links. When a `href` is provided, the component automatically renders a Puzzle `Link` instead of a native `<button>`.
+
+[Read more about the Link component here](/docs/components/link).
+
+## Import
+
+```tsx
+import { Button } from "@puzzle/ui";
+```
+
+## Basic usage
+
+Use the Button component to trigger an action.
+
+<Preview
+  height={140}
+  align="center"
+  justify="center"
+  code={`\
+    <Button onClick={() => alert("Clicked")}>
+        Click me
+    </Button>
+`}
+>
+  <Button onClick={() => alert("Clicked")}>Click me</Button>
+</Preview>
+
+By default, a Button renders a native HTML `<button>` element with `type="button"`.
+
+## Variants
+
+The `variant` prop controls the visual appearance and emphasis of the Button.
+
+| Variant         | Description                                                                          |
+| --------------- | ------------------------------------------------------------------------------------ |
+| `primary`       | The primary action. Use for the most important action in a section or page.          |
+| `secondary`     | A secondary action with less visual emphasis.                                        |
+| `outline`       | An outlined button for actions that need a visible boundary without strong emphasis. |
+| `ghost`         | A subtle button without a prominent background.                                      |
+| `danger`        | An action that may have destructive or irreversible consequences.                    |
+| `link`          | A button styled to look like a text link.                                            |
+| `toggle`        | A toggle-style button in its inactive state.                                         |
+| `toggle-active` | A toggle-style button in its active state.                                           |
+
+The default variant is `primary`.
+
+<Preview
+  code={`\
+  <Button variant="primary">Primary</Button>
+  <Button variant="secondary">Secondary</Button>
+  <Button variant="outline">Outline</Button>
+  <Button variant="ghost">Ghost</Button>
+  <Button variant="danger">Danger</Button>
+  <Button variant="link">Link</Button>
+  <Button variant="toggle">Toggle</Button>
+  <Button variant="toggle-active">Toggle active</Button>
+`}
+  height={600}
+  align="center"
+  justify="center"
+>
+  <Stack>
+    <Button variant="primary">Primary</Button>
+    <Button variant="secondary">Secondary</Button>
+    <Button variant="outline">Outline</Button>
+    <Button variant="ghost">Ghost</Button>
+    <Button variant="danger">Danger</Button>
+    <Button variant="link">Link</Button>
+    <Button variant="toggle">Toggle</Button>
+    <Button variant="toggle-active">Toggle active</Button>
+  </Stack>
+</Preview>
+
+The `link` variant only changes the visual appearance. It does not turn the Button
+into a navigation link. To render an actual link, provide an href.
+
+## Sizes
+
+Use the size prop to control the dimensions of the Button.
+
+| Size   | Description      |
+| ------ | ---------------- |
+| `xs`   | Extra small      |
+| `sm`   | Small            |
+| `md`   | Medium           |
+| `lg`   | Large            |
+| `icon` | Icon-only button |
+
+The default size is `md`.
+
+<Preview
+  height={600}
+  align="center"
+  justify="center"
+  code={`\
+  <Button size="xs">Extra small</Button>
+  <Button size="sm">Small</Button>
+  <Button size="md">Medium</Button>
+  <Button size="lg">Large</Button>
+  <Button size="icon" aria-label="Add">
+    <Icon name="akar-icons:plus" size={20} />
+  </Button>
+`}
+>
+  <Stack alignH="center">
+    <Button size="xs">Extra small</Button>
+    <Button size="sm">Small</Button>
+    <Button size="md">Medium</Button>
+    <Button size="lg">Large</Button>
+    <Button size="icon" aria-label="Add">
+      <Icon name="akar-icons:plus" size={20} />
+    </Button>
+  </Stack>
+</Preview>
+
+The `icon` size is intended for buttons that contain only an icon. Always provide an accessible name, for example through `aria-label`.
+
+## Leading and trailing content
+
+The `leading` and `trailing` props allow you to add content before or after the Button's children.
+
+They are useful for icons, indicators, or other supplementary content.
+
+<Preview
+  height={400}
+  align="center"
+  justify="center"
+  code={`\
+  const plusIcon = (<Icon name="akar-icons:plus" size={20} />);
+  const arrowRightIcon = (<Icon name="akar-icons:arrow-right" size={20} />);
+  return (
+    <Stack alignH="center">
+      <Button leading={<Icon name="akar-icons:plus" size={20} />}>
+        Add item
+      </Button>
+      <Button trailing={<Icon name="akar-icons:arrow-right" size={20} />}>
+        Continue
+      </Button>
+      <Button
+        leading={<Icon name="akar-icons:plus" size={20} />}
+        trailing={<Icon name="akar-icons:arrow-right" size={20} />}
+      >
+        Add and continue
+      </Button>
+    </Stack>
+  );
+`}
+>
+  <Stack alignH="center">
+    <Button leading={<Icon name="akar-icons:plus" size={20} />}>
+      Add item
+    </Button>
+    <Button trailing={<Icon name="akar-icons:arrow-right" size={20} />}>
+      Continue
+    </Button>
+    <Button
+      leading={<Icon name="akar-icons:plus" size={20} />}
+      trailing={<Icon name="akar-icons:arrow-right" size={20} />}
+    >
+      Add and continue
+    </Button>
+  </Stack>
+</Preview>
+
+Both props accept React nodes, so you can use any component or element as their content.
+
+When `loading` is enabled, the leading content is replaced by the loading indicator. Trailing content remains visible.
+
+## Loading
+
+Use the `loading` prop to indicate that an action is being processed.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+  <Button loading>
+    Saving
+  </Button>
+`}
+>
+  <Button loading>Saving</Button>
+</Preview>
+
+When loading:
+
+- A loading indicator replaces the leading content.
+- The Button receives `aria-busy="true"`.
+- Native buttons become disabled.
+- Link buttons prevent navigation and interaction.
+- Trailing content remains visible.
+
+The loading state also prevents accidental repeated activation while an operation is in progress.
+
+## Disabled
+
+Use the `disabled` prop when an action is currently unavailable.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+  <Button disabled>
+    Disabled
+  </Button>
+`}
+>
+  <Button disabled>Disabled</Button>
+</Preview>
+
+The disabled state can also be activated through `aria-disabled`.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+  <Button aria-disabled="true">
+    Unavailable
+  </Button>
+`}
+>
+  <Button aria-disabled="true">Unavailable</Button>
+</Preview>
+
+For native buttons, the component uses the native `disabled` attribute.
+
+For links, the component uses `aria-disabled`, removes the link from the tab order, and prevents mouse and keyboard activation. This preserves the semantic distinction between a button and a link while providing consistent disabled behavior.
+
+A Button is also considered disabled while `loading` is active.
+
+## Full width
+
+Use `fullWidth` to make a Button fill the available width of its container.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+  <Button fullWidth>
+    Continue
+  </Button>
+`}
+>
+  <Button fullWidth>Continue</Button>
+</Preview>
+
+This is useful for form actions, mobile layouts, and other situations where a full-width action is preferred.
+
+## Navigation links
+
+The Button component automatically renders a Puzzle `Link` when an `href` is provided.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+  <Button href="/dashboard">
+    Go to dashboard
+  </Button>
+`}
+>
+  <Button href="/dashboard">Go to dashboard</Button>
+</Preview>
+
+This means you can use the same component API for actions and navigation without manually switching between Button and Link components.
+
+The component determines which element to render based on the presence of `href`:
+| Configuration | Rendered element |
+| --- | --- |
+| Without href | Native `<button>` |
+| With href | Puzzle `<Link>` |
+
+The `href` property is required when using the link version of the Button.
+
+### Router-specific properties
+
+The link version supports the properties of the Puzzle `Link` component.
+
+Router-specific properties can be passed through componentProps.
+
+```tsx
+<Button
+  href="/dashboard"
+  componentProps={
+    {
+      // Router-specific properties
+    }
+  }
+>
+  Go to dashboard
+</Button>
+```
+
+This allows the Button to work with the routing integrations supported by Puzzle without coupling the Button component to a specific router.
+
+### Link versus button
+
+Use a native Button when the user is performing an action, such as submitting a form, opening a dialog, or saving data.
+
+Use `href` when the user is navigating to another location.
+
+The visual `link` variant does not change the underlying HTML element. Navigation semantics are determined by `href`, not by `variant`.
+
+## API
+
+### Props
+
+The Button component exposes a shared set of properties for both native buttons and links.
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `ButtonVariant` | `"primary"` | Visual style of the Button. |
+| `size` | `ButtonSize` | `"md"` | Size of the Button. |
+| `leading` | `ReactNode`| — | Content displayed before the children. |
+| `trailing` | `ReactNode` | — | Content displayed after the children. |
+| `loading` | `boolean` | `false` | Displays a loading indicator and prevents activation. |
+| `disabled` | `boolean` | `false` | Disables the Button. |
+| `fullWidth` | `boolean` | `false` | Makes the Button fill its container's width. |
+| `className` | `string` | — | Additional CSS class names. |
+| `children` | `ReactNode` | — | Content displayed inside the Button. |
+
+### Native button props
+
+When `href` is not provided, the component renders a native HTML `<button>`.
+
+All standard React button attributes are supported, including:
+
+- `type`
+- `onClick`
+- `onFocus`
+- `onBlur`
+- `name`
+- `value`
+- `form`
+- `aria-\*`
+- `data-\*`
+
+The `type` property defaults to `"button"`.
+
+### Link props
+
+When `href` is provided, the component renders a Puzzle `Link`.
+
+The link version supports the properties of the Puzzle `Link` component, including:
+
+- `href`
+- `target`
+- `rel`
+- `onClick`
+- `aria-*`
+- `data-*`
+- `componentProps`
+
+The `href` property is required for this version.
+
+### TypeScript types
+
+The component exposes the following types:
+
+```ts
+type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "outline"
+  | "ghost"
+  | "danger"
+  | "link"
+  | "toggle"
+  | "toggle-active";
+
+type ButtonSize = "xs" | "sm" | "md" | "lg" | "icon";
+
+type ButtonProps = ButtonNativeProps | ButtonLinkProps;
+```
+
+`ButtonProps` is a discriminated union based on the presence of `href`.
+
+This ensures that native button attributes and link attributes are correctly typed and that incompatible properties cannot accidentally be combined.
+
+For example, `type` is only available on the native button version, while `href` is required for the link version.
+
+## Accessibility
+
+The Button component includes accessibility behavior for both native buttons and links.
+
+### Keyboard interaction
+
+- Native buttons support the standard browser keyboard interactions.
+- Link buttons support normal link keyboard navigation.
+- Disabled links cannot be activated using Enter or Space.
+- Disabled links are removed from the tab order.
+
+### Focus visibility
+
+Buttons provide a visible focus indicator when navigating with a keyboard through `:focus-visible`.
+
+### Loading state
+
+When loading:
+
+- The component exposes `aria-busy="true"`.
+- The loading indicator is hidden from assistive technology.
+- The Button cannot be activated again until loading ends.
+
+### Disabled state
+
+The component uses the native `disabled` attribute for buttons and `aria-disabled` for links.
+
+This ensures that the underlying element retains the correct semantic meaning.
+
+### Icon-only buttons
+
+When using `size="icon"`, always provide an accessible name.
+
+Do not rely on the visual appearance of an icon to communicate its meaning to assistive technology.
+
+### Reduced motion
+
+The Button respects the user's reduced-motion preference. Transitions and loading animations are adjusted when `prefers-reduced-motion: reduce` is active.

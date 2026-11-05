@@ -301,6 +301,8 @@ export {
   Preview,
   type PreviewProps,
   type PreviewDevice,
+  type PreviewAlign,
+  type PreviewJustify,
 } from "./components/utilities/preview";
 
 export {

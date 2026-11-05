@@ -1,5 +1,48 @@
 /* src/styles/app.css */
 @import "tailwindcss" source("../");
+@import "fumadocs-ui/css/neutral.css" source("../");
+@import "fumadocs-ui/css/preset.css" source("../");
+
+/*
+ * Fumadocs reads --color-fd-* variables. Map them to Puzzle tokens so docs
+ * follow the active <Theme> (light/dark, custom colors and fonts).
+ */
+:root,
+.dark {
+    --color-fd-background: var(--puzzle-color-background);
+    --color-fd-foreground: var(--puzzle-color-text);
+    --color-fd-muted: var(--puzzle-color-surface-sunken);
+    --color-fd-muted-foreground: var(--puzzle-color-text-muted);
+    --color-fd-popover: var(--puzzle-color-surface-elevated);
+    --color-fd-popover-foreground: var(--puzzle-color-text);
+    --color-fd-card: var(--puzzle-color-surface);
+    --color-fd-card-foreground: var(--puzzle-color-text);
+    --color-fd-border: var(--puzzle-color-border);
+    --color-fd-primary: var(--puzzle-color-primary);
+    --color-fd-primary-foreground: var(--puzzle-color-primary-foreground);
+    --color-fd-secondary: var(--puzzle-color-secondary);
+    --color-fd-secondary-foreground: var(--puzzle-color-secondary-foreground);
+    --color-fd-accent: var(--puzzle-color-accent);
+    --color-fd-accent-foreground: var(--puzzle-color-accent-foreground);
+    --color-fd-ring: var(--puzzle-color-ring);
+    --font-sans: var(--puzzle-font-family-body);
+}
+
+/* The docs sidebar is disabled; hide its leftover mobile trigger. */
+[aria-controls="nd-sidebar-mobile"] {
+    display: none;
+}
+
+/* Headings take Puzzle's typography; the anchor must not restyle them. */
+.puzzle-docs-heading {
+    color: var(--puzzle-color-text);
+}
+
+.puzzle-docs-heading > a {
+    color: inherit;
+    font: inherit;
+    text-decoration: none;
+}
 
 @layer base {
     body {

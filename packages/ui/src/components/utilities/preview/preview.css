@@ -1,6 +1,7 @@
 .puzzle-preview {
     width: 100%;
     min-width: 0;
+    margin-block: var(--puzzle-space-6, 1.5rem);
     overflow: hidden;
     color: var(--puzzle-color-text, #171717);
     background: var(--puzzle-color-surface, #ffffff);
@@ -211,6 +212,29 @@
     min-width: fit-content;
     color: inherit;
     font: inherit;
+}
+
+/* Syntax highlighting */
+
+.puzzle-preview__token--comment {
+    color: var(--puzzle-color-text-muted, #666666);
+    font-style: italic;
+}
+
+.puzzle-preview__token--string {
+    color: var(--puzzle-color-success, #15803d);
+}
+
+.puzzle-preview__token--keyword {
+    color: var(--puzzle-color-accent, #7c3aed);
+}
+
+.puzzle-preview__token--number {
+    color: var(--puzzle-color-warning, #a16207);
+}
+
+.puzzle-preview__token--type {
+    color: var(--puzzle-color-info, #0369a1);
 }
 
 .puzzle-preview__copy-status {

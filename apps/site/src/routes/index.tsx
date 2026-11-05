@@ -200,11 +200,8 @@ function RouteComponent() {
 
           <Preview code={linkCode}>
             <div className="flex flex-wrap items-center gap-3">
-              <Button as="a" href="/docs">
-                Documentation
-              </Button>
+              <Button href="/docs">Documentation</Button>
               <Button
-                as="a"
                 href="https://example.com"
                 target="_blank"
                 rel="noopener noreferrer"
