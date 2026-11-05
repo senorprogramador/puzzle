@@ -1,0 +1,162 @@
+---
+title: Progress
+description: Progress indicators show that work is underway, either as a bar or a spinner.
+---
+
+Puzzle provides two progress indicators: LinearProgress for a horizontal bar and CircularProgress for a spinner. Both are determinate when given a `value` and indeterminate when `value` is omitted.
+
+## Import
+
+```tsx
+import { LinearProgress, CircularProgress } from "@puzzle/ui";
+```
+
+## Linear progress
+
+### Determinate
+
+Pass `value` as a number from `0` to `100`.
+
+<Preview
+  height={120}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ width: 280 }}>
+      <LinearProgress value={60} aria-label="Upload progress" />
+    </div>
+`}
+>
+  <div style={{ width: 280 }}>
+    <LinearProgress value={60} aria-label="Upload progress" />
+  </div>
+</Preview>
+
+### Indeterminate
+
+Omit `value` when the duration is unknown.
+
+<Preview
+  height={120}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ width: 280 }}>
+      <LinearProgress aria-label="Loading" />
+    </div>
+`}
+>
+  <div style={{ width: 280 }}>
+    <LinearProgress aria-label="Loading" />
+  </div>
+</Preview>
+
+### Color and track
+
+Use `color` to override the primary color with any CSS color value, and `showTrack={false}` to hide the background track.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "grid", gap: 16, width: 280 }}>
+      <LinearProgress value={40} color="var(--puzzle-color-danger)" />
+      <LinearProgress value={40} showTrack={false} />
+    </div>
+`}
+>
+  <div style={{ display: "grid", gap: 16, width: 280 }}>
+    <LinearProgress value={40} color="var(--puzzle-color-danger)" />
+    <LinearProgress value={40} showTrack={false} />
+  </div>
+</Preview>
+
+## Circular progress
+
+### Determinate
+
+<Preview
+  height={140}
+  align="center"
+  justify="center"
+  code={`\
+    <CircularProgress value={75} aria-label="Upload progress" />
+`}
+>
+  <CircularProgress value={75} aria-label="Upload progress" />
+</Preview>
+
+### Indeterminate
+
+Omit `value` to show a continuously spinning indicator.
+
+<Preview
+  height={140}
+  align="center"
+  justify="center"
+  code={`\
+    <CircularProgress />
+`}
+>
+  <CircularProgress />
+</Preview>
+
+### Size
+
+Use `size` (`sm`, `md`, `lg`) to scale the spinner. The default is `md`.
+
+<Preview
+  height={140}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+      <CircularProgress size="sm" />
+      <CircularProgress size="md" />
+      <CircularProgress size="lg" />
+    </div>
+`}
+>
+  <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+    <CircularProgress size="sm" />
+    <CircularProgress size="md" />
+    <CircularProgress size="lg" />
+  </div>
+</Preview>
+
+## API reference
+
+### Shared props
+
+| Prop        | Type      | Default                     | Description                                                                   |
+| ----------- | --------- | --------------------------- | ----------------------------------------------------------------------------- |
+| `value`     | `number`  | —                           | Progress from `0` to `100`. When omitted, the indicator is indeterminate.     |
+| `color`     | `string`  | `var(--puzzle-color-primary)` | CSS color of the indicator and track.                                       |
+| `showTrack` | `boolean` | `true`                      | Shows the background track behind the indicator.                              |
+
+### LinearProgress props
+
+LinearProgress accepts the shared props and the props of `<div>`, which are passed to the track element.
+
+### CircularProgress props
+
+| Prop   | Type                   | Default | Description              |
+| ------ | ---------------------- | ------- | ------------------------ |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"`  | Diameter of the spinner. |
+
+CircularProgress also accepts the shared props and the props of `<svg>`. Its `aria-label` defaults to `"Loading..."`.
+
+### TypeScript types
+
+The package exports `ProgressProps`, `LinearProgressProps`, `CircularProgressProps`, and `CircularProgressSize`.
+
+## Theming
+
+Both indicators default to `--puzzle-color-primary`, so they follow light, dark, and scoped themes. Animation is handled in CSS.
+
+## Accessibility
+
+- Neither component sets `role="progressbar"` or `aria-valuenow` for you. For a determinate bar, pass them yourself, for example `role="progressbar" aria-valuenow={60} aria-valuemin={0} aria-valuemax={100}`, along with an `aria-label` or `aria-labelledby`.
+- CircularProgress sets `aria-label="Loading..."` by default; override it with a more specific label, such as the task being performed.
+- For long-running or important operations, also announce completion in a live region so assistive technology users know when work finishes.

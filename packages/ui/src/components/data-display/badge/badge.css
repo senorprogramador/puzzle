@@ -3,7 +3,7 @@
     display: inline-flex;
 }
 
-.puzzle-badge > span {
+.puzzle-badge > .puzzle-badge-indicator {
     position: absolute;
     display: inline-flex;
     align-items: center;
@@ -19,74 +19,74 @@
     vertical-align: middle;
 }
 
-.puzzle-badge-primary > span {
+.puzzle-badge-primary > .puzzle-badge-indicator {
     background-color: var(--puzzle-color-primary);
     color: var(--puzzle-color-primary-foreground);
 }
 
-.puzzle-badge-secondary > span {
+.puzzle-badge-secondary > .puzzle-badge-indicator {
     background-color: var(--puzzle-color-secondary);
     color: var(--puzzle-color-secondary-foreground);
 }
 
-.puzzle-badge-accent > span {
+.puzzle-badge-accent > .puzzle-badge-indicator {
     background-color: var(--puzzle-color-accent);
     color: var(--puzzle-color-accent-foreground);
 }
 
-.puzzle-badge-danger > span {
+.puzzle-badge-danger > .puzzle-badge-indicator {
     background-color: var(--puzzle-color-danger);
     color: var(--puzzle-color-danger-foreground);
 }
 
-.puzzle-badge-info > span {
+.puzzle-badge-info > .puzzle-badge-indicator {
     background-color: var(--puzzle-color-info);
     color: var(--puzzle-color-info-foreground);
 }
 
-.puzzle-badge.rectangular.top.left > span {
+.puzzle-badge.rectangular.top.left > .puzzle-badge-indicator {
     top: 0;
     left: 0;
     transform: translate(-50%, -50%);
 }
 
-.puzzle-badge.rectangular.bottom.left > span {
+.puzzle-badge.rectangular.bottom.left > .puzzle-badge-indicator {
     bottom: 0;
     left: 0;
     transform: translate(-50%, 50%);
 }
 
-.puzzle-badge.rectangular.top.right > span {
+.puzzle-badge.rectangular.top.right > .puzzle-badge-indicator {
     top: 0;
     right: 0;
     transform: translate(50%, -50%);
 }
 
-.puzzle-badge.rectangular.bottom.right > span {
+.puzzle-badge.rectangular.bottom.right > .puzzle-badge-indicator {
     bottom: 0;
     right: 0;
     transform: translate(50%, 50%);
 }
 
-.puzzle-badge.circular.top.left > span {
+.puzzle-badge.circular.top.left > .puzzle-badge-indicator {
     top: calc(50% - sin(135deg) * 50%);
     left: calc(50% + cos(135deg) * 50%);
     transform: translate(-50%, -50%);
 }
 
-.puzzle-badge.circular.top.right > span {
+.puzzle-badge.circular.top.right > .puzzle-badge-indicator {
     top: calc(50% - sin(45deg) * 50%);
     left: calc(50% + cos(45deg) * 50%);
     transform: translate(-50%, -50%);
 }
 
-.puzzle-badge.circular.bottom.left > span {
+.puzzle-badge.circular.bottom.left > .puzzle-badge-indicator {
     top: calc(50% - sin(225deg) * 45%);
     left: calc(50% + cos(225deg) * 45%);
     transform: translate(-50%, -50%);
 }
 
-.puzzle-badge.circular.bottom.right > span {
+.puzzle-badge.circular.bottom.right > .puzzle-badge-indicator {
     top: calc(50% - sin(315deg) * 50%);
     left: calc(50% + cos(315deg) * 50%);
     transform: translate(-50%, -50%);

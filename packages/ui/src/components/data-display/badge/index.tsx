@@ -52,6 +52,7 @@ const Badge = ({
     <div className={classes}>
       {children}
       <span
+        className="puzzle-badge-indicator"
         style={{
           fontSize: `clamp(0.7rem, calc(${resolvedSize}px - 1em), 4rem)`,
           minHeight: `${resolvedSize}px`,

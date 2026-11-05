@@ -1,0 +1,128 @@
+---
+title: Avatar
+description: Avatars represent a person or entity with an image or their initials.
+---
+
+Use the Avatar component to identify a user, team, or organization. It shows an image when `src` is provided and falls back to initials derived from `alt`.
+
+## Import
+
+```tsx
+import { Avatar } from "@puzzle/ui";
+```
+
+## Basic usage
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <Avatar src="https://i.pravatar.cc/96?img=12" alt="Ada Lovelace" />
+`}
+>
+  <Avatar src="https://i.pravatar.cc/96?img=12" alt="Ada Lovelace" />
+</Preview>
+
+## Initials fallback
+
+Without `src`, Avatar renders the initials of the `alt` text. Use this when a user has no picture or while an image is unavailable.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <Avatar alt="Ada Lovelace" />
+`}
+>
+  <Avatar alt="Ada Lovelace" />
+</Preview>
+
+## Size
+
+Use `size` to set the width and height in pixels. The default is `32`, which is also the minimum; smaller values are raised to `32`.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <Avatar alt="Ada Lovelace" />
+      <Avatar alt="Ada Lovelace" size={48} />
+      <Avatar alt="Ada Lovelace" size={64} />
+    </div>
+`}
+>
+  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+    <Avatar alt="Ada Lovelace" />
+    <Avatar alt="Ada Lovelace" size={48} />
+    <Avatar alt="Ada Lovelace" size={64} />
+  </div>
+</Preview>
+
+## Shape
+
+Use `shape` to choose `circle` (default) or `square`.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "flex", gap: 12 }}>
+      <Avatar alt="Ada Lovelace" shape="circle" size={48} />
+      <Avatar alt="Ada Lovelace" shape="square" size={48} />
+    </div>
+`}
+>
+  <div style={{ display: "flex", gap: 12 }}>
+    <Avatar alt="Ada Lovelace" shape="circle" size={48} />
+    <Avatar alt="Ada Lovelace" shape="square" size={48} />
+  </div>
+</Preview>
+
+## With a badge
+
+Wrap an Avatar in a [Badge](/docs/components/ui/data-display/badge) to show status or a count. Use `anchorOverlap="circular"` for circular avatars.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <Badge content="" size={16} anchorOverlap="circular">
+      <Avatar alt="Ada Lovelace" size={48} />
+    </Badge>
+`}
+>
+  <Badge content="" size={16} anchorOverlap="circular">
+    <Avatar alt="Ada Lovelace" size={48} />
+  </Badge>
+</Preview>
+
+## API reference
+
+### Avatar props
+
+| Prop        | Type                   | Default    | Description                                                         |
+| ----------- | ---------------------- | ---------- | ------------------------------------------------------------------- |
+| `src`       | `string`               | —          | Image URL. When omitted, initials are shown instead.               |
+| `alt`       | `string`               | —          | Accessible name; also the source of the initials fallback.          |
+| `size`      | `number`               | `32`       | Width and height in pixels. Values below `32` are raised to `32`.   |
+| `shape`     | `"circle" \| "square"` | `"circle"` | Shape of the avatar.                                                |
+| `className` | `string`               | —          | Additional CSS class names.                                         |
+
+### Element props
+
+Avatar accepts the remaining props of `<img>` (except `width` and `height`) and passes them to the rendered element, which is an `<img>` with `src` and a `<span>` otherwise.
+
+### TypeScript types
+
+The component exports `AvatarProps` and `AvatarShape`.
+
+## Accessibility
+
+- Always provide `alt`. For images it is the alternative text; for the initials fallback it becomes the `aria-label`, and it is the source of the initials.
+- If the avatar sits next to the person's name and is purely decorative, pass `alt=""` for the image variant so it is skipped by screen readers.

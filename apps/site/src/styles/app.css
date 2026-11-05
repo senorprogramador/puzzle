@@ -49,6 +49,12 @@ figure.shiki {
     margin-bottom: var(--puzzle-space-8, 2rem);
 }
 
+/* Keep tables from sitting flush against the text above them. */
+div:has(> table) {
+    margin-top: var(--puzzle-space-4, 1rem);
+    margin-bottom: var(--puzzle-space-8, 2rem);
+}
+
 /*
  * Shiki ships light and dark token colors and switches on Fumadocs' `.dark`
  * class, which is disabled here. Switch on Puzzle's active scheme instead,

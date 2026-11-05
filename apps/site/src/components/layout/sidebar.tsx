@@ -43,9 +43,39 @@ const items: TreeViewItem[] = [
         label: "Data Display",
         children: [
           {
+            id: "avatar",
+            label: "Avatar",
+            href: "/docs/components/ui/data-display/avatar",
+          },
+          {
+            id: "badge",
+            label: "Badge",
+            href: "/docs/components/ui/data-display/badge",
+          },
+          {
+            id: "card",
+            label: "Card",
+            href: "/docs/components/ui/data-display/card",
+          },
+          {
             id: "image",
             label: "Image",
             href: "/docs/components/ui/data-display/image",
+          },
+          {
+            id: "paper",
+            label: "Paper",
+            href: "/docs/components/ui/data-display/paper",
+          },
+          {
+            id: "progress",
+            label: "Progress",
+            href: "/docs/components/ui/data-display/progress",
+          },
+          {
+            id: "skeleton",
+            label: "Skeleton",
+            href: "/docs/components/ui/data-display/skeleton",
           },
         ],
       },

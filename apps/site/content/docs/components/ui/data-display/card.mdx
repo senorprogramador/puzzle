@@ -1,0 +1,235 @@
+---
+title: Card
+description: Cards group related content and actions into a single, self-contained surface.
+---
+
+Use the Card component to present a unit of related content, such as a summary, a product, or a settings group. Compose it from the Card parts to get consistent spacing and structure.
+
+## Import
+
+```tsx
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardAction,
+  CardContent,
+  CardFooter,
+  CardMedia,
+} from "@puzzle/ui";
+```
+
+## Basic usage
+
+<Preview
+  height={260}
+  align="center"
+  justify="center"
+  code={`\
+    <Card style={{ width: 320 }}>
+      <CardHeader>
+        <CardTitle>Project Atlas</CardTitle>
+        <CardDescription>Last updated 2 hours ago</CardDescription>
+      </CardHeader>
+      <CardContent>
+        A shared workspace for planning and tracking the next release.
+      </CardContent>
+      <CardFooter>
+        <Button>Open</Button>
+      </CardFooter>
+    </Card>
+`}
+>
+  <Card style={{ width: 320 }}>
+    <CardHeader>
+      <CardTitle>Project Atlas</CardTitle>
+      <CardDescription>Last updated 2 hours ago</CardDescription>
+    </CardHeader>
+    <CardContent>
+      A shared workspace for planning and tracking the next release.
+    </CardContent>
+    <CardFooter>
+      <Button>Open</Button>
+    </CardFooter>
+  </Card>
+</Preview>
+
+## Variants
+
+Use `variant` to set the surface style: `outlined` (default), `elevated`, `filled`, or `ghost`.
+
+<Preview
+  height={220}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+      <Card variant="outlined"><CardContent>Outlined</CardContent></Card>
+      <Card variant="elevated"><CardContent>Elevated</CardContent></Card>
+      <Card variant="filled"><CardContent>Filled</CardContent></Card>
+      <Card variant="ghost"><CardContent>Ghost</CardContent></Card>
+    </div>
+`}
+>
+  <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+    <Card variant="outlined"><CardContent>Outlined</CardContent></Card>
+    <Card variant="elevated"><CardContent>Elevated</CardContent></Card>
+    <Card variant="filled"><CardContent>Filled</CardContent></Card>
+    <Card variant="ghost"><CardContent>Ghost</CardContent></Card>
+  </div>
+</Preview>
+
+## Size
+
+Use `size` (`sm`, `md`, `lg`) to control the card's spacing. The default is `md`.
+
+<Preview
+  height={220}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+      <Card size="sm"><CardContent>Small</CardContent></Card>
+      <Card size="md"><CardContent>Medium</CardContent></Card>
+      <Card size="lg"><CardContent>Large</CardContent></Card>
+    </div>
+`}
+>
+  <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
+    <Card size="sm"><CardContent>Small</CardContent></Card>
+    <Card size="md"><CardContent>Medium</CardContent></Card>
+    <Card size="lg"><CardContent>Large</CardContent></Card>
+  </div>
+</Preview>
+
+## Header action
+
+Place a `CardAction` inside `CardHeader` to add a control, such as a button, next to the title.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+    <Card style={{ width: 360 }}>
+      <CardHeader>
+        <CardTitle>Notifications</CardTitle>
+        <CardDescription>Choose what you hear about.</CardDescription>
+        <CardAction>
+          <Button variant="secondary">Edit</Button>
+        </CardAction>
+      </CardHeader>
+    </Card>
+`}
+>
+  <Card style={{ width: 360 }}>
+    <CardHeader>
+      <CardTitle>Notifications</CardTitle>
+      <CardDescription>Choose what you hear about.</CardDescription>
+      <CardAction>
+        <Button variant="secondary">Edit</Button>
+      </CardAction>
+    </CardHeader>
+  </Card>
+</Preview>
+
+## Orientation
+
+Set `orientation="horizontal"` to lay media and content side by side. The default is `vertical`. Use `CardMedia` for the image or other visual.
+
+<Preview
+  height={240}
+  align="center"
+  justify="center"
+  code={`\
+    <Card orientation="horizontal" style={{ width: 420 }}>
+      <CardMedia>
+        <Skeleton width={120} height="100%" radius="none" />
+      </CardMedia>
+      <CardContent>
+        <CardTitle>Horizontal card</CardTitle>
+        <CardDescription>Media sits beside the content.</CardDescription>
+      </CardContent>
+    </Card>
+`}
+>
+  <Card orientation="horizontal" style={{ width: 420 }}>
+    <CardMedia>
+      <Skeleton width={120} height="100%" radius="none" />
+    </CardMedia>
+    <CardContent>
+      <CardTitle>Horizontal card</CardTitle>
+      <CardDescription>Media sits beside the content.</CardDescription>
+    </CardContent>
+  </Card>
+</Preview>
+
+## Interactive cards
+
+Set `interactive` to add hover and focus styling when the whole card is clickable. Render it as a link or button with `as` so it is keyboard accessible.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+    <Card as="a" href="#" interactive style={{ width: 320 }}>
+      <CardHeader>
+        <CardTitle>Read the guide</CardTitle>
+        <CardDescription>Everything you need to get started.</CardDescription>
+      </CardHeader>
+    </Card>
+`}
+>
+  <Card as="a" href="#" interactive style={{ width: 320 }}>
+    <CardHeader>
+      <CardTitle>Read the guide</CardTitle>
+      <CardDescription>Everything you need to get started.</CardDescription>
+    </CardHeader>
+  </Card>
+</Preview>
+
+`interactive` only changes styling. It does not add any behavior or semantics, so always pair it with an interactive element.
+
+## API reference
+
+### Card props
+
+| Prop          | Type                                              | Default      | Description                                                  |
+| ------------- | ------------------------------------------------- | ------------ | ------------------------------------------------------------ |
+| `as`          | `ElementType`                                     | `"div"`      | Element type used to render the card.                        |
+| `variant`     | `"elevated" \| "outlined" \| "filled" \| "ghost"` | `"outlined"` | Surface style.                                               |
+| `size`        | `"sm" \| "md" \| "lg"`                            | `"md"`       | Spacing scale.                                               |
+| `orientation` | `"vertical" \| "horizontal"`                      | `"vertical"` | Direction in which the card's parts are laid out.            |
+| `interactive` | `boolean`                                         | `false`      | Adds hover and focus styling for clickable cards.            |
+| `className`   | `string`                                          | —            | Additional CSS class names.                                  |
+| `children`    | `ReactNode`                                       | —            | Card content.                                                |
+
+### Card parts
+
+| Component         | Default element | Purpose                                              |
+| ----------------- | --------------- | ---------------------------------------------------- |
+| `CardHeader`      | `div`           | Groups the title, description, and action.           |
+| `CardTitle`       | `h3`            | Card heading. Change the level with `as`.            |
+| `CardDescription` | `p`             | Supporting text for the title.                       |
+| `CardAction`      | `div`           | Control placed alongside the title.                  |
+| `CardContent`     | `div`           | Main body of the card.                               |
+| `CardFooter`      | `div`           | Actions or metadata at the end of the card.          |
+| `CardMedia`       | `div`           | Image or other visual.                               |
+
+Every part accepts `as`, `className`, `children`, and the props of the element it renders.
+
+### Element props
+
+Card accepts the props of the element selected by `as`, passed through to it.
+
+### TypeScript types
+
+The component exports `CardProps`, `CardPartProps`, `CardVariant`, `CardSize`, and `CardOrientation`.
+
+## Accessibility
+
+- `CardTitle` renders an `<h3>`. Use `as` to pick the level that fits the page's heading hierarchy.
+- For a clickable card, render the card as `a` or `button` with `as` rather than adding a click handler to a `div`. Avoid nesting other interactive controls inside it.
+- The card has no implicit role. Add `role`, `aria-labelledby`, or similar only when the card represents a meaningful landmark or group.

@@ -1,0 +1,85 @@
+---
+title: Paper
+description: Paper is a basic surface that lifts content off the page with a configurable elevation.
+---
+
+Use the Paper component as a neutral surface when you need an elevated container without the structure of a Card.
+
+## Import
+
+```tsx
+import { Paper } from "@puzzle/ui";
+```
+
+## Basic usage
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+    <Paper style={{ padding: 24 }}>Content on a paper surface</Paper>
+`}
+>
+  <Paper style={{ padding: 24 }}>Content on a paper surface</Paper>
+</Preview>
+
+Paper has no built-in padding, so add spacing yourself.
+
+## Elevation
+
+Use `elevation` to control the shadow depth. Available levels are `1`, `2`, `3`, `4`, `6`, `8`, `12`, `16`, and `24`. The default is `1`.
+
+<Preview
+  height={240}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>
+      <Paper elevation={1} style={{ padding: 24 }}>1</Paper>
+      <Paper elevation={4} style={{ padding: 24 }}>4</Paper>
+      <Paper elevation={8} style={{ padding: 24 }}>8</Paper>
+      <Paper elevation={24} style={{ padding: 24 }}>24</Paper>
+    </div>
+`}
+>
+  <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>
+    <Paper elevation={1} style={{ padding: 24 }}>1</Paper>
+    <Paper elevation={4} style={{ padding: 24 }}>4</Paper>
+    <Paper elevation={8} style={{ padding: 24 }}>8</Paper>
+    <Paper elevation={24} style={{ padding: 24 }}>24</Paper>
+  </div>
+</Preview>
+
+## Rendering a different element
+
+Use `as` to render semantic HTML, such as `section` or `aside`.
+
+```tsx
+<Paper as="aside" aria-label="Tips">
+  Remember to save your work.
+</Paper>
+```
+
+## API reference
+
+### Paper props
+
+| Prop        | Type                                              | Default | Description                           |
+| ----------- | ------------------------------------------------- | ------- | ------------------------------------- |
+| `as`        | `ElementType`                                     | `"div"` | Element type used to render the paper. |
+| `elevation` | `1 \| 2 \| 3 \| 4 \| 6 \| 8 \| 12 \| 16 \| 24`    | `1`     | Shadow depth.                         |
+| `className` | `string`                                          | —       | Additional CSS class names.           |
+| `children`  | `ReactNode`                                       | —       | Content displayed inside the paper.   |
+
+### Element props
+
+Paper accepts the props of the element selected by `as`, passed through to it.
+
+### TypeScript types
+
+The component exports `PaperProps<C extends ElementType>`. The generic follows the element selected by `as`.
+
+## Accessibility
+
+Paper is purely presentational and adds no role or semantics. Choose a semantic element with `as` when the surface represents a landmark, and provide an accessible name where needed.

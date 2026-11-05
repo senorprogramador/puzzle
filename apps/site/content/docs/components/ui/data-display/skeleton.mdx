@@ -1,0 +1,133 @@
+---
+title: Skeleton
+description: Skeletons are placeholders that hint at the shape of content while it loads.
+---
+
+Use the Skeleton component to reserve space for content that is still loading. It renders a muted block with a subtle shimmer, reducing layout shift and making loading states feel smoother.
+
+## Import
+
+```tsx
+import { Skeleton } from "@puzzle/ui";
+```
+
+## Basic usage
+
+Skeleton fills the width of its container and is `1rem` tall by default.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ width: 280 }}>
+      <Skeleton />
+    </div>
+`}
+>
+  <div style={{ width: 280 }}>
+    <Skeleton />
+  </div>
+</Preview>
+
+## Size
+
+Use `width` and `height` to match the content being replaced. Both accept any CSS length: numbers are treated as pixels, strings are passed as CSS values.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "grid", gap: 8, width: 280 }}>
+      <Skeleton height="1.5rem" width="60%" />
+      <Skeleton />
+      <Skeleton width="80%" />
+    </div>
+`}
+>
+  <div style={{ display: "grid", gap: 8, width: 280 }}>
+    <Skeleton height="1.5rem" width="60%" />
+    <Skeleton />
+    <Skeleton width="80%" />
+  </div>
+</Preview>
+
+## Radius
+
+Use `radius` to match the shape of the content. The default is `standard`.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "flex", gap: 16 }}>
+      <Skeleton width={64} height={64} radius="none" />
+      <Skeleton width={64} height={64} />
+      <Skeleton width={64} height={64} radius="full" />
+    </div>
+`}
+>
+  <div style={{ display: "flex", gap: 16 }}>
+    <Skeleton width={64} height={64} radius="none" />
+    <Skeleton width={64} height={64} />
+    <Skeleton width={64} height={64} radius="full" />
+  </div>
+</Preview>
+
+## Composing a loading state
+
+Combine several skeletons to mirror the layout of the final content.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "flex", gap: 12, width: 320 }}>
+      <Skeleton width={48} height={48} radius="full" />
+      <div style={{ display: "grid", gap: 8, flex: 1 }}>
+        <Skeleton width="50%" />
+        <Skeleton />
+      </div>
+    </div>
+`}
+>
+  <div style={{ display: "flex", gap: 12, width: 320 }}>
+    <Skeleton width={48} height={48} radius="full" />
+    <div style={{ display: "grid", gap: 8, flex: 1 }}>
+      <Skeleton width="50%" />
+      <Skeleton />
+    </div>
+  </div>
+</Preview>
+
+## API reference
+
+### Skeleton props
+
+| Prop        | Type                           | Default      | Description                                          |
+| ----------- | ------------------------------ | ------------ | ---------------------------------------------------- |
+| `width`     | `CSSProperties["width"]`       | `"100%"`     | Width of the placeholder.                            |
+| `height`    | `CSSProperties["height"]`      | `"1rem"`     | Height of the placeholder.                           |
+| `radius`    | `"standard" \| "full" \| "none"` | `"standard"` | Corner radius: theme radius, fully rounded, or square. |
+| `className` | `string`                       | —            | Additional CSS class names.                          |
+
+### TypeScript types
+
+The component exports `SkeletonProps` and `SkeletonRadius`.
+
+## Theming
+
+Skeleton uses the `--puzzle-color-border` and `--puzzle-color-surface-elevated` tokens for its background and shimmer, and `--puzzle-radius-md` and `--puzzle-radius-full` for its corners, so it follows light, dark, and scoped themes.
+
+## Accessibility
+
+### Hidden from assistive technology
+
+Skeleton renders an empty `<span>` with `aria-hidden="true"`, so it is ignored by screen readers. Communicate the loading state separately, for example by setting `aria-busy="true"` on the container being loaded or by using a visually hidden status message.
+
+### Reduced motion
+
+When the user prefers reduced motion, the shimmer animation is disabled and only the static placeholder is shown.
