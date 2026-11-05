@@ -44,18 +44,18 @@
     text-decoration: none;
 }
 
+/* Keep rendered code blocks from sitting flush against the text below. */
+figure.shiki {
+    margin-bottom: var(--puzzle-space-8, 2rem);
+}
+
 /*
  * Shiki ships light and dark token colors and switches on Fumadocs' `.dark`
  * class, which is disabled here. Switch on Puzzle's active scheme instead,
  * mirroring the selectors in @puzzle/theme (explicit dark, or system dark).
  */
-:root:has(style[data-puzzle-theme="true"][data-theme="dark"])
-    .shiki:not(.not-fumadocs-codeblock *)
-    code
-    span,
-:root:has(style[data-puzzle-theme="true"][data-theme="dark"])
-    code.shiki:not(.not-fumadocs-code *)
-    span {
+:root:has(style[data-puzzle-theme="true"][data-theme="dark"]) .shiki:not(.not-fumadocs-codeblock *) code span,
+:root:has(style[data-puzzle-theme="true"][data-theme="dark"]) code.shiki:not(.not-fumadocs-code *) span {
     color: var(--shiki-dark);
     font-style: var(--shiki-dark-font-style);
 }
@@ -63,18 +63,18 @@
 @media (prefers-color-scheme: dark) {
     :root:not(
             :has(
-                    style[data-puzzle-theme="true"][data-theme="light"],
-                    style[data-puzzle-theme="true"][data-theme="dark"]
-                )
+                style[data-puzzle-theme="true"][data-theme="light"],
+                style[data-puzzle-theme="true"][data-theme="dark"]
+            )
         )
         .shiki:not(.not-fumadocs-codeblock *)
         code
         span,
     :root:not(
             :has(
-                    style[data-puzzle-theme="true"][data-theme="light"],
-                    style[data-puzzle-theme="true"][data-theme="dark"]
-                )
+                style[data-puzzle-theme="true"][data-theme="light"],
+                style[data-puzzle-theme="true"][data-theme="dark"]
+            )
         )
         code.shiki:not(.not-fumadocs-code *)
         span {

@@ -38,12 +38,24 @@ const items: TreeViewItem[] = [
           },
         ],
       },
+      {
+        id: "data-display",
+        label: "Data Display",
+        children: [
+          {
+            id: "image",
+            label: "Image",
+            href: "/docs/components/ui/data-display/image",
+          },
+        ],
+      },
     ],
   },
 ];
 
 const Sidebar = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const matchRoute = useMatchRoute();
 
   return (
     <PuzzleSidebar>
@@ -51,19 +63,18 @@ const Sidebar = () => {
         aria-label="Navigation"
         items={items}
         selectionMode="single"
-        defaultExpandedIds={["components", "ui", "actions"]}
+        defaultExpandedIds={["components", "ui", "actions", "data-display"]}
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
-        getItemActive={(item) => {
-          const matchRoute = useMatchRoute();
-          return Boolean(
+        getItemActive={(item) =>
+          Boolean(
             item.href &&
             matchRoute({
               to: item.href,
               fuzzy: false,
             }),
-          );
-        }}
+          )
+        }
       />
     </PuzzleSidebar>
   );

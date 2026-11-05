@@ -29,6 +29,7 @@ export {
   type AvatarProps,
   type AvatarShape,
 } from "./components/data-display/avatar";
+
 export {
   Badge,
   type BadgeProps,
@@ -53,16 +54,25 @@ export {
   type CardProps,
 } from "./components/data-display/card";
 
+export {
+  Image,
+  type ImageProps,
+  type ImageSource,
+  type ImageSourceData,
+  type ImageSourceSet,
+  type ImageFit,
+  type ImageRadius,
+  type ImagePlaceholder,
+} from "./components/data-display/image";
+
 export { Paper, type PaperProps } from "./components/data-display/paper";
 
 export type { ProgressProps } from "./components/data-display/progress/types";
-
 export {
   CircularProgress,
   type CircularProgressProps,
   type CircularProgressSize,
 } from "./components/data-display/progress/circular-progress";
-
 export {
   LinearProgress,
   type LinearProgressProps,

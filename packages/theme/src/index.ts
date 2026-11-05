@@ -26,4 +26,5 @@ export type {
   ThemeComponents,
   ThemeLinkComponent,
   ThemeLinkComponentConfig,
+  ThemeImageComponent,
 } from "./components.types";

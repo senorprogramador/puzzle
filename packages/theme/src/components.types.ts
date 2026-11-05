@@ -30,10 +30,22 @@ export type ThemeLinkComponentConfig = {
 export type ThemeLinkComponent = ElementType | ThemeLinkComponentConfig | null;
 
 /**
- * Global component overrides provided by Theme.
+ * Component used to render Puzzle images.
  *
- * Additional component overrides can be added here as Puzzle grows.
+ * Defaults to the native HTML img element.
+ *
+ * This can be overridden with framework-specific image components,
+ * such as Next.js Image or a custom image CDN component.
+ *
+ * When passing components through a React Server Component boundary,
+ * use a component reference exported from a "use client" module.
+ */
+export type ThemeImageComponent = ElementType | null;
+
+/**
+ * Global component overrides provided by Theme.
  */
 export type ThemeComponents = {
   link?: ThemeLinkComponent;
+  image?: ThemeImageComponent;
 };

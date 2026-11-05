@@ -1,0 +1,245 @@
+---
+title: Image
+description: Responsive images with loading states, fallbacks, and framework image support.
+---
+
+The Image component provides a consistent way to display images with responsive sizing, loading placeholders, and fallback content. It renders a native HTML `<img>` by default and can also use an image component configured for your framework.
+
+## Import
+
+```tsx
+import { Image } from "@puzzle/ui";
+```
+
+## Basic usage
+
+Provide a source and alternative text. Set the intrinsic dimensions to reserve space while the image loads.
+
+<Preview
+  height={450}
+  align="center"
+  justify="center"
+  code={`\
+  <Image
+    src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+    alt="Mountain landscape beside a lake"
+    width={800}
+    height={450}
+  />
+`}
+>
+  <Image
+    src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+    alt="Mountain landscape beside a lake"
+    width={800}
+    height={450}
+  />
+</Preview>
+
+The `width` and `height` props describe the image's intrinsic dimensions in pixels. They can be inferred when `src` is a static image import with `src`, `width`, and `height` fields.
+
+## Fitting and positioning
+
+Use `fit` to control how the image fills its box, and `position` to align the image content within that box. These correspond to CSS `object-fit` and `object-position`; the defaults are `"cover"` and `"center"`.
+
+<Preview
+  height={360}
+  align="center"
+  justify="center"
+  code={`\
+  <Image
+    src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+    alt="Mountain landscape cropped to fill its frame"
+    width={640}
+    height={360}
+    fit="cover"
+    position="center"
+    radius="lg"
+  />
+`}
+>
+  <Image
+    src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+    alt="Mountain landscape cropped to fill its frame"
+    width={640}
+    height={360}
+    fit="cover"
+    position="center"
+    radius="lg"
+  />
+</Preview>
+
+The `radius` prop sets the border radius on the image container. It accepts the presets `"none"`, `"sm"`, `"md"`, `"lg"`, `"xl"`, and `"full"`, as well as a CSS border-radius value.
+
+## Aspect ratio and fill
+
+Set `aspectRatio` to make the image fill a full-width container with a chosen ratio.
+
+```tsx
+<Image
+  src="/images/landscape.webp"
+  alt="Mountain landscape"
+  aspectRatio="16 / 9"
+/>
+```
+
+Use `fill` to position the image across its parent container. The parent must have a defined size; set `aspectRatio` on the Image or give the parent an explicit height.
+
+```tsx
+<div style={{ width: "100%", height: 240 }}>
+  <Image
+    src="/images/landscape.webp"
+    alt="Mountain landscape"
+    fill
+    fit="cover"
+  />
+</div>
+```
+
+## Loading placeholders
+
+Use `loadingPlaceholder` to display custom content over the image while it loads.
+
+```tsx
+<Image
+  src="/images/landscape.webp"
+  alt="Mountain landscape"
+  loadingPlaceholder={<span>Loading image...</span>}
+/>
+```
+
+Alternatively, set `placeholder="blur"` and provide a small preview through `blurDataURL`. A static image import can provide this value automatically.
+
+```tsx
+<Image
+  src="/images/landscape.webp"
+  alt="Mountain landscape"
+  placeholder="blur"
+  blurDataURL="data:image/jpeg;base64,..."
+/>
+```
+
+For native `<img>` elements, the component displays the blur preview behind the image while it loads. When a framework image component is configured, the `placeholder` and `blurDataURL` props are forwarded to it. A custom `loadingPlaceholder`, when provided, takes precedence over the native blur preview.
+
+## Fallbacks
+
+Use `fallbackSrc` to try another image if the primary source fails. Use `fallback` to render custom content when no usable source is available or all image sources fail.
+
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
+  <Image
+    alt="Unavailable product image"
+    fallback={<span>Image unavailable</span>}
+  />
+`}
+>
+  <Image
+    alt="Unavailable product image"
+    fallback={<span>Image unavailable</span>}
+  />
+</Preview>
+
+If neither a usable `src` nor a `fallback` is provided, the component renders nothing.
+
+## Responsive sources
+
+Pass `sources` to render `<source>` elements inside a native `<picture>`. This supports art direction and selecting different formats or files for different media conditions.
+
+```tsx
+<Image
+  src="/images/landscape.webp"
+  alt="Mountain landscape"
+  sources={[
+    {
+      srcSet: "/images/landscape-mobile.webp",
+      media: "(max-width: 640px)",
+    },
+    {
+      srcSet: "/images/landscape.avif",
+      type: "image/avif",
+    },
+  ]}
+/>
+```
+
+The standard image props `srcSet` and `sizes` are also supported.
+
+## Framework image components
+
+By default, Image renders a native `<img>`. You can provide a framework-specific image component with `component`, or configure one through `Theme`'s `components.image`. The `component` prop takes precedence over the theme configuration.
+
+```tsx
+<Image
+  component={FrameworkImage}
+  src="/images/landscape.webp"
+  alt="Mountain landscape"
+  quality={85}
+  preload
+/>
+```
+
+Framework-specific options such as `quality`, `unoptimized`, and `componentProps` are forwarded to a custom image component. `preload` uses React DOM image preloading for a native `<img>` and is forwarded to a configured image component.
+
+## API
+
+### Props
+
+| Prop                 | Type                              | Default    | Description                                                                                  |
+| -------------------- | --------------------------------- | ---------- | -------------------------------------------------------------------------------------------- |
+| `src`                | `ImageSource \| null`             | —          | Image URL or static image data. Can be omitted when `fallbackSrc` or `fallback` is provided. |
+| `alt`                | `string`                          | Required   | Alternative text for the image. Use an empty string for decorative images.                   |
+| `width`              | `number`                          | —          | Intrinsic image width in pixels; inferred from static image data when available.             |
+| `height`             | `number`                          | —          | Intrinsic image height in pixels; inferred from static image data when available.            |
+| `fit`                | `ImageFit`                        | `"cover"`  | How the image is sized within its box.                                                       |
+| `position`           | `CSSProperties["objectPosition"]` | `"center"` | Image alignment within its box.                                                              |
+| `aspectRatio`        | `CSSProperties["aspectRatio"]`    | —          | Aspect ratio for a full-width image container.                                               |
+| `fill`               | `boolean`                         | `false`    | Positions the image to fill its container. The container needs a defined size.               |
+| `radius`             | `ImageRadius`                     | —          | Border radius of the image container.                                                        |
+| `fallbackSrc`        | `ImageSource \| null`             | —          | Alternate image source used if the primary source fails.                                     |
+| `fallback`           | `ReactNode`                       | —          | Content shown if there is no usable image source or the image fails.                         |
+| `loadingPlaceholder` | `ReactNode`                       | —          | Custom content shown over the image while it loads.                                          |
+| `placeholder`        | `ImagePlaceholder`                | `"empty"`  | Loading placeholder strategy: `"empty"` or `"blur"`.                                         |
+| `blurDataURL`        | `string`                          | —          | Small preview image used by the blur placeholder.                                            |
+| `sources`            | `ImageSourceSet[]`                | —          | Responsive sources rendered inside a `<picture>` element.                                    |
+| `component`          | `ElementType`                     | —          | Framework-specific image component for this instance.                                        |
+| `componentProps`     | `Record<string, unknown>`         | —          | Additional props forwarded to the configured image component.                                |
+| `quality`            | `number`                          | —          | Image optimization quality forwarded to a custom image component.                            |
+| `preload`            | `boolean`                         | `false`    | Preloads a native image or is forwarded to a custom image component.                         |
+| `unoptimized`        | `boolean`                         | —          | Disables optimization in a compatible custom image component.                                |
+| `className`          | `string`                          | —          | Additional class name applied to the image element.                                          |
+| `style`              | `CSSProperties`                   | —          | Styles applied to the image element.                                                         |
+| `containerClassName` | `string`                          | —          | Additional class name applied to the outer container.                                        |
+| `containerStyle`     | `CSSProperties`                   | —          | Styles applied to the outer container.                                                       |
+
+### Native image props
+
+Image supports the standard React `<img>` props, including `loading`, `fetchPriority`, `decoding`, `crossOrigin`, `referrerPolicy`, `onLoad`, and `onError`, as well as `aria-*` and `data-*` attributes. Framework-specific props should be passed through `componentProps`.
+
+### TypeScript types
+
+The component exports `ImageProps`, `ImageSource`, `ImageSourceData`, `ImageSourceSet`, `ImageFit`, `ImageRadius`, and `ImagePlaceholder`.
+
+`ImageSource` accepts either a URL string or static image data:
+
+```ts
+type ImageSource = string | ImageSourceData;
+
+type ImageSourceData = {
+  src: string;
+  width: number;
+  height: number;
+  blurDataURL?: string;
+  blurWidth?: number;
+  blurHeight?: number;
+};
+```
+
+## Accessibility
+
+- Provide descriptive `alt` text for images that convey information.
+- Use `alt=""` when an image is decorative so assistive technology can ignore it.
+- If `fallback` communicates image content, the component exposes it as an image with the provided `alt` text.
+- Native image attributes and event handlers are forwarded to the rendered image element.
