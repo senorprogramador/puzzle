@@ -249,15 +249,16 @@ const TooltipContent = ({
       direction="row"
       gap="sm"
       className={cn("puzzle-tooltip", className)}
-      role="tooltip"
-      id={id}
     >
-      {children}
+      <span role="tooltip" id={id} className="puzzle-tooltip__text">
+        {children}
+      </span>
 
       {closable && (
         <button
           type="button"
           className="puzzle-tooltip__close"
+          aria-label="Close"
           onClick={() => {
             onOpenChange?.(false);
           }}

@@ -22,8 +22,13 @@ const renderInline = (block: TextBlock, blockIndex: number): ReactNode[] =>
     return <span key={`${blockIndex}-${inlineIndex}`}>{node}</span>;
   });
 
-const getHeadingTag = (variant: TextBlock["variant"]): "h1" | "h2" | "h3" | "h4" => {
-  switch (variant) {
+const HEADING_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
+
+// Without an explicit level, fall back to the level implied by the variant.
+const getHeadingTag = (block: TextBlock): (typeof HEADING_TAGS)[number] => {
+  if (block.headingLevel) return HEADING_TAGS[block.headingLevel - 1];
+
+  switch (block.variant) {
     case "display1": case "headline1": return "h1";
     case "display2": case "headline2": return "h2";
     case "headline3": return "h3";
@@ -56,7 +61,7 @@ const TextRenderer = ({ document, className }: TextRendererProps) => {
     const children = renderInline(block, index);
     const style = { textAlign: block.align };
     if (block.type === "heading") {
-      const HeadingTag = getHeadingTag(block.variant);
+      const HeadingTag = getHeadingTag(block);
       output.push(<HeadingTag key={index} className={blockClass} style={style}>{children.length ? children : <br />}</HeadingTag>);
     } else {
       output.push(<p key={index} className={blockClass} style={style}>{children.length ? children : <br />}</p>);

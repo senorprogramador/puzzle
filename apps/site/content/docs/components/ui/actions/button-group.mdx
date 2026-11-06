@@ -116,7 +116,7 @@ Use `spacing` to set the gap between buttons. A number is interpreted as pixels;
 
 ## Disabled
 
-Use `disabled` to mark the group as unavailable to assistive technology.
+Use `disabled` to disable the whole group: the group gets `aria-disabled="true"` and every direct child receives `disabled`.
 
 ```tsx
 <ButtonGroup disabled aria-label="Unavailable actions">
@@ -125,7 +125,7 @@ Use `disabled` to mark the group as unavailable to assistive technology.
 </ButtonGroup>
 ```
 
-The group receives `aria-disabled="true"`, but this does not disable its child buttons. Disable each child separately when its action must not be available.
+Only direct children are disabled; controls nested deeper must be disabled separately.
 
 ## API
 

@@ -80,10 +80,18 @@ const TextEditorToolbar = ({
       aria-orientation="horizontal"
       dir={dir}
     >
-      <Stack direction="row" alignH="start" alignV="center" gap="xs">
+      <Stack
+        direction="row"
+        alignH="start"
+        alignV="center"
+        gap="xs"
+        role="group"
+        aria-label="Text style"
+      >
         <Button
           {...getToolbarItemProps("bold")}
           aria-label="Bold"
+          aria-pressed={isActive?.("bold") ?? false}
           variant={isActive?.("bold") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => toggleMark?.("bold")}
@@ -94,6 +102,7 @@ const TextEditorToolbar = ({
         <Button
           {...getToolbarItemProps("italic")}
           aria-label="Italic"
+          aria-pressed={isActive?.("italic") ?? false}
           variant={isActive?.("italic") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => toggleMark?.("italic")}
@@ -104,6 +113,7 @@ const TextEditorToolbar = ({
         <Button
           {...getToolbarItemProps("underline")}
           aria-label="Underline"
+          aria-pressed={isActive?.("underline") ?? false}
           variant={isActive?.("underline") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => toggleMark?.("underline")}
@@ -114,6 +124,7 @@ const TextEditorToolbar = ({
         <Button
           {...getToolbarItemProps("strike")}
           aria-label="Strikethrough"
+          aria-pressed={isActive?.("strike") ?? false}
           variant={isActive?.("strike") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => toggleMark?.("strike")}
@@ -125,13 +136,21 @@ const TextEditorToolbar = ({
       <div
         role="separator"
         aria-orientation="vertical"
-        style={{ width: "1px", backgroundColor: "#ccc", minHeight: "24px" }}
+        className="text-editor-toolbar__separator"
       />
 
-      <Stack direction="row" alignH="start" alignV="center" gap="xs">
+      <Stack
+        direction="row"
+        alignH="start"
+        alignV="center"
+        gap="xs"
+        role="group"
+        aria-label="Alignment"
+      >
         <Button
           {...getToolbarItemProps("align-left")}
           aria-label="Align left"
+          aria-pressed={isTextAlignActive?.("left") ?? false}
           variant={isTextAlignActive?.("left") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => setTextAlign?.("left")}
@@ -142,6 +161,7 @@ const TextEditorToolbar = ({
         <Button
           {...getToolbarItemProps("align-center")}
           aria-label="Align center"
+          aria-pressed={isTextAlignActive?.("center") ?? false}
           variant={isTextAlignActive?.("center") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => setTextAlign?.("center")}
@@ -152,6 +172,7 @@ const TextEditorToolbar = ({
         <Button
           {...getToolbarItemProps("align-right")}
           aria-label="Align right"
+          aria-pressed={isTextAlignActive?.("right") ?? false}
           variant={isTextAlignActive?.("right") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => setTextAlign?.("right")}
@@ -162,6 +183,7 @@ const TextEditorToolbar = ({
         <Button
           {...getToolbarItemProps("align-justify")}
           aria-label="Justify text"
+          aria-pressed={isTextAlignActive?.("justify") ?? false}
           variant={isTextAlignActive?.("justify") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => setTextAlign?.("justify")}
@@ -173,10 +195,17 @@ const TextEditorToolbar = ({
       <div
         role="separator"
         aria-orientation="vertical"
-        style={{ width: "1px", backgroundColor: "#ccc", minHeight: "24px" }}
+        className="text-editor-toolbar__separator"
       />
 
-      <Stack direction="row" alignH="start" alignV="center" gap="xs">
+      <Stack
+        direction="row"
+        alignH="start"
+        alignV="center"
+        gap="xs"
+        role="group"
+        aria-label="History"
+      >
         <Button
           {...getToolbarItemProps("undo", !canUndoAction)}
           aria-label="Undo"
@@ -200,10 +229,18 @@ const TextEditorToolbar = ({
         </Button>
       </Stack>
 
-      <Stack direction="row" alignH="start" alignV="center" gap="xs">
+      <Stack
+        direction="row"
+        alignH="start"
+        alignV="center"
+        gap="xs"
+        role="group"
+        aria-label="Lists"
+      >
         <Button
           {...getToolbarItemProps("list-bullet")}
           aria-label="Bulleted list"
+          aria-pressed={isListTypeActive?.("bullet") ?? false}
           variant={isListTypeActive?.("bullet") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => setListType?.("bullet")}
@@ -214,6 +251,7 @@ const TextEditorToolbar = ({
         <Button
           {...getToolbarItemProps("list-ordered")}
           aria-label="Numbered list"
+          aria-pressed={isListTypeActive?.("ordered") ?? false}
           variant={isListTypeActive?.("ordered") ? "toggle-active" : "toggle"}
           onMouseDown={(event) => event.preventDefault()}
           onClick={() => setListType?.("ordered")}

@@ -43,12 +43,17 @@ const Card = <C extends ElementType = "div">({
   children,
   ...props
 }: CardProps<C>) => {
-  const Component = (as ?? "div") as ElementType;
+  // Interactive cards need native keyboard behavior, so they never fall back to a div.
+  const Component = (as ??
+    (interactive ? ("href" in props ? "a" : "button") : "div")) as ElementType;
 
   return createElement(
     Component,
     {
       ...props,
+      ...(Component === "button" && !("type" in props)
+        ? { type: "button" }
+        : {}),
       className: cn(
         "puzzle-card",
         `puzzle-card--${variant}`,

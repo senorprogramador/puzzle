@@ -148,6 +148,19 @@ export const normalizeTextDocument = (input: TextDocument): TextDocument => {
             ? (candidate.align as TextAlign)
             : undefined;
 
+        const type = listType
+          ? "listItem"
+          : candidate.type === "heading" && isHeadingVariant(variant)
+            ? "heading"
+            : "paragraph";
+        const headingLevel =
+          type === "heading" &&
+          Number.isInteger(candidate.headingLevel) &&
+          candidate.headingLevel! >= 1 &&
+          candidate.headingLevel! <= 6
+            ? candidate.headingLevel
+            : undefined;
+
         return [
           {
             type: listType
@@ -159,6 +172,7 @@ export const normalizeTextDocument = (input: TextDocument): TextDocument => {
             children,
             ...(listType ? { listType } : {}),
             ...(align ? { align } : {}),
+            ...(headingLevel ? { headingLevel } : {}),
           } satisfies TextBlock,
         ];
       })

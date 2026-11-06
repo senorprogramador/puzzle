@@ -190,7 +190,7 @@ Set `interactive` to add hover and focus styling when the whole card is clickabl
   </Card>
 </Preview>
 
-`interactive` only changes styling. It does not add any behavior or semantics, so always pair it with an interactive element.
+When `interactive` is set without `as`, the card renders a `button` (or an `a` when `href` is passed) so it is keyboard operable. Do not combine `interactive` with `as="div"`: it only adds styling, not semantics.
 
 ## API reference
 

@@ -230,16 +230,29 @@ const Transition = <T extends ElementType = "div">({
     return clearTimers;
   }, [visible, unmountOnExit, duration, forceMount]);
 
-  const handleAnimationEnd = (event: React.AnimationEvent) => {
+  // animationend and transitionend can both fire for one phase; run each callback once.
+  const settledPhaseRef = useRef<TransitionPhase | null>(null);
+
+  useEffect(() => {
+    settledPhaseRef.current = null;
+  }, [phase, visible]);
+
+  const handleEnd = (event: React.SyntheticEvent) => {
     if (event.target !== event.currentTarget) {
       return;
     }
 
+    if (settledPhaseRef.current === phase) {
+      return;
+    }
+
     if (phase === "enterTo") {
+      settledPhaseRef.current = phase;
       onEntered?.();
     }
 
     if (phase === "exitTo" && !visible) {
+      settledPhaseRef.current = phase;
       clearTimers();
 
       if (unmountOnExit && !forceMount) {
@@ -251,26 +264,8 @@ const Transition = <T extends ElementType = "div">({
     }
   };
 
-  const handleTransitionEnd = (event: React.TransitionEvent) => {
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-
-    if (phase === "enterTo") {
-      onEntered?.();
-    }
-
-    if (phase === "exitTo" && !visible) {
-      clearTimers();
-
-      if (unmountOnExit && !forceMount) {
-        setMounted(false);
-      }
-
-      setPhase("enterFrom");
-      onExited?.();
-    }
-  };
+  const handleAnimationEnd = handleEnd;
+  const handleTransitionEnd = handleEnd;
 
   if (!mounted && !forceMount) {
     return null;

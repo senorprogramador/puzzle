@@ -8,3 +8,9 @@
     top: calc(var(--puzzle-sticky-offset, 0px) + var(--puzzle-spacing-sm, 8px));
     z-index: 1;
 }
+
+.text-editor-toolbar__separator {
+    width: 1px;
+    min-height: 1.5rem;
+    background-color: var(--puzzle-color-border, #e5e0d6);
+}

@@ -2,6 +2,8 @@
 
 import {
   Children,
+  cloneElement,
+  isValidElement,
   type ComponentPropsWithRef,
   type ElementType,
   type ReactNode,
@@ -66,7 +68,11 @@ const ButtonGroup = <C extends ElementType = "div">({
       role={props.role ?? "group"}
       aria-disabled={disabled || undefined}
     >
-      {Children.map(children, (child) => child)}
+      {Children.map(children, (child) =>
+        disabled && isValidElement<{ disabled?: boolean }>(child)
+          ? cloneElement(child, { disabled: true })
+          : child,
+      )}
     </Component>
   );
 };

@@ -96,4 +96,19 @@ describe("Tooltip", () => {
       ).not.toBeInTheDocument(),
     );
   });
+
+  it("keeps the close button outside the tooltip element", async () => {
+    render(
+      <Tooltip trigger={<button type="button">Trigger</button>} closable defaultOpen>
+        Hint
+      </Tooltip>,
+    );
+
+    const tooltip = await screen.findByRole("tooltip", { hidden: true });
+    const close = document.querySelector(".puzzle-tooltip__close");
+
+    expect(tooltip).toHaveTextContent("Hint");
+    expect(close).toBeTruthy();
+    expect(tooltip).not.toContainElement(close as HTMLElement);
+  });
 });

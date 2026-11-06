@@ -150,6 +150,9 @@
 
 .puzzle-card--interactive {
     cursor: pointer;
+    font: inherit;
+    text-align: start;
+    text-decoration: none;
 
     transition:
         border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),

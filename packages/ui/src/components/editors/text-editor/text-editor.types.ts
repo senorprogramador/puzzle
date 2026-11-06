@@ -10,6 +10,7 @@ type TextInline = {
 type TextBlockType = "paragraph" | "heading" | "listItem";
 type TextAlign = "left" | "center" | "right" | "justify";
 type TextListType = "bullet" | "ordered";
+type TextHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 type TextBlock = {
   type: TextBlockType;
@@ -17,6 +18,8 @@ type TextBlock = {
   children: TextInline[];
   align?: TextAlign;
   listType?: TextListType;
+  /** Semantic heading level, independent of the visual `variant`. */
+  headingLevel?: TextHeadingLevel;
 };
 
 /**
@@ -46,6 +49,7 @@ export type {
   TextBlockType,
   TextAlign,
   TextListType,
+  TextHeadingLevel,
   TextBlock,
   TextDocument,
   TextPoint,

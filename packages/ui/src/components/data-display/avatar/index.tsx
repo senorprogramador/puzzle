@@ -1,5 +1,7 @@
+"use client";
+
 import { cn, nameToInitials } from "@puzzle/core";
-import { type ComponentPropsWithRef } from "react";
+import { useState, type ComponentPropsWithRef } from "react";
 import "./avatar.css";
 
 type AvatarShape = "circle" | "square";
@@ -19,11 +21,13 @@ const Avatar = ({
   size: propsSize = 32,
   shape = "circle",
   className,
+  onError,
   ...rest
 }: AvatarProps) => {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const classes = cn("puzzle-avatar", `puzzle-avatar-${shape}`, className);
-  const size = Math.max(propsSize, 32);
-  if (src) {
+  const size = Math.max(propsSize, 1);
+  if (src && failedSrc !== src) {
     return (
       <img
         src={src}
@@ -32,17 +36,23 @@ const Avatar = ({
         height={size}
         className={classes}
         {...rest}
+        onError={(event) => {
+          onError?.(event);
+          setFailedSrc(src);
+        }}
       />
     );
   }
   return (
     <span
-      aria-label={alt}
+      role="img"
+      aria-label={alt || undefined}
+      aria-hidden={alt ? undefined : true}
       className={classes}
       style={{ width: size, height: size }}
-      {...rest}
+      {...(rest as object)}
     >
-      <span className="puzzle-avatar-initials">
+      <span aria-hidden="true" className="puzzle-avatar-initials">
         {nameToInitials(alt ?? "")}
       </span>
     </span>

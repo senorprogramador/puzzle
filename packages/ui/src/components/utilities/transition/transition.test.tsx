@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Transition } from "./index";
 
@@ -69,5 +69,25 @@ describe("Transition", () => {
     fireEvent.transitionEnd(screen.getByTestId("wrapper"));
 
     expect(onTransitionEnd).toHaveBeenCalledTimes(1);
+  });
+
+  it("runs onEntered once when animationend and transitionend both fire", () => {
+    const onEntered = vi.fn();
+
+    vi.useFakeTimers();
+    render(
+      <Transition visible onEntered={onEntered}>
+        <div data-testid="child" />
+      </Transition>,
+    );
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    fireEvent.animationEnd(screen.getByTestId("child"));
+    fireEvent.transitionEnd(screen.getByTestId("child"));
+    vi.useRealTimers();
+
+    expect(onEntered).toHaveBeenCalledTimes(1);
   });
 });

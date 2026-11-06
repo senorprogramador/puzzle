@@ -23,7 +23,7 @@
 }
 
 .puzzle-avatar-initials {
-    font-size: clamp(0.8rem, 32cqw, 4rem);
+    font-size: clamp(0.5rem, 32cqw, 4rem);
     font-weight: var(--puzzle-font-weight-bold, 700);
     line-height: var(--puzzle-font-line-height-none, 1);
     font-synthesis: none;

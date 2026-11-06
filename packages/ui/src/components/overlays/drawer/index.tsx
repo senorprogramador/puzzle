@@ -70,22 +70,6 @@ const Drawer = ({
   );
 };
 
-const calculateDimension = (position: DrawerPosition, dimension: number) => {
-  switch (position) {
-    case "left":
-      return `${dimension}px`;
-
-    case "right":
-      return `${window.innerWidth - dimension}px`;
-
-    case "top":
-      return `${dimension}px`;
-
-    case "bottom":
-      return `${window.innerHeight - dimension}px`;
-  }
-};
-
 const DrawerContent = ({
   children,
   className,
@@ -98,20 +82,18 @@ const DrawerContent = ({
 }: DrawerProps) => {
   const classes = cn("puzzle-drawer", `puzzle-drawer--${position}`, className);
 
-  const { dimension, resizeRef } = useResizeBar(position, open);
+  const horizontal = position === "left" || position === "right";
+  const { size, value, min, max, resizeRef, handleKeyDown } = useResizeBar(
+    position,
+    open,
+  );
 
-  const resolvedDimension = dimension
-    ? calculateDimension(position, dimension)
-    : undefined;
-
+  // Dragging the bar below the minimum dismisses the drawer.
   useEffect(() => {
-    if (
-      resolvedDimension !== undefined &&
-      Number.parseInt(resolvedDimension, 10) < 100
-    ) {
+    if (size !== null && size < min) {
       onOpenChange(false);
     }
-  }, [resolvedDimension, onOpenChange]);
+  }, [size, min, onOpenChange]);
 
   return (
     <Stack
@@ -127,23 +109,25 @@ const DrawerContent = ({
       aria-label={ariaLabelledBy ? undefined : ariaLabel}
       aria-labelledby={ariaLabelledBy}
       style={
-        resolvedDimension
-          ? {
-              [["left", "right"].includes(position) ? "width" : "height"]:
-                resolvedDimension,
-            }
+        size !== null
+          ? { [horizontal ? "width" : "height"]: `${size}px` }
           : undefined
       }
     >
-      <button
+      <div
         ref={resizeRef}
-        type="button"
+        role="separator"
+        tabIndex={0}
         className="puzzle-drawer__resize-bar"
         aria-label="Resize drawer"
-        onMouseDown={(event) => event.stopPropagation()}
+        aria-orientation={horizontal ? "vertical" : "horizontal"}
+        aria-valuenow={value ?? undefined}
+        aria-valuemin={min}
+        aria-valuemax={max}
+        onKeyDown={handleKeyDown}
       >
         <span className="puzzle-drawer__resize-bar-inner" />
-      </button>
+      </div>
 
       <Stack direction="col" className="puzzle-drawer__content-wrapper">
         <Stack direction="col" className="puzzle-drawer__content">

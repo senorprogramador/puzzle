@@ -12,6 +12,11 @@
 
 .puzzle-drawer__resize-bar {
     padding: var(--puzzle-space-4, 1rem);
+    touch-action: none;
+}
+.puzzle-drawer__resize-bar:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: -2px;
 }
 .puzzle-drawer__resize-bar-inner {
     display: block;

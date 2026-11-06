@@ -190,4 +190,19 @@ describe("ButtonGroup", () => {
 
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it("disables its buttons when the group is disabled", () => {
+    render(
+      <ButtonGroup disabled>
+        <Button>Save</Button>
+        <Button href="/x">Open</Button>
+      </ButtonGroup>,
+    );
+
+    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+    expect(screen.getByRole("link", { name: "Open" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+  });
 });
