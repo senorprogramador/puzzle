@@ -1,0 +1,201 @@
+---
+title: Slider
+description: Select a numeric value within a defined range.
+---
+
+import { ControlledSliderExample } from "../../../../../src/components/doc-examples";
+
+Slider allows users to select a numeric value between a minimum and maximum. It uses a native HTML range input for accessibility, keyboard interaction and form integration.
+
+## Import
+
+```tsx
+import { Slider } from "@puzzle/ui";
+```
+
+## Basic usage
+
+Wrap Slider in `FormField` to provide a visible label and supporting text. `defaultValue` sets its initial value; without it, Slider starts at the range midpoint, rounded to the allowed step.
+
+<Preview
+  height={200}
+  code={`\
+  <FormField label="Volume" description="Adjust the audio volume.">
+    <Slider name="volume" defaultValue={65} showValue />
+  </FormField>
+`}
+>
+  <Section>
+    <FormField label="Volume" description="Adjust the audio volume.">
+      <Slider name="volume" defaultValue={65} showValue />
+    </FormField>
+  </Section>
+</Preview>
+
+## Range and increments
+
+`min` and `max` define the bounds. `step` defines increments relative to `min`; use `"any"` to avoid step rounding. Values are clamped to the range and rounded to the nearest allowed increment.
+
+<Preview height={340} code={`\
+<Stack>
+  <FormField label="Temperature" description="Between 16 and 30 degrees, in half-degree steps.">
+    <Slider min={16} max={30} step={0.5} defaultValue={21.5} showValue formatValue={(value) => value + " degrees"} />
+  </FormField>
+  <FormField label="Playback speed">
+    <Slider min={0.5} max={2} step="any" defaultValue={1} showValue formatValue={(value) => value.toFixed(2) + "x"} />
+  </FormField>
+</Stack>
+`}>
+  <Section>
+    <Stack>
+      <FormField label="Temperature" description="Between 16 and 30 degrees, in half-degree steps.">
+        <Slider min={16} max={30} step={0.5} defaultValue={21.5} showValue formatValue={(value) => value + " degrees"} />
+      </FormField>
+      <FormField label="Playback speed">
+        <Slider min={0.5} max={2} step="any" defaultValue={1} showValue formatValue={(value) => value.toFixed(2) + "x"} />
+      </FormField>
+    </Stack>
+  </Section>
+</Preview>
+
+## Sizes
+
+`size` changes the track and thumb size without changing the numeric range.
+
+<Preview height={360} code={`\
+<Stack>
+  <FormField label="Small"><Slider size="sm" defaultValue={25} /></FormField>
+  <FormField label="Medium"><Slider size="md" defaultValue={50} /></FormField>
+  <FormField label="Large"><Slider size="lg" defaultValue={75} /></FormField>
+</Stack>
+`}>
+  <Section>
+    <Stack>
+      <FormField label="Small"><Slider size="sm" defaultValue={25} /></FormField>
+      <FormField label="Medium"><Slider size="md" defaultValue={50} /></FormField>
+      <FormField label="Large"><Slider size="lg" defaultValue={75} /></FormField>
+    </Stack>
+  </Section>
+</Preview>
+
+## Marks and value formatting
+
+`marks` adds visual reference points; it does not restrict selection to those points. Use `step` to constrain values. Marks outside the range are ignored.
+
+`showValue` displays the current number. `formatValue` formats that display and supplies `aria-valuetext`, even when `showValue` is off. An explicit `aria-valuetext` takes precedence.
+
+<Preview height={260} code={`\
+<FormField label="Storage budget">
+  <Slider
+    min={0}
+    max={100}
+    step={25}
+    defaultValue={50}
+    showValue
+    formatValue={(value) => value + " GB"}
+    marks={[
+      { value: 0, label: "0 GB" },
+      { value: 50, label: "50 GB" },
+      { value: 100, label: "100 GB" },
+    ]}
+  />
+</FormField>
+`}>
+  <Section>
+    <FormField label="Storage budget">
+      <Slider
+        min={0}
+        max={100}
+        step={25}
+        defaultValue={50}
+        showValue
+        formatValue={(value) => value + " GB"}
+        marks={[
+          { value: 0, label: "0 GB" },
+          { value: 50, label: "50 GB" },
+          { value: 100, label: "100 GB" },
+        ]}
+      />
+    </FormField>
+  </Section>
+</Preview>
+
+## Controlled value
+
+Use `value` with `onChange` to own the value. The callback receives a number, not a change event. Use either controlled `value` or uncontrolled `defaultValue`, not both.
+
+<Preview height={260} code={`\
+const [volume, setVolume] = useState(40);
+
+return (
+  <Stack>
+    <FormField label="Volume">
+      <Slider value={volume} onChange={setVolume} showValue formatValue={(value) => value + "%"} />
+    </FormField>
+    <span role="status">Selected volume: {volume}%</span>
+  </Stack>
+);
+`}>
+  <Section><ControlledSliderExample /></Section>
+</Preview>
+
+## Disabled and invalid states
+
+`disabled` prevents interaction and native form submission. Use `FormField` to connect an error message, or supply `aria-invalid` and `aria-describedby` yourself. Invalid state does not disable the slider.
+
+<Preview height={340} code={`\
+<Stack>
+  <FormField label="Locked volume" disabled>
+    <Slider defaultValue={60} showValue />
+  </FormField>
+  <FormField label="Budget" error="Choose a budget of at least 50.">
+    <Slider defaultValue={20} showValue />
+  </FormField>
+</Stack>
+`}>
+  <Section>
+    <Stack>
+      <FormField label="Locked volume" disabled>
+        <Slider defaultValue={60} showValue />
+      </FormField>
+      <FormField label="Budget" error="Choose a budget of at least 50.">
+        <Slider defaultValue={20} showValue />
+      </FormField>
+    </Stack>
+  </Section>
+</Preview>
+
+## API
+
+### Slider
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number` | - | Controlled numeric value. |
+| `defaultValue` | `number` | Range midpoint | Initial uncontrolled value, rounded to the allowed step. |
+| `onChange` | `(value: number) => void` | - | Called with the normalized numeric value. |
+| `min` | `number` | `0` | Minimum selectable value. |
+| `max` | `number` | `100` | Maximum selectable value. |
+| `step` | `number \| "any"` | `1` | Positive increment or unrestricted precision. |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Visual size. |
+| `marks` | `readonly SliderMark[]` | - | Visual tick marks and optional labels. |
+| `showValue` | `boolean` | `false` | Displays the current value above the track. |
+| `formatValue` | `(value: number) => string` | - | Formats the visible value and accessible value text. |
+| `className` | `string` | - | Additional class on the outer div. |
+| `disabled` | `boolean` | `false` | Disables the native range input. |
+| `id` | `string` | Generated | Input ID, used for label association. |
+| `name` | `string` | - | Native form submission field name. |
+| `aria-invalid` | `AriaAttributes["aria-invalid"]` | - | Sets native invalid semantics; `true` also enables error styling. |
+
+Other native input props, including `ref`, `form`, `aria-label`, `aria-describedby`, and `aria-valuetext`, are forwarded to the range input. `style` applies to the input; `className` applies to its wrapper.
+
+### SliderMark
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number` | Required | Position within the slider range. |
+| `label` | `ReactNode` | - | Optional visible label below the mark. |
+
+## Accessibility
+
+Always provide a visible label through `FormField` or a native label, or supply `aria-label`/`aria-labelledby`. Native range keyboard behavior includes arrow keys for increments and Home/End for the bounds. Use `formatValue` to announce meaningful units rather than relying on decorative mark labels.

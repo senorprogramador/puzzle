@@ -5,10 +5,79 @@ description: Preview content in a resizable device frame.
 
 Use `Preview` to display a component in an isolated iframe, with optional source code and device-size controls.
 
+## Import
+
 ```tsx
-<Preview code="<Button>Save</Button>" defaultDevice="mobile">
+import { Preview } from "@puzzle/ui";
+```
+
+## Basic usage
+
+Pass the rendered example as `children` and its source as `code`. The source is displayed, not executed: keep it in sync with the rendered children. Switch to **Code** to inspect or copy it.
+
+<Preview height={180} align="center" justify="center" code={`\
+<Button>Save</Button>
+`}>
   <Button>Save</Button>
+</Preview>
+
+## Device and height
+
+`defaultDevice` sets the initial viewport: `mobile` is 390px wide, `tablet` is 768px, and `desktop` is 1024px. The device selector changes the iframe viewport, so responsive styles can be tested without resizing the browser. The frame scales down to fit its container.
+
+`height` overrides the device height in pixels. Without it, mobile uses 844px, tablet 1024px, and desktop 768px.
+
+<Preview defaultDevice="tablet" height={220} align="center" justify="center" code={`\
+<Preview defaultDevice="tablet" height={220} align="center" justify="center">
+  <Button>Tablet preview</Button>
+</Preview>
+`}>
+  <Button>Tablet preview</Button>
+</Preview>
+
+The code on this page includes the `Preview` wrapper when demonstrating its props; it is not another nested preview.
+
+## Content alignment
+
+`align` controls vertical alignment; `justify` controls horizontal distribution. Both are unset by default. Use `stretch` to let children fill the frame's height, or `between`, `around`, and `evenly` to distribute multiple children horizontally.
+
+<Preview height={180} align="center" justify="evenly" code={`\
+<Preview height={180} align="center" justify="evenly">
+  <Button variant="outline">Back</Button>
+  <Button>Continue</Button>
+</Preview>
+`}>
+  <Button variant="outline">Back</Button>
+  <Button>Continue</Button>
+</Preview>
+
+## Hide device controls
+
+Use `hideDevices` for a fixed starting viewport. It hides the selector, not the iframe or its dimensions. Omitting `code` also removes the Code tab.
+
+<Preview hideDevices height={160} align="center" justify="center">
+  <Button variant="secondary">Preview only</Button>
+</Preview>
+
+```tsx
+<Preview hideDevices height={160} align="center" justify="center">
+  <Button variant="secondary">Preview only</Button>
 </Preview>
 ```
 
-Each instance generates its own tab, panel, and iframe-root IDs, so multiple previews can be rendered on the same page without conflicting accessibility relationships.
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` | Required | Live content rendered inside the iframe. |
+| `code` | `string` | - | Source shown in the Code tab, with syntax highlighting and copy support. |
+| `defaultDevice` | `"mobile" \| "tablet" \| "desktop"` | `"mobile"` | Initial device viewport. |
+| `height` | `number` | Device height | Iframe height in pixels, before scaling. |
+| `align` | `"start" \| "center" \| "end" \| "stretch"` | - | Vertical alignment of frame content. |
+| `justify` | `"start" \| "center" \| "end" \| "between" \| "around" \| "evenly"` | - | Horizontal distribution of frame content. |
+| `hideDevices` | `boolean` | `false` | Hides the device selector. |
+| `className` | `string` | - | Additional class on the outer section. |
+
+## Accessibility
+
+Each instance generates its own tab, panel, and iframe-root IDs, so multiple previews can share a page. Preview/Code tabs support arrow-key activation. Device buttons use arrow keys to move focus and Enter or Space to select. Copy feedback is announced through a live region.

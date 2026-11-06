@@ -3,14 +3,209 @@ title: Carousel
 description: Browse a collection of items with carousel navigation.
 ---
 
-Provide `getItemKey` when items can be inserted, removed, or reordered. Stable keys keep each item's component state attached to that item. If omitted, the carousel continues to use each item's index.
+import { ControlledCarouselExample, carouselItems } from "../../../../../src/components/doc-examples";
+
+Carousel displays a draggable collection with optional navigation and pagination. `CarouselController` owns the items and selection; `Carousel` controls their presentation.
+
+## Import
 
 ```tsx
-<CarouselController items={products}>
-  <Carousel
-    getItemKey={(product) => product.id}
-    renderItem={(product) => <ProductCard product={product} />}
-    panelsPerView={3}
+import { Carousel, CarouselController } from "@puzzle/ui";
+```
+
+## Basic usage
+
+Supply `items` to the controller and `renderItem` to the carousel. Navigation buttons are opt-in: pass `backButton` and `nextButton` to support click and keyboard navigation as well as dragging.
+
+<Preview height={340} code={`\
+const items = [
+  { id: "design", title: "Design", description: "Start with a clear visual language." },
+  { id: "build", title: "Build", description: "Compose reusable components." },
+  { id: "test", title: "Test", description: "Check behavior across devices." },
+  { id: "ship", title: "Ship", description: "Share your work with the world." },
+];
+
+<CarouselController items={items}>
+  <Carousel<(typeof items)[number]>
+    ariaLabel="Project workflow"
+    getItemKey={(item) => item.id}
+    renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
+    backButton={<Button variant="outline">Previous</Button>}
+    nextButton={<Button variant="outline">Next</Button>}
+    buttonAlignment="aside"
   />
 </CarouselController>
-```
+`}>
+  <Section>
+    <CarouselController items={carouselItems}>
+      <Carousel
+        ariaLabel="Project workflow"
+        getItemKey={(item) => item.id}
+        renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
+        backButton={<Button variant="outline">Previous</Button>}
+        nextButton={<Button variant="outline">Next</Button>}
+        buttonAlignment="aside"
+      />
+    </CarouselController>
+  </Section>
+</Preview>
+
+Provide `getItemKey` when items can be inserted, removed, or reordered. Stable keys keep component state attached to its item; without it, keys use the item index.
+
+## Responsive panels and gap
+
+`panelsPerView` controls how many items fit at once. Responsive values use `mobile`, `tablet`, and `desktop`, inheriting smaller breakpoints when omitted. Change the preview device to compare layouts.
+
+<Preview defaultDevice="tablet" height={360} code={`\
+<CarouselController items={items}>
+  <Carousel<(typeof items)[number]>
+    panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+    gap="var(--puzzle-space-4)"
+    getItemKey={(item) => item.id}
+    renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
+    backButton={<Button variant="outline">Previous</Button>}
+    nextButton={<Button variant="outline">Next</Button>}
+    buttonAlignment="aside"
+  />
+</CarouselController>
+`}>
+  <Section>
+    <CarouselController items={carouselItems}>
+      <Carousel
+        panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+        gap="var(--puzzle-space-4)"
+        getItemKey={(item) => item.id}
+        renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
+        backButton={<Button variant="outline">Previous</Button>}
+        nextButton={<Button variant="outline">Next</Button>}
+        buttonAlignment="aside"
+      />
+    </CarouselController>
+  </Section>
+</Preview>
+
+## Item width and single-page alignment
+
+Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes precedence when both are supplied. `singlePageAlignment` positions items when the whole collection fits on one page.
+
+<Preview defaultDevice="tablet" height={300} code={`\
+<CarouselController items={items.slice(0, 2)}>
+  <Carousel<(typeof items)[number]>
+    itemWidth="30%"
+    gap="var(--puzzle-space-4)"
+    singlePageAlignment="center"
+    getItemKey={(item) => item.id}
+    renderItem={(item) => <Card>{item.title}</Card>}
+  />
+</CarouselController>
+`}>
+  <Section>
+    <CarouselController items={carouselItems.slice(0, 2)}>
+      <Carousel
+        itemWidth="30%"
+        gap="var(--puzzle-space-4)"
+        singlePageAlignment="center"
+        getItemKey={(item) => item.id}
+        renderItem={(item) => <Card>{item.title}</Card>}
+      />
+    </CarouselController>
+  </Section>
+</Preview>
+
+## Navigation and pagination placement
+
+`buttonAlignment="over"` overlays navigation on the viewport; `"aside"` reserves space beside it. `pagerAlignment` supports `"under"` and `"over"`. Both accept responsive values. `renderPager` receives a zero-based page index and the page count.
+
+<Preview height={320} code={`\
+<CarouselController items={items} defaultPanel={1}>
+  <Carousel<(typeof items)[number]>
+    getItemKey={(item) => item.id}
+    renderItem={(item) => <Card><p>{item.description}</p></Card>}
+    backButton={<Button size="sm" aria-label="Previous slide">Back</Button>}
+    nextButton={<Button size="sm" aria-label="Next slide">Next</Button>}
+    buttonAlignment="over"
+    pagerAlignment="under"
+    renderPager={(current, total) => <span role="status">Page {current + 1} of {total}</span>}
+  />
+</CarouselController>
+`}>
+  <Section>
+    <CarouselController items={carouselItems} defaultPanel={1}>
+      <Carousel
+        getItemKey={(item) => item.id}
+        renderItem={(item) => <Card><p>{item.description}</p></Card>}
+        backButton={<Button size="sm" aria-label="Previous slide">Back</Button>}
+        nextButton={<Button size="sm" aria-label="Next slide">Next</Button>}
+        buttonAlignment="over"
+        pagerAlignment="under"
+        renderPager={(current, total) => <span role="status">Page {current + 1} of {total}</span>}
+      />
+    </CarouselController>
+  </Section>
+</Preview>
+
+## Controlled selection
+
+`currentPanel` is the zero-based **first visible item index**, not a page number. Pair it with `onPanelChange` to keep application state synchronized. `defaultPanel` supplies an initial index for uncontrolled usage.
+
+<Preview height={400} code={`\
+const [panel, setPanel] = useState(0);
+
+return (
+  <Stack>
+    <Button variant="outline" onClick={() => setPanel(0)}>Back to first item</Button>
+    <CarouselController items={items} currentPanel={panel} onPanelChange={setPanel}>
+      <Carousel<(typeof items)[number]>
+        getItemKey={(item) => item.id}
+        renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
+        backButton={<Button variant="outline">Previous</Button>}
+        nextButton={<Button variant="outline">Next</Button>}
+        buttonAlignment="aside"
+        renderPager={(current, total) => <span role="status">Page {current + 1} of {total}</span>}
+      />
+    </CarouselController>
+  </Stack>
+);
+`}>
+  <Section><ControlledCarouselExample /></Section>
+</Preview>
+
+## API
+
+`ResponsiveValue<T>` accepts a value or an object with `mobile`, `tablet`, and `desktop` values.
+
+### CarouselController
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `T[]` | Required | Collection shared with descendant carousels. |
+| `children` | `ReactNode` | Required | Carousel and optional custom controls. |
+| `currentPanel` | `number` | - | Controlled first visible item index. |
+| `defaultPanel` | `number` | `0` | Initial uncontrolled first visible item index. |
+| `onPanelChange` | `(panel: number) => void` | - | Called with the next first visible item index. |
+
+### Carousel
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `renderItem` | `(item: T, index: number) => ReactNode` | Required | Renders each item. |
+| `getItemKey` | `(item: T, index: number) => Key` | Item index | Stable React key for each item. |
+| `panelsPerView` | `ResponsiveValue<number>` | `1` | Number of visible items in panel sizing mode. |
+| `itemWidth` | `ResponsiveValue<CSSProperties["width"]>` | - | Explicit width; takes precedence over panel count. |
+| `gap` | `ResponsiveValue<CSSProperties["gap"]>` | `0` | Space between items. Numbers are pixels. |
+| `singlePageAlignment` | `"left" \| "center" \| "right"` | `"left"` | Alignment when all items fit on one page. |
+| `backButton` | `ReactElement` | - | Previous-page control; receives disabled state and click handling. |
+| `nextButton` | `ReactElement` | - | Next-page control; receives disabled state and click handling. |
+| `buttonAlignment` | `ResponsiveValue<"aside" \| "over">` | `"over"` | Navigation placement. |
+| `pagerAlignment` | `ResponsiveValue<"under" \| "over">` | `"under"` | Pager placement. |
+| `renderPager` | `(currentPage: number, numberOfPages: number) => ReactNode` | - | Custom pager; page index is zero-based. |
+| `ariaLabel` | `string` | `"Carousel"` | Accessible name of the carousel group. |
+| `className` | `string` | - | Additional class on the root. |
+| `viewportClassName` | `string` | - | Additional class on the clipping viewport. |
+| `viewportStyle` | `CSSProperties` | - | Styles on the viewport. |
+
+For custom controls within the controller, `useCarouselContext<T>()` exposes `items`, `currentPanel`, and `setPanel(index)`.
+
+## Accessibility
+
+Give each carousel a descriptive `ariaLabel`. Navigation elements must be real buttons with accessible names and forward their received props. They are disabled at the collection boundaries. Provide buttons rather than relying on pointer dragging alone.

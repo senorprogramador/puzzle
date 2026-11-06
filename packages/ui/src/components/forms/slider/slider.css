@@ -1,0 +1,282 @@
+.puzzle-slider {
+    --puzzle-slider-thumb-size: 1.125rem;
+    --puzzle-slider-track-height: 0.375rem;
+    --puzzle-slider-fill: var(--puzzle-color-primary);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    width: 100%;
+    min-width: 0;
+
+    color: var(--puzzle-color-text);
+    font-family: var(--puzzle-font-family-body, inherit);
+}
+
+/* Sizes */
+
+.puzzle-slider[data-size="sm"] {
+    --puzzle-slider-thumb-size: 0.875rem;
+    --puzzle-slider-track-height: 0.25rem;
+}
+
+.puzzle-slider[data-size="md"] {
+    --puzzle-slider-thumb-size: 1.125rem;
+    --puzzle-slider-track-height: 0.375rem;
+}
+
+.puzzle-slider[data-size="lg"] {
+    --puzzle-slider-thumb-size: 1.375rem;
+    --puzzle-slider-track-height: 0.5rem;
+}
+
+/* Current value */
+
+.puzzle-slider__value {
+    align-self: flex-end;
+
+    color: var(--puzzle-color-text);
+
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+/* Native range input */
+
+.puzzle-slider__input {
+    appearance: none;
+    -webkit-appearance: none;
+
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+    height: 2rem;
+
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    background: transparent;
+
+    cursor: pointer;
+    touch-action: pan-y;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* WebKit track */
+
+.puzzle-slider__input::-webkit-slider-runnable-track {
+    width: 100%;
+    height: var(--puzzle-slider-track-height);
+
+    border-radius: 9999px;
+
+    background: linear-gradient(
+        to right,
+        var(--puzzle-slider-fill) 0,
+        var(--puzzle-slider-fill) var(--puzzle-slider-progress, 50%),
+        var(--puzzle-color-border) var(--puzzle-slider-progress, 50%),
+        var(--puzzle-color-border) 100%
+    );
+}
+
+/* WebKit thumb */
+
+.puzzle-slider__input::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+
+    box-sizing: border-box;
+
+    width: var(--puzzle-slider-thumb-size);
+    height: var(--puzzle-slider-thumb-size);
+
+    margin-top: calc((var(--puzzle-slider-track-height) - var(--puzzle-slider-thumb-size)) / 2);
+
+    border: 2px solid var(--puzzle-slider-fill);
+    border-radius: 50%;
+
+    background: var(--puzzle-color-surface);
+
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+
+    transition:
+        border-color var(--puzzle-duration-fast, 150ms) ease,
+        box-shadow var(--puzzle-duration-fast, 150ms) ease,
+        background-color var(--puzzle-duration-fast, 150ms) ease;
+}
+
+/* Firefox track */
+
+.puzzle-slider__input::-moz-range-track {
+    height: var(--puzzle-slider-track-height);
+
+    border-radius: 9999px;
+
+    background: var(--puzzle-color-border);
+}
+
+.puzzle-slider__input::-moz-range-progress {
+    height: var(--puzzle-slider-track-height);
+
+    border-radius: 9999px;
+
+    background: var(--puzzle-slider-fill);
+}
+
+/* Firefox thumb */
+
+.puzzle-slider__input::-moz-range-thumb {
+    box-sizing: border-box;
+
+    width: var(--puzzle-slider-thumb-size);
+    height: var(--puzzle-slider-thumb-size);
+
+    border: 2px solid var(--puzzle-slider-fill);
+    border-radius: 50%;
+
+    background: var(--puzzle-color-surface);
+
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+
+    transition:
+        border-color var(--puzzle-duration-fast, 150ms) ease,
+        box-shadow var(--puzzle-duration-fast, 150ms) ease,
+        background-color var(--puzzle-duration-fast, 150ms) ease;
+}
+
+/* RTL */
+
+:dir(rtl) .puzzle-slider__input::-webkit-slider-runnable-track {
+    background: linear-gradient(
+        to left,
+        var(--puzzle-slider-fill) 0,
+        var(--puzzle-slider-fill) var(--puzzle-slider-progress, 50%),
+        var(--puzzle-color-border) var(--puzzle-slider-progress, 50%),
+        var(--puzzle-color-border) 100%
+    );
+}
+
+/* Hover */
+
+.puzzle-slider__input:hover:not(:disabled)::-webkit-slider-thumb,
+.puzzle-slider__input:hover:not(:disabled)::-moz-range-thumb {
+    border-color: var(--puzzle-color-primary);
+}
+
+/* Focus */
+
+.puzzle-slider__input:focus-visible::-webkit-slider-thumb,
+.puzzle-slider__input:focus-visible::-moz-range-thumb {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--puzzle-slider-fill), transparent 78%);
+}
+
+/* Marks */
+
+.puzzle-slider__marks {
+    position: relative;
+
+    height: 0.375rem;
+
+    margin-inline: calc(var(--puzzle-slider-thumb-size) / 2);
+}
+
+.puzzle-slider__marks[data-has-labels="true"] {
+    height: 1.5rem;
+}
+
+.puzzle-slider__mark {
+    position: absolute;
+    top: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    transform: translateX(-50%);
+}
+
+.puzzle-slider__mark[data-edge="start"] {
+    transform: translateX(0);
+}
+
+.puzzle-slider__mark[data-edge="end"] {
+    transform: translateX(-100%);
+}
+
+:dir(rtl) .puzzle-slider__mark[data-edge="start"] {
+    transform: translateX(-100%);
+}
+
+:dir(rtl) .puzzle-slider__mark[data-edge="end"] {
+    transform: translateX(0);
+}
+
+.puzzle-slider__mark-tick {
+    display: block;
+    flex: 0 0 auto;
+
+    width: 1px;
+    height: 0.375rem;
+
+    background: var(--puzzle-color-border-strong, var(--puzzle-color-border));
+}
+
+.puzzle-slider__mark-label {
+    color: var(--puzzle-color-text-muted);
+
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+
+    white-space: nowrap;
+}
+
+/* Disabled */
+
+.puzzle-slider[data-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.puzzle-slider__input:disabled {
+    cursor: not-allowed;
+}
+
+/* Invalid */
+
+.puzzle-slider[data-invalid="true"] {
+    --puzzle-slider-fill: var(--puzzle-color-danger);
+}
+
+/* Forced colors / high contrast */
+
+@media (forced-colors: active) {
+    .puzzle-slider__input:focus-visible {
+        outline: 2px solid Highlight;
+        outline-offset: 3px;
+    }
+
+    .puzzle-slider__input::-webkit-slider-thumb,
+    .puzzle-slider__input::-moz-range-thumb {
+        border-color: ButtonText;
+        background: Canvas;
+    }
+
+    .puzzle-slider__mark-tick {
+        background: ButtonText;
+    }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-slider__input::-webkit-slider-thumb,
+    .puzzle-slider__input::-moz-range-thumb {
+        transition: none;
+    }
+}

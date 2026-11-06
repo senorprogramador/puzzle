@@ -3,21 +3,327 @@ title: Select
 description: Choose one or more options from a popup list.
 ---
 
-Select exposes a select-only combobox with a listbox popup. Prefer a visible `label`; when it is omitted, provide an accessible name with `aria-label` or `aria-labelledby`.
+import { ControlledSelectExample, fruitOptions } from "../../../../../src/components/doc-examples";
+
+Select exposes a select-only combobox with a listbox popup. It supports single and multiple selection, grouped options, custom rendering, and native form integration.
+
+## Import
 
 ```tsx
-<Select
-  label="Fruit"
-  options={[
-    { value: "apple", label: "Apple" },
-    { value: "pear", label: "Pear" },
-  ]}
-  placeholder="Choose a fruit"
-/>
+import { Select } from "@puzzle/ui";
 ```
 
-The combobox keeps DOM focus while its popup is open and exposes the active option with `aria-activedescendant`. It supports arrow-key navigation, Home and End, typeahead, and Enter or Space to open or select. Escape closes the list.
+## Basic usage
 
-## Validation state
+Provide a visible `label` and an array of options with `value` and plain-text `label`. `placeholder` is shown until a value is selected. Disabled options remain visible but cannot be chosen.
 
-Select accepts `aria-invalid` and combines it with its own `error`: the control is invalid when either is set, and `data-invalid` always matches. An external `aria-describedby` is kept ahead of Select's own description and error relations, so it composes with `FormField`.
+<Preview height={420} code={`\
+const options = [
+  { value: "apple", label: "Apple" },
+  { value: "pear", label: "Pear" },
+  { value: "orange", label: "Orange" },
+  { value: "mango", label: "Mango", disabled: true },
+];
+
+<Select
+  label="Fruit"
+  options={options}
+  placeholder="Choose a fruit"
+  description="Choose one item for your basket."
+/>
+`}>
+  <Section>
+    <Select label="Fruit" options={fruitOptions} placeholder="Choose a fruit" description="Choose one item for your basket." />
+  </Section>
+</Preview>
+
+## Multiple selection and clearing
+
+`multiple` changes the value to an array and keeps the popup open after selection by default. `maxSelected` limits the number of selected options. `clearable` adds a clear action; customize its accessible name with `clearLabel`.
+
+<Preview height={440} code={`\
+<Select
+  label="Fruit basket"
+  options={options}
+  multiple
+  defaultValue={["apple", "pear"]}
+  maxSelected={3}
+  clearable
+  clearLabel="Clear fruit basket"
+  description="Choose up to three fruits."
+/>
+`}>
+  <Section>
+    <Select
+      label="Fruit basket"
+      options={fruitOptions}
+      multiple
+      defaultValue={["apple", "pear"]}
+      maxSelected={3}
+      clearable
+      clearLabel="Clear fruit basket"
+      description="Choose up to three fruits."
+    />
+  </Section>
+</Preview>
+
+Clearing returns `null` in single mode and `[]` in multiple mode. Set `closeOnSelect` explicitly to override either mode's default popup behavior.
+
+## Sizes and width
+
+`size` supports `sm`, `md`, and `lg`. `fullWidth` fills the available width. Both accept responsive objects with `mobile`, `tablet`, and `desktop` keys.
+
+<Preview height={540} code={`\
+<Stack>
+  <Select label="Small" size="sm" options={options} defaultValue="apple" />
+  <Select label="Medium" size="md" options={options} defaultValue="pear" />
+  <Select label="Large" size="lg" options={options} defaultValue="orange" />
+  <Select
+    label="Responsive"
+    size={{ mobile: "sm", tablet: "md", desktop: "lg" }}
+    fullWidth
+    options={options}
+  />
+</Stack>
+`}>
+  <Section>
+    <Stack>
+      <Select label="Small" size="sm" options={fruitOptions} defaultValue="apple" />
+      <Select label="Medium" size="md" options={fruitOptions} defaultValue="pear" />
+      <Select label="Large" size="lg" options={fruitOptions} defaultValue="orange" />
+      <Select
+        label="Responsive"
+        size={{ mobile: "sm", tablet: "md", desktop: "lg" }}
+        fullWidth
+        options={fruitOptions}
+      />
+    </Stack>
+  </Section>
+</Preview>
+
+## Groups, descriptions, and custom rendering
+
+`group` adds headings within the list. An option's `description` adds supporting text. Use `renderOption` to customize its contents without adding nested interactive controls. Its state includes `selected`, `active`, and `multiple`.
+
+`renderValue` receives one selected option or `null` in single mode, and an array in multiple mode.
+
+<Preview height={440} code={`\
+<Select
+  label="Plan"
+  options={[
+    { value: "personal", label: "Personal", group: "Individual", description: "For side projects" },
+    { value: "team", label: "Team", group: "Business", description: "For collaboration" },
+    { value: "enterprise", label: "Enterprise", group: "Business", disabled: true },
+  ]}
+  defaultValue="team"
+  renderOption={(option, state) => (
+    <Stack gap="xs">
+      <span>{option.label}{state.selected ? " (selected)" : ""}</span>
+      {option.description && <small>{option.description}</small>}
+    </Stack>
+  )}
+  renderValue={(selected) => selected && "label" in selected ? "Plan: " + selected.label : "Choose a plan"}
+/>
+`}>
+  <Section>
+    <Select
+      label="Plan"
+      options={[
+        { value: "personal", label: "Personal", group: "Individual", description: "For side projects" },
+        { value: "team", label: "Team", group: "Business", description: "For collaboration" },
+        { value: "enterprise", label: "Enterprise", group: "Business", disabled: true },
+      ]}
+      defaultValue="team"
+      renderOption={(option, state) => (
+        <Stack gap="xs">
+          <span>{option.label}{state.selected ? " (selected)" : ""}</span>
+          {option.description && <small>{option.description}</small>}
+        </Stack>
+      )}
+      renderValue={(selected) => selected && "label" in selected ? "Plan: " + selected.label : "Choose a plan"}
+    />
+  </Section>
+</Preview>
+
+Custom option rendering replaces the default description display. Include `option.description` in your renderer, as above, to keep it visible.
+
+## Controlled value
+
+Pair `value` with `onChange`. In single mode the callback receives `T | null`; in multiple mode it receives `T[]`. Use `defaultValue` only for uncontrolled selection.
+
+<Preview height={420} code={`\
+const [fruit, setFruit] = useState<string | null>("apple");
+
+return (
+  <Stack>
+    <Select label="Favorite fruit" options={options} value={fruit} onChange={setFruit} />
+    <span role="status">Selected: {fruit ?? "none"}</span>
+  </Stack>
+);
+`}>
+  <Section><ControlledSelectExample /></Section>
+</Preview>
+
+## Popup placement and empty options
+
+Control popup visibility with `open` and `onOpenChange`, or set its initial visibility with `defaultOpen`. Placement may fall back when space is limited. `menuMaxHeight` constrains the scrollable list; `matchTriggerWidth={false}` allows a narrower menu.
+
+<Preview height={420} code={`\
+<Stack>
+  <Select
+    label="Open above"
+    options={options}
+    position="top"
+    align="end"
+    offset={12}
+    collisionPadding={16}
+    matchTriggerWidth={false}
+    menuMaxHeight="12rem"
+  />
+  <Select label="Assignee" options={[]} noOptionsText="No team members available" />
+</Stack>
+`}>
+  <Section>
+    <Stack>
+      <Select
+        label="Open above"
+        options={fruitOptions}
+        position="top"
+        align="end"
+        offset={12}
+        collisionPadding={16}
+        matchTriggerWidth={false}
+        menuMaxHeight="12rem"
+      />
+      <Select label="Assignee" options={[]} noOptionsText="No team members available" />
+    </Stack>
+  </Section>
+</Preview>
+
+## Validation and disabled state
+
+`required` participates in native validation when `name` enables the hidden native select. `error` displays a message and marks the control invalid; `error={true}` uses "Invalid value". `disabled` prevents interaction.
+
+<Preview height={440} code={`\
+<Stack>
+  <Select label="Required fruit" name="fruit" required options={options} error="Choose a fruit to continue." />
+  <Select label="Unavailable fruit" options={options} disabled defaultValue="apple" />
+</Stack>
+`}>
+  <Section>
+    <Stack>
+      <Select label="Required fruit" name="fruit" required options={fruitOptions} error="Choose a fruit to continue." />
+      <Select label="Unavailable fruit" options={fruitOptions} disabled defaultValue="apple" />
+    </Stack>
+  </Section>
+</Preview>
+
+Select combines `aria-invalid` with its own `error`, and `data-invalid` matches the result. An external `aria-describedby` is preserved before its own description and error IDs, so Select composes with `FormField`.
+
+## Object values and native forms
+
+For object values, use `isOptionEqualToValue` to compare stable identifiers instead of object identity. Supply `serializeValue` with a unique string for native form submission. `name` enables a visually hidden native select; `form` associates it with a form elsewhere in the document.
+
+<Preview height={420} code={`\
+<Select
+  label="Workspace"
+  name="workspace"
+  options={[
+    { id: "design", value: { id: "design" }, label: "Design" },
+    { id: "engineering", value: { id: "engineering" }, label: "Engineering" },
+  ]}
+  defaultValue={{ id: "design" }}
+  isOptionEqualToValue={(option, value) => option.value.id === value.id}
+  serializeValue={(value) => value.id}
+/>
+`}>
+  <Section>
+    <Select
+      label="Workspace"
+      name="workspace"
+      options={[
+        { id: "design", value: { id: "design" }, label: "Design" },
+        { id: "engineering", value: { id: "engineering" }, label: "Engineering" },
+      ]}
+      defaultValue={{ id: "design" }}
+      isOptionEqualToValue={(option, value) => option.value.id === value.id}
+      serializeValue={(value) => value.id}
+    />
+  </Section>
+</Preview>
+
+## API
+
+### Selection and field props
+
+`SelectProps<T>` distinguishes single and multiple modes. `ResponsiveValue<T>` accepts a value or a `mobile`/`tablet`/`desktop` object.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` | `readonly SelectOption<T>[]` | Required | Available options. |
+| `multiple` | `boolean` | `false` | Enables array-valued selection. |
+| `value` | `T \| null` or `readonly T[]` | - | Controlled selection for the chosen mode. |
+| `defaultValue` | `T \| null` or `readonly T[]` | `null` or `[]` | Initial uncontrolled selection. |
+| `onChange` | `(value: T \| null) => void` or `(value: T[]) => void` | - | Next selection, not a DOM event. |
+| `label` | `ReactNode` | - | Visible field label. |
+| `placeholder` | `ReactNode` | `"Select an option"` | Content when nothing is selected. |
+| `description` | `ReactNode` | - | Supporting field text. |
+| `error` | `ReactNode \| boolean` | - | Error message; `true` uses "Invalid value". |
+| `disabled` | `boolean` | `false` | Disables the control. |
+| `required` | `boolean` | `false` | Marks the field required. |
+| `clearable` | `boolean` | `false` | Adds a clear-selection action. |
+| `clearLabel` | `string` | `"Clear selection"` | Accessible name of the clear action. |
+| `maxSelected` | `number` | - | Maximum simultaneous selections in multiple mode. |
+| `size` | `ResponsiveValue<"sm" \| "md" \| "lg">` | `"md"` | Control size. |
+| `fullWidth` | `ResponsiveValue<boolean>` | `false` | Fills available width. |
+
+### Popup props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | - | Controlled popup visibility. |
+| `defaultOpen` | `boolean` | `false` | Initial uncontrolled popup visibility. |
+| `onOpenChange` | `(open: boolean) => void` | - | Requested visibility changes. |
+| `position` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred popup side. |
+| `align` | `"start" \| "center" \| "end"` | `"start"` | Popup alignment. |
+| `offset` | `number` | `8` | Gap from the trigger in pixels. |
+| `collisionPadding` | `number` | `8` | Minimum viewport-edge distance in pixels. |
+| `closeOnSelect` | `boolean` | `!multiple` | Closes the popup after selection. |
+| `matchTriggerWidth` | `boolean` | `true` | Matches popup minimum width to the trigger. |
+| `menuMaxHeight` | `CSSProperties["maxHeight"]` | `"18rem"` | Maximum list height. |
+| `noOptionsText` | `ReactNode` | `"No options"` | Empty-list content. |
+
+### Rendering, forms, and styling
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `renderOption` | `(option: SelectOption<T>, state: SelectOptionRenderState) => ReactNode` | - | Custom option contents. |
+| `renderValue` | `(selected: SelectOption<T> \| readonly SelectOption<T>[] \| null) => ReactNode` | - | Custom selected-value contents. |
+| `isOptionEqualToValue` | `(option: SelectOption<T>, value: T) => boolean` | Identity comparison | Compares options with selected values. |
+| `serializeValue` | `(value: T) => string` | String conversion | Serializes values for native form submission. |
+| `name` | `string` | - | Enables and names the hidden native select. |
+| `form` | `string` | - | Associated form ID. |
+| `autoComplete` | `string` | - | Native select autocomplete attribute. |
+| `className` | `string` | - | Additional class on the combobox trigger. |
+| `rootClassName` | `string` | - | Additional class on the outer field. |
+| `popoverClassName` | `string` | - | Additional class on popup content. |
+| `menuClassName` | `string` | - | Additional class on the listbox. |
+
+Other supported button attributes, including `id`, `aria-label`, `aria-labelledby`, and `aria-describedby`, apply to the trigger.
+
+### SelectOption and render state
+
+| Option prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `id` | `string \| number` | - | Stable identifier for reordered options. |
+| `value` | `T` | Required | Value returned on selection. |
+| `label` | `string` | Required | Plain-text label for display, typeahead, and accessibility. |
+| `description` | `ReactNode` | - | Supporting option text. |
+| `group` | `string` | - | Group heading. |
+| `disabled` | `boolean` | `false` | Prevents selection. |
+
+`SelectOptionRenderState` contains three booleans: `selected` (chosen value), `active` (keyboard-highlighted option), and `multiple` (selection mode).
+
+## Accessibility
+
+Prefer a visible `label`; when omitted, provide `aria-label` or `aria-labelledby`. The combobox keeps DOM focus while its popup is open and exposes the highlighted option with `aria-activedescendant`. It supports arrow-key navigation, Home/End, typeahead, and Enter/Space to open or select. Escape closes the list. Keep custom option content non-interactive.

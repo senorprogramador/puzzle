@@ -155,6 +155,13 @@ export {
 } from "./components/forms/select";
 
 export {
+  Slider,
+  type SliderProps,
+  type SliderMark,
+  type SliderSize,
+} from "./components/forms/slider";
+
+export {
   Stepper,
   type StepperProps,
   type StepperStepProps,

@@ -36,46 +36,115 @@ const items: TreeViewItem[] = [
               },
             ],
           },
-        ],
-      },
-      {
-        id: "data-display",
-        label: "Data Display",
-        children: [
           {
-            id: "avatar",
-            label: "Avatar",
-            href: "/docs/components/ui/data-display/avatar",
+            id: "data-display",
+            label: "Data Display",
+            children: [
+              {
+                id: "avatar",
+                label: "Avatar",
+                href: "/docs/components/ui/data-display/avatar",
+              },
+              {
+                id: "badge",
+                label: "Badge",
+                href: "/docs/components/ui/data-display/badge",
+              },
+              {
+                id: "card",
+                label: "Card",
+                href: "/docs/components/ui/data-display/card",
+              },
+              {
+                id: "image",
+                label: "Image",
+                href: "/docs/components/ui/data-display/image",
+              },
+              {
+                id: "paper",
+                label: "Paper",
+                href: "/docs/components/ui/data-display/paper",
+              },
+              {
+                id: "progress",
+                label: "Progress",
+                href: "/docs/components/ui/data-display/progress",
+              },
+              {
+                id: "skeleton",
+                label: "Skeleton",
+                href: "/docs/components/ui/data-display/skeleton",
+              },
+            ],
           },
           {
-            id: "badge",
-            label: "Badge",
-            href: "/docs/components/ui/data-display/badge",
+            id: "forms",
+            label: "Forms",
+            children: [
+              {
+                id: "select",
+                label: "Select",
+                href: "/docs/components/ui/forms/select",
+              },
+              {
+                id: "slider",
+                label: "Slider",
+                href: "/docs/components/ui/forms/slider",
+              },
+              {
+                id: "stepper",
+                label: "Stepper",
+                href: "/docs/components/ui/forms/stepper",
+              },
+            ],
           },
           {
-            id: "card",
-            label: "Card",
-            href: "/docs/components/ui/data-display/card",
+            id: "navigation",
+            label: "Navigation",
+            children: [
+              {
+                id: "accordion",
+                label: "Accordion",
+                href: "/docs/components/ui/navigation/accordion",
+              },
+              {
+                id: "carousel",
+                label: "Carousel",
+                href: "/docs/components/ui/navigation/carousel",
+              },
+              {
+                id: "tabs",
+                label: "Tabs",
+                href: "/docs/components/ui/navigation/tabs",
+              },
+            ],
           },
           {
-            id: "image",
-            label: "Image",
-            href: "/docs/components/ui/data-display/image",
+            id: "overlays",
+            label: "Overlays",
+            children: [
+              {
+                id: "popover",
+                label: "Popover",
+                href: "/docs/components/ui/overlays/popover",
+              },
+              {
+                id: "tooltip",
+                label: "Tooltip",
+                href: "/docs/components/ui/overlays/tooltip",
+              },
+            ],
           },
           {
-            id: "paper",
-            label: "Paper",
-            href: "/docs/components/ui/data-display/paper",
-          },
-          {
-            id: "progress",
-            label: "Progress",
-            href: "/docs/components/ui/data-display/progress",
-          },
-          {
-            id: "skeleton",
-            label: "Skeleton",
-            href: "/docs/components/ui/data-display/skeleton",
+            id: "utilities",
+            label: "Utilities",
+            children: [
+              {
+                id: "preview",
+                label: "Preview",
+                href: "/docs/components/ui/utilities/preview",
+              },
+            ],
           },
         ],
       },
@@ -93,7 +162,16 @@ const Sidebar = () => {
         aria-label="Navigation"
         items={items}
         selectionMode="single"
-        defaultExpandedIds={["components", "ui", "actions", "data-display"]}
+        defaultExpandedIds={[
+          "components",
+          "ui",
+          "actions",
+          "data-display",
+          "forms",
+          "navigation",
+          "overlays",
+          "utilities",
+        ]}
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
         getItemActive={(item) =>

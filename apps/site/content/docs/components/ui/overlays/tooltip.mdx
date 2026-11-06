@@ -3,10 +3,107 @@ title: Tooltip
 description: Short, non-interactive supplementary information for a trigger.
 ---
 
-Tooltip opens on hover and keyboard focus and closes on pointer leave, blur or Escape. The popup has `role="tooltip"` and is linked to the trigger with `aria-describedby`; an existing `aria-describedby` on the trigger is kept.
+import { ControlledTooltipExample } from "../../../../../src/components/doc-examples";
+
+Tooltip provides a short hint on hover or keyboard focus. Use a focusable trigger that forwards its ref and event handlers, such as a native button or Puzzle `Button`.
+
+## Import
 
 ```tsx
-<Tooltip trigger={<Button>Save</Button>}>Saves a draft</Tooltip>
+import { Tooltip } from "@puzzle/ui";
 ```
 
-Tooltip content must not be interactive: keyboard users cannot reach it, because it closes as soon as focus leaves the trigger. Use [Popover](/docs/components/ui/overlays/popover) for links, buttons, form controls or a close button.
+## Basic usage
+
+Hover over the button or reach it with Tab. The tooltip closes on pointer leave, blur, or Escape.
+
+<Preview height={200} align="center" justify="center" code={`\
+<Tooltip trigger={<Button>Save</Button>}>Saves a draft</Tooltip>
+`}>
+  <Tooltip trigger={<Button>Save</Button>}>Saves a draft</Tooltip>
+</Preview>
+
+## Position
+
+`position` requests one of four sides. The popup can fall back to another side when there is not enough space.
+
+<Preview height={300} align="center" justify="center" code={`\
+<Stack alignH="center">
+  <Tooltip position="top" trigger={<Button variant="outline">Top</Button>}>Above the trigger</Tooltip>
+  <Tooltip position="right" trigger={<Button variant="outline">Right</Button>}>Beside the trigger</Tooltip>
+  <Tooltip position="bottom" trigger={<Button variant="outline">Bottom</Button>}>Below the trigger</Tooltip>
+  <Tooltip position="left" trigger={<Button variant="outline">Left</Button>}>Beside the trigger</Tooltip>
+</Stack>
+`}>
+  <Stack alignH="center">
+    <Tooltip position="top" trigger={<Button variant="outline">Top</Button>}>Above the trigger</Tooltip>
+    <Tooltip position="right" trigger={<Button variant="outline">Right</Button>}>Beside the trigger</Tooltip>
+    <Tooltip position="bottom" trigger={<Button variant="outline">Bottom</Button>}>Below the trigger</Tooltip>
+    <Tooltip position="left" trigger={<Button variant="outline">Left</Button>}>Beside the trigger</Tooltip>
+  </Stack>
+</Preview>
+
+## Alignment, offset, and exit delay
+
+`align` aligns the popup along the trigger's edge. `offset` is the gap in pixels; `exitDelay` is the delay in milliseconds before closing on pointer leave.
+
+<Preview height={260} align="center" justify="center" code={`\
+<Stack alignH="center">
+  <Tooltip align="start" offset={16} exitDelay={500} trigger={<Button variant="outline">Start, longer delay</Button>}>
+    Aligned to the start with a 16px gap.
+  </Tooltip>
+  <Tooltip align="end" trigger={<Button variant="outline">End</Button>}>
+    Aligned to the end of the trigger.
+  </Tooltip>
+</Stack>
+`}>
+  <Stack alignH="center">
+    <Tooltip align="start" offset={16} exitDelay={500} trigger={<Button variant="outline">Start, longer delay</Button>}>
+      Aligned to the start with a 16px gap.
+    </Tooltip>
+    <Tooltip align="end" trigger={<Button variant="outline">End</Button>}>
+      Aligned to the end of the trigger.
+    </Tooltip>
+  </Stack>
+</Preview>
+
+## Controlled visibility
+
+Use `open` with `onOpenChange` when visibility belongs to application state. Use `defaultOpen` instead to start an uncontrolled tooltip open.
+
+<Preview height={240} align="center" justify="center" code={`\
+const [open, setOpen] = useState(false);
+
+return (
+  <Stack alignH="center">
+    <Tooltip open={open} onOpenChange={setOpen} trigger={<Button variant="outline">Focus or hover me</Button>}>
+      Your changes are saved automatically.
+    </Tooltip>
+    <span role="status">{open ? "Tooltip open" : "Tooltip closed"}</span>
+  </Stack>
+);
+`}>
+  <ControlledTooltipExample />
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `trigger` | `ReactElement` | Required | Single trigger accepting DOM attributes and a ref. |
+| `children` | `ReactNode` | Required | Non-interactive hint content. |
+| `position` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred popup side. |
+| `align` | `"start" \| "center" \| "end"` | `"center"` | Popup alignment along the trigger. |
+| `offset` | `number` | `8` | Gap from the trigger in pixels. |
+| `exitDelay` | `number` | `100` | Pointer-leave delay in milliseconds. |
+| `open` | `boolean` | - | Controlled visibility. |
+| `defaultOpen` | `boolean` | `false` | Initial uncontrolled visibility. |
+| `onOpenChange` | `(open: boolean) => void` | - | Called when visibility changes are requested. |
+| `className` | `string` | - | Additional class on the tooltip content. |
+| `triggerClassName` | `string` | - | Additional class merged onto the trigger. |
+
+## Accessibility
+
+The popup has `role="tooltip"` and is linked to its trigger with `aria-describedby`; an existing description relationship is preserved. Keep a meaningful accessible name on the trigger itself, and do not put essential information only in a tooltip.
+
+Tooltip content must not be interactive: keyboard users cannot reach it because it closes when focus leaves the trigger. Use [Popover](/docs/components/ui/overlays/popover) for links, buttons, form controls, or a close button.
