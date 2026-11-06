@@ -1,0 +1,70 @@
+---
+title: Radio Group
+description: Choose one option from a labelled group.
+---
+
+## Import
+
+```tsx
+import { RadioGroup, Radio } from "@puzzle/ui";
+```
+
+## Selection and orientation
+
+Render `Radio` inside `RadioGroup`; every option needs a unique `value`. `name` enables native form submission and required validation.
+
+<Preview height={420} code={`\
+<Stack>
+  <RadioGroup label="Delivery" name="delivery" defaultValue="standard" description="Choose a delivery speed.">
+    <Radio value="standard" label="Standard" description="3-5 business days" />
+    <Radio value="express" label="Express" />
+    <Radio value="overnight" label="Overnight" disabled />
+  </RadioGroup>
+  <RadioGroup label="Plan" orientation="horizontal" size="sm" defaultValue="personal">
+    <Radio value="personal">Personal</Radio>
+    <Radio value="team">Team</Radio>
+  </RadioGroup>
+</Stack>
+`}>
+  <Section><Stack>
+    <RadioGroup label="Delivery" name="delivery" defaultValue="standard" description="Choose a delivery speed.">
+      <Radio value="standard" label="Standard" description="3-5 business days" />
+      <Radio value="express" label="Express" />
+      <Radio value="overnight" label="Overnight" disabled />
+    </RadioGroup>
+    <RadioGroup label="Plan" orientation="horizontal" size="sm" defaultValue="personal">
+      <Radio value="personal">Personal</Radio><Radio value="team">Team</Radio>
+    </RadioGroup>
+  </Stack></Section>
+</Preview>
+
+## API
+
+### RadioGroup
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` | Required | Radio options. |
+| `value` | `string \| null` | - | Controlled selection; `null` is empty. |
+| `defaultValue` | `string` | - | Initial uncontrolled selection. |
+| `onValueChange` | `(value: string) => void` | - | Selected option value. |
+| `label`, `description` | `ReactNode` | - | Group legend and supporting text. |
+| `error` | `ReactNode \| boolean` | - | Validation message. |
+| `invalid` | `boolean` | Error-derived | Explicit invalid state. |
+| `name` | `string` | - | Shared native input name. |
+| `required`, `disabled` | `boolean` | `false` | Group state. |
+| `orientation` | `"horizontal" \| "vertical"` | `"vertical"` | Layout direction. |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Option size. |
+| `dir` | `"ltr" \| "rtl"` | - | Keyboard text direction. |
+| `loop` | `boolean` | `true` | Wrap keyboard navigation. |
+
+### Radio
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | Required | Unique option identifier. |
+| `label`, `children` | `ReactNode` | - | Option label; `label` wins. |
+| `description` | `ReactNode` | - | Option supporting text. |
+| `disabled` | `boolean` | `false` | Disables this option. |
+
+Group props extend native fieldset attributes. Radio forwards supported input props and refs; `className`/`style` target its label. Arrow keys select enabled options; Home/End reach the boundaries.

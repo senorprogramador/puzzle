@@ -1,0 +1,36 @@
+---
+title: Scroll Lock
+description: Lock document scrolling while preserving existing body styles.
+---
+
+import { ScrollLockExample } from "../../../../../src/components/doc-examples";
+
+## Import
+
+```tsx
+import { ScrollLock } from "@puzzle/ui";
+```
+
+## Conditional locking
+
+Mount ScrollLock while an overlay is active, or toggle `enabled`. This example locks only the preview document. The control remains available to unlock it.
+
+<Preview height={350} code={`\
+const [enabled, setEnabled] = useState(false);
+<>
+  <ScrollLock enabled={enabled} />
+  <Button onClick={() => setEnabled((current) => !current)}>
+    {enabled ? "Unlock preview scrolling" : "Lock preview scrolling"}
+  </Button>
+</>
+`}>
+  <Section><ScrollLockExample /></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enabled` | `boolean` | `true` | Lock the document containing the component. |
+
+ScrollLock renders a hidden marker, not a content wrapper. Multiple locks are coordinated per document; scrolling is restored only after the final lock releases. Existing inline styles and scroll position are preserved, with scrollbar compensation and iOS handling. It does not trap focus or create modal semantics; `Dialog` and modal `Backdrop` already include it.

@@ -1,0 +1,40 @@
+---
+title: Heading
+description: Apply theme heading styles independently of semantic level.
+---
+
+## Import
+
+```tsx
+import { Heading } from "@puzzle/ui";
+```
+
+## Visual and semantic hierarchy
+
+`level` selects typography; `as` selects the HTML heading level. The default element is always `h2`, regardless of visual style.
+
+<Preview height={450} code={`\
+<Stack>
+  <Heading as="h1" level="headline1">Page title</Heading>
+  <Heading as="h2" level="headline2">Section title</Heading>
+  <Heading as="h3" level="headline3">Subsection title</Heading>
+  <Heading as="h4" level="headline4">Supporting title</Heading>
+</Stack>
+`}>
+  <Section><Stack>
+    <Heading as="h1" level="headline1">Page title</Heading>
+    <Heading as="h2" level="headline2">Section title</Heading>
+    <Heading as="h3" level="headline3">Subsection title</Heading>
+    <Heading as="h4" level="headline4">Supporting title</Heading>
+  </Stack></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `level` | `"display1" \| "display2" \| "headline1" \| "headline2" \| "headline3" \| "headline4"` | Required | Theme typography role. |
+| `as` | `ElementType` | `"h2"` | Semantic element. |
+| `children` | `ReactNode` | - | Heading content. |
+
+Native attributes, styles, classes, and refs for the chosen element are forwarded. Follow a logical heading hierarchy; do not choose semantic levels solely for appearance. Responsive typography comes from the active theme.

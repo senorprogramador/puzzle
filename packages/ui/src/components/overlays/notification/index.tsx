@@ -220,6 +220,7 @@ export type {
   NotificationAction,
   NotificationOptions,
   NotificationInput,
+  NotificationItem,
   NotificationProviderProps,
 };
 export {

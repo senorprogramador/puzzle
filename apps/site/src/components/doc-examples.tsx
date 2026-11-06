@@ -1,21 +1,32 @@
 import { useRef, useState } from "react";
 import {
   Accordion,
+  Autocomplete,
+  Backdrop,
   type AccordionValue,
   Button,
   Card,
   Carousel,
   CarouselController,
   DatePicker,
+  Dialog,
+  Drawer,
   FileUpload,
   FormField,
+  NotificationProvider,
+  Portal,
+  PortalTarget,
   Popover,
   Select,
+  Section,
   Slider,
+  ScrollLock,
   Stack,
   Stepper,
   Tabs,
   Tooltip,
+  Transition,
+  useNotification,
 } from "@puzzle/ui";
 
 export const shippingItems = [
@@ -235,3 +246,119 @@ export const FileUploadProgressExample = () => {
     />
   );
 };
+
+export const AutocompleteExample = () => {
+  const [value, setValue] = useState<string | undefined>();
+
+  return (
+    <Stack>
+      <Autocomplete label="Fruit" options={fruitOptions} value={value} onChange={setValue} />
+      <span role="status">Selected: {value ?? "none"}</span>
+    </Stack>
+  );
+};
+
+export const DialogExample = () => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open dialog</Button>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Review changes"
+        description="Check your changes before continuing."
+        footer={<Button onClick={() => setOpen(false)}>Done</Button>}
+      >
+        <p>Your changes are ready.</p>
+      </Dialog>
+    </>
+  );
+};
+
+export const DrawerExample = () => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open drawer</Button>
+      <Drawer open={open} onOpenChange={setOpen} position="right" aria-label="Filters">
+        <Section>
+          <Stack>
+            <p>Filter your results.</p>
+            <Button onClick={() => setOpen(false)}>Close filters</Button>
+          </Stack>
+        </Section>
+      </Drawer>
+    </>
+  );
+};
+
+export const BackdropExample = () => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Show backdrop</Button>
+      <Backdrop open={open} onClose={() => setOpen(false)}>
+        <Button onClick={() => setOpen(false)}>Close backdrop</Button>
+      </Backdrop>
+    </>
+  );
+};
+
+const NotificationExampleControls = () => {
+  const notification = useNotification();
+
+  return (
+    <Stack direction="row" wrap="wrap">
+      <Button onClick={() => notification.success("Changes saved")}>Show success</Button>
+      <Button variant="outline" onClick={() => notification.error("Could not save", { duration: 0 })}>Show error</Button>
+      <Button variant="ghost" onClick={notification.dismissAll}>Dismiss all</Button>
+    </Stack>
+  );
+};
+
+export const NotificationExample = () => (
+  <NotificationProvider label="Example notifications">
+    <NotificationExampleControls />
+  </NotificationProvider>
+);
+
+export const TransitionExample = () => {
+  const [visible, setVisible] = useState(true);
+
+  return (
+    <Stack>
+      <Button onClick={() => setVisible((current) => !current)}>Toggle content</Button>
+      <Transition visible={visible} template="slide-in-up">
+        <Card>Animated content</Card>
+      </Transition>
+    </Stack>
+  );
+};
+
+export const ScrollLockExample = () => {
+  const [enabled, setEnabled] = useState(false);
+
+  return (
+    <Stack>
+      <ScrollLock enabled={enabled} />
+      <Button onClick={() => setEnabled((current) => !current)}>
+        {enabled ? "Unlock preview scrolling" : "Lock preview scrolling"}
+      </Button>
+      <p>Scroll the preview, enable the lock, then try scrolling again.</p>
+      {Array.from({ length: 10 }, (_, index) => <p key={index}>Example paragraph {index + 1}</p>)}
+    </Stack>
+  );
+};
+
+export const PortalExample = () => (
+  <>
+    <PortalTarget id="documentation-portal-target" aria-label="Portal destination" />
+    <Portal targetId="documentation-portal-target">
+      <Card>This content is rendered inside the target.</Card>
+    </Portal>
+  </>
+);

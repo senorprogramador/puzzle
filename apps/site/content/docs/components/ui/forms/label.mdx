@@ -1,0 +1,41 @@
+---
+title: Label
+description: Associate visible text with a form control.
+---
+
+## Import
+
+```tsx
+import { Label } from "@puzzle/ui";
+```
+
+## Usage
+
+Match `htmlFor` to a control's `id`. Indicators are visual cues: configure `required` on the control itself as well. Prefer `FormField` when also displaying a description or error.
+
+<Preview height={300} code={`\
+<Stack>
+  <Label htmlFor="label-name" required>Name</Label>
+  <TextInput id="label-name" required />
+  <Label htmlFor="label-company" optional>Company</Label>
+  <TextInput id="label-company" />
+</Stack>
+`}>
+  <Section><Stack>
+    <Label htmlFor="label-name" required>Name</Label>
+    <TextInput id="label-name" required />
+    <Label htmlFor="label-company" optional>Company</Label>
+    <TextInput id="label-company" />
+  </Stack></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` | Required | Visible label text. |
+| `htmlFor` | `string` | - | Associated input ID. |
+| `required` | `boolean` | `false` | Adds a decorative required marker. |
+| `optional` | `boolean` | `false` | Adds optional text. |
+
+Standard native label attributes, `className`, and `style` are supported.

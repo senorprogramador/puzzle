@@ -1,0 +1,45 @@
+---
+title: Number Input
+description: Enter bounded numeric values with increment controls.
+---
+
+## Import
+
+```tsx
+import { NumberInput } from "@puzzle/ui";
+```
+
+## Bounds and precision
+
+Use `initialValue` for uncontrolled input, or `value` and `onChange` for controlled input. The callback receives a number, not an event.
+
+<Preview height={350} code={`\
+<Stack>
+  <FormField label="Quantity"><NumberInput initialValue={2} min={1} max={10} /></FormField>
+  <FormField label="Price"><NumberInput initialValue={2.5} min={0} step={0.25} fractionDigits={2} /></FormField>
+  <FormField label="Locked"><NumberInput initialValue={5} disabled /></FormField>
+</Stack>
+`}>
+  <Section><Stack>
+    <FormField label="Quantity"><NumberInput initialValue={2} min={1} max={10} /></FormField>
+    <FormField label="Price"><NumberInput initialValue={2.5} min={0} step={0.25} fractionDigits={2} /></FormField>
+    <FormField label="Locked"><NumberInput initialValue={5} disabled /></FormField>
+  </Stack></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number` | - | Controlled value. |
+| `initialValue` | `number` | `0` | Initial uncontrolled value. |
+| `onChange` | `(value: number) => void` | - | Updated numeric value. |
+| `min`, `max` | `number` | - | Inclusive bounds. |
+| `step` | `number` | `1` | Increment amount. |
+| `largeStep` | `number` | `step * 10` | PageUp/PageDown increment. |
+| `fractionDigits` | `number` | Step precision | Decimal precision, bounded to 0-12. |
+| `longPressDelay` | `number` | `450` | Delay before repeated increments, in milliseconds. |
+| `repeatInterval` | `number` | `120` | Repeat interval, in milliseconds. |
+| `decrementLabel`, `incrementLabel` | `string` | `"Decrease value"`, `"Increase value"` | Accessible control labels. |
+
+Native input attributes such as `name`, `disabled`, `readOnly`, and `aria-describedby` are supported. Arrow keys increment/decrement; PageUp/PageDown apply `largeStep`. Use a visible label.

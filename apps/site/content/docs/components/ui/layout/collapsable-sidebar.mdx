@@ -1,0 +1,44 @@
+---
+title: Collapsable Sidebar
+description: Expandable icon navigation with a compact mobile alternative.
+---
+
+## Import
+
+```tsx
+import { CollapsableSidebar } from "@puzzle/ui";
+```
+
+## Groups and expansion
+
+The sidebar starts collapsed. Its toggle expands labels, while narrow layouts use bottom navigation. Resize the preview to compare.
+
+<Preview height={500} code={`\
+<CollapsableSidebar ariaLabel="Workspace" defaultCollapsed={false} items={[
+  { id: "home", label: "Home", icon: <Icon name="lucide:house" />, href: "#home", active: true },
+  { id: "work", label: "Workspace", items: [
+    { id: "projects", label: "Projects", icon: <Icon name="lucide:folder" />, href: "#projects" },
+  ] },
+]} />
+`}>
+  <CollapsableSidebar ariaLabel="Workspace" defaultCollapsed={false} items={[
+    { id: "home", label: "Home", icon: <Icon name="lucide:house" />, href: "#home", active: true },
+    { id: "work", label: "Workspace", items: [
+      { id: "projects", label: "Projects", icon: <Icon name="lucide:folder" />, href: "#projects" },
+    ] },
+  ]} />
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `CollapsableSidebarEntry[]` | Required | Items or labelled groups. |
+| `expand` | `"inline" \| "over"` | `"inline"` | Reserve space or overlay when expanded. |
+| `collapsed` | `boolean` | - | Controlled collapsed state. |
+| `defaultCollapsed` | `boolean` | `true` | Initial uncontrolled state. |
+| `onCollapsedChange` | `(collapsed: boolean) => void` | - | Expansion callback. |
+| `ariaLabel` | `string` | `"Main navigation"` | Navigation name. |
+| `className`, `style` | `string`, `CSSProperties` | - | Root styling. |
+
+Items require `id`, `icon`, `label`, and either `href` or `onClick`; `active` marks the current item. Groups require `id` and `items`, with an optional `label`. Use stable IDs. Current links receive `aria-current`; icons are decorative.

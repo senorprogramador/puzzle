@@ -41,6 +41,11 @@ const items: TreeViewItem[] = [
             label: "Data Display",
             children: [
               {
+                id: "alert",
+                label: "Alert",
+                href: "/docs/components/ui/data-display/alert",
+              },
+              {
                 id: "avatar",
                 label: "Avatar",
                 href: "/docs/components/ui/data-display/avatar",
@@ -82,6 +87,16 @@ const items: TreeViewItem[] = [
             label: "Forms",
             children: [
               {
+                id: "autocomplete",
+                label: "Autocomplete",
+                href: "/docs/components/ui/forms/autocomplete",
+              },
+              {
+                id: "checkbox",
+                label: "Checkbox",
+                href: "/docs/components/ui/forms/checkbox",
+              },
+              {
                 id: "date-picker",
                 label: "Date Picker",
                 href: "/docs/components/ui/forms/date-picker",
@@ -90,6 +105,26 @@ const items: TreeViewItem[] = [
                 id: "file-upload",
                 label: "File Upload",
                 href: "/docs/components/ui/forms/file-upload",
+              },
+              {
+                id: "form-field",
+                label: "Form Field",
+                href: "/docs/components/ui/forms/form-field",
+              },
+              {
+                id: "label",
+                label: "Label",
+                href: "/docs/components/ui/forms/label",
+              },
+              {
+                id: "number-input",
+                label: "Number Input",
+                href: "/docs/components/ui/forms/number-input",
+              },
+              {
+                id: "radio-group",
+                label: "Radio Group",
+                href: "/docs/components/ui/forms/radio-group",
               },
               {
                 id: "select",
@@ -105,6 +140,82 @@ const items: TreeViewItem[] = [
                 id: "stepper",
                 label: "Stepper",
                 href: "/docs/components/ui/forms/stepper",
+              },
+              {
+                id: "switch",
+                label: "Switch",
+                href: "/docs/components/ui/forms/switch",
+              },
+              {
+                id: "text-area-input",
+                label: "Text Area Input",
+                href: "/docs/components/ui/forms/text-area-input",
+              },
+              {
+                id: "text-input",
+                label: "Text Input",
+                href: "/docs/components/ui/forms/text-input",
+              },
+            ],
+          },
+          {
+            id: "layout",
+            label: "Layout",
+            children: [
+              {
+                id: "app-bar",
+                label: "App Bar",
+                href: "/docs/components/ui/layout/app-bar",
+              },
+              {
+                id: "background",
+                label: "Background",
+                href: "/docs/components/ui/layout/background",
+              },
+              {
+                id: "bottom-navigation",
+                label: "Bottom Navigation",
+                href: "/docs/components/ui/layout/bottom-navigation",
+              },
+              {
+                id: "breadcrumbs",
+                label: "Breadcrumbs",
+                href: "/docs/components/ui/layout/breadcrumbs",
+              },
+              {
+                id: "collapsable-sidebar",
+                label: "Collapsable Sidebar",
+                href: "/docs/components/ui/layout/collapsable-sidebar",
+              },
+              {
+                id: "container",
+                label: "Container",
+                href: "/docs/components/ui/layout/container",
+              },
+              {
+                id: "page-layout",
+                label: "Page Layout",
+                href: "/docs/components/ui/layout/page-layout",
+              },
+              {
+                id: "section",
+                label: "Section",
+                href: "/docs/components/ui/layout/section",
+              },
+              {
+                id: "section-stack",
+                label: "Section Stack",
+                href: "/docs/components/ui/layout/section-stack",
+              },
+              {
+                id: "sidebar",
+                label: "Sidebar",
+                href: "/docs/components/ui/layout/sidebar",
+              },
+              {
+                id: "stack",
+                label: "Stack",
+                href: "/docs/components/ui/layout/stack",
               },
             ],
           },
@@ -123,9 +234,19 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/navigation/carousel",
               },
               {
+                id: "link",
+                label: "Link",
+                href: "/docs/components/ui/navigation/link",
+              },
+              {
                 id: "tabs",
                 label: "Tabs",
                 href: "/docs/components/ui/navigation/tabs",
+              },
+              {
+                id: "tree-view",
+                label: "Tree View",
+                href: "/docs/components/ui/navigation/tree-view",
               },
             ],
           },
@@ -134,14 +255,60 @@ const items: TreeViewItem[] = [
             label: "Overlays",
             children: [
               {
+                id: "backdrop",
+                label: "Backdrop",
+                href: "/docs/components/ui/overlays/backdrop",
+              },
+              {
+                id: "dialog",
+                label: "Dialog",
+                href: "/docs/components/ui/overlays/dialog",
+              },
+              {
+                id: "drawer",
+                label: "Drawer",
+                href: "/docs/components/ui/overlays/drawer",
+              },
+              {
+                id: "notification",
+                label: "Notification",
+                href: "/docs/components/ui/overlays/notification",
+              },
+              {
+                id: "popout",
+                label: "Popout",
+                href: "/docs/components/ui/overlays/popout",
+              },
+              {
                 id: "popover",
                 label: "Popover",
                 href: "/docs/components/ui/overlays/popover",
               },
               {
+                id: "portal",
+                label: "Portal",
+                href: "/docs/components/ui/overlays/portal",
+              },
+              {
                 id: "tooltip",
                 label: "Tooltip",
                 href: "/docs/components/ui/overlays/tooltip",
+              },
+            ],
+          },
+          {
+            id: "typography",
+            label: "Typography",
+            children: [
+              {
+                id: "heading",
+                label: "Heading",
+                href: "/docs/components/ui/typography/heading",
+              },
+              {
+                id: "text",
+                label: "Text",
+                href: "/docs/components/ui/typography/text",
               },
             ],
           },
@@ -153,6 +320,16 @@ const items: TreeViewItem[] = [
                 id: "preview",
                 label: "Preview",
                 href: "/docs/components/ui/utilities/preview",
+              },
+              {
+                id: "scroll-lock",
+                label: "Scroll Lock",
+                href: "/docs/components/ui/utilities/scroll-lock",
+              },
+              {
+                id: "transition",
+                label: "Transition",
+                href: "/docs/components/ui/utilities/transition",
               },
             ],
           },
@@ -178,8 +355,10 @@ const Sidebar = () => {
           "actions",
           "data-display",
           "forms",
+          "layout",
           "navigation",
           "overlays",
+          "typography",
           "utilities",
         ]}
         selectedIds={selectedIds}

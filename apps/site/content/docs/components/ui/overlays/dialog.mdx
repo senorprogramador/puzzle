@@ -1,0 +1,48 @@
+---
+title: Dialog
+description: Focused modal content with an accessible title and dismissal controls.
+---
+
+import { DialogExample } from "../../../../../src/components/doc-examples";
+
+## Import
+
+```tsx
+import { Dialog } from "@puzzle/ui";
+```
+
+## Title, description, and footer
+
+Dialog is controlled. Supply a title, update `open` from `onOpenChange`, and provide explicit footer actions when needed. This example portals into the host page.
+
+<Preview height={300} code={`\
+const [open, setOpen] = useState(false);
+<>
+  <Button onClick={() => setOpen(true)}>Open dialog</Button>
+  <Dialog open={open} onOpenChange={setOpen} title="Review changes"
+    description="Check your changes before continuing."
+    footer={<Button onClick={() => setOpen(false)}>Done</Button>}>
+    <p>Your changes are ready.</p>
+  </Dialog>
+</>
+`}>
+  <Section><DialogExample /></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | Required | Controlled visibility. |
+| `onOpenChange` | `(open: boolean) => void` | Required | State-change request. |
+| `title` | `ReactNode` | Required | Accessible heading. |
+| `description` | `string` | - | Associated short description. |
+| `children`, `footer` | `ReactNode` | - | Body and footer content. |
+| `size` | `"sm" \| "md" \| "lg" \| "xl" \| "full"` | `"md"` | Width preset. |
+| `closeButton` | `boolean` | `true` | Show the close button. |
+| `closeLabel` | `string` | `"Close dialog"` | Close button accessible name. |
+| `closeOnBackdrop`, `closeOnEscape` | `boolean` | `true` | Enable dismissal mechanisms. |
+| `onClose` | `() => void` | - | Called when dismissal is requested. |
+| `aria-describedby` | `string` | - | Additional description IDs. |
+
+Supported div attributes, classes, and styles apply to the dialog content. The component provides modal semantics, focus management, scroll locking, and portal placement. Keep an accessible close action if disabling built-in dismissal. Use headings in a logical order within the body.

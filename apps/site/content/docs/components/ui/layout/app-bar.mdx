@@ -1,0 +1,49 @@
+---
+title: App Bar
+description: Responsive application branding and navigation.
+---
+
+## Import
+
+```tsx
+import { AppBar } from "@puzzle/ui";
+```
+
+## Navigation
+
+The app bar adapts its navigation to a mobile drawer. Resize the preview to see both layouts.
+
+<Preview height={450} code={`\
+<AppBar title="Workspace" logoHref="#home"
+  navigationItems={[
+    { label: "Overview", href: "#overview", current: true },
+    { label: "Projects", href: "#projects" },
+  ]}
+  trailingComponents={<Button size="sm">Sign in</Button>}
+/>
+`}>
+  <AppBar title="Workspace" logoHref="#home"
+    navigationItems={[
+      { label: "Overview", href: "#overview", current: true },
+      { label: "Projects", href: "#projects" },
+    ]}
+    trailingComponents={<Button size="sm">Sign in</Button>}
+  />
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `logo` | `ReactNode` | - | Brand content. |
+| `title` | `string` | - | Application title. |
+| `logoHref` | `string` | `"/"` | Brand destination. |
+| `navigationItems` | `{ label: string; href: string; current?: boolean; external?: boolean }[]` | `[]` | Navigation links. |
+| `customNavigationItems` | `T[]` | - | Custom navigation data. |
+| `renderCustomNavigationItems` | `(item: T, index: number) => ReactNode` | - | Renderer for custom items. |
+| `trailingComponents` | `ReactNode` | - | Actions after navigation. |
+| `sticky` | `boolean` | `false` | Sticky positioning and PageLayout offset integration. |
+| `ariaLabel` | `string` | `"Main navigation"` | Accessible navigation name. |
+| `className` | `string` | - | Root styling hook. |
+
+Use descriptive destinations and label icon-only actions. Place sticky bars in `PageLayout.Header` to scope their layout offset to that page.

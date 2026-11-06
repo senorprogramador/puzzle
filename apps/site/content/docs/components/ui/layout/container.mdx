@@ -1,0 +1,36 @@
+---
+title: Container
+description: Constrain content to the theme's responsive page width.
+---
+
+## Import
+
+```tsx
+import { Container } from "@puzzle/ui";
+```
+
+## Usage
+
+Use Container for width constraints without introducing a surface or section theme.
+
+<Preview height={300} code={`\
+<Container as="article">
+  <Heading level="headline3">Readable content</Heading>
+  <Text as="p">The container follows the theme's content width.</Text>
+</Container>
+`}>
+  <Container as="article">
+    <Heading level="headline3">Readable content</Heading>
+    <Text as="p">The container follows the theme's content width.</Text>
+  </Container>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `as` | `ElementType` | `"div"` | Semantic root element. |
+| `children` | `ReactNode` | - | Constrained content. |
+| `className` | `string` | - | Additional root classes. |
+
+Native props and refs for the chosen element are forwarded. For theme backgrounds and vertical section spacing, use `Section`.

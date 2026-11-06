@@ -1,0 +1,51 @@
+---
+title: Form Field
+description: Connect a label, description, and validation message to a control.
+---
+
+## Import
+
+```tsx
+import { FormField } from "@puzzle/ui";
+```
+
+## Labels and validation
+
+Pass one control as the direct child. Form Field supplies its ID, required/disabled state, `aria-describedby`, and invalid state. It preserves existing description relationships.
+
+<Preview height={450} code={`\
+<Stack>
+  <FormField label="Email" description="We will not share it." required>
+    <TextInput type="email" placeholder="you@example.com" />
+  </FormField>
+  <FormField label="Project name" error="Enter a project name.">
+    <TextInput />
+  </FormField>
+  <FormField label="Notes" optional disabled>
+    <TextAreaInput />
+  </FormField>
+</Stack>
+`}>
+  <Section><Stack>
+    <FormField label="Email" description="We will not share it." required>
+      <TextInput type="email" placeholder="you@example.com" />
+    </FormField>
+    <FormField label="Project name" error="Enter a project name.">
+      <TextInput />
+    </FormField>
+    <FormField label="Notes" optional disabled><TextAreaInput /></FormField>
+  </Stack></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `ReactElement` | Required | Single control accepting ID and form attributes. |
+| `label`, `description` | `ReactNode` | - | Visible label and supporting text. |
+| `error` | `ReactNode \| boolean` | - | Validation message; `true` uses the default message. |
+| `invalid` | `boolean` | Whether an error exists | Explicit invalid state. |
+| `required`, `disabled`, `optional` | `boolean` | `false` | Control state and label indicators. |
+| `controlId` | `string` | Existing child ID or generated | Actual control ID. |
+
+Native div attributes apply to the root. Custom controls must forward the supplied accessibility attributes to their actual form element.

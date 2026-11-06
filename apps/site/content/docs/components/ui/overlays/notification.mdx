@@ -1,0 +1,91 @@
+---
+title: Notification
+description: Announce transient feedback with optional actions and persistent errors.
+---
+
+import { NotificationExample } from "../../../../../src/components/doc-examples";
+
+## Import
+
+```tsx
+import { NotificationProvider, useNotification } from "@puzzle/ui";
+```
+
+## Provider and severity helpers
+
+Place a provider around the components that call the hook. Notifications portal to the host page; try the buttons below. Errors in this example remain until dismissed.
+
+<Preview height={300} code={`\
+const Controls = () => {
+  const notification = useNotification();
+  return (
+    <Stack direction="row" wrap="wrap">
+      <Button onClick={() => notification.success("Changes saved")}>Show success</Button>
+      <Button variant="outline" onClick={() => notification.error("Could not save", { duration: 0 })}>Show error</Button>
+      <Button variant="ghost" onClick={notification.dismissAll}>Dismiss all</Button>
+    </Stack>
+  );
+};
+<NotificationProvider label="Example notifications"><Controls /></NotificationProvider>
+`}>
+  <Section><NotificationExample /></Section>
+</Preview>
+
+## Actions and replacement
+
+Use `show` for rich content. Reusing an ID replaces the notification instead of adding another. An action dismisses the notification after its callback runs.
+
+```tsx
+const id = notification.show({
+  id: "save-status",
+  severity: "warning",
+  title: "Changes not saved",
+  description: "You can retry without losing your edits.",
+  duration: 0,
+  action: { label: "Retry", onClick: retrySave },
+});
+notification.dismiss(id);
+```
+
+## API
+
+### NotificationProvider
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` | Required | Consumers of the notification hook. |
+| `position` | `"top-left" \| "top-center" \| "top-right" \| "bottom-left" \| "bottom-center" \| "bottom-right"` | `"bottom-right"` | Viewport placement. |
+| `maxNotifications` | `number` | `5` | Maximum visible notifications. |
+| `defaultDuration` | `number` | `5000` | Auto-dismiss delay in milliseconds. |
+| `label` | `string` | `"Notifications"` | Accessible region name. |
+
+### useNotification
+
+| Method | Signature | Description |
+| --- | --- | --- |
+| `show` | `(input: string \| NotificationOptions) => string` | Display a notification and return its ID. |
+| `success`, `info`, `warning`, `error` | `(message: string, options?) => string` | Severity helpers; options exclude severity/title/description. |
+| `dismiss` | `(id: string) => void` | Remove one notification. |
+| `dismissAll` | `() => void` | Remove every notification. |
+
+### NotificationOptions
+
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | Generated | Stable replacement/dismissal identifier. |
+| `severity` | `"success" \| "info" \| "warning" \| "error"` | `"info"` | Intent and announcement urgency. |
+| `title`, `description` | `ReactNode` | - | Message content. |
+| `duration` | `number` | Provider default | Milliseconds; `0` disables auto-dismiss. |
+| `action` | `{ label: string; onClick: () => void }` | - | Optional recovery action. |
+| `closable` | `boolean` | `true` | Show the dismiss button. |
+
+### Low-level components
+
+`Notification` and `NotificationViewport` are also exported for custom state management. Prefer the provider unless you need to own the list yourself.
+
+| Component | Required props | Description |
+| --- | --- | --- |
+| `Notification` | `notification: NotificationItem`, `onDismiss: (id: string) => void` | One message with its own timer and dismissal controls. |
+| `NotificationViewport` | `notifications: NotificationItem[]`, `position: NotificationPosition`, `label: string`, `onDismiss: (id: string) => void` | Positioned accessible region rendering a list. |
+
+`NotificationItem` is `NotificationOptions` with required `id`, `severity`, and `closable`. Error messages use assertive alerts; other severities use polite status announcements. Timers pause on hover, focus, window blur, and document hiding. Use persistent messages for actions users must not miss; do not make a short-lived notification the only place an important error appears.

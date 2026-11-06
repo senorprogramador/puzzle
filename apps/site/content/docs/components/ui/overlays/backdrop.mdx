@@ -1,0 +1,42 @@
+---
+title: Backdrop
+description: A dismissible background layer for custom overlays.
+---
+
+import { BackdropExample } from "../../../../../src/components/doc-examples";
+
+## Import
+
+```tsx
+import { Backdrop } from "@puzzle/ui";
+```
+
+## Controlled visibility
+
+Backdrop requests dismissal; your state must close it. Prefer `Dialog` or `Drawer` when their built-in semantics fit.
+
+<Preview height={350} code={`\
+const [open, setOpen] = useState(false);
+<>
+  <Button onClick={() => setOpen(true)}>Show backdrop</Button>
+  <Backdrop open={open} onClose={() => setOpen(false)}>
+    <Button onClick={() => setOpen(false)}>Close backdrop</Button>
+  </Backdrop>
+</>
+`}>
+  <Section><BackdropExample /></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `as` | `ElementType` | `"div"` | Root element. |
+| `open` | `boolean` | `true` | Visibility. |
+| `modal` | `boolean` | `false` | Modal overlay management and scroll locking. |
+| `closeOnBackdrop` | `boolean` | `true` | Request dismissal on a direct background click. |
+| `closeOnEscape` | `boolean` | `true` | Request dismissal with Escape. |
+| `onClose` | `() => void` | - | Dismissal request. |
+| `children` | `ReactNode` | - | Overlay content. |
+
+Native props are forwarded. Only the top overlay handles dismissal. For custom modal content, provide an accessible dialog name/role and mark its content root with `data-overlay-content`; Backdrop itself does not provide dialog semantics. It does not create a portal.

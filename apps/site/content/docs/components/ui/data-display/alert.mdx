@@ -1,0 +1,61 @@
+---
+title: Alert
+description: Display contextual feedback inline.
+---
+
+## Import
+
+```tsx
+import { Alert } from "@puzzle/ui";
+```
+
+## Severity
+
+Use `severity` to communicate the outcome, not color alone. Error alerts are assertive; other severities use polite status announcements.
+
+<Preview height={500} code={`\
+<Stack>
+  <Alert severity="success" title="Saved">Your changes are ready.</Alert>
+  <Alert severity="info" title="Information">A new version is available.</Alert>
+  <Alert severity="warning" title="Check your details">Some fields are incomplete.</Alert>
+  <Alert severity="error" title="Unable to save">Try again later.</Alert>
+</Stack>
+`}>
+  <Section><Stack>
+    <Alert severity="success" title="Saved">Your changes are ready.</Alert>
+    <Alert severity="info" title="Information">A new version is available.</Alert>
+    <Alert severity="warning" title="Check your details">Some fields are incomplete.</Alert>
+    <Alert severity="error" title="Unable to save">Try again later.</Alert>
+  </Stack></Section>
+</Preview>
+
+## Variant, icon, and dismissal
+
+`closable` dismisses the alert internally and calls `onClose`. Set `icon={false}` to remove the icon, or provide a custom node.
+
+<Preview height={400} code={`\
+<Stack>
+  <Alert variant="outlined" closable closeLabel="Dismiss update" title="Update">You can dismiss this message.</Alert>
+  <Alert variant="filled" severity="success" icon={false}>Upload complete.</Alert>
+</Stack>
+`}>
+  <Section><Stack>
+    <Alert variant="outlined" closable closeLabel="Dismiss update" title="Update">You can dismiss this message.</Alert>
+    <Alert variant="filled" severity="success" icon={false}>Upload complete.</Alert>
+  </Stack></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `severity` | `"success" \| "info" \| "warning" \| "error"` | `"info"` | Feedback intent and live-region semantics. |
+| `variant` | `"standard" \| "outlined" \| "filled"` | `"standard"` | Visual treatment. |
+| `title` | `ReactNode` | - | Optional heading. |
+| `children` | `ReactNode` | - | Message body. |
+| `icon` | `ReactNode \| false` | Severity icon | Custom icon or no icon. |
+| `closable` | `boolean` | `false` | Adds a dismiss button. |
+| `closeLabel` | `string` | `"Dismiss alert"` | Accessible button name. |
+| `onClose` | `() => void` | - | Called after dismissal. |
+
+Native div attributes, `className`, and `style` are supported. Dismissed alerts render nothing; remount to show them again.

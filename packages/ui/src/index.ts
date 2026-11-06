@@ -25,6 +25,13 @@ export {
 
 // #region Data Display
 export {
+  Alert,
+  type AlertProps,
+  type AlertSeverity,
+  type AlertVariant,
+} from "./components/data-display/alert";
+
+export {
   Avatar,
   type AvatarProps,
   type AvatarShape,
@@ -118,6 +125,18 @@ export type {
 // #region Forms
 
 export {
+  Autocomplete,
+  type AutocompleteProps,
+  type AutocompleteSingleProps,
+  type AutocompleteMultipleProps,
+  type AutocompleteOption,
+  type AutocompleteValue,
+  type AutocompleteSize,
+  type AutocompleteInputChangeReason,
+  type AutocompleteOptionRenderState,
+} from "./components/forms/autocomplete";
+
+export {
   Checkbox,
   type CheckboxProps,
   type CheckboxSize,
@@ -149,6 +168,7 @@ export {
   type TextAreaInputProps,
   TextInput,
   type TextInputProps,
+  type TextInputType,
 } from "./components/forms/input";
 
 export { Label, type LabelProps } from "./components/forms/label";
@@ -321,6 +341,11 @@ export { Dialog, type DialogProps } from "./components/overlays/dialog";
 export { Drawer, type DrawerProps } from "./components/overlays/drawer";
 
 export {
+  Notification,
+  NotificationViewport,
+  type NotificationProps,
+  type NotificationViewportProps,
+  type NotificationItem,
   NotificationProvider,
   useNotification,
   type NotificationSeverity,

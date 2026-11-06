@@ -1,0 +1,45 @@
+---
+title: Transition
+description: Animate mounting and unmounting with reusable CSS transition templates.
+---
+
+import { TransitionExample } from "../../../../../src/components/doc-examples";
+
+## Import
+
+```tsx
+import { Transition } from "@puzzle/ui";
+```
+
+## Visibility and templates
+
+Without `as`, Transition animates its single child directly. Use `as` to animate a wrapper around multiple children. Toggle the preview to see entry and exit.
+
+<Preview height={350} code={`\
+const [visible, setVisible] = useState(true);
+<Stack>
+  <Button onClick={() => setVisible((current) => !current)}>Toggle content</Button>
+  <Transition visible={visible} template="slide-in-up">
+    <Card>Animated content</Card>
+  </Transition>
+</Stack>
+`}>
+  <Section><TransitionExample /></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `visible` | `boolean` | Required | Enter or exit state. |
+| `children` | `ReactNode` | Required | A single element unless `as` creates a wrapper. |
+| `as` | `ElementType` | - | Optional animated wrapper. |
+| `template` | `"fade" \| "slide-in-up" \| "slide-in-down" \| "slide-in-left" \| "slide-in-right" \| "accordion"` | Fade behavior | Built-in CSS classes. |
+| `enterFrom`, `enterTo`, `exitTo` | `string` | Template classes | Custom phase classes. |
+| `duration` | `number` | `300` | Transition duration in milliseconds. |
+| `unmountOnExit` | `boolean` | `true` | Remove content after exiting. |
+| `forceMount` | `boolean` | `false` | Keep content mounted regardless of visibility. |
+| `onEnter`, `onEntered`, `onExit`, `onExited` | `() => void` | - | Lifecycle callbacks. |
+| `className` | `string` | `""` | Animated element classes. |
+
+Remaining native props target the wrapper or cloned child. Built-in styles respect reduced-motion preferences. Custom transitions should do the same. Hidden content should not contain reachable interactive controls; consider unmounting rather than keeping such content mounted.

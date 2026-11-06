@@ -1,0 +1,37 @@
+---
+title: Link
+description: Theme-styled links with optional router integration.
+---
+
+## Import
+
+```tsx
+import { Link } from "@puzzle/ui";
+```
+
+## Destinations and new tabs
+
+Use Link for navigation and Button for actions. New-tab links automatically include `noopener noreferrer` while preserving supplied `rel` tokens.
+
+<Preview height={250} code={`\
+<Stack>
+  <Link href="#overview">Overview</Link>
+  <Link href="https://example.com" target="_blank">Example website (opens in a new tab)</Link>
+</Stack>
+`}>
+  <Section><Stack>
+    <Link href="#overview">Overview</Link>
+    <Link href="https://example.com" target="_blank">Example website (opens in a new tab)</Link>
+  </Stack></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `href` | `string` | Required | Destination. |
+| `children` | `ReactNode` | - | Descriptive link content. |
+| `componentProps` | `Record<string, unknown>` | - | Extra props for a theme-configured router link. |
+| `target`, `rel` | `string` | - | Native link attributes with new-tab protection. |
+
+Native anchor attributes and refs are forwarded. The theme can configure a link component and its destination prop; the core UI remains router-independent. Use `aria-current="page"` for the current route.

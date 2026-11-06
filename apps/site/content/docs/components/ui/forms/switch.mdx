@@ -1,0 +1,43 @@
+---
+title: Switch
+description: Toggle a setting on or off.
+---
+
+## Import
+
+```tsx
+import { Switch } from "@puzzle/ui";
+```
+
+## Usage and sizes
+
+Use a switch for an immediate binary setting. The label should name the setting rather than describe the action.
+
+<Preview height={350} code={`\
+<Stack>
+  <Switch label="Notifications" description="Receive project updates." defaultChecked />
+  <Switch label="Compact mode" size="sm" />
+  <Switch label="Managed setting" disabled defaultChecked />
+</Stack>
+`}>
+  <Section><Stack>
+    <Switch label="Notifications" description="Receive project updates." defaultChecked />
+    <Switch label="Compact mode" size="sm" />
+    <Switch label="Managed setting" disabled defaultChecked />
+  </Stack></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `ReactNode` | - | Visible setting name. |
+| `description` | `ReactNode` | - | Associated supporting text. |
+| `size` | `"sm" \| "md"` | `"md"` | Visual size. |
+| `checked` | `boolean` | - | Controlled on/off state. |
+| `defaultChecked` | `boolean` | - | Initial uncontrolled state. |
+| `onChange` | `ChangeEventHandler<HTMLInputElement>` | - | Read state from `event.target.checked`. |
+| `disabled`, `required` | `boolean` | `false` | Native input behavior. |
+| `className` | `string` | - | Class on the wrapping label. |
+
+Standard input attributes such as `name`, `value`, and `aria-label` are supported. The input has `role="switch"`; Space toggles it. Supply an accessible name when omitting the label.

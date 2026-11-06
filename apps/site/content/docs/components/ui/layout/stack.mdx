@@ -1,0 +1,48 @@
+---
+title: Stack
+description: Arrange elements with token-based spacing and responsive direction.
+---
+
+## Import
+
+```tsx
+import { Stack } from "@puzzle/ui";
+```
+
+## Direction, alignment, and wrapping
+
+Stack defaults to a column. Horizontal and vertical alignment remain physical axes when direction changes. Resize the preview to see a responsive column become a row.
+
+<Preview height={400} code={`\
+<Stack>
+  <Stack direction={{ mobile: "col", tablet: "row", desktop: "row" }} gap="lg" alignH="center">
+    <Button>First</Button><Button variant="outline">Second</Button>
+  </Stack>
+  <Stack direction="row" wrap="wrap" gap="sm" alignV="center">
+    <Button>One</Button><Button>Two</Button><Button>Three</Button>
+  </Stack>
+</Stack>
+`}>
+  <Section><Stack>
+    <Stack direction={{ mobile: "col", tablet: "row", desktop: "row" }} gap="lg" alignH="center">
+      <Button>First</Button><Button variant="outline">Second</Button>
+    </Stack>
+    <Stack direction="row" wrap="wrap" gap="sm" alignV="center">
+      <Button>One</Button><Button>Two</Button><Button>Three</Button>
+    </Stack>
+  </Stack></Section>
+</Preview>
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `as` | `ElementType` | `"div"` | Root element. |
+| `direction` | `"row" \| "col"` or responsive object | `"col"` | Layout direction. |
+| `gap` | `"0" \| "xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"md"` | Theme spacing scale. |
+| `alignH`, `alignV` | Axis-dependent alignment | - | Horizontal/vertical alignment. |
+| `wrap` | `"wrap" \| "nowrap" \| "wrap-reverse"` | `"nowrap"` | Flex wrapping. |
+| `reverse` | `boolean` | `false` | Reverse visual direction. |
+| `divider` | `ReactNode` | - | Content inserted between children. |
+
+Main-axis alignment accepts `start`, `center`, `end`, `stretch`, `around`, `between`, `evenly`; cross-axis alignment accepts `start`, `center`, `end`, `stretch`. Native props are forwarded. Reversing visual order does not change DOM/keyboard order.
