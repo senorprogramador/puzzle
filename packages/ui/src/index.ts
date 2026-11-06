@@ -321,6 +321,17 @@ export { Dialog, type DialogProps } from "./components/overlays/dialog";
 export { Drawer, type DrawerProps } from "./components/overlays/drawer";
 
 export {
+  NotificationProvider,
+  useNotification,
+  type NotificationSeverity,
+  type NotificationPosition,
+  type NotificationAction,
+  type NotificationOptions,
+  type NotificationInput,
+  type NotificationProviderProps,
+} from "./components/overlays/notification";
+
+export {
   Popout,
   type PopoutProps,
   type PopoutPosition,
