@@ -283,6 +283,7 @@ const Select = <T,>(props: SelectProps<T>) => {
     "aria-label": ariaLabel,
     "aria-labelledby": ariaLabelledBy,
     "aria-describedby": ariaDescribedBy,
+    "aria-invalid": ariaInvalid,
     ...buttonProps
   } = props;
 
@@ -327,7 +328,16 @@ const Select = <T,>(props: SelectProps<T>) => {
   const isOpen = open ?? internalOpen;
   const hasSelection = selectedValues.length > 0;
   const hasError = error !== undefined && error !== null && error !== false;
-
+  const isAriaInvalid =
+    ariaInvalid !== undefined &&
+    ariaInvalid !== false &&
+    ariaInvalid !== "false";
+  const isInvalid = hasError || isAriaInvalid;
+  const resolvedAriaInvalid = isInvalid
+    ? hasError || ariaInvalid === true
+      ? true
+      : ariaInvalid
+    : ariaInvalid;
   const errorContent = error === true ? "Invalid value" : error;
 
   const closeOnSelect = closeOnSelectProp ?? !multiple;
@@ -594,9 +604,7 @@ const Select = <T,>(props: SelectProps<T>) => {
     }
   };
 
-  const handleComboboxKeyDown = (
-    event: ReactKeyboardEvent<HTMLElement>,
-  ) => {
+  const handleComboboxKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
@@ -795,7 +803,7 @@ const Select = <T,>(props: SelectProps<T>) => {
       aria-controls={isOpen ? listboxId : undefined}
       aria-activedescendant={isOpen ? activeOptionId : undefined}
       aria-required={required || undefined}
-      aria-invalid={hasError || undefined}
+      aria-invalid={resolvedAriaInvalid}
     >
       <span
         className={cn(
@@ -869,7 +877,7 @@ const Select = <T,>(props: SelectProps<T>) => {
       className={cn("puzzle-select", rootClassName)}
       data-open={isOpen ? "true" : "false"}
       data-disabled={disabled ? "true" : undefined}
-      data-invalid={hasError ? "true" : undefined}
+      data-invalid={isInvalid ? "true" : undefined}
       data-multiple={multiple ? "true" : undefined}
       data-size-mobile={responsiveSize.mobile}
       data-size-tablet={responsiveSize.tablet}

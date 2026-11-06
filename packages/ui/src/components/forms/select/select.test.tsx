@@ -332,4 +332,62 @@ describe("Select", () => {
     expect(trigger).toHaveAttribute("aria-describedby");
     expect(trigger).toHaveAttribute("aria-invalid", "true");
   });
+
+  describe("composable invalid state", () => {
+    const root = () =>
+      document.querySelector<HTMLElement>(".puzzle-select") as HTMLElement;
+
+    it("accepts aria-invalid and mirrors it in data-invalid", () => {
+      render(<Select label="Fruit" options={options} aria-invalid />);
+
+      expect(screen.getByRole("combobox")).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
+      expect(root()).toHaveAttribute("data-invalid", "true");
+    });
+
+    it("combines aria-invalid with the error state", () => {
+      render(
+        <Select
+          label="Fruit"
+          options={options}
+          aria-invalid={false}
+          error="Required"
+        />,
+      );
+
+      expect(screen.getByRole("combobox")).toHaveAttribute(
+        "aria-invalid",
+        "true",
+      );
+      expect(root()).toHaveAttribute("data-invalid", "true");
+    });
+
+    it("is not invalid when aria-invalid is false and there is no error", () => {
+      render(<Select label="Fruit" options={options} aria-invalid="false" />);
+
+      expect(root()).not.toHaveAttribute("data-invalid");
+    });
+
+    it("keeps external aria-describedby ahead of its own relations", () => {
+      render(
+        <Select
+          label="Fruit"
+          options={options}
+          aria-describedby="external"
+          description="Help"
+          error="Oops"
+        />,
+      );
+
+      const ids = screen
+        .getByRole("combobox")
+        .getAttribute("aria-describedby")
+        ?.split(" ");
+
+      expect(ids?.[0]).toBe("external");
+      expect(ids).toHaveLength(3);
+    });
+  });
 });

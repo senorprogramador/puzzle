@@ -9,10 +9,12 @@ import {
   useState,
   type ComponentProps,
   type CSSProperties,
+  type KeyboardEvent,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@puzzle/core";
+import { useRovingFocus } from "@puzzle/hooks";
 import { Icon } from "@puzzle/icons";
 import { Background } from "../../layout/background";
 import { highlightCode } from "./highlight";
@@ -29,12 +31,7 @@ type DeviceConfig = {
 
 type PreviewAlign = "start" | "center" | "end" | "stretch";
 type PreviewJustify =
-  | "start"
-  | "center"
-  | "end"
-  | "between"
-  | "around"
-  | "evenly";
+  "start" | "center" | "end" | "between" | "around" | "evenly";
 
 type PreviewProps = {
   children: ReactNode;
@@ -126,7 +123,47 @@ const Preview = ({
   const config = PREVIEW_DEVICES[device];
   const frameHeight = height ?? config.height;
   const hasCode = code !== undefined;
+  const [direction, setDirection] = useState<"ltr" | "rtl">("ltr");
+  const sectionRef = useRef<HTMLElement>(null);
+  const isKeyboardNavigation = useRef(false);
 
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+
+    if (section) {
+      setDirection(
+        getComputedStyle(section).direction === "rtl" ? "rtl" : "ltr",
+      );
+    }
+  }, []);
+
+  const rovingFocus = useRovingFocus<HTMLButtonElement>({
+    items: hasCode ? [{ id: "preview" }, { id: "code" }] : [{ id: "preview" }],
+    dir: direction,
+    initialActiveId: activeTab,
+  });
+
+  const handleTabKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    tab: PreviewTab,
+  ) => {
+    isKeyboardNavigation.current = true;
+
+    try {
+      rovingFocus.onItemKeyDown(event, tab);
+    } finally {
+      isKeyboardNavigation.current = false;
+    }
+  };
+
+  // Tabs use automatic activation: keyboard focus also selects the tab.
+  const handleTabFocus = (tab: PreviewTab) => {
+    rovingFocus.onItemFocus(tab);
+
+    if (isKeyboardNavigation.current) {
+      setActiveTab(tab);
+    }
+  };
 
   const syncStyles = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
@@ -383,14 +420,11 @@ const Preview = ({
   const panelProps = {
     id: panelId,
     role: "tabpanel",
-    "aria-labelledby":
-      activeTab === "preview"
-        ? previewTabId
-        : codeTabId,
+    "aria-labelledby": activeTab === "preview" ? previewTabId : codeTabId,
   };
 
   return (
-    <section className={cn("puzzle-preview", className)}>
+    <section ref={sectionRef} className={cn("puzzle-preview", className)}>
       <div className="puzzle-preview__toolbar">
         <div
           className="puzzle-preview__tabs"
@@ -401,6 +435,10 @@ const Preview = ({
             type="button"
             role="tab"
             id={previewTabId}
+            ref={rovingFocus.getItemRef("preview")}
+            tabIndex={activeTab === "preview" ? 0 : -1}
+            onFocus={() => handleTabFocus("preview")}
+            onKeyDown={(event) => handleTabKeyDown(event, "preview")}
             aria-selected={activeTab === "preview"}
             aria-controls={panelId}
             className={cn(
@@ -417,6 +455,10 @@ const Preview = ({
               type="button"
               role="tab"
               id={codeTabId}
+              ref={rovingFocus.getItemRef("code")}
+              tabIndex={activeTab === "code" ? 0 : -1}
+              onFocus={() => handleTabFocus("code")}
+              onKeyDown={(event) => handleTabKeyDown(event, "code")}
               aria-selected={activeTab === "code"}
               aria-controls={panelId}
               className={cn(
@@ -438,20 +480,22 @@ const Preview = ({
                 role="group"
                 aria-label="Device size"
               >
-                {(Object.keys(PREVIEW_DEVICES) as PreviewDevice[]).map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    className={cn(
-                      "puzzle-preview__device",
-                      device === item && "puzzle-preview__device--active",
-                    )}
-                    aria-pressed={device === item}
-                    onClick={() => setDevice(item)}
-                  >
-                    {PREVIEW_DEVICES[item].label}
-                  </button>
-                ))}
+                {(Object.keys(PREVIEW_DEVICES) as PreviewDevice[]).map(
+                  (item) => (
+                    <button
+                      key={item}
+                      type="button"
+                      className={cn(
+                        "puzzle-preview__device",
+                        device === item && "puzzle-preview__device--active",
+                      )}
+                      aria-pressed={device === item}
+                      onClick={() => setDevice(item)}
+                    >
+                      {PREVIEW_DEVICES[item].label}
+                    </button>
+                  ),
+                )}
               </div>
             )}
 
@@ -493,7 +537,10 @@ const Preview = ({
             />
 
             {frameRoot &&
-              createPortal(<div style={contentStyle}>{children}</div>, frameRoot)}
+              createPortal(
+                <div style={contentStyle}>{children}</div>,
+                frameRoot,
+              )}
           </div>
         </div>
 

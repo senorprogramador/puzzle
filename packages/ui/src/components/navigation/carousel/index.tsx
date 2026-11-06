@@ -363,6 +363,10 @@ const Carousel = <T,>({
     });
   }, [items.length]);
 
+  const itemOrderSignature = items
+    .map((item, index) => String(getItemKey ? getItemKey(item, index) : index))
+    .join("\u0000");
+
   useEffect(() => {
     const viewport = viewportRef.current;
     const track = trackRef.current;
@@ -395,7 +399,7 @@ const Carousel = <T,>({
     });
 
     return () => observer.disconnect();
-  }, [items.length, measureLayout]);
+  }, [items.length, itemOrderSignature, measureLayout]);
 
   /**
    * currentPanel is always an item index.

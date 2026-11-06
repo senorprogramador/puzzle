@@ -78,4 +78,66 @@ describe("Preview", () => {
     expect(screen.getByTitle("Mobile component preview")).toBe(frame);
     expect(frameRoot.textContent).toContain("Preview action");
   });
+
+  describe("keyboard navigation", () => {
+    it("keeps only the selected tab in the tab order", () => {
+      render(<Preview code="<Button />">Demo</Preview>);
+
+      expect(screen.getByRole("tab", { name: "Preview" })).toHaveAttribute(
+        "tabindex",
+        "0",
+      );
+      expect(screen.getByRole("tab", { name: "Code" })).toHaveAttribute(
+        "tabindex",
+        "-1",
+      );
+    });
+
+    it("moves focus and selection with the arrow keys", async () => {
+      const user = userEvent.setup();
+
+      render(<Preview code="<Button />">Demo</Preview>);
+
+      await user.tab();
+      expect(screen.getByRole("tab", { name: "Preview" })).toHaveFocus();
+
+      await user.keyboard("{ArrowRight}");
+      expect(screen.getByRole("tab", { name: "Code" })).toHaveFocus();
+      expect(screen.getByRole("tab", { name: "Code" })).toHaveAttribute(
+        "aria-selected",
+        "true",
+      );
+
+      await user.keyboard("{ArrowRight}");
+      expect(screen.getByRole("tab", { name: "Preview" })).toHaveFocus();
+    });
+
+    it("supports Home and End", async () => {
+      const user = userEvent.setup();
+
+      render(<Preview code="<Button />">Demo</Preview>);
+
+      await user.tab();
+      await user.keyboard("{End}");
+      expect(screen.getByRole("tab", { name: "Code" })).toHaveFocus();
+
+      await user.keyboard("{Home}");
+      expect(screen.getByRole("tab", { name: "Preview" })).toHaveFocus();
+    });
+
+    it("mirrors the arrow keys in right-to-left contexts", async () => {
+      const user = userEvent.setup();
+
+      render(
+        <div dir="rtl">
+          <Preview code="<Button />">Demo</Preview>
+        </div>,
+      );
+
+      await user.tab();
+      await user.keyboard("{ArrowLeft}");
+
+      expect(screen.getByRole("tab", { name: "Code" })).toHaveFocus();
+    });
+  });
 });

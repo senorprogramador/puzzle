@@ -17,3 +17,7 @@ Select exposes a select-only combobox with a listbox popup. Prefer a visible `la
 ```
 
 The combobox keeps DOM focus while its popup is open and exposes the active option with `aria-activedescendant`. It supports arrow-key navigation, Home and End, typeahead, and Enter or Space to open or select. Escape closes the list.
+
+## Validation state
+
+Select accepts `aria-invalid` and combines it with its own `error`: the control is invalid when either is set, and `data-invalid` always matches. An external `aria-describedby` is kept ahead of Select's own description and error relations, so it composes with `FormField`.
