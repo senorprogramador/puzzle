@@ -1,12 +1,14 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { ComponentPropsWithRef } from "react";
-import { afterEach, describe, expect, it } from "vitest";
+import type { ComponentPropsWithRef, CSSProperties } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Theme } from "@puzzle/theme";
 import { AppBar } from "./index";
+import { PageLayout } from "../page-layout";
 
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
 });
 
 const navigationItems = [
@@ -16,6 +18,48 @@ const navigationItems = [
 ];
 
 describe("AppBar", () => {
+  it("measures a sticky app bar inside the page header and restores the offset", () => {
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 1000, 80),
+    );
+
+    const { container, rerender } = render(
+      <PageLayout>
+        <PageLayout.Header><AppBar title="Puzzle" sticky /></PageLayout.Header>
+        <PageLayout.Main>Content</PageLayout.Main>
+      </PageLayout>,
+    );
+    const layout = container.querySelector<HTMLElement>("[data-puzzle-page-layout]")!;
+
+    expect(layout.style.getPropertyValue("--puzzle-sticky-offset")).toBe("80px");
+
+    rerender(
+      <PageLayout>
+        <PageLayout.Header><AppBar title="Puzzle" /></PageLayout.Header>
+        <PageLayout.Main>Content</PageLayout.Main>
+      </PageLayout>,
+    );
+
+    expect(layout.style.getPropertyValue("--puzzle-sticky-offset")).toBe("");
+  });
+
+  it("does not let a content example overwrite the page header offset", () => {
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 1000, 80),
+    );
+
+    const { container } = render(
+      <PageLayout style={{ "--puzzle-sticky-offset": "64px" } as CSSProperties}>
+        <PageLayout.Main><AppBar title="Example" sticky /></PageLayout.Main>
+      </PageLayout>,
+    );
+
+    expect(
+      container.querySelector<HTMLElement>("[data-puzzle-page-layout]")!.style
+        .getPropertyValue("--puzzle-sticky-offset"),
+    ).toBe("64px");
+  });
+
   it("renders the brand as a link labelled by the title", () => {
     render(<AppBar title="Puzzle" logoHref="/home" />);
 

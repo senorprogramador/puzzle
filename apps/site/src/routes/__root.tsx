@@ -111,7 +111,7 @@ function RootDocument({
           }}
         >
           <PageLayout>
-            <PageLayout.Header>
+            <PageLayout.Header className="puzzle-site-header">
               <AppBar
                 logo={
                   <img

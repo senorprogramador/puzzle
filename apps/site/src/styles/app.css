@@ -28,6 +28,20 @@
     --font-sans: var(--puzzle-font-family-body);
 }
 
+.puzzle-site-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--puzzle-z-index-navigation);
+}
+
+.puzzle-site-docs {
+    --fd-banner-height: var(--puzzle-sticky-offset);
+}
+
+.puzzle-site-docs #nd-subnav {
+    top: var(--puzzle-sticky-offset);
+}
+
 /* The docs sidebar is disabled; hide its leftover mobile trigger. */
 [aria-controls="nd-sidebar-mobile"] {
     display: none;

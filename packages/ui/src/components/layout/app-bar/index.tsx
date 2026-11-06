@@ -73,7 +73,12 @@ const AppBar = <T,>({
     const pageLayout = appBar.closest<HTMLElement>("[data-puzzle-page-layout]");
 
     // AppBars inside previews must not overwrite the page offset.
-    if (pageLayout && appBar.parentElement !== pageLayout) return;
+    const parent = appBar.parentElement;
+    const isPageHeader =
+      parent?.classList.contains("puzzle-page-layout__header") &&
+      parent.parentElement === pageLayout;
+
+    if (pageLayout && parent !== pageLayout && !isPageHeader) return;
 
     const scope = pageLayout ?? appBar.ownerDocument.documentElement;
     const property = "--puzzle-sticky-offset";

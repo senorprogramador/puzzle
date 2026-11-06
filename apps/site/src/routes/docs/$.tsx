@@ -61,6 +61,7 @@ function Page() {
   return (
     <DocsLayout
       {...baseOptions()}
+      containerProps={{ className: "puzzle-site-docs" }}
       tree={data.pageTree}
       sidebar={{ enabled: false }}
     >

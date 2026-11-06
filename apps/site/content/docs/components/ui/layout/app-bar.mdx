@@ -46,4 +46,4 @@ The app bar adapts its navigation to a mobile drawer. Resize the preview to see 
 | `ariaLabel` | `string` | `"Main navigation"` | Accessible navigation name. |
 | `className` | `string` | - | Root styling hook. |
 
-Use descriptive destinations and label icon-only actions. Place sticky bars in `PageLayout.Header` to scope their layout offset to that page.
+Use descriptive destinations and label icon-only actions. Place sticky bars in `PageLayout.Header` to scope their measured layout offset to that page. Make the header region itself sticky (`position: sticky; top: 0`) when it wraps the bar, so the wrapper does not limit its sticky travel.
