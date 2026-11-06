@@ -19,10 +19,17 @@ const isHorizontal = (position: ResizePosition) =>
 const getDirection = (position: ResizePosition) =>
   position === "left" || position === "top" ? 1 : -1;
 
-const getViewportMax = (position: ResizePosition, margin: number) =>
+// Uses the window that owns the element, which may belong to another document.
+const getViewportMax = (
+  position: ResizePosition,
+  margin: number,
+  ownerWindow: Window,
+) =>
   Math.max(
     margin,
-    (isHorizontal(position) ? window.innerWidth : window.innerHeight) - margin,
+    (isHorizontal(position)
+      ? ownerWindow.innerWidth
+      : ownerWindow.innerHeight) - margin,
   );
 
 type UseResizeBarOptions = {
@@ -40,6 +47,7 @@ const useResizeBar = (
   const resizeRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<number | null>(null);
   const [measured, setMeasured] = useState<number | null>(null);
+  const [viewportMax, setViewportMax] = useState<number | null>(null);
 
   const measure = useCallback(() => {
     const panel = resizeRef.current?.parentElement;
@@ -68,14 +76,30 @@ const useResizeBar = (
     }
   }, [active, size, position, measure]);
 
+  useLayoutEffect(() => {
+    const ownerWindow = resizeRef.current?.ownerDocument.defaultView;
+
+    if (!active || !ownerWindow) return;
+
+    const update = () =>
+      setViewportMax(getViewportMax(position, margin, ownerWindow));
+
+    update();
+    ownerWindow.addEventListener("resize", update);
+
+    return () => ownerWindow.removeEventListener("resize", update);
+  }, [active, position, margin]);
+
   useEffect(() => {
     if (!active) return;
 
     const element = resizeRef.current;
+    const ownerDocument = element?.ownerDocument;
+    const ownerWindow = ownerDocument?.defaultView;
 
-    if (!element) return;
+    if (!element || !ownerDocument || !ownerWindow) return;
 
-    const body = element.ownerDocument.body;
+    const body = ownerDocument.body;
     let activePointerId: number | null = null;
     let startPointer = 0;
     let startSize = 0;
@@ -130,7 +154,7 @@ const useResizeBar = (
       setSize(
         Math.min(
           Math.max(0, Math.round(startSize + delta)),
-          getViewportMax(position, margin),
+          getViewportMax(position, margin, ownerWindow),
         ),
       );
     };
@@ -156,8 +180,7 @@ const useResizeBar = (
     };
   }, [position, active, margin]);
 
-  const max =
-    typeof window === "undefined" ? min : getViewportMax(position, margin);
+  const max = Math.max(min, viewportMax ?? min);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     const current = size ?? measured ?? measure();

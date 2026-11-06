@@ -1,0 +1,12 @@
+---
+title: Tooltip
+description: Short, non-interactive supplementary information for a trigger.
+---
+
+Tooltip opens on hover and keyboard focus and closes on pointer leave, blur or Escape. The popup has `role="tooltip"` and is linked to the trigger with `aria-describedby`; an existing `aria-describedby` on the trigger is kept.
+
+```tsx
+<Tooltip trigger={<Button>Save</Button>}>Saves a draft</Tooltip>
+```
+
+Tooltip content must not be interactive: keyboard users cannot reach it, because it closes as soon as focus leaves the trigger. Use [Popover](/docs/components/ui/overlays/popover) for links, buttons, form controls or a close button.

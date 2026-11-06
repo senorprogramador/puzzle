@@ -97,18 +97,46 @@ describe("Tooltip", () => {
     );
   });
 
-  it("keeps the close button outside the tooltip element", async () => {
+  it("renders only non-interactive content in the tooltip popup", async () => {
     render(
-      <Tooltip trigger={<button type="button">Trigger</button>} closable defaultOpen>
+      <Tooltip trigger={<button type="button">Trigger</button>} defaultOpen>
         Hint
       </Tooltip>,
     );
 
     const tooltip = await screen.findByRole("tooltip", { hidden: true });
-    const close = document.querySelector(".puzzle-tooltip__close");
+    const popup = tooltip.closest(".puzzle-popout__content") as HTMLElement;
 
     expect(tooltip).toHaveTextContent("Hint");
-    expect(close).toBeTruthy();
-    expect(tooltip).not.toContainElement(close as HTMLElement);
+    expect(
+      popup.querySelector("button, a[href], input, [tabindex]"),
+    ).toBeNull();
+    expect(
+      screen
+        .getByRole("button", { name: "Trigger" })
+        .getAttribute("aria-describedby"),
+    ).toBe(tooltip.id);
+  });
+
+  it("stays open while the trigger is focused and closes when focus leaves", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <>
+        <Tooltip trigger={<button type="button">Trigger</button>}>Hint</Tooltip>
+        <button type="button">Next</button>
+      </>,
+    );
+
+    await user.tab();
+    await screen.findByRole("tooltip", { hidden: true });
+
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Next" })).toHaveFocus();
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("tooltip", { hidden: true }),
+      ).not.toBeInTheDocument(),
+    );
   });
 });

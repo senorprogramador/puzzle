@@ -1,0 +1,62 @@
+.puzzle-popover {
+  display: flex;
+  flex-direction: column;
+  gap: var(--puzzle-space-2, 0.5rem);
+
+  min-width: 0;
+  max-width: min(22.5rem, calc(100vw - 2rem));
+
+  outline: none;
+}
+
+.puzzle-popover__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-popover__title {
+  min-width: 0;
+  font-size: var(--puzzle-font-size-base, 1rem);
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+  overflow-wrap: anywhere;
+}
+
+.puzzle-popover__close {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  width: 2rem;
+  height: 2rem;
+  margin: calc(var(--puzzle-space-1, 0.25rem) * -1)
+    calc(var(--puzzle-space-1, 0.25rem) * -1) 0 auto;
+  padding: 0;
+
+  border: 1px solid transparent;
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  font-size: 1.5rem;
+  line-height: var(--puzzle-font-line-height-none, 1);
+
+  cursor: pointer;
+}
+
+.puzzle-popover__close:hover {
+  background: var(--puzzle-color-surface-sunken, #f1eee6);
+}
+
+.puzzle-popover__close:focus-visible {
+  outline: 2px solid var(--puzzle-color-ring, #2563eb);
+  outline-offset: 2px;
+}
+
+.puzzle-popover__body {
+  min-width: 0;
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}

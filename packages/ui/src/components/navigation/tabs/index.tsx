@@ -223,23 +223,20 @@ const TabsRoot = ({
           const { id, children: content } = tab.props;
           const isActive = id === currentActiveId;
 
-          if (!forceMountContent && !isActive) {
-            return null;
-          }
-
+          // The panel element always exists so every tab's aria-controls
+          // resolves; only inactive content is unmounted.
           return (
             <div
               key={id}
               id={getPanelId(id)}
               role="tabpanel"
               aria-labelledby={getTabId(id)}
-              aria-hidden={!isActive}
               hidden={!isActive}
               tabIndex={0}
               className="puzzle-tabs__panel"
               data-state={isActive ? "active" : "inactive"}
             >
-              {content}
+              {forceMountContent || isActive ? content : null}
             </div>
           );
         })}

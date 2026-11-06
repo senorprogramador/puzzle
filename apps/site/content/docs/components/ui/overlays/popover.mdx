@@ -1,0 +1,21 @@
+---
+title: Popover
+description: A non-modal dialog anchored to a trigger, for interactive content.
+---
+
+Popover opens on click and renders its content in a `role="dialog"` element. The trigger gets `aria-haspopup="dialog"`, `aria-expanded` and, while open, `aria-controls`. Name the dialog with a visible `title`, or with `aria-label` when there is no title.
+
+```tsx
+<Popover trigger={<Button>Filters</Button>} title="Filters" closable>
+  <Checkbox label="Only available" />
+</Popover>
+```
+
+## Focus behavior
+
+- Opening moves focus to the first focusable element, or to the dialog itself. A popover that is open on first render does not take focus.
+- Tab from the trigger enters the popover; Shift+Tab from its first element returns to the trigger.
+- Tabbing past the last element, Escape and the close button close the popover and return focus to the trigger.
+- Moving focus elsewhere or clicking outside closes it.
+
+Use [Tooltip](/docs/components/ui/overlays/tooltip) for short, non-interactive hints.

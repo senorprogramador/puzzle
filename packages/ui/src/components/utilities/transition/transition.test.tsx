@@ -1,4 +1,10 @@
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Transition } from "./index";
 
@@ -89,5 +95,81 @@ describe("Transition", () => {
     vi.useRealTimers();
 
     expect(onEntered).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not restart the enter transition when onEnter changes", () => {
+    const firstOnEnter = vi.fn();
+    const nextOnEnter = vi.fn();
+
+    vi.useFakeTimers();
+    const { rerender } = render(
+      <Transition visible onEnter={firstOnEnter}>
+        <div data-testid="child" />
+      </Transition>,
+    );
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    const child = screen.getByTestId("child");
+    expect(child).toHaveClass("puzzle-transition-fade-active");
+
+    rerender(
+      <Transition visible onEnter={nextOnEnter}>
+        <div data-testid="child" />
+      </Transition>,
+    );
+    vi.useRealTimers();
+
+    expect(firstOnEnter).toHaveBeenCalledTimes(1);
+    expect(nextOnEnter).not.toHaveBeenCalled();
+    expect(child).toHaveClass("puzzle-transition-fade-active");
+  });
+
+  it("keeps the exit timer and calls the latest onExited when callbacks change", () => {
+    const onExit = vi.fn();
+    const firstOnExited = vi.fn();
+    const nextOnExited = vi.fn();
+
+    vi.useFakeTimers();
+    const { rerender } = render(
+      <Transition visible duration={300}>
+        <div data-testid="child" />
+      </Transition>,
+    );
+
+    rerender(
+      <Transition
+        visible={false}
+        duration={300}
+        onExit={onExit}
+        onExited={firstOnExited}
+      >
+        <div data-testid="child" />
+      </Transition>,
+    );
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+
+    rerender(
+      <Transition
+        visible={false}
+        duration={300}
+        onExit={() => onExit()}
+        onExited={nextOnExited}
+      >
+        <div data-testid="child" />
+      </Transition>,
+    );
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    vi.useRealTimers();
+
+    expect(onExit).toHaveBeenCalledTimes(1);
+    expect(firstOnExited).not.toHaveBeenCalled();
+    expect(nextOnExited).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("child")).not.toBeInTheDocument();
   });
 });

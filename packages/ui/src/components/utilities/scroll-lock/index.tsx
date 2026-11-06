@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 type ScrollLockProps = {
   /** Whether body scrolling should be locked. */
@@ -215,15 +215,20 @@ const unlockScroll = (document: Document) => {
 };
 
 const ScrollLock = ({ enabled = true }: ScrollLockProps) => {
+  const markerRef = useRef<HTMLSpanElement>(null);
+
   useEffect(() => {
-    if (!enabled) {
+    const ownerDocument = markerRef.current?.ownerDocument;
+
+    if (!enabled || !ownerDocument) {
       return;
     }
 
-    return lockScroll(window.document);
+    return lockScroll(ownerDocument);
   }, [enabled]);
 
-  return null;
+  // The marker identifies the document this lock is rendered in.
+  return <span ref={markerRef} hidden />;
 };
 
 export { ScrollLock, type ScrollLockProps };

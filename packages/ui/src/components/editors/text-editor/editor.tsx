@@ -181,7 +181,7 @@ const pointFromDom = (
 };
 
 const selectionFromDom = (root: HTMLElement): TextSelection | null => {
-  const selection = window.getSelection();
+  const selection = root.ownerDocument.defaultView?.getSelection();
   if (!selection?.anchorNode || !selection.focusNode) return null;
   if (
     !root.contains(selection.anchorNode) ||
@@ -293,7 +293,7 @@ const setDomSelection = (root: HTMLElement, selection: TextSelection) => {
 
   const anchor = domPointFromPoint(anchorBlock, selection.anchor.offset);
   const focus = domPointFromPoint(focusBlock, selection.focus.offset);
-  const domSelection = window.getSelection();
+  const domSelection = root.ownerDocument.defaultView?.getSelection();
   if (!domSelection) return;
 
   try {
@@ -307,7 +307,7 @@ const setDomSelection = (root: HTMLElement, selection: TextSelection) => {
       return;
     }
 
-    const range = window.document.createRange();
+    const range = root.ownerDocument.createRange();
     const ordered = getOrderedSelection(selection);
     const startBlock = root.children.item(
       ordered.start.block,
@@ -334,10 +334,11 @@ const setDomSelection = (root: HTMLElement, selection: TextSelection) => {
  * must therefore not reconcile those descendants as React-owned nodes.
  */
 const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
-  const fragment = window.document.createDocumentFragment();
+  const ownerDocument = root.ownerDocument;
+  const fragment = ownerDocument.createDocumentFragment();
 
   for (const block of textDocument.content) {
-    const blockElement = window.document.createElement("p");
+    const blockElement = ownerDocument.createElement("p");
     blockElement.className = `puzzle-text-editor__block puzzle-typography-${block.variant}`;
     blockElement.dataset.puzzleEditorBlock = "true";
     blockElement.dataset.puzzleVariant = block.variant;
@@ -348,19 +349,18 @@ const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
     if (block.listType) blockElement.dataset.puzzleListType = block.listType;
 
     if (!block.children.length) {
-      const placeholder = window.document.createElement("br");
+      const placeholder = ownerDocument.createElement("br");
       placeholder.dataset.puzzlePlaceholder = "true";
       blockElement.appendChild(placeholder);
     } else {
       for (const inline of block.children) {
-        const inlineElement = window.document.createElement("span");
-        const content = window.document.createDocumentFragment();
+        const inlineElement = ownerDocument.createElement("span");
+        const content = ownerDocument.createDocumentFragment();
         const parts = inline.text.split("\n");
 
         parts.forEach((part, index) => {
-          if (index > 0)
-            content.appendChild(window.document.createElement("br"));
-          if (part) content.appendChild(window.document.createTextNode(part));
+          if (index > 0) content.appendChild(ownerDocument.createElement("br"));
+          if (part) content.appendChild(ownerDocument.createTextNode(part));
         });
 
         let node: Node = content;
@@ -373,7 +373,7 @@ const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
                 : mark === "underline"
                   ? "u"
                   : "s";
-          const wrapper = window.document.createElement(tagName);
+          const wrapper = ownerDocument.createElement(tagName);
           wrapper.appendChild(node);
           node = wrapper;
         }
@@ -835,6 +835,9 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
     }, [autoFocus, focus]);
 
     useEffect(() => {
+      const ownerDocument = editableRef.current?.ownerDocument;
+      if (!ownerDocument) return;
+
       const onSelectionChangeInDocument = () => {
         const root = editableRef.current;
         if (!root) return;
@@ -852,12 +855,12 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         updateSelection(next);
       };
 
-      window.document.addEventListener(
+      ownerDocument.addEventListener(
         "selectionchange",
         onSelectionChangeInDocument,
       );
       return () =>
-        window.document.removeEventListener(
+        ownerDocument.removeEventListener(
           "selectionchange",
           onSelectionChangeInDocument,
         );

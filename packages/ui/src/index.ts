@@ -297,6 +297,7 @@ export {
 } from "./components/overlays/popout";
 
 export { Portal, type PortalProps } from "./components/overlays/portal";
+export { Popover, type PopoverProps } from "./components/overlays/popover";
 export {
   PortalTarget,
   type PortalTargetProps,

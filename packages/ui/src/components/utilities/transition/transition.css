@@ -1,146 +1,157 @@
 .puzzle-transition-fade-from {
-    opacity: 0;
+  opacity: 0;
 }
 
 .puzzle-transition-fade-active,
 .puzzle-transition-fade-exit {
-    transition: opacity var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
+  transition: opacity var(--puzzle-duration-normal, 300ms)
+    var(--puzzle-easing-out, ease-out);
 }
 
 .puzzle-transition-fade-active {
-    opacity: 1;
+  opacity: 1;
 }
 
 .puzzle-transition-fade-exit {
-    opacity: 0;
+  opacity: 0;
 }
 
 .puzzle-transition-slide-in-up-from {
-    transform: translateY(100%);
-    opacity: 0;
+  transform: translateY(100%);
+  opacity: 0;
 }
 
 .puzzle-transition-slide-in-up-active,
 .puzzle-transition-slide-in-up-exit {
-    transition:
-        transform var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out),
-        opacity var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
+  transition:
+    transform var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out),
+    opacity var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out);
 }
 
 .puzzle-transition-slide-in-up-active {
-    transform: translateY(0);
-    opacity: 1;
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .puzzle-transition-slide-in-up-exit {
-    transform: translateY(100%);
-    opacity: 0;
+  transform: translateY(100%);
+  opacity: 0;
 }
 
 .puzzle-transition-slide-in-down-from {
-    transform: translateY(-100%);
-    opacity: 0;
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 .puzzle-transition-slide-in-down-active,
 .puzzle-transition-slide-in-down-exit {
-    transition:
-        transform var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out),
-        opacity var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
+  transition:
+    transform var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out),
+    opacity var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out);
 }
 
 .puzzle-transition-slide-in-down-active {
-    transform: translateY(0);
-    opacity: 1;
+  transform: translateY(0);
+  opacity: 1;
 }
 
 .puzzle-transition-slide-in-down-exit {
-    transform: translateY(-100%);
-    opacity: 0;
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 .puzzle-transition-slide-in-left-from {
-    transform: translateX(100%);
-    opacity: 0;
+  transform: translateX(100%);
+  opacity: 0;
 }
 
 .puzzle-transition-slide-in-left-active,
 .puzzle-transition-slide-in-left-exit {
-    transition:
-        transform var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out),
-        opacity var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
+  transition:
+    transform var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out),
+    opacity var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out);
 }
 
 .puzzle-transition-slide-in-left-active {
-    transform: translateX(0);
-    opacity: 1;
+  transform: translateX(0);
+  opacity: 1;
 }
 
 .puzzle-transition-slide-in-left-exit {
-    transform: translateX(100%);
-    opacity: 0;
+  transform: translateX(100%);
+  opacity: 0;
 }
 
 .puzzle-transition-slide-in-right-from {
-    transform: translateX(-100%);
-    opacity: 0;
+  transform: translateX(-100%);
+  opacity: 0;
 }
 
 .puzzle-transition-slide-in-right-active,
 .puzzle-transition-slide-in-right-exit {
-    transition:
-        transform var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out),
-        opacity var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
+  transition:
+    transform var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out),
+    opacity var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out);
 }
 
 .puzzle-transition-slide-in-right-active {
-    transform: translateX(0);
-    opacity: 1;
+  transform: translateX(0);
+  opacity: 1;
 }
 
 .puzzle-transition-slide-in-right-exit {
-    transform: translateX(-100%);
-    opacity: 0;
+  transform: translateX(-100%);
+  opacity: 0;
 }
 
 /* Accordion */
 .puzzle-transition-accordion-from,
 .puzzle-transition-accordion-exit {
-    grid-template-rows: 0fr;
-    opacity: 0;
+  grid-template-rows: 0fr;
+  opacity: 0;
 }
 
 .puzzle-transition-accordion-active {
-    grid-template-rows: 1fr;
-    opacity: 1;
+  grid-template-rows: 1fr;
+  opacity: 1;
 }
 
 .puzzle-transition-accordion-from,
 .puzzle-transition-accordion-active,
 .puzzle-transition-accordion-exit {
-    display: grid;
-    min-height: 0;
-    overflow: hidden;
+  display: grid;
+  min-height: 0;
+  overflow: hidden;
 
-    transition:
-        grid-template-rows var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out),
-        opacity var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
+  transition:
+    grid-template-rows var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out),
+    opacity var(--puzzle-duration-normal, 300ms)
+      var(--puzzle-easing-out, ease-out);
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .puzzle-transition-fade-active,
-    .puzzle-transition-fade-exit,
-    .puzzle-transition-slide-in-up-active,
-    .puzzle-transition-slide-in-up-exit,
-    .puzzle-transition-slide-in-down-active,
-    .puzzle-transition-slide-in-down-exit,
-    .puzzle-transition-slide-in-left-active,
-    .puzzle-transition-slide-in-left-exit,
-    .puzzle-transition-slide-in-right-active,
-    .puzzle-transition-slide-in-right-exit,
-    .puzzle-transition-accordion-from,
-    .puzzle-transition-accordion-active,
-    .puzzle-transition-accordion-exit {
-        transition: none;
-    }
+  .puzzle-transition-fade-active,
+  .puzzle-transition-fade-exit,
+  .puzzle-transition-slide-in-up-active,
+  .puzzle-transition-slide-in-up-exit,
+  .puzzle-transition-slide-in-down-active,
+  .puzzle-transition-slide-in-down-exit,
+  .puzzle-transition-slide-in-left-active,
+  .puzzle-transition-slide-in-left-exit,
+  .puzzle-transition-slide-in-right-active,
+  .puzzle-transition-slide-in-right-exit,
+  .puzzle-transition-accordion-from,
+  .puzzle-transition-accordion-active,
+  .puzzle-transition-accordion-exit {
+    transition: none;
+  }
 }

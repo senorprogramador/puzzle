@@ -125,22 +125,20 @@ Use `disabled` to disable the whole group: the group gets `aria-disabled="true"`
 </ButtonGroup>
 ```
 
-Only direct children are disabled; controls nested deeper must be disabled separately.
-
 ## API
 
 ### Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `as` | `ElementType` | `"div"` | Element type used to render the group. |
-| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Visual direction of the group. |
-| `attached` | `boolean` | `false` | Removes the gap and visually joins adjacent children. |
-| `fullWidth` | `boolean` | `false` | Makes the group fill its container and lets its children flex to fill the available space. |
-| `disabled` | `boolean` | `false` | Marks the group with `aria-disabled`; does not disable children. |
-| `spacing` | `number \| string` | — | Gap between children. Numbers are interpreted as pixels; strings are passed as CSS values. |
-| `className` | `string` | — | Additional CSS class names. |
-| `children` | `ReactNode` | — | Content displayed inside the group. |
+| Prop          | Type                         | Default        | Description                                                                                |
+| ------------- | ---------------------------- | -------------- | ------------------------------------------------------------------------------------------ |
+| `as`          | `ElementType`                | `"div"`        | Element type used to render the group.                                                     |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Visual direction of the group.                                                             |
+| `attached`    | `boolean`                    | `false`        | Removes the gap and visually joins adjacent children.                                      |
+| `fullWidth`   | `boolean`                    | `false`        | Makes the group fill its container and lets its children flex to fill the available space. |
+| `disabled`    | `boolean`                    | `false`        | Marks the group with `aria-disabled`; does not disable children.                           |
+| `spacing`     | `number \| string`           | —              | Gap between children. Numbers are interpreted as pixels; strings are passed as CSS values. |
+| `className`   | `string`                     | —              | Additional CSS class names.                                                                |
+| `children`    | `ReactNode`                  | —              | Content displayed inside the group.                                                        |
 
 ### Element props
 

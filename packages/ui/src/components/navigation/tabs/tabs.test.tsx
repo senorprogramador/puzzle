@@ -229,11 +229,50 @@ describe("Tabs", () => {
     expect(screen.getByText("Profile content")).toBeInTheDocument();
   });
 
-  it("only mounts the active panel by default", () => {
+  it("only mounts the active panel's content by default", () => {
     renderTabs();
 
     expect(screen.getByText("Overview content")).toBeInTheDocument();
     expect(screen.queryByText("Settings content")).toBeNull();
+  });
+
+  it("keeps every panel element so aria-controls always resolves", () => {
+    renderTabs();
+
+    for (const tab of screen.getAllByRole("tab")) {
+      const panel = document.getElementById(
+        tab.getAttribute("aria-controls") ?? "",
+      );
+
+      expect(panel).not.toBeNull();
+      expect(panel).toHaveAttribute("role", "tabpanel");
+      expect(panel).toHaveAttribute("aria-labelledby", tab.id);
+    }
+  });
+
+  it("hides inactive panels and leaves them empty", () => {
+    renderTabs();
+
+    const settings = screen.getByRole("tab", { name: "Settings" });
+    const panel = document.getElementById(
+      settings.getAttribute("aria-controls") ?? "",
+    ) as HTMLElement;
+
+    expect(panel).not.toBeVisible();
+    expect(panel).toHaveAttribute("hidden");
+    expect(panel).toBeEmptyDOMElement();
+    expect(screen.getAllByRole("tabpanel")).toHaveLength(1);
+  });
+
+  it("mounts panel content when its tab is activated", async () => {
+    const user = userEvent.setup();
+
+    renderTabs();
+
+    await user.click(screen.getByRole("tab", { name: "Settings" }));
+
+    expect(screen.getByRole("tabpanel")).toHaveTextContent("Settings content");
+    expect(screen.queryByText("Overview content")).toBeNull();
   });
 
   it("links each tab to its panel", () => {

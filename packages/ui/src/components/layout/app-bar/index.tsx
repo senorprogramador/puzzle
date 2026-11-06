@@ -75,7 +75,7 @@ const AppBar = <T,>({
     // AppBars inside previews must not overwrite the page offset.
     if (pageLayout && appBar.parentElement !== pageLayout) return;
 
-    const scope = pageLayout ?? document.documentElement;
+    const scope = pageLayout ?? appBar.ownerDocument.documentElement;
     const property = "--puzzle-sticky-offset";
 
     const previousValue = scope.style.getPropertyValue(property);
@@ -90,7 +90,9 @@ const AppBar = <T,>({
 
     updateOffset();
 
-    const observer = new ResizeObserver(updateOffset);
+    const ObserverImpl =
+      appBar.ownerDocument.defaultView?.ResizeObserver ?? ResizeObserver;
+    const observer = new ObserverImpl(updateOffset);
     observer.observe(appBar);
 
     return () => {

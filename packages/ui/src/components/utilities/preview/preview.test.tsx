@@ -140,4 +140,64 @@ describe("Preview", () => {
       expect(screen.getByRole("tab", { name: "Code" })).toHaveFocus();
     });
   });
+
+  describe("device keyboard navigation", () => {
+    const getDevice = (name: string) => screen.getByRole("button", { name });
+
+    it("keeps only the selected device in the tab order", () => {
+      render(<Preview defaultDevice="tablet">Demo</Preview>);
+
+      expect(getDevice("Mobile")).toHaveAttribute("tabindex", "-1");
+      expect(getDevice("Tablet")).toHaveAttribute("tabindex", "0");
+      expect(getDevice("Desktop")).toHaveAttribute("tabindex", "-1");
+    });
+
+    it("moves focus with the arrow keys without changing the selection", async () => {
+      const user = userEvent.setup();
+
+      render(<Preview>Demo</Preview>);
+
+      getDevice("Mobile").focus();
+      await user.keyboard("{ArrowRight}");
+
+      expect(getDevice("Tablet")).toHaveFocus();
+      expect(getDevice("Mobile")).toHaveAttribute("aria-pressed", "true");
+      expect(getDevice("Tablet")).toHaveAttribute("aria-pressed", "false");
+
+      await user.keyboard("{End}");
+      expect(getDevice("Desktop")).toHaveFocus();
+
+      await user.keyboard("{ArrowRight}");
+      expect(getDevice("Mobile")).toHaveFocus();
+    });
+
+    it("selects the focused device with Enter or Space", async () => {
+      const user = userEvent.setup();
+
+      render(<Preview>Demo</Preview>);
+
+      getDevice("Mobile").focus();
+      await user.keyboard("{ArrowRight}{Enter}");
+      expect(getDevice("Tablet")).toHaveAttribute("aria-pressed", "true");
+
+      await user.keyboard("{ArrowRight} ");
+      expect(getDevice("Desktop")).toHaveAttribute("aria-pressed", "true");
+      expect(getDevice("Tablet")).toHaveAttribute("aria-pressed", "false");
+    });
+
+    it("mirrors the arrow keys in right-to-left contexts", async () => {
+      const user = userEvent.setup();
+
+      render(
+        <div dir="rtl">
+          <Preview>Demo</Preview>
+        </div>,
+      );
+
+      getDevice("Mobile").focus();
+      await user.keyboard("{ArrowLeft}");
+
+      expect(getDevice("Tablet")).toHaveFocus();
+    });
+  });
 });

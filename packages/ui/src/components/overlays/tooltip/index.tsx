@@ -16,13 +16,7 @@ import {
   type RefAttributes,
 } from "react";
 import { cn } from "@puzzle/core";
-import {
-  Popout,
-  type PopoutAction,
-  type PopoutAlignment,
-  type PopoutPosition,
-} from "../popout";
-import { Stack } from "../../layout/stack";
+import { Popout, type PopoutAlignment, type PopoutPosition } from "../popout";
 import "./tooltip.css";
 
 type TooltipTriggerProps = HTMLAttributes<HTMLElement> &
@@ -35,10 +29,12 @@ type TooltipArrowStyle = {
   style: CSSProperties;
 };
 
+/**
+ * Non-interactive supplementary information shown on hover and keyboard focus.
+ * Use Popover for content that contains links, buttons or other controls.
+ */
 type TooltipProps = {
   trigger: ReactElement<TooltipTriggerProps>;
-  action?: PopoutAction;
-  closable?: boolean;
   children: ReactNode;
   position?: PopoutPosition;
   align?: PopoutAlignment;
@@ -55,8 +51,6 @@ type TooltipContentProps = {
   id?: string;
   anchorRef: React.RefObject<HTMLElement | null>;
   position: PopoutPosition;
-  closable?: boolean;
-  onOpenChange?: (open: boolean) => void;
   children: ReactNode;
   className?: string;
 };
@@ -148,8 +142,6 @@ const TooltipContent = ({
   id,
   anchorRef,
   position,
-  closable,
-  onOpenChange,
   children,
   className,
 }: TooltipContentProps) => {
@@ -244,28 +236,13 @@ const TooltipContent = ({
   }, [anchorRef, updateArrowPosition]);
 
   return (
-    <Stack
+    <div
       ref={contentRef}
-      direction="row"
-      gap="sm"
+      role="tooltip"
+      id={id}
       className={cn("puzzle-tooltip", className)}
     >
-      <span role="tooltip" id={id} className="puzzle-tooltip__text">
-        {children}
-      </span>
-
-      {closable && (
-        <button
-          type="button"
-          className="puzzle-tooltip__close"
-          aria-label="Close"
-          onClick={() => {
-            onOpenChange?.(false);
-          }}
-        >
-          &times;
-        </button>
-      )}
+      {children}
 
       <span
         aria-hidden="true"
@@ -278,7 +255,7 @@ const TooltipContent = ({
           visibility: arrow ? "visible" : "hidden",
         }}
       />
-    </Stack>
+    </div>
   );
 };
 
@@ -287,8 +264,6 @@ const Tooltip = ({
   children,
   position = "bottom",
   align = "center",
-  action = "hover",
-  closable = false,
   offset = arrowSize,
   exitDelay = 100,
   open,
@@ -321,13 +296,12 @@ const Tooltip = ({
     [trigger],
   );
 
-  // Keyboard users get the same tooltip as pointer users on hover tooltips.
-  const opensOnFocus = action === "hover";
-
+  // Keyboard focus is the hover equivalent. The tooltip holds no focusable
+  // content, so leaving the trigger always closes it.
   const handleFocus = (event: FocusEvent<HTMLElement>) => {
     trigger.props.onFocus?.(event);
 
-    if (opensOnFocus && !event.defaultPrevented) {
+    if (!event.defaultPrevented) {
       handleOpenChange(true);
     }
   };
@@ -336,7 +310,6 @@ const Tooltip = ({
     trigger.props.onBlur?.(event);
 
     if (
-      opensOnFocus &&
       !event.defaultPrevented &&
       !event.currentTarget.contains(event.relatedTarget as Node | null)
     ) {
@@ -360,7 +333,7 @@ const Tooltip = ({
       trigger={triggerElement}
       position={position}
       align={align}
-      action={action}
+      action="hover"
       offset={offset}
       exitDelay={exitDelay}
       open={isOpen}
@@ -374,8 +347,6 @@ const Tooltip = ({
         id={tooltipId}
         anchorRef={anchorRef}
         position={position}
-        closable={closable}
-        onOpenChange={handleOpenChange}
         className={className}
       >
         {children}

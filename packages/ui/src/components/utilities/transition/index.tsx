@@ -13,6 +13,7 @@ import {
   type ReactNode,
   type TransitionEventHandler,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -155,6 +156,14 @@ const Transition = <T extends ElementType = "div">({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialRenderRef = useRef(true);
 
+  // Always call the latest callbacks without making them effect dependencies,
+  // so passing a new callback never restarts a running transition.
+  const callbacksRef = useRef({ onEnter, onEntered, onExit, onExited });
+
+  useLayoutEffect(() => {
+    callbacksRef.current = { onEnter, onEntered, onExit, onExited };
+  });
+
   const clearTimers = () => {
     if (frameRef.current !== null) {
       cancelAnimationFrame(frameRef.current);
@@ -199,7 +208,7 @@ const Transition = <T extends ElementType = "div">({
       setMounted(true);
       setPhase("enterFrom");
 
-      onEnter?.();
+      callbacksRef.current.onEnter?.();
 
       // Ensure the browser applies the initial phase before entering.
       frameRef.current = requestAnimationFrame(() => {
@@ -214,7 +223,7 @@ const Transition = <T extends ElementType = "div">({
 
       setPhase("exitTo");
 
-      onExit?.();
+      callbacksRef.current.onExit?.();
 
       // Fallback when transitionend/animationend does not fire.
       timeoutRef.current = setTimeout(() => {
@@ -223,7 +232,7 @@ const Transition = <T extends ElementType = "div">({
         }
 
         setPhase("enterFrom");
-        onExited?.();
+        callbacksRef.current.onExited?.();
       }, duration);
     }
 
@@ -248,7 +257,7 @@ const Transition = <T extends ElementType = "div">({
 
     if (phase === "enterTo") {
       settledPhaseRef.current = phase;
-      onEntered?.();
+      callbacksRef.current.onEntered?.();
     }
 
     if (phase === "exitTo" && !visible) {
@@ -260,7 +269,7 @@ const Transition = <T extends ElementType = "div">({
       }
 
       setPhase("enterFrom");
-      onExited?.();
+      callbacksRef.current.onExited?.();
     }
   };
 

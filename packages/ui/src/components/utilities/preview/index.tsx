@@ -54,6 +54,10 @@ const PREVIEW_DEVICES: Record<PreviewDevice, DeviceConfig> = {
   desktop: { label: "Desktop", width: 1024, height: 768 },
 };
 
+const PREVIEW_DEVICE_ITEMS = (
+  Object.keys(PREVIEW_DEVICES) as PreviewDevice[]
+).map((id) => ({ id }));
+
 const ALIGN_VALUES: Record<PreviewAlign, string> = {
   start: "flex-start",
   center: "center",
@@ -131,9 +135,13 @@ const Preview = ({
     const section = sectionRef.current;
 
     if (section) {
-      setDirection(
-        getComputedStyle(section).direction === "rtl" ? "rtl" : "ltr",
-      );
+      // Computed style covers CSS `direction`; the attribute covers
+      // environments that don't inherit it (such as jsdom).
+      const isRtl =
+        getComputedStyle(section).direction === "rtl" ||
+        section.closest("[dir]")?.getAttribute("dir")?.toLowerCase() === "rtl";
+
+      setDirection(isRtl ? "rtl" : "ltr");
     }
   }, []);
 
@@ -141,6 +149,13 @@ const Preview = ({
     items: hasCode ? [{ id: "preview" }, { id: "code" }] : [{ id: "preview" }],
     dir: direction,
     initialActiveId: activeTab,
+  });
+
+  // Arrow keys only move focus between devices; Enter/Space selects one.
+  const deviceFocus = useRovingFocus<HTMLButtonElement>({
+    items: PREVIEW_DEVICE_ITEMS,
+    dir: direction,
+    initialActiveId: device,
   });
 
   const handleTabKeyDown = (
@@ -484,12 +499,18 @@ const Preview = ({
                   (item) => (
                     <button
                       key={item}
+                      ref={deviceFocus.getItemRef(item)}
                       type="button"
                       className={cn(
                         "puzzle-preview__device",
                         device === item && "puzzle-preview__device--active",
                       )}
                       aria-pressed={device === item}
+                      tabIndex={deviceFocus.getItemTabIndex(item)}
+                      onFocus={() => deviceFocus.onItemFocus(item)}
+                      onKeyDown={(event) =>
+                        deviceFocus.onItemKeyDown(event, item)
+                      }
                       onClick={() => setDevice(item)}
                     >
                       {PREVIEW_DEVICES[item].label}

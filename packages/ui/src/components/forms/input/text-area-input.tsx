@@ -38,7 +38,9 @@ const TextAreaInput = ({
 
     element.style.height = "auto";
 
-    const styles = window.getComputedStyle(element);
+    const styles = (element.ownerDocument.defaultView ?? window).getComputedStyle(
+      element,
+    );
 
     const lineHeight = Number.parseFloat(styles.lineHeight) || 20;
 
