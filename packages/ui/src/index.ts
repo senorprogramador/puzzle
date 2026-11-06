@@ -123,6 +123,8 @@ export {
   type CheckboxSize,
 } from "./components/forms/checkbox";
 
+export { FormField, type FormFieldProps } from "./components/forms/form-field";
+
 export {
   NumberInput,
   type NumberInputProps,

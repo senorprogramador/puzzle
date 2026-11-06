@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentPropsWithoutRef, type ReactNode } from "react";
+import { useState, type ComponentPropsWithRef, type ReactNode } from "react";
 
 import { cn } from "@puzzle/core";
 import { Icon } from "@puzzle/icons";
@@ -10,7 +10,7 @@ import "./input.css";
 type TextInputType = "text" | "email" | "password" | "phone";
 
 type TextInputProps = Omit<
-  ComponentPropsWithoutRef<"input">,
+  ComponentPropsWithRef<"input">,
   "type" | "prefix"
 > & {
   type?: TextInputType;
@@ -24,6 +24,7 @@ const TextInput = ({
   suffix,
   className,
   disabled,
+  ref,
   ...props
 }: TextInputProps) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -79,6 +80,7 @@ const TextInput = ({
 
       <input
         {...props}
+        ref={ref}
         type={resolvedType}
         disabled={disabled}
         className="puzzle-input__control"

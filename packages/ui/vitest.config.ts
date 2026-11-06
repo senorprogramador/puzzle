@@ -73,6 +73,7 @@ export default defineConfig({
           ...shared,
           name: "component",
           environment: "jsdom",
+          pool: "vmThreads",
           setupFiles: ["./src/test/setup.ts"],
           include: ["src/**/*.test.{ts,tsx}"],
           exclude: ["src/**/*.unit.test.ts", "src/**/*.browser.test.{ts,tsx}"],

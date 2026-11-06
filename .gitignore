@@ -43,3 +43,5 @@ storybook-static
 collections.json
 extract-icons.ts
 json/
+# Vitest browser artifacts
+.vitest/
