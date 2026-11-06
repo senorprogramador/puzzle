@@ -4,7 +4,9 @@ import {
   TreeView,
   type TreeViewItem,
 } from "@puzzle/ui/components/navigation/tree-view";
-import { useMatchRoute } from "@tanstack/react-router";
+import { useMatchRoute, useNavigate } from "@tanstack/react-router";
+import { Autocomplete, Stack } from "@puzzle/ui";
+import { stringWithCasing } from "@puzzle/core";
 
 const items: TreeViewItem[] = [
   {
@@ -337,42 +339,69 @@ const items: TreeViewItem[] = [
       },
     ],
   },
-];
+] as const;
+
+const findComponentItems = (
+  items: TreeViewItem[] | TreeViewItem,
+): TreeViewItem[] => {
+  if (Array.isArray(items)) {
+    return items.flatMap((item) => findComponentItems(item));
+  }
+  if (items.children) {
+    return findComponentItems(items.children).flat();
+  }
+  return [items];
+};
+
+const componentItems = findComponentItems(items).map((item) => ({
+  label: stringWithCasing(item.id, "pascalcase"),
+  value: item.href,
+}));
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const matchRoute = useMatchRoute();
 
   return (
     <PuzzleSidebar>
-      <TreeView
-        aria-label="Navigation"
-        items={items}
-        selectionMode="single"
-        defaultExpandedIds={[
-          "components",
-          "ui",
-          "actions",
-          "data-display",
-          "forms",
-          "layout",
-          "navigation",
-          "overlays",
-          "typography",
-          "utilities",
-        ]}
-        selectedIds={selectedIds}
-        onSelectionChange={setSelectedIds}
-        getItemActive={(item) =>
-          Boolean(
-            item.href &&
-            matchRoute({
-              to: item.href,
-              fuzzy: false,
-            }),
-          )
-        }
-      />
+      <Stack direction="col">
+        <Autocomplete
+          placeholder="Search"
+          options={componentItems}
+          onChange={(value) => {
+            navigate({ to: value });
+          }}
+        />
+        <TreeView
+          aria-label="Navigation"
+          items={items}
+          selectionMode="single"
+          defaultExpandedIds={[
+            "components",
+            "ui",
+            "actions",
+            "data-display",
+            "forms",
+            "layout",
+            "navigation",
+            "overlays",
+            "typography",
+            "utilities",
+          ]}
+          selectedIds={selectedIds}
+          onSelectionChange={setSelectedIds}
+          getItemActive={(item) =>
+            Boolean(
+              item.href &&
+              matchRoute({
+                to: item.href,
+                fuzzy: false,
+              }),
+            )
+          }
+        />
+      </Stack>
     </PuzzleSidebar>
   );
 };
