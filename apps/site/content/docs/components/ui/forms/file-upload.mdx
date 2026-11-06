@@ -1,0 +1,286 @@
+---
+title: File Upload
+description: Select, validate, and upload files with a keyboard-accessible dropzone.
+---
+
+import { FileUploadProgressExample, FileUploadSelectionExample } from "../../../../../src/components/doc-examples";
+
+File Upload supports native file selection, drag and drop, client-side validation, and optional automatic uploads. Without an `onUpload` handler, accepted files are listed as **Ready to upload**; the component does not send them anywhere.
+
+## Import
+
+```tsx
+import { FileUpload, type FileUploadUploadHandler } from "@puzzle/ui";
+```
+
+## Basic usage
+
+Click the dropzone, press Enter or Space while it is focused, or drop a file onto it. Use `title`, `description`, and `browseLabel` to explain what to select.
+
+<Preview height={440} code={`\
+<FileUpload
+  title="Upload a document"
+  description="Choose a document or drop it here."
+  browseLabel="Choose file"
+/>
+`}>
+  <Section>
+    <FileUpload
+      title="Upload a document"
+      description="Choose a document or drop it here."
+      browseLabel="Choose file"
+    />
+  </Section>
+</Preview>
+
+Single-file mode is the default: a new accepted file replaces the previous selection and aborts its in-progress upload. A rejected file does not replace the current selection. Each listed file has a Remove button.
+
+## Multiple files and selection changes
+
+Set `multiple` to append accepted files across selections. `onChange` receives the entire accepted `File[]` whenever files are added, replaced, or removed, including `[]` after removing the last file.
+
+The file list is managed internally; there are no controlled `value` or `defaultValue` props. Upload progress and completion do not call `onChange`.
+
+<Preview height={560} code={`\
+const [files, setFiles] = useState<File[]>([]);
+
+return (
+  <Stack>
+    <FileUpload multiple onChange={setFiles} />
+    <span role="status">
+      {files.length ? "Selected: " + files.map((file) => file.name).join(", ") : "No files selected"}
+    </span>
+  </Stack>
+);
+`}>
+  <Section><FileUploadSelectionExample /></Section>
+</Preview>
+
+## Accepted types and limits
+
+`accept` is an array of MIME types such as `"application/pdf"` or wildcards such as `"image/*"`. File extensions such as `".png"` are not supported by the component's validator. Files with an empty MIME type are rejected when an accept filter is configured.
+
+`maxFileSize` limits each file, `maxTotalSize` limits the combined selected size, and `maxFiles` limits the count in multiple mode. Sizes are in bytes. Files are evaluated in selection order: valid files that fit are accepted, while rejected files are reported separately.
+
+<Preview height={580} code={`\
+<FileUpload
+  multiple
+  accept={["image/*", "application/pdf"]}
+  maxFiles={3}
+  maxFileSize={2 * 1024 * 1024}
+  maxTotalSize={5 * 1024 * 1024}
+  title="Upload attachments"
+  description="Up to 3 images or PDFs, 2 MB per file and 5 MB total."
+/>
+`}>
+  <Section>
+    <FileUpload
+      multiple
+      accept={["image/*", "application/pdf"]}
+      maxFiles={3}
+      maxFileSize={2 * 1024 * 1024}
+      maxTotalSize={5 * 1024 * 1024}
+      title="Upload attachments"
+      description="Up to 3 images or PDFs, 2 MB per file and 5 MB total."
+    />
+  </Section>
+</Preview>
+
+Rejections appear in an alert with the filename and reason. `onReject` receives the rejected files for that selection. New selections replace previous rejection messages; removing a selected file does not clear them.
+
+```tsx
+<FileUpload
+  accept={["image/png"]}
+  onReject={(rejections) => {
+    for (const { file, code, message } of rejections) {
+      console.warn(file.name, code, message);
+    }
+  }}
+/>
+```
+
+These are client-side checks for user feedback, not a security boundary. Validate file contents, types, sizes, and permissions again on your server.
+
+## Automatic uploads, progress, and retry
+
+Provide `onUpload` to start uploading each accepted file automatically. The handler receives the file and `{ signal, onProgress }`. Report progress from `0` to `100`; resolve the promise on success and reject it on failure. Error messages are displayed alongside a Retry button, which calls the handler again for that file.
+
+The following local simulation intentionally fails each file's first attempt. Select a file to see progress and error feedback, then retry to complete it. **No file data is sent anywhere.**
+
+<Preview height={640} code={`\
+const attemptedFiles = useRef(new WeakSet<File>());
+
+return (
+  <FileUpload
+    multiple
+    description="Local simulation: each file fails once. Retry to complete it. No files are sent."
+    onUpload={async (file, { signal, onProgress }) => {
+      const firstAttempt = !attemptedFiles.current.has(file);
+      attemptedFiles.current.add(file);
+
+      for (const progress of [25, 50, 75, 100]) {
+        await new Promise<void>((resolve) => setTimeout(resolve, 250));
+        signal.throwIfAborted();
+        onProgress(progress);
+
+        if (firstAttempt && progress === 50) {
+          throw new Error("Simulated failure. Retry this upload.");
+        }
+      }
+    }}
+  />
+);
+`}>
+  <Section><FileUploadProgressExample /></Section>
+</Preview>
+
+Files upload independently. Progress is clamped to `0`-`100`, and resolving the handler marks the file complete at `100`. Removing a file, replacing it in single mode, or unmounting aborts its signal; pass that signal to your network client to cancel the actual request. Late results from aborted attempts are ignored.
+
+### Connect your upload endpoint
+
+Use your application's endpoint and handle unsuccessful HTTP responses explicitly. `fetch` does not provide upload-progress events; omit intermediate progress or use a client that supports them.
+
+```tsx
+const uploadFile: FileUploadUploadHandler = async (file, { signal }) => {
+  const body = new FormData();
+  body.append("file", file);
+
+  const response = await fetch("/api/uploads", {
+    method: "POST",
+    body,
+    signal,
+  });
+
+  if (!response.ok) {
+    throw new Error("Upload failed (" + response.status + "). Please retry.");
+  }
+};
+
+<FileUpload multiple onUpload={uploadFile} />
+```
+
+## Labels and validation state
+
+Wrap the component in `FormField` for an external label, supporting text, and validation message. Its label targets the native file input. The supplied description and error relationships are preserved alongside File Upload's own description.
+
+`required` sets the native file input's required attribute. It does **not** validate the internally managed file list: the native input is cleared after selection so the same file can be selected again. For form submission, validate the files received by `onChange` and send them explicitly using `FormData` or your upload handler. Do not rely on `name` and native form serialization to submit the displayed file list.
+
+<Preview height={440} code={`\
+<FormField
+  label="Supporting documents"
+  description="Attach at least one document before continuing."
+  error="A supporting document is required."
+>
+  <FileUpload
+    multiple
+    aria-label="Choose supporting documents"
+    description="Drop your documents here or browse."
+  />
+</FormField>
+`}>
+  <Section>
+    <FormField
+      label="Supporting documents"
+      description="Attach at least one document before continuing."
+      error="A supporting document is required."
+    >
+      <FileUpload
+        multiple
+        aria-label="Choose supporting documents"
+        description="Drop your documents here or browse."
+      />
+    </FormField>
+  </Section>
+</Preview>
+
+## Disabled state
+
+`disabled` prevents file selection, dropping, removal, and retry, and removes the dropzone from keyboard navigation. It does not cancel uploads that are already running.
+
+<Preview height={360} code={`\
+<FileUpload
+  disabled
+  title="Uploads unavailable"
+  description="You do not have permission to add files."
+/>
+`}>
+  <Section>
+    <FileUpload
+      disabled
+      title="Uploads unavailable"
+      description="You do not have permission to add files."
+    />
+  </Section>
+</Preview>
+
+## API
+
+### FileUpload
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `accept` | `readonly string[]` | `[]` | Accepted MIME types or MIME wildcards; empty accepts all types. |
+| `multiple` | `boolean` | `false` | Appends files instead of replacing the selection. |
+| `maxFiles` | `number` | - | Maximum selected count in multiple mode. |
+| `maxFileSize` | `number` | - | Maximum bytes per file. |
+| `maxTotalSize` | `number` | - | Maximum combined selected bytes. |
+| `onChange` | `(files: File[]) => void` | - | Full accepted list after additions, replacement, or removal. |
+| `onReject` | `(rejections: FileUploadRejection[]) => void` | - | Files rejected from the latest selection. |
+| `onUpload` | `FileUploadUploadHandler` | - | Asynchronous upload handler; enables automatic uploading. |
+| `title` | `string` | `"Drop files here"` | Dropzone heading and default accessible name. |
+| `description` | `string` | `"Drag and drop your files here or browse to select them."` | Supporting dropzone text. |
+| `browseLabel` | `string` | `"Browse files"` | Visible picker action text. |
+| `disabled` | `boolean` | `false` | Disables user interaction. |
+| `required` | `boolean` | `false` | Native input required attribute; see form limitations above. |
+| `name` | `string` | - | Native input name; does not serialize the managed list. |
+| `id` | `string` | Generated | Native file input ID for label association. |
+| `className` | `string` | - | Additional class on the outer div. |
+| `style` | `CSSProperties` | - | Styles on the outer div. |
+| `ref` | `Ref<HTMLDivElement>` | - | Ref to the outer div, not the native input. |
+| `aria-label` | `string` | `title` | Accessible name of the focusable dropzone. |
+| `aria-describedby` | `string` | - | External description IDs, merged with the internal description. |
+| `aria-invalid` | `AriaAttributes["aria-invalid"]` | - | Invalid state applied to the native input and root data attribute. |
+
+Other supported div attributes are forwarded to the outer wrapper. `children` and a custom `onDrop` are not part of the API.
+
+### FileUploadUploadContext
+
+`FileUploadUploadHandler` is `(file: File, context: FileUploadUploadContext) => Promise<void>`.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `onProgress` | `(progress: number) => void` | Reports percentage progress; finite values are clamped to `0`-`100`. |
+| `signal` | `AbortSignal` | Signals cancellation on removal, replacement, retry, or unmount. |
+
+### FileUploadRejection
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `file` | `File` | Original rejected file. |
+| `code` | `FileUploadRejectionCode` | Machine-readable rejection reason. |
+| `message` | `string` | User-facing explanation. |
+
+| Rejection code | Meaning |
+| --- | --- |
+| `"file-type"` | MIME type does not match `accept`. |
+| `"file-too-large"` | File exceeds `maxFileSize`. |
+| `"total-too-large"` | Adding the file would exceed `maxTotalSize`. |
+| `"too-many-files"` | Selection exceeds `maxFiles`, or includes extra files in single mode. |
+
+### Exported item types
+
+`FileUploadItem` describes the internal list entries. It is exported for typing, but callbacks receive files or rejections, not item records.
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Generated item identity. |
+| `file` | `File` | Selected file. |
+| `status` | `FileUploadStatus` | `"queued"`, `"uploading"`, `"complete"`, or `"error"`. |
+| `progress` | `number` | Percentage progress. |
+| `error` | `string` | Optional upload failure message. |
+
+## Accessibility
+
+The dropzone is keyboard focusable and uses button semantics. Enter and Space open the native picker; disabled dropzones are skipped by Tab. Removal and retry controls have filename-specific accessible names.
+
+The selected-file list announces additions and removals politely. Rejection messages use an alert, upload errors and completion use status messages, and progress bars have file-specific labels. Drag feedback is supplementary: users can always choose files with the keyboard instead.

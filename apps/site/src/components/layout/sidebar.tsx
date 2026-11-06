@@ -87,6 +87,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/forms/date-picker",
               },
               {
+                id: "file-upload",
+                label: "File Upload",
+                href: "/docs/components/ui/forms/file-upload",
+              },
+              {
                 id: "select",
                 label: "Select",
                 href: "/docs/components/ui/forms/select",
