@@ -106,4 +106,64 @@ describe("Stepper", () => {
       "step",
     );
   });
+
+  it("renders steps as an ordered list", () => {
+    renderSteps();
+
+    expect(screen.getByRole("list").tagName).toBe("OL");
+    expect(screen.getAllByRole("listitem")).toHaveLength(3);
+  });
+
+  it("starts on the first step by default", () => {
+    renderSteps();
+
+    expect(screen.getByText("Details").closest("li")).toHaveAttribute(
+      "aria-current",
+      "step",
+    );
+  });
+
+  it("does not render buttons unless steps are clickable", () => {
+    renderSteps();
+
+    expect(screen.queryAllByRole("button")).toHaveLength(0);
+  });
+
+  it("prevents jumping ahead of the active step in linear mode", async () => {
+    const user = userEvent.setup();
+    const onStepChange = vi.fn();
+
+    renderSteps({ clickable: true, onStepChange });
+
+    await user.click(screen.getByRole("button", { name: /payment/i }));
+
+    expect(onStepChange).not.toHaveBeenCalled();
+  });
+
+  it("allows jumping ahead when linear is off", async () => {
+    const user = userEvent.setup();
+    const onStepChange = vi.fn();
+
+    renderSteps({ clickable: true, linear: false, onStepChange });
+
+    await user.click(screen.getByRole("button", { name: /payment/i }));
+
+    expect(onStepChange).toHaveBeenCalledWith(2);
+  });
+
+  it("does not select disabled steps", async () => {
+    const user = userEvent.setup();
+    const onStepChange = vi.fn();
+
+    render(
+      <Stepper clickable linear={false} onStepChange={onStepChange}>
+        <Stepper.Step id="a" label="A" />
+        <Stepper.Step id="b" label="B" disabled />
+      </Stepper>,
+    );
+
+    await user.click(screen.getByRole("button", { name: /^B/ }));
+
+    expect(onStepChange).not.toHaveBeenCalled();
+  });
 });

@@ -1,5 +1,6 @@
 import type { ComponentPropsWithRef, ReactNode } from "react";
 import { cn } from "@puzzle/core";
+import { Link } from "../../navigation/link";
 import "./breadcrumbs.css";
 
 type BreadcrumbLinkItem = {
@@ -56,12 +57,12 @@ const Breadcrumbs = ({
                 </span>
               )}
 
-              {isCurrent ? (
+              {isCurrent || item.href === undefined ? (
                 <span className="puzzle-breadcrumbs__label">{item.label}</span>
               ) : (
-                <a className="puzzle-breadcrumbs__link" href={item.href}>
+                <Link className="puzzle-breadcrumbs__link" href={item.href}>
                   {item.label}
-                </a>
+                </Link>
               )}
             </li>
           );

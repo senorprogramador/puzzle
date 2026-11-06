@@ -2,6 +2,8 @@ import { BREAKPOINTS, cn } from "@puzzle/core";
 import {
   Children,
   cloneElement,
+  createElement,
+  Fragment,
   isValidElement,
   type ComponentPropsWithRef,
   type ElementType,
@@ -96,20 +98,17 @@ const Stack = ({
 
   const childrenWithDividers = divider
     ? Children.toArray(children).flatMap((child, index, arr) => {
-        const clonedChild = isValidElement(child)
-          ? cloneElement(child, {
-              ...(child.props || {}),
-              key: `stack-${index}`,
-            })
-          : child;
+        if (index === arr.length - 1) {
+          return [child];
+        }
+
+        // Children keep the keys assigned by Children.toArray; only dividers get new ones.
+        const dividerKey = `stack-divider-${isValidElement(child) ? child.key : index}`;
         const clonedDivider = isValidElement(divider)
-          ? cloneElement(divider, {
-              key: `stack-divider-${index}`,
-            })
-          : divider;
-        return index < arr.length - 1
-          ? [clonedChild, clonedDivider]
-          : [clonedChild];
+          ? cloneElement(divider, { key: dividerKey })
+          : createElement(Fragment, { key: dividerKey }, divider);
+
+        return [child, clonedDivider];
       })
     : children;
 

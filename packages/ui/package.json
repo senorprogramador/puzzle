@@ -20,7 +20,11 @@
   ],
   "scripts": {
     "build": "tsdown",
-    "vitest": "bunx vitest run",
+    "vitest": "bunx vitest run --project unit --project component",
+    "test:unit": "bunx vitest run --project unit",
+    "test:component": "bunx vitest run --project component",
+    "test:browser": "bunx vitest run --project browser",
+    "test:all": "bunx vitest run",
     "vitest:watch": "bunx vitest",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run build"
@@ -36,13 +40,15 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@tsdown/css": "^0.23.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
+    "@tsdown/css": "^0.23.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vitest/browser-playwright": "^5.1.0",
     "jsdom": "^26.1.0",
+    "playwright": "^1.65.0",
     "tsdown": "^0.23.1",
     "typescript": "^6.0.3",
     "vitest": "latest"

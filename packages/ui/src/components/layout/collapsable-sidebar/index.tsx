@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@puzzle/core";
+import { Link } from "../../navigation/link";
 import {
   useId,
   useState,
@@ -83,7 +84,7 @@ const SidebarItemRenderer = ({ item, collapsed }: SidebarItemRendererProps) => {
 
   if ("href" in item && item.href !== undefined) {
     return (
-      <a
+      <Link
         className={className}
         href={item.href}
         aria-current={item.active ? "page" : undefined}
@@ -91,7 +92,7 @@ const SidebarItemRenderer = ({ item, collapsed }: SidebarItemRendererProps) => {
         data-active={item.active || undefined}
       >
         {content}
-      </a>
+      </Link>
     );
   }
 
@@ -100,7 +101,6 @@ const SidebarItemRenderer = ({ item, collapsed }: SidebarItemRendererProps) => {
       type="button"
       className={className}
       onClick={item.onClick}
-      aria-current={item.active ? "page" : undefined}
       title={collapsed ? item.label : undefined}
       data-active={item.active || undefined}
     >

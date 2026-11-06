@@ -228,4 +228,54 @@ describe("Tabs", () => {
     expect(screen.getByText("Settings content")).toBeInTheDocument();
     expect(screen.getByText("Profile content")).toBeInTheDocument();
   });
+
+  it("only mounts the active panel by default", () => {
+    renderTabs();
+
+    expect(screen.getByText("Overview content")).toBeInTheDocument();
+    expect(screen.queryByText("Settings content")).toBeNull();
+  });
+
+  it("links each tab to its panel", () => {
+    renderTabs();
+
+    const tab = screen.getByRole("tab", { name: "Overview" });
+    const panel = screen.getByRole("tabpanel");
+
+    expect(tab.getAttribute("aria-controls")).toBe(panel.id);
+    expect(panel.getAttribute("aria-labelledby")).toBe(tab.id);
+  });
+
+  it("does not activate a disabled tab on click", async () => {
+    const user = userEvent.setup();
+    const onActivate = vi.fn();
+
+    render(
+      <Tabs onActivate={onActivate}>
+        <TabsTab id="a" tab="A">
+          A content
+        </TabsTab>
+        <TabsTab id="b" tab="B" disabled>
+          B content
+        </TabsTab>
+      </Tabs>,
+    );
+
+    await user.click(screen.getByRole("tab", { name: "B" }));
+
+    expect(onActivate).not.toHaveBeenCalled();
+    expect(screen.getByRole("tab", { name: "B" })).toHaveAttribute(
+      "aria-selected",
+      "false",
+    );
+  });
+
+  it("exposes the orientation of vertical tab lists", () => {
+    renderTabs({ tabBarPosition: "left" });
+
+    expect(screen.getByRole("tablist")).toHaveAttribute(
+      "aria-orientation",
+      "vertical",
+    );
+  });
 });

@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "@puzzle/core";
+import { Link } from "../../navigation/link";
 import "./bottom-navigation.css";
 
 type BottomNavigationItemProps = {
@@ -45,7 +46,7 @@ const BottomNavigationItem = ({
 
   if (href !== undefined) {
     return (
-      <a
+      <Link
         href={href}
         className={classes}
         style={style}
@@ -54,10 +55,11 @@ const BottomNavigationItem = ({
         data-active={active || undefined}
       >
         {content}
-      </a>
+      </Link>
     );
   }
 
+  // An action button is not the current page, so it gets no aria-current.
   return (
     <button
       type="button"
@@ -65,7 +67,6 @@ const BottomNavigationItem = ({
       style={style}
       onClick={onClick}
       aria-label={label}
-      aria-current={active ? "page" : undefined}
       data-active={active || undefined}
     >
       {content}

@@ -1,6 +1,10 @@
 import { cn } from "@puzzle/core";
-import { cloneElement, isValidElement, type ReactNode, Children } from "react";
+import { cloneElement, isValidElement, type ReactElement, type ReactNode, Children } from "react";
+import { Section } from "../section";
 import { type SectionProps } from "../section/types";
+
+const isSection = (node: ReactNode): node is ReactElement<SectionProps> =>
+  isValidElement(node) && node.type === Section;
 
 type SectionStackProps = {
   children: ReactNode;
@@ -12,18 +16,18 @@ const SectionStack = ({ children, className, divideY }: SectionStackProps) => {
   const sections = Children.toArray(children);
 
   const enhancedSections = sections.map((child, index) => {
-    if (!isValidElement<SectionProps>(child)) {
+    if (!isSection(child)) {
       return child;
     }
 
     const previous = sections[index - 1];
     const next = sections[index + 1];
 
-    const previousTheme = isValidElement<SectionProps>(previous)
+    const previousTheme = isSection(previous)
       ? (previous.props.theme ?? "default")
       : undefined;
 
-    const nextTheme = isValidElement<SectionProps>(next)
+    const nextTheme = isSection(next)
       ? (next.props.theme ?? "default")
       : undefined;
 

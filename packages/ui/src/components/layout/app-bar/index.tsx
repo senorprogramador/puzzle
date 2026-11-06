@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@puzzle/core";
+import { Link } from "../../navigation/link";
 import {
   useEffect,
   useLayoutEffect,
@@ -107,7 +108,7 @@ const AppBar = <T,>({
     <ul className="puzzle-app-bar__list">
       {navigationItems.map(({ label, href, current, external }) => (
         <li key={href}>
-          <a
+          <Link
             className="puzzle-app-bar__link"
             href={href}
             aria-current={current ? "page" : undefined}
@@ -120,7 +121,7 @@ const AppBar = <T,>({
             onClick={() => setOpen(false)}
           >
             {label}
-          </a>
+          </Link>
         </li>
       ))}
 
@@ -139,14 +140,14 @@ const AppBar = <T,>({
     >
       <div className="puzzle-app-bar__inner">
         {hasBrand && (
-          <a
+          <Link
             className="puzzle-app-bar__brand"
             href={logoHref}
             aria-label={title ?? "Home"}
           >
             {logo}
             {title && <span className="puzzle-app-bar__title">{title}</span>}
-          </a>
+          </Link>
         )}
 
         {hasNavigation && (
@@ -195,7 +196,7 @@ const AppBar = <T,>({
           >
             <Stack direction="row" alignH="between" alignV="center">
               {hasBrand && (
-                <a
+                <Link
                   className="puzzle-app-bar__brand"
                   href={logoHref}
                   aria-label={title ?? "Home"}
@@ -204,7 +205,7 @@ const AppBar = <T,>({
                   {title && (
                     <span className="puzzle-app-bar__title">{title}</span>
                   )}
-                </a>
+                </Link>
               )}
               <button
                 className="puzzle-app-bar__menu-button"
