@@ -129,6 +129,17 @@ export {
   type DatePickerSize,
 } from "./components/forms/date-picker";
 
+export {
+  FileUpload,
+  type FileUploadProps,
+  type FileUploadItem,
+  type FileUploadStatus,
+  type FileUploadRejection,
+  type FileUploadRejectionCode,
+  type FileUploadUploadContext,
+  type FileUploadUploadHandler,
+} from "./components/forms/file-upload";
+
 export { FormField, type FormFieldProps } from "./components/forms/form-field";
 
 export {
