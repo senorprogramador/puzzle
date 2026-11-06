@@ -1,0 +1,281 @@
+/* Root */
+
+.puzzle-radio-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    color: var(--puzzle-color-text);
+    font-family: var(--puzzle-font-family-body, inherit);
+}
+
+/* Legend */
+
+.puzzle-radio-group__legend {
+    display: block;
+    width: 100%;
+    padding: 0;
+
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-radio-group__required {
+    margin-inline-start: 0.2em;
+    color: var(--puzzle-color-danger);
+}
+
+/* Options */
+
+.puzzle-radio-group__options {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--puzzle-space-3, 0.75rem);
+
+    min-width: 0;
+}
+
+.puzzle-radio-group__options[data-orientation="horizontal"] {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+/* Radio item */
+
+.puzzle-radio {
+    position: relative;
+
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--puzzle-space-3, 0.75rem);
+
+    width: fit-content;
+    min-width: 0;
+
+    color: var(--puzzle-color-text);
+
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.puzzle-radio--disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Native input */
+
+.puzzle-radio__input {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+    opacity: 0;
+    cursor: inherit;
+}
+
+/* Visual radio control */
+
+.puzzle-radio__control {
+    position: relative;
+
+    display: inline-grid;
+    flex: 0 0 auto;
+    place-items: center;
+
+    box-sizing: border-box;
+
+    width: var(--puzzle-radio-size, 1.125rem);
+    height: var(--puzzle-radio-size, 1.125rem);
+    margin-top: var(--puzzle-radio-offset, 0.125rem);
+
+    border: 1.5px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-full, 9999px);
+
+    background: var(--puzzle-color-surface);
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        box-shadow var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+.puzzle-radio__control::after {
+    display: block;
+
+    width: 50%;
+    height: 50%;
+
+    border-radius: 50%;
+    background: var(--puzzle-color-primary);
+
+    content: "";
+
+    transform: scale(0);
+
+    transition: transform var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+/* Checked */
+
+.puzzle-radio__input:checked + .puzzle-radio__control {
+    border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-radio__input:checked + .puzzle-radio__control::after {
+    transform: scale(1);
+}
+
+/* Focus */
+
+.puzzle-radio__input:focus-visible + .puzzle-radio__control {
+    outline: 2px solid var(--puzzle-color-ring, #2563eb);
+    outline-offset: 2px;
+}
+
+/* Hover */
+
+.puzzle-radio:hover:not([data-disabled="true"]) .puzzle-radio__control {
+    border-color: var(--puzzle-color-primary);
+}
+
+/* Content */
+
+.puzzle-radio__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    min-width: 0;
+}
+
+.puzzle-radio__label {
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-radio__description {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    font-weight: var(--puzzle-font-weight-normal, 400);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+/* Group description and error */
+
+.puzzle-radio-group__description,
+.puzzle-radio-group__error {
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-radio-group__description {
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-radio-group__error {
+    color: var(--puzzle-color-danger);
+}
+
+/* Sizes */
+
+.puzzle-radio-group[data-size="sm"] {
+    --puzzle-radio-size: 0.875rem;
+    --puzzle-radio-offset: 0.125rem;
+}
+
+.puzzle-radio-group[data-size="md"] {
+    --puzzle-radio-size: 1.125rem;
+    --puzzle-radio-offset: 0.125rem;
+}
+
+.puzzle-radio-group[data-size="lg"] {
+    --puzzle-radio-size: 1.375rem;
+    --puzzle-radio-offset: 0.0625rem;
+}
+
+/* Disabled */
+
+.puzzle-radio-group[data-disabled="true"] {
+    cursor: not-allowed;
+}
+
+.puzzle-radio-group[data-disabled="true"] .puzzle-radio__control {
+    background: var(--puzzle-color-surface-sunken);
+}
+
+/* Invalid */
+
+.puzzle-radio-group[data-invalid="true"] .puzzle-radio__control {
+    border-color: var(--puzzle-color-danger);
+}
+
+/* High contrast / forced colors */
+
+@media (forced-colors: active) {
+    .puzzle-radio--disabled {
+        opacity: 1;
+        color: GrayText;
+    }
+
+    .puzzle-radio--disabled .puzzle-radio__label,
+    .puzzle-radio--disabled .puzzle-radio__description {
+        color: GrayText;
+    }
+
+    .puzzle-radio__control {
+        border-color: ButtonText;
+        background: Canvas;
+    }
+
+    .puzzle-radio__control::after {
+        background: Highlight;
+    }
+
+    .puzzle-radio__input:checked + .puzzle-radio__control {
+        border-color: Highlight;
+    }
+
+    .puzzle-radio__input:disabled + .puzzle-radio__control {
+        border-color: GrayText;
+        background: Canvas;
+    }
+
+    .puzzle-radio__input:disabled + .puzzle-radio__control::after {
+        background: GrayText;
+    }
+
+    .puzzle-radio__input:focus-visible + .puzzle-radio__control {
+        outline-color: Highlight;
+    }
+
+    .puzzle-radio-group__error {
+        color: Mark;
+    }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-radio__control,
+    .puzzle-radio__control::after {
+        transition: none;
+    }
+}
