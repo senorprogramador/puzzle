@@ -82,6 +82,11 @@ const items: TreeViewItem[] = [
             label: "Forms",
             children: [
               {
+                id: "date-picker",
+                label: "Date Picker",
+                href: "/docs/components/ui/forms/date-picker",
+              },
+              {
                 id: "select",
                 label: "Select",
                 href: "/docs/components/ui/forms/select",

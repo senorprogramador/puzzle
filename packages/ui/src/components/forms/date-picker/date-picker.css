@@ -1,0 +1,581 @@
+.puzzle-date-picker {
+    --puzzle-date-picker-height: 2.5rem;
+    --puzzle-date-picker-padding: var(--puzzle-space-3, 0.75rem);
+    --puzzle-date-picker-font-size: var(--puzzle-font-size-sm, 0.875rem);
+
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    min-width: 0;
+    color: var(--puzzle-color-text);
+    font-family: inherit;
+}
+
+/* Responsive sizes */
+
+.puzzle-date-picker[data-size-mobile="sm"] {
+    --puzzle-date-picker-height: 2rem;
+    --puzzle-date-picker-padding: var(--puzzle-space-2, 0.5rem);
+    --puzzle-date-picker-font-size: var(--puzzle-font-size-xs, 0.75rem);
+}
+
+.puzzle-date-picker[data-size-mobile="md"] {
+    --puzzle-date-picker-height: 2.5rem;
+    --puzzle-date-picker-padding: var(--puzzle-space-3, 0.75rem);
+    --puzzle-date-picker-font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-date-picker[data-size-mobile="lg"] {
+    --puzzle-date-picker-height: 3rem;
+    --puzzle-date-picker-padding: var(--puzzle-space-4, 1rem);
+    --puzzle-date-picker-font-size: var(--puzzle-font-size-base, 1rem);
+}
+
+@media (min-width: 768px) {
+    .puzzle-date-picker[data-size-tablet="sm"] {
+        --puzzle-date-picker-height: 2rem;
+        --puzzle-date-picker-padding: var(--puzzle-space-2, 0.5rem);
+        --puzzle-date-picker-font-size: var(--puzzle-font-size-xs, 0.75rem);
+    }
+
+    .puzzle-date-picker[data-size-tablet="md"] {
+        --puzzle-date-picker-height: 2.5rem;
+        --puzzle-date-picker-padding: var(--puzzle-space-3, 0.75rem);
+        --puzzle-date-picker-font-size: var(--puzzle-font-size-sm, 0.875rem);
+    }
+
+    .puzzle-date-picker[data-size-tablet="lg"] {
+        --puzzle-date-picker-height: 3rem;
+        --puzzle-date-picker-padding: var(--puzzle-space-4, 1rem);
+        --puzzle-date-picker-font-size: var(--puzzle-font-size-base, 1rem);
+    }
+
+    .puzzle-date-picker[data-full-width-tablet="true"] {
+        width: 100%;
+    }
+
+    .puzzle-date-picker[data-full-width-tablet="false"] {
+        width: auto;
+    }
+}
+
+@media (min-width: 1024px) {
+    .puzzle-date-picker[data-size-desktop="sm"] {
+        --puzzle-date-picker-height: 2rem;
+        --puzzle-date-picker-padding: var(--puzzle-space-2, 0.5rem);
+        --puzzle-date-picker-font-size: var(--puzzle-font-size-xs, 0.75rem);
+    }
+
+    .puzzle-date-picker[data-size-desktop="md"] {
+        --puzzle-date-picker-height: 2.5rem;
+        --puzzle-date-picker-padding: var(--puzzle-space-3, 0.75rem);
+        --puzzle-date-picker-font-size: var(--puzzle-font-size-sm, 0.875rem);
+    }
+
+    .puzzle-date-picker[data-size-desktop="lg"] {
+        --puzzle-date-picker-height: 3rem;
+        --puzzle-date-picker-padding: var(--puzzle-space-4, 1rem);
+        --puzzle-date-picker-font-size: var(--puzzle-font-size-base, 1rem);
+    }
+
+    .puzzle-date-picker[data-full-width-desktop="true"] {
+        width: 100%;
+    }
+
+    .puzzle-date-picker[data-full-width-desktop="false"] {
+        width: auto;
+    }
+}
+
+.puzzle-date-picker[data-full-width-mobile="true"] {
+    width: 100%;
+}
+
+/* Label */
+
+.puzzle-date-picker__label {
+    display: block;
+
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+}
+
+.puzzle-date-picker__required {
+    margin-inline-start: 0.2em;
+    color: var(--puzzle-color-danger);
+}
+
+/* Control */
+
+.puzzle-date-picker__control {
+    display: flex;
+    align-items: center;
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    width: 100%;
+    min-width: 0;
+}
+
+.puzzle-date-picker__trigger {
+    box-sizing: border-box;
+
+    display: inline-flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    width: 100%;
+    min-width: 0;
+    min-height: var(--puzzle-date-picker-height);
+
+    padding-inline: var(--puzzle-date-picker-padding);
+
+    border: 1px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface);
+
+    font: inherit;
+    font-size: var(--puzzle-date-picker-font-size);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+    text-align: start;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) ease,
+        border-color var(--puzzle-duration-fast, 150ms) ease,
+        box-shadow var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-date-picker__trigger:hover:not(:disabled) {
+    border-color: var(--puzzle-color-border-strong, var(--puzzle-color-border));
+}
+
+.puzzle-date-picker[data-open="true"] .puzzle-date-picker__trigger {
+    border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-date-picker__trigger:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-date-picker[data-invalid="true"] .puzzle-date-picker__trigger {
+    border-color: var(--puzzle-color-danger);
+}
+
+.puzzle-date-picker[data-invalid="true"] .puzzle-date-picker__trigger:focus-visible {
+    outline-color: var(--puzzle-color-danger);
+}
+
+.puzzle-date-picker__value {
+    display: block;
+    flex: 1 1 auto;
+
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.puzzle-date-picker__placeholder {
+    color: var(--puzzle-color-text-muted);
+}
+
+/* Calendar icon */
+
+.puzzle-date-picker__calendar-icon {
+    position: relative;
+    display: block;
+    flex: 0 0 1rem;
+
+    width: 1rem;
+    height: 1rem;
+
+    border: 1.5px solid currentColor;
+    border-radius: 0.2rem;
+
+    opacity: 0.7;
+}
+
+.puzzle-date-picker__calendar-icon::before {
+    position: absolute;
+    top: 0.25rem;
+    inset-inline: 0;
+
+    height: 1.5px;
+
+    background: currentColor;
+    content: "";
+}
+
+.puzzle-date-picker__calendar-icon::after {
+    position: absolute;
+    top: -0.2rem;
+    inset-inline: 0.2rem;
+
+    height: 0.35rem;
+
+    border-inline: 1.5px solid currentColor;
+    content: "";
+}
+
+/* Calendar popout */
+
+.puzzle-popout__content.puzzle-date-picker__popover {
+    box-sizing: border-box;
+
+    width: 19rem;
+    max-width: calc(100vw - 1rem);
+
+    padding: var(--puzzle-space-3, 0.75rem);
+
+    overflow: visible;
+}
+
+/* Calendar surface */
+
+.puzzle-date-picker__calendar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-3, 0.75rem);
+
+    min-width: 0;
+
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+/* Month header */
+
+.puzzle-date-picker__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-date-picker__month {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-base, 1rem);
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.puzzle-date-picker__navigation {
+    box-sizing: border-box;
+
+    display: grid;
+    flex: 0 0 2rem;
+    place-items: center;
+
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+
+    border: 1px solid transparent;
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    color: var(--puzzle-color-text);
+    background: transparent;
+
+    font-family: inherit;
+    font-size: 1.5rem;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) ease,
+        color var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-date-picker__navigation:hover:not(:disabled) {
+    background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-date-picker__navigation:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-date-picker__navigation:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Calendar grid */
+
+.puzzle-date-picker__grid {
+    width: 100%;
+
+    border-collapse: separate;
+    border-spacing: 0 0.125rem;
+
+    table-layout: fixed;
+}
+
+.puzzle-date-picker__grid th {
+    height: 2rem;
+    padding: 0;
+
+    color: var(--puzzle-color-text-muted);
+
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    text-align: center;
+}
+
+.puzzle-date-picker__cell {
+    height: 2.25rem;
+    padding: 0;
+
+    text-align: center;
+}
+
+/* Days */
+
+.puzzle-date-picker__day {
+    box-sizing: border-box;
+
+    display: grid;
+    place-items: center;
+
+    width: 100%;
+    height: 2.25rem;
+    padding: 0;
+
+    border: 1px solid transparent;
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    color: var(--puzzle-color-text);
+    background: transparent;
+
+    font-family: inherit;
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-normal, 400);
+    line-height: 1;
+
+    cursor: pointer;
+    user-select: none;
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) ease,
+        border-color var(--puzzle-duration-fast, 150ms) ease,
+        color var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-date-picker__day:hover:not(:disabled):not([data-selected="true"]) {
+    background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-date-picker__day:focus-visible {
+    position: relative;
+    z-index: 1;
+
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: -2px;
+}
+
+.puzzle-date-picker__day[data-today="true"] {
+    border-color: var(--puzzle-color-primary);
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-date-picker__day[data-selected="true"] {
+    border-color: var(--puzzle-color-primary);
+    color: var(--puzzle-color-primary-foreground);
+    background: var(--puzzle-color-primary);
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-date-picker__day[data-outside-month="true"] {
+    color: var(--puzzle-color-text-muted);
+    opacity: 0.65;
+}
+
+.puzzle-date-picker__day[data-selected="true"][data-outside-month="true"] {
+    color: var(--puzzle-color-primary-foreground);
+    opacity: 1;
+}
+
+.puzzle-date-picker__day:disabled {
+    color: var(--puzzle-color-text-subtle);
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Empty calendar */
+
+.puzzle-date-picker__empty {
+    padding: var(--puzzle-space-2, 0.5rem);
+
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    text-align: center;
+}
+
+/* Footer */
+
+.puzzle-date-picker__footer {
+    display: flex;
+    justify-content: flex-end;
+
+    padding-top: var(--puzzle-space-2, 0.5rem);
+    border-top: 1px solid var(--puzzle-color-border);
+}
+
+.puzzle-date-picker__today {
+    min-height: 2rem;
+    padding-inline: var(--puzzle-space-2, 0.5rem);
+
+    border: 1px solid transparent;
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+
+    color: var(--puzzle-color-primary);
+    background: transparent;
+
+    font-family: inherit;
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+
+    cursor: pointer;
+}
+
+.puzzle-date-picker__today:hover:not(:disabled) {
+    background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-date-picker__today:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-date-picker__today:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Clear button */
+
+.puzzle-date-picker__clear {
+    box-sizing: border-box;
+
+    display: grid;
+    flex: 0 0 var(--puzzle-date-picker-height);
+    place-items: center;
+
+    width: var(--puzzle-date-picker-height);
+    height: var(--puzzle-date-picker-height);
+    padding: 0;
+
+    border: 1px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    color: var(--puzzle-color-text-muted);
+    background: var(--puzzle-color-surface);
+
+    font-family: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.puzzle-date-picker__clear:hover:not(:disabled) {
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-date-picker__clear:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-date-picker__clear:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Description and validation */
+
+.puzzle-date-picker__description,
+.puzzle-date-picker__error {
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-caption, 1.4);
+}
+
+.puzzle-date-picker__description {
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-date-picker__error {
+    color: var(--puzzle-color-danger);
+}
+
+/* Disabled control */
+
+.puzzle-date-picker[data-disabled="true"] .puzzle-date-picker__trigger {
+    color: var(--puzzle-color-text-muted);
+    background: var(--puzzle-color-surface-sunken);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Native form input */
+
+.puzzle-date-picker__native {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    padding: 0;
+    margin: -1px;
+
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-date-picker__trigger,
+    .puzzle-date-picker__navigation,
+    .puzzle-date-picker__day {
+        transition: none;
+    }
+}
+
+/* High contrast */
+
+@media (forced-colors: active) {
+    .puzzle-date-picker__day[data-selected="true"] {
+        border: 2px solid Highlight;
+        color: HighlightText;
+        background: Highlight;
+    }
+
+    .puzzle-date-picker__day[data-today="true"]:not([data-selected="true"]) {
+        border: 2px solid ButtonText;
+    }
+
+    .puzzle-date-picker__day:focus-visible,
+    .puzzle-date-picker__trigger:focus-visible {
+        outline: 2px solid Highlight;
+    }
+}

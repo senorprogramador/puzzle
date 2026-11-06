@@ -123,6 +123,12 @@ export {
   type CheckboxSize,
 } from "./components/forms/checkbox";
 
+export {
+  DatePicker,
+  type DatePickerProps,
+  type DatePickerSize,
+} from "./components/forms/date-picker";
+
 export { FormField, type FormFieldProps } from "./components/forms/form-field";
 
 export {
