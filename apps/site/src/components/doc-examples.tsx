@@ -137,7 +137,7 @@ export const ControlledSliderExample = () => {
 };
 
 export const ControlledSelectExample = () => {
-  const [fruit, setFruit] = useState<string | null>("apple");
+  const [fruit, setFruit] = useState<string | undefined>("apple");
 
   return (
     <Stack>

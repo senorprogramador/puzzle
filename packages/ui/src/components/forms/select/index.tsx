@@ -16,13 +16,16 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
+
 import { cn, resolveResponsiveValue, type ResponsiveValue } from "@puzzle/core";
+
 import {
   Popout,
   type PopoutAlignment,
   type PopoutPosition,
   type PopoutTriggerProps,
 } from "../../overlays/popout";
+
 import "./select.css";
 
 type SelectSize = "sm" | "md" | "lg";
@@ -101,7 +104,7 @@ type SelectBaseProps<T> = Omit<
 
   /** Custom rendering of the selected value(s). */
   renderValue?: (
-    selected: SelectOption<T> | readonly SelectOption<T>[] | null,
+    selected: SelectOption<T> | readonly SelectOption<T>[] | undefined,
   ) => ReactNode;
 
   /** Custom rendering of an option. */
@@ -164,15 +167,27 @@ type SelectBaseProps<T> = Omit<
 
 type SelectSingleProps<T = string> = SelectBaseProps<T> & {
   multiple?: false;
-  value?: T | null;
-  defaultValue?: T | null;
-  onChange?: (value: T | null) => void;
+
+  /** Controlled selected value. Undefined represents no selection. */
+  value?: T | undefined;
+
+  /** Initial selected value. Undefined represents no selection. */
+  defaultValue?: T | undefined;
+
+  /** Called when the selected value changes. */
+  onChange?: (value: T | undefined) => void;
 };
 
 type SelectMultipleProps<T = string> = SelectBaseProps<T> & {
   multiple: true;
+
+  /** Controlled selected values. */
   value?: readonly T[];
+
+  /** Initial selected values. */
   defaultValue?: readonly T[];
+
+  /** Called when the selected values change. */
   onChange?: (value: T[]) => void;
 };
 
@@ -288,7 +303,11 @@ const Select = <T,>(props: SelectProps<T>) => {
   } = props;
 
   const multiple = props.multiple === true;
-  const controlledValue = value !== undefined;
+
+  // Property presence matters because value={undefined} is a controlled
+  // single-select with no selected value.
+  const controlledValue = Object.prototype.hasOwnProperty.call(props, "value");
+
   const controlledOpen = open !== undefined;
 
   const baseId = useId();
@@ -306,11 +325,12 @@ const Select = <T,>(props: SelectProps<T>) => {
     timestamp: 0,
   });
 
-  const [internalValue, setInternalValue] = useState<T | readonly T[] | null>(
-    () =>
-      multiple
-        ? ((props as SelectMultipleProps<T>).defaultValue ?? [])
-        : ((props as SelectSingleProps<T>).defaultValue ?? null),
+  const [internalValue, setInternalValue] = useState<
+    T | readonly T[] | undefined
+  >(() =>
+    multiple
+      ? ((props as SelectMultipleProps<T>).defaultValue ?? [])
+      : (props as SelectSingleProps<T>).defaultValue,
   );
 
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
@@ -320,24 +340,29 @@ const Select = <T,>(props: SelectProps<T>) => {
   const selectedValue = controlledValue ? value : internalValue;
 
   const selectedValues: readonly T[] = multiple
-    ? ((selectedValue as readonly T[] | null) ?? [])
-    : selectedValue == null
+    ? ((selectedValue as readonly T[] | undefined) ?? [])
+    : selectedValue === undefined
       ? []
       : [selectedValue as T];
 
   const isOpen = open ?? internalOpen;
   const hasSelection = selectedValues.length > 0;
+
   const hasError = error !== undefined && error !== null && error !== false;
+
   const isAriaInvalid =
     ariaInvalid !== undefined &&
     ariaInvalid !== false &&
     ariaInvalid !== "false";
+
   const isInvalid = hasError || isAriaInvalid;
+
   const resolvedAriaInvalid = isInvalid
     ? hasError || ariaInvalid === true
       ? true
       : ariaInvalid
     : ariaInvalid;
+
   const errorContent = error === true ? "Invalid value" : error;
 
   const closeOnSelect = closeOnSelectProp ?? !multiple;
@@ -348,26 +373,26 @@ const Select = <T,>(props: SelectProps<T>) => {
   const groups = useMemo(() => groupOptions(options), [options]);
 
   const isEqual = useCallback(
-    (option: SelectOption<T>, value: T) =>
+    (option: SelectOption<T>, selected: T) =>
       isOptionEqualToValue
-        ? isOptionEqualToValue(option, value)
-        : Object.is(option.value, value),
+        ? isOptionEqualToValue(option, selected)
+        : Object.is(option.value, selected),
     [isOptionEqualToValue],
   );
 
   const selectedOptions = selectedValues
-    .map((value) => options.find((option) => isEqual(option, value)))
+    .map((selected) => options.find((option) => isEqual(option, selected)))
     .filter((option): option is SelectOption<T> => option !== undefined);
 
   const isSelected = (option: SelectOption<T>) =>
-    selectedValues.some((value) => isEqual(option, value));
+    selectedValues.some((selected) => isEqual(option, selected));
 
   const initialActiveIndex = useCallback(
     (direction: -1 | 1 = 1) => {
       const selectedIndex = options.findIndex(
         (option) =>
           !option.disabled &&
-          selectedValues.some((value) => isEqual(option, value)),
+          selectedValues.some((selected) => isEqual(option, selected)),
       );
 
       if (selectedIndex !== -1) {
@@ -393,24 +418,31 @@ const Select = <T,>(props: SelectProps<T>) => {
   );
 
   const updateValue = useCallback(
-    (nextValue: T | readonly T[] | null) => {
+    (nextValue: T | readonly T[] | undefined) => {
       if (!controlledValue) {
         setInternalValue(nextValue);
       }
 
       if (multiple) {
-        const callback = onChange as SelectMultipleProps<T>["onChange"];
+        const callback = onChange as
+          | SelectMultipleProps<T>["onChange"]
+          | undefined;
+
         callback?.([...(nextValue as readonly T[])]);
       } else {
-        const callback = onChange as SelectSingleProps<T>["onChange"];
-        callback?.(nextValue as T | null);
+        const callback = onChange as
+          | SelectSingleProps<T>["onChange"]
+          | undefined;
+
+        callback?.(nextValue as T | undefined);
       }
     },
     [controlledValue, multiple, onChange],
   );
 
   const getSerializedValue = useCallback(
-    (value: T) => (serializeValue ? serializeValue(value) : String(value)),
+    (selected: T) =>
+      serializeValue ? serializeValue(selected) : String(selected),
     [serializeValue],
   );
 
@@ -418,6 +450,10 @@ const Select = <T,>(props: SelectProps<T>) => {
     character: string,
     startIndex: number,
   ): number => {
+    if (options.length === 0) {
+      return -1;
+    }
+
     const now = Date.now();
     const previous = typeaheadRef.current;
 
@@ -440,7 +476,6 @@ const Select = <T,>(props: SelectProps<T>) => {
 
     for (let offset = 1; offset <= options.length; offset++) {
       const index = (startIndex + offset + options.length) % options.length;
-
       const option = options[index];
 
       if (
@@ -475,7 +510,7 @@ const Select = <T,>(props: SelectProps<T>) => {
       }
 
       const nextValues = currentlySelected
-        ? selectedValues.filter((value) => !isEqual(option, value))
+        ? selectedValues.filter((selected) => !isEqual(option, selected))
         : [...selectedValues, option.value];
 
       updateValue(nextValues);
@@ -494,7 +529,7 @@ const Select = <T,>(props: SelectProps<T>) => {
       return;
     }
 
-    updateValue(multiple ? [] : null);
+    updateValue(multiple ? [] : undefined);
     focusTrigger();
   };
 
@@ -546,11 +581,8 @@ const Select = <T,>(props: SelectProps<T>) => {
     ) {
       event.preventDefault();
 
-      if (!isOpen) {
-        setActiveIndex(initialActiveIndex(event.key === "ArrowUp" ? -1 : 1));
-
-        changeOpenState(true);
-      }
+      setActiveIndex(initialActiveIndex(event.key === "ArrowUp" ? -1 : 1));
+      changeOpenState(true);
 
       return;
     }
@@ -689,7 +721,7 @@ const Select = <T,>(props: SelectProps<T>) => {
       )
       .map((option) => option.value);
 
-    updateValue(multiple ? nextValues : (nextValues[0] ?? null));
+    updateValue(multiple ? nextValues : nextValues[0]);
   };
 
   // Initialize or recover the active option when opening.
@@ -769,7 +801,7 @@ const Select = <T,>(props: SelectProps<T>) => {
 
   const displayValue = hasSelection
     ? renderValue
-      ? renderValue(multiple ? selectedOptions : (selectedOptions[0] ?? null))
+      ? renderValue(multiple ? selectedOptions : selectedOptions[0])
       : multiple
         ? selectedOptions.length
           ? selectedOptions.map((option) => option.label).join(", ")
@@ -933,7 +965,7 @@ const Select = <T,>(props: SelectProps<T>) => {
                 {noOptionsText}
               </div>
             ) : (
-              groups.map((group, groupIndex) =>
+              groups.map((group) =>
                 group.label != null ? (
                   <div
                     key={group.label}
@@ -1013,7 +1045,7 @@ const Select = <T,>(props: SelectProps<T>) => {
         >
           {!multiple && <option value=""> </option>}
 
-          {groups.map((group, groupIndex) =>
+          {groups.map((group) =>
             group.label != null ? (
               <optgroup key={group.label} label={group.label}>
                 {group.options.map(({ option, index }) => (

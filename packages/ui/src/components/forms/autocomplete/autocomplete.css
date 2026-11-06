@@ -1,0 +1,484 @@
+/* Root */
+
+.puzzle-autocomplete {
+    --puzzle-autocomplete-height: 2.5rem;
+    --puzzle-autocomplete-padding: var(--puzzle-space-3, 0.75rem);
+    --puzzle-autocomplete-font-size: var(--puzzle-font-size-sm, 0.875rem);
+
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    min-width: 0;
+
+    color: var(--puzzle-color-text);
+}
+
+/* Responsive size */
+
+.puzzle-autocomplete[data-size-mobile="sm"] {
+    --puzzle-autocomplete-height: 2rem;
+    --puzzle-autocomplete-padding: var(--puzzle-space-2, 0.5rem);
+    --puzzle-autocomplete-font-size: var(--puzzle-font-size-xs, 0.75rem);
+}
+
+.puzzle-autocomplete[data-size-mobile="md"] {
+    --puzzle-autocomplete-height: 2.5rem;
+    --puzzle-autocomplete-padding: var(--puzzle-space-3, 0.75rem);
+    --puzzle-autocomplete-font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-autocomplete[data-size-mobile="lg"] {
+    --puzzle-autocomplete-height: 3rem;
+    --puzzle-autocomplete-padding: var(--puzzle-space-4, 1rem);
+    --puzzle-autocomplete-font-size: var(--puzzle-font-size-base, 1rem);
+}
+
+/* Tablet: 768px and wider */
+
+@media (min-width: 768px) {
+    .puzzle-autocomplete[data-size-tablet="sm"] {
+        --puzzle-autocomplete-height: 2rem;
+        --puzzle-autocomplete-padding: var(--puzzle-space-2, 0.5rem);
+        --puzzle-autocomplete-font-size: var(--puzzle-font-size-xs, 0.75rem);
+    }
+
+    .puzzle-autocomplete[data-size-tablet="md"] {
+        --puzzle-autocomplete-height: 2.5rem;
+        --puzzle-autocomplete-padding: var(--puzzle-space-3, 0.75rem);
+        --puzzle-autocomplete-font-size: var(--puzzle-font-size-sm, 0.875rem);
+    }
+
+    .puzzle-autocomplete[data-size-tablet="lg"] {
+        --puzzle-autocomplete-height: 3rem;
+        --puzzle-autocomplete-padding: var(--puzzle-space-4, 1rem);
+        --puzzle-autocomplete-font-size: var(--puzzle-font-size-base, 1rem);
+    }
+
+    .puzzle-autocomplete[data-full-width-tablet="true"] {
+        width: 100%;
+    }
+
+    .puzzle-autocomplete[data-full-width-tablet="false"] {
+        width: auto;
+    }
+}
+
+/* Desktop: 1024px and wider */
+
+@media (min-width: 1024px) {
+    .puzzle-autocomplete[data-size-desktop="sm"] {
+        --puzzle-autocomplete-height: 2rem;
+        --puzzle-autocomplete-padding: var(--puzzle-space-2, 0.5rem);
+        --puzzle-autocomplete-font-size: var(--puzzle-font-size-xs, 0.75rem);
+    }
+
+    .puzzle-autocomplete[data-size-desktop="md"] {
+        --puzzle-autocomplete-height: 2.5rem;
+        --puzzle-autocomplete-padding: var(--puzzle-space-3, 0.75rem);
+        --puzzle-autocomplete-font-size: var(--puzzle-font-size-sm, 0.875rem);
+    }
+
+    .puzzle-autocomplete[data-size-desktop="lg"] {
+        --puzzle-autocomplete-height: 3rem;
+        --puzzle-autocomplete-padding: var(--puzzle-space-4, 1rem);
+        --puzzle-autocomplete-font-size: var(--puzzle-font-size-base, 1rem);
+    }
+
+    .puzzle-autocomplete[data-full-width-desktop="true"] {
+        width: 100%;
+    }
+
+    .puzzle-autocomplete[data-full-width-desktop="false"] {
+        width: auto;
+    }
+}
+
+/* Full width */
+
+.puzzle-autocomplete[data-full-width-mobile="true"] {
+    width: 100%;
+}
+
+/* Label */
+
+.puzzle-autocomplete__label {
+    display: block;
+
+    color: var(--puzzle-color-text);
+
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+}
+
+.puzzle-autocomplete__required {
+    margin-inline-start: 0.2em;
+    color: var(--puzzle-color-danger);
+}
+
+/* Anchor and control */
+
+.puzzle-autocomplete__anchor {
+    display: block;
+    width: 100%;
+    min-width: 0;
+}
+
+.puzzle-autocomplete__control {
+    box-sizing: border-box;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    width: 100%;
+    min-width: 0;
+    min-height: var(--puzzle-autocomplete-height);
+
+    gap: var(--puzzle-space-2, 0.5rem);
+    padding: 0 var(--puzzle-autocomplete-padding);
+
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    background: var(--puzzle-color-surface);
+    color: var(--puzzle-color-text);
+
+    transition:
+        border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        box-shadow var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        background-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+.puzzle-autocomplete__control:focus-within {
+    border-color: var(--puzzle-color-ring);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--puzzle-color-ring), transparent 82%);
+}
+
+.puzzle-autocomplete[data-invalid="true"] .puzzle-autocomplete__control {
+    border-color: var(--puzzle-color-danger);
+}
+
+.puzzle-autocomplete[data-invalid="true"] .puzzle-autocomplete__control:focus-within {
+    outline: 2px solid color-mix(in srgb, var(--puzzle-color-danger), transparent 65%);
+    outline-offset: 1px;
+}
+
+.puzzle-autocomplete[data-disabled="true"] .puzzle-autocomplete__control {
+    background: var(--puzzle-color-surface-sunken);
+    color: var(--puzzle-color-text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Input */
+
+.puzzle-autocomplete__input {
+    box-sizing: border-box;
+
+    display: block;
+    flex: 1 1 8rem;
+
+    width: 100%;
+    min-width: 3rem;
+    min-height: calc(var(--puzzle-autocomplete-height) - 2px);
+
+    padding: 0;
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+    color: inherit;
+
+    font: inherit;
+    font-size: var(--puzzle-autocomplete-font-size);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-autocomplete__input::placeholder {
+    color: var(--puzzle-color-text-subtle, var(--puzzle-color-text-muted));
+    opacity: 1;
+}
+
+.puzzle-autocomplete__input:disabled {
+    cursor: not-allowed;
+}
+
+/* Multiple selection tags */
+
+.puzzle-autocomplete__tag {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+
+    max-width: 100%;
+    min-height: 1.75rem;
+
+    gap: var(--puzzle-space-1, 0.25rem);
+    padding-inline-start: var(--puzzle-space-2, 0.5rem);
+    padding-inline-end: 0.2rem;
+
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+
+    background: var(--puzzle-color-surface-sunken);
+    color: var(--puzzle-color-text);
+
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+}
+
+.puzzle-autocomplete__tag-label {
+    display: block;
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.puzzle-autocomplete__tag-remove {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+
+    width: 1.5rem;
+    height: 1.5rem;
+
+    padding: 0;
+    border: 0;
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+
+    background: transparent;
+    color: var(--puzzle-color-text-muted);
+
+    font: inherit;
+    font-size: 1rem;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.puzzle-autocomplete__tag-remove:hover {
+    background: var(--puzzle-color-border);
+    color: var(--puzzle-color-text);
+}
+
+.puzzle-autocomplete__tag-remove:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 1px;
+}
+
+/* Clear button */
+
+.puzzle-autocomplete__clear {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+
+    width: 2rem;
+    height: 2rem;
+
+    padding: 0;
+    border: 0;
+    border-radius: var(--puzzle-radius-sm, 0.375rem);
+
+    background: transparent;
+    color: var(--puzzle-color-text-muted);
+
+    font: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.puzzle-autocomplete__clear:hover {
+    background: var(--puzzle-color-surface-sunken);
+    color: var(--puzzle-color-text);
+}
+
+.puzzle-autocomplete__clear:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+/* Popout */
+
+.puzzle-popout__content.puzzle-autocomplete__popover {
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Listbox */
+
+.puzzle-autocomplete__listbox {
+    box-sizing: border-box;
+
+    min-width: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    padding: var(--puzzle-space-1, 0.25rem);
+
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    outline: none;
+}
+
+/* Options */
+
+.puzzle-autocomplete__option {
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+    min-height: 2.25rem;
+
+    gap: var(--puzzle-space-2, 0.5rem);
+    padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+
+    background: transparent;
+    color: var(--puzzle-color-text);
+
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+
+    cursor: pointer;
+    user-select: none;
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) ease,
+        color var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-autocomplete__option[data-active="true"] {
+    background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-autocomplete__option[data-disabled="true"] {
+    color: var(--puzzle-color-text-subtle);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Selected indicator */
+
+.puzzle-autocomplete__option::after {
+    box-sizing: border-box;
+    content: "";
+
+    flex: 0 0 0.55rem;
+
+    width: 0.55rem;
+    height: 0.3rem;
+
+    margin-inline-start: auto;
+
+    border-inline-start: 2px solid currentColor;
+    border-block-end: 2px solid currentColor;
+
+    opacity: 0;
+    transform: rotate(-45deg);
+}
+
+.puzzle-autocomplete__option[aria-selected="true"]::after {
+    opacity: 1;
+}
+
+.puzzle-autocomplete__option-content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+
+    min-width: 0;
+    gap: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-autocomplete__option-label {
+    color: inherit;
+    font-weight: var(--puzzle-font-weight-medium, 500);
+}
+
+.puzzle-autocomplete__option-description {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+}
+
+/* Groups */
+
+.puzzle-autocomplete__group + .puzzle-autocomplete__group {
+    margin-block-start: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-autocomplete__group-label {
+    padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+
+    color: var(--puzzle-color-text-muted);
+
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+    line-height: var(--puzzle-font-line-height-caption, 1.4);
+
+    user-select: none;
+}
+
+/* Empty and loading state */
+
+.puzzle-autocomplete__empty {
+    padding: var(--puzzle-space-3, 0.75rem);
+
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    text-align: center;
+}
+
+/* Supporting text and validation */
+
+.puzzle-autocomplete__description {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-caption, 1.4);
+}
+
+.puzzle-autocomplete__error {
+    color: var(--puzzle-color-danger);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-caption, 1.4);
+}
+
+/* Native form values */
+
+.puzzle-autocomplete__native {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    padding: 0;
+    margin: -1px;
+
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-autocomplete__control,
+    .puzzle-autocomplete__option {
+        transition: none;
+    }
+}

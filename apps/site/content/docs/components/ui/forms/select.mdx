@@ -67,7 +67,7 @@ const options = [
   </Section>
 </Preview>
 
-Clearing returns `null` in single mode and `[]` in multiple mode. Set `closeOnSelect` explicitly to override either mode's default popup behavior.
+Clearing returns `undefined` in single mode and `[]` in multiple mode. Set `closeOnSelect` explicitly to override either mode's default popup behavior.
 
 ## Sizes and width
 
@@ -105,7 +105,7 @@ Clearing returns `null` in single mode and `[]` in multiple mode. Set `closeOnSe
 
 `group` adds headings within the list. An option's `description` adds supporting text. Use `renderOption` to customize its contents without adding nested interactive controls. Its state includes `selected`, `active`, and `multiple`.
 
-`renderValue` receives one selected option or `null` in single mode, and an array in multiple mode.
+`renderValue` receives one selected option or `undefined` in single mode, and an array in multiple mode.
 
 <Preview height={440} code={`\
 <Select
@@ -149,10 +149,10 @@ Custom option rendering replaces the default description display. Include `optio
 
 ## Controlled value
 
-Pair `value` with `onChange`. In single mode the callback receives `T | null`; in multiple mode it receives `T[]`. Use `defaultValue` only for uncontrolled selection.
+Pair `value` with `onChange`. In single mode the callback receives `T | undefined`; in multiple mode it receives `T[]`. Passing `value={undefined}` represents a controlled empty selection. Use `defaultValue` only for uncontrolled selection.
 
 <Preview height={420} code={`\
-const [fruit, setFruit] = useState<string | null>("apple");
+const [fruit, setFruit] = useState<string | undefined>("apple");
 
 return (
   <Stack>
@@ -262,9 +262,9 @@ For object values, use `isOptionEqualToValue` to compare stable identifiers inst
 | --- | --- | --- | --- |
 | `options` | `readonly SelectOption<T>[]` | Required | Available options. |
 | `multiple` | `boolean` | `false` | Enables array-valued selection. |
-| `value` | `T \| null` or `readonly T[]` | - | Controlled selection for the chosen mode. |
-| `defaultValue` | `T \| null` or `readonly T[]` | `null` or `[]` | Initial uncontrolled selection. |
-| `onChange` | `(value: T \| null) => void` or `(value: T[]) => void` | - | Next selection, not a DOM event. |
+| `value` | `T \| undefined` or `readonly T[]` | - | Controlled selection for the chosen mode. |
+| `defaultValue` | `T \| undefined` or `readonly T[]` | `undefined` or `[]` | Initial uncontrolled selection. |
+| `onChange` | `(value: T \| undefined) => void` or `(value: T[]) => void` | - | Next selection, not a DOM event. |
 | `label` | `ReactNode` | - | Visible field label. |
 | `placeholder` | `ReactNode` | `"Select an option"` | Content when nothing is selected. |
 | `description` | `ReactNode` | - | Supporting field text. |
@@ -298,7 +298,7 @@ For object values, use `isOptionEqualToValue` to compare stable identifiers inst
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `renderOption` | `(option: SelectOption<T>, state: SelectOptionRenderState) => ReactNode` | - | Custom option contents. |
-| `renderValue` | `(selected: SelectOption<T> \| readonly SelectOption<T>[] \| null) => ReactNode` | - | Custom selected-value contents. |
+| `renderValue` | `(selected: SelectOption<T> \| readonly SelectOption<T>[] \| undefined) => ReactNode` | - | Custom selected-value contents. |
 | `isOptionEqualToValue` | `(option: SelectOption<T>, value: T) => boolean` | Identity comparison | Compares options with selected values. |
 | `serializeValue` | `(value: T) => string` | String conversion | Serializes values for native form submission. |
 | `name` | `string` | - | Enables and names the hidden native select. |

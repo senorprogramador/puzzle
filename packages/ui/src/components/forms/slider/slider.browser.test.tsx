@@ -1,7 +1,8 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { userEvent as browserUserEvent } from "vitest/browser";
 
 import { FormField } from "../form-field";
 import { Slider } from "./index";
@@ -27,8 +28,17 @@ describe("Slider (browser)", () => {
 
   it("supports native keyboard interaction", async () => {
     const user = userEvent.setup();
+    const onChange = vi.fn();
 
-    render(<Slider aria-label="Volume" min={0} max={10} defaultValue={5} />);
+    render(
+      <Slider
+        aria-label="Volume"
+        min={0}
+        max={10}
+        defaultValue={5}
+        onChange={onChange}
+      />,
+    );
 
     const slider = screen.getByRole("slider");
 
@@ -36,13 +46,21 @@ describe("Slider (browser)", () => {
 
     expect(slider).toHaveFocus();
 
-    await user.keyboard("{ArrowRight}");
+    await browserUserEvent.keyboard("{ArrowRight}");
 
     expect(slider).toHaveValue("6");
+    expect(onChange).toHaveBeenLastCalledWith(6);
 
-    await user.keyboard("{ArrowLeft}");
+    await browserUserEvent.keyboard("{ArrowLeft}");
 
     expect(slider).toHaveValue("5");
+    expect(onChange).toHaveBeenLastCalledWith(5);
+
+    await browserUserEvent.keyboard("{Home}");
+    expect(slider).toHaveValue("0");
+
+    await browserUserEvent.keyboard("{End}");
+    expect(slider).toHaveValue("10");
   });
 
   it("does not receive keyboard focus when disabled", async () => {

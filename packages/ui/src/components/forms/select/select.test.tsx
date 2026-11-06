@@ -1,5 +1,6 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Select } from "./index";
@@ -314,7 +315,42 @@ describe("Select", () => {
 
     await user.click(screen.getByRole("button", { name: "Clear selection" }));
 
-    expect(onChange).toHaveBeenCalledWith(null);
+    expect(onChange).toHaveBeenCalledWith(undefined);
+    expect(screen.getByRole("combobox")).toHaveTextContent("Select an option");
+  });
+
+  it("supports selecting and clearing a controlled undefined value", async () => {
+    const user = userEvent.setup();
+    const ControlledSelect = () => {
+      const [value, setValue] = useState<string | undefined>();
+
+      return (
+        <Select
+          label="Fruit"
+          options={options}
+          value={value}
+          onChange={setValue}
+          clearable
+        />
+      );
+    };
+
+    render(<ControlledSelect />);
+
+    const trigger = screen.getByRole("combobox", { name: "Fruit" });
+
+    expect(trigger).toHaveTextContent("Select an option");
+    await user.click(trigger);
+    await user.click(await screen.findByRole("option", { name: "Banana" }));
+    expect(trigger).toHaveTextContent("Banana");
+
+    await user.click(screen.getByRole("button", { name: "Clear selection" }));
+    expect(trigger).toHaveTextContent("Select an option");
+
+    await user.click(trigger);
+    expect(
+      await screen.findByRole("option", { name: "Banana" }),
+    ).toHaveAttribute("aria-selected", "false");
   });
 
   it("associates its description and error with the trigger", () => {
