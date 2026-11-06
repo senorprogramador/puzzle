@@ -1,11 +1,57 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Popout } from "./index";
 
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
+});
+
+const createRect = (
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+): DOMRect => {
+  return {
+    x: left,
+    y: top,
+    left,
+    top,
+    width,
+    height,
+    right: left + width,
+    bottom: top + height,
+    toJSON: () => ({}),
+  } as DOMRect;
+};
+
+beforeEach(() => {
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+    function (this: HTMLElement) {
+      return this.classList.contains("puzzle-popout__content")
+        ? createRect(0, 0, 120, 80)
+        : createRect(100, 100, 100, 32);
+    },
+  );
+  vi.spyOn(HTMLElement.prototype, "getClientRects").mockImplementation(
+    function (this: HTMLElement): DOMRectList {
+      const rects = [this.getBoundingClientRect()];
+      return Object.assign(rects, {
+        item: (index: number) => rects[index] ?? null,
+      });
+    },
+  );
 });
 
 const renderPopout = (
@@ -81,6 +127,7 @@ describe("Popout", () => {
     const { onOpenChange } = renderPopout();
 
     await user.click(screen.getByRole("button", { name: "Trigger" }));
+
     await screen.findByTestId("popout-content");
 
     await user.keyboard("{Escape}");
@@ -90,11 +137,13 @@ describe("Popout", () => {
 
   it("does not request closing when Escape handling is disabled", async () => {
     const user = userEvent.setup();
+
     const { onOpenChange } = renderPopout({
       closeOnEscape: false,
     });
 
     await user.click(screen.getByRole("button", { name: "Trigger" }));
+
     await screen.findByTestId("popout-content");
 
     await user.keyboard("{Escape}");
@@ -107,6 +156,7 @@ describe("Popout", () => {
     const { onOpenChange } = renderPopout();
 
     await user.click(screen.getByRole("button", { name: "Trigger" }));
+
     await screen.findByTestId("popout-content");
 
     await user.click(screen.getByRole("button", { name: "Outside" }));
@@ -142,6 +192,7 @@ describe("Popout", () => {
     await user.click(screen.getByRole("button", { name: "Trigger" }));
 
     expect(onOpenChange).toHaveBeenCalledWith(true);
+
     expect(screen.queryByText("Controlled content")).not.toBeInTheDocument();
   });
 
@@ -165,5 +216,43 @@ describe("Popout", () => {
     await user.click(screen.getByRole("button", { name: "Trigger" }));
 
     expect(screen.queryByTestId("popout-content")).not.toBeInTheDocument();
+  });
+
+  it("uses the fallback placement when the preferred placement does not fit", async () => {
+    const anchorRect = createRect(100, 540, 100, 32);
+    const contentRect = createRect(0, 0, 120, 80);
+
+    vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(
+      800,
+    );
+
+    vi.spyOn(document.documentElement, "clientHeight", "get").mockReturnValue(
+      600,
+    );
+
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      function (this: HTMLElement) {
+        return this.classList.contains("puzzle-popout__content")
+          ? contentRect
+          : anchorRect;
+      },
+    );
+
+    renderPopout({
+      defaultOpen: true,
+      position: "bottom",
+      matchTriggerWidth: true,
+    });
+
+    const content = await screen.findByTestId("popout-content");
+
+    const popout = content.closest(".puzzle-popout__content") as HTMLElement;
+
+    await waitFor(() => {
+      expect(popout.dataset.placement).toBe("top");
+    });
+
+    expect(popout.style.top).toBe("452px");
+    expect(popout.style.minWidth).toBe("100px");
   });
 });

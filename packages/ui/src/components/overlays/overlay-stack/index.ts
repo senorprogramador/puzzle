@@ -355,17 +355,24 @@ const registerOverlay = (
       return;
     }
 
-    // Restore focus after the next overlay has updated its state.
     Promise.resolve().then(() => {
-      if (entry.previousFocus?.isConnected) {
-        focusElement(entry.previousFocus);
+      const nextTop = getTopOverlay(stack.entries);
+
+      // Als een overlay boven de gesloten overlay actief blijft,
+      // moet focus binnen die overlay blijven.
+      if (nextTop?.modal) {
+        const content = nextTop.getContent?.();
+
+        if (content && !content.contains(ownerDocument.activeElement)) {
+          focusInitial(nextTop);
+        }
+
         return;
       }
 
-      const nextTop = getTopOverlay(stack.entries);
-
-      if (nextTop?.modal) {
-        focusInitial(nextTop);
+      // Herstel focus alleen als er geen modal overlay meer actief is.
+      if (entry.previousFocus?.isConnected) {
+        focusElement(entry.previousFocus);
       }
     });
   }) as OverlayRegistration;

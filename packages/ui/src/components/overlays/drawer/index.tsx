@@ -76,7 +76,7 @@ const DrawerContent = ({
   position = "left",
   open,
   onOpenChange,
-  "aria-label": ariaLabel = "Drawer",
+  "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
   ...props
 }: DrawerProps) => {

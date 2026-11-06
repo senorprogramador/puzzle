@@ -4,10 +4,7 @@ import {
   cloneElement,
   useCallback,
   useId,
-  useLayoutEffect,
-  useRef,
   useState,
-  type CSSProperties,
   type FocusEvent,
   type HTMLAttributes,
   type ReactElement,
@@ -15,8 +12,11 @@ import {
   type Ref,
   type RefAttributes,
 } from "react";
+
 import { cn } from "@puzzle/core";
+
 import { Popout, type PopoutAlignment, type PopoutPosition } from "../popout";
+
 import "./tooltip.css";
 
 type TooltipTriggerProps = HTMLAttributes<HTMLElement> &
@@ -24,15 +24,6 @@ type TooltipTriggerProps = HTMLAttributes<HTMLElement> &
 
 type TooltipArrowSide = "top" | "right" | "bottom" | "left";
 
-type TooltipArrowStyle = {
-  side: TooltipArrowSide;
-  style: CSSProperties;
-};
-
-/**
- * Non-interactive supplementary information shown on hover and keyboard focus.
- * Use Popover for content that contains links, buttons or other controls.
- */
 type TooltipProps = {
   trigger: ReactElement<TooltipTriggerProps>;
   children: ReactNode;
@@ -49,86 +40,11 @@ type TooltipProps = {
 
 type TooltipContentProps = {
   id?: string;
-  anchorRef: React.RefObject<HTMLElement | null>;
-  position: PopoutPosition;
   children: ReactNode;
   className?: string;
 };
 
 const arrowSize = 8;
-
-const getArrowSide = (
-  anchor: DOMRect,
-  content: DOMRect,
-  position: PopoutPosition,
-): TooltipArrowSide => {
-  // Determine the actual side after Popout fallback positioning.
-  if (anchor.bottom <= content.top) {
-    return "top";
-  }
-
-  if (anchor.top >= content.bottom) {
-    return "bottom";
-  }
-
-  if (anchor.right <= content.left) {
-    return "left";
-  }
-
-  if (anchor.left >= content.right) {
-    return "right";
-  }
-
-  // Fallback when the rectangles overlap.
-  switch (position) {
-    case "top":
-      return "bottom";
-
-    case "right":
-      return "left";
-
-    case "bottom":
-      return "top";
-
-    case "left":
-      return "right";
-  }
-};
-
-const getArrowStyle = (
-  side: TooltipArrowSide,
-  anchor: DOMRect,
-  content: DOMRect,
-): CSSProperties => {
-  const anchorCenterX = anchor.left + anchor.width / 2;
-  const anchorCenterY = anchor.top + anchor.height / 2;
-
-  switch (side) {
-    case "top":
-      return {
-        top: -arrowSize,
-        left: anchorCenterX - content.left - arrowSize,
-      };
-
-    case "bottom":
-      return {
-        bottom: -arrowSize,
-        left: anchorCenterX - content.left - arrowSize,
-      };
-
-    case "left":
-      return {
-        left: -arrowSize,
-        top: anchorCenterY - content.top - arrowSize,
-      };
-
-    case "right":
-      return {
-        right: -arrowSize,
-        top: anchorCenterY - content.top - arrowSize,
-      };
-  }
-};
 
 const setRef = <T,>(ref: Ref<T> | undefined, value: T | null): void => {
   if (typeof ref === "function") {
@@ -138,123 +54,12 @@ const setRef = <T,>(ref: Ref<T> | undefined, value: T | null): void => {
   }
 };
 
-const TooltipContent = ({
-  id,
-  anchorRef,
-  position,
-  children,
-  className,
-}: TooltipContentProps) => {
-  const contentRef = useRef<HTMLDivElement | null>(null);
-
-  const [arrow, setArrow] = useState<TooltipArrowStyle | null>(null);
-
-  const updateArrowPosition = useCallback(() => {
-    const anchor = anchorRef.current;
-    const content = contentRef.current;
-
-    if (
-      !anchor?.isConnected ||
-      !content?.isConnected ||
-      anchor.getClientRects().length === 0 ||
-      content.getClientRects().length === 0
-    ) {
-      return;
-    }
-
-    const anchorRect = anchor.getBoundingClientRect();
-    const contentRect = content.getBoundingClientRect();
-
-    if (
-      (contentRect.width === 0 && contentRect.height === 0) ||
-      (anchorRect.width === 0 && anchorRect.height === 0)
-    ) {
-      return;
-    }
-
-    const side = getArrowSide(anchorRect, contentRect, position);
-
-    setArrow({
-      side,
-      style: getArrowStyle(side, anchorRect, contentRect),
-    });
-  }, [anchorRef, position]);
-
-  useLayoutEffect(() => {
-    const anchor = anchorRef.current;
-    const content = contentRef.current;
-    const ownerDocument = anchor?.ownerDocument;
-    const ownerWindow = ownerDocument?.defaultView;
-
-    if (
-      !anchor ||
-      !content ||
-      !ownerDocument ||
-      !ownerWindow ||
-      content.ownerDocument !== ownerDocument
-    ) {
-      return;
-    }
-
-    let animationFrame = 0;
-
-    const scheduleArrowUpdate = () => {
-      ownerWindow.cancelAnimationFrame(animationFrame);
-      animationFrame = ownerWindow.requestAnimationFrame(updateArrowPosition);
-    };
-
-    updateArrowPosition();
-
-    const ResizeObserverConstructor =
-      ownerWindow.ResizeObserver ?? ResizeObserver;
-    const resizeObserver = new ResizeObserverConstructor(scheduleArrowUpdate);
-
-    resizeObserver.observe(anchor);
-    resizeObserver.observe(content);
-
-    const handleResize = () => scheduleArrowUpdate();
-    const handleScroll = () => scheduleArrowUpdate();
-
-    ownerWindow.addEventListener("resize", handleResize);
-    ownerWindow.addEventListener("scroll", handleScroll, true);
-
-    const visualViewport = ownerWindow.visualViewport;
-
-    visualViewport?.addEventListener("resize", handleResize);
-    visualViewport?.addEventListener("scroll", handleScroll);
-
-    return () => {
-      ownerWindow.cancelAnimationFrame(animationFrame);
-      resizeObserver.disconnect();
-
-      ownerWindow.removeEventListener("resize", handleResize);
-      ownerWindow.removeEventListener("scroll", handleScroll, true);
-
-      visualViewport?.removeEventListener("resize", handleResize);
-      visualViewport?.removeEventListener("scroll", handleScroll);
-    };
-  }, [anchorRef, updateArrowPosition]);
-
+const TooltipContent = ({ id, children, className }: TooltipContentProps) => {
   return (
-    <div
-      ref={contentRef}
-      role="tooltip"
-      id={id}
-      className={cn("puzzle-tooltip", className)}
-    >
+    <div id={id} role="tooltip" className={cn("puzzle-tooltip", className)}>
       {children}
 
-      <span
-        aria-hidden="true"
-        className={cn(
-          "puzzle-tooltip__arrow",
-          arrow && `puzzle-tooltip__arrow--${arrow.side}`,
-        )}
-        style={{
-          ...arrow?.style,
-          visibility: arrow ? "visible" : "hidden",
-        }}
-      />
+      <span aria-hidden="true" className="puzzle-tooltip__arrow" />
     </div>
   );
 };
@@ -267,14 +72,15 @@ const Tooltip = ({
   offset = arrowSize,
   exitDelay = 100,
   open,
-  defaultOpen,
+  defaultOpen = false,
   onOpenChange,
   className,
   triggerClassName,
 }: TooltipProps) => {
-  const anchorRef = useRef<HTMLElement | null>(null);
   const tooltipId = useId();
-  const [internalOpen, setInternalOpen] = useState(defaultOpen ?? false);
+
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+
   const isOpen = open ?? internalOpen;
 
   const handleOpenChange = useCallback(
@@ -288,16 +94,6 @@ const Tooltip = ({
     [open, onOpenChange],
   );
 
-  const handleTriggerRef = useCallback(
-    (node: HTMLElement | null) => {
-      anchorRef.current = node;
-      setRef(trigger.props.ref, node);
-    },
-    [trigger],
-  );
-
-  // Keyboard focus is the hover equivalent. The tooltip holds no focusable
-  // content, so leaving the trigger always closes it.
   const handleFocus = (event: FocusEvent<HTMLElement>) => {
     trigger.props.onFocus?.(event);
 
@@ -317,12 +113,17 @@ const Tooltip = ({
     }
   };
 
-  const describedBy = [trigger.props["aria-describedby"], isOpen && tooltipId]
+  const describedBy = [
+    trigger.props["aria-describedby"],
+    isOpen ? tooltipId : undefined,
+  ]
     .filter(Boolean)
     .join(" ");
 
   const triggerElement = cloneElement(trigger, {
-    ref: handleTriggerRef,
+    ref: (node: HTMLElement | null) => {
+      setRef(trigger.props.ref, node);
+    },
     onFocus: handleFocus,
     onBlur: handleBlur,
     "aria-describedby": describedBy || undefined,
@@ -343,12 +144,7 @@ const Tooltip = ({
       className={triggerClassName}
       contentClassName="puzzle-tooltip__content"
     >
-      <TooltipContent
-        id={tooltipId}
-        anchorRef={anchorRef}
-        position={position}
-        className={className}
-      >
+      <TooltipContent id={tooltipId} className={className}>
         {children}
       </TooltipContent>
     </Popout>
