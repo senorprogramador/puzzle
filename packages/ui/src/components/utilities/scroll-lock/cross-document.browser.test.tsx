@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { AppBar } from "../../layout/app-bar";
 import { Drawer } from "../../overlays/drawer";
 import { ScrollLock } from "../../utilities/scroll-lock";
+import { Preview } from "../preview";
 import { Editor } from "../../editors/text-editor/editor";
 import { createTextDocument } from "../../editors/text-editor/text-document";
 import type { TextSelection } from "../../editors/text-editor/text-editor.types";
@@ -47,6 +48,37 @@ const getFrame = () =>
   (screen.getByTitle("frame") as HTMLIFrameElement).contentDocument as Document;
 
 describe("cross-document behavior (browser)", () => {
+  it("locks Preview's explicit root scroller and restores it when disabled", async () => {
+    const Example = ({ enabled }: { enabled: boolean }) => (
+      <Preview height={350}>
+        <ScrollLock enabled={enabled} />
+        <div style={{ minHeight: "200vh" }}>Scrollable preview content</div>
+      </Preview>
+    );
+    const { container, rerender } = render(<Example enabled={false} />);
+    const frame = container.querySelector("iframe")!;
+    const frameDocument = await waitFor(() => {
+      expect(frame.contentDocument?.body.textContent).toContain("Scrollable preview content");
+      return frame.contentDocument!;
+    });
+    const root = frameDocument.documentElement;
+    const rootStyle = root.style;
+
+    expect(root.scrollHeight).toBeGreaterThan(root.clientHeight);
+    expect(rootStyle.overflowY).toBe("auto");
+
+    rerender(<Example enabled />);
+
+    await waitFor(() => expect(rootStyle.overflowY).toBe("hidden"));
+    expect(frameDocument.defaultView!.getComputedStyle(root).overflowY).toBe("hidden");
+    expect(document.documentElement.style.overflowY).not.toBe("hidden");
+
+    rerender(<Example enabled={false} />);
+
+    await waitFor(() => expect(rootStyle.overflowY).toBe("auto"));
+    expect(rootStyle.getPropertyPriority("overflow-y")).toBe("important");
+  });
+
   it("ScrollLock locks the document it is rendered in", async () => {
     render(
       <InFrame>

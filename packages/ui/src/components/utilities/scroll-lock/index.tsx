@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 type ScrollLockProps = {
-  /** Whether body scrolling should be locked. */
+  /** Whether document scrolling should be locked. */
   enabled?: boolean;
 };
 
@@ -21,7 +21,12 @@ const BODY_STYLE_PROPERTIES = [
   "width",
 ] as const;
 
-const HTML_STYLE_PROPERTIES = ["scrollbar-gutter", "scroll-behavior"] as const;
+const HTML_STYLE_PROPERTIES = [
+  "overflow-x",
+  "overflow-y",
+  "scrollbar-gutter",
+  "scroll-behavior",
+] as const;
 
 type BodyStyleProperty = (typeof BODY_STYLE_PROPERTIES)[number];
 type HtmlStyleProperty = (typeof HTML_STYLE_PROPERTIES)[number];
@@ -157,6 +162,8 @@ const lockScroll = (document: Document) => {
   }
 
   body.style.setProperty("overflow", "hidden", "important");
+  html.style.setProperty("overflow-x", "hidden", "important");
+  html.style.setProperty("overflow-y", "hidden", "important");
 
   // iOS Safari needs additional protection against touch scrolling.
   if (isIOS) {
@@ -190,6 +197,8 @@ const unlockScroll = (document: Document) => {
 
   // Restore the exact original inline declarations and priorities.
   restoreStyleSnapshots(body.style, state.bodyStyles);
+  restoreInlineStyle(html.style, "overflow-x", state.htmlStyles["overflow-x"]);
+  restoreInlineStyle(html.style, "overflow-y", state.htmlStyles["overflow-y"]);
 
   // Explicitly restore the original scrollbar-gutter value.
   restoreInlineStyle(

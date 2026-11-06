@@ -47,14 +47,34 @@ describe("ScrollLock", () => {
     );
   });
 
+  it("locks and restores explicit document-element overflow and priorities", () => {
+    const rootStyle = document.documentElement.style;
+    rootStyle.setProperty("overflow-x", "hidden", "important");
+    rootStyle.setProperty("overflow-y", "auto", "important");
+
+    const { rerender } = render(<ScrollLock />);
+
+    expect(rootStyle.overflowY).toBe("hidden");
+    expect(rootStyle.getPropertyPriority("overflow-y")).toBe("important");
+
+    rerender(<ScrollLock enabled={false} />);
+
+    expect(rootStyle.overflowX).toBe("hidden");
+    expect(rootStyle.overflowY).toBe("auto");
+    expect(rootStyle.getPropertyPriority("overflow-x")).toBe("important");
+    expect(rootStyle.getPropertyPriority("overflow-y")).toBe("important");
+  });
+
   it("stays locked until the last lock is released", () => {
     const first = render(<ScrollLock />);
     const second = render(<ScrollLock />);
 
     first.unmount();
     expect(document.body.style.overflow).toBe("hidden");
+    expect(document.documentElement.style.overflowY).toBe("hidden");
 
     second.unmount();
     expect(document.body.style.overflow).toBe("");
+    expect(document.documentElement.style.overflowY).toBe("");
   });
 });

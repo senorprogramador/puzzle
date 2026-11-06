@@ -5,6 +5,7 @@ import { ScrollLock } from "./index";
 afterEach(() => {
   cleanup();
   document.body.removeAttribute("style");
+  document.documentElement.removeAttribute("style");
   document.body.innerHTML = "";
 });
 
