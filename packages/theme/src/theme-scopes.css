@@ -1,0 +1,132 @@
+/*
+ * Local theme scopes deliberately do not create a layout box.
+ * This keeps the existing layout behaviour while allowing descendants
+ * to inherit theme variables.
+ */
+.puzzle-theme-scope {
+    display: contents;
+    color: var(--puzzle-color-text, inherit);
+}
+
+/* Local light mode and the default state of system mode. */
+.puzzle-theme-scope[data-theme="light"],
+.puzzle-theme-scope[data-theme="system"] {
+    color-scheme: light;
+
+    --puzzle-color-background: var(--puzzle-color-scheme-light-background, #f7f4ea);
+    --puzzle-color-surface: var(--puzzle-color-scheme-light-surface, #ffffff);
+    --puzzle-color-surface-elevated: var(--puzzle-color-scheme-light-surface-elevated, #ffffff);
+    --puzzle-color-surface-sunken: var(--puzzle-color-scheme-light-surface-sunken, #f1eee6);
+
+    --puzzle-color-text: var(--puzzle-color-scheme-light-text, #171717);
+    --puzzle-color-text-muted: var(--puzzle-color-scheme-light-text-muted, #666666);
+    --puzzle-color-text-subtle: var(--puzzle-color-scheme-light-text-subtle, #737373);
+
+    --puzzle-color-border: var(--puzzle-color-scheme-light-border, #e5e0d6);
+    --puzzle-color-border-strong: var(--puzzle-color-scheme-light-border-strong, #c9c2b6);
+
+    --puzzle-color-primary: var(--puzzle-color-scheme-light-primary, #2563eb);
+    --puzzle-color-primary-foreground: var(--puzzle-color-scheme-light-primary-foreground, #ffffff);
+
+    --puzzle-color-secondary: var(--puzzle-color-scheme-light-secondary, #64748b);
+    --puzzle-color-secondary-foreground: var(--puzzle-color-scheme-light-secondary-foreground, #ffffff);
+
+    --puzzle-color-accent: var(--puzzle-color-scheme-light-accent, #7c3aed);
+    --puzzle-color-accent-foreground: var(--puzzle-color-scheme-light-accent-foreground, #ffffff);
+
+    --puzzle-color-ring: var(--puzzle-color-scheme-light-ring, #2563eb);
+
+    --puzzle-color-success: var(--puzzle-color-scheme-light-success, #15803d);
+    --puzzle-color-success-foreground: var(--puzzle-color-scheme-light-success-foreground, #ffffff);
+
+    --puzzle-color-warning: var(--puzzle-color-scheme-light-warning, #a16207);
+    --puzzle-color-warning-foreground: var(--puzzle-color-scheme-light-warning-foreground, #ffffff);
+
+    --puzzle-color-danger: var(--puzzle-color-scheme-light-danger, #b91c1c);
+    --puzzle-color-danger-foreground: var(--puzzle-color-scheme-light-danger-foreground, #ffffff);
+
+    --puzzle-color-info: var(--puzzle-color-scheme-light-info, #0369a1);
+    --puzzle-color-info-foreground: var(--puzzle-color-scheme-light-info-foreground, #ffffff);
+}
+
+/* Explicit local dark mode. */
+.puzzle-theme-scope[data-theme="dark"] {
+    color-scheme: dark;
+
+    --puzzle-color-background: var(--puzzle-color-scheme-dark-background, #111518);
+    --puzzle-color-surface: var(--puzzle-color-scheme-dark-surface, #1c2226);
+    --puzzle-color-surface-elevated: var(--puzzle-color-scheme-dark-surface-elevated, #242c31);
+    --puzzle-color-surface-sunken: var(--puzzle-color-scheme-dark-surface-sunken, #0d1113);
+
+    --puzzle-color-text: var(--puzzle-color-scheme-dark-text, #f5f5f5);
+    --puzzle-color-text-muted: var(--puzzle-color-scheme-dark-text-muted, #a4adb3);
+    --puzzle-color-text-subtle: var(--puzzle-color-scheme-dark-text-subtle, #8c969d);
+
+    --puzzle-color-border: var(--puzzle-color-scheme-dark-border, #343c42);
+    --puzzle-color-border-strong: var(--puzzle-color-scheme-dark-border-strong, #4a555d);
+
+    --puzzle-color-primary: var(--puzzle-color-scheme-dark-primary, #60a5fa);
+    --puzzle-color-primary-foreground: var(--puzzle-color-scheme-dark-primary-foreground, #0b1220);
+
+    --puzzle-color-secondary: var(--puzzle-color-scheme-dark-secondary, #94a3b8);
+    --puzzle-color-secondary-foreground: var(--puzzle-color-scheme-dark-secondary-foreground, #0f172a);
+
+    --puzzle-color-accent: var(--puzzle-color-scheme-dark-accent, #c4b5fd);
+    --puzzle-color-accent-foreground: var(--puzzle-color-scheme-dark-accent-foreground, #1e1b4b);
+
+    --puzzle-color-ring: var(--puzzle-color-scheme-dark-ring, #93c5fd);
+
+    --puzzle-color-success: var(--puzzle-color-scheme-dark-success, #4ade80);
+    --puzzle-color-success-foreground: var(--puzzle-color-scheme-dark-success-foreground, #052e16);
+
+    --puzzle-color-warning: var(--puzzle-color-scheme-dark-warning, #fbbf24);
+    --puzzle-color-warning-foreground: var(--puzzle-color-scheme-dark-warning-foreground, #422006);
+
+    --puzzle-color-danger: var(--puzzle-color-scheme-dark-danger, #f87171);
+    --puzzle-color-danger-foreground: var(--puzzle-color-scheme-dark-danger-foreground, #450a0a);
+
+    --puzzle-color-info: var(--puzzle-color-scheme-dark-info, #38bdf8);
+    --puzzle-color-info-foreground: var(--puzzle-color-scheme-dark-info-foreground, #082f49);
+}
+
+/* System mode follows the OS preference independently for each scope. */
+@media (prefers-color-scheme: dark) {
+    .puzzle-theme-scope[data-theme="system"] {
+        color-scheme: dark;
+
+        --puzzle-color-background: var(--puzzle-color-scheme-dark-background, #111518);
+        --puzzle-color-surface: var(--puzzle-color-scheme-dark-surface, #1c2226);
+        --puzzle-color-surface-elevated: var(--puzzle-color-scheme-dark-surface-elevated, #242c31);
+        --puzzle-color-surface-sunken: var(--puzzle-color-scheme-dark-surface-sunken, #0d1113);
+
+        --puzzle-color-text: var(--puzzle-color-scheme-dark-text, #f5f5f5);
+        --puzzle-color-text-muted: var(--puzzle-color-scheme-dark-text-muted, #a4adb3);
+        --puzzle-color-text-subtle: var(--puzzle-color-scheme-dark-text-subtle, #8c969d);
+
+        --puzzle-color-border: var(--puzzle-color-scheme-dark-border, #343c42);
+        --puzzle-color-border-strong: var(--puzzle-color-scheme-dark-border-strong, #4a555d);
+
+        --puzzle-color-primary: var(--puzzle-color-scheme-dark-primary, #60a5fa);
+        --puzzle-color-primary-foreground: var(--puzzle-color-scheme-dark-primary-foreground, #0b1220);
+
+        --puzzle-color-secondary: var(--puzzle-color-scheme-dark-secondary, #94a3b8);
+        --puzzle-color-secondary-foreground: var(--puzzle-color-scheme-dark-secondary-foreground, #0f172a);
+
+        --puzzle-color-accent: var(--puzzle-color-scheme-dark-accent, #c4b5fd);
+        --puzzle-color-accent-foreground: var(--puzzle-color-scheme-dark-accent-foreground, #1e1b4b);
+
+        --puzzle-color-ring: var(--puzzle-color-scheme-dark-ring, #93c5fd);
+
+        --puzzle-color-success: var(--puzzle-color-scheme-dark-success, #4ade80);
+        --puzzle-color-success-foreground: var(--puzzle-color-scheme-dark-success-foreground, #052e16);
+
+        --puzzle-color-warning: var(--puzzle-color-scheme-dark-warning, #fbbf24);
+        --puzzle-color-warning-foreground: var(--puzzle-color-scheme-dark-warning-foreground, #422006);
+
+        --puzzle-color-danger: var(--puzzle-color-scheme-dark-danger, #f87171);
+        --puzzle-color-danger-foreground: var(--puzzle-color-scheme-dark-danger-foreground, #450a0a);
+
+        --puzzle-color-info: var(--puzzle-color-scheme-dark-info, #38bdf8);
+        --puzzle-color-info-foreground: var(--puzzle-color-scheme-dark-info-foreground, #082f49);
+    }
+}

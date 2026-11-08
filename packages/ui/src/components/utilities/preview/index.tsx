@@ -13,11 +13,15 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+
 import { cn } from "@puzzle/core";
 import { useRovingFocus } from "@puzzle/hooks";
 import { Icon } from "@puzzle/icons";
+import { ThemeScopeProvider, useThemeScope } from "@puzzle/theme/scope-context";
+
 import { Background } from "../../layout/background";
 import { highlightCode } from "./highlight";
+
 import "./preview.css";
 
 type PreviewDevice = "mobile" | "tablet" | "desktop";
@@ -31,7 +35,12 @@ type DeviceConfig = {
 
 type PreviewAlign = "start" | "center" | "end" | "stretch";
 type PreviewJustify =
-  "start" | "center" | "end" | "between" | "around" | "evenly";
+  | "start"
+  | "center"
+  | "end"
+  | "between"
+  | "around"
+  | "evenly";
 
 type PreviewProps = {
   children: ReactNode;
@@ -114,6 +123,9 @@ const Preview = ({
   const previewTabId = `${generatedId}-tab-preview`;
   const codeTabId = `${generatedId}-tab-code`;
   const panelId = `${generatedId}-panel`;
+
+  const themeScope = useThemeScope();
+
   const [device, setDevice] = useState<PreviewDevice>(defaultDevice);
   const [activeTab, setActiveTab] = useState<PreviewTab>("preview");
   const [frameRoot, setFrameRoot] = useState<HTMLElement | null>(null);
@@ -135,8 +147,6 @@ const Preview = ({
     const section = sectionRef.current;
 
     if (section) {
-      // Computed style covers CSS `direction`; the attribute covers
-      // environments that don't inherit it (such as jsdom).
       const isRtl =
         getComputedStyle(section).direction === "rtl" ||
         section.closest("[dir]")?.getAttribute("dir")?.toLowerCase() === "rtl";
@@ -151,7 +161,6 @@ const Preview = ({
     initialActiveId: activeTab,
   });
 
-  // Arrow keys only move focus between devices; Enter/Space selects one.
   const deviceFocus = useRovingFocus<HTMLButtonElement>({
     items: PREVIEW_DEVICE_ITEMS,
     dir: direction,
@@ -171,7 +180,6 @@ const Preview = ({
     }
   };
 
-  // Tabs use automatic activation: keyboard focus also selects the tab.
   const handleTabFocus = (tab: PreviewTab) => {
     rovingFocus.onItemFocus(tab);
 
@@ -191,10 +199,14 @@ const Preview = ({
       .querySelectorAll("[data-puzzle-preview-style]")
       .forEach((element) => element.remove());
 
-    // Theme renders its <style> where it is mounted (often inside <body>).
     document
       .querySelectorAll(
-        'head link[rel="stylesheet"], head style, style[data-puzzle-theme]',
+        [
+          "head link[rel='stylesheet']",
+          "head style",
+          "style[data-puzzle-theme]",
+          "style[data-puzzle-theme-scope-style]",
+        ].join(", "),
       )
       .forEach((element) => {
         const clone = element.cloneNode(true) as HTMLElement;
@@ -222,7 +234,6 @@ const Preview = ({
     body.className = document.body.className;
     body.style.cssText = document.body.style.cssText;
 
-    // The document element is the only scroll container.
     targetRoot.style.setProperty("box-sizing", "border-box", "important");
     targetRoot.style.setProperty("width", "100%", "important");
     targetRoot.style.setProperty("height", "100%", "important");
@@ -233,7 +244,6 @@ const Preview = ({
     targetRoot.style.setProperty("scrollbar-width", "none", "important");
     targetRoot.style.setProperty("-ms-overflow-style", "none", "important");
 
-    // Keep the body in normal document flow.
     body.style.setProperty("display", "block", "important");
     body.style.setProperty("position", "static", "important");
     body.style.setProperty("box-sizing", "border-box", "important");
@@ -243,7 +253,6 @@ const Preview = ({
     body.style.setProperty("margin", "0", "important");
     body.style.setProperty("overflow", "visible", "important");
 
-    // Remove the previous artificial minimum height.
     const previewRoot = frameDocument.getElementById(frameRootId);
 
     previewRoot?.style.removeProperty("min-height");
@@ -280,7 +289,6 @@ const Preview = ({
     [config.width],
   );
 
-  // Calculate the initial scale and keep it synchronized with the container.
   useIsomorphicLayoutEffect(() => {
     const container = containerRef.current;
 
@@ -309,7 +317,6 @@ const Preview = ({
     return () => observer.disconnect();
   }, [updateScale]);
 
-  // Keep application styles synchronized with the iframe.
   useEffect(() => {
     const isStyleNode = (node: Node) =>
       node instanceof Element &&
@@ -325,7 +332,6 @@ const Preview = ({
       attributes: true,
     });
 
-    // Only react to style changes in the body, not to all page updates.
     const bodyObserver = new MutationObserver((mutations) => {
       const affectsStyles = mutations.some((mutation) => {
         const target =
@@ -334,7 +340,9 @@ const Preview = ({
             : mutation.target.parentElement;
 
         return (
-          target?.closest("style[data-puzzle-theme]") != null ||
+          target?.closest(
+            "style[data-puzzle-theme], style[data-puzzle-theme-scope-style]",
+          ) != null ||
           Array.from(mutation.addedNodes).some(isStyleNode) ||
           Array.from(mutation.removedNodes).some(isStyleNode)
         );
@@ -359,7 +367,6 @@ const Preview = ({
     };
   }, [syncStyles]);
 
-  // Initialize the iframe without blocking the React portal on stylesheets.
   const initializeFrame = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
     const root = frameDocument?.getElementById(frameRootId);
@@ -370,12 +377,10 @@ const Preview = ({
     setFrameRoot(root);
   }, [frameRootId, syncStyles]);
 
-  // Handle both initial loading and an already-loaded iframe.
   useEffect(() => {
     initializeFrame();
   }, [initializeFrame]);
 
-  // Copy the provided code to the clipboard.
   const handleCopyCode = useCallback(async () => {
     if (code === undefined) return;
 
@@ -404,7 +409,6 @@ const Preview = ({
     [],
   );
 
-  // If code is removed while selected, return to the preview.
   useEffect(() => {
     if (!hasCode && activeTab === "code") {
       setActiveTab("preview");
@@ -421,7 +425,6 @@ const Preview = ({
   const contentStyle: CSSProperties = {
     display: "flex",
     boxSizing: "border-box",
-    // The frame height is the iframe's viewport height.
     minHeight: "100vh",
     alignItems: align ? ALIGN_VALUES[align] : undefined,
     justifyContent: justify ? JUSTIFY_VALUES[justify] : undefined,
@@ -559,7 +562,12 @@ const Preview = ({
 
             {frameRoot &&
               createPortal(
-                <div style={contentStyle}>{children}</div>,
+                <ThemeScopeProvider
+                  scopeId={themeScope?.scopeId ?? null}
+                  theme={themeScope?.theme ?? "system"}
+                >
+                  <div style={contentStyle}>{children}</div>
+                </ThemeScopeProvider>,
                 frameRoot,
               )}
           </div>

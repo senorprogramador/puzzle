@@ -5,6 +5,8 @@ import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { Theme } from "@puzzle/theme";
+
 import { Portal } from "./index";
 
 Object.assign(globalThis, {
@@ -58,7 +60,6 @@ describe("Portal", () => {
     });
 
     expect(document.body.querySelector("#portal-child")).not.toBeNull();
-
     expect(container.querySelector("#portal-child")).toBeNull();
   });
 
@@ -118,5 +119,48 @@ describe("Portal", () => {
     ).not.toBeNull();
 
     expect(container.querySelector("#fallback-portal-child")).toBeNull();
+  });
+
+  it("renders portal children inside the active local theme portal target", async () => {
+    const container = document.createElement("div");
+
+    document.body.append(container);
+
+    const element = (
+      <Theme scope="local" theme="dark">
+        <Portal>
+          <span id="local-theme-portal-child">Local theme portal content</span>
+        </Portal>
+      </Theme>
+    );
+
+    const serverMarkup = renderToString(element);
+
+    container.innerHTML = serverMarkup;
+
+    await act(async () => {
+      root = hydrateRoot(container, element);
+    });
+
+    const scope = container.querySelector<HTMLElement>(
+      "[data-puzzle-theme-scope]",
+    );
+
+    const scopeId = scope?.dataset.puzzleThemeScope;
+
+    const portalTarget = document.body.querySelector<HTMLElement>(
+      '[data-puzzle-theme-portal="true"]',
+    );
+
+    expect(scopeId).toBeDefined();
+    expect(portalTarget).not.toBeNull();
+    expect(portalTarget?.dataset.puzzleThemeScope).toBe(scopeId);
+    expect(portalTarget?.dataset.theme).toBe("dark");
+
+    expect(
+      portalTarget?.querySelector("#local-theme-portal-child"),
+    ).not.toBeNull();
+
+    expect(scope?.querySelector("#local-theme-portal-child")).toBeNull();
   });
 });

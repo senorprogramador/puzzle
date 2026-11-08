@@ -4,7 +4,9 @@
   "description": "Theme components for Puzzle",
   "license": "MIT",
   "type": "module",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -18,6 +20,11 @@
       "types": "./dist/components-context.d.ts",
       "import": "./dist/components-context.js",
       "require": "./dist/components-context.cjs"
+    },
+    "./scope-context": {
+      "types": "./dist/scope-context.d.ts",
+      "import": "./dist/scope-context.js",
+      "require": "./dist/scope-context.cjs"
     }
   },
   "files": [

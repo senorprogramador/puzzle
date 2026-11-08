@@ -3,10 +3,12 @@
 import { useEffect, useState, type PropsWithChildren } from "react";
 import { createPortal } from "react-dom";
 
+import { useThemeScope } from "@puzzle/theme/scope-context";
+
 type PortalProps = PropsWithChildren<{
   /**
    * ID of an existing portal target.
-   * Falls back to the provided container or document.body.
+   * Falls back to document.body when the target does not exist.
    */
   targetId?: string;
 
@@ -18,6 +20,7 @@ type PortalProps = PropsWithChildren<{
 }>;
 
 const Portal = ({ targetId, container, children }: PortalProps) => {
+  const themeScope = useThemeScope();
   const [target, setTarget] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -26,12 +29,18 @@ const Portal = ({ targetId, container, children }: PortalProps) => {
       return;
     }
 
-    const nextTarget = targetId
-      ? (document.getElementById(targetId) ?? document.body)
-      : document.body;
+    if (targetId) {
+      setTarget(document.getElementById(targetId) ?? document.body);
+      return;
+    }
 
-    setTarget(nextTarget);
-  }, [targetId, container]);
+    if (themeScope) {
+      setTarget(themeScope.portalTarget);
+      return;
+    }
+
+    setTarget(document.body);
+  }, [targetId, container, themeScope]);
 
   if (!target || children == null) {
     return null;

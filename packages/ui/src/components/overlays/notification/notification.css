@@ -1,6 +1,6 @@
 .puzzle-notification-viewport {
     position: fixed;
-    z-index: var(--puzzle-z-index-notification, 1600);
+    z-index: var(--puzzle-z-index-toast, 600);
 
     display: flex;
     flex-direction: column;

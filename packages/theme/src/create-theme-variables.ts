@@ -17,13 +17,17 @@ const isRecord = (value: unknown): value is Record<string, unknown> => {
 
 const structuredCloneSafe = <T>(value: T): T => {
   if (Array.isArray(value)) return value.map(structuredCloneSafe) as T;
+
   if (isRecord(value)) {
     const copy: Record<string, unknown> = {};
+
     for (const [key, child] of Object.entries(value)) {
       copy[key] = structuredCloneSafe(child);
     }
+
     return copy as T;
   }
+
   return value;
 };
 
@@ -33,6 +37,7 @@ const mergeKnownShape = <T extends Record<string, unknown>>(
   path: string,
 ): T => {
   if (override === undefined) return structuredCloneSafe(defaults);
+
   if (!isRecord(override)) {
     throw new TypeError(`${path} must be an object.`);
   }
@@ -44,6 +49,7 @@ const mergeKnownShape = <T extends Record<string, unknown>>(
   }
 
   const result: Record<string, unknown> = {};
+
   for (const key of Object.keys(defaults)) {
     const defaultValue = defaults[key];
     const overrideValue = override[key];
@@ -77,6 +83,7 @@ const setGroupVariables = (
 
 const quoteCssFontFamily = (family: string) => {
   if (GENERIC_FAMILIES.has(family.toLowerCase())) return family;
+
   return `"${family.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
 };
 
@@ -89,6 +96,7 @@ export const resolveThemeTokens = (
   colorTheme?: ColorThemes,
 ): ThemeTokens => {
   let defaultTokens = DEFAULT_TOKENS;
+
   if (colorTheme) {
     defaultTokens = {
       ...DEFAULT_TOKENS,
@@ -102,6 +110,7 @@ export const resolveThemeTokens = (
       },
     };
   }
+
   return mergeKnownShape(
     defaultTokens,
     overrides,
@@ -174,9 +183,7 @@ export const createThemeVariables = (
   );
 
   setGroupVariables(output, "radius", resolvedTokens.radius);
-
   setGroupVariables(output, "shadow", resolvedTokens.shadows);
-
   setGroupVariables(output, "elevation", resolvedTokens.elevation);
 
   /*
@@ -316,26 +323,25 @@ export const createThemeVariables = (
   /*
    * Font-family aliases
    *
-   * These are the base heading/body/accent font stacks.
+   * Keep the original --puzzle-font-{role} variables and also emit
+   * --puzzle-font-family-{role} for consistency with the component CSS.
    */
   for (const role of ["heading", "body", "accent"] as const) {
     const config = fonts?.[role];
 
-    if (config) {
-      const resolved = resolveFontConfig({
-        ...config,
-        role,
-      });
+    const fontFamily = config
+      ? (() => {
+          const resolved = resolveFontConfig({
+            ...config,
+            role,
+          });
 
-      output[`--puzzle-font-${role}`] = buildFontFamilyValue(
-        resolved.family,
-        resolved.fallback,
-      );
-    } else {
-      output[`--puzzle-font-${role}`] = DEFAULT_FONT_FALLBACKS[role]
-        .map(quoteCssFontFamily)
-        .join(", ");
-    }
+          return buildFontFamilyValue(resolved.family, resolved.fallback);
+        })()
+      : DEFAULT_FONT_FALLBACKS[role].map(quoteCssFontFamily).join(", ");
+
+    output[`--puzzle-font-${role}`] = fontFamily;
+    output[`--puzzle-font-family-${role}`] = fontFamily;
   }
 
   /*

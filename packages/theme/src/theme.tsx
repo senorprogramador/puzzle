@@ -1,12 +1,20 @@
-import type { PropsWithChildren } from "react";
+import { useId, type PropsWithChildren } from "react";
+
 import type { FontRole, FontConfig } from "./fonts";
 import type { ColorThemes, ThemeMode, ThemeTokenOverrides } from "./types";
 import type { ThemeComponents } from "./components.types";
+
 import { ThemeComponentsProvider } from "./components-context";
+import { ThemeScopeProvider } from "./scope-context";
+
 import { resolveFontStylesheets } from "./fonts/resolve-font-stylesheets";
 import { createThemeVariables } from "./create-theme-variables";
 import { createThemeCss } from "./create-theme-css";
+
 import "./theme.css";
+import "./theme-scopes.css";
+
+type ThemeScope = "root" | "local";
 
 type ThemeProps = {
   /** Nonce for the generated style element when using a strict CSP. */
@@ -14,6 +22,14 @@ type ThemeProps = {
 
   /** Active color scheme. */
   theme?: ThemeMode;
+
+  /**
+   * Theme scope.
+   *
+   * - root: preserves the existing document-wide theme behaviour.
+   * - local: applies tokens only to this subtree and its portals.
+   */
+  scope?: ThemeScope;
 
   /** Font configuration for heading, body and accent roles. */
   fonts?: Partial<Record<FontRole, FontConfig>>;
@@ -37,23 +53,22 @@ const Theme = ({
   nonce,
   fonts,
   theme = "system",
+  scope = "root",
   tokens,
-  colorTheme, // = "electric-indigo",
+  colorTheme,
   components,
   children,
 }: PropsWithChildren<ThemeProps>) => {
+  const scopeId = useId();
+
   const fontStylesheets = resolveFontStylesheets(fonts);
   const cssVariables = createThemeVariables(fonts, tokens, theme, colorTheme);
-  const css = `:root {\n${createThemeCss(cssVariables)}\n}`;
 
-  /*
-   * Only create a provider when a component configuration is supplied.
-   *
-   * This lets nested Theme instances inherit the parent configuration
-   * when their own `components` prop is omitted.
-   *
-   * An explicitly supplied empty object resets the configuration.
-   */
+  const cssSelector =
+    scope === "root" ? ":root" : `[data-puzzle-theme-scope="${scopeId}"]`;
+
+  const css = `${cssSelector} {\n${createThemeCss(cssVariables)}\n}`;
+
   const content =
     components === undefined ? (
       children
@@ -62,6 +77,15 @@ const Theme = ({
         {children}
       </ThemeComponentsProvider>
     );
+
+  const scopedContent = (
+    <ThemeScopeProvider
+      scopeId={scope === "local" ? scopeId : null}
+      theme={theme}
+    >
+      {content}
+    </ThemeScopeProvider>
+  );
 
   return (
     <>
@@ -80,13 +104,18 @@ const Theme = ({
         <link key={href} rel="stylesheet" href={href} precedence="default" />
       ))}
 
-      <style nonce={nonce} data-theme={theme} data-puzzle-theme="true">
+      <style
+        nonce={nonce}
+        data-theme={theme}
+        data-puzzle-theme={scope === "root" ? "true" : undefined}
+        data-puzzle-theme-scope-style={scope === "local" ? scopeId : undefined}
+      >
         {css}
       </style>
 
-      {content}
+      {scopedContent}
     </>
   );
 };
 
-export { Theme, type ThemeProps };
+export { Theme, type ThemeProps, type ThemeScope };

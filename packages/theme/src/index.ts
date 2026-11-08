@@ -10,7 +10,7 @@ export type {
   ThemeFonts,
 } from "./fonts";
 
-export { Theme, type ThemeProps } from "./theme";
+export { Theme, type ThemeProps, type ThemeScope } from "./theme";
 
 export type { TypographyStyle } from "./fonts/typography";
 

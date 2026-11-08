@@ -1,7 +1,11 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["src/index.ts", "src/components-context.tsx"],
+  entry: [
+    "src/index.ts",
+    "src/components-context.tsx",
+    "src/scope-context.tsx",
+  ],
   unbundle: true,
   format: ["esm", "cjs"],
   dts: true,

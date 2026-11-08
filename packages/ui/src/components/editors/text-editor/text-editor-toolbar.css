@@ -4,8 +4,8 @@
     background: var(--puzzle-color-surface, #ffffff);
     border: 1px solid var(--puzzle-color-border, #e5e0d6);
     border-radius: var(--puzzle-radius-lg, 0.75rem);
-    padding: var(--puzzle-spacing-sm, 8px);
-    top: calc(var(--puzzle-sticky-offset, 0px) + var(--puzzle-spacing-sm, 8px));
+    padding: var(--puzzle-space-2, 0.5rem);
+    top: calc(var(--puzzle-sticky-offset, 0px) + var(--puzzle-space-2, 0.5rem));
     z-index: 1;
 }
 

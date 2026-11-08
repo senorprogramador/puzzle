@@ -6,10 +6,10 @@
     position: relative;
     display: flex;
     align-items: flex-start;
-    gap: var(--puzzle-spacing-3, 0.75rem);
+    gap: var(--puzzle-space-3, 0.75rem);
 
     width: 100%;
-    padding: var(--puzzle-spacing-4, 1rem);
+    padding: var(--puzzle-space-4, 1rem);
 
     border: 1px solid transparent;
     border-radius: var(--puzzle-radius-md, 0.5rem);
@@ -83,7 +83,7 @@
     flex: 1;
     flex-direction: column;
     min-width: 0;
-    gap: var(--puzzle-spacing-1, 0.25rem);
+    gap: var(--puzzle-space-1, 0.25rem);
 }
 
 .puzzle-alert__title {

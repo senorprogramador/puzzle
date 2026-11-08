@@ -14,20 +14,24 @@
     padding: var(--puzzle-space-4, 1rem);
     touch-action: none;
 }
+
 .puzzle-drawer__resize-bar:focus-visible {
     outline: 2px solid var(--puzzle-color-ring);
     outline-offset: -2px;
 }
+
 .puzzle-drawer__resize-bar-inner {
     display: block;
-    border-radius: var(--puzzle-radius, 4px);
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
 }
+
 .puzzle-drawer--top .puzzle-drawer__resize-bar,
 .puzzle-drawer--bottom .puzzle-drawer__resize-bar {
     cursor: row-resize;
     width: 128px;
     margin: 0 auto;
 }
+
 .puzzle-drawer--top .puzzle-drawer__resize-bar-inner,
 .puzzle-drawer--bottom .puzzle-drawer__resize-bar-inner {
     height: 4px;
@@ -42,12 +46,15 @@
     height: 100%;
     padding: 0;
 }
+
 .puzzle-drawer--left .puzzle-drawer__resize-bar {
     border-right: 2px solid var(--puzzle-color-border-strong, rgba(0, 0, 0, 0.5));
 }
+
 .puzzle-drawer--right .puzzle-drawer__resize-bar {
     border-left: 2px solid var(--puzzle-color-border-strong, rgba(0, 0, 0, 0.5));
 }
+
 .puzzle-drawer--left .puzzle-drawer__resize-bar-inner,
 .puzzle-drawer--right .puzzle-drawer__resize-bar-inner {
     width: 4px;
@@ -82,6 +89,7 @@
     width: 100%;
     max-height: calc(100% - 2.5rem);
 }
+
 .puzzle-drawer__content-wrapper {
     flex: 1 1 auto;
     overflow: hidden;
@@ -96,6 +104,7 @@
 .puzzle-drawer--top .puzzle-drawer__content-wrapper {
     padding: var(--puzzle-space-4, 1.5rem) var(--puzzle-space-2, 0.75rem) 0;
 }
+
 .puzzle-drawer--top .puzzle-drawer__content {
     padding: 0 var(--puzzle-space-2, 0.75rem);
 }
@@ -103,6 +112,7 @@
 .puzzle-drawer--bottom .puzzle-drawer__content-wrapper {
     padding: 0 var(--puzzle-space-2, 0.75rem) var(--puzzle-space-4, 1.5rem);
 }
+
 .puzzle-drawer--bottom .puzzle-drawer__content {
     padding: 0 var(--puzzle-space-2, 0.75rem);
 }
@@ -112,14 +122,17 @@
         var(--puzzle-space-4, 1.5rem);
     overflow-x: hidden;
 }
+
 .puzzle-drawer--left .puzzle-drawer__content {
     padding: 0 var(--puzzle-space-2, 0.75rem);
     min-width: 96px;
 }
+
 .puzzle-drawer--right .puzzle-drawer__content-wrapper {
     padding: var(--puzzle-space-4, 1.5rem) var(--puzzle-space-2, 0.75rem) var(--puzzle-space-4, 1.5rem)
         var(--puzzle-space-2, 0.75rem);
 }
+
 .puzzle-drawer--right .puzzle-drawer__content {
     padding: 0 var(--puzzle-space-2, 0.75rem);
 }

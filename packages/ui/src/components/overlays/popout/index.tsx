@@ -19,6 +19,7 @@ import {
 import { createPortal } from "react-dom";
 
 import { cn, debounce } from "@puzzle/core";
+import { useThemeScope } from "@puzzle/theme/scope-context";
 
 import { Transition } from "../../utilities/transition";
 import { registerOverlay } from "../overlay-stack";
@@ -82,6 +83,8 @@ const Popout = ({
   className,
   contentClassName,
 }: PopoutProps) => {
+  const themeScope = useThemeScope();
+
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const [mounted, setMounted] = useState(false);
 
@@ -162,11 +165,16 @@ const Popout = ({
     (node: HTMLElement | null) => {
       anchorRef.current = node;
       setAnchorElement(node);
-      setPortalContainer(node?.ownerDocument.body ?? null);
+
+      setPortalContainer(
+        themeScope
+          ? themeScope.portalTarget
+          : (node?.ownerDocument.body ?? null),
+      );
 
       setRef(trigger.props.ref, node);
     },
-    [trigger],
+    [trigger, themeScope],
   );
 
   const handleContentRef = useCallback((node: HTMLDivElement | null) => {
@@ -304,7 +312,6 @@ const Popout = ({
     pointerDocumentRef.current = ownerDocument;
 
     ownerDocument.addEventListener("pointerup", handleDocumentPointerUp);
-
     ownerDocument.addEventListener("pointercancel", handleDocumentPointerUp);
   };
 
