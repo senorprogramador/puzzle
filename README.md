@@ -174,7 +174,7 @@ The script requires a clean git working tree and asks whether the release is
    library package, and refreshes `bun.lock`.
 2. Runs all package tests, including the UI browser tests.
 3. Builds all packages.
-4. Publishes core, theme, hooks, icons, and UI in that order, prompting for
+4. Publishes core, theme, hooks, icons, UI, and create in that order, prompting for
    npm login, one-time passwords, or browser authentication when needed.
 5. Commits the version changes as `Release v<version>` and creates the
    annotated tag `v<version>`.

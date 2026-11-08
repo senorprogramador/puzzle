@@ -192,7 +192,9 @@ const main = async () => {
         ? "test:all"
         : scripts.vitest
           ? "vitest"
-          : undefined;
+          : scripts.test
+            ? "test"
+            : undefined;
       if (testScript) {
         runOrFail(`Tests for ${manifest.name}`, "bun", ["run", testScript], {
           cwd: dir,
