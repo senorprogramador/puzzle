@@ -13,39 +13,18 @@ import { createThemeCss } from "./create-theme-css";
 
 import "./theme.css";
 import "./theme-scopes.css";
+import "./global.css";
 
-type ThemeScope = "root" | "local";
+export type ThemeScope = "root" | "local";
 
-type ThemeProps = {
-  /** Nonce for the generated style element when using a strict CSP. */
+export type ThemeProps = {
   nonce?: string;
-
-  /** Active color scheme. */
   theme?: ThemeMode;
-
-  /**
-   * Theme scope.
-   *
-   * - root: preserves the existing document-wide theme behaviour.
-   * - local: applies tokens only to this subtree and its portals.
-   */
   scope?: ThemeScope;
-
-  /** Font configuration for heading, body and accent roles. */
+  globalStyles?: boolean;
   fonts?: Partial<Record<FontRole, FontConfig>>;
-
-  /** Deeply partial overrides of the default design tokens. */
   tokens?: ThemeTokenOverrides;
-
-  /** Color theme selection. */
   colorTheme?: ColorThemes;
-
-  /**
-   * Global component overrides.
-   *
-   * In React Server Component environments, component values must be
-   * serializable Client Component references.
-   */
   components?: ThemeComponents;
 };
 
@@ -54,6 +33,7 @@ const Theme = ({
   fonts,
   theme = "system",
   scope = "root",
+  globalStyles,
   tokens,
   colorTheme,
   components,
@@ -68,6 +48,8 @@ const Theme = ({
     scope === "root" ? ":root" : `[data-puzzle-theme-scope="${scopeId}"]`;
 
   const css = `${cssSelector} {\n${createThemeCss(cssVariables)}\n}`;
+
+  const shouldApplyGlobalStyles = scope === "root" && (globalStyles ?? true);
 
   const content =
     components === undefined ? (
@@ -104,6 +86,10 @@ const Theme = ({
         <link key={href} rel="stylesheet" href={href} precedence="default" />
       ))}
 
+      {shouldApplyGlobalStyles ? (
+        <style nonce={nonce} data-puzzle-global-styles="" />
+      ) : null}
+
       <style
         nonce={nonce}
         data-theme={theme}
@@ -118,4 +104,4 @@ const Theme = ({
   );
 };
 
-export { Theme, type ThemeProps, type ThemeScope };
+export { Theme };

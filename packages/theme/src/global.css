@@ -1,0 +1,165 @@
+/*
+ * Global document styles are opt-in through the marker style element
+ * rendered by Theme.
+ *
+ * Local themes do not activate these rules.
+ */
+
+:root:has(style[data-puzzle-global-styles]) *,
+:root:has(style[data-puzzle-global-styles]) *::before,
+:root:has(style[data-puzzle-global-styles]) *::after {
+    box-sizing: border-box;
+}
+
+/* Document defaults */
+
+:root:has(style[data-puzzle-global-styles]) {
+    color-scheme: light;
+}
+
+:root:has(style[data-puzzle-global-styles]) body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    margin: 0;
+
+    color: var(--puzzle-color-text, #171717);
+    background: var(--puzzle-color-background, #f7f4ea);
+
+    font-family: var(--puzzle-font-family-body1, system-ui, sans-serif);
+    font-size: var(--puzzle-font-size-body1, 1rem);
+    font-weight: var(--puzzle-font-weight-body1, 400);
+    line-height: var(--puzzle-font-line-height-body1, 1.5);
+    letter-spacing: var(--puzzle-font-letter-spacing-body1, 0);
+}
+
+/* Form controls */
+
+:root:has(style[data-puzzle-global-styles]) :where(input, textarea, select, button) {
+    font: inherit;
+}
+
+:root:has(style[data-puzzle-global-styles]) :where(button) {
+    cursor: pointer;
+    font-family: var(--puzzle-font-family-button, inherit);
+    font-size: var(--puzzle-font-size-button, inherit);
+    font-weight: var(--puzzle-font-weight-button, inherit);
+    line-height: var(--puzzle-font-line-height-button, inherit);
+    letter-spacing: var(--puzzle-font-letter-spacing-button, inherit);
+}
+
+:root:has(style[data-puzzle-global-styles])
+    :where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
+    cursor: not-allowed;
+}
+
+/* Headings */
+
+:root:has(style[data-puzzle-global-styles]) :where(h1, h2, h3, h4, p) {
+    margin-block: 0;
+}
+
+:root:has(style[data-puzzle-global-styles]) :where(h1) {
+    font-family: var(--puzzle-font-family-headline1, inherit);
+    font-size: var(--puzzle-font-size-headline1, 2.25rem);
+    font-weight: var(--puzzle-font-weight-headline1, 700);
+    line-height: var(--puzzle-font-line-height-headline1, 1.15);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline1, -0.025em);
+}
+
+:root:has(style[data-puzzle-global-styles]) :where(h2) {
+    font-family: var(--puzzle-font-family-headline2, inherit);
+    font-size: var(--puzzle-font-size-headline2, 1.875rem);
+    font-weight: var(--puzzle-font-weight-headline2, 700);
+    line-height: var(--puzzle-font-line-height-headline2, 1.2);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline2, -0.025em);
+}
+
+:root:has(style[data-puzzle-global-styles]) :where(h3) {
+    font-family: var(--puzzle-font-family-headline3, inherit);
+    font-size: var(--puzzle-font-size-headline3, 1.5rem);
+    font-weight: var(--puzzle-font-weight-headline3, 600);
+    line-height: var(--puzzle-font-line-height-headline3, 1.3);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline3, 0);
+}
+
+:root:has(style[data-puzzle-global-styles]) :where(h4) {
+    font-family: var(--puzzle-font-family-headline4, inherit);
+    font-size: var(--puzzle-font-size-headline4, 1.25rem);
+    font-weight: var(--puzzle-font-weight-headline4, 600);
+    line-height: var(--puzzle-font-line-height-headline4, 1.3);
+    letter-spacing: var(--puzzle-font-letter-spacing-headline4, 0);
+}
+
+/* Text vertical rhythm */
+
+:root:has(style[data-puzzle-global-styles]) :where(h1, h2, h3, h4) + :where(h1, h2, h3, h4) {
+    margin-block-start: var(--puzzle-font-gap-heading-stack-gap, 0.3em);
+}
+
+:root:has(style[data-puzzle-global-styles]) :where(h1, h2, h3, h4) + :where(p) {
+    margin-block-start: var(--puzzle-font-gap-heading-paragraph-gap, 0.65em);
+}
+
+:root:has(style[data-puzzle-global-styles]) :where(p) + :where(p) {
+    margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
+}
+
+:root:has(style[data-puzzle-global-styles]) :where(p) + :where(h1, h2, h3, h4) {
+    margin-block-start: var(--puzzle-font-gap-section-gap, 1.5em);
+}
+
+/* Links and focus */
+
+:root:has(style[data-puzzle-global-styles]) :where(a) {
+    color: var(--puzzle-color-primary, #2563eb);
+}
+
+:root:has(style[data-puzzle-global-styles]) :where(:focus-visible) {
+    outline: 2px solid var(--puzzle-color-ring, #2563eb);
+    outline-offset: 2px;
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    :root:has(style[data-puzzle-global-styles]) *,
+    :root:has(style[data-puzzle-global-styles]) *::before,
+    :root:has(style[data-puzzle-global-styles]) *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Forced colors / high contrast */
+
+@media (forced-colors: active) {
+    :root:has(style[data-puzzle-global-styles]) :where(:focus-visible) {
+        outline: 2px solid Highlight;
+        outline-offset: 2px;
+    }
+
+    :root:has(style[data-puzzle-global-styles]) :where(a) {
+        color: LinkText;
+    }
+
+    :root:has(style[data-puzzle-global-styles])
+        :where(button, input, textarea, select, [role="button"], [role="option"]) {
+        forced-color-adjust: auto;
+    }
+
+    :root:has(style[data-puzzle-global-styles]) :where(input, textarea, select) {
+        border-color: ButtonText;
+    }
+
+    :root:has(style[data-puzzle-global-styles])
+        :where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
+        color: GrayText;
+        border-color: GrayText;
+    }
+
+    :root:has(style[data-puzzle-global-styles]) :where([aria-invalid="true"], [data-invalid="true"]) {
+        outline-color: Mark;
+    }
+}

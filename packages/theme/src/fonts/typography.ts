@@ -3,7 +3,6 @@ import type { ThemeTypographyRoleTokens, TypographyStyle } from "../types";
 export type { TypographyStyle } from "../types";
 
 export const typographyDefaults = {
-  // Display — hero titles and prominent marketing content
   display1: {
     size: 80,
     lineHeight: 1.05,
@@ -17,7 +16,6 @@ export const typographyDefaults = {
       maxViewport: 1440,
     },
   },
-
   display2: {
     size: 60,
     lineHeight: 1.1,
@@ -31,8 +29,6 @@ export const typographyDefaults = {
       maxViewport: 1200,
     },
   },
-
-  // Headlines — page and section headings
   headline1: {
     size: 48,
     lineHeight: 1.15,
@@ -46,7 +42,6 @@ export const typographyDefaults = {
       maxViewport: 1200,
     },
   },
-
   headline2: {
     size: 36,
     lineHeight: 1.2,
@@ -60,7 +55,6 @@ export const typographyDefaults = {
       maxViewport: 1024,
     },
   },
-
   headline3: {
     size: 28,
     lineHeight: 1.25,
@@ -74,7 +68,6 @@ export const typographyDefaults = {
       maxViewport: 900,
     },
   },
-
   headline4: {
     size: 20,
     lineHeight: 1.3,
@@ -82,8 +75,6 @@ export const typographyDefaults = {
     letterSpacing: 0.15,
     font: "heading",
   },
-
-  // Subtitles
   subtitle1: {
     size: 16,
     lineHeight: 1.5,
@@ -91,7 +82,6 @@ export const typographyDefaults = {
     letterSpacing: 0.15,
     font: "heading",
   },
-
   subtitle2: {
     size: 14,
     lineHeight: 1.43,
@@ -99,8 +89,6 @@ export const typographyDefaults = {
     letterSpacing: 0.1,
     font: "heading",
   },
-
-  // Body text
   body1: {
     size: 16,
     lineHeight: 1.5,
@@ -108,7 +96,6 @@ export const typographyDefaults = {
     letterSpacing: 0.5,
     font: "body",
   },
-
   body2: {
     size: 14,
     lineHeight: 1.43,
@@ -116,8 +103,6 @@ export const typographyDefaults = {
     letterSpacing: 0.25,
     font: "body",
   },
-
-  // Interactive elements
   button: {
     size: 14,
     lineHeight: 1.43,
@@ -125,8 +110,6 @@ export const typographyDefaults = {
     letterSpacing: 0.5,
     font: "body",
   },
-
-  // Supporting text
   caption: {
     size: 12,
     lineHeight: 1.4,
@@ -134,7 +117,6 @@ export const typographyDefaults = {
     letterSpacing: 0.4,
     font: "body",
   },
-
   overline: {
     size: 10,
     lineHeight: 1.6,
@@ -193,57 +175,35 @@ const lineHeightTokenByValue = new Map<number, string>([
   [2, "loose"],
 ]);
 
-const letterSpacingTokens = [
-  { value: -0.05, token: "tighter" },
-  { value: -0.025, token: "tight" },
-  { value: 0, token: "normal" },
-  { value: 0.025, token: "wide" },
-  { value: 0.05, token: "wider" },
-  { value: 0.1, token: "widest" },
-] as const;
-
 const createTypographyRole = (
   name: TypographyStyle,
   typography: (typeof typographyDefaults)[TypographyStyle],
 ): ThemeTypographyRoleTokens => {
   const fontSizeScale = fontSizeScaleByRole[name];
-
-  const fontSize =
-    fontSizeScale !== undefined
-      ? `var(--puzzle-font-size-${fontSizeScale})`
-      : "responsive" in typography
-        ? createFluidFontSize(typography.responsive)
-        : `${typography.size / 16}rem`;
-
   const fontWeightToken = fontWeightTokenByValue.get(typography.weight);
-  const fontWeight =
-    fontWeightToken !== undefined
-      ? `var(--puzzle-font-weight-${fontWeightToken})`
-      : String(typography.weight);
-
   const lineHeightToken = lineHeightTokenByValue.get(typography.lineHeight);
-  const lineHeight =
-    lineHeightToken !== undefined
-      ? `var(--puzzle-font-line-height-${lineHeightToken})`
-      : String(typography.lineHeight);
-
-  const normalizedLetterSpacing = typography.letterSpacing / typography.size;
-
-  const letterSpacingToken = letterSpacingTokens.find(
-    ({ value }) => Math.abs(value - normalizedLetterSpacing) < 0.000001,
-  );
-
-  const letterSpacing =
-    letterSpacingToken !== undefined
-      ? `var(--puzzle-font-letter-spacing-${letterSpacingToken.token})`
-      : `${normalizedLetterSpacing}em`;
 
   return {
     font: typography.font,
-    fontSize,
-    fontWeight,
-    lineHeight,
-    letterSpacing,
+
+    fontSize:
+      fontSizeScale !== undefined
+        ? `var(--puzzle-font-size-${fontSizeScale})`
+        : "responsive" in typography
+          ? createFluidFontSize(typography.responsive)
+          : `${typography.size / 16}rem`,
+
+    fontWeight:
+      fontWeightToken !== undefined
+        ? `var(--puzzle-font-weight-${fontWeightToken})`
+        : String(typography.weight),
+
+    lineHeight:
+      lineHeightToken !== undefined
+        ? `var(--puzzle-font-line-height-${lineHeightToken})`
+        : String(typography.lineHeight),
+
+    letterSpacing: `${typography.letterSpacing / typography.size}em`,
   };
 };
 

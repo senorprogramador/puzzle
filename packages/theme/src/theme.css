@@ -1,20 +1,9 @@
-/* Box model */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
+/* Light scheme defaults */
 
-/* Layout defaults and light-scheme semantic aliases */
 :root {
     color-scheme: light;
 
     --puzzle-container-gutter: clamp(1rem, 3vw, 3rem);
-    --puzzle-container-max-width: 105ch;
-
-    --puzzle-breakpoint-tablet: 768px;
-    --puzzle-breakpoint-desktop: 1024px;
-    --puzzle-breakpoint-hd: 1440px;
 
     --puzzle-color-background: var(--puzzle-color-scheme-light-background, #f7f4ea);
     --puzzle-color-surface: var(--puzzle-color-scheme-light-surface, #ffffff);
@@ -52,13 +41,8 @@
     --puzzle-color-info-foreground: var(--puzzle-color-scheme-light-info-foreground, #ffffff);
 }
 
-/*
- * Explicit dark mode.
- *
- * Theme.tsx renders a style element with data-puzzle-theme="true"
- * and data-theme="dark". :has() lets us react to that signal without
- * mutating the document element from JavaScript.
- */
+/* Explicit dark mode */
+
 :root:has(style[data-puzzle-theme="true"][data-theme="dark"]) {
     color-scheme: dark;
 
@@ -98,13 +82,8 @@
     --puzzle-color-info-foreground: var(--puzzle-color-scheme-dark-info-foreground, #082f49);
 }
 
-/*
- * System mode.
- *
- * An explicit light or dark mode must win over the system preference.
- * The Theme component's "system" value intentionally matches neither
- * explicit selector above, so this media query applies in system mode.
- */
+/* System mode */
+
 @media (prefers-color-scheme: dark) {
     :root:not(
         :has(style[data-puzzle-theme="true"][data-theme="light"], style[data-puzzle-theme="true"][data-theme="dark"])
@@ -148,112 +127,24 @@
     }
 }
 
-/* Global document defaults */
-:where(html, body) {
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-    color-scheme: inherit;
-    color: var(--puzzle-color-text, #171717);
-    background: var(--puzzle-color-background, #f7f4ea);
+/* Typography utility classes */
+
+.puzzle-typography-display1,
+.puzzle-typography-display2,
+.puzzle-typography-headline1,
+.puzzle-typography-headline2,
+.puzzle-typography-headline3,
+.puzzle-typography-headline4,
+.puzzle-typography-subtitle1,
+.puzzle-typography-subtitle2,
+.puzzle-typography-body1,
+.puzzle-typography-body2,
+.puzzle-typography-button,
+.puzzle-typography-caption,
+.puzzle-typography-overline {
+    font-family: var(--puzzle-font-family-body, inherit);
 }
 
-:where(body) {
-    margin: 0;
-    font-family: var(--puzzle-font-family-body1, system-ui, sans-serif);
-    font-size: var(--puzzle-font-size-body1, 1rem);
-    font-weight: var(--puzzle-font-weight-body1, 400);
-    line-height: var(--puzzle-font-line-height-body1, 1.5);
-    letter-spacing: var(--puzzle-font-letter-spacing-body1, 0);
-}
-
-/* Browser form controls should follow the theme typography. */
-:where(input, textarea, select, button) {
-    font: inherit;
-}
-
-:where(button) {
-    cursor: pointer;
-    font-family: var(--puzzle-font-family-button, inherit);
-    font-size: var(--puzzle-font-size-button, inherit);
-    font-weight: var(--puzzle-font-weight-button, inherit);
-    line-height: var(--puzzle-font-line-height-button, inherit);
-    letter-spacing: var(--puzzle-font-letter-spacing-button, inherit);
-}
-
-:where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
-    cursor: not-allowed;
-}
-
-/* Headings */
-:where(h1, h2, h3, h4, p) {
-    margin-block: 0;
-}
-
-:where(h1) {
-    font-family: var(--puzzle-font-family-headline1, inherit);
-    font-size: var(--puzzle-font-size-headline1, 2.25rem);
-    font-weight: var(--puzzle-font-weight-headline1, 700);
-    line-height: var(--puzzle-font-line-height-headline1, 1.15);
-    letter-spacing: var(--puzzle-font-letter-spacing-headline1, -0.025em);
-}
-
-:where(h2) {
-    font-family: var(--puzzle-font-family-headline2, inherit);
-    font-size: var(--puzzle-font-size-headline2, 1.875rem);
-    font-weight: var(--puzzle-font-weight-headline2, 700);
-    line-height: var(--puzzle-font-line-height-headline2, 1.2);
-    letter-spacing: var(--puzzle-font-letter-spacing-headline2, -0.025em);
-}
-
-:where(h3) {
-    font-family: var(--puzzle-font-family-headline3, inherit);
-    font-size: var(--puzzle-font-size-headline3, 1.5rem);
-    font-weight: var(--puzzle-font-weight-headline3, 600);
-    line-height: var(--puzzle-font-line-height-headline3, 1.3);
-    letter-spacing: var(--puzzle-font-letter-spacing-headline3, 0);
-}
-
-:where(h4) {
-    font-family: var(--puzzle-font-family-headline4, inherit);
-    font-size: var(--puzzle-font-size-headline4, 1.25rem);
-    font-weight: var(--puzzle-font-weight-headline4, 600);
-    line-height: var(--puzzle-font-line-height-headline4, 1.3);
-    letter-spacing: var(--puzzle-font-letter-spacing-headline4, 0);
-}
-
-/* Text vertical rhythm */
-:where(h1, h2, h3, h4) + :where(h1, h2, h3, h4) {
-    margin-block-start: var(--puzzle-font-gap-heading-stack-gap, 0.3em);
-}
-
-:where(h1, h2, h3, h4) + :where(p) {
-    margin-block-start: var(--puzzle-font-gap-heading-paragraph-gap, 0.65em);
-}
-
-:where(p) + :where(p) {
-    margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
-}
-
-:where(p) + :where(h1, h2, h3, h4) {
-    margin-block-start: var(--puzzle-font-gap-section-gap, 1.5em);
-}
-
-/* Links and focus */
-:where(a) {
-    color: var(--puzzle-color-primary, #2563eb);
-}
-
-:where(:focus-visible) {
-    outline: 2px solid var(--puzzle-color-ring, #2563eb);
-    outline-offset: 2px;
-}
-
-/*
- * Typography utilities.
- *
- * The font role variables use the --puzzle-font-line-height-* and
- * --puzzle-font-letter-spacing-* names emitted by createThemeVariables.
- */
 .puzzle-typography-display1 {
     font-family: var(--puzzle-font-family-display1, inherit);
     font-size: var(--puzzle-font-size-display1, inherit);
@@ -356,45 +247,4 @@
     font-weight: var(--puzzle-font-weight-overline, inherit);
     line-height: var(--puzzle-font-line-height-overline, inherit);
     letter-spacing: var(--puzzle-font-letter-spacing-overline, inherit);
-}
-
-/* Respect reduced-motion preferences. */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* Respect Windows High Contrast / forced-colors mode. */
-@media (forced-colors: active) {
-    :where(:focus-visible) {
-        outline: 2px solid Highlight;
-        outline-offset: 2px;
-    }
-
-    :where(a) {
-        color: LinkText;
-    }
-
-    :where(button, input, textarea, select, [role="button"], [role="option"]) {
-        forced-color-adjust: auto;
-    }
-
-    :where(input, textarea, select) {
-        border-color: ButtonText;
-    }
-
-    :where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
-        color: GrayText;
-        border-color: GrayText;
-    }
-
-    :where([aria-invalid="true"], [data-invalid="true"]) {
-        outline-color: Mark;
-    }
 }
