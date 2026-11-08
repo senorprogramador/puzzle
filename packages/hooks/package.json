@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/hooks",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Reusable React hooks for Puzzle",
   "license": "MIT",
   "publishConfig": {
@@ -33,7 +33,7 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.2.0"
+    "@puzzle-ui/core": "^0.3.0"
   },
   "peerDependencies": {
     "react": "^19.0.0"

@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/icons",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Icons for Puzzle",
   "license": "MIT",
   "publishConfig": {
@@ -37,7 +37,7 @@
   "dependencies": {
     "@iconify/react": "^6.0.3",
     "@iconify/utils": "^3.1.7",
-    "@puzzle-ui/core": "^0.2.0"
+    "@puzzle-ui/core": "^0.3.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",
