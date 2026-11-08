@@ -336,6 +336,14 @@ export {
 
 export { Backdrop, type BackdropProps } from "./components/overlays/backdrop";
 
+export {
+  Command,
+  CommandDialog,
+  type CommandItem,
+  type CommandProps,
+  type CommandDialogProps,
+} from "./components/overlays/command";
+
 export { Dialog, type DialogProps } from "./components/overlays/dialog";
 
 export { Drawer, type DrawerProps } from "./components/overlays/drawer";

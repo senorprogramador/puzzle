@@ -1,0 +1,122 @@
+---
+title: Command
+description: Searchable, keyboard-navigable command lists and command palettes.
+---
+
+import { CommandDialogExample, CommandExample } from "../../../../../src/components/doc-examples";
+
+Command provides a searchable list of actions. Use it inline for a compact action menu, or use `CommandDialog` to present the list as a modal command palette.
+
+## Import
+
+```tsx
+import { Command, CommandDialog } from "@puzzle/ui";
+```
+
+## Inline command list
+
+Pass commands as data. By default, search matches every query term against each command's label, description, keywords, and group, without case or accent sensitivity. Select an item with a click or the keyboard.
+
+<Preview height={440} code={`\
+const commands = [
+  { id: "new-file", label: "New file", group: "File", keywords: ["create"] },
+  { id: "settings", label: "Settings", group: "Preferences" },
+];
+
+<Command
+  commands={commands}
+  autoFocus={false}
+  onSelect={(command) => console.log(command.id)}
+/>
+`}>
+  <CommandExample />
+</Preview>
+
+## Command dialog
+
+`CommandDialog` wraps the list in a modal dialog. It opens with `⌘K` on macOS or `Ctrl+K` elsewhere by default, and closes after a command is selected. The shortcut is ignored while focus is in an editable field. Set `shortcut={false}` to disable it.
+
+<Preview height={200} code={`\
+<CommandDialog
+  title="Project commands"
+  commands={commands}
+  onSelect={(command) => runCommand(command.id)}
+/>
+`}>
+  <CommandDialogExample />
+</Preview>
+
+Visibility can be controlled with `open` and `onOpenChange`, or initialized with `defaultOpen`. When controlled, update `open` in response to `onOpenChange`.
+
+## Filtering and query state
+
+Use `query` with `onQueryChange` to control the search input. `defaultQuery` sets its initial value when using the built-in state. Provide `filter` to replace the default matching behavior:
+
+```tsx
+<Command
+  commands={commands}
+  query={query}
+  onQueryChange={setQuery}
+  filter={(command, search) => command.id.startsWith(search)}
+/>
+```
+
+Use `loading` and `loadingMessage` while searching asynchronously. `emptyMessage` customizes the no-results message. Disabled items remain visible but cannot be selected or reached with keyboard navigation.
+
+## Keyboard interaction and accessibility
+
+- Arrow Up and Arrow Down move between enabled commands; navigation wraps by default. Set `loop={false}` to stop at the ends.
+- Enter selects the active command. Ctrl/Cmd+Home and Ctrl/Cmd+End move to the first and last enabled command.
+- `autoFocus` focuses the search input on mount and is enabled by default.
+- The search input is a labeled combobox associated with a listbox. Groups, disabled options, and result/loading status are exposed to assistive technology. Set `label` to provide a useful accessible name when the default is not appropriate.
+
+## API
+
+### `Command`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `commands` | `CommandItem[]` | Required | Items to display. |
+| `placeholder` | `string` | `"Search commands..."` | Search input placeholder. |
+| `label` | `string` | `"Search commands"` | Accessible name for the search input. |
+| `emptyMessage` | `ReactNode` | `"No commands found."` | Message shown when there are no matching items. |
+| `loading` | `boolean` | `false` | Shows the loading state instead of the list. |
+| `loadingMessage` | `ReactNode` | `"Searching..."` | Loading and live-region message. |
+| `filter` | `(command, query) => boolean` | Default search | Custom matching function; replaces the default filter. |
+| `query` | `string` | - | Controlled search query. Pair with `onQueryChange`. |
+| `defaultQuery` | `string` | `""` | Initial query for an uncontrolled input. |
+| `onQueryChange` | `(query: string) => void` | - | Called when the search query changes. |
+| `onSelect` | `(command: CommandItem) => void` | - | Called when an enabled command is selected. |
+| `loop` | `boolean` | `true` | Whether keyboard navigation wraps at the ends. |
+| `autoFocus` | `boolean` | `true` | Focus the search input on mount. |
+| `className` | `string` | - | Additional class on the root element. |
+
+`Command` also accepts standard `div` attributes, except `children` and `onSelect`.
+
+### `CommandDialog`
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | `boolean` | - | Controlled visibility. |
+| `defaultOpen` | `boolean` | `false` | Initial visibility when uncontrolled. |
+| `onOpenChange` | `(open: boolean) => void` | - | Called when visibility changes are requested. |
+| `title` | `ReactNode` | `"Command palette"` | Dialog title. |
+| `description` | `string` | - | Optional dialog description. |
+| `shortcut` | `string \| false` | `"k"` | Key used with Ctrl/Cmd to toggle the dialog, or `false` to disable the shortcut. |
+| `commands`, `placeholder`, `label`, `emptyMessage`, `loading`, `loadingMessage`, `filter`, `onSelect`, `onQueryChange`, `query`, `defaultQuery`, `loop`, `className` | Same as `Command` | Same as `Command` | Props forwarded to the command list. |
+
+### `CommandItem`
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Unique item identifier, also used as its React key. |
+| `label` | `string` | Primary command text. |
+| `description` | `string` | Optional secondary text; included in default search. |
+| `keywords` | `string[]` | Optional extra search terms. |
+| `group` | `string` | Optional group heading; included in default search. |
+| `shortcut` | `string` | Optional shortcut hint displayed with the item. |
+| `icon` | `ReactNode` | Optional decorative icon. |
+| `disabled` | `boolean` | Prevents selection and keyboard focus. |
+| `onSelect` | `() => void` | Optional item-specific selection callback. |
+
+When selected, an item's `onSelect` runs before the component's `onSelect`. `CommandDialog` then requests that the dialog close.

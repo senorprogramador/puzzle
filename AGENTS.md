@@ -79,6 +79,13 @@ Stop reading once the required pattern is established. Do not read package-wide 
 - Review the diff for accessibility, accidental API changes, hardcoded design values, unrelated edits, and missing exports.
 - Do not add tests that merely duplicate existing coverage; add focused tests for meaningful behavior and regressions.
 
-## 8. Completion response
+## 8. Site documentation
+
+- Component docs live in `apps/site/content/docs/components/ui/<category>/<component>.mdx`. Use the category's existing directory and follow a nearby page's MDX structure, including `title` and `description` frontmatter, import instructions, examples, API details, and accessibility guidance where relevant.
+- Use Fumadocs' `<Preview>` for runnable examples. MDX already exposes capitalized exports from `@puzzle/ui`; for stateful or reusable examples, add a named example component to `apps/site/src/components/doc-examples.tsx` and import it from the MDX page using the relative path pattern of nearby pages.
+- Add each component page to the matching category in `apps/site/src/components/layout/sidebar.tsx`; the sidebar `href` must match the documentation route.
+- Verify the documented component is exported from `@puzzle/ui` before using that import in MDX. Run `bun run --filter @puzzle/site build` to validate MDX pages, examples, and navigation changes.
+
+## 9. Completion response
 
 Briefly report what changed, key API or design decisions, and validation performed. Mention any checks not run. Keep the summary concise and do not restate the implementation in detail.

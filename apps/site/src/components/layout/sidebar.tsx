@@ -262,6 +262,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/overlays/backdrop",
               },
               {
+                id: "command",
+                label: "Command",
+                href: "/docs/components/ui/overlays/command",
+              },
+              {
                 id: "dialog",
                 label: "Dialog",
                 href: "/docs/components/ui/overlays/dialog",
