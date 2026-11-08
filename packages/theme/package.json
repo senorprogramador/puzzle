@@ -9,20 +9,16 @@
   ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
     "./components-context": {
-      "types": "./dist/components-context.d.ts",
       "import": "./dist/components-context.js",
       "require": "./dist/components-context.cjs"
     },
     "./scope-context": {
-      "types": "./dist/scope-context.d.ts",
       "import": "./dist/scope-context.js",
       "require": "./dist/scope-context.cjs"
     }
