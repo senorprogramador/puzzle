@@ -3,6 +3,8 @@ title: Bottom Navigation
 description: Compact icon-and-label navigation for primary destinations.
 ---
 
+import { BottomNavigationPreview } from "../../../../../src/components/bottom-navigation-preview";
+
 ## Import
 
 ```tsx
@@ -20,11 +22,7 @@ Use direct `BottomNavigationItem` children. Provide `href` for destinations or `
   <BottomNavigationItem icon={<Icon name="lucide:settings" />} label="Settings" href="#settings" />
 </BottomNavigation>
 `}>
-  <Section><BottomNavigation ariaLabel="Primary destinations">
-    <BottomNavigationItem icon={<Icon name="lucide:house" />} label="Home" href="#home" active />
-    <BottomNavigationItem icon={<Icon name="lucide:search" />} label="Search" href="#search" />
-    <BottomNavigationItem icon={<Icon name="lucide:settings" />} label="Settings" href="#settings" />
-  </BottomNavigation></Section>
+  <BottomNavigationPreview />
 </Preview>
 
 ## API
@@ -48,4 +46,4 @@ Use direct `BottomNavigationItem` children. Provide `href` for destinations or `
 | `active` | `boolean` | `false` | Current visual state. |
 | `className`, `style` | `string`, `CSSProperties` | - | Item styling. |
 
-The component does not choose routes or track active state. Set `active` from the application route.
+The component does not choose routes or track active state. Set `active` from the application route. Inactive items use the muted text color; only items with `active` use the primary color.

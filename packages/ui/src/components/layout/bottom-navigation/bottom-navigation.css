@@ -52,6 +52,7 @@
 
 /* Items */
 
+.puzzle-bottom-navigation-item.puzzle-link,
 .puzzle-bottom-navigation-item {
     display: flex;
     flex: 1 0 auto;

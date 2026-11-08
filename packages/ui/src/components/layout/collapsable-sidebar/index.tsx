@@ -9,8 +9,8 @@ import {
   type MouseEventHandler,
   type ReactNode,
 } from "react";
-import { BottomNavigation, BottomNavigationItem } from "../bottom-navigation";
 import "./collapsable-sidebar.css";
+import { Text } from "../../typography/text";
 
 type SidebarItemBase = {
   id: string;
@@ -55,11 +55,6 @@ type CollapsableSidebarProps = {
 const isSidebarGroup = (
   entry: CollapsableSidebarEntry,
 ): entry is CollapsableSidebarGroup => "items" in entry;
-
-const getSidebarItems = (
-  entries: CollapsableSidebarEntry[],
-): CollapsableSidebarItem[] =>
-  entries.flatMap((entry) => (isSidebarGroup(entry) ? entry.items : [entry]));
 
 type SidebarItemRendererProps = {
   item: CollapsableSidebarItem;
@@ -128,9 +123,14 @@ const SidebarGroupRenderer = ({
       aria-labelledby={group.label ? headingId : undefined}
     >
       {group.label && (
-        <h2 id={headingId} className="puzzle-collapsable-sidebar__group-label">
+        <Text
+          id={headingId}
+          type="overline"
+          as="h2"
+          className="puzzle-collapsable-sidebar__group-label"
+        >
           {group.label}
-        </h2>
+        </Text>
       )}
 
       <div className="puzzle-collapsable-sidebar__group-items">
@@ -174,8 +174,6 @@ const CollapsableSidebar = ({
     onCollapsedChange?.(nextCollapsed);
   };
 
-  const allItems = getSidebarItems(items);
-
   const classes = cn(
     "puzzle-collapsable-sidebar",
     `expand-${expand}`,
@@ -196,11 +194,13 @@ const CollapsableSidebar = ({
         onClick={toggleCollapsed}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         aria-expanded={!collapsed}
+        aria-controls={`${idPrefix}-navigation`}
       >
         <span aria-hidden="true">{collapsed ? "›" : "‹"}</span>
       </button>
 
       <nav
+        id={`${idPrefix}-navigation`}
         className="puzzle-collapsable-sidebar__navigation"
         aria-label={ariaLabel}
       >
@@ -224,22 +224,6 @@ const CollapsableSidebar = ({
           )}
         </div>
       </nav>
-
-      <BottomNavigation
-        className="puzzle-collapsable-sidebar__mobile"
-        ariaLabel={ariaLabel}
-      >
-        {allItems.map((item) => (
-          <BottomNavigationItem
-            key={item.id}
-            icon={item.icon}
-            label={item.label}
-            href={"href" in item ? item.href : undefined}
-            onClick={"onClick" in item ? item.onClick : undefined}
-            active={item.active}
-          />
-        ))}
-      </BottomNavigation>
     </aside>
   );
 };

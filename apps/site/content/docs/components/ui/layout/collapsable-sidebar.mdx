@@ -1,6 +1,6 @@
 ---
 title: Collapsable Sidebar
-description: Expandable icon navigation with a compact mobile alternative.
+description: Vertical icon navigation that expands inline or over adjacent content on desktop and mobile.
 ---
 
 ## Import
@@ -11,7 +11,9 @@ import { CollapsableSidebar } from "@puzzle/ui";
 
 ## Groups and expansion
 
-The sidebar starts collapsed. Its toggle expands labels, while narrow layouts use bottom navigation. Resize the preview to compare.
+The sidebar starts collapsed. Its toggle expands labels and group headings. Navigation stays vertical on mobile, with the same toggle and groups as desktop. Expanded labels wrap to fit the available width.
+
+Use `expand="inline"` to reserve the expanded width in the layout, or `expand="over"` to keep a compact rail while the navigation overlays adjacent content.
 
 <Preview height={500} code={`\
 <CollapsableSidebar ariaLabel="Workspace" defaultCollapsed={false} items={[

@@ -13,7 +13,9 @@ import { PageLayout } from "@puzzle/ui";
 
 Place region components directly inside PageLayout. They become semantic header, main, aside, and footer elements. Sidebars appear below main content on mobile/tablet and beside it on desktop by default.
 
-<Preview height={500} code={`\
+<Preview
+  height={500}
+  code={`\
 <PageLayout minHeight="auto">
   <PageLayout.Header><Section><Heading level="headline3">Workspace</Heading></Section></PageLayout.Header>
   <PageLayout.LeftSidebar><Paper><p>Navigation</p></Paper></PageLayout.LeftSidebar>
@@ -21,28 +23,49 @@ Place region components directly inside PageLayout. They become semantic header,
   <PageLayout.RightSidebar><Paper><p>Related content</p></Paper></PageLayout.RightSidebar>
   <PageLayout.Footer><Section><Text>Footer</Text></Section></PageLayout.Footer>
 </PageLayout>
-`}>
+`}
+>
   <PageLayout minHeight="auto">
-    <PageLayout.Header><Section><Heading level="headline3">Workspace</Heading></Section></PageLayout.Header>
-    <PageLayout.LeftSidebar><Paper><p>Navigation</p></Paper></PageLayout.LeftSidebar>
-    <PageLayout.Main><Paper><p>Main content</p></Paper></PageLayout.Main>
-    <PageLayout.RightSidebar><Paper><p>Related content</p></Paper></PageLayout.RightSidebar>
-    <PageLayout.Footer><Section><Text>Footer</Text></Section></PageLayout.Footer>
+    <PageLayout.Header>
+      <Section>
+        <Heading level="headline3">Workspace</Heading>
+      </Section>
+    </PageLayout.Header>
+    <PageLayout.LeftSidebar>
+      <Paper style={{ height: "100%" }}>
+        <p>Navigation</p>
+      </Paper>
+    </PageLayout.LeftSidebar>
+    <PageLayout.Main>
+      <Paper style={{ height: "100%" }}>
+        <p>Main content</p>
+      </Paper>
+    </PageLayout.Main>
+    <PageLayout.RightSidebar>
+      <Paper style={{ height: "100%" }}>
+        <p>Related content</p>
+      </Paper>
+    </PageLayout.RightSidebar>
+    <PageLayout.Footer>
+      <Section>
+        <Text>Footer</Text>
+      </Section>
+    </PageLayout.Footer>
   </PageLayout>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `ReactNode` | Required | Direct region components. |
-| `sidebarPlacement` | Responsive `"beside" \| "below"` | Mobile/tablet below, desktop beside | Responsive sidebar positioning. |
-| `maxWidth` | `string \| number` | Theme CSS | Content width limit. |
-| `gap`, `rowGap`, `columnGap` | `string \| number` | Theme CSS | Region spacing. |
-| `contentPaddingInline`, `contentPaddingBlock` | `string \| number` | Theme CSS | Content padding. |
-| `minHeight` | `string \| number` | Theme CSS | Page minimum height. |
-| `className`, `contentClassName` | `string` | - | Root and content-grid classes. |
-| `style` | `CSSProperties` | - | Root style. |
+| Prop                                          | Type                             | Default                             | Description                     |
+| --------------------------------------------- | -------------------------------- | ----------------------------------- | ------------------------------- |
+| `children`                                    | `ReactNode`                      | Required                            | Direct region components.       |
+| `sidebarPlacement`                            | Responsive `"beside" \| "below"` | Mobile/tablet below, desktop beside | Responsive sidebar positioning. |
+| `maxWidth`                                    | `string \| number`               | Theme CSS                           | Content width limit.            |
+| `gap`, `rowGap`, `columnGap`                  | `string \| number`               | Theme CSS                           | Region spacing.                 |
+| `contentPaddingInline`, `contentPaddingBlock` | `string \| number`               | Theme CSS                           | Content padding.                |
+| `minHeight`                                   | `string \| number`               | Theme CSS                           | Page minimum height.            |
+| `className`, `contentClassName`               | `string`                         | -                                   | Root and content-grid classes.  |
+| `style`                                       | `CSSProperties`                  | -                                   | Root style.                     |
 
 Numbers represent pixels; prefer theme variables for consistent sizing. Responsive values accept `{ mobile, tablet, desktop }`.
 

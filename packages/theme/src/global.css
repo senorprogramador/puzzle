@@ -110,7 +110,7 @@
 
 /* Links and focus */
 
-:root:has(style[data-puzzle-global-styles]) :where(a) {
+:where(:root:has(style[data-puzzle-global-styles])) :where(a) {
     color: var(--puzzle-color-primary, #2563eb);
 }
 
