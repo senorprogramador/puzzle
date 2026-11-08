@@ -277,6 +277,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/overlays/drawer",
               },
               {
+                id: "dropdown-menu",
+                label: "Dropdown Menu",
+                href: "/docs/components/ui/overlays/dropdown-menu",
+              },
+              {
                 id: "notification",
                 label: "Notification",
                 href: "/docs/components/ui/overlays/notification",
