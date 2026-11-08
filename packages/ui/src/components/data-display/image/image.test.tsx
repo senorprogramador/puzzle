@@ -2,7 +2,7 @@ import type { ComponentPropsWithRef } from "react";
 
 import { fireEvent, render, screen } from "@testing-library/react";
 
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 
 import { describe, expect, it, vi } from "vitest";
 

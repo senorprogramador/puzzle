@@ -7,7 +7,7 @@ import {
   type ComponentPropsWithoutRef,
 } from "react";
 
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 
 import "./input.css";
 

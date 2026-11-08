@@ -1,8 +1,8 @@
-import { Stack } from "@puzzle/ui/components/layout/stack";
+import { Stack } from "@puzzle-ui/ui/components/layout/stack";
 import {
   Accordion,
   type AccordionItemData,
-} from "@puzzle/ui/components/navigation/accordion";
+} from "@puzzle-ui/ui/components/navigation/accordion";
 
 const items: AccordionItemData[] = [
   {

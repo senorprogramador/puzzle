@@ -1,5 +1,5 @@
 import { type ReactNode, useState } from "react";
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 
 import type { AlertProps, AlertSeverity, AlertVariant } from "./alert.types";
 

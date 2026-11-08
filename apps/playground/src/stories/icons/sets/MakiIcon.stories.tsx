@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MakiIcon } from "@puzzle/icons/sets/maki";
-import { MakiIconPage } from "@puzzle/icons/sets/maki.page";
-import { ALL_MAKI_ICONS } from "@puzzle/icons/sets/maki.constants";
+import { MakiIcon } from "@puzzle-ui/icons/sets/maki";
+import { MakiIconPage } from "@puzzle-ui/icons/sets/maki.page";
+import { ALL_MAKI_ICONS } from "@puzzle-ui/icons/sets/maki.constants";
 
 const meta = {
   title: "Icons/Sets/Maki",

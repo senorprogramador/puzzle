@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { LineMdIcon } from "@puzzle/icons/sets/line-md";
-import { LineMdIconPage } from "@puzzle/icons/sets/line-md.page";
-import { ALL_LINE_MD_ICONS } from "@puzzle/icons/sets/line-md.constants";
+import { LineMdIcon } from "@puzzle-ui/icons/sets/line-md";
+import { LineMdIconPage } from "@puzzle-ui/icons/sets/line-md.page";
+import { ALL_LINE_MD_ICONS } from "@puzzle-ui/icons/sets/line-md.constants";
 
 const meta = {
   title: "Icons/Sets/LineMd",

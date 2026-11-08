@@ -10,23 +10,30 @@ Organize related content into panels, with a single selected tab at a time. Comp
 ## Import
 
 ```tsx
-import { Tabs } from "@puzzle/ui";
+import { Tabs } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
 
 `tab` supplies the trigger label, and `children` supplies the panel content. `initialActiveId` chooses the initial panel; otherwise the first enabled tab is selected.
 
-<Preview height={240} code={`\
+<Preview
+  height={240}
+  code={`\
 <Tabs initialActiveId="details">
   <Tabs.Tab id="overview" tab="Overview">A summary of your project.</Tabs.Tab>
   <Tabs.Tab id="details" tab="Details">Project settings and details.</Tabs.Tab>
 </Tabs>
-`}>
+`}
+>
   <Section>
     <Tabs initialActiveId="details">
-      <Tabs.Tab id="overview" tab="Overview">A summary of your project.</Tabs.Tab>
-      <Tabs.Tab id="details" tab="Details">Project settings and details.</Tabs.Tab>
+      <Tabs.Tab id="overview" tab="Overview">
+        A summary of your project.
+      </Tabs.Tab>
+      <Tabs.Tab id="details" tab="Details">
+        Project settings and details.
+      </Tabs.Tab>
     </Tabs>
   </Section>
 </Preview>
@@ -35,7 +42,9 @@ import { Tabs } from "@puzzle/ui";
 
 `tabBarPosition` supports `top`, `bottom`, `left`, and `right`. Left and right positions use vertical keyboard navigation.
 
-<Preview height={540} code={`\
+<Preview
+  height={540}
+  code={`\
 <Stack>
   <Tabs tabBarPosition="bottom">
     <Tabs.Tab id="summary" tab="Summary">Bottom navigation.</Tabs.Tab>
@@ -50,20 +59,33 @@ import { Tabs } from "@puzzle/ui";
     <Tabs.Tab id="activity" tab="Activity">Recent activity.</Tabs.Tab>
   </Tabs>
 </Stack>
-`}>
+`}
+>
   <Section>
     <Stack>
       <Tabs tabBarPosition="bottom">
-        <Tabs.Tab id="summary" tab="Summary">Bottom navigation.</Tabs.Tab>
-        <Tabs.Tab id="activity" tab="Activity">Recent activity.</Tabs.Tab>
+        <Tabs.Tab id="summary" tab="Summary">
+          Bottom navigation.
+        </Tabs.Tab>
+        <Tabs.Tab id="activity" tab="Activity">
+          Recent activity.
+        </Tabs.Tab>
       </Tabs>
       <Tabs tabBarPosition="left">
-        <Tabs.Tab id="summary" tab="Summary">Left navigation.</Tabs.Tab>
-        <Tabs.Tab id="activity" tab="Activity">Recent activity.</Tabs.Tab>
+        <Tabs.Tab id="summary" tab="Summary">
+          Left navigation.
+        </Tabs.Tab>
+        <Tabs.Tab id="activity" tab="Activity">
+          Recent activity.
+        </Tabs.Tab>
       </Tabs>
       <Tabs tabBarPosition="right">
-        <Tabs.Tab id="summary" tab="Summary">Right navigation.</Tabs.Tab>
-        <Tabs.Tab id="activity" tab="Activity">Recent activity.</Tabs.Tab>
+        <Tabs.Tab id="summary" tab="Summary">
+          Right navigation.
+        </Tabs.Tab>
+        <Tabs.Tab id="activity" tab="Activity">
+          Recent activity.
+        </Tabs.Tab>
       </Tabs>
     </Stack>
   </Section>
@@ -77,6 +99,7 @@ Use `activeId` with `onActivate` to own the selected tab. Do not combine control
 const [activeId, setActiveId] = useState("overview");
 
 return (
+
   <Tabs activeId={activeId} onActivate={setActiveId}>
     <Tabs.Tab id="overview" tab="Overview">Selected tab: {activeId}</Tabs.Tab>
     <Tabs.Tab id="details" tab="Details">Selected tab: {activeId}</Tabs.Tab>
@@ -90,20 +113,27 @@ return (
 
 Inactive panel contents are unmounted by default. `forceMountContent` keeps them mounted but hidden, preserving local state and uncontrolled form values. Type a note, switch tabs, then return to see it preserved.
 
-<Preview height={300} code={`\
+<Preview
+  height={300}
+  code={`\
 <Tabs forceMountContent>
   <Tabs.Tab id="notes" tab="Notes">
     <label>Draft note <input placeholder="Write a note" /></label>
   </Tabs.Tab>
   <Tabs.Tab id="help" tab="Help">Your note stays mounted in the other panel.</Tabs.Tab>
 </Tabs>
-`}>
+`}
+>
   <Section>
     <Tabs forceMountContent>
       <Tabs.Tab id="notes" tab="Notes">
-        <label>Draft note <input placeholder="Write a note" /></label>
+        <label>
+          Draft note <input placeholder="Write a note" />
+        </label>
       </Tabs.Tab>
-      <Tabs.Tab id="help" tab="Help">Your note stays mounted in the other panel.</Tabs.Tab>
+      <Tabs.Tab id="help" tab="Help">
+        Your note stays mounted in the other panel.
+      </Tabs.Tab>
     </Tabs>
   </Section>
 </Preview>
@@ -112,18 +142,27 @@ Inactive panel contents are unmounted by default. `forceMountContent` keeps them
 
 Set `disabled` on a tab to prevent selection and skip it during keyboard navigation. Provide `dir="rtl"` on `Tabs` for right-to-left horizontal arrow-key behavior.
 
-<Preview height={280} code={`\
+<Preview
+  height={280}
+  code={`\
 <Tabs dir="rtl" initialActiveId="details">
   <Tabs.Tab id="overview" tab="Overview">Overview content</Tabs.Tab>
   <Tabs.Tab id="details" tab="Details">Details content</Tabs.Tab>
   <Tabs.Tab id="settings" tab="Settings" disabled>Settings content</Tabs.Tab>
 </Tabs>
-`}>
+`}
+>
   <Section>
     <Tabs dir="rtl" initialActiveId="details">
-      <Tabs.Tab id="overview" tab="Overview">Overview content</Tabs.Tab>
-      <Tabs.Tab id="details" tab="Details">Details content</Tabs.Tab>
-      <Tabs.Tab id="settings" tab="Settings" disabled>Settings content</Tabs.Tab>
+      <Tabs.Tab id="overview" tab="Overview">
+        Overview content
+      </Tabs.Tab>
+      <Tabs.Tab id="details" tab="Details">
+        Details content
+      </Tabs.Tab>
+      <Tabs.Tab id="settings" tab="Settings" disabled>
+        Settings content
+      </Tabs.Tab>
     </Tabs>
   </Section>
 </Preview>
@@ -132,16 +171,16 @@ Set `disabled` on a tab to prevent selection and skip it during keyboard navigat
 
 ### Tabs
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `ReactNode` | Required | Direct `Tabs.Tab` children. |
-| `tabBarPosition` | `"top" \| "bottom" \| "left" \| "right"` | `"top"` | Position and orientation of the tab bar. |
-| `initialActiveId` | `string` | First enabled tab | Initial uncontrolled selection. |
-| `activeId` | `string` | - | Controlled selection. Invalid or disabled IDs fall back to the first enabled tab. |
-| `onActivate` | `(tabId: string) => void` | - | Called when a tab is activated. |
-| `forceMountContent` | `boolean` | `false` | Keeps inactive panel contents mounted and hidden. |
-| `className` | `string` | - | Additional class on the root div. |
-| `dir` | `"ltr" \| "rtl" \| "auto"` | - | Root text direction; use explicit `rtl` for RTL keyboard navigation. |
+| Prop                | Type                                     | Default           | Description                                                                       |
+| ------------------- | ---------------------------------------- | ----------------- | --------------------------------------------------------------------------------- |
+| `children`          | `ReactNode`                              | Required          | Direct `Tabs.Tab` children.                                                       |
+| `tabBarPosition`    | `"top" \| "bottom" \| "left" \| "right"` | `"top"`           | Position and orientation of the tab bar.                                          |
+| `initialActiveId`   | `string`                                 | First enabled tab | Initial uncontrolled selection.                                                   |
+| `activeId`          | `string`                                 | -                 | Controlled selection. Invalid or disabled IDs fall back to the first enabled tab. |
+| `onActivate`        | `(tabId: string) => void`                | -                 | Called when a tab is activated.                                                   |
+| `forceMountContent` | `boolean`                                | `false`           | Keeps inactive panel contents mounted and hidden.                                 |
+| `className`         | `string`                                 | -                 | Additional class on the root div.                                                 |
+| `dir`               | `"ltr" \| "rtl" \| "auto"`               | -                 | Root text direction; use explicit `rtl` for RTL keyboard navigation.              |
 
 Other native div attributes are forwarded to the root, except `onChange`.
 
@@ -149,12 +188,12 @@ Other native div attributes are forwarded to the root, except `onChange`.
 
 `TabsTab` is also exported as a named alias of `Tabs.Tab`, with the same props and direct-child requirement.
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `id` | `string` | Required | Unique tab identifier. |
-| `tab` | `ReactNode` | Required | Content of the tab button. |
-| `children` | `ReactNode` | Required | Panel content. |
-| `disabled` | `boolean` | `false` | Prevents focus and selection. |
+| Prop       | Type        | Default  | Description                   |
+| ---------- | ----------- | -------- | ----------------------------- |
+| `id`       | `string`    | Required | Unique tab identifier.        |
+| `tab`      | `ReactNode` | Required | Content of the tab button.    |
+| `children` | `ReactNode` | Required | Panel content.                |
+| `disabled` | `boolean`   | `false`  | Prevents focus and selection. |
 
 ## Accessibility
 

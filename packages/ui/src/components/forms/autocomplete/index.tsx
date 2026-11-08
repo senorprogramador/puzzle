@@ -12,7 +12,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 
-import { cn, resolveResponsiveValue } from "@puzzle/core";
+import { cn, resolveResponsiveValue } from "@puzzle-ui/core";
 
 import { Popout } from "../../overlays/popout";
 

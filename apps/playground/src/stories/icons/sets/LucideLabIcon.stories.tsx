@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { LucideLabIcon } from "@puzzle/icons/sets/lucide-lab";
-import { LucideLabIconPage } from "@puzzle/icons/sets/lucide-lab.page";
-import { ALL_LUCIDE_LAB_ICONS } from "@puzzle/icons/sets/lucide-lab.constants";
+import { LucideLabIcon } from "@puzzle-ui/icons/sets/lucide-lab";
+import { LucideLabIconPage } from "@puzzle-ui/icons/sets/lucide-lab.page";
+import { ALL_LUCIDE_LAB_ICONS } from "@puzzle-ui/icons/sets/lucide-lab.constants";
 
 const meta = {
   title: "Icons/Sets/LucideLab",

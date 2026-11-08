@@ -20,28 +20,28 @@
             "@testing-library/jest-dom"
         ],
         "paths": {
-            "@puzzle/core": [
+            "@puzzle-ui/core": [
                 "../core/src/index.ts"
             ],
-            "@puzzle/core/*": [
+            "@puzzle-ui/core /*": [
                 "../core/src/*"
             ],
-            "@puzzle/theme": [
+            "@puzzle-ui/theme": [
                 "../theme/src/index.ts"
             ],
-            "@puzzle/theme/*": [
+            "@puzzle-ui/theme/*": [
                 "../theme/src/*"
             ],
-            "@puzzle/hooks": [
+            "@puzzle-ui/hooks": [
                 "../hooks/src/index.ts"
             ],
-            "@puzzle/hooks/*": [
+            "@puzzle-ui/hooks/*": [
                 "../hooks/src/*"
             ],
-            "@puzzle/icons": [
+            "@puzzle-ui/icons": [
                 "../icons/src/index.ts"
             ],
-            "@puzzle/icons/*": [
+            "@puzzle-ui/icons/*": [
                 "../icons/src/*"
             ]
         }

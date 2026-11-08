@@ -6,14 +6,16 @@ description: A semantic supporting-content region.
 ## Import
 
 ```tsx
-import { Sidebar } from "@puzzle/ui";
+import { Sidebar } from "@puzzle-ui/ui";
 ```
 
 ## Usage
 
 Sidebar supplies a styled region, not navigation state or page positioning. Compose it with `PageLayout` when building a full page.
 
-<Preview height={350} code={`\
+<Preview
+  height={350}
+  code={`\
 <Sidebar aria-label="Related resources">
   <Stack>
     <Heading level="headline4">Resources</Heading>
@@ -21,18 +23,22 @@ Sidebar supplies a styled region, not navigation state or page positioning. Comp
     <Link href="#support">Support</Link>
   </Stack>
 </Sidebar>
-`}>
-  <Sidebar aria-label="Related resources"><Stack>
-    <Heading level="headline4">Resources</Heading>
-    <Link href="#guides">Guides</Link><Link href="#support">Support</Link>
-  </Stack></Sidebar>
+`}
+>
+  <Sidebar aria-label="Related resources">
+    <Stack>
+      <Heading level="headline4">Resources</Heading>
+      <Link href="#guides">Guides</Link>
+      <Link href="#support">Support</Link>
+    </Stack>
+  </Sidebar>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `as` | `ElementType` | `"aside"` | Semantic element override. |
-| `children` | `ReactNode` | - | Supporting content. |
+| Prop       | Type          | Default   | Description                |
+| ---------- | ------------- | --------- | -------------------------- |
+| `as`       | `ElementType` | `"aside"` | Semantic element override. |
+| `children` | `ReactNode`   | -         | Supporting content.        |
 
 Native attributes, styles, classes, and refs for the chosen element are forwarded. Name multiple complementary landmarks distinctly. Use `CollapsableSidebar` for expandable icon navigation.

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GuidanceIcon } from "@puzzle/icons/sets/guidance";
-import { GuidanceIconPage } from "@puzzle/icons/sets/guidance.page";
-import { ALL_GUIDANCE_ICONS } from "@puzzle/icons/sets/guidance.constants";
+import { GuidanceIcon } from "@puzzle-ui/icons/sets/guidance";
+import { GuidanceIconPage } from "@puzzle-ui/icons/sets/guidance.page";
+import { ALL_GUIDANCE_ICONS } from "@puzzle-ui/icons/sets/guidance.constants";
 
 const meta = {
   title: "Icons/Sets/Guidance",

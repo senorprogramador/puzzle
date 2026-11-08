@@ -2,7 +2,9 @@
 
 import {
   cloneElement,
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useRef,
@@ -18,14 +20,19 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import { cn, debounce } from "@puzzle/core";
-import { useThemeScope } from "@puzzle/theme/scope-context";
+import { cn, debounce } from "@puzzle-ui/core";
+import { useThemeScope } from "@puzzle-ui/theme/scope-context";
 
 import { Transition } from "../../utilities/transition";
 import { registerOverlay } from "../overlay-stack";
 import { useFloatingPosition } from "../floating-position";
 
 import "./popout.css";
+
+// Content is hidden, and therefore unfocusable, until it has been positioned.
+const PopoutPositionedContext = createContext(true);
+
+const usePopoutPositioned = (): boolean => useContext(PopoutPositionedContext);
 
 type PopoutPosition = "top" | "right" | "bottom" | "left";
 
@@ -367,7 +374,9 @@ const Popout = ({
               }
               onPointerLeave={action === "hover" ? scheduleClose : undefined}
             >
-              {children}
+              <PopoutPositionedContext.Provider value={isPositioned}>
+                {children}
+              </PopoutPositionedContext.Provider>
             </div>
           </Transition>,
           portalContainer,
@@ -378,6 +387,7 @@ const Popout = ({
 
 export {
   Popout,
+  usePopoutPositioned,
   type PopoutProps,
   type PopoutPosition,
   type PopoutAlignment,

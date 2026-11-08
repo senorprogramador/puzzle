@@ -1,4 +1,4 @@
-import type { TypographyStyle } from "@puzzle/theme";
+import type { TypographyStyle } from "@puzzle-ui/theme";
 
 type TextMark = "bold" | "italic" | "underline" | "strike";
 

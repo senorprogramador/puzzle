@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { SimpleLineIconsIcon } from "@puzzle/icons/sets/simple-line-icons";
-import { SimpleLineIconsIconPage } from "@puzzle/icons/sets/simple-line-icons.page";
-import { ALL_SIMPLE_LINE_ICONS_ICONS } from "@puzzle/icons/sets/simple-line-icons.constants";
+import { SimpleLineIconsIcon } from "@puzzle-ui/icons/sets/simple-line-icons";
+import { SimpleLineIconsIconPage } from "@puzzle-ui/icons/sets/simple-line-icons.page";
+import { ALL_SIMPLE_LINE_ICONS_ICONS } from "@puzzle-ui/icons/sets/simple-line-icons.constants";
 
 const meta = {
   title: "Icons/Sets/SimpleLineIcons",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { TdesignIcon } from "@puzzle/icons/sets/tdesign";
-import { TdesignIconPage } from "@puzzle/icons/sets/tdesign.page";
-import { ALL_TDESIGN_ICONS } from "@puzzle/icons/sets/tdesign.constants";
+import { TdesignIcon } from "@puzzle-ui/icons/sets/tdesign";
+import { TdesignIconPage } from "@puzzle-ui/icons/sets/tdesign.page";
+import { ALL_TDESIGN_ICONS } from "@puzzle-ui/icons/sets/tdesign.constants";
 
 const meta = {
   title: "Icons/Sets/Tdesign",

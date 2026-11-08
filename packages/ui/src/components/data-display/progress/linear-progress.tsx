@@ -1,7 +1,7 @@
 import type { ComponentPropsWithRef } from "react";
 import type { ProgressProps } from "./types";
 import "./linear-progress.css";
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 import { getProgressAriaProps, normalizeProgressValue } from "./utils";
 
 type LinearProgressProps = ProgressProps &

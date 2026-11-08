@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { WpfIcon } from "@puzzle/icons/sets/wpf";
-import { WpfIconPage } from "@puzzle/icons/sets/wpf.page";
-import { ALL_WPF_ICONS } from "@puzzle/icons/sets/wpf.constants";
+import { WpfIcon } from "@puzzle-ui/icons/sets/wpf";
+import { WpfIconPage } from "@puzzle-ui/icons/sets/wpf.page";
+import { ALL_WPF_ICONS } from "@puzzle-ui/icons/sets/wpf.constants";
 
 const meta = {
   title: "Icons/Sets/Wpf",

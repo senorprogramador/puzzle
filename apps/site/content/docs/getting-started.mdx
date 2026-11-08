@@ -3,7 +3,7 @@ title: Getting Started
 description: Install Puzzle in your React app, build your first interface, and customize the theme.
 ---
 
-Puzzle is a TypeScript and React UI component library built around reusable components and shared design tokens. Its components are composable and router-independent, with styling supplied by `@puzzle/theme`. The framework is setup to be compatible with `Next.js`, `Tanstack Start` and `react-router`.
+Puzzle is a TypeScript and React UI component library built around reusable components and shared design tokens. Its components are composable and router-independent, with styling supplied by `"@puzzle-ui/theme`. The framework is setup to be compatible with `Next.js`, `Tanstack Start` and `react-router`.
 
 **Puzzle is under active development and is not ready for production use.** APIs, props, exports, and styling may change without notice. Accessibility and framework compatibility are still being tested. Use the project for experimentation and evaluation.
 
@@ -19,16 +19,24 @@ Install the UI library and theme package in your application's directory. Choose
 
 <PackageManagerTabs>
   <PackageManagerTab value="npm">
-    ```bash npm install @puzzle/ui @puzzle/theme ```
+    ```bash
+    npm install @puzzle-ui/ui @puzzle-ui/theme
+    ```
   </PackageManagerTab>
   <PackageManagerTab value="bun">
-    ```bash bun add @puzzle/ui @puzzle/theme ```
+    ```bash
+    bun add @puzzle-ui/ui @puzzle-ui/theme
+    ```
   </PackageManagerTab>
   <PackageManagerTab value="pnpm">
-    ```bash pnpm add @puzzle/ui @puzzle/theme ```
+    ```bash
+    pnpm add @puzzle-ui/ui @puzzle-ui/theme
+    ```
   </PackageManagerTab>
   <PackageManagerTab value="yarn">
-    ```bash yarn add @puzzle/ui @puzzle/theme ```
+    ```bash
+    yarn add @puzzle-ui/ui @puzzle-ui/theme
+    ```
   </PackageManagerTab>
 </PackageManagerTabs>
 
@@ -36,11 +44,11 @@ These commands install published packages; they do not clone the repository or b
 
 ## Your first interface
 
-Import components from `@puzzle/ui` and wrap your application in `Theme` from `@puzzle/theme`:
+Import components from `"@puzzle-ui/ui` and wrap your application in `Theme` from `"@puzzle-ui/theme`:
 
 ```tsx
-import { Theme } from "@puzzle/theme";
-import { Button } from "@puzzle/ui";
+import { Theme } from "@puzzle-ui/theme";
+import { Button } from "@puzzle-ui/ui";
 
 export const App = () => (
   <Theme>

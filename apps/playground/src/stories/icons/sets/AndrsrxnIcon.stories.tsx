@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { AndrsrxnIcon } from "@puzzle/icons/sets/andrsrxn";
-import { AndrsrxnIconPage } from "@puzzle/icons/sets/andrsrxn.page";
-import { ALL_ANDRSRXN_ICONS } from "@puzzle/icons/sets/andrsrxn.constants";
+import { AndrsrxnIcon } from "@puzzle-ui/icons/sets/andrsrxn";
+import { AndrsrxnIconPage } from "@puzzle-ui/icons/sets/andrsrxn.page";
+import { ALL_ANDRSRXN_ICONS } from "@puzzle-ui/icons/sets/andrsrxn.constants";
 
 const meta = {
   title: "Icons/Sets/Andrsrxn",

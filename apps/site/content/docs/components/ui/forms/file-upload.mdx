@@ -3,27 +3,33 @@ title: File Upload
 description: Select, validate, and upload files with a keyboard-accessible dropzone.
 ---
 
-import { FileUploadProgressExample, FileUploadSelectionExample } from "../../../../../src/components/doc-examples";
+import {
+  FileUploadProgressExample,
+  FileUploadSelectionExample,
+} from "../../../../../src/components/doc-examples";
 
 File Upload supports native file selection, drag and drop, client-side validation, and optional automatic uploads. Without an `onUpload` handler, accepted files are listed as **Ready to upload**; the component does not send them anywhere.
 
 ## Import
 
 ```tsx
-import { FileUpload, type FileUploadUploadHandler } from "@puzzle/ui";
+import { FileUpload, type FileUploadUploadHandler } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
 
 Click the dropzone, press Enter or Space while it is focused, or drop a file onto it. Use `title`, `description`, and `browseLabel` to explain what to select.
 
-<Preview height={440} code={`\
+<Preview
+  height={440}
+  code={`\
 <FileUpload
   title="Upload a document"
   description="Choose a document or drop it here."
   browseLabel="Choose file"
 />
-`}>
+`}
+>
   <Section>
     <FileUpload
       title="Upload a document"
@@ -45,6 +51,7 @@ The file list is managed internally; there are no controlled `value` or `default
 const [files, setFiles] = useState<File[]>([]);
 
 return (
+
   <Stack>
     <FileUpload multiple onChange={setFiles} />
     <span role="status">
@@ -62,7 +69,9 @@ return (
 
 `maxFileSize` limits each file, `maxTotalSize` limits the combined selected size, and `maxFiles` limits the count in multiple mode. Sizes are in bytes. Files are evaluated in selection order: valid files that fit are accepted, while rejected files are reported separately.
 
-<Preview height={580} code={`\
+<Preview
+  height={580}
+  code={`\
 <FileUpload
   multiple
   accept={["image/*", "application/pdf"]}
@@ -72,7 +81,8 @@ return (
   title="Upload attachments"
   description="Up to 3 images or PDFs, 2 MB per file and 5 MB total."
 />
-`}>
+`}
+>
   <Section>
     <FileUpload
       multiple
@@ -111,6 +121,7 @@ The following local simulation intentionally fails each file's first attempt. Se
 const attemptedFiles = useRef(new WeakSet<File>());
 
 return (
+
   <FileUpload
     multiple
     description="Local simulation: each file fails once. Retry to complete it. No files are sent."
@@ -128,9 +139,11 @@ return (
         }
       }
     }}
-  />
+
+/>
 );
 `}>
+
   <Section><FileUploadProgressExample /></Section>
 </Preview>
 
@@ -156,7 +169,7 @@ const uploadFile: FileUploadUploadHandler = async (file, { signal }) => {
   }
 };
 
-<FileUpload multiple onUpload={uploadFile} />
+<FileUpload multiple onUpload={uploadFile} />;
 ```
 
 ## Labels and validation state
@@ -165,7 +178,9 @@ Wrap the component in `FormField` for an external label, supporting text, and va
 
 `required` sets the native file input's required attribute. It does **not** validate the internally managed file list: the native input is cleared after selection so the same file can be selected again. For form submission, validate the files received by `onChange` and send them explicitly using `FormData` or your upload handler. Do not rely on `name` and native form serialization to submit the displayed file list.
 
-<Preview height={440} code={`\
+<Preview
+  height={440}
+  code={`\
 <FormField
   label="Supporting documents"
   description="Attach at least one document before continuing."
@@ -177,7 +192,8 @@ Wrap the component in `FormField` for an external label, supporting text, and va
     description="Drop your documents here or browse."
   />
 </FormField>
-`}>
+`}
+>
   <Section>
     <FormField
       label="Supporting documents"
@@ -197,13 +213,16 @@ Wrap the component in `FormField` for an external label, supporting text, and va
 
 `disabled` prevents file selection, dropping, removal, and retry, and removes the dropzone from keyboard navigation. It does not cancel uploads that are already running.
 
-<Preview height={360} code={`\
+<Preview
+  height={360}
+  code={`\
 <FileUpload
   disabled
   title="Uploads unavailable"
   description="You do not have permission to add files."
 />
-`}>
+`}
+>
   <Section>
     <FileUpload
       disabled
@@ -217,29 +236,29 @@ Wrap the component in `FormField` for an external label, supporting text, and va
 
 ### FileUpload
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `accept` | `readonly string[]` | `[]` | Accepted MIME types or MIME wildcards; empty accepts all types. |
-| `multiple` | `boolean` | `false` | Appends files instead of replacing the selection. |
-| `maxFiles` | `number` | - | Maximum selected count in multiple mode. |
-| `maxFileSize` | `number` | - | Maximum bytes per file. |
-| `maxTotalSize` | `number` | - | Maximum combined selected bytes. |
-| `onChange` | `(files: File[]) => void` | - | Full accepted list after additions, replacement, or removal. |
-| `onReject` | `(rejections: FileUploadRejection[]) => void` | - | Files rejected from the latest selection. |
-| `onUpload` | `FileUploadUploadHandler` | - | Asynchronous upload handler; enables automatic uploading. |
-| `title` | `string` | `"Drop files here"` | Dropzone heading and default accessible name. |
-| `description` | `string` | `"Drag and drop your files here or browse to select them."` | Supporting dropzone text. |
-| `browseLabel` | `string` | `"Browse files"` | Visible picker action text. |
-| `disabled` | `boolean` | `false` | Disables user interaction. |
-| `required` | `boolean` | `false` | Native input required attribute; see form limitations above. |
-| `name` | `string` | - | Native input name; does not serialize the managed list. |
-| `id` | `string` | Generated | Native file input ID for label association. |
-| `className` | `string` | - | Additional class on the outer div. |
-| `style` | `CSSProperties` | - | Styles on the outer div. |
-| `ref` | `Ref<HTMLDivElement>` | - | Ref to the outer div, not the native input. |
-| `aria-label` | `string` | `title` | Accessible name of the focusable dropzone. |
-| `aria-describedby` | `string` | - | External description IDs, merged with the internal description. |
-| `aria-invalid` | `AriaAttributes["aria-invalid"]` | - | Invalid state applied to the native input and root data attribute. |
+| Prop               | Type                                          | Default                                                     | Description                                                        |
+| ------------------ | --------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------ |
+| `accept`           | `readonly string[]`                           | `[]`                                                        | Accepted MIME types or MIME wildcards; empty accepts all types.    |
+| `multiple`         | `boolean`                                     | `false`                                                     | Appends files instead of replacing the selection.                  |
+| `maxFiles`         | `number`                                      | -                                                           | Maximum selected count in multiple mode.                           |
+| `maxFileSize`      | `number`                                      | -                                                           | Maximum bytes per file.                                            |
+| `maxTotalSize`     | `number`                                      | -                                                           | Maximum combined selected bytes.                                   |
+| `onChange`         | `(files: File[]) => void`                     | -                                                           | Full accepted list after additions, replacement, or removal.       |
+| `onReject`         | `(rejections: FileUploadRejection[]) => void` | -                                                           | Files rejected from the latest selection.                          |
+| `onUpload`         | `FileUploadUploadHandler`                     | -                                                           | Asynchronous upload handler; enables automatic uploading.          |
+| `title`            | `string`                                      | `"Drop files here"`                                         | Dropzone heading and default accessible name.                      |
+| `description`      | `string`                                      | `"Drag and drop your files here or browse to select them."` | Supporting dropzone text.                                          |
+| `browseLabel`      | `string`                                      | `"Browse files"`                                            | Visible picker action text.                                        |
+| `disabled`         | `boolean`                                     | `false`                                                     | Disables user interaction.                                         |
+| `required`         | `boolean`                                     | `false`                                                     | Native input required attribute; see form limitations above.       |
+| `name`             | `string`                                      | -                                                           | Native input name; does not serialize the managed list.            |
+| `id`               | `string`                                      | Generated                                                   | Native file input ID for label association.                        |
+| `className`        | `string`                                      | -                                                           | Additional class on the outer div.                                 |
+| `style`            | `CSSProperties`                               | -                                                           | Styles on the outer div.                                           |
+| `ref`              | `Ref<HTMLDivElement>`                         | -                                                           | Ref to the outer div, not the native input.                        |
+| `aria-label`       | `string`                                      | `title`                                                     | Accessible name of the focusable dropzone.                         |
+| `aria-describedby` | `string`                                      | -                                                           | External description IDs, merged with the internal description.    |
+| `aria-invalid`     | `AriaAttributes["aria-invalid"]`              | -                                                           | Invalid state applied to the native input and root data attribute. |
 
 Other supported div attributes are forwarded to the outer wrapper. `children` and a custom `onDrop` are not part of the API.
 
@@ -247,37 +266,37 @@ Other supported div attributes are forwarded to the outer wrapper. `children` an
 
 `FileUploadUploadHandler` is `(file: File, context: FileUploadUploadContext) => Promise<void>`.
 
-| Property | Type | Description |
-| --- | --- | --- |
+| Property     | Type                         | Description                                                          |
+| ------------ | ---------------------------- | -------------------------------------------------------------------- |
 | `onProgress` | `(progress: number) => void` | Reports percentage progress; finite values are clamped to `0`-`100`. |
-| `signal` | `AbortSignal` | Signals cancellation on removal, replacement, retry, or unmount. |
+| `signal`     | `AbortSignal`                | Signals cancellation on removal, replacement, retry, or unmount.     |
 
 ### FileUploadRejection
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `file` | `File` | Original rejected file. |
-| `code` | `FileUploadRejectionCode` | Machine-readable rejection reason. |
-| `message` | `string` | User-facing explanation. |
+| Property  | Type                      | Description                        |
+| --------- | ------------------------- | ---------------------------------- |
+| `file`    | `File`                    | Original rejected file.            |
+| `code`    | `FileUploadRejectionCode` | Machine-readable rejection reason. |
+| `message` | `string`                  | User-facing explanation.           |
 
-| Rejection code | Meaning |
-| --- | --- |
-| `"file-type"` | MIME type does not match `accept`. |
-| `"file-too-large"` | File exceeds `maxFileSize`. |
-| `"total-too-large"` | Adding the file would exceed `maxTotalSize`. |
-| `"too-many-files"` | Selection exceeds `maxFiles`, or includes extra files in single mode. |
+| Rejection code      | Meaning                                                               |
+| ------------------- | --------------------------------------------------------------------- |
+| `"file-type"`       | MIME type does not match `accept`.                                    |
+| `"file-too-large"`  | File exceeds `maxFileSize`.                                           |
+| `"total-too-large"` | Adding the file would exceed `maxTotalSize`.                          |
+| `"too-many-files"`  | Selection exceeds `maxFiles`, or includes extra files in single mode. |
 
 ### Exported item types
 
 `FileUploadItem` describes the internal list entries. It is exported for typing, but callbacks receive files or rejections, not item records.
 
-| Property | Type | Description |
-| --- | --- | --- |
-| `id` | `string` | Generated item identity. |
-| `file` | `File` | Selected file. |
-| `status` | `FileUploadStatus` | `"queued"`, `"uploading"`, `"complete"`, or `"error"`. |
-| `progress` | `number` | Percentage progress. |
-| `error` | `string` | Optional upload failure message. |
+| Property   | Type               | Description                                            |
+| ---------- | ------------------ | ------------------------------------------------------ |
+| `id`       | `string`           | Generated item identity.                               |
+| `file`     | `File`             | Selected file.                                         |
+| `status`   | `FileUploadStatus` | `"queued"`, `"uploading"`, `"complete"`, or `"error"`. |
+| `progress` | `number`           | Percentage progress.                                   |
+| `error`    | `string`           | Optional upload failure message.                       |
 
 ## Accessibility
 

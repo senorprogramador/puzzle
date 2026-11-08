@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { DinkieIconsIcon } from "@puzzle/icons/sets/dinkie-icons";
-import { DinkieIconsIconPage } from "@puzzle/icons/sets/dinkie-icons.page";
-import { ALL_DINKIE_ICONS_ICONS } from "@puzzle/icons/sets/dinkie-icons.constants";
+import { DinkieIconsIcon } from "@puzzle-ui/icons/sets/dinkie-icons";
+import { DinkieIconsIconPage } from "@puzzle-ui/icons/sets/dinkie-icons.page";
+import { ALL_DINKIE_ICONS_ICONS } from "@puzzle-ui/icons/sets/dinkie-icons.constants";
 
 const meta = {
   title: "Icons/Sets/DinkieIcons",

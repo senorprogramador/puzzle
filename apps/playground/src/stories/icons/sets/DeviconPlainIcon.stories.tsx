@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { DeviconPlainIcon } from "@puzzle/icons/sets/devicon-plain";
-import { DeviconPlainIconPage } from "@puzzle/icons/sets/devicon-plain.page";
-import { ALL_DEVICON_PLAIN_ICONS } from "@puzzle/icons/sets/devicon-plain.constants";
+import { DeviconPlainIcon } from "@puzzle-ui/icons/sets/devicon-plain";
+import { DeviconPlainIconPage } from "@puzzle-ui/icons/sets/devicon-plain.page";
+import { ALL_DEVICON_PLAIN_ICONS } from "@puzzle-ui/icons/sets/devicon-plain.constants";
 
 const meta = {
   title: "Icons/Sets/DeviconPlain",

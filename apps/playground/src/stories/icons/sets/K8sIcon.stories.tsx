@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { K8sIcon } from "@puzzle/icons/sets/k8s";
-import { K8sIconPage } from "@puzzle/icons/sets/k8s.page";
-import { ALL_K8S_ICONS } from "@puzzle/icons/sets/k8s.constants";
+import { K8sIcon } from "@puzzle-ui/icons/sets/k8s";
+import { K8sIconPage } from "@puzzle-ui/icons/sets/k8s.page";
+import { ALL_K8S_ICONS } from "@puzzle-ui/icons/sets/k8s.constants";
 
 const meta = {
   title: "Icons/Sets/K8s",

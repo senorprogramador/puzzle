@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MdiIcon } from "@puzzle/icons/sets/mdi";
-import { MdiIconPage } from "@puzzle/icons/sets/mdi.page";
-import { ALL_MDI_ICONS } from "@puzzle/icons/sets/mdi.constants";
+import { MdiIcon } from "@puzzle-ui/icons/sets/mdi";
+import { MdiIconPage } from "@puzzle-ui/icons/sets/mdi.page";
+import { ALL_MDI_ICONS } from "@puzzle-ui/icons/sets/mdi.constants";
 
 const meta = {
   title: "Icons/Sets/Mdi",

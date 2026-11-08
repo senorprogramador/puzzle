@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FluentEmojiIcon } from "@puzzle/icons/sets/fluent-emoji";
-import { FluentEmojiIconPage } from "@puzzle/icons/sets/fluent-emoji.page";
-import { ALL_FLUENT_EMOJI_ICONS } from "@puzzle/icons/sets/fluent-emoji.constants";
+import { FluentEmojiIcon } from "@puzzle-ui/icons/sets/fluent-emoji";
+import { FluentEmojiIconPage } from "@puzzle-ui/icons/sets/fluent-emoji.page";
+import { ALL_FLUENT_EMOJI_ICONS } from "@puzzle-ui/icons/sets/fluent-emoji.constants";
 
 const meta = {
   title: "Icons/Sets/FluentEmoji",

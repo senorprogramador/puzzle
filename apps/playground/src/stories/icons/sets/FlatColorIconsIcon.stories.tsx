@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FlatColorIconsIcon } from "@puzzle/icons/sets/flat-color-icons";
-import { FlatColorIconsIconPage } from "@puzzle/icons/sets/flat-color-icons.page";
-import { ALL_FLAT_COLOR_ICONS_ICONS } from "@puzzle/icons/sets/flat-color-icons.constants";
+import { FlatColorIconsIcon } from "@puzzle-ui/icons/sets/flat-color-icons";
+import { FlatColorIconsIconPage } from "@puzzle-ui/icons/sets/flat-color-icons.page";
+import { ALL_FLAT_COLOR_ICONS_ICONS } from "@puzzle-ui/icons/sets/flat-color-icons.constants";
 
 const meta = {
   title: "Icons/Sets/FlatColorIcons",

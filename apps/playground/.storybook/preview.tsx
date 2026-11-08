@@ -1,5 +1,5 @@
 import type { Preview } from "@storybook/react-vite";
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 
 const preview: Preview = {
   parameters: {

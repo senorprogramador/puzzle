@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { EvaIcon } from "@puzzle/icons/sets/eva";
-import { EvaIconPage } from "@puzzle/icons/sets/eva.page";
-import { ALL_EVA_ICONS } from "@puzzle/icons/sets/eva.constants";
+import { EvaIcon } from "@puzzle-ui/icons/sets/eva";
+import { EvaIconPage } from "@puzzle-ui/icons/sets/eva.page";
+import { ALL_EVA_ICONS } from "@puzzle-ui/icons/sets/eva.constants";
 
 const meta = {
   title: "Icons/Sets/Eva",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { IwwaIcon } from "@puzzle/icons/sets/iwwa";
-import { IwwaIconPage } from "@puzzle/icons/sets/iwwa.page";
-import { ALL_IWWA_ICONS } from "@puzzle/icons/sets/iwwa.constants";
+import { IwwaIcon } from "@puzzle-ui/icons/sets/iwwa";
+import { IwwaIconPage } from "@puzzle-ui/icons/sets/iwwa.page";
+import { ALL_IWWA_ICONS } from "@puzzle-ui/icons/sets/iwwa.constants";
 
 const meta = {
   title: "Icons/Sets/Iwwa",

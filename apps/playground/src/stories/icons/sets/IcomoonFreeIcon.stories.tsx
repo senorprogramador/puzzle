@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { IcomoonFreeIcon } from "@puzzle/icons/sets/icomoon-free";
-import { IcomoonFreeIconPage } from "@puzzle/icons/sets/icomoon-free.page";
-import { ALL_ICOMOON_FREE_ICONS } from "@puzzle/icons/sets/icomoon-free.constants";
+import { IcomoonFreeIcon } from "@puzzle-ui/icons/sets/icomoon-free";
+import { IcomoonFreeIconPage } from "@puzzle-ui/icons/sets/icomoon-free.page";
+import { ALL_ICOMOON_FREE_ICONS } from "@puzzle-ui/icons/sets/icomoon-free.constants";
 
 const meta = {
   title: "Icons/Sets/IcomoonFree",

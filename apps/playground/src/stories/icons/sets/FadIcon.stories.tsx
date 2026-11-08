@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FadIcon } from "@puzzle/icons/sets/fad";
-import { FadIconPage } from "@puzzle/icons/sets/fad.page";
-import { ALL_FAD_ICONS } from "@puzzle/icons/sets/fad.constants";
+import { FadIcon } from "@puzzle-ui/icons/sets/fad";
+import { FadIconPage } from "@puzzle-ui/icons/sets/fad.page";
+import { ALL_FAD_ICONS } from "@puzzle-ui/icons/sets/fad.constants";
 
 const meta = {
   title: "Icons/Sets/Fad",

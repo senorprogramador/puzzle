@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { QuillIcon } from "@puzzle/icons/sets/quill";
-import { QuillIconPage } from "@puzzle/icons/sets/quill.page";
-import { ALL_QUILL_ICONS } from "@puzzle/icons/sets/quill.constants";
+import { QuillIcon } from "@puzzle-ui/icons/sets/quill";
+import { QuillIconPage } from "@puzzle-ui/icons/sets/quill.page";
+import { ALL_QUILL_ICONS } from "@puzzle-ui/icons/sets/quill.constants";
 
 const meta = {
   title: "Icons/Sets/Quill",

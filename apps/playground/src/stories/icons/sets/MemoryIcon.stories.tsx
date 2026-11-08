@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MemoryIcon } from "@puzzle/icons/sets/memory";
-import { MemoryIconPage } from "@puzzle/icons/sets/memory.page";
-import { ALL_MEMORY_ICONS } from "@puzzle/icons/sets/memory.constants";
+import { MemoryIcon } from "@puzzle-ui/icons/sets/memory";
+import { MemoryIconPage } from "@puzzle-ui/icons/sets/memory.page";
+import { ALL_MEMORY_ICONS } from "@puzzle-ui/icons/sets/memory.constants";
 
 const meta = {
   title: "Icons/Sets/Memory",

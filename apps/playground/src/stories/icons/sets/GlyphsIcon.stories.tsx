@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GlyphsIcon } from "@puzzle/icons/sets/glyphs";
-import { GlyphsIconPage } from "@puzzle/icons/sets/glyphs.page";
-import { ALL_GLYPHS_ICONS } from "@puzzle/icons/sets/glyphs.constants";
+import { GlyphsIcon } from "@puzzle-ui/icons/sets/glyphs";
+import { GlyphsIconPage } from "@puzzle-ui/icons/sets/glyphs.page";
+import { ALL_GLYPHS_ICONS } from "@puzzle-ui/icons/sets/glyphs.constants";
 
 const meta = {
   title: "Icons/Sets/Glyphs",

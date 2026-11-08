@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { SectionStack as UISectionStack, Section } from "@puzzle/ui";
+import { SectionStack as UISectionStack, Section } from "@puzzle-ui/ui";
 
 const meta = {
   title: "UI/Components/SectionStack",

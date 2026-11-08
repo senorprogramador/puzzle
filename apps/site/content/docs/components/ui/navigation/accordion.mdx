@@ -3,14 +3,17 @@ title: Accordion
 description: Show and hide related sections of content.
 ---
 
-import { ControlledAccordionExample, shippingItems } from "../../../../../src/components/doc-examples";
+import {
+  ControlledAccordionExample,
+  shippingItems,
+} from "../../../../../src/components/doc-examples";
 
 Accordion groups related sections behind expandable headings. Prefer stable item IDs when sections may be reordered.
 
 ## Import
 
 ```tsx
-import { Accordion, type AccordionValue } from "@puzzle/ui";
+import { Accordion, type AccordionValue } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
@@ -37,11 +40,18 @@ The Support item demonstrates `disabled`: its trigger cannot be activated.
 
 `type="multiple"` is the default. Pass an array of IDs to open more than one section. In multiple mode, `onValueChange` returns an array; in single mode it returns an ID or `null` when the last section closes.
 
-<Preview height={380} code={`\
+<Preview
+  height={380}
+  code={`\
 <Accordion items={items} type="multiple" defaultValue={["shipping", "returns"]} />
-`}>
+`}
+>
   <Section>
-    <Accordion items={shippingItems} type="multiple" defaultValue={["shipping", "returns"]} />
+    <Accordion
+      items={shippingItems}
+      type="multiple"
+      defaultValue={["shipping", "returns"]}
+    />
   </Section>
 </Preview>
 
@@ -49,11 +59,19 @@ The Support item demonstrates `disabled`: its trigger cannot be activated.
 
 In single mode, `collapsible={false}` prevents the currently open section from being closed by its trigger. Set an initial value if a section should be open from the start.
 
-<Preview height={360} code={`\
+<Preview
+  height={360}
+  code={`\
 <Accordion items={items} type="single" collapsible={false} defaultValue="shipping" />
-`}>
+`}
+>
   <Section>
-    <Accordion items={shippingItems} type="single" collapsible={false} defaultValue="shipping" />
+    <Accordion
+      items={shippingItems}
+      type="single"
+      collapsible={false}
+      defaultValue="shipping"
+    />
   </Section>
 </Preview>
 
@@ -65,6 +83,7 @@ Pair `value` with `onValueChange`. Stable IDs keep open sections associated with
 const [value, setValue] = useState<AccordionValue>("shipping");
 
 return (
+
   <Stack>
     <Button variant="outline" onClick={() => setValue("returns")}>Show returns</Button>
     <Accordion items={items} type="single" value={value} onValueChange={setValue} />
@@ -78,7 +97,9 @@ return (
 
 `headingLevel` matches the surrounding document hierarchy. `region` explicitly enables or disables panel landmarks. With `unMountOnClose`, content unmounts after the closing animation; reopening resets local state. Enter a note and close/reopen the section to try it.
 
-<Preview height={320} code={`\
+<Preview
+  height={320}
+  code={`\
 <Accordion
   headingLevel={4}
   region={false}
@@ -91,7 +112,8 @@ return (
     content: <label>Note <input placeholder="Resets after closing" /></label>,
   }]}
 />
-`}>
+`}
+>
   <Section>
     <Accordion
       headingLevel={4}
@@ -99,11 +121,17 @@ return (
       unMountOnClose
       type="single"
       defaultValue="note"
-      items={[{
-        id: "note",
-        title: "Order note",
-        content: <label>Note <input placeholder="Resets after closing" /></label>,
-      }]}
+      items={[
+        {
+          id: "note",
+          title: "Order note",
+          content: (
+            <label>
+              Note <input placeholder="Resets after closing" />
+            </label>
+          ),
+        },
+      ]}
     />
   </Section>
 </Preview>
@@ -114,35 +142,35 @@ return (
 
 `AccordionItemId` is `string | number`. `AccordionValue` is an ID, a readonly array of IDs, or `null`.
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `items` | `AccordionItemData[]` | Required | Sections to render. |
-| `type` | `"single" \| "multiple"` | `"multiple"` | Whether more than one section can open. |
-| `value` | `AccordionValue` | - | Controlled open IDs; requires unique IDs on every item. |
-| `defaultValue` | `AccordionValue` | - | Initial uncontrolled open IDs. |
-| `onValueChange` | `(value: AccordionItemId \| AccordionItemId[] \| null) => void` | - | Next open ID(s). |
-| `collapsible` | `boolean` | `true` | Allows the open item to collapse in single mode. |
-| `initialOpenItemIndexes` | `number[]` | `[]` | Initial uncontrolled open indexes (compatibility API). |
-| `openItemIndexes` | `number[]` | - | Controlled open indexes (compatibility API). |
-| `onChange` | `(indexes: number[]) => void` | - | Next open indexes, also called in ID mode. |
-| `headingLevel` | `1 \| 2 \| 3 \| 4 \| 5 \| 6` | `3` | Semantic heading level for triggers. |
-| `region` | `boolean` | `items.length <= 6` | Adds region landmarks to panels. |
-| `unMountOnClose` | `boolean` | `false` | Unmounts content after its closing animation. |
-| `className` | `string` | - | Additional class on the root div. |
-| `triggerClassName` | `string` | - | Additional class on each trigger. |
-| `panelClassName` | `string` | - | Additional class on each animated panel. |
-| `contentClassName` | `string` | - | Additional class on each content wrapper. |
+| Prop                     | Type                                                            | Default             | Description                                             |
+| ------------------------ | --------------------------------------------------------------- | ------------------- | ------------------------------------------------------- |
+| `items`                  | `AccordionItemData[]`                                           | Required            | Sections to render.                                     |
+| `type`                   | `"single" \| "multiple"`                                        | `"multiple"`        | Whether more than one section can open.                 |
+| `value`                  | `AccordionValue`                                                | -                   | Controlled open IDs; requires unique IDs on every item. |
+| `defaultValue`           | `AccordionValue`                                                | -                   | Initial uncontrolled open IDs.                          |
+| `onValueChange`          | `(value: AccordionItemId \| AccordionItemId[] \| null) => void` | -                   | Next open ID(s).                                        |
+| `collapsible`            | `boolean`                                                       | `true`              | Allows the open item to collapse in single mode.        |
+| `initialOpenItemIndexes` | `number[]`                                                      | `[]`                | Initial uncontrolled open indexes (compatibility API).  |
+| `openItemIndexes`        | `number[]`                                                      | -                   | Controlled open indexes (compatibility API).            |
+| `onChange`               | `(indexes: number[]) => void`                                   | -                   | Next open indexes, also called in ID mode.              |
+| `headingLevel`           | `1 \| 2 \| 3 \| 4 \| 5 \| 6`                                    | `3`                 | Semantic heading level for triggers.                    |
+| `region`                 | `boolean`                                                       | `items.length <= 6` | Adds region landmarks to panels.                        |
+| `unMountOnClose`         | `boolean`                                                       | `false`             | Unmounts content after its closing animation.           |
+| `className`              | `string`                                                        | -                   | Additional class on the root div.                       |
+| `triggerClassName`       | `string`                                                        | -                   | Additional class on each trigger.                       |
+| `panelClassName`         | `string`                                                        | -                   | Additional class on each animated panel.                |
+| `contentClassName`       | `string`                                                        | -                   | Additional class on each content wrapper.               |
 
 Other native div attributes are forwarded to the root, except `children` and `onChange`.
 
 ### AccordionItemData
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `id` | `string \| number` | - | Stable identifier; required for ID-based selection. |
-| `title` | `ReactNode` | Required | Trigger content. |
-| `content` | `ReactNode` | Required | Expandable panel content. |
-| `disabled` | `boolean` | `false` | Prevents user toggling. |
+| Prop       | Type               | Default  | Description                                         |
+| ---------- | ------------------ | -------- | --------------------------------------------------- |
+| `id`       | `string \| number` | -        | Stable identifier; required for ID-based selection. |
+| `title`    | `ReactNode`        | Required | Trigger content.                                    |
+| `content`  | `ReactNode`        | Required | Expandable panel content.                           |
+| `disabled` | `boolean`          | `false`  | Prevents user toggling.                             |
 
 ## Accessibility
 

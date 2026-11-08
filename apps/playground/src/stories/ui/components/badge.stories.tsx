@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Avatar, Badge } from "@puzzle/ui";
+import { Avatar, Badge } from "@puzzle-ui/ui";
 
 const anchorOrigins = {
   topLeft: {

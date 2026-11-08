@@ -1,0 +1,163 @@
+.puzzle-resizable-panels {
+    --puzzle-resizable-panels-handle-size: var(--puzzle-space-3, 0.75rem);
+
+    display: flex;
+    align-items: stretch;
+
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.puzzle-resizable-panels[data-orientation="vertical"] {
+    flex-direction: column;
+}
+
+/* Panels */
+
+.puzzle-resizable-panels__panel {
+    position: relative;
+
+    min-width: 0;
+    min-height: 0;
+
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+/* Resize handle */
+
+.puzzle-resizable-panels__handle {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 var(--puzzle-resizable-panels-handle-size);
+
+    padding: 0;
+    border: 0;
+
+    color: var(--puzzle-color-text-muted);
+    background: transparent;
+
+    cursor: col-resize;
+    touch-action: none;
+    user-select: none;
+
+    outline: none;
+}
+
+/* Vertical divider for horizontal layouts. */
+
+.puzzle-resizable-panels[data-orientation="horizontal"] .puzzle-resizable-panels__handle {
+    cursor: col-resize;
+}
+
+/* Horizontal divider for vertical layouts. */
+
+.puzzle-resizable-panels[data-orientation="vertical"] .puzzle-resizable-panels__handle {
+    cursor: row-resize;
+}
+
+/* Visible divider line. */
+
+.puzzle-resizable-panels__handle::before {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 50%;
+
+    inline-size: var(--puzzle-border-width, 1px);
+
+    content: "";
+
+    background-color: var(--puzzle-color-border);
+    transform: translateX(-50%);
+}
+
+/* Adjust the divider line for vertical layouts. */
+
+.puzzle-resizable-panels[data-orientation="vertical"] .puzzle-resizable-panels__handle::before {
+    inset-block: 50%;
+    inset-inline: 0;
+
+    inline-size: auto;
+    block-size: var(--puzzle-border-width, 1px);
+
+    transform: translateY(-50%);
+}
+
+/* Interaction states. */
+
+.puzzle-resizable-panels__handle:hover:not([data-disabled="true"])::before,
+.puzzle-resizable-panels__handle:focus-visible::before {
+    background-color: var(--puzzle-color-border-strong);
+}
+
+.puzzle-resizable-panels__handle:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: -2px;
+}
+
+.puzzle-resizable-panels__handle:active:not([data-disabled="true"])::before {
+    background-color: var(--puzzle-color-ring);
+}
+
+.puzzle-resizable-panels__handle[data-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+/* Optional grip. */
+
+.puzzle-resizable-panels__handle-grip {
+    position: relative;
+    z-index: 1;
+
+    display: block;
+
+    inline-size: var(--puzzle-space-1, 0.25rem);
+    block-size: 1.5rem;
+
+    border-radius: 999px;
+
+    background-image: radial-gradient(circle, currentColor 1px, transparent 1.5px);
+
+    background-size: var(--puzzle-space-1, 0.25rem) var(--puzzle-space-1, 0.25rem);
+
+    background-position: center;
+    background-repeat: repeat;
+}
+
+.puzzle-resizable-panels[data-orientation="vertical"] .puzzle-resizable-panels__handle-grip {
+    inline-size: 1.5rem;
+    block-size: var(--puzzle-space-1, 0.25rem);
+}
+
+/* Prevent text selection while resizing. */
+
+.puzzle-resizable-panels[data-resizing="true"] {
+    user-select: none;
+    cursor: inherit;
+}
+
+.puzzle-resizable-panels[data-resizing="true"] .puzzle-resizable-panels__panel {
+    user-select: none;
+}
+
+@media (forced-colors: active) {
+    .puzzle-resizable-panels__handle::before {
+        background-color: CanvasText;
+    }
+
+    .puzzle-resizable-panels__handle:focus-visible {
+        outline-color: Highlight;
+    }
+}

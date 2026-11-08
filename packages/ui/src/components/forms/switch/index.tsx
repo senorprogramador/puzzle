@@ -3,7 +3,7 @@
 import { useId } from "react";
 import type { ChangeEventHandler, InputHTMLAttributes, ReactNode } from "react";
 
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 
 import "./switch.css";
 

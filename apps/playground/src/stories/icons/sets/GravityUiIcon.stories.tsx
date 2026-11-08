@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GravityUiIcon } from "@puzzle/icons/sets/gravity-ui";
-import { GravityUiIconPage } from "@puzzle/icons/sets/gravity-ui.page";
-import { ALL_GRAVITY_UI_ICONS } from "@puzzle/icons/sets/gravity-ui.constants";
+import { GravityUiIcon } from "@puzzle-ui/icons/sets/gravity-ui";
+import { GravityUiIconPage } from "@puzzle-ui/icons/sets/gravity-ui.page";
+import { ALL_GRAVITY_UI_ICONS } from "@puzzle-ui/icons/sets/gravity-ui.constants";
 
 const meta = {
   title: "Icons/Sets/GravityUi",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MingcuteIcon } from "@puzzle/icons/sets/mingcute";
-import { MingcuteIconPage } from "@puzzle/icons/sets/mingcute.page";
-import { ALL_MINGCUTE_ICONS } from "@puzzle/icons/sets/mingcute.constants";
+import { MingcuteIcon } from "@puzzle-ui/icons/sets/mingcute";
+import { MingcuteIconPage } from "@puzzle-ui/icons/sets/mingcute.page";
+import { ALL_MINGCUTE_ICONS } from "@puzzle-ui/icons/sets/mingcute.constants";
 
 const meta = {
   title: "Icons/Sets/Mingcute",

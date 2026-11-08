@@ -1,8 +1,12 @@
 {
-  "name": "@puzzle/theme",
+  "name": "@puzzle-ui/theme",
   "version": "0.1.0",
   "description": "Theme components for Puzzle",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "sideEffects": [
     "**/*.css"
@@ -12,19 +16,34 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./components-context": {
-      "types": "./dist/components-context.d.ts",
-      "import": "./dist/components-context.js",
-      "require": "./dist/components-context.cjs"
+      "import": {
+        "types": "./dist/components-context.d.ts",
+        "default": "./dist/components-context.js"
+      },
+      "require": {
+        "types": "./dist/components-context.d.cts",
+        "default": "./dist/components-context.cjs"
+      }
     },
     "./scope-context": {
-      "types": "./dist/scope-context.d.ts",
-      "import": "./dist/scope-context.js",
-      "require": "./dist/scope-context.cjs"
+      "import": {
+        "types": "./dist/scope-context.d.ts",
+        "default": "./dist/scope-context.js"
+      },
+      "require": {
+        "types": "./dist/scope-context.d.cts",
+        "default": "./dist/scope-context.cjs"
+      }
     }
   },
   "files": [
@@ -35,10 +54,10 @@
     "vitest": "bunx vitest run",
     "vitest:watch": "bunx vitest",
     "clean": "rm -rf dist",
-    "prepublishOnly": "tsdown"
+    "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle/core": "^0.1.0"
+    "@puzzle-ui/core": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

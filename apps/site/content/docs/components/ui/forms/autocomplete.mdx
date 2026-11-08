@@ -8,14 +8,16 @@ import { AutocompleteExample } from "../../../../../src/components/doc-examples"
 ## Import
 
 ```tsx
-import { Autocomplete } from "@puzzle/ui";
+import { Autocomplete } from "@puzzle-ui/ui";
 ```
 
 ## Controlled selection
 
 Options pair a display `label` with a typed `value`. Clearing a controlled single selection produces `undefined`, not `null`.
 
-<Preview height={450} code={`\
+<Preview
+  height={450}
+  code={`\
 const [value, setValue] = useState<string | undefined>();
 <Autocomplete
   label="Fruit"
@@ -28,15 +30,20 @@ const [value, setValue] = useState<string | undefined>();
   value={value}
   onChange={setValue}
 />
-`}>
-  <Section><AutocompleteExample /></Section>
+`}
+>
+  <Section>
+    <AutocompleteExample />
+  </Section>
 </Preview>
 
 ## Multiple values and custom text
 
 `multiple` uses an array. `freeSolo` permits text not present in the options; Enter commits it. Use `maxSelected` to limit selections.
 
-<Preview height={500} code={`\
+<Preview
+  height={500}
+  code={`\
 <Stack>
   <Autocomplete label="Skills" multiple maxSelected={3} options={[
     { value: "react", label: "React", group: "Frontend" },
@@ -46,30 +53,57 @@ const [value, setValue] = useState<string | undefined>();
   <Autocomplete label="Tag" freeSolo options={[{ value: "design", label: "Design" }]} />
   <Autocomplete label="Unavailable" disabled options={[]} />
 </Stack>
-`}>
-  <Section><Stack>
-    <Autocomplete label="Skills" multiple maxSelected={3} options={[
-      { value: "react", label: "React", group: "Frontend" },
-      { value: "typescript", label: "TypeScript", group: "Frontend" },
-      { value: "go", label: "Go", group: "Backend" },
-    ]} />
-    <Autocomplete label="Tag" freeSolo options={[{ value: "design", label: "Design" }]} />
-    <Autocomplete label="Unavailable" disabled options={[]} />
-  </Stack></Section>
+`}
+>
+  <Section>
+    <Stack>
+      <Autocomplete
+        label="Skills"
+        multiple
+        maxSelected={3}
+        options={[
+          { value: "react", label: "React", group: "Frontend" },
+          { value: "typescript", label: "TypeScript", group: "Frontend" },
+          { value: "go", label: "Go", group: "Backend" },
+        ]}
+      />
+      <Autocomplete
+        label="Tag"
+        freeSolo
+        options={[{ value: "design", label: "Design" }]}
+      />
+      <Autocomplete label="Unavailable" disabled options={[]} />
+    </Stack>
+  </Section>
 </Preview>
 
 ## Validation and loading
 
-<Preview height={400} code={`\
+<Preview
+  height={400}
+  code={`\
 <Stack>
   <Autocomplete label="Assignee" required error="Choose an assignee." options={[]} />
   <Autocomplete label="Search users" loading loadingText="Finding users..." options={[]} />
 </Stack>
-`}>
-  <Section><Stack>
-    <Autocomplete label="Assignee" required error="Choose an assignee." options={[]} />
-    <Autocomplete label="Search users" loading loadingText="Finding users..." options={[]} />
-  </Stack></Section>
+`}
+>
+  <Section>
+    <Stack>
+      <Autocomplete
+        label="Assignee"
+        required
+        error="Choose an assignee."
+        options={[]}
+      />
+      <Autocomplete
+        label="Search users"
+        loading
+        loadingText="Finding users..."
+        options={[]}
+      />
+    </Stack>
+  </Section>
 </Preview>
 
 ## API
@@ -78,46 +112,46 @@ const [value, setValue] = useState<string | undefined>();
 
 `V` is `T`, or `T | string` when `freeSolo` is enabled.
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `options` | `readonly AutocompleteOption<T>[]` | Required | Searchable options. |
-| `value`, `defaultValue` | `V \| undefined`, or `readonly V[]` in multiple mode | - | Controlled/initial selection. |
-| `onChange` | `(value: V \| undefined) => void`, or `(values: V[]) => void` | - | Selection callback. |
-| `multiple`, `freeSolo` | `boolean` | `false` | Multiple selection or custom text. |
-| `label`, `description`, `error` | `ReactNode` | - | Accessible field content. |
-| `disabled`, `required`, `readOnly` | `boolean` | `false` | Input state. |
-| `inputValue`, `defaultInputValue` | `string` | - | Controlled/initial search text. |
-| `onInputChange` | `(text, reason) => void` | - | Reasons: `"input"`, `"reset"`, `"clear"`, `"select"`. |
-| `name`, `form` | `string` | - | Native form association. |
-| `serializeValue` | `(value: V) => string` | Built-in serialization | Hidden-input value serialization. |
-| `isOptionEqualToValue` | `(option: AutocompleteOption<T>, value: V) => boolean` | Built-in equality | Match object-valued selections. |
-| `filterOptions` | `(options, inputValue) => options` | Built-in filter | Custom search filtering. |
-| `renderOption` | `(option, state) => ReactNode` | Option label/description | Custom non-interactive option content. |
-| `maxSelected`, `maxOptions` | `number` | - | Selection and visible-option limits. |
-| `filterSelectedOptions` | `boolean` | - | Hide selected options. |
-| `clearable` | `boolean` | `true` | Show clear control. |
-| `clearLabel`, `removeOptionLabel` | `string` | `"Clear selection"`, `"Remove"` | Accessible button text. |
-| `clearOnBlur` | `boolean` | Depends on freeSolo | Reset uncommitted input on blur. |
-| `clearOnEscape` | `boolean` | `false` | Allow Escape to clear. |
+| Prop                               | Type                                                          | Default                         | Description                                           |
+| ---------------------------------- | ------------------------------------------------------------- | ------------------------------- | ----------------------------------------------------- |
+| `options`                          | `readonly AutocompleteOption<T>[]`                            | Required                        | Searchable options.                                   |
+| `value`, `defaultValue`            | `V \| undefined`, or `readonly V[]` in multiple mode          | -                               | Controlled/initial selection.                         |
+| `onChange`                         | `(value: V \| undefined) => void`, or `(values: V[]) => void` | -                               | Selection callback.                                   |
+| `multiple`, `freeSolo`             | `boolean`                                                     | `false`                         | Multiple selection or custom text.                    |
+| `label`, `description`, `error`    | `ReactNode`                                                   | -                               | Accessible field content.                             |
+| `disabled`, `required`, `readOnly` | `boolean`                                                     | `false`                         | Input state.                                          |
+| `inputValue`, `defaultInputValue`  | `string`                                                      | -                               | Controlled/initial search text.                       |
+| `onInputChange`                    | `(text, reason) => void`                                      | -                               | Reasons: `"input"`, `"reset"`, `"clear"`, `"select"`. |
+| `name`, `form`                     | `string`                                                      | -                               | Native form association.                              |
+| `serializeValue`                   | `(value: V) => string`                                        | Built-in serialization          | Hidden-input value serialization.                     |
+| `isOptionEqualToValue`             | `(option: AutocompleteOption<T>, value: V) => boolean`        | Built-in equality               | Match object-valued selections.                       |
+| `filterOptions`                    | `(options, inputValue) => options`                            | Built-in filter                 | Custom search filtering.                              |
+| `renderOption`                     | `(option, state) => ReactNode`                                | Option label/description        | Custom non-interactive option content.                |
+| `maxSelected`, `maxOptions`        | `number`                                                      | -                               | Selection and visible-option limits.                  |
+| `filterSelectedOptions`            | `boolean`                                                     | -                               | Hide selected options.                                |
+| `clearable`                        | `boolean`                                                     | `true`                          | Show clear control.                                   |
+| `clearLabel`, `removeOptionLabel`  | `string`                                                      | `"Clear selection"`, `"Remove"` | Accessible button text.                               |
+| `clearOnBlur`                      | `boolean`                                                     | Depends on freeSolo             | Reset uncommitted input on blur.                      |
+| `clearOnEscape`                    | `boolean`                                                     | `false`                         | Allow Escape to clear.                                |
 
 ### Menu and presentation
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `open`, `defaultOpen` | `boolean` | `false` | Controlled/initial menu state. |
-| `onOpenChange` | `(open: boolean) => void` | - | Menu state changes. |
-| `openOnFocus`, `autoHighlight` | `boolean` | `false` | Open on focus or highlight the first option. |
-| `closeOnSelect` | `boolean` | Single: true; multiple: false | Dismiss after choosing. |
-| `loading` | `boolean` | `false` | Loading state. |
-| `loadingText`, `noOptionsText` | `ReactNode` | `"Loading options..."`, `"No options found"` | Menu feedback. |
-| `requiredMessage` | `string` | `"Please select an option."` | Required validation message. |
-| `position` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side. |
-| `align` | `"start" \| "center" \| "end"` | `"start"` | Alignment. |
-| `offset`, `collisionPadding` | `number` | `8` | Positioning distances in pixels. |
-| `matchTriggerWidth` | `boolean` | `true` | Menu width follows input. |
-| `menuMaxHeight` | `string \| number` | `"18rem"` | Menu height limit. |
-| `size` | Responsive `"sm" \| "md" \| "lg"` | `"md"` | Input size. |
-| `fullWidth` | Responsive `boolean` | `false` | Fill available width. |
-| `className`, `inputClassName`, `popoverClassName`, `menuClassName`, `optionClassName` | `string` | - | Scoped styling hooks. |
+| Prop                                                                                  | Type                                     | Default                                      | Description                                  |
+| ------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------------- | -------------------------------------------- |
+| `open`, `defaultOpen`                                                                 | `boolean`                                | `false`                                      | Controlled/initial menu state.               |
+| `onOpenChange`                                                                        | `(open: boolean) => void`                | -                                            | Menu state changes.                          |
+| `openOnFocus`, `autoHighlight`                                                        | `boolean`                                | `false`                                      | Open on focus or highlight the first option. |
+| `closeOnSelect`                                                                       | `boolean`                                | Single: true; multiple: false                | Dismiss after choosing.                      |
+| `loading`                                                                             | `boolean`                                | `false`                                      | Loading state.                               |
+| `loadingText`, `noOptionsText`                                                        | `ReactNode`                              | `"Loading options..."`, `"No options found"` | Menu feedback.                               |
+| `requiredMessage`                                                                     | `string`                                 | `"Please select an option."`                 | Required validation message.                 |
+| `position`                                                                            | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"`                                   | Preferred side.                              |
+| `align`                                                                               | `"start" \| "center" \| "end"`           | `"start"`                                    | Alignment.                                   |
+| `offset`, `collisionPadding`                                                          | `number`                                 | `8`                                          | Positioning distances in pixels.             |
+| `matchTriggerWidth`                                                                   | `boolean`                                | `true`                                       | Menu width follows input.                    |
+| `menuMaxHeight`                                                                       | `string \| number`                       | `"18rem"`                                    | Menu height limit.                           |
+| `size`                                                                                | Responsive `"sm" \| "md" \| "lg"`        | `"md"`                                       | Input size.                                  |
+| `fullWidth`                                                                           | Responsive `boolean`                     | `false`                                      | Fill available width.                        |
+| `className`, `inputClassName`, `popoverClassName`, `menuClassName`, `optionClassName` | `string`                                 | -                                            | Scoped styling hooks.                        |
 
 Options support `id`, `value`, `label`, `description`, `group`, and `disabled`. Standard input attributes and refs are supported. Arrow keys navigate, Enter selects, and Escape closes. Custom renderers must not nest interactive controls inside options.

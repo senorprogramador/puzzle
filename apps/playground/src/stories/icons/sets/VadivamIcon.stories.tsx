@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { VadivamIcon } from "@puzzle/icons/sets/vadivam";
-import { VadivamIconPage } from "@puzzle/icons/sets/vadivam.page";
-import { ALL_VADIVAM_ICONS } from "@puzzle/icons/sets/vadivam.constants";
+import { VadivamIcon } from "@puzzle-ui/icons/sets/vadivam";
+import { VadivamIconPage } from "@puzzle-ui/icons/sets/vadivam.page";
+import { ALL_VADIVAM_ICONS } from "@puzzle-ui/icons/sets/vadivam.constants";
 
 const meta = {
   title: "Icons/Sets/Vadivam",

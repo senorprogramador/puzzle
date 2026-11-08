@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { StreamlineStickiesColorIcon } from "@puzzle/icons/sets/streamline-stickies-color";
-import { StreamlineStickiesColorIconPage } from "@puzzle/icons/sets/streamline-stickies-color.page";
-import { ALL_STREAMLINE_STICKIES_COLOR_ICONS } from "@puzzle/icons/sets/streamline-stickies-color.constants";
+import { StreamlineStickiesColorIcon } from "@puzzle-ui/icons/sets/streamline-stickies-color";
+import { StreamlineStickiesColorIconPage } from "@puzzle-ui/icons/sets/streamline-stickies-color.page";
+import { ALL_STREAMLINE_STICKIES_COLOR_ICONS } from "@puzzle-ui/icons/sets/streamline-stickies-color.constants";
 
 const meta = {
   title: "Icons/Sets/StreamlineStickiesColor",

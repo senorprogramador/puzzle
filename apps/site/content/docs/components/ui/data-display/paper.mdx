@@ -8,7 +8,7 @@ Use the Paper component as a neutral surface when you need an elevated container
 ## Import
 
 ```tsx
-import { Paper } from "@puzzle/ui";
+import { Paper } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
@@ -44,10 +44,18 @@ Use `elevation` to control the shadow depth. Available levels are `1`, `2`, `3`,
 `}
 >
   <div style={{ display: "flex", flexWrap: "wrap", gap: 24 }}>
-    <Paper elevation={1} style={{ padding: 24 }}>1</Paper>
-    <Paper elevation={4} style={{ padding: 24 }}>4</Paper>
-    <Paper elevation={8} style={{ padding: 24 }}>8</Paper>
-    <Paper elevation={24} style={{ padding: 24 }}>24</Paper>
+    <Paper elevation={1} style={{ padding: 24 }}>
+      1
+    </Paper>
+    <Paper elevation={4} style={{ padding: 24 }}>
+      4
+    </Paper>
+    <Paper elevation={8} style={{ padding: 24 }}>
+      8
+    </Paper>
+    <Paper elevation={24} style={{ padding: 24 }}>
+      24
+    </Paper>
   </div>
 </Preview>
 
@@ -65,12 +73,12 @@ Use `as` to render semantic HTML, such as `section` or `aside`.
 
 ### Paper props
 
-| Prop        | Type                                              | Default | Description                           |
-| ----------- | ------------------------------------------------- | ------- | ------------------------------------- |
-| `as`        | `ElementType`                                     | `"div"` | Element type used to render the paper. |
-| `elevation` | `1 \| 2 \| 3 \| 4 \| 6 \| 8 \| 12 \| 16 \| 24`    | `1`     | Shadow depth.                         |
-| `className` | `string`                                          | —       | Additional CSS class names.           |
-| `children`  | `ReactNode`                                       | —       | Content displayed inside the paper.   |
+| Prop        | Type                                           | Default | Description                            |
+| ----------- | ---------------------------------------------- | ------- | -------------------------------------- |
+| `as`        | `ElementType`                                  | `"div"` | Element type used to render the paper. |
+| `elevation` | `1 \| 2 \| 3 \| 4 \| 6 \| 8 \| 12 \| 16 \| 24` | `1`     | Shadow depth.                          |
+| `className` | `string`                                       | —       | Additional CSS class names.            |
+| `children`  | `ReactNode`                                    | —       | Content displayed inside the paper.    |
 
 ### Element props
 

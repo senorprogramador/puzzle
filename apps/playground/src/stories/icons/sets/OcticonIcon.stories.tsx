@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { OcticonIcon } from "@puzzle/icons/sets/octicon";
-import { OcticonIconPage } from "@puzzle/icons/sets/octicon.page";
-import { ALL_OCTICON_ICONS } from "@puzzle/icons/sets/octicon.constants";
+import { OcticonIcon } from "@puzzle-ui/icons/sets/octicon";
+import { OcticonIconPage } from "@puzzle-ui/icons/sets/octicon.page";
+import { ALL_OCTICON_ICONS } from "@puzzle-ui/icons/sets/octicon.constants";
 
 const meta = {
   title: "Icons/Sets/Octicon",

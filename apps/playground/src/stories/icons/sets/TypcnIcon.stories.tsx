@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { TypcnIcon } from "@puzzle/icons/sets/typcn";
-import { TypcnIconPage } from "@puzzle/icons/sets/typcn.page";
-import { ALL_TYPCN_ICONS } from "@puzzle/icons/sets/typcn.constants";
+import { TypcnIcon } from "@puzzle-ui/icons/sets/typcn";
+import { TypcnIconPage } from "@puzzle-ui/icons/sets/typcn.page";
+import { ALL_TYPCN_ICONS } from "@puzzle-ui/icons/sets/typcn.constants";
 
 const meta = {
   title: "Icons/Sets/Typcn",

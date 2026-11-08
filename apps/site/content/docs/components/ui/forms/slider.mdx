@@ -10,7 +10,7 @@ Slider allows users to select a numeric value between a minimum and maximum. It 
 ## Import
 
 ```tsx
-import { Slider } from "@puzzle/ui";
+import { Slider } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
@@ -36,7 +36,9 @@ Wrap Slider in `FormField` to provide a visible label and supporting text. `defa
 
 `min` and `max` define the bounds. `step` defines increments relative to `min`; use `"any"` to avoid step rounding. Values are clamped to the range and rounded to the nearest allowed increment.
 
-<Preview height={340} code={`\
+<Preview
+  height={340}
+  code={`\
 <Stack>
   <FormField label="Temperature" description="Between 16 and 30 degrees, in half-degree steps.">
     <Slider min={16} max={30} step={0.5} defaultValue={21.5} showValue formatValue={(value) => value + " degrees"} />
@@ -45,14 +47,32 @@ Wrap Slider in `FormField` to provide a visible label and supporting text. `defa
     <Slider min={0.5} max={2} step="any" defaultValue={1} showValue formatValue={(value) => value.toFixed(2) + "x"} />
   </FormField>
 </Stack>
-`}>
+`}
+>
   <Section>
     <Stack>
-      <FormField label="Temperature" description="Between 16 and 30 degrees, in half-degree steps.">
-        <Slider min={16} max={30} step={0.5} defaultValue={21.5} showValue formatValue={(value) => value + " degrees"} />
+      <FormField
+        label="Temperature"
+        description="Between 16 and 30 degrees, in half-degree steps."
+      >
+        <Slider
+          min={16}
+          max={30}
+          step={0.5}
+          defaultValue={21.5}
+          showValue
+          formatValue={(value) => value + " degrees"}
+        />
       </FormField>
       <FormField label="Playback speed">
-        <Slider min={0.5} max={2} step="any" defaultValue={1} showValue formatValue={(value) => value.toFixed(2) + "x"} />
+        <Slider
+          min={0.5}
+          max={2}
+          step="any"
+          defaultValue={1}
+          showValue
+          formatValue={(value) => value.toFixed(2) + "x"}
+        />
       </FormField>
     </Stack>
   </Section>
@@ -62,18 +82,27 @@ Wrap Slider in `FormField` to provide a visible label and supporting text. `defa
 
 `size` changes the track and thumb size without changing the numeric range.
 
-<Preview height={360} code={`\
+<Preview
+  height={360}
+  code={`\
 <Stack>
   <FormField label="Small"><Slider size="sm" defaultValue={25} /></FormField>
   <FormField label="Medium"><Slider size="md" defaultValue={50} /></FormField>
   <FormField label="Large"><Slider size="lg" defaultValue={75} /></FormField>
 </Stack>
-`}>
+`}
+>
   <Section>
     <Stack>
-      <FormField label="Small"><Slider size="sm" defaultValue={25} /></FormField>
-      <FormField label="Medium"><Slider size="md" defaultValue={50} /></FormField>
-      <FormField label="Large"><Slider size="lg" defaultValue={75} /></FormField>
+      <FormField label="Small">
+        <Slider size="sm" defaultValue={25} />
+      </FormField>
+      <FormField label="Medium">
+        <Slider size="md" defaultValue={50} />
+      </FormField>
+      <FormField label="Large">
+        <Slider size="lg" defaultValue={75} />
+      </FormField>
     </Stack>
   </Section>
 </Preview>
@@ -84,7 +113,9 @@ Wrap Slider in `FormField` to provide a visible label and supporting text. `defa
 
 `showValue` displays the current number. `formatValue` formats that display and supplies `aria-valuetext`, even when `showValue` is off. An explicit `aria-valuetext` takes precedence.
 
-<Preview height={260} code={`\
+<Preview
+  height={260}
+  code={`\
 <FormField label="Storage budget">
   <Slider
     min={0}
@@ -100,7 +131,8 @@ Wrap Slider in `FormField` to provide a visible label and supporting text. `defa
     ]}
   />
 </FormField>
-`}>
+`}
+>
   <Section>
     <FormField label="Storage budget">
       <Slider
@@ -128,6 +160,7 @@ Use `value` with `onChange` to own the value. The callback receives a number, no
 const [volume, setVolume] = useState(40);
 
 return (
+
   <Stack>
     <FormField label="Volume">
       <Slider value={volume} onChange={setVolume} showValue formatValue={(value) => value + "%"} />
@@ -143,7 +176,9 @@ return (
 
 `disabled` prevents interaction and native form submission. Use `FormField` to connect an error message, or supply `aria-invalid` and `aria-describedby` yourself. Invalid state does not disable the slider.
 
-<Preview height={340} code={`\
+<Preview
+  height={340}
+  code={`\
 <Stack>
   <FormField label="Locked volume" disabled>
     <Slider defaultValue={60} showValue />
@@ -152,7 +187,8 @@ return (
     <Slider defaultValue={20} showValue />
   </FormField>
 </Stack>
-`}>
+`}
+>
   <Section>
     <Stack>
       <FormField label="Locked volume" disabled>
@@ -169,32 +205,32 @@ return (
 
 ### Slider
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `value` | `number` | - | Controlled numeric value. |
-| `defaultValue` | `number` | Range midpoint | Initial uncontrolled value, rounded to the allowed step. |
-| `onChange` | `(value: number) => void` | - | Called with the normalized numeric value. |
-| `min` | `number` | `0` | Minimum selectable value. |
-| `max` | `number` | `100` | Maximum selectable value. |
-| `step` | `number \| "any"` | `1` | Positive increment or unrestricted precision. |
-| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Visual size. |
-| `marks` | `readonly SliderMark[]` | - | Visual tick marks and optional labels. |
-| `showValue` | `boolean` | `false` | Displays the current value above the track. |
-| `formatValue` | `(value: number) => string` | - | Formats the visible value and accessible value text. |
-| `className` | `string` | - | Additional class on the outer div. |
-| `disabled` | `boolean` | `false` | Disables the native range input. |
-| `id` | `string` | Generated | Input ID, used for label association. |
-| `name` | `string` | - | Native form submission field name. |
-| `aria-invalid` | `AriaAttributes["aria-invalid"]` | - | Sets native invalid semantics; `true` also enables error styling. |
+| Prop           | Type                             | Default        | Description                                                       |
+| -------------- | -------------------------------- | -------------- | ----------------------------------------------------------------- |
+| `value`        | `number`                         | -              | Controlled numeric value.                                         |
+| `defaultValue` | `number`                         | Range midpoint | Initial uncontrolled value, rounded to the allowed step.          |
+| `onChange`     | `(value: number) => void`        | -              | Called with the normalized numeric value.                         |
+| `min`          | `number`                         | `0`            | Minimum selectable value.                                         |
+| `max`          | `number`                         | `100`          | Maximum selectable value.                                         |
+| `step`         | `number \| "any"`                | `1`            | Positive increment or unrestricted precision.                     |
+| `size`         | `"sm" \| "md" \| "lg"`           | `"md"`         | Visual size.                                                      |
+| `marks`        | `readonly SliderMark[]`          | -              | Visual tick marks and optional labels.                            |
+| `showValue`    | `boolean`                        | `false`        | Displays the current value above the track.                       |
+| `formatValue`  | `(value: number) => string`      | -              | Formats the visible value and accessible value text.              |
+| `className`    | `string`                         | -              | Additional class on the outer div.                                |
+| `disabled`     | `boolean`                        | `false`        | Disables the native range input.                                  |
+| `id`           | `string`                         | Generated      | Input ID, used for label association.                             |
+| `name`         | `string`                         | -              | Native form submission field name.                                |
+| `aria-invalid` | `AriaAttributes["aria-invalid"]` | -              | Sets native invalid semantics; `true` also enables error styling. |
 
 Other native input props, including `ref`, `form`, `aria-label`, `aria-describedby`, and `aria-valuetext`, are forwarded to the range input. `style` applies to the input; `className` applies to its wrapper.
 
 ### SliderMark
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `value` | `number` | Required | Position within the slider range. |
-| `label` | `ReactNode` | - | Optional visible label below the mark. |
+| Prop    | Type        | Default  | Description                            |
+| ------- | ----------- | -------- | -------------------------------------- |
+| `value` | `number`    | Required | Position within the slider range.      |
+| `label` | `ReactNode` | -        | Optional visible label below the mark. |
 
 ## Accessibility
 

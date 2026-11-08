@@ -2,7 +2,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentPropsWithRef, CSSProperties } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 import { AppBar } from "./index";
 import { PageLayout } from "../page-layout";
 
@@ -25,17 +25,25 @@ describe("AppBar", () => {
 
     const { container, rerender } = render(
       <PageLayout>
-        <PageLayout.Header><AppBar title="Puzzle" sticky /></PageLayout.Header>
+        <PageLayout.Header>
+          <AppBar title="Puzzle" sticky />
+        </PageLayout.Header>
         <PageLayout.Main>Content</PageLayout.Main>
       </PageLayout>,
     );
-    const layout = container.querySelector<HTMLElement>("[data-puzzle-page-layout]")!;
+    const layout = container.querySelector<HTMLElement>(
+      "[data-puzzle-page-layout]",
+    )!;
 
-    expect(layout.style.getPropertyValue("--puzzle-sticky-offset")).toBe("80px");
+    expect(layout.style.getPropertyValue("--puzzle-sticky-offset")).toBe(
+      "80px",
+    );
 
     rerender(
       <PageLayout>
-        <PageLayout.Header><AppBar title="Puzzle" /></PageLayout.Header>
+        <PageLayout.Header>
+          <AppBar title="Puzzle" />
+        </PageLayout.Header>
         <PageLayout.Main>Content</PageLayout.Main>
       </PageLayout>,
     );
@@ -50,13 +58,16 @@ describe("AppBar", () => {
 
     const { container } = render(
       <PageLayout style={{ "--puzzle-sticky-offset": "64px" } as CSSProperties}>
-        <PageLayout.Main><AppBar title="Example" sticky /></PageLayout.Main>
+        <PageLayout.Main>
+          <AppBar title="Example" sticky />
+        </PageLayout.Main>
       </PageLayout>,
     );
 
     expect(
-      container.querySelector<HTMLElement>("[data-puzzle-page-layout]")!.style
-        .getPropertyValue("--puzzle-sticky-offset"),
+      container
+        .querySelector<HTMLElement>("[data-puzzle-page-layout]")!
+        .style.getPropertyValue("--puzzle-sticky-offset"),
     ).toBe("64px");
   });
 
@@ -119,9 +130,10 @@ describe("AppBar", () => {
       </Theme>,
     );
 
-    expect(
-      screen.getAllByRole("link", { name: "Docs" })[0],
-    ).toHaveAttribute("data-router-link", "true");
+    expect(screen.getAllByRole("link", { name: "Docs" })[0]).toHaveAttribute(
+      "data-router-link",
+      "true",
+    );
     expect(screen.getByRole("link", { name: "Puzzle" })).toHaveAttribute(
       "data-router-link",
       "true",
@@ -144,7 +156,9 @@ describe("AppBar", () => {
     const button = screen.getByRole("button", { name: "Open navigation" });
 
     expect(button).toHaveAttribute("aria-expanded", "false");
-    expect(document.getElementById(button.getAttribute("aria-controls")!)).toBeTruthy();
+    expect(
+      document.getElementById(button.getAttribute("aria-controls")!),
+    ).toBeTruthy();
 
     await user.click(button);
 
@@ -174,6 +188,8 @@ describe("AppBar", () => {
       />,
     );
 
-    expect(screen.getAllByRole("navigation", { name: "Site" }).length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole("navigation", { name: "Site" }).length,
+    ).toBeGreaterThan(0);
   });
 });

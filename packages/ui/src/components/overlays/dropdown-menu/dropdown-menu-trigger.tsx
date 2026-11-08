@@ -15,7 +15,7 @@ import {
   type Ref,
 } from "react";
 
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 
 import { useDropdownMenuContext } from "./dropdown-menu.context";
 import { setRef } from "./dropdown-menu.utils";

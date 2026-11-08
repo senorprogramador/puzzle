@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { AntDesignIcon } from "@puzzle/icons/sets/ant-design";
-import { AntDesignIconPage } from "@puzzle/icons/sets/ant-design.page";
-import { ALL_ANT_DESIGN_ICONS } from "@puzzle/icons/sets/ant-design.constants";
+import { AntDesignIcon } from "@puzzle-ui/icons/sets/ant-design";
+import { AntDesignIconPage } from "@puzzle-ui/icons/sets/ant-design.page";
+import { ALL_ANT_DESIGN_ICONS } from "@puzzle-ui/icons/sets/ant-design.constants";
 
 const meta = {
   title: "Icons/Sets/AntDesign",

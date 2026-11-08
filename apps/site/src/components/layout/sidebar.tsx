@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Sidebar as PuzzleSidebar } from "@puzzle/ui/components/layout/sidebar";
+import { Sidebar as PuzzleSidebar } from "@puzzle-ui/ui/components/layout/sidebar";
 import {
   TreeView,
   type TreeViewItem,
-} from "@puzzle/ui/components/navigation/tree-view";
+} from "@puzzle-ui/ui/components/navigation/tree-view";
 import { useMatchRoute, useNavigate } from "@tanstack/react-router";
-import { Autocomplete, Stack } from "@puzzle/ui";
-import { stringWithCasing } from "@puzzle/core";
+import { Autocomplete, Stack } from "@puzzle-ui/ui";
+import { stringWithCasing } from "@puzzle-ui/core";
 import { items } from "./constants";
 
 const findComponentItems = (

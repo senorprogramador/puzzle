@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { IconoirIcon } from "@puzzle/icons/sets/iconoir";
-import { IconoirIconPage } from "@puzzle/icons/sets/iconoir.page";
-import { ALL_ICONOIR_ICONS } from "@puzzle/icons/sets/iconoir.constants";
+import { IconoirIcon } from "@puzzle-ui/icons/sets/iconoir";
+import { IconoirIconPage } from "@puzzle-ui/icons/sets/iconoir.page";
+import { ALL_ICONOIR_ICONS } from "@puzzle-ui/icons/sets/iconoir.constants";
 
 const meta = {
   title: "Icons/Sets/Iconoir",

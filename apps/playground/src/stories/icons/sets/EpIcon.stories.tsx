@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { EpIcon } from "@puzzle/icons/sets/ep";
-import { EpIconPage } from "@puzzle/icons/sets/ep.page";
-import { ALL_EP_ICONS } from "@puzzle/icons/sets/ep.constants";
+import { EpIcon } from "@puzzle-ui/icons/sets/ep";
+import { EpIconPage } from "@puzzle-ui/icons/sets/ep.page";
+import { ALL_EP_ICONS } from "@puzzle-ui/icons/sets/ep.constants";
 
 const meta = {
   title: "Icons/Sets/Ep",

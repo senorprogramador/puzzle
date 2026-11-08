@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FaSolidIcon } from "@puzzle/icons/sets/fa-solid";
-import { FaSolidIconPage } from "@puzzle/icons/sets/fa-solid.page";
-import { ALL_FA_SOLID_ICONS } from "@puzzle/icons/sets/fa-solid.constants";
+import { FaSolidIcon } from "@puzzle-ui/icons/sets/fa-solid";
+import { FaSolidIconPage } from "@puzzle-ui/icons/sets/fa-solid.page";
+import { ALL_FA_SOLID_ICONS } from "@puzzle-ui/icons/sets/fa-solid.constants";
 
 const meta = {
   title: "Icons/Sets/FaSolid",

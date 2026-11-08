@@ -6,35 +6,44 @@ description: Theme-aware page sections with consistent content spacing.
 ## Import
 
 ```tsx
-import { Section } from "@puzzle/ui";
+import { Section } from "@puzzle-ui/ui";
 ```
 
 ## Themes and width
 
 Section applies section colors and vertical spacing. Use `fullWidth` to remove the inner width constraint or `noPadding` to remove its padding.
 
-<Preview height={500} code={`\
+<Preview
+  height={500}
+  code={`\
 <SectionStack>
   <Section><Heading level="headline3">Default section</Heading></Section>
   <Section theme="primary" fullWidth><Heading level="headline3">Primary section</Heading></Section>
   <Section theme="dark"><Text>Dark section</Text></Section>
 </SectionStack>
-`}>
+`}
+>
   <SectionStack>
-    <Section><Heading level="headline3">Default section</Heading></Section>
-    <Section theme="primary" fullWidth><Heading level="headline3">Primary section</Heading></Section>
-    <Section theme="dark"><Text>Dark section</Text></Section>
+    <Section>
+      <Heading level="headline3">Default section</Heading>
+    </Section>
+    <Section theme="primary" fullWidth>
+      <Heading level="headline3">Primary section</Heading>
+    </Section>
+    <Section theme="dark">
+      <Text>Dark section</Text>
+    </Section>
   </SectionStack>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `ReactNode` | - | Section content. |
-| `theme` | `"default" \| "light" \| "dark" \| "primary" \| "secondary" \| "accent"` | `"default"` | Theme treatment. |
-| `fullWidth` | `boolean` | `false` | Unconstrained inner content width. |
-| `noPadding` | `boolean` | `false` | Removes section padding. |
-| `className` | `string` | - | Root class. |
+| Prop        | Type                                                                     | Default     | Description                        |
+| ----------- | ------------------------------------------------------------------------ | ----------- | ---------------------------------- |
+| `children`  | `ReactNode`                                                              | -           | Section content.                   |
+| `theme`     | `"default" \| "light" \| "dark" \| "primary" \| "secondary" \| "accent"` | `"default"` | Theme treatment.                   |
+| `fullWidth` | `boolean`                                                                | `false`     | Unconstrained inner content width. |
+| `noPadding` | `boolean`                                                                | `false`     | Removes section padding.           |
+| `className` | `string`                                                                 | -           | Root class.                        |
 
 `compactTop`, `compactBottom`, and `divider` are internal coordination props set by `SectionStack`; prefer composing sections rather than setting them manually. Section does not forward arbitrary native DOM attributes.

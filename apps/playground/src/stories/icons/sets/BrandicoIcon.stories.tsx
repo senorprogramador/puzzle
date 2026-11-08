@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { BrandicoIcon } from "@puzzle/icons/sets/brandico";
-import { BrandicoIconPage } from "@puzzle/icons/sets/brandico.page";
-import { ALL_BRANDICO_ICONS } from "@puzzle/icons/sets/brandico.constants";
+import { BrandicoIcon } from "@puzzle-ui/icons/sets/brandico";
+import { BrandicoIconPage } from "@puzzle-ui/icons/sets/brandico.page";
+import { ALL_BRANDICO_ICONS } from "@puzzle-ui/icons/sets/brandico.constants";
 
 const meta = {
   title: "Icons/Sets/Brandico",

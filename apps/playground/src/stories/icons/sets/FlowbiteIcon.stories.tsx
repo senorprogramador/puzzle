@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FlowbiteIcon } from "@puzzle/icons/sets/flowbite";
-import { FlowbiteIconPage } from "@puzzle/icons/sets/flowbite.page";
-import { ALL_FLOWBITE_ICONS } from "@puzzle/icons/sets/flowbite.constants";
+import { FlowbiteIcon } from "@puzzle-ui/icons/sets/flowbite";
+import { FlowbiteIconPage } from "@puzzle-ui/icons/sets/flowbite.page";
+import { ALL_FLOWBITE_ICONS } from "@puzzle-ui/icons/sets/flowbite.constants";
 
 const meta = {
   title: "Icons/Sets/Flowbite",

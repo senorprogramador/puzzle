@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { HealthiconsIcon } from "@puzzle/icons/sets/healthicons";
-import { HealthiconsIconPage } from "@puzzle/icons/sets/healthicons.page";
-import { ALL_HEALTHICONS_ICONS } from "@puzzle/icons/sets/healthicons.constants";
+import { HealthiconsIcon } from "@puzzle-ui/icons/sets/healthicons";
+import { HealthiconsIconPage } from "@puzzle-ui/icons/sets/healthicons.page";
+import { ALL_HEALTHICONS_ICONS } from "@puzzle-ui/icons/sets/healthicons.constants";
 
 const meta = {
   title: "Icons/Sets/Healthicons",

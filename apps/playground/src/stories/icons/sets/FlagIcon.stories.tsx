@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FlagIcon } from "@puzzle/icons/sets/flag";
-import { FlagIconPage } from "@puzzle/icons/sets/flag.page";
-import { ALL_FLAG_ICONS } from "@puzzle/icons/sets/flag.constants";
+import { FlagIcon } from "@puzzle-ui/icons/sets/flag";
+import { FlagIconPage } from "@puzzle-ui/icons/sets/flag.page";
+import { ALL_FLAG_ICONS } from "@puzzle-ui/icons/sets/flag.constants";
 
 const meta = {
   title: "Icons/Sets/Flag",

@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 
 import { Label } from "../label";
 import { resolveFormFieldState } from "./form-field-state";

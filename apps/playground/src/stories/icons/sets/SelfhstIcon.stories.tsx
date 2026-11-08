@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { SelfhstIcon } from "@puzzle/icons/sets/selfhst";
-import { SelfhstIconPage } from "@puzzle/icons/sets/selfhst.page";
-import { ALL_SELFHST_ICONS } from "@puzzle/icons/sets/selfhst.constants";
+import { SelfhstIcon } from "@puzzle-ui/icons/sets/selfhst";
+import { SelfhstIconPage } from "@puzzle-ui/icons/sets/selfhst.page";
+import { ALL_SELFHST_ICONS } from "@puzzle-ui/icons/sets/selfhst.constants";
 
 const meta = {
   title: "Icons/Sets/Selfhst",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MdiLightIcon } from "@puzzle/icons/sets/mdi-light";
-import { MdiLightIconPage } from "@puzzle/icons/sets/mdi-light.page";
-import { ALL_MDI_LIGHT_ICONS } from "@puzzle/icons/sets/mdi-light.constants";
+import { MdiLightIcon } from "@puzzle-ui/icons/sets/mdi-light";
+import { MdiLightIconPage } from "@puzzle-ui/icons/sets/mdi-light.page";
+import { ALL_MDI_LIGHT_ICONS } from "@puzzle-ui/icons/sets/mdi-light.constants";
 
 const meta = {
   title: "Icons/Sets/MdiLight",

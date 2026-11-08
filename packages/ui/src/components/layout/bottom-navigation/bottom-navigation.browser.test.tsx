@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 import { BottomNavigation, BottomNavigationItem } from "./index";
 import linkCss from "../../navigation/link/link.css?inline";
 
@@ -22,8 +22,12 @@ describe("BottomNavigation (browser)", () => {
     const home = screen.getByRole("link", { name: "Home" });
     const search = screen.getByRole("link", { name: "Search" });
     const create = screen.getByRole("button", { name: "Create" });
-    await expect.poll(() => getComputedStyle(home).color).toBe("rgb(2, 132, 199)");
-    await expect.poll(() => getComputedStyle(search).color).toBe("rgb(95, 100, 133)");
+    await expect
+      .poll(() => getComputedStyle(home).color)
+      .toBe("rgb(2, 132, 199)");
+    await expect
+      .poll(() => getComputedStyle(search).color)
+      .toBe("rgb(95, 100, 133)");
     expect(getComputedStyle(create).color).toBe(getComputedStyle(search).color);
     expect(getComputedStyle(search).textDecorationLine).toBe("none");
     expect(home).toHaveAttribute("aria-current", "page");

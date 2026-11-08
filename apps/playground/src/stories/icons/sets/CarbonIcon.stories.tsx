@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CarbonIcon } from "@puzzle/icons/sets/carbon";
-import { CarbonIconPage } from "@puzzle/icons/sets/carbon.page";
-import { ALL_CARBON_ICONS } from "@puzzle/icons/sets/carbon.constants";
+import { CarbonIcon } from "@puzzle-ui/icons/sets/carbon";
+import { CarbonIconPage } from "@puzzle-ui/icons/sets/carbon.page";
+import { ALL_CARBON_ICONS } from "@puzzle-ui/icons/sets/carbon.constants";
 
 const meta = {
   title: "Icons/Sets/Carbon",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { PajamasIcon } from "@puzzle/icons/sets/pajamas";
-import { PajamasIconPage } from "@puzzle/icons/sets/pajamas.page";
-import { ALL_PAJAMAS_ICONS } from "@puzzle/icons/sets/pajamas.constants";
+import { PajamasIcon } from "@puzzle-ui/icons/sets/pajamas";
+import { PajamasIconPage } from "@puzzle-ui/icons/sets/pajamas.page";
+import { ALL_PAJAMAS_ICONS } from "@puzzle-ui/icons/sets/pajamas.constants";
 
 const meta = {
   title: "Icons/Sets/Pajamas",

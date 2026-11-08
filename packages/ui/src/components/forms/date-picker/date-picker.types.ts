@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import type { ResponsiveValue } from "@puzzle/core";
+import type { ResponsiveValue } from "@puzzle-ui/core";
 import type { PopoutAlignment, PopoutPosition } from "../../overlays/popout";
 
 type DatePickerSize = "sm" | "md" | "lg";

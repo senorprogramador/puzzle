@@ -6,33 +6,42 @@ description: Enter multiline text with automatic sizing.
 ## Import
 
 ```tsx
-import { TextAreaInput } from "@puzzle/ui";
+import { TextAreaInput } from "@puzzle-ui/ui";
 ```
 
 ## Automatic and manual resizing
 
 `rows` sets the minimum visible height. Automatic sizing follows the content; disable it and enable `resizable` for a manually resizable textarea.
 
-<Preview height={450} code={`\
+<Preview
+  height={450}
+  code={`\
 <Stack>
   <FormField label="Message"><TextAreaInput rows={3} placeholder="Write a message..." /></FormField>
   <FormField label="Notes"><TextAreaInput rows={4} autoSize={false} resizable /></FormField>
 </Stack>
-`}>
-  <Section><Stack>
-    <FormField label="Message"><TextAreaInput rows={3} placeholder="Write a message..." /></FormField>
-    <FormField label="Notes"><TextAreaInput rows={4} autoSize={false} resizable /></FormField>
-  </Stack></Section>
+`}
+>
+  <Section>
+    <Stack>
+      <FormField label="Message">
+        <TextAreaInput rows={3} placeholder="Write a message..." />
+      </FormField>
+      <FormField label="Notes">
+        <TextAreaInput rows={4} autoSize={false} resizable />
+      </FormField>
+    </Stack>
+  </Section>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `rows` | `number` | `3` | Minimum row count. |
-| `autoSize` | `boolean` | `true` | Expands to fit content. |
-| `resizable` | `boolean` | `false` | Enables vertical manual resizing. |
-| `value`, `defaultValue` | Native textarea value | - | Controlled or initial text. |
-| `onChange` | `ChangeEventHandler<HTMLTextAreaElement>` | - | Native change event. |
+| Prop                    | Type                                      | Default | Description                       |
+| ----------------------- | ----------------------------------------- | ------- | --------------------------------- |
+| `rows`                  | `number`                                  | `3`     | Minimum row count.                |
+| `autoSize`              | `boolean`                                 | `true`  | Expands to fit content.           |
+| `resizable`             | `boolean`                                 | `false` | Enables vertical manual resizing. |
+| `value`, `defaultValue` | Native textarea value                     | -       | Controlled or initial text.       |
+| `onChange`              | `ChangeEventHandler<HTMLTextAreaElement>` | -       | Native change event.              |
 
 Standard textarea attributes, `className`, and `style` target the textarea. Provide a visible label, and use `maxLength` when input must be bounded.

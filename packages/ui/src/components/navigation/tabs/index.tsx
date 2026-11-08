@@ -1,7 +1,7 @@
 "use client";
 
-import { useRovingFocus } from "@puzzle/hooks";
-import { cn } from "@puzzle/core";
+import { useRovingFocus } from "@puzzle-ui/hooks";
+import { cn } from "@puzzle-ui/core";
 import {
   Children,
   isValidElement,

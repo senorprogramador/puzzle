@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { LsiconIcon } from "@puzzle/icons/sets/lsicon";
-import { LsiconIconPage } from "@puzzle/icons/sets/lsicon.page";
-import { ALL_LSICON_ICONS } from "@puzzle/icons/sets/lsicon.constants";
+import { LsiconIcon } from "@puzzle-ui/icons/sets/lsicon";
+import { LsiconIconPage } from "@puzzle-ui/icons/sets/lsicon.page";
+import { ALL_LSICON_ICONS } from "@puzzle-ui/icons/sets/lsicon.constants";
 
 const meta = {
   title: "Icons/Sets/Lsicon",

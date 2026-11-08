@@ -10,16 +10,21 @@ Tooltip provides a short hint on hover or keyboard focus. Use a focusable trigge
 ## Import
 
 ```tsx
-import { Tooltip } from "@puzzle/ui";
+import { Tooltip } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
 
 Hover over the button or reach it with Tab. The tooltip closes on pointer leave, blur, or Escape.
 
-<Preview height={200} align="center" justify="center" code={`\
+<Preview
+  height={200}
+  align="center"
+  justify="center"
+  code={`\
 <Tooltip trigger={<Button>Save</Button>}>Saves a draft</Tooltip>
-`}>
+`}
+>
   <Tooltip trigger={<Button>Save</Button>}>Saves a draft</Tooltip>
 </Preview>
 
@@ -27,19 +32,38 @@ Hover over the button or reach it with Tab. The tooltip closes on pointer leave,
 
 `position` requests one of four sides. The popup can fall back to another side when there is not enough space.
 
-<Preview height={300} align="center" justify="center" code={`\
+<Preview
+  height={300}
+  align="center"
+  justify="center"
+  code={`\
 <Stack alignH="center">
   <Tooltip position="top" trigger={<Button variant="outline">Top</Button>}>Above the trigger</Tooltip>
   <Tooltip position="right" trigger={<Button variant="outline">Right</Button>}>Beside the trigger</Tooltip>
   <Tooltip position="bottom" trigger={<Button variant="outline">Bottom</Button>}>Below the trigger</Tooltip>
   <Tooltip position="left" trigger={<Button variant="outline">Left</Button>}>Beside the trigger</Tooltip>
 </Stack>
-`}>
+`}
+>
   <Stack alignH="center">
-    <Tooltip position="top" trigger={<Button variant="outline">Top</Button>}>Above the trigger</Tooltip>
-    <Tooltip position="right" trigger={<Button variant="outline">Right</Button>}>Beside the trigger</Tooltip>
-    <Tooltip position="bottom" trigger={<Button variant="outline">Bottom</Button>}>Below the trigger</Tooltip>
-    <Tooltip position="left" trigger={<Button variant="outline">Left</Button>}>Beside the trigger</Tooltip>
+    <Tooltip position="top" trigger={<Button variant="outline">Top</Button>}>
+      Above the trigger
+    </Tooltip>
+    <Tooltip
+      position="right"
+      trigger={<Button variant="outline">Right</Button>}
+    >
+      Beside the trigger
+    </Tooltip>
+    <Tooltip
+      position="bottom"
+      trigger={<Button variant="outline">Bottom</Button>}
+    >
+      Below the trigger
+    </Tooltip>
+    <Tooltip position="left" trigger={<Button variant="outline">Left</Button>}>
+      Beside the trigger
+    </Tooltip>
   </Stack>
 </Preview>
 
@@ -47,7 +71,11 @@ Hover over the button or reach it with Tab. The tooltip closes on pointer leave,
 
 `align` aligns the popup along the trigger's edge. `offset` is the gap in pixels; `exitDelay` is the delay in milliseconds before closing on pointer leave.
 
-<Preview height={260} align="center" justify="center" code={`\
+<Preview
+  height={260}
+  align="center"
+  justify="center"
+  code={`\
 <Stack alignH="center">
   <Tooltip align="start" offset={16} exitDelay={500} trigger={<Button variant="outline">Start, longer delay</Button>}>
     Aligned to the start with a 16px gap.
@@ -56,9 +84,15 @@ Hover over the button or reach it with Tab. The tooltip closes on pointer leave,
     Aligned to the end of the trigger.
   </Tooltip>
 </Stack>
-`}>
+`}
+>
   <Stack alignH="center">
-    <Tooltip align="start" offset={16} exitDelay={500} trigger={<Button variant="outline">Start, longer delay</Button>}>
+    <Tooltip
+      align="start"
+      offset={16}
+      exitDelay={500}
+      trigger={<Button variant="outline">Start, longer delay</Button>}
+    >
       Aligned to the start with a 16px gap.
     </Tooltip>
     <Tooltip align="end" trigger={<Button variant="outline">End</Button>}>
@@ -75,6 +109,7 @@ Use `open` with `onOpenChange` when visibility belongs to application state. Use
 const [open, setOpen] = useState(false);
 
 return (
+
   <Stack alignH="center">
     <Tooltip open={open} onOpenChange={setOpen} trigger={<Button variant="outline">Focus or hover me</Button>}>
       Your changes are saved automatically.
@@ -88,19 +123,19 @@ return (
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `trigger` | `ReactElement` | Required | Single trigger accepting DOM attributes and a ref. |
-| `children` | `ReactNode` | Required | Non-interactive hint content. |
-| `position` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred popup side. |
-| `align` | `"start" \| "center" \| "end"` | `"center"` | Popup alignment along the trigger. |
-| `offset` | `number` | `8` | Gap from the trigger in pixels. |
-| `exitDelay` | `number` | `100` | Pointer-leave delay in milliseconds. |
-| `open` | `boolean` | - | Controlled visibility. |
-| `defaultOpen` | `boolean` | `false` | Initial uncontrolled visibility. |
-| `onOpenChange` | `(open: boolean) => void` | - | Called when visibility changes are requested. |
-| `className` | `string` | - | Additional class on the tooltip content. |
-| `triggerClassName` | `string` | - | Additional class merged onto the trigger. |
+| Prop               | Type                                     | Default    | Description                                        |
+| ------------------ | ---------------------------------------- | ---------- | -------------------------------------------------- |
+| `trigger`          | `ReactElement`                           | Required   | Single trigger accepting DOM attributes and a ref. |
+| `children`         | `ReactNode`                              | Required   | Non-interactive hint content.                      |
+| `position`         | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred popup side.                              |
+| `align`            | `"start" \| "center" \| "end"`           | `"center"` | Popup alignment along the trigger.                 |
+| `offset`           | `number`                                 | `8`        | Gap from the trigger in pixels.                    |
+| `exitDelay`        | `number`                                 | `100`      | Pointer-leave delay in milliseconds.               |
+| `open`             | `boolean`                                | -          | Controlled visibility.                             |
+| `defaultOpen`      | `boolean`                                | `false`    | Initial uncontrolled visibility.                   |
+| `onOpenChange`     | `(open: boolean) => void`                | -          | Called when visibility changes are requested.      |
+| `className`        | `string`                                 | -          | Additional class on the tooltip content.           |
+| `triggerClassName` | `string`                                 | -          | Additional class merged onto the trigger.          |
 
 ## Accessibility
 

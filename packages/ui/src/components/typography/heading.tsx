@@ -1,4 +1,4 @@
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 import type { ComponentPropsWithRef, ElementType } from "react";
 
 type HeadingLevel =

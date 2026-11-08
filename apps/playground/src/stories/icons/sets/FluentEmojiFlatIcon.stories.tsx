@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FluentEmojiFlatIcon } from "@puzzle/icons/sets/fluent-emoji-flat";
-import { FluentEmojiFlatIconPage } from "@puzzle/icons/sets/fluent-emoji-flat.page";
-import { ALL_FLUENT_EMOJI_FLAT_ICONS } from "@puzzle/icons/sets/fluent-emoji-flat.constants";
+import { FluentEmojiFlatIcon } from "@puzzle-ui/icons/sets/fluent-emoji-flat";
+import { FluentEmojiFlatIconPage } from "@puzzle-ui/icons/sets/fluent-emoji-flat.page";
+import { ALL_FLUENT_EMOJI_FLAT_ICONS } from "@puzzle-ui/icons/sets/fluent-emoji-flat.constants";
 
 const meta = {
   title: "Icons/Sets/FluentEmojiFlat",

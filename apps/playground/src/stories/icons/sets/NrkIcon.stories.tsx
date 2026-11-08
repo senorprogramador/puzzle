@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { NrkIcon } from "@puzzle/icons/sets/nrk";
-import { NrkIconPage } from "@puzzle/icons/sets/nrk.page";
-import { ALL_NRK_ICONS } from "@puzzle/icons/sets/nrk.constants";
+import { NrkIcon } from "@puzzle-ui/icons/sets/nrk";
+import { NrkIconPage } from "@puzzle-ui/icons/sets/nrk.page";
+import { ALL_NRK_ICONS } from "@puzzle-ui/icons/sets/nrk.constants";
 
 const meta = {
   title: "Icons/Sets/Nrk",

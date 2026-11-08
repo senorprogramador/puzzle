@@ -8,21 +8,21 @@ The `Theme` component is the entry point of the theme system. It resolves tokens
 ## Import
 
 ```tsx
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 ```
 
 ## Props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `theme` | `"light" \| "dark" \| "system"` | `"system"` | The color scheme mode. `system` follows `prefers-color-scheme`. |
-| `scope` | `"root" \| "local"` | `"root"` | Whether variables apply to `:root` or only to the component's subtree. |
-| `globalStyles` | `boolean` | `true` | Applies Puzzle's global base styles. Only used with root scope. |
-| `tokens` | `ThemeTokenOverrides` | — | Deep-partial overrides of the default [design tokens](/docs/theme/tokens). |
-| `colorTheme` | `ColorThemes` | — | One of the built-in [color themes](/docs/theme/colors#built-in-color-themes). |
-| `fonts` | `Partial<Record<FontRole, FontConfig>>` | — | Google Fonts for the `heading`, `body`, and `accent` roles. See [Typography & Fonts](/docs/theme/typography). |
-| `components` | `ThemeComponents` | — | Global link and image [component overrides](/docs/theme/components). |
-| `nonce` | `string` | — | CSP nonce applied to the injected `<style>` elements. |
+| Prop           | Type                                    | Default    | Description                                                                                                   |
+| -------------- | --------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------- |
+| `theme`        | `"light" \| "dark" \| "system"`         | `"system"` | The color scheme mode. `system` follows `prefers-color-scheme`.                                               |
+| `scope`        | `"root" \| "local"`                     | `"root"`   | Whether variables apply to `:root` or only to the component's subtree.                                        |
+| `globalStyles` | `boolean`                               | `true`     | Applies Puzzle's global base styles. Only used with root scope.                                               |
+| `tokens`       | `ThemeTokenOverrides`                   | —          | Deep-partial overrides of the default [design tokens](/docs/theme/tokens).                                    |
+| `colorTheme`   | `ColorThemes`                           | —          | One of the built-in [color themes](/docs/theme/colors#built-in-color-themes).                                 |
+| `fonts`        | `Partial<Record<FontRole, FontConfig>>` | —          | Google Fonts for the `heading`, `body`, and `accent` roles. See [Typography & Fonts](/docs/theme/typography). |
+| `components`   | `ThemeComponents`                       | —          | Global link and image [component overrides](/docs/theme/components).                                          |
+| `nonce`        | `string`                                | —          | CSP nonce applied to the injected `<style>` elements.                                                         |
 
 ## Root scope
 

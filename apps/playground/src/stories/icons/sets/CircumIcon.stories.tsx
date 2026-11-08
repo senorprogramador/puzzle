@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CircumIcon } from "@puzzle/icons/sets/circum";
-import { CircumIconPage } from "@puzzle/icons/sets/circum.page";
-import { ALL_CIRCUM_ICONS } from "@puzzle/icons/sets/circum.constants";
+import { CircumIcon } from "@puzzle-ui/icons/sets/circum";
+import { CircumIconPage } from "@puzzle-ui/icons/sets/circum.page";
+import { ALL_CIRCUM_ICONS } from "@puzzle-ui/icons/sets/circum.constants";
 
 const meta = {
   title: "Icons/Sets/Circum",

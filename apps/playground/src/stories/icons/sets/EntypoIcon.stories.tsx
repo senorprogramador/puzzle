@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { EntypoIcon } from "@puzzle/icons/sets/entypo";
-import { EntypoIconPage } from "@puzzle/icons/sets/entypo.page";
-import { ALL_ENTYPO_ICONS } from "@puzzle/icons/sets/entypo.constants";
+import { EntypoIcon } from "@puzzle-ui/icons/sets/entypo";
+import { EntypoIconPage } from "@puzzle-ui/icons/sets/entypo.page";
+import { ALL_ENTYPO_ICONS } from "@puzzle-ui/icons/sets/entypo.constants";
 
 const meta = {
   title: "Icons/Sets/Entypo",

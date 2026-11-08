@@ -1,6 +1,6 @@
 import { type ComponentPropsWithRef } from "react";
 import "./circular-progress.css";
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 import type { ProgressProps } from "./types";
 import { getProgressAriaProps, normalizeProgressValue } from "./utils";
 

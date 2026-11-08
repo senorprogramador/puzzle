@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { ClarityIcon } from "@puzzle/icons/sets/clarity";
-import { ClarityIconPage } from "@puzzle/icons/sets/clarity.page";
-import { ALL_CLARITY_ICONS } from "@puzzle/icons/sets/clarity.constants";
+import { ClarityIcon } from "@puzzle-ui/icons/sets/clarity";
+import { ClarityIconPage } from "@puzzle-ui/icons/sets/clarity.page";
+import { ALL_CLARITY_ICONS } from "@puzzle-ui/icons/sets/clarity.constants";
 
 const meta = {
   title: "Icons/Sets/Clarity",

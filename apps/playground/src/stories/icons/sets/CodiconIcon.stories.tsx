@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CodiconIcon } from "@puzzle/icons/sets/codicon";
-import { CodiconIconPage } from "@puzzle/icons/sets/codicon.page";
-import { ALL_CODICON_ICONS } from "@puzzle/icons/sets/codicon.constants";
+import { CodiconIcon } from "@puzzle-ui/icons/sets/codicon";
+import { CodiconIconPage } from "@puzzle-ui/icons/sets/codicon.page";
+import { ALL_CODICON_ICONS } from "@puzzle-ui/icons/sets/codicon.constants";
 
 const meta = {
   title: "Icons/Sets/Codicon",

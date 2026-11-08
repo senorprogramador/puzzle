@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { TablerIcon } from "@puzzle/icons/sets/tabler";
-import { TablerIconPage } from "@puzzle/icons/sets/tabler.page";
-import { ALL_TABLER_ICONS } from "@puzzle/icons/sets/tabler.constants";
+import { TablerIcon } from "@puzzle-ui/icons/sets/tabler";
+import { TablerIconPage } from "@puzzle-ui/icons/sets/tabler.page";
+import { ALL_TABLER_ICONS } from "@puzzle-ui/icons/sets/tabler.constants";
 
 const meta = {
   title: "Icons/Sets/Tabler",

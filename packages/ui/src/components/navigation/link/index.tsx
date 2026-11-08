@@ -1,12 +1,12 @@
 "use client";
 
 import { createElement } from "react";
-import { cn } from "@puzzle/core";
-import { useThemeComponents } from "@puzzle/theme/components-context";
+import { cn } from "@puzzle-ui/core";
+import { useThemeComponents } from "@puzzle-ui/theme/components-context";
 import type {
   ThemeLinkComponent,
   ThemeLinkComponentConfig,
-} from "@puzzle/theme";
+} from "@puzzle-ui/theme";
 import type { LinkProps } from "./types";
 import "./link.css";
 

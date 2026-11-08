@@ -38,10 +38,10 @@ Package / app Purpose
 
 ---
 
-`@puzzle/core` Core UI components and shared primitives
-`@puzzle/theme` Theme and design-token functionality
-`@puzzle/hooks` Reusable React hooks
-`@puzzle/playground` Playground and component exploration
+`"@puzzle-ui/core` Core UI components and shared primitives
+`"@puzzle-ui/theme` Theme and design-token functionality
+`"@puzzle-ui/hooks` Reusable React hooks
+`"@puzzle-ui/playground` Playground and component exploration
 
 The exact structure and package responsibilities may evolve during
 development.
@@ -140,6 +140,53 @@ Until Puzzle reaches a more stable stage:
 
 Pin versions or use a specific commit if you are experimenting with the
 project.
+
+### Publishing packages
+
+The library packages are published separately as public packages on npmjs.
+The repository root and applications are private and are not published.
+
+From the repository root, validate a package's build and tarball without
+publishing it:
+
+```bash
+npm pack --workspace=@puzzle-ui/core --dry-run
+npm publish --workspace=@puzzle-ui/core --dry-run
+```
+
+Every library package runs `tsdown` in `prepack`, so packing and publishing
+rebuild its JavaScript, ESM/CommonJS declarations, styles where applicable,
+and included MIT license. Runtime dependencies use registry-compatible
+version ranges; consumers do not need Bun or workspace links.
+
+### Releasing
+
+Release all library packages together from the repository root:
+
+```bash
+npm run release
+```
+
+The script requires a clean git working tree and asks whether the release is
+`major`, `minor`, or `patch`. It then:
+
+1. Updates the version and internal `@puzzle-ui/*` dependency ranges of every
+   library package, and refreshes `bun.lock`.
+2. Runs all package tests, including the UI browser tests.
+3. Builds all packages.
+4. Publishes core, theme, hooks, icons, and UI in that order, prompting for
+   npm login, one-time passwords, or browser authentication when needed.
+5. Commits the version changes as `Release v<version>` and creates the
+   annotated tag `v<version>`.
+
+The script stops at the first failing test, build, or publish. If it stops
+before anything is published, the version changes are restored. Push the
+release afterwards with `git push --follow-tags`.
+
+Run `npm run release:dry-run` to perform every step with `npm publish
+--dry-run`, without publishing, committing, or tagging. Releasing requires Bun,
+Git, npm, Playwright's Chromium browser, and publish access to the
+`@puzzle-ui` scope.
 
 ## License
 

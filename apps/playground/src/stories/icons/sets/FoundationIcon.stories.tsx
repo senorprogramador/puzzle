@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FoundationIcon } from "@puzzle/icons/sets/foundation";
-import { FoundationIconPage } from "@puzzle/icons/sets/foundation.page";
-import { ALL_FOUNDATION_ICONS } from "@puzzle/icons/sets/foundation.constants";
+import { FoundationIcon } from "@puzzle-ui/icons/sets/foundation";
+import { FoundationIconPage } from "@puzzle-ui/icons/sets/foundation.page";
+import { ALL_FOUNDATION_ICONS } from "@puzzle-ui/icons/sets/foundation.constants";
 
 const meta = {
   title: "Icons/Sets/Foundation",

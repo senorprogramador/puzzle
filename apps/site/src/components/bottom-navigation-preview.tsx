@@ -1,6 +1,6 @@
-import { Theme } from "@puzzle/theme";
-import { Icon } from "@puzzle/icons";
-import { BottomNavigation, BottomNavigationItem, Section } from "@puzzle/ui";
+import { Theme } from "@puzzle-ui/theme";
+import { Icon } from "@puzzle-ui/icons";
+import { BottomNavigation, BottomNavigationItem, Section } from "@puzzle-ui/ui";
 
 const BottomNavigationPreview = () => (
   <Theme scope="local" components={{ link: null }}>

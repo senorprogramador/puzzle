@@ -18,13 +18,13 @@ Instructions for AI coding agents working in Puzzle. Keep changes focused, token
 - Use functional React components and arrow functions.
 - Use named exports; match the repository's existing export style.
 - Use explicit, useful TypeScript types. Avoid `any`, unnecessary abstractions, and dependencies added for trivial functionality.
-- Reuse shared utilities such as `cn` from `@puzzle/core` where appropriate.
+- Reuse shared utilities such as `cn` from `"@puzzle-ui/core` where appropriate.
 - Keep components generic and router-independent. Accept React primitives such as `ReactNode` when they make a component reusable; do not couple core UI components to an app or routing framework.
 - Prefer minimal, semantic HTML. Do not add wrapper elements without a layout, accessibility, or styling purpose.
 
 ## 3. Theme tokens are the source of truth
 
-- `@puzzle/theme` owns theme tokens and generated theme CSS. `@puzzle/ui` consumes the resulting CSS custom properties; it must not duplicate the theme system.
+- `"@puzzle-ui/theme` owns theme tokens and generated theme CSS. `"@puzzle-ui/ui` consumes the resulting CSS custom properties; it must not duplicate the theme system.
 - Before adding a CSS value, use an existing `--puzzle-*` token if one represents that purpose. Prefer semantic tokens over raw palette values.
 - Use the existing token names exactly as defined in the repository. Do not guess token names: inspect the relevant theme definition only when a token is needed and its name is not already clear from nearby code.
 - Prefer semantic roles such as background, surface, text, muted, border, and primary, plus existing typography, spacing, radius, shadow, layout, motion, and z-index tokens where available.
@@ -82,9 +82,9 @@ Stop reading once the required pattern is established. Do not read package-wide 
 ## 8. Site documentation
 
 - Component docs live in `apps/site/content/docs/components/ui/<category>/<component>.mdx`. Use the category's existing directory and follow a nearby page's MDX structure, including `title` and `description` frontmatter, import instructions, examples, API details, and accessibility guidance where relevant.
-- Use Fumadocs' `<Preview>` for runnable examples. MDX already exposes capitalized exports from `@puzzle/ui`; for stateful or reusable examples, add a named example component to `apps/site/src/components/doc-examples.tsx` and import it from the MDX page using the relative path pattern of nearby pages.
+- Use Fumadocs' `<Preview>` for runnable examples. MDX already exposes capitalized exports from `"@puzzle-ui/ui`; for stateful or reusable examples, add a named example component to `apps/site/src/components/doc-examples.tsx` and import it from the MDX page using the relative path pattern of nearby pages.
 - Add each component page to the matching category in `apps/site/src/components/layout/sidebar.tsx`; the sidebar `href` must match the documentation route.
-- Verify the documented component is exported from `@puzzle/ui` before using that import in MDX. Run `bun run --filter @puzzle/site build` to validate MDX pages, examples, and navigation changes.
+- Verify the documented component is exported from `"@puzzle-ui/ui` before using that import in MDX. Run `bun run --filter "@puzzle-ui/site build` to validate MDX pages, examples, and navigation changes.
 
 ## 9. Completion response
 

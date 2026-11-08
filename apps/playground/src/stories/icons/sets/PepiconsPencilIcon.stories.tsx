@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { PepiconsPencilIcon } from "@puzzle/icons/sets/pepicons-pencil";
-import { PepiconsPencilIconPage } from "@puzzle/icons/sets/pepicons-pencil.page";
-import { ALL_PEPICONS_PENCIL_ICONS } from "@puzzle/icons/sets/pepicons-pencil.constants";
+import { PepiconsPencilIcon } from "@puzzle-ui/icons/sets/pepicons-pencil";
+import { PepiconsPencilIconPage } from "@puzzle-ui/icons/sets/pepicons-pencil.page";
+import { ALL_PEPICONS_PENCIL_ICONS } from "@puzzle-ui/icons/sets/pepicons-pencil.constants";
 
 const meta = {
   title: "Icons/Sets/PepiconsPencil",

@@ -1,9 +1,9 @@
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { ComponentProps, ComponentType } from "react";
 import type { MDXComponents } from "mdx/types";
-import * as PuzzleUI from "@puzzle/ui";
-import * as PuzzleIcons from "@puzzle/icons";
-import { cn } from "@puzzle/core";
+import * as PuzzleUI from "@puzzle-ui/ui";
+import * as PuzzleIcons from "@puzzle-ui/icons";
+import { cn } from "@puzzle-ui/core";
 import { PackageManagerTab, PackageManagerTabs } from "./package-manager-tabs";
 
 // Puzzle's exports include non-component values (e.g. hooks), which MDX would

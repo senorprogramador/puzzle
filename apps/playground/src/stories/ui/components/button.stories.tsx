@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { fn } from "storybook/test";
 
-import { Button } from "@puzzle/ui";
+import { Button } from "@puzzle-ui/ui";
 
 const meta = {
   title: "UI/Components/Button",

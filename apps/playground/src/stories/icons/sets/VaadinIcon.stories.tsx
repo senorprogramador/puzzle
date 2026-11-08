@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { VaadinIcon } from "@puzzle/icons/sets/vaadin";
-import { VaadinIconPage } from "@puzzle/icons/sets/vaadin.page";
-import { ALL_VAADIN_ICONS } from "@puzzle/icons/sets/vaadin.constants";
+import { VaadinIcon } from "@puzzle-ui/icons/sets/vaadin";
+import { VaadinIconPage } from "@puzzle-ui/icons/sets/vaadin.page";
+import { ALL_VAADIN_ICONS } from "@puzzle-ui/icons/sets/vaadin.constants";
 
 const meta = {
   title: "Icons/Sets/Vaadin",

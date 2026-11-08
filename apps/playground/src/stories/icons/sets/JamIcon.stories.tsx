@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { JamIcon } from "@puzzle/icons/sets/jam";
-import { JamIconPage } from "@puzzle/icons/sets/jam.page";
-import { ALL_JAM_ICONS } from "@puzzle/icons/sets/jam.constants";
+import { JamIcon } from "@puzzle-ui/icons/sets/jam";
+import { JamIconPage } from "@puzzle-ui/icons/sets/jam.page";
+import { ALL_JAM_ICONS } from "@puzzle-ui/icons/sets/jam.constants";
 
 const meta = {
   title: "Icons/Sets/Jam",

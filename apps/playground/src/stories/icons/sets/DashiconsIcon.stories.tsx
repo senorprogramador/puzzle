@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { DashiconsIcon } from "@puzzle/icons/sets/dashicons";
-import { DashiconsIconPage } from "@puzzle/icons/sets/dashicons.page";
-import { ALL_DASHICONS_ICONS } from "@puzzle/icons/sets/dashicons.constants";
+import { DashiconsIcon } from "@puzzle-ui/icons/sets/dashicons";
+import { DashiconsIconPage } from "@puzzle-ui/icons/sets/dashicons.page";
+import { ALL_DASHICONS_ICONS } from "@puzzle-ui/icons/sets/dashicons.constants";
 
 const meta = {
   title: "Icons/Sets/Dashicons",

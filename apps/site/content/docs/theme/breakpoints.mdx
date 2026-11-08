@@ -8,24 +8,24 @@ The theme package exports a single set of breakpoints so JavaScript logic and CS
 ## Import
 
 ```tsx
-import { BREAKPOINTS, type Breakpoint } from "@puzzle/theme";
+import { BREAKPOINTS, type Breakpoint } from "@puzzle-ui/theme";
 ```
 
 ## Values
 
-| Breakpoint | Value |
-| --- | --- |
-| `compact` | `480` |
-| `tablet` | `768` |
-| `desktop` | `1024` |
-| `hd` | `1440` |
+| Breakpoint | Value  |
+| ---------- | ------ |
+| `compact`  | `480`  |
+| `tablet`   | `768`  |
+| `desktop`  | `1024` |
+| `hd`       | `1440` |
 
 Values are numbers in pixels. The `Breakpoint` type is the union of the keys: `"compact" | "tablet" | "desktop" | "hd"`.
 
 ## Usage in JavaScript
 
 ```tsx
-import { BREAKPOINTS } from "@puzzle/theme";
+import { BREAKPOINTS } from "@puzzle-ui/theme";
 
 const isDesktop = window.matchMedia(
   `(min-width: ${BREAKPOINTS.desktop}px)`,

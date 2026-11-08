@@ -3,14 +3,17 @@ title: Carousel
 description: Browse a collection of items with carousel navigation.
 ---
 
-import { ControlledCarouselExample, carouselItems } from "../../../../../src/components/doc-examples";
+import {
+  ControlledCarouselExample,
+  carouselItems,
+} from "../../../../../src/components/doc-examples";
 
 Carousel displays a draggable collection with optional navigation and pagination. `CarouselController` owns the items and selection; `Carousel` controls their presentation.
 
 ## Import
 
 ```tsx
-import { Carousel, CarouselController } from "@puzzle/ui";
+import { Carousel, CarouselController } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
@@ -56,7 +59,10 @@ Provide `getItemKey` when items can be inserted, removed, or reordered. Stable k
 
 `panelsPerView` controls how many items fit at once. Responsive values use `mobile`, `tablet`, and `desktop`, inheriting smaller breakpoints when omitted. Change the preview device to compare layouts.
 
-<Preview defaultDevice="tablet" height={360} code={`\
+<Preview
+  defaultDevice="tablet"
+  height={360}
+  code={`\
 <CarouselController items={items}>
   <Carousel<(typeof items)[number]>
     panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
@@ -68,14 +74,20 @@ Provide `getItemKey` when items can be inserted, removed, or reordered. Stable k
     buttonAlignment="aside"
   />
 </CarouselController>
-`}>
+`}
+>
   <Section>
     <CarouselController items={carouselItems}>
       <Carousel
         panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
         gap="var(--puzzle-space-4)"
         getItemKey={(item) => item.id}
-        renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
+        renderItem={(item) => (
+          <Card>
+            <strong>{item.title}</strong>
+            <p>{item.description}</p>
+          </Card>
+        )}
         backButton={<Button variant="outline">Previous</Button>}
         nextButton={<Button variant="outline">Next</Button>}
         buttonAlignment="aside"
@@ -88,7 +100,10 @@ Provide `getItemKey` when items can be inserted, removed, or reordered. Stable k
 
 Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes precedence when both are supplied. `singlePageAlignment` positions items when the whole collection fits on one page.
 
-<Preview defaultDevice="tablet" height={300} code={`\
+<Preview
+  defaultDevice="tablet"
+  height={300}
+  code={`\
 <CarouselController items={items.slice(0, 2)}>
   <Carousel<(typeof items)[number]>
     itemWidth="30%"
@@ -98,7 +113,8 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
     renderItem={(item) => <Card>{item.title}</Card>}
   />
 </CarouselController>
-`}>
+`}
+>
   <Section>
     <CarouselController items={carouselItems.slice(0, 2)}>
       <Carousel
@@ -116,7 +132,9 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
 
 `buttonAlignment="over"` overlays navigation on the viewport; `"aside"` reserves space beside it. `pagerAlignment` supports `"under"` and `"over"`. Both accept responsive values. `renderPager` receives a zero-based page index and the page count.
 
-<Preview height={320} code={`\
+<Preview
+  height={320}
+  code={`\
 <CarouselController items={items} defaultPanel={1}>
   <Carousel<(typeof items)[number]>
     getItemKey={(item) => item.id}
@@ -128,17 +146,34 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
     renderPager={(current, total) => <span role="status">Page {current + 1} of {total}</span>}
   />
 </CarouselController>
-`}>
+`}
+>
   <Section>
     <CarouselController items={carouselItems} defaultPanel={1}>
       <Carousel
         getItemKey={(item) => item.id}
-        renderItem={(item) => <Card><p>{item.description}</p></Card>}
-        backButton={<Button size="sm" aria-label="Previous slide">Back</Button>}
-        nextButton={<Button size="sm" aria-label="Next slide">Next</Button>}
+        renderItem={(item) => (
+          <Card>
+            <p>{item.description}</p>
+          </Card>
+        )}
+        backButton={
+          <Button size="sm" aria-label="Previous slide">
+            Back
+          </Button>
+        }
+        nextButton={
+          <Button size="sm" aria-label="Next slide">
+            Next
+          </Button>
+        }
         buttonAlignment="over"
         pagerAlignment="under"
-        renderPager={(current, total) => <span role="status">Page {current + 1} of {total}</span>}
+        renderPager={(current, total) => (
+          <span role="status">
+            Page {current + 1} of {total}
+          </span>
+        )}
       />
     </CarouselController>
   </Section>
@@ -152,6 +187,7 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
 const [panel, setPanel] = useState(0);
 
 return (
+
   <Stack>
     <Button variant="outline" onClick={() => setPanel(0)}>Back to first item</Button>
     <CarouselController items={items} currentPanel={panel} onPanelChange={setPanel}>
@@ -176,33 +212,33 @@ return (
 
 ### CarouselController
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `items` | `T[]` | Required | Collection shared with descendant carousels. |
-| `children` | `ReactNode` | Required | Carousel and optional custom controls. |
-| `currentPanel` | `number` | - | Controlled first visible item index. |
-| `defaultPanel` | `number` | `0` | Initial uncontrolled first visible item index. |
-| `onPanelChange` | `(panel: number) => void` | - | Called with the next first visible item index. |
+| Prop            | Type                      | Default  | Description                                    |
+| --------------- | ------------------------- | -------- | ---------------------------------------------- |
+| `items`         | `T[]`                     | Required | Collection shared with descendant carousels.   |
+| `children`      | `ReactNode`               | Required | Carousel and optional custom controls.         |
+| `currentPanel`  | `number`                  | -        | Controlled first visible item index.           |
+| `defaultPanel`  | `number`                  | `0`      | Initial uncontrolled first visible item index. |
+| `onPanelChange` | `(panel: number) => void` | -        | Called with the next first visible item index. |
 
 ### Carousel
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `renderItem` | `(item: T, index: number) => ReactNode` | Required | Renders each item. |
-| `getItemKey` | `(item: T, index: number) => Key` | Item index | Stable React key for each item. |
-| `panelsPerView` | `ResponsiveValue<number>` | `1` | Number of visible items in panel sizing mode. |
-| `itemWidth` | `ResponsiveValue<CSSProperties["width"]>` | - | Explicit width; takes precedence over panel count. |
-| `gap` | `ResponsiveValue<CSSProperties["gap"]>` | `0` | Space between items. Numbers are pixels. |
-| `singlePageAlignment` | `"left" \| "center" \| "right"` | `"left"` | Alignment when all items fit on one page. |
-| `backButton` | `ReactElement` | - | Previous-page control; receives disabled state and click handling. |
-| `nextButton` | `ReactElement` | - | Next-page control; receives disabled state and click handling. |
-| `buttonAlignment` | `ResponsiveValue<"aside" \| "over">` | `"over"` | Navigation placement. |
-| `pagerAlignment` | `ResponsiveValue<"under" \| "over">` | `"under"` | Pager placement. |
-| `renderPager` | `(currentPage: number, numberOfPages: number) => ReactNode` | - | Custom pager; page index is zero-based. |
-| `ariaLabel` | `string` | `"Carousel"` | Accessible name of the carousel group. |
-| `className` | `string` | - | Additional class on the root. |
-| `viewportClassName` | `string` | - | Additional class on the clipping viewport. |
-| `viewportStyle` | `CSSProperties` | - | Styles on the viewport. |
+| Prop                  | Type                                                        | Default      | Description                                                        |
+| --------------------- | ----------------------------------------------------------- | ------------ | ------------------------------------------------------------------ |
+| `renderItem`          | `(item: T, index: number) => ReactNode`                     | Required     | Renders each item.                                                 |
+| `getItemKey`          | `(item: T, index: number) => Key`                           | Item index   | Stable React key for each item.                                    |
+| `panelsPerView`       | `ResponsiveValue<number>`                                   | `1`          | Number of visible items in panel sizing mode.                      |
+| `itemWidth`           | `ResponsiveValue<CSSProperties["width"]>`                   | -            | Explicit width; takes precedence over panel count.                 |
+| `gap`                 | `ResponsiveValue<CSSProperties["gap"]>`                     | `0`          | Space between items. Numbers are pixels.                           |
+| `singlePageAlignment` | `"left" \| "center" \| "right"`                             | `"left"`     | Alignment when all items fit on one page.                          |
+| `backButton`          | `ReactElement`                                              | -            | Previous-page control; receives disabled state and click handling. |
+| `nextButton`          | `ReactElement`                                              | -            | Next-page control; receives disabled state and click handling.     |
+| `buttonAlignment`     | `ResponsiveValue<"aside" \| "over">`                        | `"over"`     | Navigation placement.                                              |
+| `pagerAlignment`      | `ResponsiveValue<"under" \| "over">`                        | `"under"`    | Pager placement.                                                   |
+| `renderPager`         | `(currentPage: number, numberOfPages: number) => ReactNode` | -            | Custom pager; page index is zero-based.                            |
+| `ariaLabel`           | `string`                                                    | `"Carousel"` | Accessible name of the carousel group.                             |
+| `className`           | `string`                                                    | -            | Additional class on the root.                                      |
+| `viewportClassName`   | `string`                                                    | -            | Additional class on the clipping viewport.                         |
+| `viewportStyle`       | `CSSProperties`                                             | -            | Styles on the viewport.                                            |
 
 For custom controls within the controller, `useCarouselContext<T>()` exposes `items`, `currentPanel`, and `setPanel(index)`.
 

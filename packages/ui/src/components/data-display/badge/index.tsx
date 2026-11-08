@@ -1,4 +1,4 @@
-import { cn, isDarkColor, isHexColor } from "@puzzle/core";
+import { cn, isDarkColor, isHexColor } from "@puzzle-ui/core";
 import { type ReactNode } from "react";
 import "./badge.css";
 

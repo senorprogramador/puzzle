@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import type { ClipboardEvent, FormEvent, KeyboardEvent } from "react";
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 import {
   applyMark,
   createTextDocument,

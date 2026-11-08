@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { NotoV1Icon } from "@puzzle/icons/sets/noto-v1";
-import { NotoV1IconPage } from "@puzzle/icons/sets/noto-v1.page";
-import { ALL_NOTO_V1_ICONS } from "@puzzle/icons/sets/noto-v1.constants";
+import { NotoV1Icon } from "@puzzle-ui/icons/sets/noto-v1";
+import { NotoV1IconPage } from "@puzzle-ui/icons/sets/noto-v1.page";
+import { ALL_NOTO_V1_ICONS } from "@puzzle-ui/icons/sets/noto-v1.constants";
 
 const meta = {
   title: "Icons/Sets/NotoV1",

@@ -8,7 +8,7 @@ import {
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from "react";
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 import { Transition } from "../../utilities/transition";
 import "./accordion.css";
 

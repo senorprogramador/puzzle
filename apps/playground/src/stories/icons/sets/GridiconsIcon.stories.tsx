@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GridiconsIcon } from "@puzzle/icons/sets/gridicons";
-import { GridiconsIconPage } from "@puzzle/icons/sets/gridicons.page";
-import { ALL_GRIDICONS_ICONS } from "@puzzle/icons/sets/gridicons.constants";
+import { GridiconsIcon } from "@puzzle-ui/icons/sets/gridicons";
+import { GridiconsIconPage } from "@puzzle-ui/icons/sets/gridicons.page";
+import { ALL_GRIDICONS_ICONS } from "@puzzle-ui/icons/sets/gridicons.constants";
 
 const meta = {
   title: "Icons/Sets/Gridicons",

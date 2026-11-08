@@ -3,7 +3,7 @@
 import { useEffect, useState, type PropsWithChildren } from "react";
 import { createPortal } from "react-dom";
 
-import { useThemeScope } from "@puzzle/theme/scope-context";
+import { useThemeScope } from "@puzzle-ui/theme/scope-context";
 
 type PortalProps = PropsWithChildren<{
   /**

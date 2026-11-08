@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { ReiconIcon } from "@puzzle/icons/sets/reicon";
-import { ReiconIconPage } from "@puzzle/icons/sets/reicon.page";
-import { ALL_REICON_ICONS } from "@puzzle/icons/sets/reicon.constants";
+import { ReiconIcon } from "@puzzle-ui/icons/sets/reicon";
+import { ReiconIconPage } from "@puzzle-ui/icons/sets/reicon.page";
+import { ALL_REICON_ICONS } from "@puzzle-ui/icons/sets/reicon.constants";
 
 const meta = {
   title: "Icons/Sets/Reicon",

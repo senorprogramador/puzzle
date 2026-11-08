@@ -10,20 +10,23 @@ Stepper shows progress through a sequence. It does not render panels or validate
 ## Import
 
 ```tsx
-import { Stepper } from "@puzzle/ui";
+import { Stepper } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
 
 Compose direct `Stepper.Step` children. Steps before the active step are completed automatically. Stable IDs preserve selection when steps are reordered; every step needs a unique ID in ID-based mode, and the active ID must match an available step.
 
-<Preview height={240} code={`\
+<Preview
+  height={240}
+  code={`\
 <Stepper defaultActiveStepId="shipping" aria-label="Checkout progress">
   <Stepper.Step id="details" label="Details" />
   <Stepper.Step id="shipping" label="Shipping" />
   <Stepper.Step id="payment" label="Payment" />
 </Stepper>
-`}>
+`}
+>
   <Section>
     <Stepper defaultActiveStepId="shipping" aria-label="Checkout progress">
       <Stepper.Step id="details" label="Details" />
@@ -37,7 +40,9 @@ Compose direct `Stepper.Step` children. Steps before the active step are complet
 
 `orientation` accepts `"horizontal"`, `"vertical"`, or a responsive object. Use `description` for supporting text and `optional` to identify a non-required step. Change device sizes to see the layout switch.
 
-<Preview height={420} code={`\
+<Preview
+  height={420}
+  code={`\
 <Stepper
   orientation={{ mobile: "vertical", tablet: "horizontal" }}
   defaultActiveStep={1}
@@ -46,7 +51,8 @@ Compose direct `Stepper.Step` children. Steps before the active step are complet
   <Stepper.Step label="Shipping" description="Delivery address" />
   <Stepper.Step label="Gift note" optional="Optional" />
 </Stepper>
-`}>
+`}
+>
   <Section>
     <Stepper
       orientation={{ mobile: "vertical", tablet: "horizontal" }}
@@ -63,18 +69,31 @@ Compose direct `Stepper.Step` children. Steps before the active step are complet
 
 `clickable` turns selectable steps into buttons. By default, `linear` allows only the current and earlier steps to be selected. Set `linear={false}` to allow navigation to future steps; `disabled` still prevents selection.
 
-<Preview height={340} code={`\
+<Preview
+  height={340}
+  code={`\
 <Stepper clickable linear={false} defaultActiveStepId="details" orientation="vertical">
   <Stepper.Step id="details" label="Details" />
   <Stepper.Step id="shipping" label="Shipping" />
   <Stepper.Step id="payment" label="Payment" disabled description="Not available yet" />
 </Stepper>
-`}>
+`}
+>
   <Section>
-    <Stepper clickable linear={false} defaultActiveStepId="details" orientation="vertical">
+    <Stepper
+      clickable
+      linear={false}
+      defaultActiveStepId="details"
+      orientation="vertical"
+    >
       <Stepper.Step id="details" label="Details" />
       <Stepper.Step id="shipping" label="Shipping" />
-      <Stepper.Step id="payment" label="Payment" disabled description="Not available yet" />
+      <Stepper.Step
+        id="payment"
+        label="Payment"
+        disabled
+        description="Not available yet"
+      />
     </Stepper>
   </Section>
 </Preview>
@@ -83,18 +102,33 @@ Compose direct `Stepper.Step` children. Steps before the active step are complet
 
 `completed` overrides automatic completion. `error` takes precedence over other visual states. `icon` replaces the numeric or state indicator; keep the visible `label` meaningful because the indicator is hidden from assistive technology.
 
-<Preview height={380} code={`\
+<Preview
+  height={380}
+  code={`\
 <Stepper defaultActiveStep={1} orientation="vertical">
   <Stepper.Step label="Account" completed icon={<Icon name="akar-icons:check" size={20} />} />
   <Stepper.Step label="Address" error description="Add a valid postal code to continue." />
   <Stepper.Step label="Payment" completed={false} optional="Choose a method later" />
 </Stepper>
-`}>
+`}
+>
   <Section>
     <Stepper defaultActiveStep={1} orientation="vertical">
-      <Stepper.Step label="Account" completed icon={<Icon name="akar-icons:check" size={20} />} />
-      <Stepper.Step label="Address" error description="Add a valid postal code to continue." />
-      <Stepper.Step label="Payment" completed={false} optional="Choose a method later" />
+      <Stepper.Step
+        label="Account"
+        completed
+        icon={<Icon name="akar-icons:check" size={20} />}
+      />
+      <Stepper.Step
+        label="Address"
+        error
+        description="Add a valid postal code to continue."
+      />
+      <Stepper.Step
+        label="Payment"
+        completed={false}
+        optional="Choose a method later"
+      />
     </Stepper>
   </Section>
 </Preview>
@@ -107,6 +141,7 @@ Use `activeStep` with `onStepChange` for zero-based index selection. An external
 const [activeStep, setActiveStep] = useState(0);
 
 return (
+
   <Stack>
     <Stepper activeStep={activeStep} onStepChange={setActiveStep} clickable>
       <Stepper.Step label="Details" />
@@ -128,36 +163,36 @@ return (
 
 ### Stepper
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `ReactNode` | Required | Direct `Stepper.Step` children. |
-| `activeStep` | `number` | - | Controlled zero-based index, clamped to available steps. |
-| `defaultActiveStep` | `number` | `0` | Initial uncontrolled index. |
-| `onStepChange` | `(step: number) => void` | - | Next index after user selection, including in ID mode. |
-| `activeStepId` | `string \| number` | - | Controlled stable ID; must match an available step. |
-| `defaultActiveStepId` | `string \| number` | - | Initial uncontrolled stable ID. |
-| `onStepIdChange` | `(stepId: string \| number) => void` | - | Next ID after selection in ID mode. |
-| `orientation` | `ResponsiveValue<"horizontal" \| "vertical">` | `"horizontal"` | Layout direction; responsive keys are `mobile`, `tablet`, and `desktop`. |
-| `clickable` | `boolean` | `false` | Renders step buttons for navigation. |
-| `linear` | `boolean` | `true` | Prevents selecting steps ahead of the active one. |
-| `className` | `string` | - | Additional class on the root ordered list. |
-| `dir` | `"ltr" \| "rtl" \| "auto"` | - | Root direction; explicit `rtl` reverses horizontal keyboard navigation. |
+| Prop                  | Type                                          | Default        | Description                                                              |
+| --------------------- | --------------------------------------------- | -------------- | ------------------------------------------------------------------------ |
+| `children`            | `ReactNode`                                   | Required       | Direct `Stepper.Step` children.                                          |
+| `activeStep`          | `number`                                      | -              | Controlled zero-based index, clamped to available steps.                 |
+| `defaultActiveStep`   | `number`                                      | `0`            | Initial uncontrolled index.                                              |
+| `onStepChange`        | `(step: number) => void`                      | -              | Next index after user selection, including in ID mode.                   |
+| `activeStepId`        | `string \| number`                            | -              | Controlled stable ID; must match an available step.                      |
+| `defaultActiveStepId` | `string \| number`                            | -              | Initial uncontrolled stable ID.                                          |
+| `onStepIdChange`      | `(stepId: string \| number) => void`          | -              | Next ID after selection in ID mode.                                      |
+| `orientation`         | `ResponsiveValue<"horizontal" \| "vertical">` | `"horizontal"` | Layout direction; responsive keys are `mobile`, `tablet`, and `desktop`. |
+| `clickable`           | `boolean`                                     | `false`        | Renders step buttons for navigation.                                     |
+| `linear`              | `boolean`                                     | `true`         | Prevents selecting steps ahead of the active one.                        |
+| `className`           | `string`                                      | -              | Additional class on the root ordered list.                               |
+| `dir`                 | `"ltr" \| "rtl" \| "auto"`                    | -              | Root direction; explicit `rtl` reverses horizontal keyboard navigation.  |
 
 Other native ordered-list attributes are forwarded to the root.
 
 ### Stepper.Step
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `id` | `string \| number` | - | Stable identifier; required on every step in ID mode. |
-| `label` | `ReactNode` | Required | Visible step label. |
-| `description` | `ReactNode` | - | Supporting text beneath the label. |
-| `optional` | `ReactNode` | - | Additional optional-step text. |
-| `icon` | `ReactNode` | - | Custom indicator content. |
-| `completed` | `boolean` | Before active step | Overrides automatic completion. |
-| `error` | `boolean` | `false` | Displays an error state. |
-| `disabled` | `boolean` | `false` | Prevents navigation to this step. |
-| `className` | `string` | - | Additional class on the step list item. |
+| Prop          | Type               | Default            | Description                                           |
+| ------------- | ------------------ | ------------------ | ----------------------------------------------------- |
+| `id`          | `string \| number` | -                  | Stable identifier; required on every step in ID mode. |
+| `label`       | `ReactNode`        | Required           | Visible step label.                                   |
+| `description` | `ReactNode`        | -                  | Supporting text beneath the label.                    |
+| `optional`    | `ReactNode`        | -                  | Additional optional-step text.                        |
+| `icon`        | `ReactNode`        | -                  | Custom indicator content.                             |
+| `completed`   | `boolean`          | Before active step | Overrides automatic completion.                       |
+| `error`       | `boolean`          | `false`            | Displays an error state.                              |
+| `disabled`    | `boolean`          | `false`            | Prevents navigation to this step.                     |
+| `className`   | `string`           | -                  | Additional class on the step list item.               |
 
 ## Accessibility
 

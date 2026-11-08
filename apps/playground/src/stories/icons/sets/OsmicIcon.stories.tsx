@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { OsmicIcon } from "@puzzle/icons/sets/osmic";
-import { OsmicIconPage } from "@puzzle/icons/sets/osmic.page";
-import { ALL_OSMIC_ICONS } from "@puzzle/icons/sets/osmic.constants";
+import { OsmicIcon } from "@puzzle-ui/icons/sets/osmic";
+import { OsmicIconPage } from "@puzzle-ui/icons/sets/osmic.page";
+import { ALL_OSMIC_ICONS } from "@puzzle-ui/icons/sets/osmic.constants";
 
 const meta = {
   title: "Icons/Sets/Osmic",

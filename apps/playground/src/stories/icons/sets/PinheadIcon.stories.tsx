@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { PinheadIcon } from "@puzzle/icons/sets/pinhead";
-import { PinheadIconPage } from "@puzzle/icons/sets/pinhead.page";
-import { ALL_PINHEAD_ICONS } from "@puzzle/icons/sets/pinhead.constants";
+import { PinheadIcon } from "@puzzle-ui/icons/sets/pinhead";
+import { PinheadIconPage } from "@puzzle-ui/icons/sets/pinhead.page";
+import { ALL_PINHEAD_ICONS } from "@puzzle-ui/icons/sets/pinhead.constants";
 
 const meta = {
   title: "Icons/Sets/Pinhead",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { Fa6SolidIcon } from "@puzzle/icons/sets/fa6-solid";
-import { Fa6SolidIconPage } from "@puzzle/icons/sets/fa6-solid.page";
-import { ALL_FA6_SOLID_ICONS } from "@puzzle/icons/sets/fa6-solid.constants";
+import { Fa6SolidIcon } from "@puzzle-ui/icons/sets/fa6-solid";
+import { Fa6SolidIconPage } from "@puzzle-ui/icons/sets/fa6-solid.page";
+import { ALL_FA6_SOLID_ICONS } from "@puzzle-ui/icons/sets/fa6-solid.constants";
 
 const meta = {
   title: "Icons/Sets/Fa6Solid",

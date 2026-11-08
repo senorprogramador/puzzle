@@ -7,7 +7,7 @@ import { renderToString } from "react-dom/server";
 import { render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 import { Link } from "./index";
 
 type RouterLinkProps = ComponentPropsWithRef<"a"> & {

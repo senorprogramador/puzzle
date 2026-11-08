@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { StreamlineFreehandIcon } from "@puzzle/icons/sets/streamline-freehand";
-import { StreamlineFreehandIconPage } from "@puzzle/icons/sets/streamline-freehand.page";
-import { ALL_STREAMLINE_FREEHAND_ICONS } from "@puzzle/icons/sets/streamline-freehand.constants";
+import { StreamlineFreehandIcon } from "@puzzle-ui/icons/sets/streamline-freehand";
+import { StreamlineFreehandIconPage } from "@puzzle-ui/icons/sets/streamline-freehand.page";
+import { ALL_STREAMLINE_FREEHAND_ICONS } from "@puzzle-ui/icons/sets/streamline-freehand.constants";
 
 const meta = {
   title: "Icons/Sets/StreamlineFreehand",

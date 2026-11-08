@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FluentIcon } from "@puzzle/icons/sets/fluent";
-import { FluentIconPage } from "@puzzle/icons/sets/fluent.page";
-import { ALL_FLUENT_ICONS } from "@puzzle/icons/sets/fluent.constants";
+import { FluentIcon } from "@puzzle-ui/icons/sets/fluent";
+import { FluentIconPage } from "@puzzle-ui/icons/sets/fluent.page";
+import { ALL_FLUENT_ICONS } from "@puzzle-ui/icons/sets/fluent.constants";
 
 const meta = {
   title: "Icons/Sets/Fluent",

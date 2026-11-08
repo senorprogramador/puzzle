@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CharmIcon } from "@puzzle/icons/sets/charm";
-import { CharmIconPage } from "@puzzle/icons/sets/charm.page";
-import { ALL_CHARM_ICONS } from "@puzzle/icons/sets/charm.constants";
+import { CharmIcon } from "@puzzle-ui/icons/sets/charm";
+import { CharmIconPage } from "@puzzle-ui/icons/sets/charm.page";
+import { ALL_CHARM_ICONS } from "@puzzle-ui/icons/sets/charm.constants";
 
 const meta = {
   title: "Icons/Sets/Charm",

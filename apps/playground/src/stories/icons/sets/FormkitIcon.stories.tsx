@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FormkitIcon } from "@puzzle/icons/sets/formkit";
-import { FormkitIconPage } from "@puzzle/icons/sets/formkit.page";
-import { ALL_FORMKIT_ICONS } from "@puzzle/icons/sets/formkit.constants";
+import { FormkitIcon } from "@puzzle-ui/icons/sets/formkit";
+import { FormkitIconPage } from "@puzzle-ui/icons/sets/formkit.page";
+import { ALL_FORMKIT_ICONS } from "@puzzle-ui/icons/sets/formkit.constants";
 
 const meta = {
   title: "Icons/Sets/Formkit",

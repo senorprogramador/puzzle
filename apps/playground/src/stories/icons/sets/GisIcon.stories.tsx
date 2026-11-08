@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GisIcon } from "@puzzle/icons/sets/gis";
-import { GisIconPage } from "@puzzle/icons/sets/gis.page";
-import { ALL_GIS_ICONS } from "@puzzle/icons/sets/gis.constants";
+import { GisIcon } from "@puzzle-ui/icons/sets/gis";
+import { GisIconPage } from "@puzzle-ui/icons/sets/gis.page";
+import { ALL_GIS_ICONS } from "@puzzle-ui/icons/sets/gis.constants";
 
 const meta = {
   title: "Icons/Sets/Gis",

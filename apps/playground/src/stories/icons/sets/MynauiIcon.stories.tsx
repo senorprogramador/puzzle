@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MynauiIcon } from "@puzzle/icons/sets/mynaui";
-import { MynauiIconPage } from "@puzzle/icons/sets/mynaui.page";
-import { ALL_MYNAUI_ICONS } from "@puzzle/icons/sets/mynaui.constants";
+import { MynauiIcon } from "@puzzle-ui/icons/sets/mynaui";
+import { MynauiIconPage } from "@puzzle-ui/icons/sets/mynaui.page";
+import { ALL_MYNAUI_ICONS } from "@puzzle-ui/icons/sets/mynaui.constants";
 
 const meta = {
   title: "Icons/Sets/Mynaui",

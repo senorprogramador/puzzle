@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { QlementineIconsIcon } from "@puzzle/icons/sets/qlementine-icons";
-import { QlementineIconsIconPage } from "@puzzle/icons/sets/qlementine-icons.page";
-import { ALL_QLEMENTINE_ICONS_ICONS } from "@puzzle/icons/sets/qlementine-icons.constants";
+import { QlementineIconsIcon } from "@puzzle-ui/icons/sets/qlementine-icons";
+import { QlementineIconsIconPage } from "@puzzle-ui/icons/sets/qlementine-icons.page";
+import { ALL_QLEMENTINE_ICONS_ICONS } from "@puzzle-ui/icons/sets/qlementine-icons.constants";
 
 const meta = {
   title: "Icons/Sets/QlementineIcons",

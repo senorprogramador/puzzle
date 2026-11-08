@@ -6,39 +6,51 @@ description: Low-level anchored positioning for custom floating content.
 ## Import
 
 ```tsx
-import { Popout } from "@puzzle/ui";
+import { Popout } from "@puzzle-ui/ui";
 ```
 
 ## Trigger and placement
 
 Popout positions content and handles opening/dismissal without imposing menu, tooltip, or dialog semantics. Use `Popover` or `Tooltip` for their higher-level interactions.
 
-<Preview height={350} code={`\
+<Preview
+  height={350}
+  code={`\
 <Popout trigger={<Button>Open details</Button>} position="bottom" align="start" toggleOnClick>
   <Paper><Text as="p">Anchored information.</Text></Paper>
 </Popout>
-`}>
-  <Section><Popout trigger={<Button>Open details</Button>} position="bottom" align="start" toggleOnClick>
-    <Paper><Text as="p">Anchored information.</Text></Paper>
-  </Popout></Section>
+`}
+>
+  <Section>
+    <Popout
+      trigger={<Button>Open details</Button>}
+      position="bottom"
+      align="start"
+      toggleOnClick
+    >
+      <Paper>
+        <Text as="p">Anchored information.</Text>
+      </Paper>
+    </Popout>
+  </Section>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `trigger` | `ReactElement<PopoutTriggerProps>` | Required | Element that forwards refs and event handlers. |
-| `children` | `ReactNode` | Required | Floating content. |
-| `position` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side, adjusted for collisions. |
-| `align` | `"start" \| "center" \| "end"` | `"start"` | Alignment on the chosen side. |
-| `action` | `"hover" \| "click" \| "down"` | `"click"` | Pointer opening strategy. |
-| `offset`, `collisionPadding` | `number` | `8` | Pixel distances from trigger and viewport edges. |
-| `exitDelay` | `number` | `150` | Hover-close delay in milliseconds. |
-| `open`, `defaultOpen` | `boolean` | `false` | Controlled/initial open state. |
-| `onOpenChange` | `(open: boolean) => void` | - | State changes. |
-| `closeOnOutsideClick`, `closeOnEscape` | `boolean` | `true` | Dismissal behavior. |
-| `toggleOnClick` | `boolean` | `false` | Allow repeated trigger clicks to close. |
-| `matchTriggerWidth` | `boolean` | `false` | Match floating width to trigger. |
-| `className`, `contentClassName` | `string` | - | Floating wrapper/content classes. |
+| Prop                                   | Type                                     | Default    | Description                                      |
+| -------------------------------------- | ---------------------------------------- | ---------- | ------------------------------------------------ |
+| `trigger`                              | `ReactElement<PopoutTriggerProps>`       | Required   | Element that forwards refs and event handlers.   |
+| `children`                             | `ReactNode`                              | Required   | Floating content.                                |
+| `position`                             | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred side, adjusted for collisions.         |
+| `align`                                | `"start" \| "center" \| "end"`           | `"start"`  | Alignment on the chosen side.                    |
+| `action`                               | `"hover" \| "click" \| "down"`           | `"click"`  | Pointer opening strategy.                        |
+| `offset`, `collisionPadding`           | `number`                                 | `8`        | Pixel distances from trigger and viewport edges. |
+| `exitDelay`                            | `number`                                 | `150`      | Hover-close delay in milliseconds.               |
+| `open`, `defaultOpen`                  | `boolean`                                | `false`    | Controlled/initial open state.                   |
+| `onOpenChange`                         | `(open: boolean) => void`                | -          | State changes.                                   |
+| `closeOnOutsideClick`, `closeOnEscape` | `boolean`                                | `true`     | Dismissal behavior.                              |
+| `toggleOnClick`                        | `boolean`                                | `false`    | Allow repeated trigger clicks to close.          |
+| `matchTriggerWidth`                    | `boolean`                                | `false`    | Match floating width to trigger.                 |
+| `className`, `contentClassName`        | `string`                                 | -          | Floating wrapper/content classes.                |
 
 Supply appropriate accessible relationships for custom interactive content. Hover-only opening must not be the only way to reach essential information. Do not use a disabled element as the only trigger.

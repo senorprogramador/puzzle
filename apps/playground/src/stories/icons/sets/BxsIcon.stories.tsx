@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { BxsIcon } from "@puzzle/icons/sets/bxs";
-import { BxsIconPage } from "@puzzle/icons/sets/bxs.page";
-import { ALL_BXS_ICONS } from "@puzzle/icons/sets/bxs.constants";
+import { BxsIcon } from "@puzzle-ui/icons/sets/bxs";
+import { BxsIconPage } from "@puzzle-ui/icons/sets/bxs.page";
+import { ALL_BXS_ICONS } from "@puzzle-ui/icons/sets/bxs.constants";
 
 const meta = {
   title: "Icons/Sets/Bxs",

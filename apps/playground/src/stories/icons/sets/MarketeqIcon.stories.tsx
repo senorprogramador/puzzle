@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MarketeqIcon } from "@puzzle/icons/sets/marketeq";
-import { MarketeqIconPage } from "@puzzle/icons/sets/marketeq.page";
-import { ALL_MARKETEQ_ICONS } from "@puzzle/icons/sets/marketeq.constants";
+import { MarketeqIcon } from "@puzzle-ui/icons/sets/marketeq";
+import { MarketeqIconPage } from "@puzzle-ui/icons/sets/marketeq.page";
+import { ALL_MARKETEQ_ICONS } from "@puzzle-ui/icons/sets/marketeq.constants";
 
 const meta = {
   title: "Icons/Sets/Marketeq",

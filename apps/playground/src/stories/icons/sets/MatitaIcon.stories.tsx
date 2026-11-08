@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MatitaIcon } from "@puzzle/icons/sets/matita";
-import { MatitaIconPage } from "@puzzle/icons/sets/matita.page";
-import { ALL_MATITA_ICONS } from "@puzzle/icons/sets/matita.constants";
+import { MatitaIcon } from "@puzzle-ui/icons/sets/matita";
+import { MatitaIconPage } from "@puzzle-ui/icons/sets/matita.page";
+import { ALL_MATITA_ICONS } from "@puzzle-ui/icons/sets/matita.constants";
 
 const meta = {
   title: "Icons/Sets/Matita",

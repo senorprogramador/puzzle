@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { WebsymbolIcon } from "@puzzle/icons/sets/websymbol";
-import { WebsymbolIconPage } from "@puzzle/icons/sets/websymbol.page";
-import { ALL_WEBSYMBOL_ICONS } from "@puzzle/icons/sets/websymbol.constants";
+import { WebsymbolIcon } from "@puzzle-ui/icons/sets/websymbol";
+import { WebsymbolIconPage } from "@puzzle-ui/icons/sets/websymbol.page";
+import { ALL_WEBSYMBOL_ICONS } from "@puzzle-ui/icons/sets/websymbol.constants";
 
 const meta = {
   title: "Icons/Sets/Websymbol",

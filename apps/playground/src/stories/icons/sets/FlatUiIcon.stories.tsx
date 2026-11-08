@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FlatUiIcon } from "@puzzle/icons/sets/flat-ui";
-import { FlatUiIconPage } from "@puzzle/icons/sets/flat-ui.page";
-import { ALL_FLAT_UI_ICONS } from "@puzzle/icons/sets/flat-ui.constants";
+import { FlatUiIcon } from "@puzzle-ui/icons/sets/flat-ui";
+import { FlatUiIconPage } from "@puzzle-ui/icons/sets/flat-ui.page";
+import { ALL_FLAT_UI_ICONS } from "@puzzle-ui/icons/sets/flat-ui.constants";
 
 const meta = {
   title: "Icons/Sets/FlatUi",

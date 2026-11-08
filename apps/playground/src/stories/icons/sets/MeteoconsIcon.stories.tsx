@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MeteoconsIcon } from "@puzzle/icons/sets/meteocons";
-import { MeteoconsIconPage } from "@puzzle/icons/sets/meteocons.page";
-import { ALL_METEOCONS_ICONS } from "@puzzle/icons/sets/meteocons.constants";
+import { MeteoconsIcon } from "@puzzle-ui/icons/sets/meteocons";
+import { MeteoconsIconPage } from "@puzzle-ui/icons/sets/meteocons.page";
+import { ALL_METEOCONS_ICONS } from "@puzzle-ui/icons/sets/meteocons.constants";
 
 const meta = {
   title: "Icons/Sets/Meteocons",

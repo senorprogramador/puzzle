@@ -1,17 +1,26 @@
 {
-  "name": "@puzzle/core",
+  "name": "@puzzle-ui/core",
   "version": "0.1.0",
   "description": "Framework-independent utilities",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "files": [
@@ -20,10 +29,12 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsdown",
+    "prepack": "tsdown",
     "vitest": "bunx vitest run --passWithNoTests",
     "vitest:watch": "bunx vitest"
   },
   "devDependencies": {
+    "tsdown": "^0.23.1",
     "tsup": "latest",
     "typescript": "^6.0.3"
   }

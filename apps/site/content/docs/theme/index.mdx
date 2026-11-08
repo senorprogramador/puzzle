@@ -1,39 +1,31 @@
 ---
 title: Theme
-description: The @puzzle/theme package owns Puzzle's design tokens, color themes, typography, fonts, and theme scoping.
+description: The "@puzzle-ui/theme package owns Puzzle's design tokens, color themes, typography, fonts, and theme scoping.
 ---
 
-`@puzzle/theme` is the source of truth for Puzzle's visual design. It turns a typed token object into `--puzzle-*` CSS custom properties, loads Google Fonts, resolves light and dark color schemes, and lets you scope a theme to the whole document or a single subtree. All `@puzzle/ui` components consume these CSS custom properties, so a single `Theme` provider styles your entire application.
+`"@puzzle-ui/theme` is the source of truth for Puzzle's visual design. It turns a typed token object into `--puzzle-*` CSS custom properties, loads Google Fonts, resolves light and dark color schemes, and lets you scope a theme to the whole document or a single subtree. All `"@puzzle-ui/ui` components consume these CSS custom properties, so a single `Theme` provider styles your entire application.
 
 ## Import
 
 Install the theme package with your preferred package manager:
 
 <PackageManagerTabs>
-<PackageManagerTab value="npm">
-```bash
-npm install @puzzle/theme
-```
-</PackageManagerTab>
-<PackageManagerTab value="bun">
-```bash
-bun add @puzzle/theme
-```
-</PackageManagerTab>
-<PackageManagerTab value="pnpm">
-```bash
-pnpm add @puzzle/theme
-```
-</PackageManagerTab>
-<PackageManagerTab value="yarn">
-```bash
-yarn add @puzzle/theme
-```
-</PackageManagerTab>
+  <PackageManagerTab value="npm">
+    ```bash npm install "@puzzle-ui/theme ```
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+    ```bash bun add "@puzzle-ui/theme ```
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+    ```bash pnpm add "@puzzle-ui/theme ```
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+    ```bash yarn add "@puzzle-ui/theme ```
+  </PackageManagerTab>
 </PackageManagerTabs>
 
 ```tsx
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 ```
 
 ## Quick start
@@ -41,7 +33,7 @@ import { Theme } from "@puzzle/theme";
 Wrap your application in a single `Theme` at the root. Without any props it applies the default tokens, follows the user's system color scheme, and injects Puzzle's global styles.
 
 ```tsx
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 
 const App = () => (
   <Theme>
@@ -70,14 +62,14 @@ A customized root theme typically combines a color theme, fonts, and a few token
 
 ## What the package provides
 
-| Area | Description | Read more |
-| --- | --- | --- |
-| `Theme` provider | Injects token CSS variables, loads fonts, and applies global styles at root or local scope. | [Theme Provider](/docs/theme/theme-provider) |
-| Design tokens | Typed token groups for spacing, radius, shadows, elevation, borders, layout, motion, and z-index. | [Design Tokens](/docs/theme/tokens) |
-| Colors | Semantic color roles, light/dark color schemes, and built-in color themes. | [Colors](/docs/theme/colors) |
-| Typography & fonts | Named typography roles, fluid font sizes, and Google Font loading. | [Typography & Fonts](/docs/theme/typography) |
-| Breakpoints | Shared responsive breakpoints for JavaScript and CSS. | [Breakpoints](/docs/theme/breakpoints) |
-| Component overrides | Global link and image component overrides for router and framework integration. | [Component Overrides](/docs/theme/components) |
+| Area                | Description                                                                                       | Read more                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `Theme` provider    | Injects token CSS variables, loads fonts, and applies global styles at root or local scope.       | [Theme Provider](/docs/theme/theme-provider)  |
+| Design tokens       | Typed token groups for spacing, radius, shadows, elevation, borders, layout, motion, and z-index. | [Design Tokens](/docs/theme/tokens)           |
+| Colors              | Semantic color roles, light/dark color schemes, and built-in color themes.                        | [Colors](/docs/theme/colors)                  |
+| Typography & fonts  | Named typography roles, fluid font sizes, and Google Font loading.                                | [Typography & Fonts](/docs/theme/typography)  |
+| Breakpoints         | Shared responsive breakpoints for JavaScript and CSS.                                             | [Breakpoints](/docs/theme/breakpoints)        |
+| Component overrides | Global link and image component overrides for router and framework integration.                   | [Component Overrides](/docs/theme/components) |
 
 ## Exports
 
@@ -87,7 +79,7 @@ import {
   GoogleFont,
   createGoogleFontUrl,
   BREAKPOINTS,
-} from "@puzzle/theme";
+} from "@puzzle-ui/theme";
 
 import type {
   ThemeProps,
@@ -112,7 +104,7 @@ import type {
   ThemeLinkComponent,
   ThemeLinkComponentConfig,
   ThemeImageComponent,
-} from "@puzzle/theme";
+} from "@puzzle-ui/theme";
 ```
 
 ## How it works

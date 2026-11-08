@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button, Preview, Section } from "@puzzle/ui";
+import { Button, Preview, Section } from "@puzzle-ui/ui";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
@@ -85,7 +85,7 @@ function RouteComponent() {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold">Import</h2>
           <pre className="overflow-x-auto rounded-lg bg-(--puzzle-color-surface-sunken) p-4 text-sm">
-            <code>{`import { Button } from "@puzzle/ui";`}</code>
+            <code>{`import { Button } from "@puzzle-ui/ui";`}</code>
           </pre>
           <p>
             Button is available as a named export from the Puzzle UI package.

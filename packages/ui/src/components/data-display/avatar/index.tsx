@@ -1,6 +1,6 @@
 "use client";
 
-import { cn, nameToInitials } from "@puzzle/core";
+import { cn, nameToInitials } from "@puzzle-ui/core";
 import { useState, type ComponentPropsWithRef } from "react";
 import "./avatar.css";
 

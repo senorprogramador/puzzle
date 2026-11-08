@@ -16,7 +16,7 @@ import {
   type RefAttributes,
   type RefObject,
 } from "react";
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 import { Popout, type PopoutAlignment, type PopoutPosition } from "../popout";
 import "./popover.css";
 

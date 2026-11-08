@@ -4,7 +4,7 @@ import {
   type ElementType,
   type ReactNode,
 } from "react";
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 import "./card.css";
 
 type CardVariant = "elevated" | "outlined" | "filled" | "ghost";

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { SvgSpinnersIcon } from "@puzzle/icons/sets/svg-spinners";
-import { SvgSpinnersIconPage } from "@puzzle/icons/sets/svg-spinners.page";
-import { ALL_SVG_SPINNERS_ICONS } from "@puzzle/icons/sets/svg-spinners.constants";
+import { SvgSpinnersIcon } from "@puzzle-ui/icons/sets/svg-spinners";
+import { SvgSpinnersIconPage } from "@puzzle-ui/icons/sets/svg-spinners.page";
+import { ALL_SVG_SPINNERS_ICONS } from "@puzzle-ui/icons/sets/svg-spinners.constants";
 
 const meta = {
   title: "Icons/Sets/SvgSpinners",

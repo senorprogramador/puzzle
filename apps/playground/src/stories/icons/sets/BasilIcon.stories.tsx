@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { BasilIcon } from "@puzzle/icons/sets/basil";
-import { BasilIconPage } from "@puzzle/icons/sets/basil.page";
-import { ALL_BASIL_ICONS } from "@puzzle/icons/sets/basil.constants";
+import { BasilIcon } from "@puzzle-ui/icons/sets/basil";
+import { BasilIconPage } from "@puzzle-ui/icons/sets/basil.page";
+import { ALL_BASIL_ICONS } from "@puzzle-ui/icons/sets/basil.constants";
 
 const meta = {
   title: "Icons/Sets/Basil",

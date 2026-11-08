@@ -6,41 +6,56 @@ description: Theme-aware decorative background patterns.
 ## Import
 
 ```tsx
-import { Background } from "@puzzle/ui";
+import { Background } from "@puzzle-ui/ui";
 ```
 
 ## Patterns
 
 Use backgrounds behind real content rather than as the only way to communicate meaning.
 
-<Preview height={500} code={`\
+<Preview
+  height={500}
+  code={`\
 <Stack>
   <Background pattern="grid"><Section><Heading level="headline3">Grid</Heading></Section></Background>
   <Background pattern="dots" fade="bottom"><Section><Heading level="headline3">Dots</Heading></Section></Background>
   <Background pattern="mesh"><Section><Heading level="headline3">Mesh</Heading></Section></Background>
 </Stack>
-`}>
+`}
+>
   <Stack>
-    <Background pattern="grid"><Section><Heading level="headline3">Grid</Heading></Section></Background>
-    <Background pattern="dots" fade="bottom"><Section><Heading level="headline3">Dots</Heading></Section></Background>
-    <Background pattern="mesh"><Section><Heading level="headline3">Mesh</Heading></Section></Background>
+    <Background pattern="grid">
+      <Section>
+        <Heading level="headline3">Grid</Heading>
+      </Section>
+    </Background>
+    <Background pattern="dots" fade="bottom">
+      <Section>
+        <Heading level="headline3">Dots</Heading>
+      </Section>
+    </Background>
+    <Background pattern="mesh">
+      <Section>
+        <Heading level="headline3">Mesh</Heading>
+      </Section>
+    </Background>
   </Stack>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `as` | `ElementType` | `"div"` | Semantic root element. |
-| `pattern` | `"grid" \| "dots" \| "checkerboard" \| "stripes" \| "crosshatch" \| "glow" \| "blueprint" \| "topographic" \| "mesh"` | `"grid"` | Decorative pattern. |
-| `size` | `number \| string` | `24` | Pattern cell size; numbers are pixels. |
-| `majorSize` | `number \| string` | - | Major grid spacing. |
-| `lineWidth`, `dotSize` | `number \| string` | `1`, `2` | Pattern line/dot dimensions. |
-| `angle` | `number \| string` | `45` | Stripe angle; numbers are degrees. |
-| `patternColor`, `backgroundColor` | `string` | Theme-derived | CSS colors; prefer theme variables. |
-| `patternOpacity` | `number` | - | Pattern opacity, clamped to 0-1. |
-| `meshColors` | `readonly [string, string, string, string]` | Theme-derived | Four mesh colors. |
-| `fade` | `"top" \| "right" \| "bottom" \| "left"` | - | Fade pattern toward an edge. |
-| `children` | `ReactNode` | - | Foreground content. |
+| Prop                              | Type                                                                                                                  | Default       | Description                            |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- | -------------------------------------- |
+| `as`                              | `ElementType`                                                                                                         | `"div"`       | Semantic root element.                 |
+| `pattern`                         | `"grid" \| "dots" \| "checkerboard" \| "stripes" \| "crosshatch" \| "glow" \| "blueprint" \| "topographic" \| "mesh"` | `"grid"`      | Decorative pattern.                    |
+| `size`                            | `number \| string`                                                                                                    | `24`          | Pattern cell size; numbers are pixels. |
+| `majorSize`                       | `number \| string`                                                                                                    | -             | Major grid spacing.                    |
+| `lineWidth`, `dotSize`            | `number \| string`                                                                                                    | `1`, `2`      | Pattern line/dot dimensions.           |
+| `angle`                           | `number \| string`                                                                                                    | `45`          | Stripe angle; numbers are degrees.     |
+| `patternColor`, `backgroundColor` | `string`                                                                                                              | Theme-derived | CSS colors; prefer theme variables.    |
+| `patternOpacity`                  | `number`                                                                                                              | -             | Pattern opacity, clamped to 0-1.       |
+| `meshColors`                      | `readonly [string, string, string, string]`                                                                           | Theme-derived | Four mesh colors.                      |
+| `fade`                            | `"top" \| "right" \| "bottom" \| "left"`                                                                              | -             | Fade pattern toward an edge.           |
+| `children`                        | `ReactNode`                                                                                                           | -             | Foreground content.                    |
 
 Native props for the selected element, including `className` and `style`, are forwarded. Check foreground contrast when customizing colors.

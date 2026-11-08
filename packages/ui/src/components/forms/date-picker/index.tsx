@@ -14,7 +14,7 @@ import {
   type ReactElement,
 } from "react";
 
-import { cn, resolveResponsiveValue } from "@puzzle/core";
+import { cn, resolveResponsiveValue } from "@puzzle-ui/core";
 
 import { Popout, type PopoutTriggerProps } from "../../overlays/popout";
 

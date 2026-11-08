@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { TwemojiIcon } from "@puzzle/icons/sets/twemoji";
-import { TwemojiIconPage } from "@puzzle/icons/sets/twemoji.page";
-import { ALL_TWEMOJI_ICONS } from "@puzzle/icons/sets/twemoji.constants";
+import { TwemojiIcon } from "@puzzle-ui/icons/sets/twemoji";
+import { TwemojiIconPage } from "@puzzle-ui/icons/sets/twemoji.page";
+import { ALL_TWEMOJI_ICONS } from "@puzzle-ui/icons/sets/twemoji.constants";
 
 const meta = {
   title: "Icons/Sets/Twemoji",

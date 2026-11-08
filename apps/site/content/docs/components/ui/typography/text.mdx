@@ -6,14 +6,16 @@ description: Theme typography for body copy and supporting content.
 ## Import
 
 ```tsx
-import { Text } from "@puzzle/ui";
+import { Text } from "@puzzle-ui/ui";
 ```
 
 ## Roles and elements
 
 `type` chooses a theme typography role; `as` chooses markup. Use `as="p"` for paragraphs rather than relying on the default inline span.
 
-<Preview height={350} code={`\
+<Preview
+  height={350}
+  code={`\
 <Stack>
   <Text as="p" type="body1">Primary body text for readable content.</Text>
   <Text as="p" type="body2">Secondary body text.</Text>
@@ -21,22 +23,31 @@ import { Text } from "@puzzle/ui";
   <Text as="small" type="caption">Supporting caption</Text>
   <Text type="overline">Category</Text>
 </Stack>
-`}>
-  <Section><Stack>
-    <Text as="p" type="body1">Primary body text for readable content.</Text>
-    <Text as="p" type="body2">Secondary body text.</Text>
-    <Text type="subtitle1">Section subtitle</Text>
-    <Text as="small" type="caption">Supporting caption</Text>
-    <Text type="overline">Category</Text>
-  </Stack></Section>
+`}
+>
+  <Section>
+    <Stack>
+      <Text as="p" type="body1">
+        Primary body text for readable content.
+      </Text>
+      <Text as="p" type="body2">
+        Secondary body text.
+      </Text>
+      <Text type="subtitle1">Section subtitle</Text>
+      <Text as="small" type="caption">
+        Supporting caption
+      </Text>
+      <Text type="overline">Category</Text>
+    </Stack>
+  </Section>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `type` | `TextType` | `"body1"` | Typography role from the theme. |
-| `as` | `ElementType` | `"span"` | Semantic root element. |
-| `children` | `ReactNode` | - | Text content. |
+| Prop       | Type          | Default   | Description                     |
+| ---------- | ------------- | --------- | ------------------------------- |
+| `type`     | `TextType`    | `"body1"` | Typography role from the theme. |
+| `as`       | `ElementType` | `"span"`  | Semantic root element.          |
+| `children` | `ReactNode`   | -         | Text content.                   |
 
 Common roles are `body1`, `body2`, `subtitle1`, `subtitle2`, `button`, `caption`, and `overline`. Native props, classes, styles, and refs for the selected element are forwarded. Use `Heading` for semantic headings and preserve legible contrast when overriding text colors.

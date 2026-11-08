@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 
 import { useCallback, useEffect, type ComponentPropsWithRef } from "react";
 

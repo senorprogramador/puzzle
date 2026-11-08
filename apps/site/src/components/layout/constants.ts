@@ -1,4 +1,4 @@
-import type { TreeViewItem } from "@puzzle/ui/components/navigation/tree-view";
+import type { TreeViewItem } from "@puzzle-ui/ui/components/navigation/tree-view";
 
 const items: TreeViewItem[] = [
   {
@@ -195,6 +195,11 @@ const items: TreeViewItem[] = [
                 id: "page-layout",
                 label: "Page Layout",
                 href: "/docs/components/ui/layout/page-layout",
+              },
+              {
+                id: "resizable-panels",
+                label: "Resizable Panels",
+                href: "/docs/components/ui/layout/resizable-panels",
               },
               {
                 id: "section",

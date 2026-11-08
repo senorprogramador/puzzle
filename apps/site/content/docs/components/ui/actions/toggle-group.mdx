@@ -8,7 +8,7 @@ Use the ToggleGroup component to present a set of related toggle buttons. Choose
 ## Import
 
 ```tsx
-import { ToggleGroup } from "@puzzle/ui";
+import { ToggleGroup } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
@@ -214,8 +214,8 @@ Set `disabled` on the group to disable all items, or set it on an individual ite
 | `defaultValue`  | `string` (single); `string[]` (multiple)                                                | —                    | Initial selection for an uncontrolled group.                                            |
 | `onValueChange` | `(value: string \| undefined) => void` (single); `(value: string[]) => void` (multiple) | —                    | Called when the selection changes.                                                      |
 | `orientation`   | `"horizontal" \| "vertical"`                                                            | `"horizontal"`       | Layout direction and arrow-key navigation direction.                                    |
-| `size`          | `"xs" \| "sm" \| "md" \| "lg" \| "icon"`                                        | `"md"`               | Size applied to every item in the group.                                                  |
-| `dir`           | `"ltr" \| "rtl"`                                                                    | `"ltr"`               | Text direction; reverses horizontal arrow-key navigation in RTL.                          |
+| `size`          | `"xs" \| "sm" \| "md" \| "lg" \| "icon"`                                                | `"md"`               | Size applied to every item in the group.                                                |
+| `dir`           | `"ltr" \| "rtl"`                                                                        | `"ltr"`              | Text direction; reverses horizontal arrow-key navigation in RTL.                        |
 | `disabled`      | `boolean`                                                                               | `false`              | Disables all items in the group.                                                        |
 | `loop`          | `boolean`                                                                               | `true`               | Wraps arrow-key focus navigation from the last item to the first and vice versa.        |
 | `required`      | `boolean`                                                                               | `false`              | Prevents clearing the final selected item; does not force an initial selection.         |

@@ -1,4 +1,4 @@
-import { assertSafeCssValue, stringWithCasing } from "@puzzle/core";
+import { assertSafeCssValue, stringWithCasing } from "@puzzle-ui/core";
 import type { ThemeFonts } from "./fonts";
 import { resolveFontConfig } from "./fonts/resolve-font-config";
 import { DEFAULT_FONT_FALLBACKS } from "./fonts/constants";

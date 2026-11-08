@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FontistoIcon } from "@puzzle/icons/sets/fontisto";
-import { FontistoIconPage } from "@puzzle/icons/sets/fontisto.page";
-import { ALL_FONTISTO_ICONS } from "@puzzle/icons/sets/fontisto.constants";
+import { FontistoIcon } from "@puzzle-ui/icons/sets/fontisto";
+import { FontistoIconPage } from "@puzzle-ui/icons/sets/fontisto.page";
+import { ALL_FONTISTO_ICONS } from "@puzzle-ui/icons/sets/fontisto.constants";
 
 const meta = {
   title: "Icons/Sets/Fontisto",

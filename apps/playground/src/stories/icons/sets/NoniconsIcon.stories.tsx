@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { NoniconsIcon } from "@puzzle/icons/sets/nonicons";
-import { NoniconsIconPage } from "@puzzle/icons/sets/nonicons.page";
-import { ALL_NONICONS_ICONS } from "@puzzle/icons/sets/nonicons.constants";
+import { NoniconsIcon } from "@puzzle-ui/icons/sets/nonicons";
+import { NoniconsIconPage } from "@puzzle-ui/icons/sets/nonicons.page";
+import { ALL_NONICONS_ICONS } from "@puzzle-ui/icons/sets/nonicons.constants";
 
 const meta = {
   title: "Icons/Sets/Nonicons",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { NimbusIcon } from "@puzzle/icons/sets/nimbus";
-import { NimbusIconPage } from "@puzzle/icons/sets/nimbus.page";
-import { ALL_NIMBUS_ICONS } from "@puzzle/icons/sets/nimbus.constants";
+import { NimbusIcon } from "@puzzle-ui/icons/sets/nimbus";
+import { NimbusIconPage } from "@puzzle-ui/icons/sets/nimbus.page";
+import { ALL_NIMBUS_ICONS } from "@puzzle-ui/icons/sets/nimbus.constants";
 
 const meta = {
   title: "Icons/Sets/Nimbus",

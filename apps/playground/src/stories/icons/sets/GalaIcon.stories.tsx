@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GalaIcon } from "@puzzle/icons/sets/gala";
-import { GalaIconPage } from "@puzzle/icons/sets/gala.page";
-import { ALL_GALA_ICONS } from "@puzzle/icons/sets/gala.constants";
+import { GalaIcon } from "@puzzle-ui/icons/sets/gala";
+import { GalaIconPage } from "@puzzle-ui/icons/sets/gala.page";
+import { ALL_GALA_ICONS } from "@puzzle-ui/icons/sets/gala.constants";
 
 const meta = {
   title: "Icons/Sets/Gala",

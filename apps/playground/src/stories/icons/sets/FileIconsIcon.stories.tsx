@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FileIconsIcon } from "@puzzle/icons/sets/file-icons";
-import { FileIconsIconPage } from "@puzzle/icons/sets/file-icons.page";
-import { ALL_FILE_ICONS_ICONS } from "@puzzle/icons/sets/file-icons.constants";
+import { FileIconsIcon } from "@puzzle-ui/icons/sets/file-icons";
+import { FileIconsIconPage } from "@puzzle-ui/icons/sets/file-icons.page";
+import { ALL_FILE_ICONS_ICONS } from "@puzzle-ui/icons/sets/file-icons.constants";
 
 const meta = {
   title: "Icons/Sets/FileIcons",

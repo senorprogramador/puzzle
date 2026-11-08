@@ -6,56 +6,70 @@ description: Select independent options with native checkbox semantics.
 ## Import
 
 ```tsx
-import { Checkbox } from "@puzzle/ui";
+import { Checkbox } from "@puzzle-ui/ui";
 ```
 
 ## Labels and states
 
 Use a visible `label` (or `children`). `description` is associated with the input. `indeterminate` displays a mixed state without changing the checked value.
 
-<Preview height={400} code={`\
+<Preview
+  height={400}
+  code={`\
 <Stack>
   <Checkbox label="Email updates" description="Receive occasional news." defaultChecked />
   <Checkbox label="Select all" indeterminate />
   <Checkbox label="Unavailable" disabled />
   <Checkbox label="Accept terms" required name="terms" />
 </Stack>
-`}>
-  <Section><Stack>
-    <Checkbox label="Email updates" description="Receive occasional news." defaultChecked />
-    <Checkbox label="Select all" indeterminate />
-    <Checkbox label="Unavailable" disabled />
-    <Checkbox label="Accept terms" required name="terms" />
-  </Stack></Section>
+`}
+>
+  <Section>
+    <Stack>
+      <Checkbox
+        label="Email updates"
+        description="Receive occasional news."
+        defaultChecked
+      />
+      <Checkbox label="Select all" indeterminate />
+      <Checkbox label="Unavailable" disabled />
+      <Checkbox label="Accept terms" required name="terms" />
+    </Stack>
+  </Section>
 </Preview>
 
 ## Sizes
 
-<Preview height={300} code={`\
+<Preview
+  height={300}
+  code={`\
 <Stack>
   <Checkbox size="sm" label="Small" />
   <Checkbox size="md" label="Medium" />
   <Checkbox size="lg" label="Large" />
 </Stack>
-`}>
-  <Section><Stack>
-    <Checkbox size="sm" label="Small" />
-    <Checkbox size="md" label="Medium" />
-    <Checkbox size="lg" label="Large" />
-  </Stack></Section>
+`}
+>
+  <Section>
+    <Stack>
+      <Checkbox size="sm" label="Small" />
+      <Checkbox size="md" label="Medium" />
+      <Checkbox size="lg" label="Large" />
+    </Stack>
+  </Section>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `label`, `children` | `ReactNode` | - | Visible label; `label` takes precedence. |
-| `description` | `ReactNode` | - | Supporting description. |
-| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Visual size. |
-| `indeterminate` | `boolean` | `false` | Native mixed state. |
-| `checked` | `boolean` | - | Controlled selection. |
-| `defaultChecked` | `boolean` | - | Initial uncontrolled selection. |
-| `onChange` | `ChangeEventHandler<HTMLInputElement>` | - | Read selection from `event.target.checked`. |
-| `disabled`, `required` | `boolean` | `false` | Native disabled and required behavior. |
+| Prop                   | Type                                   | Default | Description                                 |
+| ---------------------- | -------------------------------------- | ------- | ------------------------------------------- |
+| `label`, `children`    | `ReactNode`                            | -       | Visible label; `label` takes precedence.    |
+| `description`          | `ReactNode`                            | -       | Supporting description.                     |
+| `size`                 | `"sm" \| "md" \| "lg"`                 | `"md"`  | Visual size.                                |
+| `indeterminate`        | `boolean`                              | `false` | Native mixed state.                         |
+| `checked`              | `boolean`                              | -       | Controlled selection.                       |
+| `defaultChecked`       | `boolean`                              | -       | Initial uncontrolled selection.             |
+| `onChange`             | `ChangeEventHandler<HTMLInputElement>` | -       | Read selection from `event.target.checked`. |
+| `disabled`, `required` | `boolean`                              | `false` | Native disabled and required behavior.      |
 
 Other native input props and `ref` target the input; `className` and `style` target its wrapping label. Space toggles a focused checkbox. Provide `aria-label` if no visible label exists.

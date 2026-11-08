@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { TopcoatIcon } from "@puzzle/icons/sets/topcoat";
-import { TopcoatIconPage } from "@puzzle/icons/sets/topcoat.page";
-import { ALL_TOPCOAT_ICONS } from "@puzzle/icons/sets/topcoat.constants";
+import { TopcoatIcon } from "@puzzle-ui/icons/sets/topcoat";
+import { TopcoatIconPage } from "@puzzle-ui/icons/sets/topcoat.page";
+import { ALL_TOPCOAT_ICONS } from "@puzzle-ui/icons/sets/topcoat.constants";
 
 const meta = {
   title: "Icons/Sets/Topcoat",

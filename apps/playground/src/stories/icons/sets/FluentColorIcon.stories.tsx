@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FluentColorIcon } from "@puzzle/icons/sets/fluent-color";
-import { FluentColorIconPage } from "@puzzle/icons/sets/fluent-color.page";
-import { ALL_FLUENT_COLOR_ICONS } from "@puzzle/icons/sets/fluent-color.constants";
+import { FluentColorIcon } from "@puzzle-ui/icons/sets/fluent-color";
+import { FluentColorIconPage } from "@puzzle-ui/icons/sets/fluent-color.page";
+import { ALL_FLUENT_COLOR_ICONS } from "@puzzle-ui/icons/sets/fluent-color.constants";
 
 const meta = {
   title: "Icons/Sets/FluentColor",

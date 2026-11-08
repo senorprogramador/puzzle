@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 import { CollapsableSidebar, type CollapsableSidebarExpansion } from "./index";
 
 afterEach(cleanup);
@@ -43,8 +43,16 @@ describe("CollapsableSidebar (browser)", () => {
         const sidebar = navigation.parentElement!;
         const toggle = screen.getByRole("button", { name: "Expand sidebar" });
         const collapsedWidth = sidebar.getBoundingClientRect().width;
-        const adjacentLeft = screen.getByRole("main").getBoundingClientRect().left;
-        expect(collapsedWidth).toBeCloseTo(72, 0);
+        const expectedCollapsedWidth =
+          parseFloat(
+            getComputedStyle(sidebar).getPropertyValue(
+              "--puzzle-sidebar-collapsed-width",
+            ),
+          ) * parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const adjacentLeft = screen
+          .getByRole("main")
+          .getBoundingClientRect().left;
+        expect(collapsedWidth).toBeCloseTo(expectedCollapsedWidth, 0);
         expect(toggle).toBeVisible();
         expect(navigation).toBeVisible();
         expect(screen.getAllByRole("navigation")).toHaveLength(1);
@@ -62,7 +70,9 @@ describe("CollapsableSidebar (browser)", () => {
           home.getBoundingClientRect().bottom,
         );
         expect(projects.scrollWidth).toBeLessThanOrEqual(projects.clientWidth);
-        expect(navigation.scrollWidth).toBeLessThanOrEqual(navigation.clientWidth);
+        expect(navigation.scrollWidth).toBeLessThanOrEqual(
+          navigation.clientWidth,
+        );
         expect(navigation.getBoundingClientRect().top).toBeGreaterThanOrEqual(
           toggle.getBoundingClientRect().bottom,
         );
@@ -72,10 +82,9 @@ describe("CollapsableSidebar (browser)", () => {
             collapsedWidth,
             0,
           );
-          expect(screen.getByRole("main").getBoundingClientRect().left).toBeCloseTo(
-            adjacentLeft,
-            0,
-          );
+          expect(
+            screen.getByRole("main").getBoundingClientRect().left,
+          ).toBeCloseTo(adjacentLeft, 0);
         } else {
           expect(sidebar.getBoundingClientRect().width).toBeCloseTo(320, 0);
         }
@@ -83,7 +92,7 @@ describe("CollapsableSidebar (browser)", () => {
         fireEvent.click(toggle);
         await expect
           .poll(() => navigation.getBoundingClientRect().width)
-          .toBeLessThanOrEqual(72);
+          .toBeLessThanOrEqual(expectedCollapsedWidth);
         expect(toggle).toHaveAttribute("aria-expanded", "false");
       });
     }

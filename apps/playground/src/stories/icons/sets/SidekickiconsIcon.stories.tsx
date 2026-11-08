@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { SidekickiconsIcon } from "@puzzle/icons/sets/sidekickicons";
-import { SidekickiconsIconPage } from "@puzzle/icons/sets/sidekickicons.page";
-import { ALL_SIDEKICKICONS_ICONS } from "@puzzle/icons/sets/sidekickicons.constants";
+import { SidekickiconsIcon } from "@puzzle-ui/icons/sets/sidekickicons";
+import { SidekickiconsIconPage } from "@puzzle-ui/icons/sets/sidekickicons.page";
+import { ALL_SIDEKICKICONS_ICONS } from "@puzzle-ui/icons/sets/sidekickicons.constants";
 
 const meta = {
   title: "Icons/Sets/Sidekickicons",

@@ -8,14 +8,16 @@ import { ScrollLockExample } from "../../../../../src/components/doc-examples";
 ## Import
 
 ```tsx
-import { ScrollLock } from "@puzzle/ui";
+import { ScrollLock } from "@puzzle-ui/ui";
 ```
 
 ## Conditional locking
 
 Mount ScrollLock while an overlay is active, or toggle `enabled`. This example locks both the body and document-element scrolling in the preview iframe, not the surrounding docs page or independently scrollable elements. The control remains available to unlock it.
 
-<Preview height={350} code={`\
+<Preview
+  height={350}
+  code={`\
 const [enabled, setEnabled] = useState(false);
 <>
   <ScrollLock enabled={enabled} />
@@ -23,14 +25,17 @@ const [enabled, setEnabled] = useState(false);
     {enabled ? "Unlock preview scrolling" : "Lock preview scrolling"}
   </Button>
 </>
-`}>
-  <Section><ScrollLockExample /></Section>
+`}
+>
+  <Section>
+    <ScrollLockExample />
+  </Section>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `enabled` | `boolean` | `true` | Lock the document containing the component. |
+| Prop      | Type      | Default | Description                                 |
+| --------- | --------- | ------- | ------------------------------------------- |
+| `enabled` | `boolean` | `true`  | Lock the document containing the component. |
 
 ScrollLock renders a hidden marker, not a content wrapper. Multiple locks are coordinated per document; scrolling is restored only after the final lock releases. Existing inline styles and scroll position are preserved, with scrollbar compensation and iOS handling. It does not trap focus or create modal semantics; `Dialog` and modal `Backdrop` already include it.

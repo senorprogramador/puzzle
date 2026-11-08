@@ -17,7 +17,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { cn, resolveResponsiveValue, type ResponsiveValue } from "@puzzle/core";
+import { cn, resolveResponsiveValue, type ResponsiveValue } from "@puzzle-ui/core";
 
 import {
   Popout,

@@ -17,7 +17,7 @@ import {
   CardContent,
   CardFooter,
   CardMedia,
-} from "@puzzle/ui";
+} from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
@@ -73,10 +73,18 @@ Use `variant` to set the surface style: `outlined` (default), `elevated`, `fille
 `}
 >
   <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-    <Card variant="outlined"><CardContent>Outlined</CardContent></Card>
-    <Card variant="elevated"><CardContent>Elevated</CardContent></Card>
-    <Card variant="filled"><CardContent>Filled</CardContent></Card>
-    <Card variant="ghost"><CardContent>Ghost</CardContent></Card>
+    <Card variant="outlined">
+      <CardContent>Outlined</CardContent>
+    </Card>
+    <Card variant="elevated">
+      <CardContent>Elevated</CardContent>
+    </Card>
+    <Card variant="filled">
+      <CardContent>Filled</CardContent>
+    </Card>
+    <Card variant="ghost">
+      <CardContent>Ghost</CardContent>
+    </Card>
   </div>
 </Preview>
 
@@ -97,9 +105,15 @@ Use `size` (`sm`, `md`, `lg`) to control the card's spacing. The default is `md`
 `}
 >
   <div style={{ display: "flex", flexWrap: "wrap", gap: 16 }}>
-    <Card size="sm"><CardContent>Small</CardContent></Card>
-    <Card size="md"><CardContent>Medium</CardContent></Card>
-    <Card size="lg"><CardContent>Large</CardContent></Card>
+    <Card size="sm">
+      <CardContent>Small</CardContent>
+    </Card>
+    <Card size="md">
+      <CardContent>Medium</CardContent>
+    </Card>
+    <Card size="lg">
+      <CardContent>Large</CardContent>
+    </Card>
   </div>
 </Preview>
 
@@ -196,27 +210,27 @@ When `interactive` is set without `as`, the card renders a `button` (or an `a` w
 
 ### Card props
 
-| Prop          | Type                                              | Default      | Description                                                  |
-| ------------- | ------------------------------------------------- | ------------ | ------------------------------------------------------------ |
-| `as`          | `ElementType`                                     | `"div"`      | Element type used to render the card.                        |
-| `variant`     | `"elevated" \| "outlined" \| "filled" \| "ghost"` | `"outlined"` | Surface style.                                               |
-| `size`        | `"sm" \| "md" \| "lg"`                            | `"md"`       | Spacing scale.                                               |
-| `orientation` | `"vertical" \| "horizontal"`                      | `"vertical"` | Direction in which the card's parts are laid out.            |
-| `interactive` | `boolean`                                         | `false`      | Adds hover and focus styling for clickable cards.            |
-| `className`   | `string`                                          | —            | Additional CSS class names.                                  |
-| `children`    | `ReactNode`                                       | —            | Card content.                                                |
+| Prop          | Type                                              | Default      | Description                                       |
+| ------------- | ------------------------------------------------- | ------------ | ------------------------------------------------- |
+| `as`          | `ElementType`                                     | `"div"`      | Element type used to render the card.             |
+| `variant`     | `"elevated" \| "outlined" \| "filled" \| "ghost"` | `"outlined"` | Surface style.                                    |
+| `size`        | `"sm" \| "md" \| "lg"`                            | `"md"`       | Spacing scale.                                    |
+| `orientation` | `"vertical" \| "horizontal"`                      | `"vertical"` | Direction in which the card's parts are laid out. |
+| `interactive` | `boolean`                                         | `false`      | Adds hover and focus styling for clickable cards. |
+| `className`   | `string`                                          | —            | Additional CSS class names.                       |
+| `children`    | `ReactNode`                                       | —            | Card content.                                     |
 
 ### Card parts
 
-| Component         | Default element | Purpose                                              |
-| ----------------- | --------------- | ---------------------------------------------------- |
-| `CardHeader`      | `div`           | Groups the title, description, and action.           |
-| `CardTitle`       | `h3`            | Card heading. Change the level with `as`.            |
-| `CardDescription` | `p`             | Supporting text for the title.                       |
-| `CardAction`      | `div`           | Control placed alongside the title.                  |
-| `CardContent`     | `div`           | Main body of the card.                               |
-| `CardFooter`      | `div`           | Actions or metadata at the end of the card.          |
-| `CardMedia`       | `div`           | Image or other visual.                               |
+| Component         | Default element | Purpose                                     |
+| ----------------- | --------------- | ------------------------------------------- |
+| `CardHeader`      | `div`           | Groups the title, description, and action.  |
+| `CardTitle`       | `h3`            | Card heading. Change the level with `as`.   |
+| `CardDescription` | `p`             | Supporting text for the title.              |
+| `CardAction`      | `div`           | Control placed alongside the title.         |
+| `CardContent`     | `div`           | Main body of the card.                      |
+| `CardFooter`      | `div`           | Actions or metadata at the end of the card. |
+| `CardMedia`       | `div`           | Image or other visual.                      |
 
 Every part accepts `as`, `className`, `children`, and the props of the element it renders.
 

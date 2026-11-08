@@ -8,20 +8,23 @@ import { BottomNavigationPreview } from "../../../../../src/components/bottom-na
 ## Import
 
 ```tsx
-import { BottomNavigation, BottomNavigationItem } from "@puzzle/ui";
+import { BottomNavigation, BottomNavigationItem } from "@puzzle-ui/ui";
 ```
 
 ## Items
 
 Use direct `BottomNavigationItem` children. Provide `href` for destinations or `onClick` for actions; active destinations receive `aria-current="page"`.
 
-<Preview height={250} code={`\
+<Preview
+  height={250}
+  code={`\
 <BottomNavigation ariaLabel="Primary destinations">
   <BottomNavigationItem icon={<Icon name="lucide:house" />} label="Home" href="#home" active />
   <BottomNavigationItem icon={<Icon name="lucide:search" />} label="Search" href="#search" />
   <BottomNavigationItem icon={<Icon name="lucide:settings" />} label="Settings" href="#settings" />
 </BottomNavigation>
-`}>
+`}
+>
   <BottomNavigationPreview />
 </Preview>
 
@@ -29,21 +32,21 @@ Use direct `BottomNavigationItem` children. Provide `href` for destinations or `
 
 ### BottomNavigation
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `ReactNode` | Required | Direct navigation items. |
-| `ariaLabel` | `string` | `"Bottom navigation"` | Navigation landmark name. |
-| `className`, `style` | `string`, `CSSProperties` | - | Root styling. |
+| Prop                 | Type                      | Default               | Description               |
+| -------------------- | ------------------------- | --------------------- | ------------------------- |
+| `children`           | `ReactNode`               | Required              | Direct navigation items.  |
+| `ariaLabel`          | `string`                  | `"Bottom navigation"` | Navigation landmark name. |
+| `className`, `style` | `string`, `CSSProperties` | -                     | Root styling.             |
 
 ### BottomNavigationItem
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `icon` | `ReactNode` | Required | Decorative item icon. |
-| `label` | `string` | Required | Visible accessible name. |
-| `href` | `string` | - | Link destination. |
-| `onClick` | `MouseEventHandler<HTMLButtonElement>` | - | Action callback when no href is supplied. |
-| `active` | `boolean` | `false` | Current visual state. |
-| `className`, `style` | `string`, `CSSProperties` | - | Item styling. |
+| Prop                 | Type                                   | Default  | Description                               |
+| -------------------- | -------------------------------------- | -------- | ----------------------------------------- |
+| `icon`               | `ReactNode`                            | Required | Decorative item icon.                     |
+| `label`              | `string`                               | Required | Visible accessible name.                  |
+| `href`               | `string`                               | -        | Link destination.                         |
+| `onClick`            | `MouseEventHandler<HTMLButtonElement>` | -        | Action callback when no href is supplied. |
+| `active`             | `boolean`                              | `false`  | Current visual state.                     |
+| `className`, `style` | `string`, `CSSProperties`              | -        | Item styling.                             |
 
 The component does not choose routes or track active state. Set `active` from the application route. Inactive items use the muted text color; only items with `active` use the primary color.

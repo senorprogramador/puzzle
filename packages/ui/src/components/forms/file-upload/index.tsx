@@ -11,8 +11,8 @@ import {
   type KeyboardEvent,
 } from "react";
 
-import { cn } from "@puzzle/core";
-import { Icon } from "@puzzle/icons";
+import { cn } from "@puzzle-ui/core";
+import { Icon } from "@puzzle-ui/icons";
 
 import { LinearProgress } from "../../data-display/progress/linear-progress";
 

@@ -8,7 +8,7 @@ import { PortalExample } from "../../../../../src/components/doc-examples";
 ## Import
 
 ```tsx
-import { Portal, PortalTarget } from "@puzzle/ui";
+import { Portal, PortalTarget } from "@puzzle-ui/ui";
 ```
 
 ## Named target
@@ -19,7 +19,10 @@ Portal renders after mounting into the host document. This live example is inten
 
 ```tsx
 <>
-  <PortalTarget id="documentation-portal-target" aria-label="Portal destination" />
+  <PortalTarget
+    id="documentation-portal-target"
+    aria-label="Portal destination"
+  />
   <Portal targetId="documentation-portal-target">
     <Card>This content is rendered inside the target.</Card>
   </Portal>
@@ -30,18 +33,18 @@ Portal renders after mounting into the host document. This live example is inten
 
 ### Portal
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `targetId` | `string` | - | ID of an existing host-document element. |
-| `children` | `ReactNode` | - | Content rendered into the target. |
+| Prop       | Type        | Default | Description                              |
+| ---------- | ----------- | ------- | ---------------------------------------- |
+| `targetId` | `string`    | -       | ID of an existing host-document element. |
+| `children` | `ReactNode` | -       | Content rendered into the target.        |
 
 Without a target ID, or if it is not found, Portal uses `document.body`. It renders nothing during server rendering and until its mount effect runs. Keep target IDs unique and make the target available when the portal mounts.
 
 ### PortalTarget
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `id` | `string` | Required | Destination ID. |
-| `children` | `ReactNode` | - | Optional content already inside the target. |
+| Prop       | Type        | Default  | Description                                 |
+| ---------- | ----------- | -------- | ------------------------------------------- |
+| `id`       | `string`    | Required | Destination ID.                             |
+| `children` | `ReactNode` | -        | Optional content already inside the target. |
 
 Native div attributes and refs are supported. React context and event propagation follow the React tree; DOM layout and reading order follow the target location. Portal does not add dialog semantics, focus management, or scroll locking.

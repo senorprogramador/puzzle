@@ -19,13 +19,13 @@ Without configured fonts, every role falls back to `"Open Sans", sans-serif`.
 
 Pass a `fonts` map to `Theme`. Each entry is a `FontConfig`:
 
-| Field | Type | Default | Description |
-| --- | --- | --- | --- |
-| `family` | `GoogleFontFamily` | — | A typed Google Font family name. |
-| `weights` | `readonly number[]` | role-based defaults | The weights to load. |
-| `styles` | `readonly ("normal" \| "italic")[]` | `["normal"]` | Font styles to load. |
-| `display` | `"auto" \| "block" \| "swap" \| "fallback" \| "optional"` | `"swap"` | The CSS `font-display` strategy. |
-| `fallback` | `readonly string[]` | role-based defaults | Fallback font families. |
+| Field      | Type                                                      | Default             | Description                      |
+| ---------- | --------------------------------------------------------- | ------------------- | -------------------------------- |
+| `family`   | `GoogleFontFamily`                                        | —                   | A typed Google Font family name. |
+| `weights`  | `readonly number[]`                                       | role-based defaults | The weights to load.             |
+| `styles`   | `readonly ("normal" \| "italic")[]`                       | `["normal"]`        | Font styles to load.             |
+| `display`  | `"auto" \| "block" \| "swap" \| "fallback" \| "optional"` | `"swap"`            | The CSS `font-display` strategy. |
+| `fallback` | `readonly string[]`                                       | role-based defaults | Fallback font families.          |
 
 ```tsx
 <Theme
@@ -46,7 +46,7 @@ Pass a `fonts` map to `Theme`. Each entry is a `FontConfig`:
 `GoogleFont` loads a single font and sets its role variable without the rest of the theme system. Prefer `Theme` when you want the full token system.
 
 ```tsx
-import { GoogleFont } from "@puzzle/theme";
+import { GoogleFont } from "@puzzle-ui/theme";
 
 <GoogleFont family="Inter" role="body" />;
 ```
@@ -56,7 +56,7 @@ import { GoogleFont } from "@puzzle/theme";
 Builds a Google Fonts CSS2 stylesheet URL for a font configuration:
 
 ```tsx
-import { createGoogleFontUrl } from "@puzzle/theme";
+import { createGoogleFontUrl } from "@puzzle-ui/theme";
 
 const href = createGoogleFontUrl({
   family: "Inter",
@@ -70,13 +70,13 @@ const href = createGoogleFontUrl({
 
 These token groups form the raw scales. Font sizes use `rem` and letter spacing uses `em`.
 
-| Group | CSS variable | Keys |
-| --- | --- | --- |
-| `typography.fontSize` | `--puzzle-font-size-{key}` | `xs` (0.75rem) … `6xl` (3.75rem), with `base` = 1rem |
-| `typography.fontWeight` | `--puzzle-font-weight-{key}` | `normal` 400, `medium` 500, `semibold` 600, `bold` 700, `extrabold` 800 |
-| `typography.lineHeight` | `--puzzle-font-line-height-{key}` | `none` 1, `tight` 1.15, `snug` 1.3, `normal` 1.5, `relaxed` 1.625, `loose` 2 |
-| `typography.letterSpacing` | `--puzzle-font-letter-spacing-{key}` | `tighter` −0.05em … `widest` 0.1em |
-| `typography.fontGap` | `--puzzle-font-gap-{key}` | `headingStackGap`, `headingParagraphGap`, `paragraphGap`, `sectionGap` |
+| Group                      | CSS variable                         | Keys                                                                         |
+| -------------------------- | ------------------------------------ | ---------------------------------------------------------------------------- |
+| `typography.fontSize`      | `--puzzle-font-size-{key}`           | `xs` (0.75rem) … `6xl` (3.75rem), with `base` = 1rem                         |
+| `typography.fontWeight`    | `--puzzle-font-weight-{key}`         | `normal` 400, `medium` 500, `semibold` 600, `bold` 700, `extrabold` 800      |
+| `typography.lineHeight`    | `--puzzle-font-line-height-{key}`    | `none` 1, `tight` 1.15, `snug` 1.3, `normal` 1.5, `relaxed` 1.625, `loose` 2 |
+| `typography.letterSpacing` | `--puzzle-font-letter-spacing-{key}` | `tighter` −0.05em … `widest` 0.1em                                           |
+| `typography.fontGap`       | `--puzzle-font-gap-{key}`            | `headingStackGap`, `headingParagraphGap`, `paragraphGap`, `sectionGap`       |
 
 ## Typography roles
 
@@ -88,21 +88,21 @@ Named roles (`TypographyStyle`) describe complete text styles. Each role resolve
 - `--puzzle-font-line-height-{role}`
 - `--puzzle-font-letter-spacing-{role}`
 
-| Role | Font | Size | Weight | Notes |
-| --- | --- | --- | --- | --- |
-| `display1` | heading | 40–80px fluid | 300 | Largest display text. |
-| `display2` | heading | 36–60px fluid | 300 | |
-| `headline1` | heading | 32–48px fluid | 400 | |
-| `headline2` | heading | 28–36px fluid | 400 | |
-| `headline3` | heading | 22–28px fluid | 400 | |
-| `headline4` | heading | `xl` scale | 500 | |
-| `subtitle1` | heading | `base` scale | 500 | |
-| `subtitle2` | heading | `sm` scale | 500 | |
-| `body1` | body | `base` scale | 400 | Default body text. |
-| `body2` | body | `sm` scale | 400 | |
-| `button` | body | `sm` scale | 500 | |
-| `caption` | body | 12px | 400 | |
-| `overline` | body | 10px | 500 | |
+| Role        | Font    | Size          | Weight | Notes                 |
+| ----------- | ------- | ------------- | ------ | --------------------- |
+| `display1`  | heading | 40–80px fluid | 300    | Largest display text. |
+| `display2`  | heading | 36–60px fluid | 300    |                       |
+| `headline1` | heading | 32–48px fluid | 400    |                       |
+| `headline2` | heading | 28–36px fluid | 400    |                       |
+| `headline3` | heading | 22–28px fluid | 400    |                       |
+| `headline4` | heading | `xl` scale    | 500    |                       |
+| `subtitle1` | heading | `base` scale  | 500    |                       |
+| `subtitle2` | heading | `sm` scale    | 500    |                       |
+| `body1`     | body    | `base` scale  | 400    | Default body text.    |
+| `body2`     | body    | `sm` scale    | 400    |                       |
+| `button`    | body    | `sm` scale    | 500    |                       |
+| `caption`   | body    | 12px          | 400    |                       |
+| `overline`  | body    | 10px          | 500    |                       |
 
 The larger roles use fluid font sizes built with `clamp()`, scaling smoothly between a minimum and maximum size across viewport widths. The smaller roles reference the base font-size scale, so overriding `typography.fontSize` flows through to them.
 

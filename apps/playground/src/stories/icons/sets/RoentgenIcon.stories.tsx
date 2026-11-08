@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { RoentgenIcon } from "@puzzle/icons/sets/roentgen";
-import { RoentgenIconPage } from "@puzzle/icons/sets/roentgen.page";
-import { ALL_ROENTGEN_ICONS } from "@puzzle/icons/sets/roentgen.constants";
+import { RoentgenIcon } from "@puzzle-ui/icons/sets/roentgen";
+import { RoentgenIconPage } from "@puzzle-ui/icons/sets/roentgen.page";
+import { ALL_ROENTGEN_ICONS } from "@puzzle-ui/icons/sets/roentgen.constants";
 
 const meta = {
   title: "Icons/Sets/Roentgen",

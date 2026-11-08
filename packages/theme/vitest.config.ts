@@ -8,11 +8,11 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^@puzzle\/core$/,
+        find: /^@puzzle-ui\/core$/,
         replacement: resolvePath("../core/src/index.ts"),
       },
       {
-        find: /^@puzzle\/core\/(.+)$/,
+        find: /^@puzzle-ui\/core\/(.+)$/,
         replacement: resolvePath("../core/src/$1"),
       },
     ],

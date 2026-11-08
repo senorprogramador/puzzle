@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { TemakiIcon } from "@puzzle/icons/sets/temaki";
-import { TemakiIconPage } from "@puzzle/icons/sets/temaki.page";
-import { ALL_TEMAKI_ICONS } from "@puzzle/icons/sets/temaki.constants";
+import { TemakiIcon } from "@puzzle-ui/icons/sets/temaki";
+import { TemakiIconPage } from "@puzzle-ui/icons/sets/temaki.page";
+import { ALL_TEMAKI_ICONS } from "@puzzle-ui/icons/sets/temaki.constants";
 
 const meta = {
   title: "Icons/Sets/Temaki",

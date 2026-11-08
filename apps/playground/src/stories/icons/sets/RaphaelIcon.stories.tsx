@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { RaphaelIcon } from "@puzzle/icons/sets/raphael";
-import { RaphaelIconPage } from "@puzzle/icons/sets/raphael.page";
-import { ALL_RAPHAEL_ICONS } from "@puzzle/icons/sets/raphael.constants";
+import { RaphaelIcon } from "@puzzle-ui/icons/sets/raphael";
+import { RaphaelIconPage } from "@puzzle-ui/icons/sets/raphael.page";
+import { ALL_RAPHAEL_ICONS } from "@puzzle-ui/icons/sets/raphael.constants";
 
 const meta = {
   title: "Icons/Sets/Raphael",

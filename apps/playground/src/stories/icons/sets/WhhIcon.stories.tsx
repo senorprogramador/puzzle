@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { WhhIcon } from "@puzzle/icons/sets/whh";
-import { WhhIconPage } from "@puzzle/icons/sets/whh.page";
-import { ALL_WHH_ICONS } from "@puzzle/icons/sets/whh.constants";
+import { WhhIcon } from "@puzzle-ui/icons/sets/whh";
+import { WhhIconPage } from "@puzzle-ui/icons/sets/whh.page";
+import { ALL_WHH_ICONS } from "@puzzle-ui/icons/sets/whh.constants";
 
 const meta = {
   title: "Icons/Sets/Whh",

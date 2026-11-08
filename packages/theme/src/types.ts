@@ -1,4 +1,4 @@
-import type { DeepPartial } from "@puzzle/core";
+import type { DeepPartial } from "@puzzle-ui/core";
 import type { COLOR_THEMES } from "./constants";
 
 export type ThemeMode = "light" | "dark" | "system";

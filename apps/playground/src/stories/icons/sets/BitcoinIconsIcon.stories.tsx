@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { BitcoinIconsIcon } from "@puzzle/icons/sets/bitcoin-icons";
-import { BitcoinIconsIconPage } from "@puzzle/icons/sets/bitcoin-icons.page";
-import { ALL_BITCOIN_ICONS_ICONS } from "@puzzle/icons/sets/bitcoin-icons.constants";
+import { BitcoinIconsIcon } from "@puzzle-ui/icons/sets/bitcoin-icons";
+import { BitcoinIconsIconPage } from "@puzzle-ui/icons/sets/bitcoin-icons.page";
+import { ALL_BITCOIN_ICONS_ICONS } from "@puzzle-ui/icons/sets/bitcoin-icons.constants";
 
 const meta = {
   title: "Icons/Sets/BitcoinIcons",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { IconParkTwotoneIcon } from "@puzzle/icons/sets/icon-park-twotone";
-import { IconParkTwotoneIconPage } from "@puzzle/icons/sets/icon-park-twotone.page";
-import { ALL_ICON_PARK_TWOTONE_ICONS } from "@puzzle/icons/sets/icon-park-twotone.constants";
+import { IconParkTwotoneIcon } from "@puzzle-ui/icons/sets/icon-park-twotone";
+import { IconParkTwotoneIconPage } from "@puzzle-ui/icons/sets/icon-park-twotone.page";
+import { ALL_ICON_PARK_TWOTONE_ICONS } from "@puzzle-ui/icons/sets/icon-park-twotone.constants";
 
 const meta = {
   title: "Icons/Sets/IconParkTwotone",

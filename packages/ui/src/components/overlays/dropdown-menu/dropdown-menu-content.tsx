@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, type KeyboardEvent } from "react";
 
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
+
+import { usePopoutPositioned } from "../popout";
 
 import { useDropdownMenuContext } from "./dropdown-menu.context";
 import {
@@ -29,15 +31,23 @@ const DropdownMenuContent = ({
   const menuRef = useRef<HTMLDivElement | null>(null);
   const typeaheadRef = useRef("");
   const typeaheadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const initialFocusDoneRef = useRef(false);
+  const positioned = usePopoutPositioned();
 
   useEffect(() => {
+    if (!context.open) {
+      initialFocusDoneRef.current = false;
+    }
+
     typeaheadRef.current = "";
 
     if (typeaheadTimerRef.current !== null) {
       clearTimeout(typeaheadTimerRef.current);
       typeaheadTimerRef.current = null;
     }
+  }, [context.open]);
 
+  useEffect(() => {
     if (!context.open) {
       return;
     }
@@ -48,6 +58,12 @@ const DropdownMenuContent = ({
       return;
     }
 
+    if (!positioned || initialFocusDoneRef.current) {
+      return;
+    }
+
+    initialFocusDoneRef.current = true;
+
     const items = getEnabledMenuItems(menu);
     const target =
       context.focusPositionRef.current === "last"
@@ -55,7 +71,7 @@ const DropdownMenuContent = ({
         : items[0];
 
     focusElement(target ?? menu);
-  }, [context.open, context.focusPositionRef]);
+  }, [context.open, context.focusPositionRef, positioned]);
 
   useEffect(
     () => () => {

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { OpenmojiIcon } from "@puzzle/icons/sets/openmoji";
-import { OpenmojiIconPage } from "@puzzle/icons/sets/openmoji.page";
-import { ALL_OPENMOJI_ICONS } from "@puzzle/icons/sets/openmoji.constants";
+import { OpenmojiIcon } from "@puzzle-ui/icons/sets/openmoji";
+import { OpenmojiIconPage } from "@puzzle-ui/icons/sets/openmoji.page";
+import { ALL_OPENMOJI_ICONS } from "@puzzle-ui/icons/sets/openmoji.constants";
 
 const meta = {
   title: "Icons/Sets/Openmoji",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GinetexIcon } from "@puzzle/icons/sets/ginetex";
-import { GinetexIconPage } from "@puzzle/icons/sets/ginetex.page";
-import { ALL_GINETEX_ICONS } from "@puzzle/icons/sets/ginetex.constants";
+import { GinetexIcon } from "@puzzle-ui/icons/sets/ginetex";
+import { GinetexIconPage } from "@puzzle-ui/icons/sets/ginetex.page";
+import { ALL_GINETEX_ICONS } from "@puzzle-ui/icons/sets/ginetex.constants";
 
 const meta = {
   title: "Icons/Sets/Ginetex",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { StreamlineKameleonColorIcon } from "@puzzle/icons/sets/streamline-kameleon-color";
-import { StreamlineKameleonColorIconPage } from "@puzzle/icons/sets/streamline-kameleon-color.page";
-import { ALL_STREAMLINE_KAMELEON_COLOR_ICONS } from "@puzzle/icons/sets/streamline-kameleon-color.constants";
+import { StreamlineKameleonColorIcon } from "@puzzle-ui/icons/sets/streamline-kameleon-color";
+import { StreamlineKameleonColorIconPage } from "@puzzle-ui/icons/sets/streamline-kameleon-color.page";
+import { ALL_STREAMLINE_KAMELEON_COLOR_ICONS } from "@puzzle-ui/icons/sets/streamline-kameleon-color.constants";
 
 const meta = {
   title: "Icons/Sets/StreamlineKameleonColor",

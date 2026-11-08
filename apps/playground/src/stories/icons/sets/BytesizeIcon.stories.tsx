@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { BytesizeIcon } from "@puzzle/icons/sets/bytesize";
-import { BytesizeIconPage } from "@puzzle/icons/sets/bytesize.page";
-import { ALL_BYTESIZE_ICONS } from "@puzzle/icons/sets/bytesize.constants";
+import { BytesizeIcon } from "@puzzle-ui/icons/sets/bytesize";
+import { BytesizeIconPage } from "@puzzle-ui/icons/sets/bytesize.page";
+import { ALL_BYTESIZE_ICONS } from "@puzzle-ui/icons/sets/bytesize.constants";
 
 const meta = {
   title: "Icons/Sets/Bytesize",

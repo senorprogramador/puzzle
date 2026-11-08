@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { RivetIconsIcon } from "@puzzle/icons/sets/rivet-icons";
-import { RivetIconsIconPage } from "@puzzle/icons/sets/rivet-icons.page";
-import { ALL_RIVET_ICONS_ICONS } from "@puzzle/icons/sets/rivet-icons.constants";
+import { RivetIconsIcon } from "@puzzle-ui/icons/sets/rivet-icons";
+import { RivetIconsIconPage } from "@puzzle-ui/icons/sets/rivet-icons.page";
+import { ALL_RIVET_ICONS_ICONS } from "@puzzle-ui/icons/sets/rivet-icons.constants";
 
 const meta = {
   title: "Icons/Sets/RivetIcons",

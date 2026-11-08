@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MajesticonsIcon } from "@puzzle/icons/sets/majesticons";
-import { MajesticonsIconPage } from "@puzzle/icons/sets/majesticons.page";
-import { ALL_MAJESTICONS_ICONS } from "@puzzle/icons/sets/majesticons.constants";
+import { MajesticonsIcon } from "@puzzle-ui/icons/sets/majesticons";
+import { MajesticonsIconPage } from "@puzzle-ui/icons/sets/majesticons.page";
+import { ALL_MAJESTICONS_ICONS } from "@puzzle-ui/icons/sets/majesticons.constants";
 
 const meta = {
   title: "Icons/Sets/Majesticons",

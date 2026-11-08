@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { HeroiconsIcon } from "@puzzle/icons/sets/heroicons";
-import { HeroiconsIconPage } from "@puzzle/icons/sets/heroicons.page";
-import { ALL_HEROICONS_ICONS } from "@puzzle/icons/sets/heroicons.constants";
+import { HeroiconsIcon } from "@puzzle-ui/icons/sets/heroicons";
+import { HeroiconsIconPage } from "@puzzle-ui/icons/sets/heroicons.page";
+import { ALL_HEROICONS_ICONS } from "@puzzle-ui/icons/sets/heroicons.constants";
 
 const meta = {
   title: "Icons/Sets/Heroicons",

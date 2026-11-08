@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CryptocurrencyColorIcon } from "@puzzle/icons/sets/cryptocurrency-color";
-import { CryptocurrencyColorIconPage } from "@puzzle/icons/sets/cryptocurrency-color.page";
-import { ALL_CRYPTOCURRENCY_COLOR_ICONS } from "@puzzle/icons/sets/cryptocurrency-color.constants";
+import { CryptocurrencyColorIcon } from "@puzzle-ui/icons/sets/cryptocurrency-color";
+import { CryptocurrencyColorIconPage } from "@puzzle-ui/icons/sets/cryptocurrency-color.page";
+import { ALL_CRYPTOCURRENCY_COLOR_ICONS } from "@puzzle-ui/icons/sets/cryptocurrency-color.constants";
 
 const meta = {
   title: "Icons/Sets/CryptocurrencyColor",

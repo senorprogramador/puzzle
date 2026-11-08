@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { ArcticonsIcon } from "@puzzle/icons/sets/arcticons";
-import { ArcticonsIconPage } from "@puzzle/icons/sets/arcticons.page";
-import { ALL_ARCTICONS_ICONS } from "@puzzle/icons/sets/arcticons.constants";
+import { ArcticonsIcon } from "@puzzle-ui/icons/sets/arcticons";
+import { ArcticonsIconPage } from "@puzzle-ui/icons/sets/arcticons.page";
+import { ALL_ARCTICONS_ICONS } from "@puzzle-ui/icons/sets/arcticons.constants";
 
 const meta = {
   title: "Icons/Sets/Arcticons",

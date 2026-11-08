@@ -1,6 +1,6 @@
 "use client";
 
-import { cn, resolveResponsiveValue } from "@puzzle/core";
+import { cn, resolveResponsiveValue } from "@puzzle-ui/core";
 import {
   cloneElement,
   useCallback,
@@ -17,7 +17,7 @@ import {
 } from "react";
 import { useCarouselContext } from "./controller";
 import "./carousel.css";
-import type { ResponsiveValue } from "@puzzle/core";
+import type { ResponsiveValue } from "@puzzle-ui/core";
 
 type CarouselAlignment = "left" | "center" | "right";
 

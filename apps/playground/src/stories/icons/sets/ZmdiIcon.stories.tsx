@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { ZmdiIcon } from "@puzzle/icons/sets/zmdi";
-import { ZmdiIconPage } from "@puzzle/icons/sets/zmdi.page";
-import { ALL_ZMDI_ICONS } from "@puzzle/icons/sets/zmdi.constants";
+import { ZmdiIcon } from "@puzzle-ui/icons/sets/zmdi";
+import { ZmdiIconPage } from "@puzzle-ui/icons/sets/zmdi.page";
+import { ALL_ZMDI_ICONS } from "@puzzle-ui/icons/sets/zmdi.constants";
 
 const meta = {
   title: "Icons/Sets/Zmdi",

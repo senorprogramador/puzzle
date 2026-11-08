@@ -37,9 +37,8 @@ describe("DropdownMenu browser behavior", () => {
     await waitFor(() => {
       expect(screen.queryByRole("menu")).not.toBeInTheDocument();
       expect(trigger).toHaveFocus();
+      expect(menu).not.toBeInTheDocument();
     });
-
-    expect(menu).not.toBeInTheDocument();
   });
 
   it("moves Tab focus outside the portaled menu before it unmounts", async () => {

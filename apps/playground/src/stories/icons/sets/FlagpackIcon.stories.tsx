@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FlagpackIcon } from "@puzzle/icons/sets/flagpack";
-import { FlagpackIconPage } from "@puzzle/icons/sets/flagpack.page";
-import { ALL_FLAGPACK_ICONS } from "@puzzle/icons/sets/flagpack.constants";
+import { FlagpackIcon } from "@puzzle-ui/icons/sets/flagpack";
+import { FlagpackIconPage } from "@puzzle-ui/icons/sets/flagpack.page";
+import { ALL_FLAGPACK_ICONS } from "@puzzle-ui/icons/sets/flagpack.constants";
 
 const meta = {
   title: "Icons/Sets/Flagpack",

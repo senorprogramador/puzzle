@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { SkillIconsIcon } from "@puzzle/icons/sets/skill-icons";
-import { SkillIconsIconPage } from "@puzzle/icons/sets/skill-icons.page";
-import { ALL_SKILL_ICONS_ICONS } from "@puzzle/icons/sets/skill-icons.constants";
+import { SkillIconsIcon } from "@puzzle-ui/icons/sets/skill-icons";
+import { SkillIconsIconPage } from "@puzzle-ui/icons/sets/skill-icons.page";
+import { ALL_SKILL_ICONS_ICONS } from "@puzzle-ui/icons/sets/skill-icons.constants";
 
 const meta = {
   title: "Icons/Sets/SkillIcons",

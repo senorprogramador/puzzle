@@ -16,8 +16,8 @@ import {
   Children,
 } from "react";
 
-import { useRovingFocus, type UseRovingFocusReturn } from "@puzzle/hooks";
-import { cn } from "@puzzle/core";
+import { useRovingFocus, type UseRovingFocusReturn } from "@puzzle-ui/hooks";
+import { cn } from "@puzzle-ui/core";
 
 import { Button } from "../button";
 

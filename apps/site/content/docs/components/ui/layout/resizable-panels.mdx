@@ -1,0 +1,214 @@
+---
+title: Resizable Panels
+description: Split an area into panels that users resize with a pointer or keyboard.
+---
+
+import { ControlledResizablePanelsExample } from "../../../../../src/components/doc-examples";
+
+## Import
+
+```tsx
+import { ResizablePanels } from "@puzzle-ui/ui";
+```
+
+`ResizablePanel` and `ResizableHandle` are also exported individually and are the same components as `ResizablePanels.Panel` and `ResizablePanels.Handle`.
+
+## Usage
+
+Alternate `ResizablePanels.Panel` and `ResizablePanels.Handle` children, starting and ending with a panel. A group needs at least two panels. Each handle resizes the two panels next to it while keeping their combined size.
+
+The group fills its parent, so give the parent a height. Panels scroll their own overflowing content.
+
+<Preview
+  height={280}
+  code={`\
+<div style={{ width: "100%", height: "14rem" }}>
+  <ResizablePanels defaultSizes={[30, 70]}>
+    <ResizablePanels.Panel>Navigation</ResizablePanels.Panel>
+    <ResizablePanels.Handle aria-label="Resize navigation" />
+    <ResizablePanels.Panel>Content</ResizablePanels.Panel>
+  </ResizablePanels>
+</div>
+`}
+>
+  <div style={{ width: "100%", height: "14rem", border: "1px solid var(--puzzle-color-border)" }}>
+    <ResizablePanels defaultSizes={[30, 70]}>
+      <ResizablePanels.Panel style={{ padding: "var(--puzzle-space-4)" }}>Navigation</ResizablePanels.Panel>
+      <ResizablePanels.Handle aria-label="Resize navigation" />
+      <ResizablePanels.Panel style={{ padding: "var(--puzzle-space-4)" }}>Content</ResizablePanels.Panel>
+    </ResizablePanels>
+  </div>
+</Preview>
+
+## Sizes
+
+Sizes are percentages of the space left after handles and padding. Panel sizes are normalized to a total of 100%: `defaultSizes={[1, 2]}` produces `33.3%` and `66.7%`. Without sizes, the space is divided equally.
+
+## Size constraints
+
+Use `minSize` and `maxSize` on a panel to limit it, in percentages. Initial sizes outside the limits are clamped, and the remaining space is redistributed proportionally across the other panels. The constraints of all panels must be able to add up to exactly 100%; otherwise a `RangeError` is thrown.
+
+<Preview
+  height={280}
+  code={`\
+<div style={{ width: "100%", height: "14rem" }}>
+  <ResizablePanels defaultSizes={[25, 50, 25]}>
+    <ResizablePanels.Panel minSize={15} maxSize={35}>Files</ResizablePanels.Panel>
+    <ResizablePanels.Handle withGrip aria-label="Resize files" />
+    <ResizablePanels.Panel minSize={30}>Editor</ResizablePanels.Panel>
+    <ResizablePanels.Handle withGrip aria-label="Resize outline" />
+    <ResizablePanels.Panel minSize={15} maxSize={35}>Outline</ResizablePanels.Panel>
+  </ResizablePanels>
+</div>
+`}
+>
+  <div style={{ width: "100%", height: "14rem", border: "1px solid var(--puzzle-color-border)" }}>
+    <ResizablePanels defaultSizes={[25, 50, 25]}>
+      <ResizablePanels.Panel minSize={15} maxSize={35} style={{ padding: "var(--puzzle-space-4)" }}>Files</ResizablePanels.Panel>
+      <ResizablePanels.Handle withGrip aria-label="Resize files" />
+      <ResizablePanels.Panel minSize={30} style={{ padding: "var(--puzzle-space-4)" }}>Editor</ResizablePanels.Panel>
+      <ResizablePanels.Handle withGrip aria-label="Resize outline" />
+      <ResizablePanels.Panel minSize={15} maxSize={35} style={{ padding: "var(--puzzle-space-4)" }}>Outline</ResizablePanels.Panel>
+    </ResizablePanels>
+  </div>
+</Preview>
+
+## Vertical orientation
+
+Set `orientation="vertical"` to stack panels from top to bottom. Handles then render as horizontal dividers.
+
+<Preview
+  height={340}
+  code={`\
+<div style={{ width: "100%", height: "18rem" }}>
+  <ResizablePanels orientation="vertical" defaultSizes={[60, 40]}>
+    <ResizablePanels.Panel minSize={25}>Editor</ResizablePanels.Panel>
+    <ResizablePanels.Handle withGrip aria-label="Resize terminal" />
+    <ResizablePanels.Panel minSize={20}>Terminal</ResizablePanels.Panel>
+  </ResizablePanels>
+</div>
+`}
+>
+  <div style={{ width: "100%", height: "18rem", border: "1px solid var(--puzzle-color-border)" }}>
+    <ResizablePanels orientation="vertical" defaultSizes={[60, 40]}>
+      <ResizablePanels.Panel minSize={25} style={{ padding: "var(--puzzle-space-4)" }}>Editor</ResizablePanels.Panel>
+      <ResizablePanels.Handle withGrip aria-label="Resize terminal" />
+      <ResizablePanels.Panel minSize={20} style={{ padding: "var(--puzzle-space-4)" }}>Terminal</ResizablePanels.Panel>
+    </ResizablePanels>
+  </div>
+</Preview>
+
+## Controlled sizes
+
+Use `sizes` with `onSizesChange` to own the layout, for example to persist it. The callback receives normalized percentages. For uncontrolled usage, pass `defaultSizes` and optionally listen with `onSizesChange`.
+
+<Preview
+  height={320}
+  code={`\
+const [sizes, setSizes] = useState([30, 70]);
+
+return (
+  <Stack>
+    <div style={{ width: "100%", height: "12rem" }}>
+      <ResizablePanels sizes={sizes} onSizesChange={setSizes}>
+        <ResizablePanels.Panel minSize={20}>Navigation</ResizablePanels.Panel>
+        <ResizablePanels.Handle withGrip aria-label="Resize navigation" />
+        <ResizablePanels.Panel minSize={40}>Content</ResizablePanels.Panel>
+      </ResizablePanels>
+    </div>
+    <Stack direction="row">
+      <span role="status">Sizes: {sizes.map((size) => Math.round(size) + "%").join(" / ")}</span>
+      <Button variant="outline" onClick={() => setSizes([30, 70])}>Reset</Button>
+    </Stack>
+  </Stack>
+);
+`}
+>
+  <Section><ControlledResizablePanelsExample /></Section>
+</Preview>
+
+## Disabled
+
+Set `disabled` on the group to lock every handle, or on a single handle to lock only that one. Disabled handles are removed from the tab order.
+
+<Preview
+  height={240}
+  code={`\
+<div style={{ width: "100%", height: "10rem" }}>
+  <ResizablePanels disabled defaultSizes={[40, 60]}>
+    <ResizablePanels.Panel>Fixed</ResizablePanels.Panel>
+    <ResizablePanels.Handle />
+    <ResizablePanels.Panel>Layout</ResizablePanels.Panel>
+  </ResizablePanels>
+</div>
+`}
+>
+  <div style={{ width: "100%", height: "10rem", border: "1px solid var(--puzzle-color-border)" }}>
+    <ResizablePanels disabled defaultSizes={[40, 60]}>
+      <ResizablePanels.Panel style={{ padding: "var(--puzzle-space-4)" }}>Fixed</ResizablePanels.Panel>
+      <ResizablePanels.Handle />
+      <ResizablePanels.Panel style={{ padding: "var(--puzzle-space-4)" }}>Layout</ResizablePanels.Panel>
+    </ResizablePanels>
+  </div>
+</Preview>
+
+## Accessibility
+
+Each handle is a focusable `separator` that controls its two adjacent panels through `aria-controls`. It exposes the size of the panel before it with `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and a percentage `aria-valuetext`. The default accessible name is "Resize panels"; pass a descriptive `aria-label` when a group has several handles.
+
+| Key                                | Action                                                         |
+| ---------------------------------- | -------------------------------------------------------------- |
+| <kbd>ArrowLeft</kbd> / <kbd>ArrowRight</kbd> | Resize horizontal panels by `keyboardStep`. Mirrored in right-to-left layouts. |
+| <kbd>ArrowUp</kbd> / <kbd>ArrowDown</kbd>    | Resize vertical panels by `keyboardStep`.                      |
+| <kbd>Shift</kbd> + arrow key       | Resize by ten times `keyboardStep`.                            |
+| <kbd>Home</kbd> / <kbd>End</kbd>   | Shrink or grow the panel before the handle to its limit.        |
+
+Pointer resizing supports mouse, touch, and pen input, and prevents text selection while dragging.
+
+## API
+
+### ResizablePanels
+
+| Prop            | Type                         | Default        | Description                                       |
+| --------------- | ---------------------------- | -------------- | ------------------------------------------------- |
+| `children`      | `ReactNode`                  | Required       | Alternating panels and handles.                   |
+| `orientation`   | `"horizontal" \| "vertical"` | `"horizontal"` | Layout direction.                                 |
+| `defaultSizes`  | `number[]`                   | Equal sizes    | Initial sizes for uncontrolled usage.             |
+| `sizes`         | `number[]`                   | -              | Controlled sizes in percentages.                  |
+| `onSizesChange` | `(sizes: number[]) => void`  | -              | Called with normalized sizes after every change.  |
+| `disabled`      | `boolean`                    | `false`        | Disables all resizing.                            |
+| `keyboardStep`  | `number`                     | `1`            | Percentage change per arrow key press.            |
+
+The number of sizes must match the number of panels. Native `div` props and refs are forwarded; the root defaults to `role="group"`.
+
+### ResizablePanels.Panel
+
+| Prop      | Type     | Default | Description                     |
+| --------- | -------- | ------- | ------------------------------- |
+| `minSize` | `number` | `0`     | Minimum size in percentages.    |
+| `maxSize` | `number` | `100`   | Maximum size in percentages.    |
+
+Native `div` props and refs are forwarded. Panel IDs must be unique within a group; IDs are generated when omitted.
+
+### ResizablePanels.Handle
+
+| Prop         | Type        | Default           | Description                                   |
+| ------------ | ----------- | ----------------- | --------------------------------------------- |
+| `withGrip`   | `boolean`   | `false`           | Renders a visible grip instead of `children`. |
+| `disabled`   | `boolean`   | `false`           | Disables resizing through this handle.        |
+| `aria-label` | `string`    | `"Resize panels"` | Accessible name of the handle.                |
+| `children`   | `ReactNode` | -                 | Custom handle content when there is no grip.  |
+
+Native `div` props are forwarded, and event handlers such as `onPointerDown` and `onKeyDown` run before the built-in resizing. Call `event.preventDefault()` to skip it.
+
+## Styling
+
+The handle's hit area uses `--puzzle-resizable-panels-handle-size`, which defaults to `var(--puzzle-space-3)`. Override it on the group to change the handle size:
+
+```css
+.editor-layout {
+  --puzzle-resizable-panels-handle-size: var(--puzzle-space-4);
+}
+```
+
+The divider line uses the theme's border colors and shows the focus ring color while dragging. The state is reflected in `data-orientation`, `data-disabled`, and `data-resizing` attributes.

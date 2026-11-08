@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { EosIconsIcon } from "@puzzle/icons/sets/eos-icons";
-import { EosIconsIconPage } from "@puzzle/icons/sets/eos-icons.page";
-import { ALL_EOS_ICONS_ICONS } from "@puzzle/icons/sets/eos-icons.constants";
+import { EosIconsIcon } from "@puzzle-ui/icons/sets/eos-icons";
+import { EosIconsIconPage } from "@puzzle-ui/icons/sets/eos-icons.page";
+import { ALL_EOS_ICONS_ICONS } from "@puzzle-ui/icons/sets/eos-icons.constants";
 
 const meta = {
   title: "Icons/Sets/EosIcons",

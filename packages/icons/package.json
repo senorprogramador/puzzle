@@ -1,8 +1,12 @@
 {
-  "name": "@puzzle/icons",
+  "name": "@puzzle-ui/icons",
   "version": "0.1.0",
   "description": "Icons for Puzzle",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.cjs",
@@ -10,9 +14,14 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "files": [
@@ -23,12 +32,12 @@
     "vitest": "bunx vitest run --passWithNoTests",
     "vitest:watch": "bunx vitest",
     "clean": "rm -rf dist",
-    "prepublishOnly": "tsdown"
+    "prepack": "tsdown"
   },
   "dependencies": {
     "@iconify/react": "^6.0.3",
     "@iconify/utils": "^3.1.7",
-    "@puzzle/core": "^0.1.0"
+    "@puzzle-ui/core": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

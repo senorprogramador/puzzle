@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { PixelIcon } from "@puzzle/icons/sets/pixel";
-import { PixelIconPage } from "@puzzle/icons/sets/pixel.page";
-import { ALL_PIXEL_ICONS } from "@puzzle/icons/sets/pixel.constants";
+import { PixelIcon } from "@puzzle-ui/icons/sets/pixel";
+import { PixelIconPage } from "@puzzle-ui/icons/sets/pixel.page";
+import { ALL_PIXEL_ICONS } from "@puzzle-ui/icons/sets/pixel.constants";
 
 const meta = {
   title: "Icons/Sets/Pixel",

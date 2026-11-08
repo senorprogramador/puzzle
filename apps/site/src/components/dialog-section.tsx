@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Heading, Section, Button, Dialog, Drawer, Stack } from "@puzzle/ui";
+import { Heading, Section, Button, Dialog, Drawer, Stack } from "@puzzle-ui/ui";
 
 type DialogSectionProps = {};
 

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MonoIconsIcon } from "@puzzle/icons/sets/mono-icons";
-import { MonoIconsIconPage } from "@puzzle/icons/sets/mono-icons.page";
-import { ALL_MONO_ICONS_ICONS } from "@puzzle/icons/sets/mono-icons.constants";
+import { MonoIconsIcon } from "@puzzle-ui/icons/sets/mono-icons";
+import { MonoIconsIconPage } from "@puzzle-ui/icons/sets/mono-icons.page";
+import { ALL_MONO_ICONS_ICONS } from "@puzzle-ui/icons/sets/mono-icons.constants";
 
 const meta = {
   title: "Icons/Sets/MonoIcons",

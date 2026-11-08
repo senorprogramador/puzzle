@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { EmojioneIcon } from "@puzzle/icons/sets/emojione";
-import { EmojioneIconPage } from "@puzzle/icons/sets/emojione.page";
-import { ALL_EMOJIONE_ICONS } from "@puzzle/icons/sets/emojione.constants";
+import { EmojioneIcon } from "@puzzle-ui/icons/sets/emojione";
+import { EmojioneIconPage } from "@puzzle-ui/icons/sets/emojione.page";
+import { ALL_EMOJIONE_ICONS } from "@puzzle-ui/icons/sets/emojione.constants";
 
 const meta = {
   title: "Icons/Sets/Emojione",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CifIcon } from "@puzzle/icons/sets/cif";
-import { CifIconPage } from "@puzzle/icons/sets/cif.page";
-import { ALL_CIF_ICONS } from "@puzzle/icons/sets/cif.constants";
+import { CifIcon } from "@puzzle-ui/icons/sets/cif";
+import { CifIconPage } from "@puzzle-ui/icons/sets/cif.page";
+import { ALL_CIF_ICONS } from "@puzzle-ui/icons/sets/cif.constants";
 
 const meta = {
   title: "Icons/Sets/Cif",

@@ -1,5 +1,5 @@
 import type { ComponentPropsWithRef, CSSProperties, ReactNode } from "react";
-import type { ResponsiveValue } from "@puzzle/core";
+import type { ResponsiveValue } from "@puzzle-ui/core";
 import type { PopoutAlignment, PopoutPosition } from "../../overlays/popout";
 
 type AutocompleteSize = "sm" | "md" | "lg";

@@ -1,4 +1,4 @@
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 import { cloneElement, isValidElement, type ReactElement, type ReactNode, Children } from "react";
 import { Section } from "../section";
 import { type SectionProps } from "../section/types";

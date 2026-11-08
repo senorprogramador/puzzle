@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { EnergyIconsIcon } from "@puzzle/icons/sets/energy-icons";
-import { EnergyIconsIconPage } from "@puzzle/icons/sets/energy-icons.page";
-import { ALL_ENERGY_ICONS_ICONS } from "@puzzle/icons/sets/energy-icons.constants";
+import { EnergyIconsIcon } from "@puzzle-ui/icons/sets/energy-icons";
+import { EnergyIconsIconPage } from "@puzzle-ui/icons/sets/energy-icons.page";
+import { ALL_ENERGY_ICONS_ICONS } from "@puzzle-ui/icons/sets/energy-icons.constants";
 
 const meta = {
   title: "Icons/Sets/EnergyIcons",

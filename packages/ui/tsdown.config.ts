@@ -9,13 +9,14 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
+  copy: ["../../LICENSE"],
   deps: {
     neverBundle: [
       "react",
-      "@puzzle/core",
-      "@puzzle/theme",
-      "@puzzle/icons",
-      "@puzzle/hooks",
+      "@puzzle-ui/core",
+      "@puzzle-ui/theme",
+      "@puzzle-ui/icons",
+      "@puzzle-ui/hooks",
     ],
   },
   suppressWarnings: [/MODULE_LEVEL_DIRECTIVE/],

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { KeylineIconsIcon } from "@puzzle/icons/sets/keyline-icons";
-import { KeylineIconsIconPage } from "@puzzle/icons/sets/keyline-icons.page";
-import { ALL_KEYLINE_ICONS_ICONS } from "@puzzle/icons/sets/keyline-icons.constants";
+import { KeylineIconsIcon } from "@puzzle-ui/icons/sets/keyline-icons";
+import { KeylineIconsIconPage } from "@puzzle-ui/icons/sets/keyline-icons.page";
+import { ALL_KEYLINE_ICONS_ICONS } from "@puzzle-ui/icons/sets/keyline-icons.constants";
 
 const meta = {
   title: "Icons/Sets/KeylineIcons",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { LucideExtendedIcon } from "@puzzle/icons/sets/lucide-extended";
-import { LucideExtendedIconPage } from "@puzzle/icons/sets/lucide-extended.page";
-import { ALL_LUCIDE_EXTENDED_ICONS } from "@puzzle/icons/sets/lucide-extended.constants";
+import { LucideExtendedIcon } from "@puzzle-ui/icons/sets/lucide-extended";
+import { LucideExtendedIconPage } from "@puzzle-ui/icons/sets/lucide-extended.page";
+import { ALL_LUCIDE_EXTENDED_ICONS } from "@puzzle-ui/icons/sets/lucide-extended.constants";
 
 const meta = {
   title: "Icons/Sets/LucideExtended",

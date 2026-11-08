@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FeatherIcon } from "@puzzle/icons/sets/feather";
-import { FeatherIconPage } from "@puzzle/icons/sets/feather.page";
-import { ALL_FEATHER_ICONS } from "@puzzle/icons/sets/feather.constants";
+import { FeatherIcon } from "@puzzle-ui/icons/sets/feather";
+import { FeatherIconPage } from "@puzzle-ui/icons/sets/feather.page";
+import { ALL_FEATHER_ICONS } from "@puzzle-ui/icons/sets/feather.constants";
 
 const meta = {
   title: "Icons/Sets/Feather",

@@ -2,8 +2,8 @@
 
 import { useState, type ComponentPropsWithRef, type ReactNode } from "react";
 
-import { cn } from "@puzzle/core";
-import { Icon } from "@puzzle/icons";
+import { cn } from "@puzzle-ui/core";
+import { Icon } from "@puzzle-ui/icons";
 
 import "./input.css";
 

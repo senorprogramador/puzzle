@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GeoIcon } from "@puzzle/icons/sets/geo";
-import { GeoIconPage } from "@puzzle/icons/sets/geo.page";
-import { ALL_GEO_ICONS } from "@puzzle/icons/sets/geo.constants";
+import { GeoIcon } from "@puzzle-ui/icons/sets/geo";
+import { GeoIconPage } from "@puzzle-ui/icons/sets/geo.page";
+import { ALL_GEO_ICONS } from "@puzzle-ui/icons/sets/geo.constants";
 
 const meta = {
   title: "Icons/Sets/Geo",

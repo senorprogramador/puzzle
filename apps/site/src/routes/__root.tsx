@@ -6,9 +6,9 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import appCss from "../styles/app.css?url";
-import { Theme } from "@puzzle/theme";
-import { PageLayout } from "@puzzle/ui/components/layout/page-layout";
-import { AppBar } from "@puzzle/ui/components/layout/app-bar";
+import { Theme } from "@puzzle-ui/theme";
+import { PageLayout } from "@puzzle-ui/ui/components/layout/page-layout";
+import { AppBar } from "@puzzle-ui/ui/components/layout/app-bar";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TanStackLink } from "../components/navigation/link/link";
 import { RootProvider } from "fumadocs-ui/provider/tanstack";

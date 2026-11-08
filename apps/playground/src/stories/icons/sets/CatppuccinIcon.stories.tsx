@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CatppuccinIcon } from "@puzzle/icons/sets/catppuccin";
-import { CatppuccinIconPage } from "@puzzle/icons/sets/catppuccin.page";
-import { ALL_CATPPUCCIN_ICONS } from "@puzzle/icons/sets/catppuccin.constants";
+import { CatppuccinIcon } from "@puzzle-ui/icons/sets/catppuccin";
+import { CatppuccinIconPage } from "@puzzle-ui/icons/sets/catppuccin.page";
+import { ALL_CATPPUCCIN_ICONS } from "@puzzle-ui/icons/sets/catppuccin.constants";
 
 const meta = {
   title: "Icons/Sets/Catppuccin",

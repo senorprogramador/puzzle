@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { RadixIconsIcon } from "@puzzle/icons/sets/radix-icons";
-import { RadixIconsIconPage } from "@puzzle/icons/sets/radix-icons.page";
-import { ALL_RADIX_ICONS_ICONS } from "@puzzle/icons/sets/radix-icons.constants";
+import { RadixIconsIcon } from "@puzzle-ui/icons/sets/radix-icons";
+import { RadixIconsIconPage } from "@puzzle-ui/icons/sets/radix-icons.page";
+import { ALL_RADIX_ICONS_ICONS } from "@puzzle-ui/icons/sets/radix-icons.constants";
 
 const meta = {
   title: "Icons/Sets/RadixIcons",

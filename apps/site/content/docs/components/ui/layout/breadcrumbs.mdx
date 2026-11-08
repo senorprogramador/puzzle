@@ -6,32 +6,39 @@ description: Show a page's position in a navigation hierarchy.
 ## Import
 
 ```tsx
-import { Breadcrumbs } from "@puzzle/ui";
+import { Breadcrumbs } from "@puzzle-ui/ui";
 ```
 
 ## Hierarchy
 
 Provide linked ancestors followed by a current-page item without `href`. The last item receives `aria-current="page"`.
 
-<Preview height={250} code={`\
+<Preview
+  height={250}
+  code={`\
 <Breadcrumbs items={[
   { label: "Home", href: "#home" },
   { label: "Projects", href: "#projects" },
   { label: "Puzzle" },
 ]} />
-`}>
-  <Section><Breadcrumbs items={[
-    { label: "Home", href: "#home" },
-    { label: "Projects", href: "#projects" },
-    { label: "Puzzle" },
-  ]} /></Section>
+`}
+>
+  <Section>
+    <Breadcrumbs
+      items={[
+        { label: "Home", href: "#home" },
+        { label: "Projects", href: "#projects" },
+        { label: "Puzzle" },
+      ]}
+    />
+  </Section>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `items` | `[...BreadcrumbLinkItem[], BreadcrumbCurrentItem]` | Required | Linked ancestors and one final current item. |
-| `aria-label` | `string` | `"Breadcrumbs"` | Navigation landmark name. |
+| Prop         | Type                                               | Default         | Description                                  |
+| ------------ | -------------------------------------------------- | --------------- | -------------------------------------------- |
+| `items`      | `[...BreadcrumbLinkItem[], BreadcrumbCurrentItem]` | Required        | Linked ancestors and one final current item. |
+| `aria-label` | `string`                                           | `"Breadcrumbs"` | Navigation landmark name.                    |
 
 Each item has `label: ReactNode` and optional `leadingIcon: ReactNode`; ancestor items require `href: string`. Native nav attributes are forwarded. Use concise labels and keep the path meaningful on narrow screens.

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FxemojiIcon } from "@puzzle/icons/sets/fxemoji";
-import { FxemojiIconPage } from "@puzzle/icons/sets/fxemoji.page";
-import { ALL_FXEMOJI_ICONS } from "@puzzle/icons/sets/fxemoji.constants";
+import { FxemojiIcon } from "@puzzle-ui/icons/sets/fxemoji";
+import { FxemojiIconPage } from "@puzzle-ui/icons/sets/fxemoji.page";
+import { ALL_FXEMOJI_ICONS } from "@puzzle-ui/icons/sets/fxemoji.constants";
 
 const meta = {
   title: "Icons/Sets/Fxemoji",

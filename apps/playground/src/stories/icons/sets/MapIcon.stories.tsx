@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MapIcon } from "@puzzle/icons/sets/map";
-import { MapIconPage } from "@puzzle/icons/sets/map.page";
-import { ALL_MAP_ICONS } from "@puzzle/icons/sets/map.constants";
+import { MapIcon } from "@puzzle-ui/icons/sets/map";
+import { MapIconPage } from "@puzzle-ui/icons/sets/map.page";
+import { ALL_MAP_ICONS } from "@puzzle-ui/icons/sets/map.constants";
 
 const meta = {
   title: "Icons/Sets/Map",

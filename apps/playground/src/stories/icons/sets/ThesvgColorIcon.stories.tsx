@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { ThesvgColorIcon } from "@puzzle/icons/sets/thesvg-color";
-import { ThesvgColorIconPage } from "@puzzle/icons/sets/thesvg-color.page";
-import { ALL_THESVG_COLOR_ICONS } from "@puzzle/icons/sets/thesvg-color.constants";
+import { ThesvgColorIcon } from "@puzzle-ui/icons/sets/thesvg-color";
+import { ThesvgColorIconPage } from "@puzzle-ui/icons/sets/thesvg-color.page";
+import { ALL_THESVG_COLOR_ICONS } from "@puzzle-ui/icons/sets/thesvg-color.constants";
 
 const meta = {
   title: "Icons/Sets/ThesvgColor",

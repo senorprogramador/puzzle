@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { StashIcon } from "@puzzle/icons/sets/stash";
-import { StashIconPage } from "@puzzle/icons/sets/stash.page";
-import { ALL_STASH_ICONS } from "@puzzle/icons/sets/stash.constants";
+import { StashIcon } from "@puzzle-ui/icons/sets/stash";
+import { StashIconPage } from "@puzzle-ui/icons/sets/stash.page";
+import { ALL_STASH_ICONS } from "@puzzle-ui/icons/sets/stash.constants";
 
 const meta = {
   title: "Icons/Sets/Stash",

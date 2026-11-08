@@ -3,21 +3,30 @@ title: Date Picker
 description: Choose a single date from an accessible calendar popup.
 ---
 
-import { ControlledDatePickerExample, DatePickerFormExample } from "../../../../../src/components/doc-examples";
+import {
+  ControlledDatePickerExample,
+  DatePickerFormExample,
+} from "../../../../../src/components/doc-examples";
 
 Date Picker combines a button trigger, a calendar dialog, and a native date input for form integration. It selects a single calendar date, not a time or a date range.
 
 ## Import
 
 ```tsx
-import { DatePicker, type DatePickerProps, type DatePickerSize } from "@puzzle/ui";
+import {
+  DatePicker,
+  type DatePickerProps,
+  type DatePickerSize,
+} from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
 
 Use `label` for a visible, accessible field name. `placeholder` appears when nothing is selected, and `description` provides supporting text. Click the trigger or use Enter, Space, ArrowUp, or ArrowDown to open the calendar.
 
-<Preview height={600} code={`\
+<Preview
+  height={600}
+  code={`\
 <DatePicker
   label="Appointment date"
   placeholder="Choose an appointment"
@@ -25,7 +34,8 @@ Use `label` for a visible, accessible field name. `placeholder` appears when not
   locale="en-GB"
   defaultValue={new Date(2025, 2, 15)}
 />
-`}>
+`}
+>
   <Section>
     <DatePicker
       label="Appointment date"
@@ -55,6 +65,7 @@ Use `value` with `onChange` to own the selection. Date Picker uses `null` for a 
 const [date, setDate] = useState<Date | null>(new Date(2025, 2, 15));
 
 return (
+
   <Stack>
     <DatePicker
       label="Appointment"
@@ -78,7 +89,9 @@ return (
 
 `minDate` and `maxDate` define inclusive bounds. Use `disabledDates` for specific exclusions and `shouldDisableDate` for recurring rules such as weekends. All restrictions are combined; the callback receives a date normalized to local midnight.
 
-<Preview height={600} code={`\
+<Preview
+  height={600}
+  code={`\
 <DatePicker
   label="Delivery date"
   locale="en-GB"
@@ -89,7 +102,8 @@ return (
   shouldDisableDate={(date) => date.getDay() === 0 || date.getDay() === 6}
   description="Weekdays from 10 to 28 March, excluding 17 March."
 />
-`}>
+`}
+>
   <Section>
     <DatePicker
       label="Delivery date"
@@ -112,7 +126,9 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 
 `dateFormat` customizes the trigger's date format without shortening the accessible names of day buttons. Translate `calendarLabel`, `previousMonthLabel`, `nextMonthLabel`, and `clearLabel` for your application. The built-in Today action and empty-calendar message currently use English text.
 
-<Preview height={700} code={`\
+<Preview
+  height={700}
+  code={`\
 <Stack>
   <DatePicker
     label="Datum"
@@ -133,7 +149,8 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
     defaultValue={new Date(2025, 2, 15)}
   />
 </Stack>
-`}>
+`}
+>
   <Section>
     <Stack>
       <DatePicker
@@ -162,7 +179,9 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 
 `size` supports `sm`, `md`, and `lg`. `fullWidth` fills the available width. Both accept responsive values using `mobile`, `tablet`, and `desktop` keys. Change the preview device to compare the responsive control.
 
-<Preview height={760} code={`\
+<Preview
+  height={760}
+  code={`\
 <Stack>
   <DatePicker label="Small" size="sm" defaultValue={new Date(2025, 2, 15)} />
   <DatePicker label="Medium" size="md" defaultValue={new Date(2025, 2, 15)} />
@@ -174,12 +193,25 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
     defaultValue={new Date(2025, 2, 15)}
   />
 </Stack>
-`}>
+`}
+>
   <Section>
     <Stack>
-      <DatePicker label="Small" size="sm" defaultValue={new Date(2025, 2, 15)} />
-      <DatePicker label="Medium" size="md" defaultValue={new Date(2025, 2, 15)} />
-      <DatePicker label="Large" size="lg" defaultValue={new Date(2025, 2, 15)} />
+      <DatePicker
+        label="Small"
+        size="sm"
+        defaultValue={new Date(2025, 2, 15)}
+      />
+      <DatePicker
+        label="Medium"
+        size="md"
+        defaultValue={new Date(2025, 2, 15)}
+      />
+      <DatePicker
+        label="Large"
+        size="lg"
+        defaultValue={new Date(2025, 2, 15)}
+      />
       <DatePicker
         label="Responsive"
         size={{ mobile: "sm", tablet: "md", desktop: "lg" }}
@@ -196,7 +228,10 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 
 `defaultOpen` sets initial uncontrolled visibility. Use `open` with `onOpenChange` for controlled visibility, independently of controlled selection.
 
-<Preview height={650} align="end" code={`\
+<Preview
+  height={650}
+  align="end"
+  code={`\
 <DatePicker
   label="Open above"
   locale="en-GB"
@@ -207,7 +242,8 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
   offset={12}
   collisionPadding={16}
 />
-`}>
+`}
+>
   <Section>
     <DatePicker
       label="Open above"
@@ -228,7 +264,9 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 
 `disabled` prevents interaction and excludes the native input from form submission. Supporting description and error IDs are combined with any external `aria-describedby`.
 
-<Preview height={720} code={`\
+<Preview
+  height={720}
+  code={`\
 <Stack>
   <DatePicker
     label="Required appointment"
@@ -243,7 +281,8 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
     description="Appointments are temporarily locked."
   />
 </Stack>
-`}>
+`}
+>
   <Section>
     <Stack>
       <DatePicker
@@ -270,6 +309,7 @@ Supply `name` to include the selected date in native form submission as `YYYY-MM
 const [submittedDate, setSubmittedDate] = useState("");
 
 return (
+
   <form onSubmit={(event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -298,55 +338,55 @@ return (
 
 ### Selection and field props
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `value` | `Date \| null` | - | Controlled selection; `null` represents no date. |
-| `defaultValue` | `Date \| null` | `null` | Initial uncontrolled selection. |
-| `onChange` | `(value: Date \| null) => void` | - | Selected local-midnight date, or `null` when cleared. |
-| `label` | `ReactNode` | - | Visible field label. |
-| `placeholder` | `ReactNode` | `"Select date"` | Trigger content without a selection. |
-| `description` | `ReactNode` | - | Supporting text below the control. |
-| `error` | `ReactNode \| boolean` | - | Error message; `true` uses "Invalid date". |
-| `disabled` | `boolean` | `false` | Disables the control and native input. |
-| `required` | `boolean` | `false` | Enables required validation and prevents clearing. |
-| `clearable` | `boolean` | `false` | Adds a clear action for a selected, non-required date. |
-| `clearLabel` | `string` | `"Clear date"` | Accessible name of the clear button. |
-| `name` | `string` | - | Native form field name. |
-| `form` | `string` | - | ID of the associated form. |
-| `size` | `ResponsiveValue<DatePickerSize>` | `"md"` | Trigger size: `"sm"`, `"md"`, or `"lg"`. |
-| `fullWidth` | `ResponsiveValue<boolean>` | `false` | Fills the available width. |
+| Prop           | Type                              | Default         | Description                                            |
+| -------------- | --------------------------------- | --------------- | ------------------------------------------------------ |
+| `value`        | `Date \| null`                    | -               | Controlled selection; `null` represents no date.       |
+| `defaultValue` | `Date \| null`                    | `null`          | Initial uncontrolled selection.                        |
+| `onChange`     | `(value: Date \| null) => void`   | -               | Selected local-midnight date, or `null` when cleared.  |
+| `label`        | `ReactNode`                       | -               | Visible field label.                                   |
+| `placeholder`  | `ReactNode`                       | `"Select date"` | Trigger content without a selection.                   |
+| `description`  | `ReactNode`                       | -               | Supporting text below the control.                     |
+| `error`        | `ReactNode \| boolean`            | -               | Error message; `true` uses "Invalid date".             |
+| `disabled`     | `boolean`                         | `false`         | Disables the control and native input.                 |
+| `required`     | `boolean`                         | `false`         | Enables required validation and prevents clearing.     |
+| `clearable`    | `boolean`                         | `false`         | Adds a clear action for a selected, non-required date. |
+| `clearLabel`   | `string`                          | `"Clear date"`  | Accessible name of the clear button.                   |
+| `name`         | `string`                          | -               | Native form field name.                                |
+| `form`         | `string`                          | -               | ID of the associated form.                             |
+| `size`         | `ResponsiveValue<DatePickerSize>` | `"md"`          | Trigger size: `"sm"`, `"md"`, or `"lg"`.               |
+| `fullWidth`    | `ResponsiveValue<boolean>`        | `false`         | Fills the available width.                             |
 
 `ResponsiveValue<T>` accepts a value or an object with `mobile`, `tablet`, and `desktop` keys.
 
 ### Availability and localization
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `minDate` | `Date` | - | Earliest selectable date, inclusive. |
-| `maxDate` | `Date` | - | Latest selectable date, inclusive. |
-| `disabledDates` | `readonly Date[]` | `[]` | Dates excluded from selection. |
-| `shouldDisableDate` | `(date: Date) => boolean` | - | Returns `true` for unavailable dates. |
-| `locale` | `string` | Runtime locale | Locale for dates, month names, weekdays, and numbers. |
-| `weekStartsOn` | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6` | Locale week start | First weekday; Sunday is `0`. Sunday is the fallback when locale week information is unavailable. |
-| `dateFormat` | `Intl.DateTimeFormatOptions` | Long month, numeric day/year | Format for the selected date in the trigger. |
-| `calendarLabel` | `string` | `"Choose date"` | Accessible name of the calendar dialog. |
-| `previousMonthLabel` | `string` | `"Previous month"` | Previous navigation label prefix; target month is appended. |
-| `nextMonthLabel` | `string` | `"Next month"` | Next navigation label prefix; target month is appended. |
+| Prop                 | Type                              | Default                      | Description                                                                                       |
+| -------------------- | --------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------- |
+| `minDate`            | `Date`                            | -                            | Earliest selectable date, inclusive.                                                              |
+| `maxDate`            | `Date`                            | -                            | Latest selectable date, inclusive.                                                                |
+| `disabledDates`      | `readonly Date[]`                 | `[]`                         | Dates excluded from selection.                                                                    |
+| `shouldDisableDate`  | `(date: Date) => boolean`         | -                            | Returns `true` for unavailable dates.                                                             |
+| `locale`             | `string`                          | Runtime locale               | Locale for dates, month names, weekdays, and numbers.                                             |
+| `weekStartsOn`       | `0 \| 1 \| 2 \| 3 \| 4 \| 5 \| 6` | Locale week start            | First weekday; Sunday is `0`. Sunday is the fallback when locale week information is unavailable. |
+| `dateFormat`         | `Intl.DateTimeFormatOptions`      | Long month, numeric day/year | Format for the selected date in the trigger.                                                      |
+| `calendarLabel`      | `string`                          | `"Choose date"`              | Accessible name of the calendar dialog.                                                           |
+| `previousMonthLabel` | `string`                          | `"Previous month"`           | Previous navigation label prefix; target month is appended.                                       |
+| `nextMonthLabel`     | `string`                          | `"Next month"`               | Next navigation label prefix; target month is appended.                                           |
 
 ### Popup and styling
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `open` | `boolean` | - | Controlled calendar visibility. |
-| `defaultOpen` | `boolean` | `false` | Initial uncontrolled visibility. |
-| `onOpenChange` | `(open: boolean) => void` | - | Called when visibility changes are requested. |
-| `position` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred popup side. |
-| `align` | `"start" \| "center" \| "end"` | `"start"` | Alignment along the trigger. |
-| `offset` | `number` | `8` | Trigger-to-popup distance in pixels. |
-| `collisionPadding` | `number` | `8` | Minimum viewport-edge distance in pixels. |
-| `className` | `string` | - | Additional class on the trigger button. |
-| `rootClassName` | `string` | - | Additional class on the outer field. |
-| `popoverClassName` | `string` | - | Additional class on the popup content. |
+| Prop               | Type                                     | Default    | Description                                   |
+| ------------------ | ---------------------------------------- | ---------- | --------------------------------------------- |
+| `open`             | `boolean`                                | -          | Controlled calendar visibility.               |
+| `defaultOpen`      | `boolean`                                | `false`    | Initial uncontrolled visibility.              |
+| `onOpenChange`     | `(open: boolean) => void`                | -          | Called when visibility changes are requested. |
+| `position`         | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred popup side.                         |
+| `align`            | `"start" \| "center" \| "end"`           | `"start"`  | Alignment along the trigger.                  |
+| `offset`           | `number`                                 | `8`        | Trigger-to-popup distance in pixels.          |
+| `collisionPadding` | `number`                                 | `8`        | Minimum viewport-edge distance in pixels.     |
+| `className`        | `string`                                 | -          | Additional class on the trigger button.       |
+| `rootClassName`    | `string`                                 | -          | Additional class on the outer field.          |
+| `popoverClassName` | `string`                                 | -          | Additional class on the popup content.        |
 
 Other supported native button attributes, including `id`, `style`, `dir`, `aria-label`, `aria-labelledby`, and `aria-describedby`, apply to the trigger. Use an accessible name when there is no visible label.
 
@@ -354,16 +394,16 @@ Other supported native button attributes, including `id`, `style`, `dir`, `aria-
 
 The trigger exposes `aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls` while open. The dialog contains a labelled grid; days have full localized date names, selected cells expose `aria-selected`, and today exposes `aria-current="date"`.
 
-| Key | Behavior |
-| --- | --- |
-| Enter, Space, Up/Down on the trigger | Opens the calendar and focuses an available day. |
-| Left/Right | Moves one day, skipping unavailable dates; horizontal direction follows RTL. |
-| Up/Down in the calendar | Moves one week, then searches for an available date. |
-| Home/End | Moves to the first/last available day in the current week. |
-| PageUp/PageDown | Moves one month, clamping the day at month boundaries. |
-| Shift + PageUp/PageDown | Moves one year, including leap-day clamping. |
-| Enter/Space on a day | Selects it, closes the calendar, and returns focus to the trigger. |
-| Escape | Closes the calendar and returns focus to the trigger. |
-| Tab/Shift + Tab | Closes the calendar and resumes tab navigation from the trigger. |
+| Key                                  | Behavior                                                                     |
+| ------------------------------------ | ---------------------------------------------------------------------------- |
+| Enter, Space, Up/Down on the trigger | Opens the calendar and focuses an available day.                             |
+| Left/Right                           | Moves one day, skipping unavailable dates; horizontal direction follows RTL. |
+| Up/Down in the calendar              | Moves one week, then searches for an available date.                         |
+| Home/End                             | Moves to the first/last available day in the current week.                   |
+| PageUp/PageDown                      | Moves one month, clamping the day at month boundaries.                       |
+| Shift + PageUp/PageDown              | Moves one year, including leap-day clamping.                                 |
+| Enter/Space on a day                 | Selects it, closes the calendar, and returns focus to the trigger.           |
+| Escape                               | Closes the calendar and returns focus to the trigger.                        |
+| Tab/Shift + Tab                      | Closes the calendar and resumes tab navigation from the trigger.             |
 
 Month changes are announced politely. Provide visible explanations for unavailable dates and validation errors rather than relying only on disabled styling.

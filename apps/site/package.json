@@ -1,5 +1,5 @@
 {
-  "name": "@puzzle/site",
+  "name": "@puzzle-ui/site",
   "module": "index.ts",
   "type": "module",
   "private": true,
@@ -8,11 +8,11 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@puzzle/core": "workspace:*",
-    "@puzzle/hooks": "workspace:*",
-    "@puzzle/icons": "workspace:*",
-    "@puzzle/theme": "workspace:*",
-    "@puzzle/ui": "workspace:*",
+    "@puzzle-ui/core": "workspace:*",
+    "@puzzle-ui/hooks": "workspace:*",
+    "@puzzle-ui/icons": "workspace:*",
+    "@puzzle-ui/theme": "workspace:*",
+    "@puzzle-ui/ui": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-router": "^1.170.41",
     "@tanstack/react-start": "^1.168.60",

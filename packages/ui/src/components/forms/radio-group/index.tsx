@@ -18,8 +18,8 @@ import {
   type ReactNode,
 } from "react";
 
-import { cn } from "@puzzle/core";
-import { useRovingFocus, type UseRovingFocusReturn } from "@puzzle/hooks";
+import { cn } from "@puzzle-ui/core";
+import { useRovingFocus, type UseRovingFocusReturn } from "@puzzle-ui/hooks";
 
 import type {
   RadioGroupOrientation,

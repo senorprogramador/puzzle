@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { StreamlineUltimateIcon } from "@puzzle/icons/sets/streamline-ultimate";
-import { StreamlineUltimateIconPage } from "@puzzle/icons/sets/streamline-ultimate.page";
-import { ALL_STREAMLINE_ULTIMATE_ICONS } from "@puzzle/icons/sets/streamline-ultimate.constants";
+import { StreamlineUltimateIcon } from "@puzzle-ui/icons/sets/streamline-ultimate";
+import { StreamlineUltimateIconPage } from "@puzzle-ui/icons/sets/streamline-ultimate.page";
+import { ALL_STREAMLINE_ULTIMATE_ICONS } from "@puzzle-ui/icons/sets/streamline-ultimate.constants";
 
 const meta = {
   title: "Icons/Sets/StreamlineUltimate",

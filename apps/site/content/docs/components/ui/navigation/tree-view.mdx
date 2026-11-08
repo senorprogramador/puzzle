@@ -6,14 +6,16 @@ description: Navigate and select items in a keyboard-accessible hierarchy.
 ## Import
 
 ```tsx
-import { TreeView, type TreeViewItem } from "@puzzle/ui";
+import { TreeView, type TreeViewItem } from "@puzzle-ui/ui";
 ```
 
 ## Hierarchy and selection
 
 Each item needs a stable unique ID. Supply `textValue` for rich labels so typeahead can find them. Every tree requires an accessible name.
 
-<Preview height={400} code={`\
+<Preview
+  height={400}
+  code={`\
 <TreeView aria-label="Project files" defaultExpandedIds={["src"]} items={[
   { id: "src", label: "src", children: [
     { id: "app", label: "app.tsx" },
@@ -22,56 +24,79 @@ Each item needs a stable unique ID. Supply `textValue` for rich labels so typeah
   { id: "readme", label: "README.md" },
   { id: "archive", label: "Archive", disabled: true },
 ]} />
-`}>
-  <Section><TreeView aria-label="Project files" defaultExpandedIds={["src"]} items={[
-    { id: "src", label: "src", children: [
-      { id: "app", label: "app.tsx" }, { id: "styles", label: "styles.css" },
-    ] },
-    { id: "readme", label: "README.md" },
-    { id: "archive", label: "Archive", disabled: true },
-  ]} /></Section>
+`}
+>
+  <Section>
+    <TreeView
+      aria-label="Project files"
+      defaultExpandedIds={["src"]}
+      items={[
+        {
+          id: "src",
+          label: "src",
+          children: [
+            { id: "app", label: "app.tsx" },
+            { id: "styles", label: "styles.css" },
+          ],
+        },
+        { id: "readme", label: "README.md" },
+        { id: "archive", label: "Archive", disabled: true },
+      ]}
+    />
+  </Section>
 </Preview>
 
 ## Multiple selection and navigation
 
 `selectionMode="none"` is useful for navigation trees. Link items can report route state with `getItemActive`. Use multiple selection for independent file-like choices.
 
-<Preview height={300} code={`\
+<Preview
+  height={300}
+  code={`\
 <TreeView aria-label="Choose resources" selectionMode="multiple" size="sm"
   defaultSelectedIds={["guides"]}
   items={[{ id: "guides", label: "Guides" }, { id: "examples", label: "Examples" }]}
 />
-`}>
-  <Section><TreeView aria-label="Choose resources" selectionMode="multiple" size="sm"
-    defaultSelectedIds={["guides"]}
-    items={[{ id: "guides", label: "Guides" }, { id: "examples", label: "Examples" }]}
-  /></Section>
+`}
+>
+  <Section>
+    <TreeView
+      aria-label="Choose resources"
+      selectionMode="multiple"
+      size="sm"
+      defaultSelectedIds={["guides"]}
+      items={[
+        { id: "guides", label: "Guides" },
+        { id: "examples", label: "Examples" },
+      ]}
+    />
+  </Section>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `items` | `TreeViewItem<TData>[]` | Required | Hierarchical data. |
-| `aria-label` or `aria-labelledby` | `string` | Required | Accessible tree name. |
-| `selectionMode` | `"none" \| "single" \| "multiple"` | `"single"` | Selection behavior. |
-| `expandedIds`, `defaultExpandedIds` | `string[]` | `[]` | Controlled/initial expansion. |
-| `onExpandedChange` | `(ids: string[]) => void` | - | Expansion changes. |
-| `selectedIds`, `defaultSelectedIds` | `string[]` | `[]` | Controlled/initial selection. |
-| `onSelectionChange` | `(ids: string[]) => void` | - | Selection changes. |
-| `defaultFocusedId` | `string` | Selected or first root item | Initial focus target. |
-| `onFocusedChange` | `(id: string) => void` | - | Focus changes. |
-| `loadChildren` | `(item) => Promise<TreeViewItem<TData>[]>` | - | Load children of a `hasChildren` item. |
-| `onLoadChildrenError` | `(item, error: unknown) => void` | - | Handle load failures. |
-| `onItemActivate` | `(item) => void` | - | Enter activation. |
-| `getItemActive` | `(item) => boolean` | - | Current-route predicate. |
-| `renderItem`, `renderIcon`, `renderLabel` | `(item, state) => ReactNode` | Built-in renderer | Non-interactive custom content. |
-| `expandOnItemClick` | `boolean` | `false` | Toggle branches on label click. |
-| `size` | `"sm" \| "md"` | `"md"` | Density. |
-| `indentation` | `string \| number` | Theme spacing | Hierarchy indentation. |
-| `typeahead` | `boolean` | `true` | Character-based navigation. |
-| `loadingLabel`, `loadErrorLabel` | `string` | Built-in messages | Loading/error feedback. |
-| `itemClassName` | `string` | - | Class on each item. |
+| Prop                                      | Type                                       | Default                     | Description                            |
+| ----------------------------------------- | ------------------------------------------ | --------------------------- | -------------------------------------- |
+| `items`                                   | `TreeViewItem<TData>[]`                    | Required                    | Hierarchical data.                     |
+| `aria-label` or `aria-labelledby`         | `string`                                   | Required                    | Accessible tree name.                  |
+| `selectionMode`                           | `"none" \| "single" \| "multiple"`         | `"single"`                  | Selection behavior.                    |
+| `expandedIds`, `defaultExpandedIds`       | `string[]`                                 | `[]`                        | Controlled/initial expansion.          |
+| `onExpandedChange`                        | `(ids: string[]) => void`                  | -                           | Expansion changes.                     |
+| `selectedIds`, `defaultSelectedIds`       | `string[]`                                 | `[]`                        | Controlled/initial selection.          |
+| `onSelectionChange`                       | `(ids: string[]) => void`                  | -                           | Selection changes.                     |
+| `defaultFocusedId`                        | `string`                                   | Selected or first root item | Initial focus target.                  |
+| `onFocusedChange`                         | `(id: string) => void`                     | -                           | Focus changes.                         |
+| `loadChildren`                            | `(item) => Promise<TreeViewItem<TData>[]>` | -                           | Load children of a `hasChildren` item. |
+| `onLoadChildrenError`                     | `(item, error: unknown) => void`           | -                           | Handle load failures.                  |
+| `onItemActivate`                          | `(item) => void`                           | -                           | Enter activation.                      |
+| `getItemActive`                           | `(item) => boolean`                        | -                           | Current-route predicate.               |
+| `renderItem`, `renderIcon`, `renderLabel` | `(item, state) => ReactNode`               | Built-in renderer           | Non-interactive custom content.        |
+| `expandOnItemClick`                       | `boolean`                                  | `false`                     | Toggle branches on label click.        |
+| `size`                                    | `"sm" \| "md"`                             | `"md"`                      | Density.                               |
+| `indentation`                             | `string \| number`                         | Theme spacing               | Hierarchy indentation.                 |
+| `typeahead`                               | `boolean`                                  | `true`                      | Character-based navigation.            |
+| `loadingLabel`, `loadErrorLabel`          | `string`                                   | Built-in messages           | Loading/error feedback.                |
+| `itemClassName`                           | `string`                                   | -                           | Class on each item.                    |
 
 Items require `id` and `label`; optional fields are `href`, `textValue`, `icon`, `endAdornment`, `children`, `hasChildren`, `disabled`, `selectable`, and `data`. Disabled branches can still expand. Rendering state contains `expanded`, `selected`, `focused`, `loading`, `disabled`, and `hasChildren`.
 

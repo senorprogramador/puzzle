@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CircleFlagsIcon } from "@puzzle/icons/sets/circle-flags";
-import { CircleFlagsIconPage } from "@puzzle/icons/sets/circle-flags.page";
-import { ALL_CIRCLE_FLAGS_ICONS } from "@puzzle/icons/sets/circle-flags.constants";
+import { CircleFlagsIcon } from "@puzzle-ui/icons/sets/circle-flags";
+import { CircleFlagsIconPage } from "@puzzle-ui/icons/sets/circle-flags.page";
+import { ALL_CIRCLE_FLAGS_ICONS } from "@puzzle-ui/icons/sets/circle-flags.constants";
 
 const meta = {
   title: "Icons/Sets/CircleFlags",

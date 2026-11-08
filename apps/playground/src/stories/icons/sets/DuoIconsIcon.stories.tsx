@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { DuoIconsIcon } from "@puzzle/icons/sets/duo-icons";
-import { DuoIconsIconPage } from "@puzzle/icons/sets/duo-icons.page";
-import { ALL_DUO_ICONS_ICONS } from "@puzzle/icons/sets/duo-icons.constants";
+import { DuoIconsIcon } from "@puzzle-ui/icons/sets/duo-icons";
+import { DuoIconsIconPage } from "@puzzle-ui/icons/sets/duo-icons.page";
+import { ALL_DUO_ICONS_ICONS } from "@puzzle-ui/icons/sets/duo-icons.constants";
 
 const meta = {
   title: "Icons/Sets/DuoIcons",

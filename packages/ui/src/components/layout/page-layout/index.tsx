@@ -6,7 +6,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
-import { resolveResponsiveValue, type ResponsiveValue } from "@puzzle/core";
+import { resolveResponsiveValue, type ResponsiveValue } from "@puzzle-ui/core";
 
 import "./page-layout.css";
 

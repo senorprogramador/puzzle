@@ -1,5 +1,5 @@
-import { cn } from "@puzzle/core";
-import type { TypographyStyle } from "@puzzle/theme";
+import { cn } from "@puzzle-ui/core";
+import type { TypographyStyle } from "@puzzle-ui/theme";
 import type { ComponentPropsWithRef, ElementType } from "react";
 
 type TextType = Omit<

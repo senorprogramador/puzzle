@@ -8,16 +8,21 @@ Use `Preview` to display a component in an isolated iframe, with optional source
 ## Import
 
 ```tsx
-import { Preview } from "@puzzle/ui";
+import { Preview } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
 
 Pass the rendered example as `children` and its source as `code`. The source is displayed, not executed: keep it in sync with the rendered children. Switch to **Code** to inspect or copy it.
 
-<Preview height={180} align="center" justify="center" code={`\
+<Preview
+  height={180}
+  align="center"
+  justify="center"
+  code={`\
 <Button>Save</Button>
-`}>
+`}
+>
   <Button>Save</Button>
 </Preview>
 
@@ -27,11 +32,17 @@ Pass the rendered example as `children` and its source as `code`. The source is 
 
 `height` overrides the device height in pixels. Without it, mobile uses 844px, tablet 1024px, and desktop 768px.
 
-<Preview defaultDevice="tablet" height={220} align="center" justify="center" code={`\
+<Preview
+  defaultDevice="tablet"
+  height={220}
+  align="center"
+  justify="center"
+  code={`\
 <Preview defaultDevice="tablet" height={220} align="center" justify="center">
   <Button>Tablet preview</Button>
 </Preview>
-`}>
+`}
+>
   <Button>Tablet preview</Button>
 </Preview>
 
@@ -41,12 +52,17 @@ The code on this page includes the `Preview` wrapper when demonstrating its prop
 
 `align` controls vertical alignment; `justify` controls horizontal distribution. Both are unset by default. Use `stretch` to let children fill the frame's height, or `between`, `around`, and `evenly` to distribute multiple children horizontally.
 
-<Preview height={180} align="center" justify="evenly" code={`\
+<Preview
+  height={180}
+  align="center"
+  justify="evenly"
+  code={`\
 <Preview height={180} align="center" justify="evenly">
   <Button variant="outline">Back</Button>
   <Button>Continue</Button>
 </Preview>
-`}>
+`}
+>
   <Button variant="outline">Back</Button>
   <Button>Continue</Button>
 </Preview>
@@ -67,16 +83,16 @@ Use `hideDevices` for a fixed starting viewport. It hides the selector, not the 
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `ReactNode` | Required | Live content rendered inside the iframe. |
-| `code` | `string` | - | Source shown in the Code tab, with syntax highlighting and copy support. |
-| `defaultDevice` | `"mobile" \| "tablet" \| "desktop"` | `"mobile"` | Initial device viewport. |
-| `height` | `number` | Device height | Iframe height in pixels, before scaling. |
-| `align` | `"start" \| "center" \| "end" \| "stretch"` | - | Vertical alignment of frame content. |
-| `justify` | `"start" \| "center" \| "end" \| "between" \| "around" \| "evenly"` | - | Horizontal distribution of frame content. |
-| `hideDevices` | `boolean` | `false` | Hides the device selector. |
-| `className` | `string` | - | Additional class on the outer section. |
+| Prop            | Type                                                                | Default       | Description                                                              |
+| --------------- | ------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------ |
+| `children`      | `ReactNode`                                                         | Required      | Live content rendered inside the iframe.                                 |
+| `code`          | `string`                                                            | -             | Source shown in the Code tab, with syntax highlighting and copy support. |
+| `defaultDevice` | `"mobile" \| "tablet" \| "desktop"`                                 | `"mobile"`    | Initial device viewport.                                                 |
+| `height`        | `number`                                                            | Device height | Iframe height in pixels, before scaling.                                 |
+| `align`         | `"start" \| "center" \| "end" \| "stretch"`                         | -             | Vertical alignment of frame content.                                     |
+| `justify`       | `"start" \| "center" \| "end" \| "between" \| "around" \| "evenly"` | -             | Horizontal distribution of frame content.                                |
+| `hideDevices`   | `boolean`                                                           | `false`       | Hides the device selector.                                               |
+| `className`     | `string`                                                            | -             | Additional class on the outer section.                                   |
 
 ## Accessibility
 

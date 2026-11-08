@@ -8,35 +8,35 @@ const resolvePath = (path: string) =>
 const resolve = {
   alias: [
     {
-      find: /^@puzzle\/core$/,
+      find: /^@puzzle-ui\/core$/,
       replacement: resolvePath("../core/src/index.ts"),
     },
     {
-      find: /^@puzzle\/core\/(.+)$/,
+      find: /^@puzzle-ui\/core\/(.+)$/,
       replacement: resolvePath("../core/src/$1"),
     },
     {
-      find: /^@puzzle\/theme$/,
+      find: /^@puzzle-ui\/theme$/,
       replacement: resolvePath("../theme/src/index.ts"),
     },
     {
-      find: /^@puzzle\/theme\/(.+)$/,
+      find: /^@puzzle-ui\/theme\/(.+)$/,
       replacement: resolvePath("../theme/src/$1"),
     },
     {
-      find: /^@puzzle\/hooks$/,
+      find: /^@puzzle-ui\/hooks$/,
       replacement: resolvePath("../hooks/src/index.ts"),
     },
     {
-      find: /^@puzzle\/hooks\/(.+)$/,
+      find: /^@puzzle-ui\/hooks\/(.+)$/,
       replacement: resolvePath("../hooks/src/$1"),
     },
     {
-      find: /^@puzzle\/icons$/,
+      find: /^@puzzle-ui\/icons$/,
       replacement: resolvePath("../icons/src/index.ts"),
     },
     {
-      find: /^@puzzle\/icons\/(.+)$/,
+      find: /^@puzzle-ui\/icons\/(.+)$/,
       replacement: resolvePath("../icons/src/$1"),
     },
   ],

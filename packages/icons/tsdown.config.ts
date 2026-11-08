@@ -7,7 +7,8 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
+  copy: ["../../LICENSE"],
   deps: {
-    neverBundle: ["react", "@puzzle/core"],
+    neverBundle: ["react", "@puzzle-ui/core"],
   },
 });

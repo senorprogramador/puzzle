@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { fn } from "storybook/test";
 
-import { Button, Container as UIContainer } from "@puzzle/ui";
+import { Button, Container as UIContainer } from "@puzzle-ui/ui";
 
 const meta = {
   title: "UI/Components/Container",

@@ -262,6 +262,16 @@ export {
   type SidebarPlacement,
 } from "./components/layout/page-layout";
 
+export {
+  ResizablePanels,
+  ResizablePanel,
+  ResizableHandle,
+  type ResizablePanelsProps,
+  type ResizablePanelProps,
+  type ResizableHandleProps,
+  type ResizablePanelsOrientation,
+} from "./components/layout/resizable-panels";
+
 export { Section } from "./components/layout/section";
 export type {
   SectionTheme,

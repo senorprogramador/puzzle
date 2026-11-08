@@ -17,19 +17,19 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@puzzle/core": fileURLToPath(
+      "@puzzle-ui/core": fileURLToPath(
         new URL("../../packages/core/src/index.ts", import.meta.url),
       ),
-      "@puzzle/hooks": fileURLToPath(
+      "@puzzle-ui/hooks": fileURLToPath(
         new URL("../../packages/hooks/src/index.ts", import.meta.url),
       ),
-      "@puzzle/theme": fileURLToPath(
+      "@puzzle-ui/theme": fileURLToPath(
         new URL("../../packages/theme/src/index.ts", import.meta.url),
       ),
-      "@puzzle/ui": fileURLToPath(
+      "@puzzle-ui/ui": fileURLToPath(
         new URL("../../packages/ui/src/index.ts", import.meta.url),
       ),
-      "@puzzle/icons": fileURLToPath(
+      "@puzzle-ui/icons": fileURLToPath(
         new URL("../../packages/icons/src", import.meta.url),
       ),
     },

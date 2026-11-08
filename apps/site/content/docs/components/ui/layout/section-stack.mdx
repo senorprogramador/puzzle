@@ -6,33 +6,42 @@ description: Coordinate spacing and dividers between adjacent sections.
 ## Import
 
 ```tsx
-import { SectionStack, Section } from "@puzzle/ui";
+import { SectionStack, Section } from "@puzzle-ui/ui";
 ```
 
 ## Shared themes and dividers
 
 Adjacent direct Sections with matching themes receive compact adjoining spacing. `divideY` adds dividers between sections.
 
-<Preview height={500} code={`\
+<Preview
+  height={500}
+  code={`\
 <SectionStack divideY>
   <Section><Heading level="headline3">Overview</Heading></Section>
   <Section><Text>A matching theme keeps spacing compact.</Text></Section>
   <Section theme="primary"><Text>A new theme starts a distinct section.</Text></Section>
 </SectionStack>
-`}>
+`}
+>
   <SectionStack divideY>
-    <Section><Heading level="headline3">Overview</Heading></Section>
-    <Section><Text>A matching theme keeps spacing compact.</Text></Section>
-    <Section theme="primary"><Text>A new theme starts a distinct section.</Text></Section>
+    <Section>
+      <Heading level="headline3">Overview</Heading>
+    </Section>
+    <Section>
+      <Text>A matching theme keeps spacing compact.</Text>
+    </Section>
+    <Section theme="primary">
+      <Text>A new theme starts a distinct section.</Text>
+    </Section>
   </SectionStack>
 </Preview>
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `children` | `ReactNode` | Required | Prefer direct Section children. |
-| `divideY` | `boolean` | - | Add dividers after non-final sections. |
-| `className` | `string` | - | Root class. |
+| Prop        | Type        | Default  | Description                            |
+| ----------- | ----------- | -------- | -------------------------------------- |
+| `children`  | `ReactNode` | Required | Prefer direct Section children.        |
+| `divideY`   | `boolean`   | -        | Add dividers after non-final sections. |
+| `className` | `string`    | -        | Root class.                            |
 
 Other children render unchanged, but interrupt same-theme adjacency. Wrapping a Section in another component prevents direct-child coordination.

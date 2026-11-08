@@ -5,7 +5,7 @@ import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { Theme } from "@puzzle/theme";
+import { Theme } from "@puzzle-ui/theme";
 
 import { Portal } from "./index";
 

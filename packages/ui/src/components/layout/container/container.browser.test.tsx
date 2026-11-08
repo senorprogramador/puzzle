@@ -39,14 +39,14 @@ describe("Container (browser)", () => {
   });
 
   it("uses the configured prose width token", () => {
-    document.documentElement.style.setProperty("--puzzle-prose-width", "65ch");
+    document.documentElement.style.setProperty("--puzzle-prose-width", "560px");
 
     const { container } = render(
       <Container widthPreset="prose">Content</Container>,
     );
 
     expect(getComputedStyle(container.firstElementChild!).maxWidth).toBe(
-      "65ch",
+      "560px",
     );
   });
 

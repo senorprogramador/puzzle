@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CbiIcon } from "@puzzle/icons/sets/cbi";
-import { CbiIconPage } from "@puzzle/icons/sets/cbi.page";
-import { ALL_CBI_ICONS } from "@puzzle/icons/sets/cbi.constants";
+import { CbiIcon } from "@puzzle-ui/icons/sets/cbi";
+import { CbiIconPage } from "@puzzle-ui/icons/sets/cbi.page";
+import { ALL_CBI_ICONS } from "@puzzle-ui/icons/sets/cbi.constants";
 
 const meta = {
   title: "Icons/Sets/Cbi",

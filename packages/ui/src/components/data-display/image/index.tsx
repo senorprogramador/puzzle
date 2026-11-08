@@ -12,8 +12,8 @@ import {
 
 import { preload as preloadImage } from "react-dom";
 
-import { cn } from "@puzzle/core";
-import { useThemeComponents } from "@puzzle/theme/components-context";
+import { cn } from "@puzzle-ui/core";
+import { useThemeComponents } from "@puzzle-ui/theme/components-context";
 
 import type { ImageProps } from "./image.types";
 

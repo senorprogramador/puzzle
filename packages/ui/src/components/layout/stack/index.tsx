@@ -1,4 +1,4 @@
-import { BREAKPOINTS, cn } from "@puzzle/core";
+import { BREAKPOINTS, cn } from "@puzzle-ui/core";
 import {
   Children,
   cloneElement,
@@ -9,7 +9,7 @@ import {
   type ElementType,
   type ReactNode,
 } from "react";
-import type { ResponsiveValue } from "@puzzle/core";
+import type { ResponsiveValue } from "@puzzle-ui/core";
 import "./stack.css";
 
 type StackDirection = "row" | "col";

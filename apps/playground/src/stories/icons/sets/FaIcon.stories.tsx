@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FaIcon } from "@puzzle/icons/sets/fa";
-import { FaIconPage } from "@puzzle/icons/sets/fa.page";
-import { ALL_FA_ICONS } from "@puzzle/icons/sets/fa.constants";
+import { FaIcon } from "@puzzle-ui/icons/sets/fa";
+import { FaIconPage } from "@puzzle-ui/icons/sets/fa.page";
+import { ALL_FA_ICONS } from "@puzzle-ui/icons/sets/fa.constants";
 
 const meta = {
   title: "Icons/Sets/Fa",

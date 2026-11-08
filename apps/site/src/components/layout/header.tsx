@@ -1,4 +1,4 @@
-import { Button, Heading, Stack } from "@puzzle/ui";
+import { Button, Heading, Stack } from "@puzzle-ui/ui";
 
 type HeaderProps = {};
 

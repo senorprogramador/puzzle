@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GrommetIconsIcon } from "@puzzle/icons/sets/grommet-icons";
-import { GrommetIconsIconPage } from "@puzzle/icons/sets/grommet-icons.page";
-import { ALL_GROMMET_ICONS_ICONS } from "@puzzle/icons/sets/grommet-icons.constants";
+import { GrommetIconsIcon } from "@puzzle-ui/icons/sets/grommet-icons";
+import { GrommetIconsIconPage } from "@puzzle-ui/icons/sets/grommet-icons.page";
+import { ALL_GROMMET_ICONS_ICONS } from "@puzzle-ui/icons/sets/grommet-icons.constants";
 
 const meta = {
   title: "Icons/Sets/GrommetIcons",

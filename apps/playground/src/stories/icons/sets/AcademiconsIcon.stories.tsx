@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { AcademiconsIcon } from "@puzzle/icons/sets/academicons";
-import { AcademiconsIconPage } from "@puzzle/icons/sets/academicons.page";
-import { ALL_ACADEMICONS_ICONS } from "@puzzle/icons/sets/academicons.constants";
+import { AcademiconsIcon } from "@puzzle-ui/icons/sets/academicons";
+import { AcademiconsIconPage } from "@puzzle-ui/icons/sets/academicons.page";
+import { ALL_ACADEMICONS_ICONS } from "@puzzle-ui/icons/sets/academicons.constants";
 
 const meta = {
   title: "Icons/Sets/Academicons",

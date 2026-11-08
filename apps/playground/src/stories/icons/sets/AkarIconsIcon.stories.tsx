@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { AkarIconsIcon } from "@puzzle/icons/sets/akar-icons";
-import { AkarIconsIconPage } from "@puzzle/icons/sets/akar-icons.page";
-import { ALL_AKAR_ICONS_ICONS } from "@puzzle/icons/sets/akar-icons.constants";
+import { AkarIconsIcon } from "@puzzle-ui/icons/sets/akar-icons";
+import { AkarIconsIconPage } from "@puzzle-ui/icons/sets/akar-icons.page";
+import { ALL_AKAR_ICONS_ICONS } from "@puzzle-ui/icons/sets/akar-icons.constants";
 
 const meta = {
   title: "Icons/Sets/AkarIcons",

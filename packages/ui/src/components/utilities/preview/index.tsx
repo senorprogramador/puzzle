@@ -14,10 +14,10 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-import { cn } from "@puzzle/core";
-import { useRovingFocus } from "@puzzle/hooks";
-import { Icon } from "@puzzle/icons";
-import { ThemeScopeProvider, useThemeScope } from "@puzzle/theme/scope-context";
+import { cn } from "@puzzle-ui/core";
+import { useRovingFocus } from "@puzzle-ui/hooks";
+import { Icon } from "@puzzle-ui/icons";
+import { ThemeScopeProvider, useThemeScope } from "@puzzle-ui/theme/scope-context";
 
 import { Background } from "../../layout/background";
 import { highlightCode } from "./highlight";

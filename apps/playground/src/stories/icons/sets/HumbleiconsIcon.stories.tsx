@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { HumbleiconsIcon } from "@puzzle/icons/sets/humbleicons";
-import { HumbleiconsIconPage } from "@puzzle/icons/sets/humbleicons.page";
-import { ALL_HUMBLEICONS_ICONS } from "@puzzle/icons/sets/humbleicons.constants";
+import { HumbleiconsIcon } from "@puzzle-ui/icons/sets/humbleicons";
+import { HumbleiconsIconPage } from "@puzzle-ui/icons/sets/humbleicons.page";
+import { ALL_HUMBLEICONS_ICONS } from "@puzzle-ui/icons/sets/humbleicons.constants";
 
 const meta = {
   title: "Icons/Sets/Humbleicons",

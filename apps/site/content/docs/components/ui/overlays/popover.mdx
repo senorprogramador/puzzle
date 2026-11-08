@@ -10,20 +10,25 @@ Popover opens on click and contains an interactive, non-modal dialog. Use a focu
 ## Import
 
 ```tsx
-import { Popover } from "@puzzle/ui";
+import { Popover } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
 
 Name the dialog with a visible `title`. `closable` adds a close button alongside the title.
 
-<Preview height={320} align="center" justify="center" code={`\
+<Preview
+  height={320}
+  align="center"
+  justify="center"
+  code={`\
 <Popover trigger={<Button>Filters</Button>} title="Filters" closable>
   <label>
     <input type="checkbox" /> Only available
   </label>
 </Popover>
-`}>
+`}
+>
   <Popover trigger={<Button>Filters</Button>} title="Filters" closable>
     <label>
       <input type="checkbox" /> Only available
@@ -35,7 +40,11 @@ Name the dialog with a visible `title`. `closable` adds a close button alongside
 
 `position` requests `top`, `right`, `bottom`, or `left`; placement can change when space is limited. `align` accepts `start`, `center`, or `end`. `offset` changes the gap in pixels.
 
-<Preview height={320} align="center" justify="center" code={`\
+<Preview
+  height={320}
+  align="center"
+  justify="center"
+  code={`\
 <Stack alignH="center">
   <Popover position="top" align="start" offset={16} title="Above" closable trigger={<Button variant="outline">Top / start</Button>}>
     Content with a 16px gap.
@@ -44,12 +53,26 @@ Name the dialog with a visible `title`. `closable` adds a close button alongside
     Content aligned to the end.
   </Popover>
 </Stack>
-`}>
+`}
+>
   <Stack alignH="center">
-    <Popover position="top" align="start" offset={16} title="Above" closable trigger={<Button variant="outline">Top / start</Button>}>
+    <Popover
+      position="top"
+      align="start"
+      offset={16}
+      title="Above"
+      closable
+      trigger={<Button variant="outline">Top / start</Button>}
+    >
       Content with a 16px gap.
     </Popover>
-    <Popover position="bottom" align="end" title="Below" closable trigger={<Button variant="outline">Bottom / end</Button>}>
+    <Popover
+      position="bottom"
+      align="end"
+      title="Below"
+      closable
+      trigger={<Button variant="outline">Bottom / end</Button>}
+    >
       Content aligned to the end.
     </Popover>
   </Stack>
@@ -59,14 +82,24 @@ Name the dialog with a visible `title`. `closable` adds a close button alongside
 
 When there is no visible title, provide `aria-label`. Customize `closeLabel` to describe the close action in the language of your application.
 
-<Preview height={280} align="center" justify="center" code={`\
+<Preview
+  height={280}
+  align="center"
+  justify="center"
+  code={`\
 <Popover aria-label="Display options" closable closeLabel="Close display options" trigger={<Button variant="outline">Display options</Button>}>
   <label>
     <input type="checkbox" defaultChecked /> Show completed items
   </label>
 </Popover>
-`}>
-  <Popover aria-label="Display options" closable closeLabel="Close display options" trigger={<Button variant="outline">Display options</Button>}>
+`}
+>
+  <Popover
+    aria-label="Display options"
+    closable
+    closeLabel="Close display options"
+    trigger={<Button variant="outline">Display options</Button>}
+  >
     <label>
       <input type="checkbox" defaultChecked /> Show completed items
     </label>
@@ -81,6 +114,7 @@ Pair `open` with `onOpenChange` to respond to trigger clicks and dismissal. Appl
 const [open, setOpen] = useState(false);
 
 return (
+
   <Popover open={open} onOpenChange={setOpen} title="Ready to continue?" trigger={<Button>Review changes</Button>}>
     <Stack>
       <p>Your changes are ready to save.</p>
@@ -94,22 +128,22 @@ return (
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `trigger` | `ReactElement` | Required | Single trigger accepting DOM attributes and a ref. |
-| `children` | `ReactNode` | Required | Dialog body; may contain interactive controls. |
-| `title` | `ReactNode` | - | Visible heading and accessible dialog name. |
-| `aria-label` | `string` | - | Dialog name when no title is provided. |
-| `closable` | `boolean` | `false` | Displays a close button. |
-| `closeLabel` | `string` | `"Close"` | Accessible name of the close button. |
-| `position` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred popup side. |
-| `align` | `"start" \| "center" \| "end"` | `"center"` | Popup alignment along the trigger. |
-| `offset` | `number` | `8` | Gap from the trigger in pixels. |
-| `open` | `boolean` | - | Controlled visibility. |
-| `defaultOpen` | `boolean` | `false` | Initial uncontrolled visibility. |
-| `onOpenChange` | `(open: boolean) => void` | - | Called when visibility changes are requested. |
-| `className` | `string` | - | Additional class on the dialog. |
-| `triggerClassName` | `string` | - | Additional class merged onto the trigger. |
+| Prop               | Type                                     | Default    | Description                                        |
+| ------------------ | ---------------------------------------- | ---------- | -------------------------------------------------- |
+| `trigger`          | `ReactElement`                           | Required   | Single trigger accepting DOM attributes and a ref. |
+| `children`         | `ReactNode`                              | Required   | Dialog body; may contain interactive controls.     |
+| `title`            | `ReactNode`                              | -          | Visible heading and accessible dialog name.        |
+| `aria-label`       | `string`                                 | -          | Dialog name when no title is provided.             |
+| `closable`         | `boolean`                                | `false`    | Displays a close button.                           |
+| `closeLabel`       | `string`                                 | `"Close"`  | Accessible name of the close button.               |
+| `position`         | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred popup side.                              |
+| `align`            | `"start" \| "center" \| "end"`           | `"center"` | Popup alignment along the trigger.                 |
+| `offset`           | `number`                                 | `8`        | Gap from the trigger in pixels.                    |
+| `open`             | `boolean`                                | -          | Controlled visibility.                             |
+| `defaultOpen`      | `boolean`                                | `false`    | Initial uncontrolled visibility.                   |
+| `onOpenChange`     | `(open: boolean) => void`                | -          | Called when visibility changes are requested.      |
+| `className`        | `string`                                 | -          | Additional class on the dialog.                    |
+| `triggerClassName` | `string`                                 | -          | Additional class merged onto the trigger.          |
 
 ## Focus behavior
 

@@ -20,22 +20,22 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
-      "@puzzle/theme": [
+      "@puzzle-ui/theme": [
         "../../packages/theme/src/index.ts"
       ],
-      "@puzzle/theme/*": [
+      "@puzzle-ui/theme/*": [
         "../../packages/theme/src/*"
       ],
-      "@puzzle/ui": [
+      "@puzzle-ui/ui": [
         "../../packages/ui/src/index.ts"
       ],
-      "@puzzle/ui/*": [
+      "@puzzle-ui/ui/*": [
         "../../packages/ui/src/*"
       ],
-      "@puzzle/icons": [
+      "@puzzle-ui/icons": [
         "../../packages/icons/src/index.ts"
       ],
-      "@puzzle/icons/*": [
+      "@puzzle-ui/icons/*": [
         "../../packages/icons/src/*"
       ]
     }

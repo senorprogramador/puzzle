@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { VscodeIconsIcon } from "@puzzle/icons/sets/vscode-icons";
-import { VscodeIconsIconPage } from "@puzzle/icons/sets/vscode-icons.page";
-import { ALL_VSCODE_ICONS_ICONS } from "@puzzle/icons/sets/vscode-icons.constants";
+import { VscodeIconsIcon } from "@puzzle-ui/icons/sets/vscode-icons";
+import { VscodeIconsIconPage } from "@puzzle-ui/icons/sets/vscode-icons.page";
+import { ALL_VSCODE_ICONS_ICONS } from "@puzzle-ui/icons/sets/vscode-icons.constants";
 
 const meta = {
   title: "Icons/Sets/VscodeIcons",

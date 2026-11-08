@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { SolarIcon } from "@puzzle/icons/sets/solar";
-import { SolarIconPage } from "@puzzle/icons/sets/solar.page";
-import { ALL_SOLAR_ICONS } from "@puzzle/icons/sets/solar.constants";
+import { SolarIcon } from "@puzzle-ui/icons/sets/solar";
+import { SolarIconPage } from "@puzzle-ui/icons/sets/solar.page";
+import { ALL_SOLAR_ICONS } from "@puzzle-ui/icons/sets/solar.constants";
 
 const meta = {
   title: "Icons/Sets/Solar",

@@ -10,7 +10,7 @@ import {
   CircularProgress,
   PortalTarget,
   Portal,
-} from "@puzzle/ui";
+} from "@puzzle-ui/ui";
 
 const meta = {
   title: "UI/Components/Backdrop",

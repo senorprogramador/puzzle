@@ -8,7 +8,7 @@ Use the Badge component to annotate an element, such as an avatar or icon, with 
 ## Import
 
 ```tsx
-import { Badge } from "@puzzle/ui";
+import { Badge } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
@@ -50,12 +50,24 @@ Use `color` with a theme role (`primary`, `secondary`, `accent`, `danger`, `info
 `}
 >
   <div style={{ display: "flex", gap: 24 }}>
-    <Badge content="1" color="primary"><Avatar alt="Ada Lovelace" /></Badge>
-    <Badge content="2" color="secondary"><Avatar alt="Ada Lovelace" /></Badge>
-    <Badge content="3" color="accent"><Avatar alt="Ada Lovelace" /></Badge>
-    <Badge content="4" color="danger"><Avatar alt="Ada Lovelace" /></Badge>
-    <Badge content="5" color="info"><Avatar alt="Ada Lovelace" /></Badge>
-    <Badge content="6" color="#7c3aed"><Avatar alt="Ada Lovelace" /></Badge>
+    <Badge content="1" color="primary">
+      <Avatar alt="Ada Lovelace" />
+    </Badge>
+    <Badge content="2" color="secondary">
+      <Avatar alt="Ada Lovelace" />
+    </Badge>
+    <Badge content="3" color="accent">
+      <Avatar alt="Ada Lovelace" />
+    </Badge>
+    <Badge content="4" color="danger">
+      <Avatar alt="Ada Lovelace" />
+    </Badge>
+    <Badge content="5" color="info">
+      <Avatar alt="Ada Lovelace" />
+    </Badge>
+    <Badge content="6" color="#7c3aed">
+      <Avatar alt="Ada Lovelace" />
+    </Badge>
   </div>
 </Preview>
 
@@ -76,9 +88,15 @@ Use `size` to set the minimum width and height of the badge in pixels. The defau
 `}
 >
   <div style={{ display: "flex", gap: 24 }}>
-    <Badge content="" size={16}><Avatar alt="Ada Lovelace" /></Badge>
-    <Badge content="9" size={20}><Avatar alt="Ada Lovelace" /></Badge>
-    <Badge content="99+" size={28}><Avatar alt="Ada Lovelace" /></Badge>
+    <Badge content="" size={16}>
+      <Avatar alt="Ada Lovelace" />
+    </Badge>
+    <Badge content="9" size={20}>
+      <Avatar alt="Ada Lovelace" />
+    </Badge>
+    <Badge content="99+" size={28}>
+      <Avatar alt="Ada Lovelace" />
+    </Badge>
   </div>
 </Preview>
 
@@ -102,10 +120,17 @@ Use `anchorOrigin` to choose the corner (`vertical`: `top` | `bottom`, `horizont
 `}
 >
   <div style={{ display: "flex", gap: 24 }}>
-    <Badge content="1" anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+    <Badge
+      content="1"
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+    >
       <Avatar alt="Ada Lovelace" size={48} shape="square" />
     </Badge>
-    <Badge content="2" anchorOverlap="circular" anchorOrigin={{ vertical: "bottom", horizontal: "right" }}>
+    <Badge
+      content="2"
+      anchorOverlap="circular"
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+    >
       <Avatar alt="Ada Lovelace" size={48} />
     </Badge>
   </div>
@@ -115,15 +140,15 @@ Use `anchorOrigin` to choose the corner (`vertical`: `top` | `bottom`, `horizont
 
 ### Badge props
 
-| Prop            | Type                                                           | Default                                          | Description                                                        |
-| --------------- | -------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------ |
-| `content`       | `ReactNode`                                                    | —                                                | Content of the badge, such as a count. Required.                   |
-| `size`          | `number`                                                       | `20`                                             | Minimum width and height in pixels. Values below `16` become `16`. |
-| `color` | `BadgeColor` | `"primary"` | `primary`, `secondary`, `accent`, `danger`, `info`, or a hex string such as `#7c3aed`. |
-| `anchorOrigin`  | `{ vertical: "top" \| "bottom"; horizontal: "left" \| "right" }` | `{ vertical: "top", horizontal: "right" }`     | Corner where the badge is placed.                                  |
-| `anchorOverlap` | `"rectangular" \| "circular"`                                  | `"rectangular"`                                  | Positioning relative to a rectangular or round child.              |
-| `className`     | `string`                                                       | —                                                | Additional CSS class names on the wrapper.                         |
-| `children`      | `ReactNode`                                                    | —                                                | Element the badge is attached to.                                  |
+| Prop            | Type                                                             | Default                                    | Description                                                                            |
+| --------------- | ---------------------------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `content`       | `ReactNode`                                                      | —                                          | Content of the badge, such as a count. Required.                                       |
+| `size`          | `number`                                                         | `20`                                       | Minimum width and height in pixels. Values below `16` become `16`.                     |
+| `color`         | `BadgeColor`                                                     | `"primary"`                                | `primary`, `secondary`, `accent`, `danger`, `info`, or a hex string such as `#7c3aed`. |
+| `anchorOrigin`  | `{ vertical: "top" \| "bottom"; horizontal: "left" \| "right" }` | `{ vertical: "top", horizontal: "right" }` | Corner where the badge is placed.                                                      |
+| `anchorOverlap` | `"rectangular" \| "circular"`                                    | `"rectangular"`                            | Positioning relative to a rectangular or round child.                                  |
+| `className`     | `string`                                                         | —                                          | Additional CSS class names on the wrapper.                                             |
+| `children`      | `ReactNode`                                                      | —                                          | Element the badge is attached to.                                                      |
 
 ### TypeScript types
 

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { ZondiconsIcon } from "@puzzle/icons/sets/zondicons";
-import { ZondiconsIconPage } from "@puzzle/icons/sets/zondicons.page";
-import { ALL_ZONDICONS_ICONS } from "@puzzle/icons/sets/zondicons.constants";
+import { ZondiconsIcon } from "@puzzle-ui/icons/sets/zondicons";
+import { ZondiconsIconPage } from "@puzzle-ui/icons/sets/zondicons.page";
+import { ALL_ZONDICONS_ICONS } from "@puzzle-ui/icons/sets/zondicons.constants";
 
 const meta = {
   title: "Icons/Sets/Zondicons",

@@ -16,10 +16,10 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "paths": {
-            "@puzzle/core": [
+            "@puzzle-ui/core": [
                 "../core/src/index.ts"
             ],
-            "@puzzle/core/*": [
+            "@puzzle-ui/core/*": [
                 "../core/src/*"
             ],
         },

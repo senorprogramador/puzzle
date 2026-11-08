@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { StreamlineSharpIcon } from "@puzzle/icons/sets/streamline-sharp";
-import { StreamlineSharpIconPage } from "@puzzle/icons/sets/streamline-sharp.page";
-import { ALL_STREAMLINE_SHARP_ICONS } from "@puzzle/icons/sets/streamline-sharp.constants";
+import { StreamlineSharpIcon } from "@puzzle-ui/icons/sets/streamline-sharp";
+import { StreamlineSharpIconPage } from "@puzzle-ui/icons/sets/streamline-sharp.page";
+import { ALL_STREAMLINE_SHARP_ICONS } from "@puzzle-ui/icons/sets/streamline-sharp.constants";
 
 const meta = {
   title: "Icons/Sets/StreamlineSharp",

@@ -1,5 +1,5 @@
 import type { ComponentPropsWithRef, ReactNode } from "react";
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 import { Link } from "../../navigation/link";
 import "./breadcrumbs.css";
 

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Avatar } from "@puzzle/ui";
+import { Avatar } from "@puzzle-ui/ui";
 
 const meta = {
   title: "UI/Components/Avatar",

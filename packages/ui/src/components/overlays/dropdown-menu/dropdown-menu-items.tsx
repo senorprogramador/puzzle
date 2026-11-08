@@ -13,7 +13,7 @@ import {
   type ReactElement,
 } from "react";
 
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 
 import { useDropdownMenuContext } from "./dropdown-menu.context";
 

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GardenIcon } from "@puzzle/icons/sets/garden";
-import { GardenIconPage } from "@puzzle/icons/sets/garden.page";
-import { ALL_GARDEN_ICONS } from "@puzzle/icons/sets/garden.constants";
+import { GardenIcon } from "@puzzle-ui/icons/sets/garden";
+import { GardenIconPage } from "@puzzle-ui/icons/sets/garden.page";
+import { ALL_GARDEN_ICONS } from "@puzzle-ui/icons/sets/garden.constants";
 
 const meta = {
   title: "Icons/Sets/Garden",

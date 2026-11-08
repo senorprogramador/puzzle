@@ -1,5 +1,5 @@
 {
-  "name": "playground",
+  "name": "@puzzle-ui/playground",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,11 +11,11 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@puzzle/core": "workspace:*",
-    "@puzzle/hooks": "workspace:*",
-    "@puzzle/icons": "workspace:*",
-    "@puzzle/theme": "workspace:*",
-    "@puzzle/ui": "workspace:*",
+    "@puzzle-ui/core": "workspace:*",
+    "@puzzle-ui/hooks": "workspace:*",
+    "@puzzle-ui/icons": "workspace:*",
+    "@puzzle-ui/theme": "workspace:*",
+    "@puzzle-ui/ui": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

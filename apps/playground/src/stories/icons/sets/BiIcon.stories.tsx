@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { BiIcon } from "@puzzle/icons/sets/bi";
-import { BiIconPage } from "@puzzle/icons/sets/bi.page";
-import { ALL_BI_ICONS } from "@puzzle/icons/sets/bi.constants";
+import { BiIcon } from "@puzzle-ui/icons/sets/bi";
+import { BiIconPage } from "@puzzle-ui/icons/sets/bi.page";
+import { ALL_BI_ICONS } from "@puzzle-ui/icons/sets/bi.constants";
 
 const meta = {
   title: "Icons/Sets/Bi",

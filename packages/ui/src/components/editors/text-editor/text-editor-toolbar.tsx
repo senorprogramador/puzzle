@@ -2,12 +2,12 @@
 
 import type { KeyboardEvent } from "react";
 
-import { useRovingFocus } from "@puzzle/hooks";
+import { useRovingFocus } from "@puzzle-ui/hooks";
 import { Button } from "../../actions/button";
 import { Stack } from "../../layout/stack";
-import { Icon } from "@puzzle/icons";
+import { Icon } from "@puzzle-ui/icons";
 import { useTextEditor } from ".";
-import { cn } from "@puzzle/core";
+import { cn } from "@puzzle-ui/core";
 
 import "./text-editor-toolbar.css";
 

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MaterialIconThemeIcon } from "@puzzle/icons/sets/material-icon-theme";
-import { MaterialIconThemeIconPage } from "@puzzle/icons/sets/material-icon-theme.page";
-import { ALL_MATERIAL_ICON_THEME_ICONS } from "@puzzle/icons/sets/material-icon-theme.constants";
+import { MaterialIconThemeIcon } from "@puzzle-ui/icons/sets/material-icon-theme";
+import { MaterialIconThemeIconPage } from "@puzzle-ui/icons/sets/material-icon-theme.page";
+import { ALL_MATERIAL_ICON_THEME_ICONS } from "@puzzle-ui/icons/sets/material-icon-theme.constants";
 
 const meta = {
   title: "Icons/Sets/MaterialIconTheme",

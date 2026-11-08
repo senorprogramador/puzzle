@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { MageIcon } from "@puzzle/icons/sets/mage";
-import { MageIconPage } from "@puzzle/icons/sets/mage.page";
-import { ALL_MAGE_ICONS } from "@puzzle/icons/sets/mage.constants";
+import { MageIcon } from "@puzzle-ui/icons/sets/mage";
+import { MageIconPage } from "@puzzle-ui/icons/sets/mage.page";
+import { ALL_MAGE_ICONS } from "@puzzle-ui/icons/sets/mage.constants";
 
 const meta = {
   title: "Icons/Sets/Mage",

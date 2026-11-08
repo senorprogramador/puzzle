@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { CuidaIcon } from "@puzzle/icons/sets/cuida";
-import { CuidaIconPage } from "@puzzle/icons/sets/cuida.page";
-import { ALL_CUIDA_ICONS } from "@puzzle/icons/sets/cuida.constants";
+import { CuidaIcon } from "@puzzle-ui/icons/sets/cuida";
+import { CuidaIconPage } from "@puzzle-ui/icons/sets/cuida.page";
+import { ALL_CUIDA_ICONS } from "@puzzle-ui/icons/sets/cuida.constants";
 
 const meta = {
   title: "Icons/Sets/Cuida",

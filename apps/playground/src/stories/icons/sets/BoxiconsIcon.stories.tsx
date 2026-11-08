@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { BoxiconsIcon } from "@puzzle/icons/sets/boxicons";
-import { BoxiconsIconPage } from "@puzzle/icons/sets/boxicons.page";
-import { ALL_BOXICONS_ICONS } from "@puzzle/icons/sets/boxicons.constants";
+import { BoxiconsIcon } from "@puzzle-ui/icons/sets/boxicons";
+import { BoxiconsIconPage } from "@puzzle-ui/icons/sets/boxicons.page";
+import { ALL_BOXICONS_ICONS } from "@puzzle-ui/icons/sets/boxicons.constants";
 
 const meta = {
   title: "Icons/Sets/Boxicons",

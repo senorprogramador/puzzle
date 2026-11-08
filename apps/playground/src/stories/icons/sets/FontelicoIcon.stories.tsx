@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FontelicoIcon } from "@puzzle/icons/sets/fontelico";
-import { FontelicoIconPage } from "@puzzle/icons/sets/fontelico.page";
-import { ALL_FONTELICO_ICONS } from "@puzzle/icons/sets/fontelico.constants";
+import { FontelicoIcon } from "@puzzle-ui/icons/sets/fontelico";
+import { FontelicoIconPage } from "@puzzle-ui/icons/sets/fontelico.page";
+import { ALL_FONTELICO_ICONS } from "@puzzle-ui/icons/sets/fontelico.constants";
 
 const meta = {
   title: "Icons/Sets/Fontelico",

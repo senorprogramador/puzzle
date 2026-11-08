@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { WordpressIcon } from "@puzzle/icons/sets/wordpress";
-import { WordpressIconPage } from "@puzzle/icons/sets/wordpress.page";
-import { ALL_WORDPRESS_ICONS } from "@puzzle/icons/sets/wordpress.constants";
+import { WordpressIcon } from "@puzzle-ui/icons/sets/wordpress";
+import { WordpressIconPage } from "@puzzle-ui/icons/sets/wordpress.page";
+import { ALL_WORDPRESS_ICONS } from "@puzzle-ui/icons/sets/wordpress.constants";
 
 const meta = {
   title: "Icons/Sets/Wordpress",

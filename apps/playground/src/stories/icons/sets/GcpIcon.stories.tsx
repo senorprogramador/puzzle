@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GcpIcon } from "@puzzle/icons/sets/gcp";
-import { GcpIconPage } from "@puzzle/icons/sets/gcp.page";
-import { ALL_GCP_ICONS } from "@puzzle/icons/sets/gcp.constants";
+import { GcpIcon } from "@puzzle-ui/icons/sets/gcp";
+import { GcpIconPage } from "@puzzle-ui/icons/sets/gcp.page";
+import { ALL_GCP_ICONS } from "@puzzle-ui/icons/sets/gcp.constants";
 
 const meta = {
   title: "Icons/Sets/Gcp",

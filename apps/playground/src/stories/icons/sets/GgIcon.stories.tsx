@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { GgIcon } from "@puzzle/icons/sets/gg";
-import { GgIconPage } from "@puzzle/icons/sets/gg.page";
-import { ALL_GG_ICONS } from "@puzzle/icons/sets/gg.constants";
+import { GgIcon } from "@puzzle-ui/icons/sets/gg";
+import { GgIconPage } from "@puzzle-ui/icons/sets/gg.page";
+import { ALL_GG_ICONS } from "@puzzle-ui/icons/sets/gg.constants";
 
 const meta = {
   title: "Icons/Sets/Gg",

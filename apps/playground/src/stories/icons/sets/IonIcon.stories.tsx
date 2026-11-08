@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { IonIcon } from "@puzzle/icons/sets/ion";
-import { IonIconPage } from "@puzzle/icons/sets/ion.page";
-import { ALL_ION_ICONS } from "@puzzle/icons/sets/ion.constants";
+import { IonIcon } from "@puzzle-ui/icons/sets/ion";
+import { IonIconPage } from "@puzzle-ui/icons/sets/ion.page";
+import { ALL_ION_ICONS } from "@puzzle-ui/icons/sets/ion.constants";
 
 const meta = {
   title: "Icons/Sets/Ion",

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { SystemUiconsIcon } from "@puzzle/icons/sets/system-uicons";
-import { SystemUiconsIconPage } from "@puzzle/icons/sets/system-uicons.page";
-import { ALL_SYSTEM_UICONS_ICONS } from "@puzzle/icons/sets/system-uicons.constants";
+import { SystemUiconsIcon } from "@puzzle-ui/icons/sets/system-uicons";
+import { SystemUiconsIconPage } from "@puzzle-ui/icons/sets/system-uicons.page";
+import { ALL_SYSTEM_UICONS_ICONS } from "@puzzle-ui/icons/sets/system-uicons.constants";
 
 const meta = {
   title: "Icons/Sets/SystemUicons",

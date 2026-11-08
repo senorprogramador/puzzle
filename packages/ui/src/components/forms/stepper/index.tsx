@@ -4,8 +4,8 @@ import {
   cn,
   resolveResponsiveValue,
   type ResponsiveValue,
-} from "@puzzle/core";
-import { useRovingFocus } from "@puzzle/hooks";
+} from "@puzzle-ui/core";
+import { useRovingFocus } from "@puzzle-ui/hooks";
 import {
   Children,
   isValidElement,

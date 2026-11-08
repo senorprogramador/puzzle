@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { IconParkOutlineIcon } from "@puzzle/icons/sets/icon-park-outline";
-import { IconParkOutlineIconPage } from "@puzzle/icons/sets/icon-park-outline.page";
-import { ALL_ICON_PARK_OUTLINE_ICONS } from "@puzzle/icons/sets/icon-park-outline.constants";
+import { IconParkOutlineIcon } from "@puzzle-ui/icons/sets/icon-park-outline";
+import { IconParkOutlineIconPage } from "@puzzle-ui/icons/sets/icon-park-outline.page";
+import { ALL_ICON_PARK_OUTLINE_ICONS } from "@puzzle-ui/icons/sets/icon-park-outline.constants";
 
 const meta = {
   title: "Icons/Sets/IconParkOutline",

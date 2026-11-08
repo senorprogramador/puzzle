@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { HugeiconsIcon } from "@puzzle/icons/sets/hugeicons";
-import { HugeiconsIconPage } from "@puzzle/icons/sets/hugeicons.page";
-import { ALL_HUGEICONS_ICONS } from "@puzzle/icons/sets/hugeicons.constants";
+import { HugeiconsIcon } from "@puzzle-ui/icons/sets/hugeicons";
+import { HugeiconsIconPage } from "@puzzle-ui/icons/sets/hugeicons.page";
+import { ALL_HUGEICONS_ICONS } from "@puzzle-ui/icons/sets/hugeicons.constants";
 
 const meta = {
   title: "Icons/Sets/Hugeicons",

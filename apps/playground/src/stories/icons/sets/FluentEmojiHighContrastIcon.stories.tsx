@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 
-import { FluentEmojiHighContrastIcon } from "@puzzle/icons/sets/fluent-emoji-high-contrast";
-import { FluentEmojiHighContrastIconPage } from "@puzzle/icons/sets/fluent-emoji-high-contrast.page";
-import { ALL_FLUENT_EMOJI_HIGH_CONTRAST_ICONS } from "@puzzle/icons/sets/fluent-emoji-high-contrast.constants";
+import { FluentEmojiHighContrastIcon } from "@puzzle-ui/icons/sets/fluent-emoji-high-contrast";
+import { FluentEmojiHighContrastIconPage } from "@puzzle-ui/icons/sets/fluent-emoji-high-contrast.page";
+import { ALL_FLUENT_EMOJI_HIGH_CONTRAST_ICONS } from "@puzzle-ui/icons/sets/fluent-emoji-high-contrast.constants";
 
 const meta = {
   title: "Icons/Sets/FluentEmojiHighContrast",
