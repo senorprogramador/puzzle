@@ -9,10 +9,12 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dryRun = process.argv.includes("--dry-run");
 
 // Publish order: dependencies before the packages that depend on them.
-const packages = ["core", "theme", "hooks", "icons", "ui"].map((name) => {
-  const dir = join(root, "packages", name);
-  return { dir, manifestPath: join(dir, "package.json") };
-});
+const packages = ["core", "theme", "hooks", "icons", "ui", "create"].map(
+  (name) => {
+    const dir = join(root, "packages", name);
+    return { dir, manifestPath: join(dir, "package.json") };
+  },
+);
 const dependencyFields = [
   "dependencies",
   "peerDependencies",

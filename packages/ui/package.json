@@ -36,7 +36,7 @@
     "test:component": "bunx vitest run --project component",
     "test:browser": "bunx vitest run --project browser",
     "test:all": "bunx vitest run",
-    "vitest:watch": "bunx vitest",
+    "vitest:watch": "bunx vitest run --watch --passWithNoTests",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
   },

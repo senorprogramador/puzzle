@@ -1,0 +1,36 @@
+{
+  "name": "@puzzle-ui/create",
+  "version": "0.2.0",
+  "description": "Create Beautiful React applications fast with Puzzle UI",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "create-puzzle": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run",
+    "test:watch": "bunx vitest run --watch --passWithNoTests",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "tsdown": "^0.23.1",
+    "typescript": "^6.0.3",
+    "vitest": "^5.1.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

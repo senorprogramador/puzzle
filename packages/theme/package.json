@@ -52,7 +52,7 @@
   "scripts": {
     "build": "tsdown",
     "vitest": "bunx vitest run",
-    "vitest:watch": "bunx vitest",
+    "vitest:watch": "bunx vitest run --watch --passWithNoTests",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
   },
