@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/theme",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Theme components for Puzzle",
   "license": "MIT",
   "publishConfig": {
@@ -57,7 +57,7 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.1.0"
+    "@puzzle-ui/core": "^0.2.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",
