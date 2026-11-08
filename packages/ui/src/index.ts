@@ -349,6 +349,36 @@ export { Dialog, type DialogProps } from "./components/overlays/dialog";
 export { Drawer, type DrawerProps } from "./components/overlays/drawer";
 
 export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuGroup,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from "./components/overlays/dropdown-menu";
+
+export type {
+  DropdownMenuProps,
+  DropdownMenuTriggerProps,
+  DropdownMenuContentProps,
+  DropdownMenuItemProps,
+  DropdownMenuGroupProps,
+  DropdownMenuLabelProps,
+  DropdownMenuSeparatorProps,
+  DropdownMenuCheckboxItemProps,
+  DropdownMenuRadioGroupProps,
+  DropdownMenuRadioItemProps,
+  DropdownMenuPosition,
+  DropdownMenuAlignment,
+  DropdownMenuItemVariant,
+  DropdownMenuCheckedState,
+} from "./components/overlays/dropdown-menu";
+
+export {
   Notification,
   NotificationViewport,
   type NotificationProps,

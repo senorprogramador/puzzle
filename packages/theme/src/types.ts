@@ -3,6 +3,31 @@ import type { COLOR_THEMES } from "./constants";
 
 export type ThemeMode = "light" | "dark" | "system";
 
+export type TypographyStyle =
+  | "display1"
+  | "display2"
+  | "headline1"
+  | "headline2"
+  | "headline3"
+  | "headline4"
+  | "subtitle1"
+  | "subtitle2"
+  | "body1"
+  | "body2"
+  | "button"
+  | "caption"
+  | "overline";
+
+export type ThemeTypographyFontRole = "heading" | "body" | "accent";
+
+export type ThemeTypographyRoleTokens = {
+  font: ThemeTypographyFontRole;
+  fontSize: string;
+  fontWeight: string;
+  lineHeight: string;
+  letterSpacing: string;
+};
+
 /**
  * Semantic colors for one color scheme.
  *
@@ -136,6 +161,14 @@ export type ThemeTokens = {
       /** Gap before a heading that follows a paragraph. */
       sectionGap: string;
     };
+
+    /**
+     * Named typography roles used by global elements and components.
+     *
+     * Optional for backwards-compatible input. Resolved themes always
+     * contain every role.
+     */
+    roles?: Partial<Record<TypographyStyle, ThemeTypographyRoleTokens>>;
   };
 
   /** Spacing scale used by layout and components. */
@@ -204,7 +237,16 @@ export type ThemeTokens = {
     style: string;
   };
 
+  /**
+   * Responsive breakpoints.
+   *
+   * These values are exposed as CSS variables for consumers and
+   * JavaScript integrations. Component CSS uses build-time custom-media
+   * aliases from breakpoints.css; runtime theme overrides cannot change
+   * compiled @media thresholds.
+   */
   breakpoints: {
+    compact: string;
     tablet: string;
     desktop: string;
     hd: string;
@@ -243,6 +285,12 @@ export type ThemeTokens = {
   };
 };
 
+export type ResolvedThemeTokens = Omit<ThemeTokens, "typography"> & {
+  typography: Omit<ThemeTokens["typography"], "roles"> & {
+    roles: Record<TypographyStyle, ThemeTypographyRoleTokens>;
+  };
+};
+
 export type ColorTheme = {
   light: ThemeTokens["colorSchemes"]["light"];
   dark: Pick<
@@ -266,6 +314,16 @@ export type ColorThemes = keyof typeof COLOR_THEMES;
  *   colorSchemes: {
  *     dark: {
  *       background: "#101010"
+ *     }
+ *   },
+ *   typography: {
+ *     fontSize: {
+ *       base: "1.125rem"
+ *     },
+ *     roles: {
+ *       body1: {
+ *         letterSpacing: "0.02em"
+ *       }
  *     }
  *   }
  * }

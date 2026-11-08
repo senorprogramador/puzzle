@@ -1,3 +1,7 @@
+import type { ThemeTypographyRoleTokens, TypographyStyle } from "../types";
+
+export type { TypographyStyle } from "../types";
+
 export const typographyDefaults = {
   // Display — hero titles and prominent marketing content
   display1: {
@@ -140,7 +144,6 @@ export const typographyDefaults = {
   },
 } as const;
 
-export type TypographyStyle = keyof typeof typographyDefaults;
 export type ResponsiveFontSize = {
   min: number;
   max: number;
@@ -148,18 +151,108 @@ export type ResponsiveFontSize = {
   maxViewport?: number;
 };
 
-export function createFluidFontSize({
+export const createFluidFontSize = ({
   min,
   max,
   minViewport = 360,
   maxViewport = 1440,
-}: ResponsiveFontSize): string {
+}: ResponsiveFontSize): string => {
   const minRem = min / 16;
   const maxRem = max / 16;
 
   const slope = ((max - min) / (maxViewport - minViewport)) * 100;
-
   const intercept = (min - (slope * minViewport) / 100) / 16;
 
   return `clamp(${minRem}rem, ${intercept.toFixed(4)}rem + ${slope.toFixed(4)}vw, ${maxRem}rem)`;
-}
+};
+
+const fontSizeScaleByRole: Partial<Record<TypographyStyle, string>> = {
+  headline4: "xl",
+  subtitle1: "base",
+  subtitle2: "sm",
+  body1: "base",
+  body2: "sm",
+  button: "sm",
+  caption: "xs",
+};
+
+const fontWeightTokenByValue = new Map<number, string>([
+  [400, "normal"],
+  [500, "medium"],
+  [600, "semibold"],
+  [700, "bold"],
+  [800, "extrabold"],
+]);
+
+const lineHeightTokenByValue = new Map<number, string>([
+  [1, "none"],
+  [1.15, "tight"],
+  [1.3, "snug"],
+  [1.5, "normal"],
+  [1.625, "relaxed"],
+  [2, "loose"],
+]);
+
+const letterSpacingTokens = [
+  { value: -0.05, token: "tighter" },
+  { value: -0.025, token: "tight" },
+  { value: 0, token: "normal" },
+  { value: 0.025, token: "wide" },
+  { value: 0.05, token: "wider" },
+  { value: 0.1, token: "widest" },
+] as const;
+
+const createTypographyRole = (
+  name: TypographyStyle,
+  typography: (typeof typographyDefaults)[TypographyStyle],
+): ThemeTypographyRoleTokens => {
+  const fontSizeScale = fontSizeScaleByRole[name];
+
+  const fontSize =
+    fontSizeScale !== undefined
+      ? `var(--puzzle-font-size-${fontSizeScale})`
+      : "responsive" in typography
+        ? createFluidFontSize(typography.responsive)
+        : `${typography.size / 16}rem`;
+
+  const fontWeightToken = fontWeightTokenByValue.get(typography.weight);
+  const fontWeight =
+    fontWeightToken !== undefined
+      ? `var(--puzzle-font-weight-${fontWeightToken})`
+      : String(typography.weight);
+
+  const lineHeightToken = lineHeightTokenByValue.get(typography.lineHeight);
+  const lineHeight =
+    lineHeightToken !== undefined
+      ? `var(--puzzle-font-line-height-${lineHeightToken})`
+      : String(typography.lineHeight);
+
+  const normalizedLetterSpacing = typography.letterSpacing / typography.size;
+
+  const letterSpacingToken = letterSpacingTokens.find(
+    ({ value }) => Math.abs(value - normalizedLetterSpacing) < 0.000001,
+  );
+
+  const letterSpacing =
+    letterSpacingToken !== undefined
+      ? `var(--puzzle-font-letter-spacing-${letterSpacingToken.token})`
+      : `${normalizedLetterSpacing}em`;
+
+  return {
+    font: typography.font,
+    fontSize,
+    fontWeight,
+    lineHeight,
+    letterSpacing,
+  };
+};
+
+export const DEFAULT_TYPOGRAPHY_ROLES = Object.fromEntries(
+  Object.entries(typographyDefaults).map(([name, typography]) => [
+    name,
+    createTypographyRole(
+      name as TypographyStyle,
+      typography as (typeof typographyDefaults)[TypographyStyle],
+    ),
+  ]),
+) as Record<TypographyStyle, ThemeTypographyRoleTokens>;
