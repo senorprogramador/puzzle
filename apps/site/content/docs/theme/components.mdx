@@ -1,0 +1,76 @@
+---
+title: Component Overrides
+description: Globally override how Puzzle renders links and images to integrate with routers and frameworks.
+---
+
+Puzzle components are router- and framework-independent. The `components` prop on `Theme` lets you provide the link and image implementations your application uses, and every Puzzle component that renders a link or image picks them up automatically.
+
+## ThemeComponents
+
+```tsx
+type ThemeComponents = {
+  link?: ThemeLinkComponent;
+  image?: ThemeImageComponent;
+};
+```
+
+## Link overrides
+
+A link override is either a component that follows the standard `href` contract, or a configuration object for components that use a different destination prop:
+
+```tsx
+type ThemeLinkComponentConfig = {
+  component: ElementType;
+  /** The prop used for the destination. Defaults to "href". */
+  hrefProp?: "href" | "to";
+};
+```
+
+### TanStack Router
+
+TanStack Router's `Link` uses `to` instead of `href`:
+
+```tsx
+import { Theme } from "@puzzle/theme";
+import { Link } from "@tanstack/react-router";
+
+<Theme components={{ link: { component: Link, hrefProp: "to" } }}>
+  <App />
+</Theme>;
+```
+
+### Next.js
+
+Next.js `Link` already follows the `href` contract, so the component reference is enough:
+
+```tsx
+import Link from "next/link";
+
+<Theme components={{ link: Link }}>
+  <App />
+</Theme>;
+```
+
+Passing `null` resets the override to the native `<a>` element.
+
+## Image overrides
+
+By default Puzzle renders native `<img>` elements. Override this with a framework image component, such as Next.js `Image` or a custom CDN component:
+
+```tsx
+import Image from "next/image";
+
+<Theme components={{ image: Image }}>
+  <App />
+</Theme>;
+```
+
+Passing `null` resets the override to the native `<img>` element.
+
+## Server component boundaries
+
+When passing components through a React Server Component boundary, pass a component reference exported from a `"use client"` module rather than defining the component inline.
+
+## Scoping
+
+Component overrides are provided through React context by `Theme`, so they follow the component tree rather than the CSS scope. A nested `Theme` with its own `components` prop replaces the overrides for its subtree.

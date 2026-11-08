@@ -1,0 +1,97 @@
+---
+title: Theme
+description: The @puzzle/theme package owns Puzzle's design tokens, color themes, typography, fonts, and theme scoping.
+---
+
+`@puzzle/theme` is the source of truth for Puzzle's visual design. It turns a typed token object into `--puzzle-*` CSS custom properties, loads Google Fonts, resolves light and dark color schemes, and lets you scope a theme to the whole document or a single subtree. All `@puzzle/ui` components consume these CSS custom properties, so a single `Theme` provider styles your entire application.
+
+## Import
+
+```tsx
+import { Theme } from "@puzzle/theme";
+```
+
+## Quick start
+
+Wrap your application in a single `Theme` at the root. Without any props it applies the default tokens, follows the user's system color scheme, and injects Puzzle's global styles.
+
+```tsx
+import { Theme } from "@puzzle/theme";
+
+const App = () => (
+  <Theme>
+    <YourApp />
+  </Theme>
+);
+```
+
+A customized root theme typically combines a color theme, fonts, and a few token overrides:
+
+```tsx
+<Theme
+  theme="system"
+  colorTheme="cobalt-sky"
+  fonts={{
+    heading: { family: "Sora" },
+    body: { family: "Inter" },
+  }}
+  tokens={{
+    radius: { md: "0.5rem" },
+  }}
+>
+  <YourApp />
+</Theme>
+```
+
+## What the package provides
+
+| Area | Description | Read more |
+| --- | --- | --- |
+| `Theme` provider | Injects token CSS variables, loads fonts, and applies global styles at root or local scope. | [Theme Provider](/docs/theme/theme-provider) |
+| Design tokens | Typed token groups for spacing, radius, shadows, elevation, borders, layout, motion, and z-index. | [Design Tokens](/docs/theme/tokens) |
+| Colors | Semantic color roles, light/dark color schemes, and built-in color themes. | [Colors](/docs/theme/colors) |
+| Typography & fonts | Named typography roles, fluid font sizes, and Google Font loading. | [Typography & Fonts](/docs/theme/typography) |
+| Breakpoints | Shared responsive breakpoints for JavaScript and CSS. | [Breakpoints](/docs/theme/breakpoints) |
+| Component overrides | Global link and image component overrides for router and framework integration. | [Component Overrides](/docs/theme/components) |
+
+## Exports
+
+```tsx
+import {
+  Theme,
+  GoogleFont,
+  createGoogleFontUrl,
+  BREAKPOINTS,
+} from "@puzzle/theme";
+
+import type {
+  ThemeProps,
+  ThemeScope,
+  ThemeMode,
+  ThemeTokens,
+  ThemeTokenOverrides,
+  ThemeColorSchemeTokens,
+  ThemeTypographyRoleTokens,
+  ThemeTypographyFontRole,
+  TypographyStyle,
+  ColorTheme,
+  Breakpoint,
+  FontRole,
+  FontStyle,
+  FontDisplay,
+  FontConfig,
+  ResolvedFontConfig,
+  FontStylesheet,
+  ThemeFonts,
+  ThemeComponents,
+  ThemeLinkComponent,
+  ThemeLinkComponentConfig,
+  ThemeImageComponent,
+} from "@puzzle/theme";
+```
+
+## How it works
+
+`Theme` resolves the default tokens, the optional `colorTheme`, and your `tokens` overrides into a flat map of `--puzzle-*` CSS custom properties. It renders a `<style>` element that assigns those variables to `:root` (root scope) or to a generated scope attribute (local scope). Static CSS shipped with the package maps the scheme-specific variables—such as `--puzzle-color-scheme-light-primary` and `--puzzle-color-scheme-dark-primary`—onto the semantic variables like `--puzzle-color-primary` based on the active mode, including automatic `prefers-color-scheme` handling in `system` mode.
+
+Every token value is validated before it is written into CSS, so unsafe values and unknown token names throw instead of silently producing broken styles.

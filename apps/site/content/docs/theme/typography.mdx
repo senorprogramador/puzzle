@@ -1,0 +1,128 @@
+---
+title: Typography & Fonts
+description: Typography scales, named typography roles, fluid font sizes, and Google Font loading.
+---
+
+The theme package provides base typography scales, a set of named typography roles used by the `Heading` and `Text` components, and first-class Google Font loading for three font roles.
+
+## Font roles
+
+Fonts are organized into three roles (`FontRole`): `heading`, `body`, and `accent`. Each role resolves to a font family variable, emitted under two equivalent names:
+
+- `--puzzle-font-heading` / `--puzzle-font-family-heading`
+- `--puzzle-font-body` / `--puzzle-font-family-body`
+- `--puzzle-font-accent` / `--puzzle-font-family-accent`
+
+Without configured fonts, every role falls back to `"Open Sans", sans-serif`.
+
+## Loading Google Fonts
+
+Pass a `fonts` map to `Theme`. Each entry is a `FontConfig`:
+
+| Field | Type | Default | Description |
+| --- | --- | --- | --- |
+| `family` | `GoogleFontFamily` | — | A typed Google Font family name. |
+| `weights` | `readonly number[]` | role-based defaults | The weights to load. |
+| `styles` | `readonly ("normal" \| "italic")[]` | `["normal"]` | Font styles to load. |
+| `display` | `"auto" \| "block" \| "swap" \| "fallback" \| "optional"` | `"swap"` | The CSS `font-display` strategy. |
+| `fallback` | `readonly string[]` | role-based defaults | Fallback font families. |
+
+```tsx
+<Theme
+  fonts={{
+    heading: { family: "Sora", weights: [600, 700] },
+    body: { family: "Inter" },
+    accent: { family: "JetBrains Mono", styles: ["normal", "italic"] },
+  }}
+>
+  <App />
+</Theme>
+```
+
+`Theme` renders the Google Fonts preconnect links and one stylesheet link per font, and builds properly quoted `font-family` values including your fallbacks.
+
+### Standalone font loading
+
+`GoogleFont` loads a single font and sets its role variable without the rest of the theme system. Prefer `Theme` when you want the full token system.
+
+```tsx
+import { GoogleFont } from "@puzzle/theme";
+
+<GoogleFont family="Inter" role="body" />;
+```
+
+### createGoogleFontUrl
+
+Builds a Google Fonts CSS2 stylesheet URL for a font configuration:
+
+```tsx
+import { createGoogleFontUrl } from "@puzzle/theme";
+
+const href = createGoogleFontUrl({
+  family: "Inter",
+  weights: [400, 700],
+  styles: ["normal", "italic"],
+  display: "swap",
+});
+```
+
+## Base typography scales
+
+These token groups form the raw scales. Font sizes use `rem` and letter spacing uses `em`.
+
+| Group | CSS variable | Keys |
+| --- | --- | --- |
+| `typography.fontSize` | `--puzzle-font-size-{key}` | `xs` (0.75rem) … `6xl` (3.75rem), with `base` = 1rem |
+| `typography.fontWeight` | `--puzzle-font-weight-{key}` | `normal` 400, `medium` 500, `semibold` 600, `bold` 700, `extrabold` 800 |
+| `typography.lineHeight` | `--puzzle-font-line-height-{key}` | `none` 1, `tight` 1.15, `snug` 1.3, `normal` 1.5, `relaxed` 1.625, `loose` 2 |
+| `typography.letterSpacing` | `--puzzle-font-letter-spacing-{key}` | `tighter` −0.05em … `widest` 0.1em |
+| `typography.fontGap` | `--puzzle-font-gap-{key}` | `headingStackGap`, `headingParagraphGap`, `paragraphGap`, `sectionGap` |
+
+## Typography roles
+
+Named roles (`TypographyStyle`) describe complete text styles. Each role resolves to a font role plus size, weight, line height, and letter spacing, emitted as:
+
+- `--puzzle-font-family-{role}`
+- `--puzzle-font-size-{role}`
+- `--puzzle-font-weight-{role}`
+- `--puzzle-font-line-height-{role}`
+- `--puzzle-font-letter-spacing-{role}`
+
+| Role | Font | Size | Weight | Notes |
+| --- | --- | --- | --- | --- |
+| `display1` | heading | 40–80px fluid | 300 | Largest display text. |
+| `display2` | heading | 36–60px fluid | 300 | |
+| `headline1` | heading | 32–48px fluid | 400 | |
+| `headline2` | heading | 28–36px fluid | 400 | |
+| `headline3` | heading | 22–28px fluid | 400 | |
+| `headline4` | heading | `xl` scale | 500 | |
+| `subtitle1` | heading | `base` scale | 500 | |
+| `subtitle2` | heading | `sm` scale | 500 | |
+| `body1` | body | `base` scale | 400 | Default body text. |
+| `body2` | body | `sm` scale | 400 | |
+| `button` | body | `sm` scale | 500 | |
+| `caption` | body | 12px | 400 | |
+| `overline` | body | 10px | 500 | |
+
+The larger roles use fluid font sizes built with `clamp()`, scaling smoothly between a minimum and maximum size across viewport widths. The smaller roles reference the base font-size scale, so overriding `typography.fontSize` flows through to them.
+
+### Overriding roles
+
+Roles can be overridden per property through `tokens.typography.roles`:
+
+```tsx
+<Theme
+  tokens={{
+    typography: {
+      roles: {
+        headline1: { fontWeight: "600" },
+        body1: { lineHeight: "1.6" },
+      },
+    },
+  }}
+>
+  <App />
+</Theme>
+```
+
+Each role override accepts `font` (a font role), `fontSize`, `fontWeight`, `lineHeight`, and `letterSpacing`.

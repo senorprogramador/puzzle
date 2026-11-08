@@ -1,0 +1,49 @@
+---
+title: Breakpoints
+description: Shared responsive breakpoints for JavaScript and CSS.
+---
+
+The theme package exports a single set of breakpoints so JavaScript logic and CSS media queries stay in sync.
+
+## Import
+
+```tsx
+import { BREAKPOINTS, type Breakpoint } from "@puzzle/theme";
+```
+
+## Values
+
+| Breakpoint | Value |
+| --- | --- |
+| `compact` | `480` |
+| `tablet` | `768` |
+| `desktop` | `1024` |
+| `hd` | `1440` |
+
+Values are numbers in pixels. The `Breakpoint` type is the union of the keys: `"compact" | "tablet" | "desktop" | "hd"`.
+
+## Usage in JavaScript
+
+```tsx
+import { BREAKPOINTS } from "@puzzle/theme";
+
+const isDesktop = window.matchMedia(
+  `(min-width: ${BREAKPOINTS.desktop}px)`,
+).matches;
+```
+
+## Usage in CSS
+
+The `tablet`, `desktop`, and `hd` breakpoints are also available as [design tokens](/docs/theme/tokens#breakpoints), emitted as `--puzzle-breakpoint-tablet`, `--puzzle-breakpoint-desktop`, and `--puzzle-breakpoint-hd`. Note that CSS custom properties cannot be used inside media query conditions, so media queries should use the pixel values directly; the token variables are useful for layout calculations such as `max-width`.
+
+```css
+.layout {
+  max-width: var(--puzzle-breakpoint-desktop);
+}
+
+@media (min-width: 768px) {
+  .layout {
+    padding: var(--puzzle-space-8);
+  }
+}
+```

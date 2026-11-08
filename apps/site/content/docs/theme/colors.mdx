@@ -1,0 +1,80 @@
+---
+title: Colors
+description: Semantic color roles, light and dark color schemes, and the built-in color themes.
+---
+
+Puzzle uses semantic color roles instead of raw palette values. Each role exists in a light and a dark color scheme, and the active [theme mode](/docs/theme/theme-provider#theme-modes) decides which scheme resolves into the semantic `--puzzle-color-*` variables that components consume.
+
+## Color roles
+
+Every color scheme defines the following roles (`ThemeColorSchemeTokens`):
+
+| Role | CSS variable | Purpose |
+| --- | --- | --- |
+| `background` | `--puzzle-color-background` | Page background. |
+| `surface` | `--puzzle-color-surface` | Default surface for cards and panels. |
+| `surfaceElevated` | `--puzzle-color-surface-elevated` | Raised surfaces such as menus and dialogs. |
+| `surfaceSunken` | `--puzzle-color-surface-sunken` | Recessed surfaces such as wells and inputs. |
+| `text` | `--puzzle-color-text` | Primary text. |
+| `textMuted` | `--puzzle-color-text-muted` | Secondary text. |
+| `textSubtle` | `--puzzle-color-text-subtle` | Tertiary, de-emphasized text. |
+| `border` | `--puzzle-color-border` | Default borders and dividers. |
+| `borderStrong` | `--puzzle-color-border-strong` | Emphasized borders. |
+| `primary` / `primaryForeground` | `--puzzle-color-primary` / `--puzzle-color-primary-foreground` | Primary actions and their text. |
+| `secondary` / `secondaryForeground` | `--puzzle-color-secondary` / `--puzzle-color-secondary-foreground` | Secondary actions. |
+| `accent` / `accentForeground` | `--puzzle-color-accent` / `--puzzle-color-accent-foreground` | Accents and highlights. |
+| `ring` | `--puzzle-color-ring` | Focus rings. |
+| `success` / `successForeground` | `--puzzle-color-success` / `--puzzle-color-success-foreground` | Positive status. |
+| `warning` / `warningForeground` | `--puzzle-color-warning` / `--puzzle-color-warning-foreground` | Cautionary status. |
+| `danger` / `dangerForeground` | `--puzzle-color-danger` / `--puzzle-color-danger-foreground` | Destructive actions and errors. |
+| `info` / `infoForeground` | `--puzzle-color-info` / `--puzzle-color-info-foreground` | Informational status. |
+
+## Light and dark schemes
+
+Both schemes are always emitted as scheme-specific variables—`--puzzle-color-scheme-light-{role}` and `--puzzle-color-scheme-dark-{role}`—and the package's static CSS maps the active scheme onto the semantic `--puzzle-color-{role}` variables. In `system` mode this happens through `prefers-color-scheme`, so switching the OS appearance updates the UI without re-rendering. The CSS `color-scheme` property is set alongside, keeping native form controls and scrollbars consistent.
+
+Override individual scheme colors through the `tokens` prop:
+
+```tsx
+<Theme
+  tokens={{
+    colorSchemes: {
+      light: { primary: "#0F766E", primaryForeground: "#FFFFFF" },
+      dark: { primary: "#2DD4BF", primaryForeground: "#042F2E" },
+    },
+  }}
+>
+  <App />
+</Theme>
+```
+
+## Built-in color themes
+
+The `colorTheme` prop swaps the default color schemes for a curated palette:
+
+```tsx
+<Theme colorTheme="violet-dream">
+  <App />
+</Theme>
+```
+
+Available themes:
+
+- `cobalt-sky`
+- `violet-dream`
+- `emerald-forest`
+- `coral-navy`
+- `ocean-blue`
+- `mint-graphite`
+- `plum-rose`
+- `graphite-cyan`
+- `soft-white-terracotta`
+- `electric-indigo`
+
+Each color theme (`ColorTheme`) defines a complete light scheme plus dark-mode overrides for the brand roles (`primary`, `secondary`, and `accent` with their foregrounds); the remaining dark roles fall back to the theme's light values merged with Puzzle's dark defaults. `tokens.colorSchemes` overrides still apply on top of a color theme, so you can pick a palette and fine-tune individual roles.
+
+## Guidelines
+
+- Always pair a role with its foreground: `primary` text should use `primaryForeground`.
+- Use `ring` for focus indicators rather than reusing `primary`.
+- Never hardcode colors in component CSS; reference the semantic variables so light/dark modes and color themes keep working.

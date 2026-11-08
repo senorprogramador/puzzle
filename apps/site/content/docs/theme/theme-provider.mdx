@@ -1,0 +1,88 @@
+---
+title: Theme Provider
+description: The Theme component injects design token CSS variables, loads fonts, and applies Puzzle's global styles.
+---
+
+The `Theme` component is the entry point of the theme system. It resolves tokens into CSS custom properties, renders font stylesheet links, and provides theme context to Puzzle components.
+
+## Import
+
+```tsx
+import { Theme } from "@puzzle/theme";
+```
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `theme` | `"light" \| "dark" \| "system"` | `"system"` | The color scheme mode. `system` follows `prefers-color-scheme`. |
+| `scope` | `"root" \| "local"` | `"root"` | Whether variables apply to `:root` or only to the component's subtree. |
+| `globalStyles` | `boolean` | `true` | Applies Puzzle's global base styles. Only used with root scope. |
+| `tokens` | `ThemeTokenOverrides` | — | Deep-partial overrides of the default [design tokens](/docs/theme/tokens). |
+| `colorTheme` | `ColorThemes` | — | One of the built-in [color themes](/docs/theme/colors#built-in-color-themes). |
+| `fonts` | `Partial<Record<FontRole, FontConfig>>` | — | Google Fonts for the `heading`, `body`, and `accent` roles. See [Typography & Fonts](/docs/theme/typography). |
+| `components` | `ThemeComponents` | — | Global link and image [component overrides](/docs/theme/components). |
+| `nonce` | `string` | — | CSP nonce applied to the injected `<style>` elements. |
+
+## Root scope
+
+With the default `scope="root"`, the resolved CSS variables are assigned to `:root` and the theme applies to the whole document. This is the standard setup for an application:
+
+```tsx
+<Theme theme="system" colorTheme="emerald-forest">
+  <App />
+</Theme>
+```
+
+Root scope also applies Puzzle's global styles unless you opt out:
+
+```tsx
+<Theme globalStyles={false}>
+  <App />
+</Theme>
+```
+
+## Local scope
+
+With `scope="local"`, the variables are assigned to a generated scope attribute instead of `:root`, and the children are wrapped in a scope element that resolves the color scheme locally. Use this to theme a single section differently from the rest of the page—for example, a permanently dark hero or an embedded preview:
+
+```tsx
+<Theme scope="local" theme="dark">
+  <HeroSection />
+</Theme>
+```
+
+Local scopes do not create a layout box (`display: contents`), so wrapping content in a scoped theme does not affect layout. Local scopes never apply global styles and can be nested inside a root theme; descendants inherit the scoped variables while the rest of the document keeps the root theme.
+
+## Theme modes
+
+- `light` — forces the light color scheme.
+- `dark` — forces the dark color scheme.
+- `system` — follows the user's `prefers-color-scheme` setting and updates automatically.
+
+The active mode controls which color scheme tokens resolve into the semantic `--puzzle-color-*` variables, and sets the CSS `color-scheme` so native controls, scrollbars, and form elements match.
+
+## Fonts
+
+When `fonts` are provided, `Theme` renders preconnect links for Google Fonts plus one stylesheet link per configured font, and wires the resolved font families into the typography CSS variables:
+
+```tsx
+<Theme
+  fonts={{
+    heading: { family: "Sora", weights: [600, 700] },
+    body: { family: "Inter" },
+  }}
+>
+  <App />
+</Theme>
+```
+
+## Content Security Policy
+
+If your application uses a CSP that restricts inline styles, pass a `nonce`. It is applied to the injected `<style>` elements:
+
+```tsx
+<Theme nonce={cspNonce}>
+  <App />
+</Theme>
+```
