@@ -14,11 +14,6 @@
     width: var(--puzzle-sidebar-collapsed-width);
     min-width: 0;
 
-    /*
-     * Keep the sidebar anchored to the viewport.
-     * Use min-height rather than a height that changes
-     * whenever the sticky offset is recalculated.
-     */
     height: auto;
     min-height: calc(100svh - var(--puzzle-sticky-offset, 0px));
     max-height: calc(100svh - var(--puzzle-sticky-offset, 0px));
@@ -167,7 +162,7 @@
 
 .puzzle-collapsable-sidebar__item:hover {
     color: var(--puzzle-color-text);
-    background: var(--puzzle-color-background-subtle, var(--puzzle-color-background));
+    background: var(--puzzle-color-surface-sunken, var(--puzzle-color-surface));
 }
 
 .puzzle-collapsable-sidebar__item.active,

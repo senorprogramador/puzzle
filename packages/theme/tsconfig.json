@@ -14,9 +14,6 @@
         "forceConsistentCasingInFileNames": true,
         "verbatimModuleSyntax": true,
         "noEmit": true,
-        "types": [
-            "node"
-        ],
         "jsx": "react-jsx",
         "paths": {
             "@puzzle/core": [

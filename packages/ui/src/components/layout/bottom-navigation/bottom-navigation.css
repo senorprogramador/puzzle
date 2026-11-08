@@ -90,7 +90,7 @@
 
 .puzzle-bottom-navigation-item:hover {
     color: var(--puzzle-color-text);
-    background: var(--puzzle-color-background-subtle, transparent);
+    background: var(--puzzle-color-surface-sunken, var(--puzzle-color-surface));
 }
 
 .puzzle-bottom-navigation-item.active,
