@@ -8,7 +8,9 @@ export default defineConfig({
   ],
   unbundle: true,
   format: ["esm", "cjs"],
-  dts: false,
+  fixedExtension: false,
+  css: { inject: true },
+  dts: true,
   clean: true,
   sourcemap: true,
   deps: {

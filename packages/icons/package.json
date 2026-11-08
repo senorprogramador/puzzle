@@ -23,12 +23,12 @@
     "vitest": "bunx vitest run --passWithNoTests",
     "vitest:watch": "bunx vitest",
     "clean": "rm -rf dist",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "tsdown"
   },
   "dependencies": {
     "@iconify/react": "^6.0.3",
     "@iconify/utils": "^3.1.7",
-    "@puzzle/core": "workspace:*"
+    "@puzzle/core": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

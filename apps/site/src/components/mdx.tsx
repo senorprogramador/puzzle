@@ -4,6 +4,7 @@ import type { MDXComponents } from "mdx/types";
 import * as PuzzleUI from "@puzzle/ui";
 import * as PuzzleIcons from "@puzzle/icons";
 import { cn } from "@puzzle/core";
+import { PackageManagerTab, PackageManagerTabs } from "./package-manager-tabs";
 
 // Puzzle's exports include non-component values (e.g. hooks), which MDX would
 // treat as components; keep only capitalized exports.
@@ -50,6 +51,8 @@ export function getMDXComponents(components?: MDXComponents) {
     ...defaultMdxComponents,
     ...puzzleComponents,
     ...headings,
+    PackageManagerTabs,
+    PackageManagerTab,
     ...components,
   } satisfies MDXComponents;
 }

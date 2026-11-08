@@ -20,10 +20,10 @@
     --color-fd-border: var(--puzzle-color-border);
     --color-fd-primary: var(--puzzle-color-primary);
     --color-fd-primary-foreground: var(--puzzle-color-primary-foreground);
-    --color-fd-secondary: var(--puzzle-color-secondary);
-    --color-fd-secondary-foreground: var(--puzzle-color-secondary-foreground);
-    --color-fd-accent: var(--puzzle-color-accent);
-    --color-fd-accent-foreground: var(--puzzle-color-accent-foreground);
+    --color-fd-secondary: var(--puzzle-color-surface-sunken);
+    --color-fd-secondary-foreground: var(--puzzle-color-text);
+    --color-fd-accent: var(--puzzle-color-surface-sunken);
+    --color-fd-accent-foreground: var(--puzzle-color-text);
     --color-fd-ring: var(--puzzle-color-ring);
     --font-sans: var(--puzzle-font-family-body);
 }

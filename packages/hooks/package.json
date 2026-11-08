@@ -21,10 +21,10 @@
   "scripts": {
     "build": "tsdown",
     "clean": "rm -rf dist",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "tsdown"
   },
   "dependencies": {
-    "@puzzle/core": "workspace:*"
+    "@puzzle/core": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^19.0.0"

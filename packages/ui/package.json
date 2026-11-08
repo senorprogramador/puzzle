@@ -29,13 +29,13 @@
     "test:all": "bunx vitest run",
     "vitest:watch": "bunx vitest",
     "clean": "rm -rf dist",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "tsdown"
   },
   "dependencies": {
-    "@puzzle/core": "workspace:*",
-    "@puzzle/hooks": "workspace:*",
-    "@puzzle/icons": "workspace:*",
-    "@puzzle/theme": "workspace:*"
+    "@puzzle/core": "^0.1.0",
+    "@puzzle/hooks": "^0.1.0",
+    "@puzzle/icons": "^0.1.0",
+    "@puzzle/theme": "^0.1.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

@@ -2,6 +2,11 @@ import type { TreeViewItem } from "@puzzle/ui/components/navigation/tree-view";
 
 const items: TreeViewItem[] = [
   {
+    id: "getting-started",
+    label: "Getting Started",
+    href: "/docs/getting-started",
+  },
+  {
     id: "components",
     label: "Components",
     children: [

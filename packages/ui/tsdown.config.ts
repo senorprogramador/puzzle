@@ -4,6 +4,8 @@ export default defineConfig({
   entry: ["src/index.ts"],
   unbundle: true,
   format: ["esm", "cjs"],
+  fixedExtension: false,
+  css: { inject: true },
   dts: true,
   clean: true,
   sourcemap: true,
