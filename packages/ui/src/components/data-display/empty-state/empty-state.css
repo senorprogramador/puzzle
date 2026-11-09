@@ -1,0 +1,150 @@
+.puzzle-empty-state {
+    --empty-state-padding: var(--puzzle-space-6, 1.5rem);
+    --empty-state-gap: var(--puzzle-space-3, 0.75rem);
+
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--empty-state-gap);
+
+    width: 100%;
+    min-width: 0;
+    padding: var(--empty-state-padding);
+
+    color: var(--puzzle-color-text);
+    font-family: var(--puzzle-font-family-body, inherit);
+    text-align: center;
+
+    border: 1px solid transparent;
+    border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+/* Sizes */
+
+.puzzle-empty-state--sm {
+    --empty-state-padding: var(--puzzle-space-4, 1rem);
+    --empty-state-gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-empty-state--md {
+    --empty-state-padding: var(--puzzle-space-6, 1.5rem);
+    --empty-state-gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-empty-state--lg {
+    --empty-state-padding: var(--puzzle-space-8, 2rem);
+    --empty-state-gap: var(--puzzle-space-4, 1rem);
+    border-radius: var(--puzzle-radius-xl, 1rem);
+}
+
+/* Variants */
+
+.puzzle-empty-state--default {
+    background: transparent;
+}
+
+.puzzle-empty-state--outlined {
+    border-style: dashed;
+    border-color: var(--puzzle-color-border);
+}
+
+.puzzle-empty-state--filled {
+    background: var(--puzzle-color-surface-sunken);
+}
+
+/* Header */
+
+.puzzle-empty-state__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    width: 100%;
+    min-width: 0;
+}
+
+/* Media */
+
+.puzzle-empty-state__media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-empty-state__media--icon {
+    width: 3rem;
+    height: 3rem;
+
+    border-radius: var(--puzzle-radius-lg, 0.75rem);
+    background: var(--puzzle-color-surface-sunken);
+
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-empty-state--lg .puzzle-empty-state__media--icon {
+    width: 3.5rem;
+    height: 3.5rem;
+}
+
+.puzzle-empty-state__media > svg {
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+}
+
+/* Typography */
+
+.puzzle-empty-state__title {
+    margin: 0;
+
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-lg, 1.125rem);
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+    line-height: var(--puzzle-font-line-height-tight, 1.25);
+}
+
+.puzzle-empty-state--sm .puzzle-empty-state__title {
+    font-size: var(--puzzle-font-size-base, 1rem);
+}
+
+.puzzle-empty-state--lg .puzzle-empty-state__title {
+    font-size: var(--puzzle-font-size-lg, 1.125rem);
+}
+
+.puzzle-empty-state__description {
+    max-width: 36rem;
+    margin: 0;
+
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+/* Content */
+
+.puzzle-empty-state__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 30rem) {
+    .puzzle-empty-state__content {
+        flex-direction: column;
+    }
+
+    .puzzle-empty-state__content > * {
+        max-width: 100%;
+    }
+}

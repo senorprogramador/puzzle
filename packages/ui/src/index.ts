@@ -62,6 +62,20 @@ export {
 } from "./components/data-display/card";
 
 export {
+  EmptyState,
+  EmptyStateHeader,
+  EmptyStateMedia,
+  EmptyStateTitle,
+  EmptyStateDescription,
+  EmptyStateContent,
+  type EmptyStateProps,
+  type EmptyStateSize,
+  type EmptyStateVariant,
+  type EmptyStateMediaProps,
+  type EmptyStateMediaVariant,
+} from "./components/data-display/empty-state";
+
+export {
   Image,
   type ImageProps,
   type ImageSource,

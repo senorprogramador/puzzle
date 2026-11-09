@@ -1,0 +1,108 @@
+---
+title: Empty State
+description: Help people understand when a collection has no content and what to do next.
+---
+
+Use an empty state when a list, search, or other content area has nothing to show. Explain why it is empty when that is useful, and offer a relevant next step when one is available.
+
+## Import
+
+```tsx
+import {
+  EmptyState,
+  EmptyStateHeader,
+  EmptyStateMedia,
+  EmptyStateTitle,
+  EmptyStateDescription,
+  EmptyStateContent,
+} from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Compose the message from a title, an optional description, and optional content such as an action. The component parts can be omitted when they are not needed.
+
+<Preview
+  height={250}
+  code={`\
+<EmptyState variant="outlined">
+  <EmptyStateHeader>
+    <EmptyStateTitle>No projects yet</EmptyStateTitle>
+    <EmptyStateDescription>
+      Create a project to start organizing your work.
+    </EmptyStateDescription>
+  </EmptyStateHeader>
+  <EmptyStateContent>
+    <Button>Create project</Button>
+  </EmptyStateContent>
+</EmptyState>
+`}
+>
+  <EmptyState variant="outlined">
+    <EmptyStateHeader>
+      <EmptyStateTitle>No projects yet</EmptyStateTitle>
+      <EmptyStateDescription>
+        Create a project to start organizing your work.
+      </EmptyStateDescription>
+    </EmptyStateHeader>
+    <EmptyStateContent>
+      <Button>Create project</Button>
+    </EmptyStateContent>
+  </EmptyState>
+</Preview>
+
+## Size and variant
+
+Use `size` (`sm`, `md`, or `lg`) to adjust the component's spacing. The default is `md`. Choose a `variant` of `default` (transparent), `outlined` (dashed border), or `filled` (sunken surface); the default is `default`.
+
+<Preview
+  height={300}
+  code={`\
+<Stack>
+  <EmptyState size="sm" variant="default">
+    <EmptyStateTitle>Nothing here</EmptyStateTitle>
+  </EmptyState>
+  <EmptyState size="md" variant="outlined">
+    <EmptyStateTitle>No saved items</EmptyStateTitle>
+  </EmptyState>
+  <EmptyState size="lg" variant="filled">
+    <EmptyStateTitle>No notifications</EmptyStateTitle>
+  </EmptyState>
+</Stack>
+`}
+>
+  <Stack>
+    <EmptyState size="sm" variant="default">
+      <EmptyStateTitle>Nothing here</EmptyStateTitle>
+    </EmptyState>
+    <EmptyState size="md" variant="outlined">
+      <EmptyStateTitle>No saved items</EmptyStateTitle>
+    </EmptyState>
+    <EmptyState size="lg" variant="filled">
+      <EmptyStateTitle>No notifications</EmptyStateTitle>
+    </EmptyState>
+  </Stack>
+</Preview>
+
+## Media
+
+`EmptyStateMedia` is hidden from assistive technology by default, which is appropriate for decorative imagery. Use `variant="icon"` for the icon treatment. If the media conveys information not repeated in the text, provide an `aria-label`; this gives the media an image role by default.
+
+## API
+
+| Component | Element | Props |
+| --- | --- | --- |
+| `EmptyState` | `div` | `size`: `"sm" \| "md" \| "lg"` (default `"md"`); `variant`: `"default" \| "outlined" \| "filled"` (default `"default"`). |
+| `EmptyStateHeader` | `div` | Native div attributes, including `className`. |
+| `EmptyStateMedia` | `div` | `variant`: `"default" \| "icon"` (default `"default"`); `aria-label`, `aria-hidden`, and `role` control its accessible meaning. |
+| `EmptyStateTitle` | `h3` | Native heading attributes, including `className`. |
+| `EmptyStateDescription` | `p` | Native paragraph attributes, including `className`. |
+| `EmptyStateContent` | `div` | Native div attributes, including `className`. |
+
+All parts accept `children`. `EmptyState` and each part also accept the native attributes for their rendered element.
+
+## Accessibility
+
+- Keep the title concise and ensure its `h3` level fits the surrounding heading hierarchy.
+- Use a clear description and an actionable control when a useful next step exists; do not rely on an icon or color alone to explain the empty state.
+- Leave decorative media unnamed so it stays hidden from assistive technology. Label media only when it adds information not already present in the text.

@@ -60,6 +60,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/data-display/card",
               },
               {
+                id: "empty-state",
+                label: "Empty State",
+                href: "/docs/components/ui/data-display/empty-state",
+              },
+              {
                 id: "image",
                 label: "Image",
                 href: "/docs/components/ui/data-display/image",
