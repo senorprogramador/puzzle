@@ -1,1 +1,7 @@
-export type { MongoDatabaseLike, MongoStorageAdapterOptions } from "./mongodb.types";
+export { MongoStorageAdapter } from "./mongodb.adapter";
+export { MongoStorageMigrationAdapter } from "./mongodb.migrations";
+
+export type {
+  MongoStorageAdapterOptions,
+  MongoStorageMigrationOptions,
+} from "./mongodb.types";
