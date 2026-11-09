@@ -1,7 +1,6 @@
----
-title: Getting Started
-description: Install Puzzle in your React app, build your first interface, and customize the theme.
----
+# Getting Started
+
+Install Puzzle in your React app, build your first interface, and customize the theme.
 
 > \[!WARNING\] **Puzzle is not ready for production use.**
 >
