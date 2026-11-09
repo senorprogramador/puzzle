@@ -331,20 +331,19 @@ export class MongoStorageAdapter implements StorageAdapter {
 
     const collection = this.database.collection(collectionName);
 
-    await collection.createIndex({ _id: 1 }, { unique: true });
-
-    for (const index of definition.indexes ?? []) {
-      const keys = Object.fromEntries(
+    const indexes = (definition.indexes ?? []).map((index) => ({
+      key: Object.fromEntries(
         index.fields.map((field) => [toMongoField(String(field)), 1]),
-      );
+      ),
+      name: index.name,
+      unique: index.unique ?? false,
+      ...(index.expireAfterSeconds !== undefined
+        ? { expireAfterSeconds: index.expireAfterSeconds }
+        : {}),
+    }));
 
-      await collection.createIndex(keys, {
-        name: index.name,
-        unique: index.unique ?? false,
-        ...(index.expireAfterSeconds !== undefined
-          ? { expireAfterSeconds: index.expireAfterSeconds }
-          : {}),
-      });
+    if (indexes.length > 0) {
+      await collection.createIndexes(indexes);
     }
   }
 

@@ -42,7 +42,11 @@ export const runAtomicBatchConformance = (
           collection: USERS_COLLECTION,
           record: {
             id: "batch-1",
-            ...createUser({ name: "Batch One" }),
+            ...createUser({
+              name: "Batch One",
+              email: "batch-1@example.com",
+              normalizedEmail: "batch-1@example.com",
+            }),
           } as StorageInsert<ConformanceUser>,
         },
         {
@@ -50,7 +54,11 @@ export const runAtomicBatchConformance = (
           collection: USERS_COLLECTION,
           record: {
             id: "batch-2",
-            ...createUser({ name: "Batch Two" }),
+            ...createUser({
+              name: "Batch Two",
+              email: "batch-2@example.com",
+              normalizedEmail: "batch-2@example.com",
+            }),
           } as StorageInsert<ConformanceUser>,
         },
       ];
