@@ -52,5 +52,6 @@ export type SessionDataRecord = {
   readonly expiresAt: Date | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
+  readonly revokedAt?: Date | null;
   readonly revision: number;
 };

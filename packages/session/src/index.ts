@@ -67,4 +67,8 @@ export type { SessionDataOptions } from "./session-data.manager";
 export type {
   AnonymousMigrationOptions,
   AnonymousMigrationResult,
+  SessionMigrationEntry,
+  SessionMigrationContext,
 } from "./session.migration";
+
+export type { SessionUserLockRecord } from "./types/session-lock.types";

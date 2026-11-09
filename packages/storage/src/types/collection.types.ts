@@ -4,6 +4,7 @@ export type StorageRecord = {
   readonly id: string;
   readonly createdAt: Date;
   readonly updatedAt: Date;
+  readonly revokedAt?: Date | null;
   readonly revision: number;
 };
 

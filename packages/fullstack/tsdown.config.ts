@@ -9,6 +9,7 @@
 "src/auth/tanstack/index.ts",
         ],
         unbundle: true,
+        root: "src",
         format: ["esm", "cjs"],
         fixedExtension: false,
         dts: true,

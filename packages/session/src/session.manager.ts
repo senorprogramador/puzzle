@@ -1,4 +1,9 @@
-import { StorageConflictError, type StorageAdapter } from "@puzzle-ui/storage";
+import {
+  StorageConflictError,
+  StorageDuplicateError,
+  type StorageAdapter,
+  type StorageBatchOperation,
+} from "@puzzle-ui/storage";
 
 import {
   SessionConfigurationError,
@@ -11,13 +16,20 @@ import {
   hashSessionToken,
 } from "./utils/session-crypto";
 
-import { SESSION_COLLECTION, sessionCollection } from "./session.storage";
+import {
+  SESSION_COLLECTION,
+  SESSION_USER_LOCK_COLLECTION,
+  sessionCollection,
+  sessionUserLockCollection,
+} from "./session.storage";
 
 import type {
   SessionDevice,
   SessionRecord,
   SessionStorageRecord,
 } from "./types/session.types";
+
+import type { SessionUserLockRecord } from "./types/session-lock.types";
 
 import type {
   CreatedSession,
@@ -127,6 +139,8 @@ export class StorageSessionManager implements SessionManager {
       ...sessionCollection,
       name: this.collection,
     });
+
+    await this.storage.registerCollection(sessionUserLockCollection);
   }
 
   private now(): Date {
@@ -147,10 +161,12 @@ export class StorageSessionManager implements SessionManager {
   }
 
   private effectiveExpiry(createdAt: Date, lastSeenAt: Date): Date {
-    const absolute = this.absoluteExpiry(createdAt);
-    const idle = this.idleExpiry(lastSeenAt);
-
-    return absolute.getTime() < idle.getTime() ? absolute : idle;
+    return new Date(
+      Math.min(
+        this.absoluteExpiry(createdAt).getTime(),
+        this.idleExpiry(lastSeenAt).getTime(),
+      ),
+    );
   }
 
   private async createRecord(
@@ -171,23 +187,19 @@ export class StorageSessionManager implements SessionManager {
 
     const token = generateSessionToken();
     const tokenHash = await hashSessionToken(token);
-    const absoluteExpiry = this.absoluteExpiry(now);
 
+    const absoluteExpiry = this.absoluteExpiry(now);
     const requestedExpiry = input.expiresAt ?? absoluteExpiry;
 
-    if (requestedExpiry.getTime() <= now.getTime()) {
+    if (
+      !(requestedExpiry instanceof Date) ||
+      !Number.isFinite(requestedExpiry.getTime()) ||
+      requestedExpiry.getTime() <= now.getTime()
+    ) {
       throw new SessionConfigurationError(
-        "Session expiration must be in the future.",
+        "Session expiration must be a valid future date.",
       );
     }
-
-    const expiresAt = new Date(
-      Math.min(
-        requestedExpiry.getTime(),
-        absoluteExpiry.getTime(),
-        this.idleExpiry(now).getTime(),
-      ),
-    );
 
     const record: SessionStorageRecord = {
       id: generateSessionId(),
@@ -198,7 +210,13 @@ export class StorageSessionManager implements SessionManager {
       updatedAt: now,
       revision: 1,
       lastSeenAt: now,
-      expiresAt,
+      expiresAt: new Date(
+        Math.min(
+          requestedExpiry.getTime(),
+          absoluteExpiry.getTime(),
+          this.idleExpiry(now).getTime(),
+        ),
+      ),
       revokedAt: null,
       metadata: input.metadata,
     };
@@ -209,56 +227,138 @@ export class StorageSessionManager implements SessionManager {
     };
   }
 
-  async create(input: CreateSessionInput): Promise<CreatedSession> {
-    const now = this.now();
-    const created = await this.createRecord(input, now);
+  private toStorageRecord(session: SessionRecord): SessionStorageRecord {
+    return {
+      ...session,
+      updatedAt: session.lastSeenAt,
+      revision: 1,
+    };
+  }
 
-    try {
+  async create(input: CreateSessionInput): Promise<CreatedSession> {
+    const created = await this.createRecord(input, this.now());
+
+    if (!input.userId) {
       await this.storage.insert<SessionStorageRecord>(
         this.collection,
-        created.session as SessionStorageRecord,
+        this.toStorageRecord(created.session),
       );
-    } catch (error) {
-      if (error instanceof StorageConflictError) {
-        throw new SessionConfigurationError(
-          "Session creation conflicted with existing storage state.",
-        );
-      }
 
-      throw error;
+      return created;
     }
 
-    if (input.userId) {
-      await this.enforceSessionLimit(input.userId);
-    }
+    await this.createAuthenticatedSessionAtomically(input.userId, created);
 
     return created;
   }
 
-  private async enforceSessionLimit(userId: string): Promise<void> {
+  private async createAuthenticatedSessionAtomically(
+    userId: string,
+    created: CreatedSession,
+  ): Promise<void> {
     const maximum = this.options.maximumSessionsPerUser;
 
-    if (maximum === undefined) return;
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const now = this.now();
 
-    const sessions = await this.storage.findMany<SessionStorageRecord>(
-      this.collection,
-      {
-        where: {
-          userId: { operator: "eq", value: userId },
-          revokedAt: { operator: "eq", value: null },
+      const lock = await this.storage.findOne<SessionUserLockRecord>(
+        SESSION_USER_LOCK_COLLECTION,
+        {
+          where: {
+            userId: { operator: "eq", value: userId },
+          },
         },
-        orderBy: [{ field: "lastSeenAt", direction: "desc" }],
-      },
-    );
+      );
 
-    const now = this.now();
-    const active = sessions.filter((session) => isActive(session, now));
+      const sessions = await this.storage.findMany<SessionStorageRecord>(
+        this.collection,
+        {
+          where: {
+            userId: { operator: "eq", value: userId },
+            revokedAt: { operator: "eq", value: null },
+          },
+          orderBy: [
+            { field: "lastSeenAt", direction: "desc" },
+            { field: "createdAt", direction: "desc" },
+          ],
+        },
+      );
 
-    const excess = active.slice(maximum);
+      const active = sessions.filter((session) => isActive(session, now));
 
-    for (const session of excess) {
-      await this.revoke(session.id);
+      const excess =
+        maximum === undefined ? [] : active.slice(Math.max(0, maximum - 1));
+
+      const operations: (
+        | StorageBatchOperation<SessionStorageRecord>
+        | StorageBatchOperation<SessionUserLockRecord>
+      )[] = [];
+
+      if (lock) {
+        operations.push({
+          type: "update",
+          collection: SESSION_USER_LOCK_COLLECTION,
+          id: lock.id,
+          condition: {
+            expectedRevision: lock.revision,
+          },
+          changes: {},
+        });
+      } else {
+        operations.push({
+          type: "insert",
+          collection: SESSION_USER_LOCK_COLLECTION,
+          record: {
+            id: generateSessionId(),
+            userId,
+            createdAt: now,
+            updatedAt: now,
+            revision: 1,
+          },
+        });
+      }
+
+      operations.push({
+        type: "insert",
+        collection: this.collection,
+        record: this.toStorageRecord(created.session),
+      });
+
+      for (const session of excess) {
+        operations.push({
+          type: "update",
+          collection: this.collection,
+          id: session.id,
+          condition: {
+            expectedRevision: session.revision,
+          },
+          changes: {
+            revokedAt: now,
+          },
+        });
+      }
+
+      try {
+        await this.storage.atomicBatch<
+          SessionStorageRecord | SessionUserLockRecord
+        >(operations);
+
+        return;
+      } catch (error) {
+        if (
+          error instanceof StorageConflictError ||
+          error instanceof StorageDuplicateError
+        ) {
+          continue;
+        }
+
+        throw error;
+      }
     }
+
+    throw new SessionConfigurationError(
+      "Could not acquire the user session concurrency lock after repeated conflicts.",
+    );
   }
 
   async validate(
@@ -284,12 +384,9 @@ export class StorageSessionManager implements SessionManager {
 
     if (!isActive(session, now)) return null;
 
-    const idleExpiry = this.idleExpiry(session.lastSeenAt);
-    const absoluteExpiry = this.absoluteExpiry(session.createdAt);
-
     if (
-      idleExpiry.getTime() <= now.getTime() ||
-      absoluteExpiry.getTime() <= now.getTime()
+      this.idleExpiry(session.lastSeenAt).getTime() <= now.getTime() ||
+      this.absoluteExpiry(session.createdAt).getTime() <= now.getTime()
     ) {
       await this.revoke(session.id);
       return null;
@@ -300,26 +397,27 @@ export class StorageSessionManager implements SessionManager {
       now.getTime() - session.lastSeenAt.getTime() >=
         (this.options.touchIntervalSeconds ?? 60) * 1000;
 
-    if (!touch) {
-      return toPublicSession(session);
+    if (!touch) return toPublicSession(session);
+
+    try {
+      const updated = await this.storage.update<SessionStorageRecord>(
+        this.collection,
+        session.id,
+        {
+          lastSeenAt: now,
+          expiresAt: this.effectiveExpiry(session.createdAt, now),
+        },
+        { expectedRevision: session.revision },
+      );
+
+      return updated ? toPublicSession(updated) : null;
+    } catch (error) {
+      if (error instanceof StorageConflictError) {
+        return null;
+      }
+
+      throw error;
     }
-
-    const nextLastSeenAt = now;
-    const nextExpiry = this.effectiveExpiry(session.createdAt, nextLastSeenAt);
-
-    const updated = await this.storage.update<SessionStorageRecord>(
-      this.collection,
-      session.id,
-      {
-        lastSeenAt: nextLastSeenAt,
-        expiresAt: nextExpiry,
-      },
-      { expectedRevision: session.revision },
-    );
-
-    if (!updated) return null;
-
-    return toPublicSession(updated);
   }
 
   async get(sessionId: string): Promise<SessionRecord | null> {
@@ -330,9 +428,11 @@ export class StorageSessionManager implements SessionManager {
 
     if (!session || !isActive(session, this.now())) return null;
 
+    const now = this.now();
+
     if (
-      this.idleExpiry(session.lastSeenAt).getTime() <= this.now().getTime() ||
-      this.absoluteExpiry(session.createdAt).getTime() <= this.now().getTime()
+      this.idleExpiry(session.lastSeenAt).getTime() <= now.getTime() ||
+      this.absoluteExpiry(session.createdAt).getTime() <= now.getTime()
     ) {
       await this.revoke(sessionId);
       return null;
@@ -349,11 +449,9 @@ export class StorageSessionManager implements SessionManager {
 
     const now = this.now();
 
-    if (!current || !isActive(current, now)) {
-      throw new SessionNotFoundError();
-    }
-
     if (
+      !current ||
+      !isActive(current, now) ||
       this.idleExpiry(current.lastSeenAt).getTime() <= now.getTime() ||
       this.absoluteExpiry(current.createdAt).getTime() <= now.getTime()
     ) {
@@ -369,33 +467,26 @@ export class StorageSessionManager implements SessionManager {
       now,
     );
 
-    const next = {
-      ...created.session,
-      updatedAt: now,
-      revision: 1,
-    } as SessionStorageRecord;
-
-    const result = await this.storage.atomicBatch<SessionStorageRecord>([
+    const operations: StorageBatchOperation<SessionStorageRecord>[] = [
       {
         type: "insert",
         collection: this.collection,
-        record: next,
+        record: this.toStorageRecord(created.session),
       },
       {
         type: "update",
         collection: this.collection,
         id: current.id,
-        condition: { expectedRevision: current.revision },
+        condition: {
+          expectedRevision: current.revision,
+        },
         changes: {
           revokedAt: now,
         },
       },
-    ]);
+    ];
 
-    if (result.results[1]?.type !== "update" || !result.results[1].record) {
-      await this.revoke(created.session.id);
-      throw new SessionNotFoundError();
-    }
+    await this.storage.atomicBatch(operations);
 
     return created;
   }
@@ -453,9 +544,9 @@ export class StorageSessionManager implements SessionManager {
     );
 
     return sessions
-      .filter((session) => isActive(session, now))
       .filter(
         (session) =>
+          isActive(session, now) &&
           this.idleExpiry(session.lastSeenAt).getTime() > now.getTime() &&
           this.absoluteExpiry(session.createdAt).getTime() > now.getTime(),
       )

@@ -1,291 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { StorageSessionManager } from "../dist/index.js";
-
-class MemoryStorage {
-  capabilities = {
-    transactions: true,
-    atomicBatch: true,
-    conditionalWrites: true,
-    uniqueConstraints: true,
-    upsert: true,
-    cursorPagination: true,
-    migrations: true,
-    ttlIndexes: false,
-  };
-
-  collections = new Map();
-
-  getCapabilities() {
-    return { capabilities: this.capabilities };
-  }
-
-  async registerCollection(definition) {
-    this.collections.set(
-      definition.name,
-      this.collections.get(definition.name) ?? new Map(),
-    );
-  }
-
-  collection(name) {
-    if (!this.collections.has(name)) {
-      this.collections.set(name, new Map());
-    }
-
-    return this.collections.get(name);
-  }
-
-  async insert(collection, record) {
-    const records = this.collection(collection);
-
-    if (records.has(record.id)) {
-      throw new Error("Duplicate record");
-    }
-
-    if (
-      [...records.values()].some((item) => item.tokenHash === record.tokenHash)
-    ) {
-      throw new Error("Duplicate token hash");
-    }
-
-    const now = new Date();
-
-    const stored = {
-      ...record,
-      createdAt: record.createdAt ?? now,
-      updatedAt: record.updatedAt ?? now,
-      revision: record.revision ?? 1,
-    };
-
-    records.set(stored.id, stored);
-
-    return stored;
-  }
-
-  async findById(collection, id) {
-    return this.collection(collection).get(id) ?? null;
-  }
-
-  matches(record, where = {}) {
-    return Object.entries(where).every(([field, comparison]) => {
-      if (field === "and") {
-        return comparison.every((item) => this.matches(record, item));
-      }
-
-      if (field === "or") {
-        return comparison.some((item) => this.matches(record, item));
-      }
-
-      const actual = record[field];
-      const expected = comparison.value;
-
-      switch (comparison.operator) {
-        case "eq":
-          return actual instanceof Date && expected instanceof Date
-            ? actual.getTime() === expected.getTime()
-            : actual === expected;
-        case "ne":
-          return actual !== expected;
-        case "lte":
-          return actual <= expected;
-        case "gte":
-          return actual >= expected;
-        case "in":
-          return comparison.value.includes(actual);
-        default:
-          return false;
-      }
-    });
-  }
-
-  async findOne(collection, query = {}) {
-    return (
-      (
-        await this.findMany(collection, {
-          ...query,
-          limit: 1,
-        })
-      )[0] ?? null
-    );
-  }
-
-  async findMany(collection, query = {}) {
-    let records = [...this.collection(collection).values()];
-
-    if (query.where) {
-      records = records.filter((record) => this.matches(record, query.where));
-    }
-
-    if (query.orderBy) {
-      records.sort((a, b) => {
-        for (const order of query.orderBy) {
-          const left = a[order.field];
-          const right = b[order.field];
-
-          const comparison =
-            left instanceof Date && right instanceof Date
-              ? left.getTime() - right.getTime()
-              : left < right
-                ? -1
-                : left > right
-                  ? 1
-                  : 0;
-
-          if (comparison !== 0) {
-            return order.direction === "asc" ? comparison : -comparison;
-          }
-        }
-
-        return 0;
-      });
-    }
-
-    return records.slice(
-      query.offset ?? 0,
-      query.limit === undefined ? undefined : (query.offset ?? 0) + query.limit,
-    );
-  }
-
-  async update(collection, id, changes, condition) {
-    const records = this.collection(collection);
-    const current = records.get(id);
-
-    if (!current) return null;
-
-    if (
-      condition?.expectedRevision !== undefined &&
-      condition.expectedRevision !== current.revision
-    ) {
-      throw new Error("Storage conflict");
-    }
-
-    const updated = {
-      ...current,
-      ...changes,
-      updatedAt: new Date(),
-      revision: current.revision + 1,
-    };
-
-    records.set(id, updated);
-
-    return updated;
-  }
-
-  async updateMany(collection, query, changes) {
-    const records = this.collection(collection);
-    let count = 0;
-
-    for (const [id, record] of records) {
-      if (!this.matches(record, query.where)) continue;
-
-      records.set(id, {
-        ...record,
-        ...changes,
-        updatedAt: new Date(),
-        revision: record.revision + 1,
-      });
-
-      count++;
-    }
-
-    return count;
-  }
-
-  async delete(collection, id, condition) {
-    const records = this.collection(collection);
-    const current = records.get(id);
-
-    if (!current) return false;
-
-    if (
-      condition?.expectedRevision !== undefined &&
-      current.revision !== condition.expectedRevision
-    ) {
-      throw new Error("Storage conflict");
-    }
-
-    return records.delete(id);
-  }
-
-  async deleteMany(collection, query) {
-    const records = this.collection(collection);
-    let count = 0;
-
-    for (const [id, record] of records) {
-      if (this.matches(record, query.where)) {
-        records.delete(id);
-        count++;
-      }
-    }
-
-    return count;
-  }
-
-  async atomicBatch(operations) {
-    const snapshot = new Map();
-
-    for (const [name, records] of this.collections) {
-      snapshot.set(name, new Map(records));
-    }
-
-    const results = [];
-
-    try {
-      for (const operation of operations) {
-        if (operation.type === "insert") {
-          const record = await this.insert(
-            operation.collection,
-            operation.record,
-          );
-
-          results.push({
-            type: "insert",
-            record,
-          });
-
-          continue;
-        }
-
-        if (operation.type === "update") {
-          const record = await this.update(
-            operation.collection,
-            operation.id,
-            operation.changes,
-            operation.condition,
-          );
-
-          if (!record) {
-            throw new Error("Atomic update failed");
-          }
-
-          results.push({
-            type: "update",
-            record,
-          });
-
-          continue;
-        }
-
-        const deleted = await this.delete(
-          operation.collection,
-          operation.id,
-          operation.condition,
-        );
-
-        results.push({
-          type: "delete",
-          deleted,
-        });
-      }
-
-      return { results };
-    } catch (error) {
-      this.collections = snapshot;
-      throw error;
-    }
-  }
-}
+import {
+  SessionDataManager,
+  SessionMigrationManager,
+  SessionSecurityError,
+  StorageSessionManager,
+} from "../dist/index.js";
+import { MemoryStorage } from "./fixtures/memory-storage.mjs";
 
 const createHarness = () => {
   const storage = new MemoryStorage();
@@ -305,6 +27,7 @@ const createHarness = () => {
   return {
     storage,
     sessions,
+    clock: () => new Date(currentTime),
     setTime(value) {
       currentTime = new Date(value);
     },
@@ -555,4 +278,518 @@ test("does not touch a session when touch is disabled", async () => {
     validated.lastSeenAt.toISOString(),
     created.session.lastSeenAt.toISOString(),
   );
+});
+
+test("enforces the maximum session limit during concurrent creation", async () => {
+  const storage = new MemoryStorage();
+
+  const sessions = new StorageSessionManager(storage, {
+    lifetime: {
+      idleTimeoutSeconds: 3600,
+      absoluteLifetimeSeconds: 86400,
+    },
+    maximumSessionsPerUser: 3,
+    touchIntervalSeconds: 60,
+  });
+
+  await sessions.initialize();
+
+  const created = await Promise.all(
+    Array.from({ length: 12 }, () =>
+      sessions.create({
+        kind: "authenticated",
+        userId: "concurrent-user",
+      }),
+    ),
+  );
+
+  assert.equal(created.length, 12);
+
+  const devices = await sessions.list("concurrent-user");
+
+  assert.equal(devices.length, 3);
+
+  const allRecords = await storage.findMany("sessions", {
+    where: {
+      userId: {
+        operator: "eq",
+        value: "concurrent-user",
+      },
+    },
+  });
+
+  const active = allRecords.filter((session) => session.revokedAt === null);
+
+  assert.equal(active.length, 3);
+});
+
+test("does not leave a session behind when atomic creation fails", async () => {
+  const storage = new MemoryStorage();
+
+  const sessions = new StorageSessionManager(storage, {
+    maximumSessionsPerUser: 3,
+  });
+
+  await sessions.initialize();
+
+  storage.failNextBatch = true;
+
+  await assert.rejects(
+    () =>
+      sessions.create({
+        kind: "authenticated",
+        userId: "user-1",
+      }),
+    /Simulated transaction failure/,
+  );
+
+  assert.equal(await storage.count("sessions"), 0);
+
+  assert.equal(await storage.count("session_user_locks"), 0);
+});
+
+test("does not exceed the session limit when multiple clients race", async () => {
+  const storage = new MemoryStorage();
+
+  const firstManager = new StorageSessionManager(storage, {
+    maximumSessionsPerUser: 2,
+  });
+
+  const secondManager = new StorageSessionManager(storage, {
+    maximumSessionsPerUser: 2,
+  });
+
+  await firstManager.initialize();
+  await secondManager.initialize();
+
+  await Promise.all([
+    firstManager.create({
+      kind: "authenticated",
+      userId: "race-user",
+    }),
+    secondManager.create({
+      kind: "authenticated",
+      userId: "race-user",
+    }),
+    firstManager.create({
+      kind: "authenticated",
+      userId: "race-user",
+    }),
+    secondManager.create({
+      kind: "authenticated",
+      userId: "race-user",
+    }),
+  ]);
+
+  assert.equal((await firstManager.list("race-user")).length, 2);
+});
+
+test("rejects rotation when another request already rotated the session", async () => {
+  const { sessions } = createHarness();
+
+  await sessions.initialize();
+
+  const original = await sessions.create({
+    kind: "authenticated",
+    userId: "user-1",
+  });
+
+  const results = await Promise.allSettled([
+    sessions.rotate({ sessionId: original.session.id }),
+    sessions.rotate({ sessionId: original.session.id }),
+  ]);
+
+  assert.equal(
+    results.filter((result) => result.status === "fulfilled").length,
+    1,
+  );
+
+  assert.equal(
+    results.filter((result) => result.status === "rejected").length,
+    1,
+  );
+
+  const devices = await sessions.list("user-1");
+
+  assert.equal(devices.length, 1);
+});
+
+test("migrates anonymous session data to a new authenticated session", async () => {
+  const { storage, sessions, clock } = createHarness();
+
+  await sessions.initialize();
+
+  const data = new SessionDataManager(storage, {
+    clock,
+    allowedNamespaces: ["cart", "checkout"],
+  });
+
+  await data.initialize();
+
+  const anonymous = await sessions.create({
+    kind: "anonymous",
+    userId: null,
+  });
+
+  await data.set(anonymous.session.id, "cart", "items", [
+    { productId: "product-1", quantity: 2 },
+  ]);
+
+  const migration = new SessionMigrationManager(storage, {
+    clock,
+    allowedNamespaces: ["cart", "checkout"],
+    idleTimeoutSeconds: 3600,
+    absoluteLifetimeSeconds: 86400,
+  });
+
+  const result = await migration.migrate({
+    anonymousSessionId: anonymous.session.id,
+    userId: "user-1",
+  });
+
+  assert.equal(result.session.kind, "authenticated");
+  assert.equal(result.session.userId, "user-1");
+  assert.notEqual(result.session.id, anonymous.session.id);
+
+  assert.equal(await sessions.validate(anonymous.token), null);
+
+  assert.ok(await sessions.validate(result.token));
+
+  assert.deepEqual(await data.get(result.session.id, "cart", "items"), [
+    { productId: "product-1", quantity: 2 },
+  ]);
+});
+
+test("does not migrate namespaces outside the allowlist", async () => {
+  const { storage, sessions, clock } = createHarness();
+
+  await sessions.initialize();
+
+  const data = new SessionDataManager(storage, {
+    clock,
+    allowedNamespaces: ["cart", "admin"],
+  });
+
+  await data.initialize();
+
+  const anonymous = await sessions.create({
+    kind: "anonymous",
+    userId: null,
+  });
+
+  await data.set(anonymous.session.id, "cart", "items", [1]);
+
+  await data.set(anonymous.session.id, "admin", "permissions", ["admin"]);
+
+  const migration = new SessionMigrationManager(storage, {
+    clock,
+    allowedNamespaces: ["cart"],
+    idleTimeoutSeconds: 3600,
+    absoluteLifetimeSeconds: 86400,
+  });
+
+  const result = await migration.migrate({
+    anonymousSessionId: anonymous.session.id,
+    userId: "user-1",
+  });
+
+  assert.deepEqual(await data.get(result.session.id, "cart", "items"), [1]);
+
+  assert.equal(await data.get(result.session.id, "admin", "permissions"), null);
+});
+
+test("does not migrate expired session data", async () => {
+  const storage = new MemoryStorage();
+
+  let time = new Date("2026-11-09T10:00:00.000Z");
+
+  const sessions = new StorageSessionManager(storage, {
+    clock: () => new Date(time),
+  });
+
+  await sessions.initialize();
+
+  const data = new SessionDataManager(storage, {
+    allowedNamespaces: ["cart"],
+    clock: () => new Date(time),
+  });
+
+  await data.initialize();
+
+  const anonymous = await sessions.create({
+    kind: "anonymous",
+    userId: null,
+  });
+
+  await data.set(anonymous.session.id, "cart", "active", [1], 3600);
+
+  await data.set(anonymous.session.id, "cart", "expired", [2], 60);
+
+  time = new Date("2026-11-09T10:01:01.000Z");
+
+  const migration = new SessionMigrationManager(storage, {
+    allowedNamespaces: ["cart"],
+    idleTimeoutSeconds: 3600,
+    absoluteLifetimeSeconds: 86400,
+    clock: () => new Date(time),
+  });
+
+  const result = await migration.migrate({
+    anonymousSessionId: anonymous.session.id,
+    userId: "user-1",
+  });
+
+  assert.deepEqual(await data.get(result.session.id, "cart", "active"), [1]);
+
+  assert.equal(await data.get(result.session.id, "cart", "expired"), null);
+});
+
+test("supports custom merge strategies", async () => {
+  const { storage, sessions, clock } = createHarness();
+
+  await sessions.initialize();
+
+  const data = new SessionDataManager(storage, {
+    clock,
+    allowedNamespaces: ["cart"],
+  });
+
+  await data.initialize();
+
+  const anonymous = await sessions.create({
+    kind: "anonymous",
+    userId: null,
+  });
+
+  await data.set(anonymous.session.id, "cart", "first", [
+    { productId: "a", quantity: 2 },
+  ]);
+
+  await data.set(anonymous.session.id, "cart", "second", [
+    { productId: "a", quantity: 3 },
+  ]);
+
+  const records = await storage.findMany("session_data", {
+    where: {
+      ownerId: {
+        operator: "eq",
+        value: anonymous.session.id,
+      },
+    },
+  });
+
+  const migration = new SessionMigrationManager(storage, {
+    clock,
+    allowedNamespaces: ["cart"],
+    idleTimeoutSeconds: 3600,
+    absoluteLifetimeSeconds: 86400,
+
+    merge: ({ records }) => {
+      const quantities = new Map();
+
+      for (const record of records) {
+        for (const item of record.value) {
+          quantities.set(
+            item.productId,
+            (quantities.get(item.productId) ?? 0) + item.quantity,
+          );
+        }
+      }
+
+      return [
+        {
+          sourceIds: records.map((record) => record.id),
+          namespace: "cart",
+          key: "items",
+          value: [...quantities].map(([productId, quantity]) => ({
+            productId,
+            quantity,
+          })),
+          expiresAt: null,
+        },
+      ];
+    },
+  });
+
+  const result = await migration.migrate({
+    anonymousSessionId: anonymous.session.id,
+    userId: "user-1",
+  });
+
+  assert.equal(result.migratedRecords, 1);
+
+  assert.deepEqual(await data.get(result.session.id, "cart", "items"), [
+    { productId: "a", quantity: 5 },
+  ]);
+
+  assert.equal(
+    await storage.count("session_data", {
+      where: {
+        ownerId: {
+          operator: "eq",
+          value: result.session.id,
+        },
+      },
+    }),
+    1,
+  );
+
+  assert.equal(records.length, 2);
+});
+
+test("rejects repeated migration of the same anonymous session", async () => {
+  const { storage, sessions, clock } = createHarness();
+
+  await sessions.initialize();
+
+  const anonymous = await sessions.create({
+    kind: "anonymous",
+    userId: null,
+  });
+
+  const migration = new SessionMigrationManager(storage, {
+    clock,
+    allowedNamespaces: ["cart"],
+    idleTimeoutSeconds: 3600,
+    absoluteLifetimeSeconds: 86400,
+  });
+
+  const first = await migration.migrate({
+    anonymousSessionId: anonymous.session.id,
+    userId: "user-1",
+  });
+
+  await assert.rejects(
+    () =>
+      migration.migrate({
+        anonymousSessionId: anonymous.session.id,
+        userId: "user-1",
+      }),
+    SessionSecurityError,
+  );
+
+  assert.ok(await sessions.validate(first.token));
+
+  assert.equal(
+    await storage.count("sessions", {
+      where: {
+        userId: {
+          operator: "eq",
+          value: "user-1",
+        },
+      },
+    }),
+    1,
+  );
+});
+
+test("rolls back the entire migration when an atomic operation fails", async () => {
+  const { storage, sessions, clock } = createHarness();
+
+  await sessions.initialize();
+
+  const data = new SessionDataManager(storage, {
+    clock,
+    allowedNamespaces: ["cart"],
+  });
+
+  await data.initialize();
+
+  const anonymous = await sessions.create({
+    kind: "anonymous",
+    userId: null,
+  });
+
+  await data.set(anonymous.session.id, "cart", "items", [1]);
+
+  const migration = new SessionMigrationManager(storage, {
+    clock,
+    allowedNamespaces: ["cart"],
+    idleTimeoutSeconds: 3600,
+    absoluteLifetimeSeconds: 86400,
+  });
+
+  storage.failNextBatch = true;
+
+  await assert.rejects(
+    () =>
+      migration.migrate({
+        anonymousSessionId: anonymous.session.id,
+        userId: "user-1",
+      }),
+    /Simulated transaction failure/,
+  );
+
+  assert.ok(await sessions.validate(anonymous.token));
+
+  assert.equal(
+    await storage.count("sessions", {
+      where: {
+        userId: {
+          operator: "eq",
+          value: "user-1",
+        },
+      },
+    }),
+    0,
+  );
+
+  assert.deepEqual(await data.get(anonymous.session.id, "cart", "items"), [1]);
+});
+
+test("rejects migration callbacks that duplicate target keys", async () => {
+  const { storage, sessions, clock } = createHarness();
+
+  await sessions.initialize();
+
+  const anonymous = await sessions.create({
+    kind: "anonymous",
+    userId: null,
+  });
+
+  const data = new SessionDataManager(storage, {
+    clock,
+    allowedNamespaces: ["cart"],
+  });
+
+  await data.initialize();
+
+  await data.set(anonymous.session.id, "cart", "first", [1]);
+  await data.set(anonymous.session.id, "cart", "second", [2]);
+
+  const records = await storage.findMany("session_data", {
+    where: {
+      ownerId: {
+        operator: "eq",
+        value: anonymous.session.id,
+      },
+    },
+  });
+
+  const migration = new SessionMigrationManager(storage, {
+    clock,
+    allowedNamespaces: ["cart"],
+    idleTimeoutSeconds: 3600,
+    absoluteLifetimeSeconds: 86400,
+
+    merge: () =>
+      records.map((record) => ({
+        sourceIds: [record.id],
+        namespace: "cart",
+        key: "duplicate",
+        value: record.value,
+        expiresAt: null,
+      })),
+  });
+
+  await assert.rejects(
+    () =>
+      migration.migrate({
+        anonymousSessionId: anonymous.session.id,
+        userId: "user-1",
+      }),
+    /duplicate target keys/,
+  );
+
+  assert.ok(await sessions.validate(anonymous.token));
 });

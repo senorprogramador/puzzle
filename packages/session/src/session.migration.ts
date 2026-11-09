@@ -1,6 +1,7 @@
-import type {
-  StorageAdapter,
-  StorageBatchOperation,
+import {
+  StorageConflictError,
+  type StorageAdapter,
+  type StorageBatchOperation,
 } from "@puzzle-ui/storage";
 
 import { SessionSecurityError } from "./errors/session.errors";
@@ -18,13 +19,34 @@ import {
   hashSessionToken,
 } from "./utils/session-crypto";
 
+export type SessionMigrationEntry = {
+  readonly sourceIds: readonly string[];
+  readonly namespace: string;
+  readonly key: string;
+  readonly value: unknown;
+  readonly expiresAt: Date | null;
+};
+
+export type SessionMigrationContext = {
+  readonly anonymousSession: SessionStorageRecord;
+  readonly targetUserId: string;
+  readonly records: readonly SessionDataRecord[];
+};
+
 export type AnonymousMigrationOptions = {
   readonly allowedNamespaces: readonly string[];
   readonly maximumRecords?: number;
   readonly maximumTotalBytes?: number;
+  readonly maximumEntryBytes?: number;
   readonly idleTimeoutSeconds: number;
   readonly absoluteLifetimeSeconds: number;
   readonly clock?: () => Date;
+
+  readonly merge?: (
+    context: SessionMigrationContext,
+  ) =>
+    | readonly SessionMigrationEntry[]
+    | Promise<readonly SessionMigrationEntry[]>;
 };
 
 export type AnonymousMigrationResult = {
@@ -42,6 +64,40 @@ export type AnonymousMigrationResult = {
   readonly migratedRecords: number;
 };
 
+const serialize = (value: unknown): string => {
+  let result: string | undefined;
+
+  try {
+    result = JSON.stringify(value);
+  } catch {
+    throw new SessionSecurityError(
+      "Migrated session data must be JSON serializable.",
+    );
+  }
+
+  if (result === undefined) {
+    throw new SessionSecurityError(
+      "Migrated session data must be JSON serializable.",
+    );
+  }
+
+  return result;
+};
+
+const toBytes = (value: unknown): number =>
+  new TextEncoder().encode(serialize(value)).byteLength;
+
+const defaultMerge = (
+  records: readonly SessionDataRecord[],
+): readonly SessionMigrationEntry[] =>
+  records.map((record) => ({
+    sourceIds: [record.id],
+    namespace: record.namespace,
+    key: record.key,
+    value: record.value,
+    expiresAt: record.expiresAt,
+  }));
+
 export class SessionMigrationManager {
   private readonly clock: () => Date;
 
@@ -52,11 +108,29 @@ export class SessionMigrationManager {
     this.clock = options.clock ?? (() => new Date());
 
     if (
+      !options.allowedNamespaces.length ||
+      !Number.isFinite(options.idleTimeoutSeconds) ||
+      !Number.isFinite(options.absoluteLifetimeSeconds) ||
       options.idleTimeoutSeconds <= 0 ||
       options.absoluteLifetimeSeconds <= 0 ||
       options.idleTimeoutSeconds > options.absoluteLifetimeSeconds
     ) {
-      throw new Error("Invalid migration session lifetime.");
+      throw new Error("Invalid anonymous session migration configuration.");
+    }
+
+    if (
+      options.maximumRecords !== undefined &&
+      (!Number.isInteger(options.maximumRecords) || options.maximumRecords < 0)
+    ) {
+      throw new Error("maximumRecords must be a non-negative integer.");
+    }
+
+    if (
+      options.maximumTotalBytes !== undefined &&
+      (!Number.isInteger(options.maximumTotalBytes) ||
+        options.maximumTotalBytes < 0)
+    ) {
+      throw new Error("maximumTotalBytes must be a non-negative integer.");
     }
   }
 
@@ -82,8 +156,7 @@ export class SessionMigrationManager {
       !oldSession ||
       oldSession.kind !== "anonymous" ||
       oldSession.userId !== null ||
-      oldSession.revokedAt !== null ||
-      oldSession.expiresAt.getTime() <= now.getTime()
+      oldSession.revokedAt !== null
     ) {
       throw new SessionSecurityError(
         "The anonymous session is not eligible for migration.",
@@ -91,24 +164,18 @@ export class SessionMigrationManager {
     }
 
     if (
-      now.getTime() - oldSession.lastSeenAt.getTime() >
-      this.options.idleTimeoutSeconds * 1000
+      oldSession.expiresAt.getTime() <= now.getTime() ||
+      oldSession.lastSeenAt.getTime() +
+        this.options.idleTimeoutSeconds * 1000 <=
+        now.getTime() ||
+      oldSession.createdAt.getTime() +
+        this.options.absoluteLifetimeSeconds * 1000 <=
+        now.getTime()
     ) {
-      throw new SessionSecurityError(
-        "The anonymous session has expired due to inactivity.",
-      );
+      throw new SessionSecurityError("The anonymous session has expired.");
     }
 
-    if (
-      now.getTime() - oldSession.createdAt.getTime() >
-      this.options.absoluteLifetimeSeconds * 1000
-    ) {
-      throw new SessionSecurityError(
-        "The anonymous session has reached its absolute lifetime.",
-      );
-    }
-
-    const records = await this.storage.findMany<SessionDataRecord>(
+    const allRecords = await this.storage.findMany<SessionDataRecord>(
       SESSION_DATA_COLLECTION,
       {
         where: {
@@ -120,35 +187,51 @@ export class SessionMigrationManager {
       },
     );
 
-    const allowed = records.filter((record) =>
-      this.options.allowedNamespaces.includes(record.namespace),
+    const records = allRecords.filter(
+      (record) =>
+        this.options.allowedNamespaces.includes(record.namespace) &&
+        (!record.expiresAt || record.expiresAt.getTime() > now.getTime()),
     );
 
     const maximumRecords = this.options.maximumRecords ?? 100;
     const maximumTotalBytes = this.options.maximumTotalBytes ?? 65_536;
+    const maximumEntryBytes = this.options.maximumEntryBytes ?? 16_384;
 
-    if (allowed.length > maximumRecords) {
+    if (records.length > maximumRecords) {
       throw new SessionSecurityError(
         "Anonymous session contains too many records to migrate.",
       );
     }
 
-    const totalBytes = allowed.reduce((total, record) => {
-      return (
-        total +
-        new TextEncoder().encode(JSON.stringify(record.value)).byteLength
-      );
-    }, 0);
+    const sourceBytes = records.reduce(
+      (total, record) => total + toBytes(record.value),
+      0,
+    );
 
-    if (totalBytes > maximumTotalBytes) {
+    if (sourceBytes > maximumTotalBytes) {
       throw new SessionSecurityError(
         "Anonymous session data exceeds the migration size limit.",
       );
     }
 
+    const entries = this.options.merge
+      ? await this.options.merge({
+          anonymousSession: oldSession,
+          targetUserId: input.userId,
+          records,
+        })
+      : defaultMerge(records);
+
+    this.validateEntries(
+      entries,
+      records,
+      now,
+      maximumEntryBytes,
+      maximumTotalBytes,
+    );
+
     const token = generateSessionToken();
     const tokenHash = await hashSessionToken(token);
-
     const id = generateSessionId();
 
     const absoluteExpiry = new Date(
@@ -177,6 +260,10 @@ export class SessionMigrationManager {
       metadata: input.metadata,
     };
 
+    const sourceMap = new Map(records.map((record) => [record.id, record]));
+
+    const usedIds = new Set<string>();
+
     const operations: (
       | StorageBatchOperation<SessionStorageRecord>
       | StorageBatchOperation<SessionDataRecord>
@@ -197,22 +284,72 @@ export class SessionMigrationManager {
           revokedAt: now,
         },
       },
-      ...allowed.map<StorageBatchOperation<SessionDataRecord>>((record) => ({
+    ];
+
+    for (const entry of entries) {
+      const sources = entry.sourceIds.map((sourceId) => {
+        const source = sourceMap.get(sourceId);
+
+        if (!source || usedIds.has(sourceId)) {
+          throw new SessionSecurityError(
+            "The migration merge callback returned an invalid or duplicate source ID.",
+          );
+        }
+
+        usedIds.add(sourceId);
+
+        return source;
+      });
+
+      const primary = sources[0];
+
+      if (!primary) {
+        throw new SessionSecurityError(
+          "A migration entry must have at least one source record.",
+        );
+      }
+
+      operations.push({
         type: "update",
         collection: SESSION_DATA_COLLECTION,
-        id: record.id,
+        id: primary.id,
         condition: {
-          expectedRevision: record.revision,
+          expectedRevision: primary.revision,
         },
         changes: {
           ownerId: id,
+          namespace: entry.namespace,
+          key: entry.key,
+          value: entry.value,
+          expiresAt: entry.expiresAt,
         },
-      })),
-    ];
+      });
 
-    await this.storage.atomicBatch<SessionStorageRecord | SessionDataRecord>(
-      operations,
-    );
+      for (const duplicate of sources.slice(1)) {
+        operations.push({
+          type: "delete",
+          collection: SESSION_DATA_COLLECTION,
+          id: duplicate.id,
+          condition: {
+            expectedRevision: duplicate.revision,
+          },
+        });
+      }
+    }
+
+    try {
+      await this.storage.atomicBatch<SessionStorageRecord | SessionDataRecord>(
+        operations,
+      );
+    } catch (error) {
+      if (error instanceof StorageConflictError) {
+        throw new SessionSecurityError(
+          "The anonymous session was already migrated or modified concurrently.",
+        );
+      }
+
+      throw error;
+    }
 
     return {
       session: {
@@ -226,7 +363,76 @@ export class SessionMigrationManager {
         metadata: input.metadata,
       },
       token,
-      migratedRecords: allowed.length,
+      migratedRecords: entries.length,
     };
+  }
+
+  private validateEntries(
+    entries: readonly SessionMigrationEntry[],
+    records: readonly SessionDataRecord[],
+    now: Date,
+    maximumEntryBytes: number,
+    maximumTotalBytes: number,
+  ): void {
+    const allowedIds = new Set(records.map((record) => record.id));
+    const sourceIds = new Set<string>();
+    const targetKeys = new Set<string>();
+
+    let totalBytes = 0;
+
+    for (const entry of entries) {
+      if (
+        !entry.sourceIds.length ||
+        !entry.namespace ||
+        !entry.key ||
+        !this.options.allowedNamespaces.includes(entry.namespace)
+      ) {
+        throw new SessionSecurityError(
+          "The migration merge callback returned an invalid entry.",
+        );
+      }
+
+      const targetKey = `${entry.namespace}\0${entry.key}`;
+
+      if (targetKeys.has(targetKey)) {
+        throw new SessionSecurityError(
+          "The migration merge callback returned duplicate target keys.",
+        );
+      }
+
+      targetKeys.add(targetKey);
+
+      for (const sourceId of entry.sourceIds) {
+        if (!allowedIds.has(sourceId) || sourceIds.has(sourceId)) {
+          throw new SessionSecurityError(
+            "The migration merge callback referenced an invalid source record.",
+          );
+        }
+
+        sourceIds.add(sourceId);
+      }
+
+      if (entry.expiresAt && entry.expiresAt.getTime() <= now.getTime()) {
+        throw new SessionSecurityError(
+          "The migration merge callback returned expired data.",
+        );
+      }
+
+      const size = toBytes(entry.value);
+
+      if (size > maximumEntryBytes) {
+        throw new SessionSecurityError(
+          "A migrated session data entry exceeds the maximum allowed size.",
+        );
+      }
+
+      totalBytes += size;
+    }
+
+    if (totalBytes > maximumTotalBytes) {
+      throw new SessionSecurityError(
+        "Merged session data exceeds the maximum allowed size.",
+      );
+    }
   }
 }

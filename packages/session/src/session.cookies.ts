@@ -11,8 +11,9 @@ export type SessionCookieEnvironment = {
 export const createSessionCookieOptions = (
   environment: SessionCookieEnvironment,
 ): SessionCookieOptions => {
-  const name = environment.name ?? "__Host-puzzle.session";
   const secure = environment.production;
+  const name =
+    environment.name ?? (secure ? "__Host-puzzle.session" : "puzzle.session");
   const sameSite = environment.sameSite ?? "lax";
 
   if (name.startsWith("__Host-") && !secure) {

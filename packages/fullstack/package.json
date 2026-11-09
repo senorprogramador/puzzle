@@ -67,6 +67,7 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p .",
+    "test": "node --test",
     "vitest": "node --test",
     "clean": "rm -rf dist",
     "prepack": "tsdown"

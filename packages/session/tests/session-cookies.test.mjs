@@ -25,6 +25,7 @@ test("rejects insecure __Host cookies", () => {
     () =>
       createSessionCookieOptions({
         production: false,
+        name: "__Host-puzzle.session",
       }),
     /__Host- cookies require Secure/,
   );
@@ -90,4 +91,22 @@ test("rejects invalid cookie max age", () => {
     () => serializeSessionCookie("token", options, 0),
     /positive integer/,
   );
+});
+
+test("uses a development-compatible cookie name", () => {
+  const options = createSessionCookieOptions({
+    production: false,
+  });
+
+  assert.equal(options.name, "puzzle.session");
+  assert.equal(options.secure, false);
+});
+
+test("uses a secure host-prefixed cookie in production", () => {
+  const options = createSessionCookieOptions({
+    production: true,
+  });
+
+  assert.equal(options.name, "__Host-puzzle.session");
+  assert.equal(options.secure, true);
 });

@@ -102,16 +102,22 @@ export const logoutRequest = async (
 
 export const logoutAllRequest = async (
   request: Request,
-  userId: string,
   options: SessionResponseOptions,
 ): Promise<Response> => {
   protectAuthenticatedRequest(request, options.csrf);
 
-  if (!userId) {
-    return new Response(null, { status: 401 });
+  const session = await getRequestSession(request, options);
+
+  if (!session || session.kind !== "authenticated" || !session.userId) {
+    return new Response(null, {
+      status: 401,
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    });
   }
 
-  await options.sessions.revokeAll(userId);
+  await options.sessions.revokeAll(session.userId);
 
   return clearSessionResponse(JSON.stringify({ success: true }), options);
 };

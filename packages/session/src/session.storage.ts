@@ -5,8 +5,11 @@ import type {
   SessionStorageRecord,
 } from "./types/session.types";
 
+import type { SessionUserLockRecord } from "./types/session-lock.types";
+
 export const SESSION_COLLECTION = "sessions";
 export const SESSION_DATA_COLLECTION = "session_data";
+export const SESSION_USER_LOCK_COLLECTION = "session_user_locks";
 
 export const sessionCollection: StorageCollection<SessionStorageRecord> = {
   name: SESSION_COLLECTION,
@@ -46,6 +49,18 @@ export const sessionDataCollection: StorageCollection<SessionDataRecord> = {
   ],
 };
 
+export const sessionUserLockCollection: StorageCollection<SessionUserLockRecord> =
+  {
+    name: SESSION_USER_LOCK_COLLECTION,
+    indexes: [
+      {
+        name: "user_id_unique",
+        fields: ["userId"],
+        unique: true,
+      },
+    ],
+  };
+
 export const initializeSessionStorage = async (
   storage: StorageAdapter,
 ): Promise<void> => {
@@ -61,4 +76,5 @@ export const initializeSessionStorage = async (
 
   await storage.registerCollection(sessionCollection);
   await storage.registerCollection(sessionDataCollection);
+  await storage.registerCollection(sessionUserLockCollection);
 };
