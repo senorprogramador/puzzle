@@ -5,7 +5,7 @@ import { act } from "react";
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Theme } from "@puzzle-ui/theme";
 import { Link } from "./index";
@@ -30,6 +30,8 @@ describe("Link", () => {
   let hydrationContainer: HTMLDivElement | null = null;
 
   afterEach(async () => {
+    vi.unstubAllGlobals();
+
     if (root) {
       await act(async () => {
         root?.unmount();
@@ -205,6 +207,8 @@ describe("Link", () => {
     hydrationContainer.innerHTML = serverMarkup;
 
     document.body.append(hydrationContainer);
+
+    vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
 
     await act(async () => {
       root = hydrateRoot(hydrationContainer!, element);

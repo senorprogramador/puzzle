@@ -1,25 +1,24 @@
+import { hexToRgba } from "./color.utils";
+
 export const hexToRgb = (hex: string): { r: number; g: number; b: number } => {
-  if (!/^#([0-9A-F]{3}){1,2}$/i.test(hex)) {
-    throw new Error("Invalid hex color");
-  }
-  let r: number, g: number, b: number;
-  if (hex.length === 4) {
-    const [, red, green, blue] = hex;
-    r = parseInt(`${red}${red}`, 16);
-    g = parseInt(`${green}${green}`, 16);
-    b = parseInt(`${blue}${blue}`, 16);
-  } else {
-    r = parseInt(hex.slice(1, 3), 16);
-    g = parseInt(hex.slice(3, 5), 16);
-    b = parseInt(hex.slice(5, 7), 16);
-  }
+  const { r, g, b } = hexToRgba(hex);
+
   return { r, g, b };
 };
 
-export const rgbToHex = (r: number, g: number, b: number): string => {
-  const toHex = (value: number) => {
-    const hex = value.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-  };
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+export const rgbToHex = (
+  r: number,
+  g: number,
+  b: number,
+  a?: number,
+): string => {
+  const channel = (value: number): string =>
+    Math.round(Math.min(255, Math.max(0, value)))
+      .toString(16)
+      .padStart(2, "0");
+
+  const alpha =
+    a !== undefined && a < 1 ? channel(Math.min(1, Math.max(0, a)) * 255) : "";
+
+  return `#${channel(r)}${channel(g)}${channel(b)}${alpha}`;
 };

@@ -1,0 +1,447 @@
+.puzzle-color-picker {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    min-width: 0;
+
+    color: var(--puzzle-color-text);
+    font-family: inherit;
+}
+
+.puzzle-color-picker__label {
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+}
+
+.puzzle-color-picker__description {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+}
+
+/* Trigger */
+
+.puzzle-color-picker__trigger {
+    box-sizing: border-box;
+
+    display: inline-flex;
+    align-items: center;
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    width: 100%;
+    min-height: 2.5rem;
+    padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+
+    border: 1px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface);
+
+    font: inherit;
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    text-align: start;
+
+    cursor: pointer;
+
+    transition:
+        border-color var(--puzzle-duration-fast, 150ms) ease,
+        background-color var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-color-picker__trigger:hover:not(:disabled) {
+    border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-color-picker__trigger:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-color-picker__trigger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.puzzle-color-picker__trigger-swatch {
+    flex: 0 0 1.25rem;
+
+    width: 1.25rem;
+    height: 1.25rem;
+
+    border: 1px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+}
+
+.puzzle-color-picker__trigger-value {
+    flex: 1;
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.puzzle-color-picker__trigger-chevron {
+    color: var(--puzzle-color-text-muted);
+}
+
+/* Popout */
+
+.puzzle-color-picker__popover {
+    width: 17rem;
+    max-width: calc(100vw - 1rem);
+
+    padding: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-color-picker__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-3, 0.75rem);
+
+    min-width: 0;
+
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+/* Color area */
+
+.puzzle-color-picker__area {
+    position: relative;
+
+    width: 100%;
+    height: 10rem;
+
+    overflow: hidden;
+
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    background: var(--puzzle-color-picker-hue);
+
+    cursor: crosshair;
+    touch-action: none;
+    user-select: none;
+}
+
+.puzzle-color-picker__area-saturation {
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(to right, #fff, transparent);
+}
+
+.puzzle-color-picker__area-brightness {
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(to top, #000, transparent);
+}
+
+.puzzle-color-picker__area-indicator {
+    position: absolute;
+    z-index: 1;
+
+    width: 0.875rem;
+    height: 0.875rem;
+
+    border: 2px solid white;
+    border-radius: 50%;
+
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 45%);
+
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.puzzle-color-picker__area:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 3px;
+}
+
+/* Sliders */
+
+.puzzle-color-picker__sliders {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-color-picker__slider-row {
+    display: flex;
+    align-items: center;
+    gap: var(--puzzle-space-3, 0.75rem);
+
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+}
+
+.puzzle-color-picker__slider-row span {
+    flex: 0 0 3.5rem;
+}
+
+.puzzle-color-picker__slider-row input {
+    flex: 1;
+    min-width: 0;
+
+    height: 1rem;
+    margin: 0;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    border: 0;
+    border-radius: 999px;
+
+    cursor: pointer;
+}
+
+.puzzle-color-picker__slider-row input::-webkit-slider-thumb {
+    width: 0.875rem;
+    height: 0.875rem;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    border: 2px solid white;
+    border-radius: 50%;
+
+    background: var(--puzzle-color-text);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 35%);
+}
+
+.puzzle-color-picker__slider-row input::-moz-range-thumb {
+    width: 0.75rem;
+    height: 0.75rem;
+
+    border: 2px solid white;
+    border-radius: 50%;
+
+    background: var(--puzzle-color-text);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 35%);
+}
+
+.puzzle-color-picker__slider-row input:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 3px;
+}
+
+.puzzle-color-picker__hue-slider {
+    background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+.puzzle-color-picker__opacity-slider {
+    background-color: white;
+    background-image:
+        linear-gradient(to right, transparent, var(--puzzle-color-picker-hue)),
+        conic-gradient(#ccc 25%, #fff 0 50%, #ccc 0 75%, #fff 0);
+    background-size:
+        100% 100%,
+        0.5rem 0.5rem;
+}
+
+/* Input */
+
+.puzzle-color-picker__input-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    padding-top: var(--puzzle-space-3, 0.75rem);
+
+    border-top: 1px solid var(--puzzle-color-border);
+}
+
+.puzzle-color-picker__input-label,
+.puzzle-color-picker__section-label {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+}
+
+.puzzle-color-picker__input-row {
+    display: flex;
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-color-picker__input-row input {
+    box-sizing: border-box;
+    flex: 1;
+    min-width: 0;
+
+    height: 2.25rem;
+    padding-inline: var(--puzzle-space-2, 0.5rem);
+
+    border: 1px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface);
+
+    font-family: monospace;
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-color-picker__input-row input:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-color-picker__input-row input[aria-invalid="true"] {
+    border-color: var(--puzzle-color-danger);
+}
+
+.puzzle-color-picker__apply {
+    padding-inline: var(--puzzle-space-3, 0.75rem);
+
+    border: 1px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface);
+
+    font: inherit;
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+
+    cursor: pointer;
+}
+
+.puzzle-color-picker__apply:hover {
+    background: var(--puzzle-color-surface-secondary, var(--puzzle-color-border));
+}
+
+.puzzle-color-picker__apply:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-color-picker__error {
+    margin: 0;
+
+    color: var(--puzzle-color-danger);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+}
+
+/* Swatches */
+
+.puzzle-color-picker__swatches-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    padding-top: var(--puzzle-space-3, 0.75rem);
+
+    border-top: 1px solid var(--puzzle-color-border);
+}
+
+.puzzle-color-picker__swatches {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-color-picker__swatch {
+    position: relative;
+
+    box-sizing: border-box;
+
+    width: 100%;
+    aspect-ratio: 1;
+
+    padding: 0;
+
+    border: 1px solid rgb(0 0 0 / 12%);
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+
+    cursor: pointer;
+
+    transition:
+        outline-color var(--puzzle-duration-fast, 150ms) ease,
+        transform var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-color-picker__swatch:hover {
+    transform: scale(1.08);
+}
+
+.puzzle-color-picker__swatch:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-color-picker__swatch[data-selected="true"]::after {
+    position: absolute;
+    inset: -0.2rem;
+
+    border: 2px solid var(--puzzle-color-primary);
+    border-radius: calc(var(--puzzle-radius-sm, 0.25rem) + 0.2rem);
+
+    content: "";
+    pointer-events: none;
+}
+
+/* Clear swatch */
+
+.puzzle-color-picker__clear {
+    overflow: hidden;
+
+    background-color: white;
+    background-image:
+        linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%);
+    background-position:
+        0 0,
+        0 0.25rem,
+        0.25rem -0.25rem,
+        -0.25rem 0;
+    background-size: 0.5rem 0.5rem;
+}
+
+.puzzle-color-picker__clear span {
+    position: absolute;
+    top: 50%;
+    left: -15%;
+
+    width: 130%;
+    height: 2px;
+
+    background: #dc2626;
+
+    transform: rotate(-45deg);
+    pointer-events: none;
+}
+
+/* Disabled */
+
+.puzzle-color-picker[data-disabled="true"] {
+    opacity: 0.55;
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-color-picker__trigger,
+    .puzzle-color-picker__swatch {
+        transition: none;
+    }
+
+    .puzzle-color-picker__swatch:hover {
+        transform: none;
+    }
+}
+
+/* High contrast */
+
+@media (forced-colors: active) {
+    .puzzle-color-picker__trigger:focus-visible,
+    .puzzle-color-picker__area:focus-visible,
+    .puzzle-color-picker__swatch:focus-visible {
+        outline: 2px solid Highlight;
+    }
+
+    .puzzle-color-picker__swatch[data-selected="true"]::after {
+        border-color: Highlight;
+    }
+}

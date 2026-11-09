@@ -157,6 +157,13 @@ export {
 } from "./components/forms/checkbox";
 
 export {
+  ColorPicker,
+  type ColorPickerProps,
+  type ColorPickerFormat,
+  type ColorPickerSwatch,
+} from "./components/forms/color-picker";
+
+export {
   DatePicker,
   type DatePickerProps,
   type DatePickerSize,

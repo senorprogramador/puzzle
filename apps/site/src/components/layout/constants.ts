@@ -101,6 +101,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/forms/checkbox",
               },
               {
+                id: "color-picker",
+                label: "Color Picker",
+                href: "/docs/components/ui/forms/color-picker",
+              },
+              {
                 id: "date-picker",
                 label: "Date Picker",
                 href: "/docs/components/ui/forms/date-picker",

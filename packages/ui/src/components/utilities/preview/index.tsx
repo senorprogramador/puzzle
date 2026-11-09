@@ -297,7 +297,8 @@ const Preview = ({
     const measure = () => {
       const styles = window.getComputedStyle(container);
       const horizontalPadding =
-        parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+        (Number.parseFloat(styles.paddingLeft) || 0) +
+        (Number.parseFloat(styles.paddingRight) || 0);
 
       updateScale(container.clientWidth - horizontalPadding);
     };

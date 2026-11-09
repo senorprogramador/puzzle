@@ -1,23 +1,21 @@
-export const isHexColor = (color: string): boolean => {
-  return /^#([0-9A-F]{3}){1,2}$/i.test(color);
-};
+import {
+  getColorType,
+  isColor,
+  isColorDark,
+  isCssVariable,
+} from "./color.utils";
 
-import { hexToRgb } from "./to-color";
+export const isHexColor = (color: string): boolean =>
+  /^#(?:[\da-f]{3}|[\da-f]{4}|[\da-f]{6}|[\da-f]{8})$/i.test(color.trim());
 
-const linearize = (value: number): number => {
-  const channel = value / 255;
-
-  return channel <= 0.04045
-    ? channel / 12.92
-    : ((channel + 0.055) / 1.055) ** 2.4;
-};
-
-/** Returns whether a color is dark based on WCAG relative luminance. */
 export const isDarkColor = (color: string): boolean => {
-  const { r, g, b } = hexToRgb(color);
+  const result = isColorDark(color);
 
-  const luminance =
-    0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b);
+  if (result === null) {
+    throw new Error(`Unsupported color: ${color}`);
+  }
 
-  return luminance < 0.179;
+  return result;
 };
+
+export { getColorType, isColor, isCssVariable, isColorDark };
