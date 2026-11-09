@@ -5,7 +5,8 @@ export type AuthErrorCode =
   | "CONFLICT"
   | "CONFIGURATION"
   | "PROVIDER"
-  | "SESSION";
+  | "SESSION"
+  | "INVALID_TOKEN";
 
 export class AuthError extends Error {
   readonly code: AuthErrorCode;
@@ -96,5 +97,12 @@ export class AuthSessionError extends AuthError {
   constructor(message: string, options?: { readonly cause?: unknown }) {
     super("SESSION", message, options);
     this.name = "AuthSessionError";
+  }
+}
+
+export class AuthTokenError extends AuthError {
+  constructor() {
+    super("INVALID_TOKEN", "This link is invalid or has expired.");
+    this.name = "AuthTokenError";
   }
 }

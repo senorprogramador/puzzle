@@ -21,5 +21,19 @@ export interface EmailProvider {
 }
 
 export interface RateLimitProvider {
-  consume(input: { readonly key: string; readonly limit: number; readonly windowSeconds: number }): Promise<{ readonly allowed: boolean; readonly remaining: number; readonly resetAt: Date }>;
+  consume(input: {
+    readonly key: string;
+    readonly limit: number;
+    readonly windowSeconds: number;
+  }): Promise<{
+    readonly allowed: boolean;
+    readonly remaining: number;
+    readonly resetAt: Date;
+  }>;
+}
+
+export interface PasswordHasher {
+  hash(password: string): Promise<PasswordHash>;
+  verify(password: string, stored: PasswordHash): Promise<boolean>;
+  needsRehash?(stored: PasswordHash): boolean | Promise<boolean>;
 }

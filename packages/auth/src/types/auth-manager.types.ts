@@ -24,19 +24,20 @@ export type AuthRateLimitPolicies = {
 };
 
 export type AuthManagerOptions = {
-  /**
-   * Secret used to HMAC rate-limit identifiers.
-   *
-   * Must contain at least 32 characters and be identical across
-   * application instances.
-   */
   readonly rateLimitKeySecret: string;
 
   readonly usersCollection?: string;
   readonly credentialsCollection?: string;
+  readonly auditCollection?: string;
 
   readonly minimumPasswordLength?: number;
   readonly maximumPasswordLength?: number;
+
+  /**
+   * When enabled, valid credentials are still rejected until the account
+   * has completed email verification.
+   */
+  readonly requireVerifiedEmail?: boolean;
 
   readonly rateLimits?: {
     readonly registration?: Partial<AuthRateLimitScopePolicy>;

@@ -55,3 +55,28 @@ export const createRateLimitKey = async (
 
   return `hmac-sha256:${hash}`;
 };
+
+export const generateSecureAuthToken = (): string => {
+  const bytes = new Uint8Array(32);
+
+  getCrypto().getRandomValues(bytes);
+
+  return Array.from(bytes)
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+};
+
+export const hashAuthToken = async (token: string): Promise<string> => {
+  if (typeof token !== "string" || token.length === 0) {
+    throw new AuthConfigurationError("A valid token is required.");
+  }
+
+  const digest = await getCrypto().subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(token),
+  );
+
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+};
