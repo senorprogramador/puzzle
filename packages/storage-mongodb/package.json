@@ -30,8 +30,8 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p .",
-    "test": "bun test tests",
-    "vitest": "bun test tests",
+    "test": "bash scripts/test-with-mongodb.sh",
+    "vitest": "bash scripts/test-with-mongodb.sh",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
   },

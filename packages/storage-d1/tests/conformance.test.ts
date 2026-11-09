@@ -8,35 +8,26 @@ import {
   runStorageAdapterConformance,
   runStorageMigrationConformance,
 } from "../../storage/tests/conformance";
+import { USERS_COLLECTION } from "../../storage/tests/conformance/storage-adapter.test-types";
 
 let miniflare: Miniflare;
 let storageDatabase: D1DatabaseLike;
 let migrationDatabase: D1DatabaseLike;
 
-const resetDatabase = async (
-  database: D1DatabaseLike,
-  allowedPrefixes: string[],
-) => {
-  const result = await database
-    .prepare(
-      `
-      SELECT name
-      FROM sqlite_master
-      WHERE type = 'table'
-        AND name NOT LIKE 'sqlite_%'
-    `,
-    )
-    .all<{ name: string }>();
+const resetStorageDatabase = async () => {
+  await storageDatabase
+    .prepare('DROP TABLE IF EXISTS "puzzle_conformance_users"')
+    .run();
+};
 
-  const tables = (result.results ?? []).filter(({ name }) =>
-    allowedPrefixes.some((prefix) => name.startsWith(prefix)),
-  );
+const resetMigrationDatabase = async () => {
+  await migrationDatabase
+    .prepare('DROP TABLE IF EXISTS "puzzle_migrations"')
+    .run();
 
-  for (const { name } of tables) {
-    const escapedName = name.replaceAll('"', '""');
-
-    await database.prepare(`DROP TABLE IF EXISTS "${escapedName}"`).run();
-  }
+  await migrationDatabase
+    .prepare('DROP TABLE IF EXISTS "puzzle_migration_lock"')
+    .run();
 };
 
 beforeAll(async () => {
@@ -65,19 +56,24 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await resetDatabase(storageDatabase, ["puzzle_conformance_"]);
-  await resetDatabase(migrationDatabase, ["puzzle_migrations"]);
   await miniflare?.dispose();
 });
 
 runStorageAdapterConformance({
-  createAdapter: async () =>
-    new D1StorageAdapter({
+  createAdapter: async () => {
+    const adapter = new D1StorageAdapter({
       database: storageDatabase,
-      tablePrefix: "puzzle_conformance",
-    }),
+      tablePrefix: "puzzle_",
+    });
 
-  reset: () => resetDatabase(storageDatabase, ["puzzle_conformance_"]),
+    await adapter.registerCollection({
+      name: USERS_COLLECTION,
+    });
+
+    return adapter;
+  },
+
+  reset: resetStorageDatabase,
 });
 
 runStorageMigrationConformance({
@@ -86,5 +82,5 @@ runStorageMigrationConformance({
       database: migrationDatabase,
     }),
 
-  reset: () => resetDatabase(migrationDatabase, ["puzzle_migrations"]),
+  reset: resetMigrationDatabase,
 });
