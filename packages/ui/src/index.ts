@@ -345,6 +345,11 @@ export {
 export { Link, type LinkProps } from "./components/navigation/link";
 
 export {
+  Pagination,
+  type PaginationProps,
+} from "./components/navigation/pagination";
+
+export {
   Tabs,
   TabsTab,
   type TabsProps,

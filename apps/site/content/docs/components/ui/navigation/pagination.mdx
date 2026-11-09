@@ -1,0 +1,99 @@
+---
+title: Pagination
+description: Navigate between pages of a larger collection.
+---
+
+Pagination provides page-number and previous/next controls for content split across multiple pages. It supports both button-based state updates and URL-based links.
+
+## Import
+
+```tsx
+import { Pagination } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Set `totalPages` to the number of pages and use `defaultPage` to choose the initial page for an uncontrolled pagination control. Page numbers start at 1.
+
+<Preview
+  height={160}
+  code={`\
+<Pagination totalPages={10} defaultPage={4} onPageChange={(page) => console.log(page)} />
+`}
+>
+  <Section>
+    <Pagination totalPages={10} defaultPage={4} />
+  </Section>
+</Preview>
+
+## Controlled page
+
+Use `page` and `onPageChange` when the parent manages the selected page. The callback receives the new page number. Updating a controlled pagination requires updating `page` in response to that callback.
+
+```tsx
+const [page, setPage] = useState(1);
+
+<Pagination totalPages={10} page={page} onPageChange={setPage} />;
+```
+
+Without `page`, `defaultPage` sets the initial page and the component updates its own page state. The selected page is clamped to the available range; when `totalPages` is zero, page numbers are omitted and navigation controls are disabled.
+
+## Page links
+
+Provide `getPageHref` to render available pages as links, for example when each page has a URL. The callback receives a page number and should return its destination. Current and disabled controls are not links.
+
+<Preview
+  height={160}
+  code={`\
+<Pagination
+  totalPages={8}
+  defaultPage={3}
+  getPageHref={(page) => \`/articles?page=\${page}\`}
+/>
+`}
+>
+  <Section>
+    <Pagination
+      totalPages={8}
+      defaultPage={3}
+      getPageHref={(page) => `/articles?page=${page}`}
+    />
+  </Section>
+</Preview>
+
+## Visible pages and controls
+
+`boundaryCount` sets how many page numbers to keep visible at each end, and `siblingCount` sets how many page numbers appear beside the current page. Gaps of one page are shown as a page number; larger gaps use an ellipsis. When the total is small enough to fit the window, all pages are shown.
+
+Set `showFirstLast={false}` to hide the first- and last-page controls. Use `disabled` to disable all navigation, and `size="sm"` for a smaller control size (`md` is the default).
+
+## Accessible labels
+
+The navigation landmark is named “Pagination” by default. Override it with `aria-label` or `labels.navigation`. Customize the control labels with `labels`, or provide `getPageAriaLabel` for individual page controls. `labels` supports `navigation`, `first`, `previous`, `next`, `last`, `ellipsis`, and `page`; `page` is a function that receives the page number.
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `totalPages` | `number` | Required | Total number of pages. |
+| `page` | `number` | - | Controlled current page; page numbers start at 1. |
+| `defaultPage` | `number` | `1` | Initial page when uncontrolled. |
+| `onPageChange` | `(page: number) => void` | - | Called when a different page is selected. |
+| `siblingCount` | `number` | `1` | Number of adjacent page numbers around the current page. |
+| `boundaryCount` | `number` | `1` | Number of page numbers shown at each end. |
+| `showFirstLast` | `boolean` | `true` | Whether to show first- and last-page controls. |
+| `disabled` | `boolean` | `false` | Disables navigation controls. |
+| `size` | `"sm" \| "md"` | `"md"` | Control size. |
+| `getPageHref` | `(page: number) => string` | - | Returns a URL to render available pages as links. |
+| `getPageAriaLabel` | `(page: number) => string` | - | Returns the accessible label for a page control. |
+| `labels` | `Partial<PaginationLabels>` | - | Accessible labels for navigation, first, previous, next, last, ellipsis, and page controls. |
+| `aria-label` | `string` | `"Pagination"` | Accessible name for the navigation landmark; `labels.navigation` is used when omitted. |
+| `className` | `string` | - | Additional class for the navigation landmark. |
+
+Other native `nav` attributes are supported.
+
+## Accessibility
+
+- Pagination renders a labeled navigation landmark containing a list of controls.
+- The current page is identified with `aria-current="page"` and cannot be selected again.
+- Previous and next controls are disabled at the ends of the page range. Use descriptive custom labels when the defaults do not fit your language or context.

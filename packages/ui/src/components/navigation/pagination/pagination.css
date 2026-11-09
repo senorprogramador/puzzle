@@ -1,0 +1,147 @@
+.puzzle-pagination {
+    --puzzle-pagination-size: 2.25rem;
+    --puzzle-pagination-gap: var(--puzzle-space-1, 0.25rem);
+    --puzzle-pagination-radius: var(--puzzle-radius-md, 0.375rem);
+    --puzzle-pagination-color: var(--puzzle-color-text, #171717);
+    --puzzle-pagination-muted: var(--puzzle-color-text-muted, #737373);
+    --puzzle-pagination-border: var(--puzzle-color-border, #e5e0d6);
+    --puzzle-pagination-active-bg: var(--puzzle-color-primary);
+    --puzzle-pagination-active-color: var(--puzzle-color-on-primary, #fff);
+    --puzzle-pagination-focus: var(--puzzle-color-ring, currentColor);
+
+    display: flex;
+    width: fit-content;
+    max-width: 100%;
+    color: var(--puzzle-pagination-color);
+}
+
+.puzzle-pagination--sm {
+    --puzzle-pagination-size: 1.875rem;
+}
+
+.puzzle-pagination--md {
+    --puzzle-pagination-size: 2.25rem;
+}
+
+.puzzle-pagination__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--puzzle-pagination-gap);
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.puzzle-pagination__item {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+}
+
+.puzzle-pagination__control {
+    display: inline-flex;
+    width: var(--puzzle-pagination-size);
+    height: var(--puzzle-pagination-size);
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--puzzle-pagination-radius);
+
+    background: transparent;
+    color: var(--puzzle-pagination-color);
+
+    font-family: inherit;
+    font-size: var(--puzzle-font-size-body2, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: 1;
+    text-decoration: none;
+
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) ease,
+        color var(--puzzle-duration-fast, 150ms) ease,
+        border-color var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-pagination__control:hover:not(:disabled):not(.puzzle-pagination__control--disabled):not(
+        .puzzle-pagination__page--active
+    ) {
+    background: var(--puzzle-color-action-hover, rgb(128 128 128 / 10%));
+}
+
+.puzzle-pagination__control:focus-visible {
+    outline: 2px solid var(--puzzle-pagination-focus);
+    outline-offset: 2px;
+}
+
+.puzzle-pagination__page--active {
+    border-color: var(--puzzle-pagination-active-bg);
+    background: var(--puzzle-pagination-active-bg);
+    color: var(--puzzle-pagination-active-color);
+    cursor: default;
+}
+
+.puzzle-pagination__navigation {
+    border-color: var(--puzzle-pagination-border);
+    font-size: 1.25rem;
+}
+
+.puzzle-pagination__control:disabled,
+.puzzle-pagination__control--disabled {
+    color: var(--puzzle-pagination-muted);
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.puzzle-pagination__ellipsis {
+    display: inline-flex;
+    width: var(--puzzle-pagination-size);
+    height: var(--puzzle-pagination-size);
+    align-items: center;
+    justify-content: center;
+
+    color: var(--puzzle-pagination-muted);
+    font-size: 1rem;
+    user-select: none;
+}
+
+.puzzle-pagination[data-disabled] {
+    opacity: 0.65;
+}
+
+@media (forced-colors: active) {
+    .puzzle-pagination__control {
+        border-color: ButtonText;
+    }
+
+    .puzzle-pagination__page--active {
+        border: 2px solid Highlight;
+        background: Highlight;
+        color: HighlightText;
+    }
+
+    .puzzle-pagination__control:focus-visible {
+        outline: 2px solid Highlight;
+    }
+
+    .puzzle-pagination__control:disabled,
+    .puzzle-pagination__control--disabled {
+        color: GrayText;
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-pagination__control {
+        transition: none;
+    }
+}

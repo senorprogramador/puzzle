@@ -253,6 +253,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/navigation/link",
               },
               {
+                id: "pagination",
+                label: "Pagination",
+                href: "/docs/components/ui/navigation/pagination",
+              },
+              {
                 id: "tabs",
                 label: "Tabs",
                 href: "/docs/components/ui/navigation/tabs",
