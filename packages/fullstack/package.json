@@ -1,0 +1,97 @@
+{
+  "name": "@puzzle-ui/fullstack",
+  "version": "0.4.0",
+  "description": "First-party Puzzle Auth client, server and framework integration entry points.",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "type": "module",
+  "exports": {
+    "./auth/client": {
+      "import": {
+        "types": "./dist/auth/client/index.d.ts",
+        "default": "./dist/auth/client/index.js"
+      },
+      "require": {
+        "types": "./dist/auth/client/index.d.cts",
+        "default": "./dist/auth/client/index.cjs"
+      }
+    },
+    "./auth/server": {
+      "import": {
+        "types": "./dist/auth/server/index.d.ts",
+        "default": "./dist/auth/server/index.js"
+      },
+      "require": {
+        "types": "./dist/auth/server/index.d.cts",
+        "default": "./dist/auth/server/index.cjs"
+      }
+    },
+    "./auth/shared": {
+      "import": {
+        "types": "./dist/auth/shared/index.d.ts",
+        "default": "./dist/auth/shared/index.js"
+      },
+      "require": {
+        "types": "./dist/auth/shared/index.d.cts",
+        "default": "./dist/auth/shared/index.cjs"
+      }
+    },
+    "./auth/next": {
+      "import": {
+        "types": "./dist/auth/next/index.d.ts",
+        "default": "./dist/auth/next/index.js"
+      },
+      "require": {
+        "types": "./dist/auth/next/index.d.cts",
+        "default": "./dist/auth/next/index.cjs"
+      }
+    },
+    "./auth/tanstack": {
+      "import": {
+        "types": "./dist/auth/tanstack/index.d.ts",
+        "default": "./dist/auth/tanstack/index.js"
+      },
+      "require": {
+        "types": "./dist/auth/tanstack/index.d.cts",
+        "default": "./dist/auth/tanstack/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
+    "vitest": "node --test",
+    "clean": "rm -rf dist",
+    "prepack": "tsdown"
+  },
+  "devDependencies": {
+    "tsdown": "^0.23.1",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@puzzle-ui/ui": "^0.4.0",
+    "@puzzle-ui/auth": "^0.4.0",
+    "@puzzle-ui/session": "^0.4.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "next": "^15.0.0 || ^16.0.0",
+    "@tanstack/react-start": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    },
+    "@tanstack/react-start": {
+      "optional": true
+    }
+  }
+}

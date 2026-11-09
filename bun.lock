@@ -71,6 +71,18 @@
         "typescript": "^6.0.3",
       },
     },
+    "packages/auth": {
+      "name": "@puzzle-ui/auth",
+      "version": "0.4.0",
+      "dependencies": {
+        "@puzzle-ui/session": "^0.4.0",
+        "@puzzle-ui/storage": "^0.4.0",
+      },
+      "devDependencies": {
+        "tsdown": "^0.23.1",
+        "typescript": "^6.0.3",
+      },
+    },
     "packages/core": {
       "name": "@puzzle-ui/core",
       "version": "0.4.0",
@@ -96,6 +108,29 @@
         "typescript": "^6.0.3",
         "vitest": "^5.1.0",
       },
+    },
+    "packages/fullstack": {
+      "name": "@puzzle-ui/fullstack",
+      "version": "0.4.0",
+      "dependencies": {
+        "@puzzle-ui/auth": "^0.4.0",
+        "@puzzle-ui/session": "^0.4.0",
+        "@puzzle-ui/ui": "^0.4.0",
+      },
+      "devDependencies": {
+        "tsdown": "^0.23.1",
+        "typescript": "^6.0.3",
+      },
+      "peerDependencies": {
+        "@tanstack/react-start": "^1.0.0",
+        "next": "^15.0.0 || ^16.0.0",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+      },
+      "optionalPeers": [
+        "@tanstack/react-start",
+        "next",
+      ],
     },
     "packages/hooks": {
       "name": "@puzzle-ui/hooks",
@@ -131,6 +166,47 @@
       "peerDependencies": {
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
+      },
+    },
+    "packages/session": {
+      "name": "@puzzle-ui/session",
+      "version": "0.4.0",
+      "dependencies": {
+        "@puzzle-ui/storage": "^0.4.0",
+      },
+      "devDependencies": {
+        "tsdown": "^0.23.1",
+        "typescript": "^6.0.3",
+      },
+    },
+    "packages/storage": {
+      "name": "@puzzle-ui/storage",
+      "version": "0.4.0",
+      "devDependencies": {
+        "tsdown": "^0.23.1",
+        "typescript": "^6.0.3",
+      },
+    },
+    "packages/storage-d1": {
+      "name": "@puzzle-ui/storage-d1",
+      "version": "0.4.0",
+      "dependencies": {
+        "@puzzle-ui/storage": "^0.4.0",
+      },
+      "devDependencies": {
+        "tsdown": "^0.23.1",
+        "typescript": "^6.0.3",
+      },
+    },
+    "packages/storage-mongodb": {
+      "name": "@puzzle-ui/storage-mongodb",
+      "version": "0.4.0",
+      "dependencies": {
+        "@puzzle-ui/storage": "^0.4.0",
+      },
+      "devDependencies": {
+        "tsdown": "^0.23.1",
+        "typescript": "^6.0.3",
       },
     },
     "packages/theme": {
@@ -469,9 +545,13 @@
 
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww=="],
 
+    "@puzzle-ui/auth": ["@puzzle-ui/auth@workspace:packages/auth"],
+
     "@puzzle-ui/core": ["@puzzle-ui/core@workspace:packages/core"],
 
     "@puzzle-ui/create": ["@puzzle-ui/create@workspace:packages/create"],
+
+    "@puzzle-ui/fullstack": ["@puzzle-ui/fullstack@workspace:packages/fullstack"],
 
     "@puzzle-ui/hooks": ["@puzzle-ui/hooks@workspace:packages/hooks"],
 
@@ -479,7 +559,15 @@
 
     "@puzzle-ui/playground": ["@puzzle-ui/playground@workspace:apps/playground"],
 
+    "@puzzle-ui/session": ["@puzzle-ui/session@workspace:packages/session"],
+
     "@puzzle-ui/site": ["@puzzle-ui/site@workspace:apps/site"],
+
+    "@puzzle-ui/storage": ["@puzzle-ui/storage@workspace:packages/storage"],
+
+    "@puzzle-ui/storage-d1": ["@puzzle-ui/storage-d1@workspace:packages/storage-d1"],
+
+    "@puzzle-ui/storage-mongodb": ["@puzzle-ui/storage-mongodb@workspace:packages/storage-mongodb"],
 
     "@puzzle-ui/theme": ["@puzzle-ui/theme@workspace:packages/theme"],
 
