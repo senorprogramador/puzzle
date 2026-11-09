@@ -149,5 +149,47 @@ export const runMigrationConformance = (
 
       expect(executionCount).toBe(1);
     });
+
+    it("retries a previously failed migration", async () => {
+      await reset();
+
+      const adapter = await createMigrationAdapter();
+      let executionCount = 0;
+
+      const failedMigration: StorageMigration = {
+        id: "retryable-migration",
+        version: 1,
+        description: "Migration that initially fails",
+        up: async () => {
+          executionCount++;
+          throw new Error("Temporary failure");
+        },
+      };
+
+      await expect(adapter.runMigrations([failedMigration])).rejects.toThrow(
+        "Temporary failure",
+      );
+
+      const failedStatus = await adapter.getMigrationStatus();
+
+      expect(failedStatus.migrations[0]?.status).toBe("failed");
+
+      const recoveredMigration: StorageMigration = {
+        ...failedMigration,
+        up: async () => {
+          executionCount++;
+        },
+      };
+
+      const result = await adapter.runMigrations([recoveredMigration]);
+
+      expect(executionCount).toBe(2);
+      expect(result.applied).toEqual([1]);
+      expect(result.currentVersion).toBe(1);
+
+      const recoveredStatus = await adapter.getMigrationStatus();
+
+      expect(recoveredStatus.migrations[0]?.status).toBe("completed");
+    });
   });
 };

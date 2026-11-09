@@ -1,4 +1,4 @@
-import { afterAll, beforeAll } from "bun:test";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { Miniflare } from "miniflare";
 
 import { D1StorageMigrationAdapter, D1StorageAdapter } from "../src";
@@ -83,4 +83,61 @@ runStorageMigrationConformance({
     }),
 
   reset: resetMigrationDatabase,
+});
+
+describe("D1 migration-specific conformance", () => {
+  it("recovers when a previous migration lock has expired", async () => {
+    await resetMigrationDatabase();
+
+    const adapter = new D1StorageMigrationAdapter({
+      database: migrationDatabase,
+      lockDurationMs: 1_000,
+    });
+
+    // Laat de adapter eerst de migratietabellen initialiseren.
+    await adapter.getMigrationStatus();
+
+    await migrationDatabase
+      .prepare(
+        `
+        UPDATE "puzzle_migration_lock"
+        SET owner = ?, expires_at = ?
+        WHERE id = 1
+      `,
+      )
+      .bind("abandoned-migration-runner", Date.now() - 60_000)
+      .run();
+
+    let executionCount = 0;
+
+    const result = await adapter.runMigrations([
+      {
+        id: "recover-expired-lock",
+        version: 1,
+        description: "Recover after an expired lock",
+        up: async () => {
+          executionCount++;
+        },
+      },
+    ]);
+
+    expect(executionCount).toBe(1);
+    expect(result.applied).toEqual([1]);
+    expect(result.currentVersion).toBe(1);
+
+    const lock = await migrationDatabase
+      .prepare(
+        `
+        SELECT owner, expires_at
+        FROM "puzzle_migration_lock"
+        WHERE id = 1
+      `,
+      )
+      .first<{ owner: string; expires_at: number }>();
+
+    expect(lock).toEqual({
+      owner: "",
+      expires_at: 0,
+    });
+  });
 });

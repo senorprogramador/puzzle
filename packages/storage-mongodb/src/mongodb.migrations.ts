@@ -81,7 +81,13 @@ export class MongoStorageMigrationAdapter implements StorageMigrationAdapter {
       }
     }
 
-    await this.locks.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+    await this.locks.createIndexes([
+      {
+        key: { expiresAt: 1 },
+        name: "expiresAt_ttl",
+        expireAfterSeconds: 0,
+      },
+    ]);
   }
 
   async getMigrationStatus(): Promise<{
@@ -183,18 +189,18 @@ export class MongoStorageMigrationAdapter implements StorageMigrationAdapter {
           `${this.prefix}${operation.collection}`,
         );
 
-        await collection.createIndex(
-          Object.fromEntries(operation.fields.map((field) => [field, 1])),
+        await collection.createIndexes([
           {
+            key: Object.fromEntries(
+              operation.fields.map((field) => [field, 1]),
+            ),
             name: operation.name,
             unique: operation.unique ?? false,
             ...(operation.expireAfterSeconds !== undefined
-              ? {
-                  expireAfterSeconds: operation.expireAfterSeconds,
-                }
+              ? { expireAfterSeconds: operation.expireAfterSeconds }
               : {}),
           },
-        );
+        ]);
 
         return;
       }
