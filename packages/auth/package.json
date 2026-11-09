@@ -1,7 +1,7 @@
 {
   "name": "@puzzle-ui/auth",
   "version": "0.4.0",
-  "description": "Framework-independent authentication contracts for Puzzle.",
+  "description": "Framework-independent authentication core for Puzzle.",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
@@ -30,6 +30,7 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p .",
+    "test": "node --test",
     "vitest": "node --test",
     "clean": "rm -rf dist",
     "prepack": "tsdown"

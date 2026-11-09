@@ -31,7 +31,7 @@ export type StorageCondition = {
   readonly expectedUpdatedAt?: Date;
 };
 
-export type StorageBatchOperation<T extends StorageRecord> =
+type StorageBatchOperationItem<T extends StorageRecord> =
   | {
       readonly type: "insert";
       readonly collection: StorageCollectionName;
@@ -50,6 +50,13 @@ export type StorageBatchOperation<T extends StorageRecord> =
       readonly id: string;
       readonly condition?: StorageCondition;
     };
+
+/**
+ * Distributes over unions so an atomic batch can contain records
+ * from different collections with different record types.
+ */
+export type StorageBatchOperation<T extends StorageRecord> =
+  T extends StorageRecord ? StorageBatchOperationItem<T> : never;
 
 export type StorageBatchResult<T extends StorageRecord> = {
   readonly results: readonly (
