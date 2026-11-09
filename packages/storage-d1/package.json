@@ -30,11 +30,16 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p .",
-    "vitest": "node --test",
+    "test": "bun test tests",
+    "vitest": "bun test tests",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
   },
   "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "@types/node": "^26.6.6",
+    "bun": "^1.4.4",
+    "miniflare": "^4.20260730.0",
     "tsdown": "^0.23.1",
     "typescript": "^6.0.3"
   },

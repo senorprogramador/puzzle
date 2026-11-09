@@ -13,10 +13,18 @@ export type D1PreparedStatementLike = {
 
 export type D1DatabaseLike = {
   prepare(query: string): D1PreparedStatementLike;
-  batch<T = unknown>(statements: readonly D1PreparedStatementLike[]): Promise<readonly D1ResultLike<T>[]>;
+  batch<T = unknown>(
+    statements: readonly D1PreparedStatementLike[],
+  ): Promise<readonly D1ResultLike<T>[]>;
 };
 
 export type D1StorageAdapterOptions = {
   readonly database: D1DatabaseLike;
   readonly tablePrefix?: string;
+};
+
+export type D1StorageMigrationOptions = {
+  readonly database: D1DatabaseLike;
+  readonly tablePrefix?: string;
+  readonly lockDurationMs?: number;
 };
