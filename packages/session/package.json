@@ -1,7 +1,7 @@
 {
   "name": "@puzzle-ui/session",
   "version": "0.4.0",
-  "description": "Session contracts and lifecycle foundation for Puzzle Auth.",
+  "description": "Secure, database-independent session management for Puzzle Auth.",
   "license": "MIT",
   "publishConfig": {
     "access": "public",
@@ -31,6 +31,7 @@
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p .",
     "vitest": "node --test",
+    "test": "node --test",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
   },
