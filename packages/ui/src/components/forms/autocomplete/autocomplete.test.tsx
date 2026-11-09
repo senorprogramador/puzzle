@@ -753,7 +753,7 @@ describe("Autocomplete", () => {
           label="Country"
           name="country"
           options={countries}
-          defaultValue={countries[1].value}
+          defaultValue={countries[1]!.value}
           serializeValue={(value) =>
             typeof value === "string" ? value : String(value.id)
           }

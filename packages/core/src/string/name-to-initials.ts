@@ -74,19 +74,17 @@ const getFirstLetter = (part: string): string => {
 
 export const nameToInitials = (name: string) => {
   const parts = name.trim().split(/\s+/u).filter(Boolean);
-  if (parts.length === 0) {
+  const [firstPart] = parts;
+  if (firstPart === undefined) {
     return "?";
   }
 
   // Ignore suffixes such as Jr., Sr. and III.
-  while (
-    parts.length > 1 &&
-    NAME_SUFFIXES.has(normalizeNamePart(parts[parts.length - 1]))
-  ) {
+  while (parts.length > 1 && NAME_SUFFIXES.has(normalizeNamePart(parts.at(-1)!))) {
     parts.pop();
   }
 
-  const firstInitial = getFirstLetter(parts[0]);
+  const firstInitial = getFirstLetter(firstPart);
 
   if (parts.length === 1) {
     return firstInitial;
@@ -98,7 +96,7 @@ export const nameToInitials = (name: string) => {
     .find((part) => !NAME_PARTICLES.has(normalizeNamePart(part)));
 
   // Fallback for unusual names consisting only of particles.
-  const lastInitial = getFirstLetter(surname ?? parts[parts.length - 1]);
+  const lastInitial = getFirstLetter(surname ?? parts.at(-1)!);
 
   return firstInitial + lastInitial;
 };

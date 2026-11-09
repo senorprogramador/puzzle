@@ -92,7 +92,7 @@ describe("AppBar", () => {
   it("marks only the current item with aria-current=page", () => {
     render(<AppBar title="Puzzle" navigationItems={navigationItems} />);
 
-    const desktop = screen.getAllByRole("navigation")[0];
+    const desktop = screen.getAllByRole("navigation")[0]!;
 
     expect(within(desktop).getByRole("link", { name: "Home" })).toHaveAttribute(
       "aria-current",
@@ -106,7 +106,7 @@ describe("AppBar", () => {
   it("protects external links from reverse tabnabbing", () => {
     render(<AppBar title="Puzzle" navigationItems={navigationItems} />);
 
-    const link = within(screen.getAllByRole("navigation")[0]).getByRole(
+    const link = within(screen.getAllByRole("navigation")[0]!).getByRole(
       "link",
       { name: "GitHub" },
     );

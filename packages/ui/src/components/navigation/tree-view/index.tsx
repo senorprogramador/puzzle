@@ -576,7 +576,7 @@ const TreeView = <TData,>({
     switch (event.key) {
       case "ArrowDown":
         if (index < visibleItems.length - 1) {
-          focusItem(visibleItems[index + 1].id);
+          focusItem(visibleItems[index + 1]!.id);
         }
 
         handled = true;
@@ -584,7 +584,7 @@ const TreeView = <TData,>({
 
       case "ArrowUp":
         if (index > 0) {
-          focusItem(visibleItems[index - 1].id);
+          focusItem(visibleItems[index - 1]!.id);
         }
 
         handled = true;
@@ -600,7 +600,7 @@ const TreeView = <TData,>({
 
       case "End":
         if (visibleItems.length > 0) {
-          focusItem(visibleItems[visibleItems.length - 1].id);
+          focusItem(visibleItems[visibleItems.length - 1]!.id);
         }
 
         handled = true;

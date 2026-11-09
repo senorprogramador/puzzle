@@ -374,8 +374,8 @@ export const insertDocumentAtSelection = (
     startIndex,
     Math.min(end.block, source.content.length - 1),
   );
-  const startBlock = source.content[startIndex];
-  const endBlock = source.content[endIndex];
+  const startBlock = source.content[startIndex]!;
+  const endBlock = source.content[endIndex]!;
   const startOffset = Math.max(
     0,
     Math.min(start.offset, getBlockLength(startBlock)),
@@ -394,8 +394,8 @@ export const insertDocumentAtSelection = (
   const leftSurvives = prefix.length > 0 || startOffset > 0;
   const rightSurvives =
     suffix.length > 0 || endOffset < getBlockLength(endBlock);
-  const first = insertedBlocks[0];
-  const last = insertedBlocks[insertedBlocks.length - 1];
+  const first = insertedBlocks[0]!;
+  const last = insertedBlocks[insertedBlocks.length - 1]!;
   const separatePrefix = leftSurvives && first.type === "heading";
   const separateSuffix = rightSurvives && last.type === "heading";
   const replacement: TextBlock[] = [];
@@ -423,9 +423,9 @@ export const insertDocumentAtSelection = (
       } else {
         const finalIndex = replacement.length - 1;
         replacement[finalIndex] = {
-          ...replacement[finalIndex],
+          ...replacement[finalIndex]!,
           children: normalizeInlines([
-            ...replacement[finalIndex].children,
+            ...replacement[finalIndex]!.children,
             ...suffix,
           ]),
         };
@@ -451,7 +451,7 @@ export const insertDocumentAtSelection = (
     });
 
     for (let index = 1; index < insertedBlocks.length - 1; index += 1) {
-      replacement.push(insertedBlocks[index]);
+      replacement.push(insertedBlocks[index]!);
     }
 
     if (separateSuffix) {
@@ -475,7 +475,7 @@ export const insertDocumentAtSelection = (
   const caretReplacementIndex = separateSuffix
     ? replacement.length - 2
     : replacement.length - 1;
-  const caretBlock = replacement[Math.max(0, caretReplacementIndex)];
+  const caretBlock = replacement[Math.max(0, caretReplacementIndex)]!;
   const suffixLength = suffix.reduce(
     (total, inline) => total + inline.text.length,
     0,
@@ -549,7 +549,7 @@ export const getTextAlign = (
       : end.block;
   const selected = document.content.slice(start.block, lastBlock + 1);
   if (selected.length === 0) return null;
-  const align = selected[0].align ?? null;
+  const align = selected[0]!.align ?? null;
   return selected.every((block) => (block.align ?? null) === align)
     ? align
     : null;

@@ -37,7 +37,7 @@ const matchesMimeType = (
   fileType: string,
   acceptedTypes: readonly string[],
 ): boolean => {
-  const normalizedType = fileType.split(";")[0].trim().toLowerCase();
+  const normalizedType = fileType.split(";")[0]!.trim().toLowerCase();
 
   if (!normalizedType) return false;
 

@@ -75,11 +75,11 @@ describe("Stack (browser)", () => {
 
     expect(dividers).toHaveLength(2);
     expect(
-      screen.getByTestId("a").compareDocumentPosition(dividers[0]) &
+      screen.getByTestId("a").compareDocumentPosition(dividers[0]!) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
     expect(
-      dividers[1].compareDocumentPosition(screen.getByTestId("c")) &
+      dividers[1]!.compareDocumentPosition(screen.getByTestId("c")) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });

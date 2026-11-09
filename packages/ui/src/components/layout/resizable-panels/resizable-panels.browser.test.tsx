@@ -175,7 +175,7 @@ describe("ResizablePanels (browser)", () => {
 
     const initialThirdWidth = third.getBoundingClientRect().width;
 
-    const handle = screen.getAllByRole("separator")[0];
+    const handle = screen.getAllByRole("separator")[0]!;
 
     const rect = handle.getBoundingClientRect();
 

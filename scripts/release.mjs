@@ -185,6 +185,8 @@ const main = async () => {
     updateLockfile(manifests, currentVersion, version);
     runOrFail("Verifying bun.lock", "bun", ["install", "--frozen-lockfile"]);
 
+    runOrFail("Type checking", "bun", ["run", "typecheck"]);
+
     log("Running tests");
     for (const { dir, manifest } of manifests) {
       const scripts = manifest.scripts ?? {};

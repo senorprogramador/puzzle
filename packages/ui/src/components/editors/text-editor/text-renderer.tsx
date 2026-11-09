@@ -26,7 +26,7 @@ const HEADING_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
 
 // Without an explicit level, fall back to the level implied by the variant.
 const getHeadingTag = (block: TextBlock): (typeof HEADING_TAGS)[number] => {
-  if (block.headingLevel) return HEADING_TAGS[block.headingLevel - 1];
+  if (block.headingLevel) return HEADING_TAGS[block.headingLevel - 1]!;
 
   switch (block.variant) {
     case "display1": case "headline1": return "h1";
@@ -41,12 +41,12 @@ const TextRenderer = ({ document, className }: TextRendererProps) => {
   const output: ReactNode[] = [];
   let index = 0;
   while (index < blocks.length) {
-    const block = blocks[index];
+    const block = blocks[index]!;
     if (block.listType) {
       const listType = block.listType;
       const items: ReactNode[] = [];
-      while (index < blocks.length && blocks[index].listType === listType) {
-        const item = blocks[index];
+      while (index < blocks.length && blocks[index]!.listType === listType) {
+        const item = blocks[index]!;
         const itemChildren = renderInline(item, index);
         items.push(<li key={index} className={cn("puzzle-text-renderer__block", `puzzle-typography-${item.variant}`)} style={{ textAlign: item.align }}>
           {itemChildren.length ? itemChildren : <br />}

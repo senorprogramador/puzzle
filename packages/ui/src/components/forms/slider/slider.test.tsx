@@ -103,7 +103,7 @@ describe("Slider", () => {
 
     expect(slider).toHaveValue("75");
     expect(onChange).toHaveBeenCalledWith(75);
-    expect(typeof onChange.mock.calls[0][0]).toBe("number");
+    expect(typeof onChange.mock.calls[0]![0]).toBe("number");
   });
 
   it("supports controlled values", () => {

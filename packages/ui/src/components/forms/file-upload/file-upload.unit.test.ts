@@ -128,7 +128,7 @@ describe("validateFiles", () => {
 
     expect(result.accepted).toHaveLength(1);
     expect(result.rejected).toHaveLength(1);
-    expect(result.rejected[0].code).toBe("too-many-files");
+    expect(result.rejected[0]!.code).toBe("too-many-files");
   });
 
   it("enforces maxFiles across existing and incoming files", () => {
@@ -143,7 +143,7 @@ describe("validateFiles", () => {
 
     expect(result.accepted).toHaveLength(1);
     expect(result.rejected).toHaveLength(1);
-    expect(result.rejected[0].code).toBe("too-many-files");
+    expect(result.rejected[0]!.code).toBe("too-many-files");
   });
 
   it("enforces maxTotalSize across existing and incoming files", () => {
@@ -157,7 +157,7 @@ describe("validateFiles", () => {
     );
 
     expect(result.accepted).toHaveLength(0);
-    expect(result.rejected[0].code).toBe("total-too-large");
+    expect(result.rejected[0]!.code).toBe("total-too-large");
   });
 
   it("allows a total size exactly at the limit", () => {
@@ -186,7 +186,7 @@ describe("validateFiles", () => {
     );
 
     expect(result.accepted).toHaveLength(1);
-    expect(result.accepted[0].name).toBe("valid.png");
+    expect(result.accepted[0]!.name).toBe("valid.png");
   });
 
   it("does not count rejected files toward maxTotalSize", () => {
@@ -204,7 +204,7 @@ describe("validateFiles", () => {
     );
 
     expect(result.accepted).toHaveLength(1);
-    expect(result.accepted[0].name).toBe("valid.png");
+    expect(result.accepted[0]!.name).toBe("valid.png");
   });
 });
 

@@ -42,7 +42,7 @@ describe("text document operations", () => {
     };
 
     const bold = applyMark(document, selection, "bold");
-    expect(bold.content[0].children).toEqual([
+    expect(bold.content[0]!.children).toEqual([
       { text: "Hello " },
       { text: "world", marks: ["bold"] },
     ]);
@@ -57,8 +57,8 @@ describe("text document operations", () => {
       "headline2",
     );
 
-    expect(next.content[0].type).toBe("heading");
-    expect(next.content[0].variant).toBe("headline2");
+    expect(next.content[0]!.type).toBe("heading");
+    expect(next.content[0]!.variant).toBe("headline2");
   });
 
   it("replaces the selection with a parsed document and returns the caret", () => {
@@ -82,8 +82,8 @@ describe("text document operations", () => {
       inserted,
     );
 
-    expect(getBlockText(result.document.content[0])).toBe("Hello Puzzle");
-    expect(result.document.content[0].children[1]).toEqual({
+    expect(getBlockText(result.document.content[0]!)).toBe("Hello Puzzle");
+    expect(result.document.content[0]!.children[1]).toEqual({
       text: "Puzzle",
       marks: ["italic"],
     });

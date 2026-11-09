@@ -5,6 +5,7 @@
     "site": "bun run --filter '@puzzle-ui/site' dev",
     "dev": "bun run --filter '@puzzle-ui/playground' dev",
     "build": "bun run --filter './packages/*' build",
+    "typecheck": "bun run --filter './packages/*' --filter './apps/site' typecheck",
     "vitest": "bun run --filter './packages/*' vitest",
     "storybook": "bun run --filter './apps/playground' storybook",
     "release": "node scripts/release.mjs",

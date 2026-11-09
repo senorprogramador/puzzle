@@ -218,7 +218,7 @@ const Accordion = ({
 
     if (isValueMode) {
       const nextIds = nextOpenItemIndexes.map(
-        (openIndex) => items[openIndex].id as AccordionItemId,
+        (openIndex) => items[openIndex]!.id as AccordionItemId,
       );
 
       if (!isValueControlled) {

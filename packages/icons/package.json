@@ -29,6 +29,7 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
     "vitest": "bunx vitest run --passWithNoTests",
     "vitest:watch": "bunx vitest run --watch --passWithNoTests",
     "clean": "rm -rf dist",

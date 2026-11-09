@@ -11,7 +11,7 @@ const DialogSection = ({}: DialogSectionProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   return (
     <Section>
-      <Heading variant="headline2">Press te button to open a dialog</Heading>
+      <Heading level="headline2">Press te button to open a dialog</Heading>
       <Stack direction="row">
         <Button onClick={() => setIsDialogOpen(true)}>Open Dialog</Button>
         <Dialog

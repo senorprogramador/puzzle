@@ -88,7 +88,7 @@ const normalizePanelSizes = (
 
   while (unresolved.length > 0) {
     const activeWeightTotal = unresolved.reduce(
-      (total, index) => total + weights[index],
+      (total, index) => total + weights[index]!,
       0,
     );
 
@@ -97,12 +97,12 @@ const normalizePanelSizes = (
     const candidates = unresolved.map((index) => ({
       index,
       size:
-        (remainingSize * (useEqualDistribution ? 1 : weights[index])) /
+        (remainingSize * (useEqualDistribution ? 1 : weights[index]!)) /
         (useEqualDistribution ? unresolved.length : activeWeightTotal),
     }));
 
     const violations = candidates.filter(({ index, size }) => {
-      const constraint = normalizedConstraints[index];
+      const constraint = normalizedConstraints[index]!;
 
       return size < constraint.minSize || size > constraint.maxSize;
     });
@@ -116,7 +116,7 @@ const normalizePanelSizes = (
     }
 
     const clampedViolations = violations.map(({ index, size }) => {
-      const constraint = normalizedConstraints[index];
+      const constraint = normalizedConstraints[index]!;
 
       return {
         index,
@@ -151,7 +151,7 @@ const normalizePanelSizes = (
     }
 
     for (let index = unresolved.length - 1; index >= 0; index--) {
-      if (fixedIndexes.has(unresolved[index])) {
+      if (fixedIndexes.has(unresolved[index]!)) {
         unresolved.splice(index, 1);
       }
     }
@@ -182,11 +182,12 @@ const getPanelPairBounds = (
     throw new RangeError("Invalid panel resize index.");
   }
 
-  const first = normalizedConstraints[panelIndex];
-  const second = normalizedConstraints[panelIndex + 1];
+  // The guard above ensures both panels of the pair exist.
+  const first = normalizedConstraints[panelIndex]!;
+  const second = normalizedConstraints[panelIndex + 1]!;
 
   const combinedSize =
-    normalizedSizes[panelIndex] + normalizedSizes[panelIndex + 1];
+    normalizedSizes[panelIndex]! + normalizedSizes[panelIndex + 1]!;
 
   return {
     minSize: Math.max(first.minSize, combinedSize - second.maxSize),
@@ -214,12 +215,13 @@ const resizePanelPair = (
 
   const bounds = getPanelPairBounds(normalizedSizes, constraints, panelIndex);
 
+  // getPanelPairBounds has validated panelIndex.
   const combinedSize =
-    normalizedSizes[panelIndex] + normalizedSizes[panelIndex + 1];
+    normalizedSizes[panelIndex]! + normalizedSizes[panelIndex + 1]!;
 
   const nextFirstSize = Math.min(
     bounds.maxSize,
-    Math.max(bounds.minSize, normalizedSizes[panelIndex] + delta),
+    Math.max(bounds.minSize, normalizedSizes[panelIndex]! + delta),
   );
 
   const nextSizes = [...normalizedSizes];

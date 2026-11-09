@@ -31,6 +31,7 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
     "vitest": "bunx vitest run --project unit --project component",
     "test:unit": "bunx vitest run --project unit",
     "test:component": "bunx vitest run --project component",

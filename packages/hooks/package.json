@@ -29,6 +29,7 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
   },

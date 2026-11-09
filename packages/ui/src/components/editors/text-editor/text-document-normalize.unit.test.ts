@@ -68,15 +68,15 @@ describe("normalizeTextDocument headingLevel", () => {
   it("keeps a valid level independent of the variant", () => {
     const [block] = normalizeTextDocument(heading(2)).content;
 
-    expect(block.type).toBe("heading");
-    expect(block.variant).toBe("headline4");
-    expect(block.headingLevel).toBe(2);
+    expect(block!.type).toBe("heading");
+    expect(block!.variant).toBe("headline4");
+    expect(block!.headingLevel).toBe(2);
   });
 
   it.each([0, 7, 1.5, "2", null])("drops the invalid level %s", (level) => {
     const [block] = normalizeTextDocument(heading(level)).content;
 
-    expect(block.headingLevel).toBeUndefined();
+    expect(block!.headingLevel).toBeUndefined();
   });
 
   it("drops the level of non-heading blocks", () => {
@@ -92,6 +92,6 @@ describe("normalizeTextDocument headingLevel", () => {
       ],
     } as TextDocument).content;
 
-    expect(block.headingLevel).toBeUndefined();
+    expect(block!.headingLevel).toBeUndefined();
   });
 });

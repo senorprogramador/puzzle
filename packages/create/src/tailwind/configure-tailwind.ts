@@ -90,7 +90,7 @@ const findTanStackCssPath = async (directory: string) => {
   for (const match of matches) {
     const importedPath = match[1];
 
-    if (!importedPath.startsWith(".")) {
+    if (!importedPath?.startsWith(".")) {
       continue;
     }
 

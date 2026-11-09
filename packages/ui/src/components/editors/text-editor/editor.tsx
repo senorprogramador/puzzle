@@ -149,7 +149,7 @@ const pointFromDom = (
     const blocks = Array.from(root.children) as HTMLElement[];
     if (!blocks.length) return null;
     const blockIndex = Math.max(0, Math.min(offset, blocks.length - 1));
-    const blockElement = blocks[blockIndex];
+    const blockElement = blocks[blockIndex]!;
     return {
       block: blockIndex,
       offset: offset >= blocks.length ? nodeTextLength(blockElement) : 0,
@@ -467,7 +467,7 @@ const getVariantForSelection = (
     .slice(start.block, lastBlock + 1)
     .map((block) => block.variant);
   return variants.length && variants.every((variant) => variant === variants[0])
-    ? variants[0]
+    ? variants[0]!
     : null;
 };
 

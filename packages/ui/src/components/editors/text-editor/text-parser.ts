@@ -273,9 +273,9 @@ export const parseMarkdownToDocument = (markdown: string): TextDocument => {
       const heading = line.match(/^\s{0,3}(#{1,4})\s+(.+?)\s*#*\s*$/);
       if (heading) {
         flushParagraph();
-        const level = heading[1].length;
+        const level = heading[1]!.length;
         const variant = (`headline${level}`) as TextBlockVariant;
-        blocks.push(createBlock(variant, parseInlineMarkdown(heading[2]), true));
+        blocks.push(createBlock(variant, parseInlineMarkdown(heading[2]!), true));
         continue;
       }
 
@@ -287,14 +287,14 @@ export const parseMarkdownToDocument = (markdown: string): TextDocument => {
       const listItem = line.match(/^\s{0,3}([-+*]|\d+[.)])\s+(.+)$/);
       if (listItem) {
         flushParagraph();
-        const listType: TextListType = /^\d/.test(listItem[1]) ? "ordered" : "bullet";
-        blocks.push(createBlock("body1", parseInlineMarkdown(listItem[2]), false, undefined, listType));
+        const listType: TextListType = /^\d/.test(listItem[1]!) ? "ordered" : "bullet";
+        blocks.push(createBlock("body1", parseInlineMarkdown(listItem[2]!), false, undefined, listType));
         continue;
       }
 
       const quote = line.match(/^\s{0,3}>\s?(.*)$/);
       if (quote) {
-        paragraphLines.push(quote[1]);
+        paragraphLines.push(quote[1]!);
         continue;
       }
     }

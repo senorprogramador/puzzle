@@ -4,9 +4,10 @@ export const hexToRgb = (hex: string): { r: number; g: number; b: number } => {
   }
   let r: number, g: number, b: number;
   if (hex.length === 4) {
-    r = parseInt(hex[1] + hex[1], 16);
-    g = parseInt(hex[2] + hex[2], 16);
-    b = parseInt(hex[3] + hex[3], 16);
+    const [, red, green, blue] = hex;
+    r = parseInt(`${red}${red}`, 16);
+    g = parseInt(`${green}${green}`, 16);
+    b = parseInt(`${blue}${blue}`, 16);
   } else {
     r = parseInt(hex.slice(1, 3), 16);
     g = parseInt(hex.slice(3, 5), 16);

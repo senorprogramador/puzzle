@@ -203,7 +203,7 @@ const DropdownMenuContent = ({
     const nextBuffer = `${typeaheadRef.current}${event.key}`;
     const repeatedCharacter = [...nextBuffer].every(
       (character) =>
-        character.toLocaleLowerCase() === nextBuffer[0].toLocaleLowerCase(),
+        character.toLocaleLowerCase() === nextBuffer[0]!.toLocaleLowerCase(),
     );
     const query = repeatedCharacter ? event.key : nextBuffer;
     typeaheadRef.current = query;

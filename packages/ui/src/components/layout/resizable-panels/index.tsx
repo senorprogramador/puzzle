@@ -389,7 +389,7 @@ const ResizablePanelsRoot = ({
     const normalized = normalizePanelSizes(nextSizes, panelConstraints);
 
     const hasChanged = normalized.some(
-      (size, index) => Math.abs(size - currentSizes[index]) > 0.000001,
+      (size, index) => Math.abs(size - (currentSizes[index] ?? 0)) > 0.000001,
     );
 
     if (!hasChanged) {
@@ -493,7 +493,7 @@ const ResizablePanelsRoot = ({
       return;
     }
 
-    const currentSize = currentSizes[handleIndex];
+    const currentSize = currentSizes[handleIndex]!;
 
     const bounds = getPanelPairBounds(
       currentSizes,
@@ -579,7 +579,7 @@ const ResizablePanelsRoot = ({
         value: currentSizes[handleIndex],
         minValue: bounds.minSize,
         maxValue: bounds.maxSize,
-        panelIds: [panelIds[handleIndex], panelIds[handleIndex + 1]],
+        panelIds: [panelIds[handleIndex]!, panelIds[handleIndex + 1]!],
         inheritedDisabled: disabled,
         onResizeStart: handlePointerDown,
         onResizeMove: handlePointerMove,

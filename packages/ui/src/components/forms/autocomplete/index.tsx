@@ -318,7 +318,7 @@ const Autocomplete = <T, FreeSolo extends boolean = false>(
     const nextInputValue = multiple
       ? ""
       : selectedValues.length > 0
-        ? getValueLabel(selectedValues[0])
+        ? getValueLabel(selectedValues[0]!)
         : "";
 
     changeInputValue(nextInputValue, "reset");
@@ -609,7 +609,7 @@ const Autocomplete = <T, FreeSolo extends boolean = false>(
       const nextInputValue = multiple
         ? ""
         : selectedValues.length > 0
-          ? getValueLabel(selectedValues[0])
+          ? getValueLabel(selectedValues[0]!)
           : "";
 
       changeInputValue(nextInputValue, "reset");
@@ -729,7 +729,7 @@ const Autocomplete = <T, FreeSolo extends boolean = false>(
           const nextInputValue = multiple
             ? ""
             : selectedValues.length > 0
-              ? getValueLabel(selectedValues[0])
+              ? getValueLabel(selectedValues[0]!)
               : "";
 
           changeInputValue(nextInputValue, "reset");

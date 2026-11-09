@@ -91,8 +91,8 @@ describe("TextRenderer", () => {
 
     expect(screen.getAllByRole("list")).toHaveLength(2);
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
-    expect(screen.getAllByRole("list")[0].tagName).toBe("UL");
-    expect(screen.getAllByRole("list")[1].tagName).toBe("OL");
+    expect(screen.getAllByRole("list")[0]!.tagName).toBe("UL");
+    expect(screen.getAllByRole("list")[1]!.tagName).toBe("OL");
   });
 
   it("applies inline marks as semantic elements", () => {

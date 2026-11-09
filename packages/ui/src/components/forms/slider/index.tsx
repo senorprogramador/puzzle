@@ -73,7 +73,7 @@ type SliderProps = Omit<
 };
 
 const getPrecision = (value: number) => {
-  const [coefficient, exponent = "0"] = String(value).toLowerCase().split("e");
+  const [coefficient = "", exponent = "0"] = String(value).toLowerCase().split("e");
 
   const decimals = coefficient.split(".")[1]?.length ?? 0;
 

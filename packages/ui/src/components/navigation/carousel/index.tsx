@@ -123,7 +123,7 @@ const readRenderedOffset = (element: HTMLElement, fallback: number): number => {
     .split(",")
     .map(Number);
 
-  const translateX = values[isMatrix3d ? 12 : 4];
+  const translateX = values[isMatrix3d ? 12 : 4] ?? Number.NaN;
 
   return Number.isFinite(translateX) ? -translateX : fallback;
 };
@@ -133,10 +133,10 @@ const estimatePointerVelocity = (samples: DragSample[]): number => {
     return 0;
   }
 
-  const end = samples[samples.length - 1];
+  const end = samples[samples.length - 1]!;
   const cutoff = end.time - 100;
 
-  let start = samples[0];
+  let start = samples[0]!;
 
   for (const sample of samples) {
     if (sample.time <= cutoff) {
@@ -335,7 +335,7 @@ const Carousel = <T,>({
 
     const numberOfPages = Math.ceil(items.length / itemsPerPage);
     const maxStartIndex = Math.max(0, items.length - itemsPerPage);
-    const lastItemEnd = itemRects[itemRects.length - 1].right - trackRect.left;
+    const lastItemEnd = itemRects[itemRects.length - 1]!.right - trackRect.left;
     const maxOffset = Math.max(0, lastItemEnd - viewportWidth);
 
     setLayout((previous) => {
@@ -443,7 +443,7 @@ const Carousel = <T,>({
     }
 
     return pageStartIndices.reduce((closestIndex, pageStart, index) => {
-      const closestStart = pageStartIndices[closestIndex];
+      const closestStart = pageStartIndices[closestIndex]!;
 
       return Math.abs(pageStart - activePanel) <
         Math.abs(closestStart - activePanel)
@@ -729,7 +729,7 @@ const Carousel = <T,>({
         });
 
         // Retain a short history for release-velocity estimation.
-        while (drag.samples.length > 2 && now - drag.samples[1].time > 120) {
+        while (drag.samples.length > 2 && now - drag.samples[1]!.time > 120) {
           drag.samples.shift();
         }
 

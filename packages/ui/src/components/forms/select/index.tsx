@@ -210,7 +210,7 @@ const findEnabledIndex = <T,>(
       break;
     }
 
-    if (!options[index].disabled) {
+    if (!options[index]!.disabled) {
       return index;
     }
   }
@@ -468,7 +468,7 @@ const Select = <T,>(props: SelectProps<T>) => {
     const repeatedCharacter =
       query.length > 1 &&
       Array.from(query).every(
-        (item) => item.toLowerCase() === query[0].toLowerCase(),
+        (item) => item.toLowerCase() === query[0]!.toLowerCase(),
       );
 
     const search = repeatedCharacter ? character : query;
@@ -476,7 +476,7 @@ const Select = <T,>(props: SelectProps<T>) => {
 
     for (let offset = 1; offset <= options.length; offset++) {
       const index = (startIndex + offset + options.length) % options.length;
-      const option = options[index];
+      const option = options[index]!;
 
       if (
         !option.disabled &&
@@ -1034,7 +1034,7 @@ const Select = <T,>(props: SelectProps<T>) => {
             multiple
               ? selectedValues.map(getSerializedValue)
               : selectedValues.length
-                ? getSerializedValue(selectedValues[0])
+                ? getSerializedValue(selectedValues[0]!)
                 : ""
           }
           onChange={handleNativeChange}

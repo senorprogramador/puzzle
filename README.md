@@ -172,14 +172,15 @@ The script requires a clean git working tree and asks whether the release is
 
 1. Updates the version and internal `@puzzle-ui/*` dependency ranges of every
    library package, and refreshes `bun.lock`.
-2. Runs all package tests, including the UI browser tests.
-3. Builds all packages.
-4. Publishes core, theme, hooks, icons, UI, and create in that order, prompting for
+2. Type checks all packages and the documentation site.
+3. Runs all package tests, including the UI browser tests.
+4. Builds all packages.
+5. Publishes core, theme, hooks, icons, UI, and create in that order, prompting for
    npm login, one-time passwords, or browser authentication when needed.
-5. Commits the version changes as `Release v<version>` and creates the
+6. Commits the version changes as `Release v<version>` and creates the
    annotated tag `v<version>`.
 
-The script stops at the first failing test, build, or publish. If it stops
+The script stops at the first failing type check, test, build, or publish. If it stops
 before anything is published, the version changes are restored. Push the
 release afterwards with `git push --follow-tags`.
 

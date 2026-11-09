@@ -31,7 +31,7 @@ const findNextMenuItemIndex = <T extends MenuItemLike>(
       return -1;
     }
 
-    if (!items[index].disabled) {
+    if (!items[index]!.disabled) {
       return index;
     }
   }
@@ -52,7 +52,7 @@ const findMenuItemIndexByText = <T extends MenuItemLike>(
 
   for (let step = 1; step <= items.length; step += 1) {
     const index = (currentIndex + step + items.length) % items.length;
-    const item = items[index];
+    const item = items[index]!;
 
     if (
       !item.disabled &&

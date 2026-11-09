@@ -29,6 +29,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
     "prepack": "tsdown",
     "vitest": "bunx vitest run --passWithNoTests",
     "vitest:watch": "bunx vitest run --watch --passWithNoTests"
