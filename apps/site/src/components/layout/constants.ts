@@ -170,6 +170,11 @@ const items: TreeViewItem[] = [
                 label: "Text Input",
                 href: "/docs/components/ui/forms/text-input",
               },
+              {
+                id: "token-input",
+                label: "Token Input",
+                href: "/docs/components/ui/forms/token-input",
+              },
             ],
           },
           {

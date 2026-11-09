@@ -239,6 +239,13 @@ export {
   type SwitchSize,
 } from "./components/forms/switch";
 
+export {
+  TokenInput,
+  type TokenInputProps,
+  type TokenInputMode,
+  type TokenInputSize,
+} from "./components/forms/token-input";
+
 // #endregion Forms
 
 // #region Layout

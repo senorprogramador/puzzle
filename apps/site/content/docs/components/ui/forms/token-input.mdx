@@ -1,0 +1,175 @@
+---
+title: Token Input
+description: Enter verification codes and short tokens using individual character slots.
+---
+
+TokenInput displays a short token as a row of native inputs. It supports numeric and alphanumeric values, automatic focus advancement, pasting, masking, and native form submission.
+
+## Import
+
+```tsx
+import { TokenInput } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Use `label` to provide a visible label. The default configuration accepts six numeric characters and preserves leading zeroes.
+
+<Preview
+  height={220}
+  code={`\
+<TokenInput label="Verification code" name="code" required />
+`}
+>
+  <Section>
+    <TokenInput label="Verification code" name="code" required />
+  </Section>
+</Preview>
+
+Typing replaces the character at the active slot and advances focus. Backspace and Delete remove a character and shift the remaining characters left. Arrow keys move between slots; Home and End focus the first and last slots.
+
+## Length and character mode
+
+Set `length` to an integer from 1 through 32. Numeric mode accepts ASCII digits only. Alphanumeric mode accepts ASCII letters and digits, preserving letter case. Other characters are removed, and values are truncated to the configured length.
+
+<Preview
+  height={260}
+  code={`\
+<TokenInput label="Four-digit PIN" length={4} defaultValue="0123" />
+<TokenInput label="Recovery code" length={8} mode="alphanumeric" />
+`}
+>
+  <Section>
+    <TokenInput label="Four-digit PIN" length={4} defaultValue="0123" />
+    <TokenInput label="Recovery code" length={8} mode="alphanumeric" />
+  </Section>
+</Preview>
+
+The default `inputMode` is `"numeric"` for numeric tokens and `"text"` for alphanumeric tokens. Override it when a different virtual keyboard is appropriate.
+
+## Controlled values and completion
+
+Use `defaultValue` for an uncontrolled initial value, or pair `value` with `onValueChange` for controlled usage. Values and callbacks use a single string rather than an array of characters.
+
+```tsx
+import { useState } from "react";
+import { TokenInput } from "@puzzle-ui/ui";
+
+export const VerificationCode = () => {
+  const [code, setCode] = useState("");
+
+  return (
+    <TokenInput
+      label="Verification code"
+      value={code}
+      onValueChange={setCode}
+      onComplete={(completedCode) => {
+        console.log("Code ready for verification:", completedCode.length);
+      }}
+    />
+  );
+};
+```
+
+`onComplete` runs when an interaction changes an incomplete token into a complete one. It does not run for an initially complete value, a parent-driven value update, or replacement of a character in an already complete token. Completion means every slot is filled, not that the token has been verified; verify it on the server.
+
+The first input defaults to `autoComplete="one-time-code"`. Pasting a complete token replaces the existing value. A shorter paste replaces characters starting at the active slot.
+
+## Sizes and masking
+
+Choose `"sm"`, `"md"` (default), or `"lg"` for the slot size. Set `mask` to render password inputs.
+
+<Preview
+  height={320}
+  code={`\
+<TokenInput label="Small" size="sm" length={4} />
+<TokenInput label="Medium" size="md" length={4} />
+<TokenInput label="Masked PIN" size="lg" length={4} mask />
+`}
+>
+  <Section>
+    <TokenInput label="Small" size="sm" length={4} />
+    <TokenInput label="Medium" size="md" length={4} />
+    <TokenInput label="Masked PIN" size="lg" length={4} mask />
+  </Section>
+</Preview>
+
+Masking only changes the visual presentation; it does not encrypt the token.
+
+## Validation and interaction states
+
+Use `FormField` to associate instructions and error messages with the inputs. `aria-invalid` applies the invalid state to the group and each slot.
+
+<Preview
+  height={360}
+  code={`\
+<FormField
+  label="Verification code"
+  description="Enter the six-digit code from your email."
+  error="This code has expired. Request a new one."
+>
+  <TokenInput aria-invalid="true" />
+</FormField>
+<TokenInput label="Disabled" defaultValue="123456" disabled />
+<TokenInput label="Read-only" defaultValue="123456" readOnly />
+`}
+>
+  <Section>
+    <FormField
+      label="Verification code"
+      description="Enter the six-digit code from your email."
+      error="This code has expired. Request a new one."
+    >
+      <TokenInput aria-invalid="true" />
+    </FormField>
+    <TokenInput label="Disabled" defaultValue="123456" disabled />
+    <TokenInput label="Read-only" defaultValue="123456" readOnly />
+  </Section>
+</Preview>
+
+## Native forms
+
+Providing `name` renders a hidden input containing the combined token. Individual slots do not have names, so the token is submitted once. `required` marks each slot as required for native form validation.
+
+```tsx
+<form method="post">
+  <TokenInput label="Verification code" name="code" required />
+  <button type="submit">Verify</button>
+</form>
+```
+
+Disabled tokens are omitted from form submission; read-only tokens remain included. The `form` prop associates the hidden submission input with a form by ID; it does not associate the visible character inputs with that external form for validation.
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `length` | `number` | `6` | Integer between 1 and 32. |
+| `value` | `string` | - | Controlled token value. |
+| `defaultValue` | `string` | `""` | Initial uncontrolled value. |
+| `onValueChange` | `(value: string) => void` | - | Called when an interaction changes the normalized value. |
+| `onComplete` | `(value: string) => void` | - | Called when an incomplete token becomes complete. |
+| `mode` | `"numeric" \| "alphanumeric"` | `"numeric"` | Allowed character set. |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Visual slot size. |
+| `mask` | `boolean` | `false` | Displays characters using password inputs. |
+| `disabled` | `boolean` | `false` | Disables editing, focus, and submission. |
+| `readOnly` | `boolean` | `false` | Prevents editing while allowing focus. |
+| `required` | `boolean` | `false` | Requires every character input. |
+| `label` | `ReactNode` | - | Visible label associated with the first input. |
+| `id` | `string` | Generated | ID of the first native input. |
+| `name` | `string` | - | Name of the hidden combined-value input. |
+| `form` | `string` | - | Form ID for the hidden submission input. |
+| `inputMode` | Native input mode | Based on `mode` | Virtual keyboard hint for all slots. |
+| `autoComplete` | Native autocomplete value | `"one-time-code"` | Autocomplete hint for the first slot; other slots use `"off"`. |
+| `ref` | `Ref<HTMLInputElement>` | - | Ref to the first native input. |
+| `onFocus`, `onBlur`, `onKeyDown` | Native input handlers | - | Handlers for individual character inputs. |
+
+Other supported native `div` attributes, including `className`, `style`, and `data-*`, apply to the root group. `aria-describedby` and `aria-invalid` are also forwarded to each slot.
+
+## Accessibility
+
+- Provide a visible `label`, use `FormField`, or supply an accessible name with `aria-label`. Use `aria-describedby` for instructions and errors.
+- The root has `role="group"`. One slot is in the tab order at a time; Tab leaves the component, while arrow keys navigate within it.
+- `id` and `ref` target the first input, allowing external labels and programmatic focus.
+- Keep error messages visible and explain how to recover, such as requesting a new verification code.
+- Prefer short token lengths. Long rows may exceed narrow containers; choose a length and size appropriate to the available space.

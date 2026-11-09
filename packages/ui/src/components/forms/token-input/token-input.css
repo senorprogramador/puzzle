@@ -1,0 +1,177 @@
+.puzzle-token-input {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    width: fit-content;
+    max-width: 100%;
+    min-width: 0;
+
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-token-input__label {
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-token-input__slots {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    direction: ltr;
+
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    max-width: 100%;
+}
+
+/* Character slots */
+
+.puzzle-token-input__slot {
+    box-sizing: border-box;
+    display: block;
+    flex: 0 0 auto;
+
+    width: 2.5rem;
+    height: 2.75rem;
+    min-width: 0;
+
+    padding: 0;
+
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    outline: none;
+
+    background: var(--puzzle-color-surface);
+    color: var(--puzzle-color-text);
+
+    font: inherit;
+    font-size: 1.125rem;
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: 1;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+
+    caret-color: var(--puzzle-color-ring);
+
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+
+    transition:
+        border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        box-shadow var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        background-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+.puzzle-token-input__slot:hover:not(:disabled) {
+    border-color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-token-input__slot:focus {
+    border-color: var(--puzzle-color-ring);
+}
+
+.puzzle-token-input__slot:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--puzzle-color-ring), transparent 82%);
+}
+
+/* Invalid state */
+
+.puzzle-token-input[data-invalid="true"] .puzzle-token-input__slot {
+    border-color: var(--puzzle-color-danger);
+}
+
+.puzzle-token-input[data-invalid="true"] .puzzle-token-input__slot:focus-visible {
+    outline-color: var(--puzzle-color-danger);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--puzzle-color-danger), transparent 82%);
+}
+
+/* Disabled state */
+
+.puzzle-token-input[data-disabled="true"] {
+    cursor: not-allowed;
+}
+
+.puzzle-token-input[data-disabled="true"] .puzzle-token-input__slot {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--puzzle-color-surface-sunken);
+}
+
+/* Read-only state */
+
+.puzzle-token-input[data-readonly="true"] .puzzle-token-input__slot {
+    cursor: default;
+}
+
+/* Sizes */
+
+.puzzle-token-input[data-size="sm"] .puzzle-token-input__slot {
+    width: 2rem;
+    height: 2.25rem;
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-token-input[data-size="md"] .puzzle-token-input__slot {
+    width: 2.5rem;
+    height: 2.75rem;
+}
+
+.puzzle-token-input[data-size="lg"] .puzzle-token-input__slot {
+    width: 3rem;
+    height: 3.25rem;
+    font-size: 1.375rem;
+}
+
+/* Compact layouts */
+
+@media (max-width: 360px) {
+    .puzzle-token-input__slots {
+        gap: var(--puzzle-space-1, 0.25rem);
+    }
+
+    .puzzle-token-input[data-size="md"] .puzzle-token-input__slot {
+        width: 2.25rem;
+    }
+}
+
+/* Windows High Contrast Mode */
+
+@media (forced-colors: active) {
+    .puzzle-token-input__slot {
+        border-color: FieldText;
+        background: Field;
+        color: FieldText;
+        forced-color-adjust: auto;
+    }
+
+    .puzzle-token-input__slot:focus-visible {
+        outline: 2px solid Highlight;
+        outline-offset: 2px;
+    }
+
+    .puzzle-token-input__slot:disabled {
+        border-color: GrayText;
+        color: GrayText;
+    }
+
+    .puzzle-token-input[data-invalid="true"] .puzzle-token-input__slot {
+        border-color: Mark;
+    }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-token-input__slot {
+        transition: none;
+    }
+}
