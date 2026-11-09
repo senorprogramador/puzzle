@@ -121,6 +121,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/forms/form-field",
               },
               {
+                id: "input-group",
+                label: "Input Group",
+                href: "/docs/components/ui/forms/input-group",
+              },
+              {
                 id: "label",
                 label: "Label",
                 href: "/docs/components/ui/forms/label",

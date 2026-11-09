@@ -1,0 +1,77 @@
+---
+title: Input Group
+description: Pair an input with leading or trailing text and actions.
+---
+
+InputGroup visually combines an input with add-ons, such as a URL prefix, unit, or action button. It is composed around existing input components and does not change their value or form behavior.
+
+## Import
+
+```tsx
+import { InputGroup } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Place an input and one or more `InputGroup.Addon` elements inside the group. Add-ons align to the start by default; set `align="end"` for trailing content.
+
+<Preview
+  height={220}
+  code={`\
+<InputGroup>
+  <TextInput aria-label="Website" placeholder="example.com" />
+  <InputGroup.Addon>https://</InputGroup.Addon>
+  <InputGroup.Addon align="end">.com</InputGroup.Addon>
+</InputGroup>
+`}
+>
+  <Section>
+    <InputGroup>
+      <TextInput aria-label="Website" placeholder="example.com" />
+      <InputGroup.Addon>https://</InputGroup.Addon>
+      <InputGroup.Addon align="end">.com</InputGroup.Addon>
+    </InputGroup>
+  </Section>
+</Preview>
+
+## Add actions
+
+Add-ons can contain interactive controls. Their visual position is independent from DOM order, so keyboard focus follows the order in which the controls appear in the markup.
+
+<Preview
+  height={220}
+  code={`\
+<InputGroup>
+  <TextInput aria-label="Search terms" placeholder="Search..." />
+  <InputGroup.Addon align="end">
+    <Button size="sm" variant="ghost">Search</Button>
+  </InputGroup.Addon>
+</InputGroup>
+`}
+>
+  <Section>
+    <InputGroup>
+      <TextInput aria-label="Search terms" placeholder="Search..." />
+      <InputGroup.Addon align="end">
+        <Button size="sm" variant="ghost">
+          Search
+        </Button>
+      </InputGroup.Addon>
+    </InputGroup>
+  </Section>
+</Preview>
+
+## API
+
+| Component | Props | Description |
+| --- | --- | --- |
+| `InputGroup` | Native `div` attributes, `className`, and `ref` | Root layout and shared focus treatment. |
+| `InputGroup.Addon` | Native `div` attributes, `className`, and `ref`; `align`: `"start" \| "end"` (default `"start"`) | Add-on content positioned at the start or end of the group. |
+
+Both components accept `children`. Add-ons forward custom attributes such as `data-*` and `aria-*`.
+
+## Accessibility
+
+- Give the input an accessible label, for example with `aria-label` or a surrounding `FormField`.
+- Use text add-ons for useful units or context; keep essential instructions in the input's label or description.
+- Interactive elements inside add-ons remain keyboard-operable. Visual positioning does not alter their DOM or focus order.

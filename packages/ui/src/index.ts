@@ -183,6 +183,13 @@ export {
 export { FormField, type FormFieldProps } from "./components/forms/form-field";
 
 export {
+  InputGroup,
+  type InputGroupProps,
+  type InputGroupAddonProps,
+  type InputGroupAddonAlign,
+} from "./components/forms/input-group";
+
+export {
   NumberInput,
   type NumberInputProps,
   TextAreaInput,

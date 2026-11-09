@@ -18,9 +18,7 @@ describe("Pagination", () => {
 
     for (let page = 1; page <= 5; page += 1) {
       expect(
-        screen.getByRole("button", {
-          name: `Go to page ${page}`,
-        }),
+        screen.getByLabelText(`Go to page ${page}`),
       ).toBeInTheDocument();
     }
   });
@@ -29,7 +27,7 @@ describe("Pagination", () => {
     render(<Pagination totalPages={10} defaultPage={5} />);
 
     expect(
-      screen.getByRole("button", { name: "Go to page 5" }),
+      screen.getByLabelText("Go to page 5"),
     ).toHaveAttribute("aria-current", "page");
   });
 
@@ -50,7 +48,7 @@ describe("Pagination", () => {
     expect(onPageChange).toHaveBeenCalledWith(2);
 
     expect(
-      screen.getByRole("button", { name: "Go to page 2" }),
+      screen.getByLabelText("Go to page 2"),
     ).toHaveAttribute("aria-current", "page");
   });
 
@@ -67,7 +65,7 @@ describe("Pagination", () => {
     expect(onPageChange).toHaveBeenCalledWith(2);
 
     expect(
-      screen.getByRole("button", { name: "Go to page 1" }),
+      screen.getByLabelText("Go to page 1"),
     ).toHaveAttribute("aria-current", "page");
 
     rerender(
@@ -75,7 +73,7 @@ describe("Pagination", () => {
     );
 
     expect(
-      screen.getByRole("button", { name: "Go to page 2" }),
+      screen.getByLabelText("Go to page 2"),
     ).toHaveAttribute("aria-current", "page");
   });
 
@@ -244,16 +242,16 @@ describe("Pagination", () => {
     expect(screen.getByRole("navigation")).toHaveClass("puzzle-pagination--sm");
   });
 
-  it("does not notify when the current page is selected", async () => {
-    const user = userEvent.setup();
+  it("renders the current page as non-interactive", () => {
     const onPageChange = vi.fn();
 
     render(
       <Pagination totalPages={5} defaultPage={2} onPageChange={onPageChange} />,
     );
 
-    expect(screen.getByRole("button", { name: "Go to page 2" })).toBeDisabled();
-
+    const currentPage = screen.getByLabelText("Go to page 2");
+    expect(currentPage).toHaveAttribute("aria-current", "page");
+    expect(currentPage.tagName).toBe("SPAN");
     expect(onPageChange).not.toHaveBeenCalled();
   });
 
@@ -261,7 +259,7 @@ describe("Pagination", () => {
     render(<Pagination totalPages={5} defaultPage={20} />);
 
     expect(
-      screen.getByRole("button", { name: "Go to page 5" }),
+      screen.getByLabelText("Go to page 5"),
     ).toHaveAttribute("aria-current", "page");
   });
 });

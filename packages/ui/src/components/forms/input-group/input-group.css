@@ -1,0 +1,81 @@
+.puzzle-input-group {
+    box-sizing: border-box;
+    display: flex;
+    align-items: stretch;
+
+    width: 100%;
+    min-width: 0;
+
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    background: var(--puzzle-color-surface);
+    color: var(--puzzle-color-text);
+
+    transition:
+        border-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
+        box-shadow var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+/* Shared focus state */
+
+.puzzle-input-group:focus-within {
+    border-color: var(--puzzle-color-ring);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--puzzle-color-ring), transparent 82%);
+}
+
+/* Existing TextInput */
+
+.puzzle-input-group > .puzzle-input {
+    flex: 1 1 0;
+
+    width: auto;
+    min-width: 0;
+    min-height: 2.375rem;
+
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+    box-shadow: none;
+}
+
+.puzzle-input-group > .puzzle-input:focus-within {
+    border-color: transparent;
+    box-shadow: none;
+}
+
+/* Addons */
+
+.puzzle-input-group__addon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+    min-height: 2.375rem;
+
+    padding-inline: var(--puzzle-space-2, 0.5rem);
+
+    color: var(--puzzle-color-text-muted);
+    white-space: nowrap;
+}
+
+/* Visual positioning is independent of DOM order. */
+
+.puzzle-input-group__addon[data-align="start"] {
+    order: -1;
+    border-inline-end: 1px solid var(--puzzle-color-border);
+}
+
+.puzzle-input-group__addon[data-align="end"] {
+    order: 1;
+    border-inline-start: 1px solid var(--puzzle-color-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-input-group {
+        transition: none;
+    }
+}
