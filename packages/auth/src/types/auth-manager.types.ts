@@ -5,6 +5,8 @@ import type {
   PasswordHasher,
   RateLimitProvider,
 } from "../providers/provider.types";
+
+import type { AuthMfaGateway, AuthMfaPendingResult } from "./mfa.types";
 import type { AuthState } from "./state.types";
 import type { AuthUser } from "./user.types";
 
@@ -33,10 +35,6 @@ export type AuthManagerOptions = {
   readonly minimumPasswordLength?: number;
   readonly maximumPasswordLength?: number;
 
-  /**
-   * When enabled, valid credentials are still rejected until the account
-   * has completed email verification.
-   */
   readonly requireVerifiedEmail?: boolean;
 
   readonly rateLimits?: {
@@ -52,6 +50,7 @@ export type AuthManagerDependencies = {
   readonly passwordHasher: PasswordHasher;
   readonly rateLimitProvider: RateLimitProvider;
   readonly sessions: SessionManager;
+  readonly mfa?: AuthMfaGateway;
 };
 
 export type AuthSession = {
@@ -68,26 +67,23 @@ export type AuthResult = {
   readonly user: AuthUser;
   readonly session: AuthSession;
 
-  /**
-   * Raw session token.
-   *
-   * Server-only. Deliver exclusively through a secure HttpOnly cookie.
-   * Never serialize this token into a client-side JSON response.
-   */
+  /** Server-only. Deliver exclusively through a secure HttpOnly cookie. */
   readonly token: string;
 };
+
+/**
+ * A successful password check may result in either:
+ *
+ * 1. A fully authenticated session.
+ * 2. An MFA-pending challenge without an authenticated session.
+ */
+export type AuthSignInResult = AuthResult | AuthMfaPendingResult;
 
 export type AuthRegisterInput = {
   readonly email: string;
   readonly password: string;
   readonly name?: string | null;
-
-  /**
-   * The trusted client IP supplied by the framework integration.
-   * Do not blindly trust arbitrary X-Forwarded-For values.
-   */
   readonly ipAddress: string;
-
   readonly sessionMetadata?: Readonly<Record<string, unknown>>;
 };
 
@@ -103,7 +99,7 @@ export interface AuthManager {
 
   register(input: AuthRegisterInput): Promise<AuthResult>;
 
-  signIn(input: AuthSignInInput): Promise<AuthResult>;
+  signIn(input: AuthSignInInput): Promise<AuthSignInResult>;
 
   getCurrentUser(token: string): Promise<AuthUser | null>;
 

@@ -29,7 +29,15 @@ export type AuthAuditAction =
   | "email-change-requested"
   | "email-changed"
   | "account-deactivated"
-  | "account-deleted";
+  | "account-deleted"
+  | "mfa-challenge-created"
+  | "mfa-challenge-failed"
+  | "mfa-completed"
+  | "mfa-factor-added"
+  | "mfa-factor-removed"
+  | "mfa-recovery-codes-regenerated"
+  | "passkey-registered"
+  | "passkey-authenticated";
 
 export type AuthAuditEventStorageRecord = StorageRecord & {
   readonly action: AuthAuditAction;
@@ -67,7 +75,6 @@ export type AuthLifecycleRateLimitPolicies = Partial<
 >;
 
 export type AuthLifecycleManagerOptions = {
-  /** Shared secret used to HMAC identifiers before rate limiting. */
   readonly rateLimitKeySecret: string;
 
   readonly usersCollection?: string;
@@ -94,20 +101,8 @@ export type AuthLifecycleManagerOptions = {
   readonly rateLimits?: AuthLifecycleRateLimitPolicies;
   readonly clock?: () => Date;
 
-  /**
-   * Reject lifecycle operations for users whose email is not verified.
-   * Keep this aligned with AuthManagerOptions.requireVerifiedEmail.
-   */
   readonly requireVerifiedEmail?: boolean;
 
-  /**
-   * Receives delivery failures without exposing them to password-reset
-   * callers. This hook should write to the application's operational logger.
-   */
   readonly onEmailDeliveryError?: (error: unknown) => void;
-  /**
-   * Receives physical session-revocation failures.
-   * The account's sessionsInvalidatedAt timestamp already blocks old sessions.
-   */
   readonly onSessionRevocationError?: (error: unknown) => void;
 };

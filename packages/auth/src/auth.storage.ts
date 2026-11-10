@@ -6,11 +6,18 @@ import type {
 
 import type { AuthUser } from "./types/user.types";
 import type { PasswordCredentialStorageRecord } from "./types/credential.types";
+
 import type {
   AuthActionTokenStorageRecord,
   AuthAuditEventStorageRecord,
   AuthRateLimitStorageRecord,
 } from "./types/auth-lifecycle.types";
+
+import type {
+  AuthMfaChallengeStorageRecord,
+  AuthMfaFactorStorageRecord,
+  AuthRecoveryCodeStorageRecord,
+} from "./types/mfa.types";
 
 export const AUTH_USER_COLLECTION = "auth_users";
 export const AUTH_CREDENTIAL_COLLECTION = "auth_credentials";
@@ -18,15 +25,14 @@ export const AUTH_ACTION_TOKEN_COLLECTION = "auth_action_tokens";
 export const AUTH_AUDIT_COLLECTION = "auth_audit_events";
 export const AUTH_RATE_LIMIT_COLLECTION = "auth_rate_limits";
 
+export const AUTH_MFA_FACTOR_COLLECTION = "auth_mfa_factors";
+export const AUTH_MFA_CHALLENGE_COLLECTION = "auth_mfa_challenges";
+export const AUTH_RECOVERY_CODE_COLLECTION = "auth_recovery_codes";
+
 export type AuthUserStorageRecord = AuthUser &
   StorageRecord & {
     readonly normalizedEmail: string;
-    /** Account is blocked from authentication when this timestamp is set. */
     readonly deactivatedAt: Date | null;
-    /**
-     * Sessions created at or before this timestamp are no longer valid.
-     * This is the fail-closed fallback when the session provider is unavailable.
-     */
     readonly sessionsInvalidatedAt: Date | null;
   };
 
@@ -103,12 +109,72 @@ export const authRateLimitCollection: StorageCollection<AuthRateLimitStorageReco
     ],
   };
 
+export const authMfaFactorCollection: StorageCollection<AuthMfaFactorStorageRecord> =
+  {
+    name: AUTH_MFA_FACTOR_COLLECTION,
+    indexes: [
+      {
+        name: "factor_key_unique",
+        fields: ["factorKey"],
+        unique: true,
+      },
+      {
+        name: "factor_user_status",
+        fields: ["userId", "status"],
+      },
+      {
+        name: "factor_credential_id",
+        fields: ["credentialId"],
+      },
+    ],
+  };
+
+export const authMfaChallengeCollection: StorageCollection<AuthMfaChallengeStorageRecord> =
+  {
+    name: AUTH_MFA_CHALLENGE_COLLECTION,
+    indexes: [
+      {
+        name: "mfa_challenge_token_unique",
+        fields: ["tokenHash"],
+        unique: true,
+      },
+      {
+        name: "mfa_challenge_user",
+        fields: ["userId", "purpose"],
+      },
+      {
+        name: "mfa_challenge_expiration",
+        fields: ["expiresAt"],
+      },
+    ],
+  };
+
+export const authRecoveryCodeCollection: StorageCollection<AuthRecoveryCodeStorageRecord> =
+  {
+    name: AUTH_RECOVERY_CODE_COLLECTION,
+    indexes: [
+      {
+        name: "recovery_code_hash_unique",
+        fields: ["codeHash"],
+        unique: true,
+      },
+      {
+        name: "recovery_code_user",
+        fields: ["userId", "consumedAt"],
+      },
+    ],
+  };
+
 export type InitializeAuthStorageOptions = {
   readonly usersCollection?: string;
   readonly credentialsCollection?: string;
   readonly actionTokensCollection?: string;
   readonly auditCollection?: string;
   readonly rateLimitsCollection?: string;
+
+  readonly factorsCollection?: string;
+  readonly challengesCollection?: string;
+  readonly recoveryCodesCollection?: string;
 };
 
 export const initializeAuthStorage = async (
@@ -147,5 +213,20 @@ export const initializeAuthStorage = async (
   await storage.registerCollection({
     ...authRateLimitCollection,
     name: options.rateLimitsCollection ?? AUTH_RATE_LIMIT_COLLECTION,
+  });
+
+  await storage.registerCollection({
+    ...authMfaFactorCollection,
+    name: options.factorsCollection ?? AUTH_MFA_FACTOR_COLLECTION,
+  });
+
+  await storage.registerCollection({
+    ...authMfaChallengeCollection,
+    name: options.challengesCollection ?? AUTH_MFA_CHALLENGE_COLLECTION,
+  });
+
+  await storage.registerCollection({
+    ...authRecoveryCodeCollection,
+    name: options.recoveryCodesCollection ?? AUTH_RECOVERY_CODE_COLLECTION,
   });
 };

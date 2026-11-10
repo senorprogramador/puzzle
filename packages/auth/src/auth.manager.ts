@@ -18,6 +18,7 @@ import type {
   AuthResult,
   AuthRegisterInput,
   AuthSignInInput,
+  AuthSignInResult,
   AuthSession,
   AuthRateLimitPolicies,
   AuthRateLimitRule,
@@ -55,11 +56,14 @@ import { normalizeDisplayName, normalizeEmail } from "./utils/email.utils";
 
 import { createRateLimitKey, generateAuthId } from "./utils/auth-crypto.utils";
 
+import type { AuthMfaGateway } from "./types/mfa.types";
+
 export type StorageAuthManagerDependencies = {
   readonly storage: StorageAdapter;
   readonly passwordHasher: PasswordHasher;
   readonly rateLimitProvider: RateLimitProvider;
   readonly sessions: SessionManager;
+  readonly mfa?: AuthMfaGateway;
 };
 
 const DEFAULT_RATE_LIMITS: AuthRateLimitPolicies = {
@@ -175,6 +179,7 @@ export class StorageAuthManager implements AuthManager {
   private readonly passwordHasher: PasswordHasher;
   private readonly rateLimitProvider: RateLimitProvider;
   private readonly sessions: SessionManager;
+  private readonly mfa?: AuthMfaGateway;
 
   private readonly usersCollection: string;
   private readonly credentialsCollection: string;
@@ -199,6 +204,7 @@ export class StorageAuthManager implements AuthManager {
     this.passwordHasher = dependencies.passwordHasher;
     this.rateLimitProvider = dependencies.rateLimitProvider;
     this.sessions = dependencies.sessions;
+    this.mfa = dependencies.mfa;
 
     if (
       typeof options.rateLimitKeySecret !== "string" ||
@@ -270,12 +276,6 @@ export class StorageAuthManager implements AuthManager {
     this.clock = options.clock ?? (() => new Date());
   }
 
-  /**
-   * Initializes auth storage and creates a dummy password hash.
-   *
-   * Unknown accounts also execute password verification to reduce
-   * timing differences during sign-in.
-   */
   async initialize(): Promise<void> {
     if (!this.initializationPromise) {
       const initialization = (async () => {
@@ -284,6 +284,10 @@ export class StorageAuthManager implements AuthManager {
           credentialsCollection: this.credentialsCollection,
           auditCollection: this.auditCollection,
         });
+
+        // MFA storage must be initialized before authentication is exposed.
+        // An initialization failure therefore fails closed.
+        await this.mfa?.initialize();
 
         this.dummyPasswordHash = await this.hashPassword(
           generateAuthId("auth-dummy"),
@@ -373,7 +377,9 @@ export class StorageAuthManager implements AuthManager {
 
       return result;
     } catch (error) {
-      throw new AuthProviderError("Password hashing failed.", { cause: error });
+      throw new AuthProviderError("Password hashing failed.", {
+        cause: error,
+      });
     }
   }
 
@@ -588,11 +594,7 @@ export class StorageAuthManager implements AuthManager {
     ];
 
     try {
-      await this.storage.atomicBatch<
-        | AuthUserStorageRecord
-        | PasswordCredentialStorageRecord
-        | AuthAuditEventStorageRecord
-      >(operations);
+      await this.storage.atomicBatch(operations);
     } catch (error) {
       if (error instanceof StorageDuplicateError) {
         throw new AuthAccountConflictError({ cause: error });
@@ -613,7 +615,7 @@ export class StorageAuthManager implements AuthManager {
     };
   }
 
-  async signIn(input: AuthSignInInput): Promise<AuthResult> {
+  async signIn(input: AuthSignInInput): Promise<AuthSignInResult> {
     this.assertInitialized();
 
     const normalizedEmail = normalizeEmail(input.email);
@@ -676,6 +678,18 @@ export class StorageAuthManager implements AuthManager {
       });
 
       throw new AuthEmailVerificationRequiredError();
+    }
+
+    // CRITICAL:
+    // When active factors exist, stop here.
+    // Do not create a normal authenticated session yet.
+    const mfaPending = await this.mfa?.createSignInChallenge({
+      userId: userRecord.id,
+      ipAddress,
+    });
+
+    if (mfaPending) {
+      return mfaPending;
     }
 
     const authenticated = await this.createAuthenticatedSession(
@@ -752,6 +766,13 @@ export class StorageAuthManager implements AuthManager {
   async getAuthState(token: string): Promise<AuthState> {
     this.assertInitialized();
 
+    // A temporary MFA token is never treated as an authenticated session.
+    const pendingMfa = await this.mfa?.getPendingAuthState(token);
+
+    if (pendingMfa) {
+      return pendingMfa;
+    }
+
     const session = await this.validateSession(token);
 
     if (!session || session.kind !== "authenticated" || !session.userId) {
@@ -812,6 +833,14 @@ export class StorageAuthManager implements AuthManager {
       await this.sessions.revokeAll(userId);
     } catch (error) {
       throw new AuthSessionError("Could not revoke the user's sessions.", {
+        cause: error,
+      });
+    }
+
+    try {
+      await this.mfa?.revokeChallenges(userId);
+    } catch (error) {
+      throw new AuthProviderError("Could not revoke pending MFA challenges.", {
         cause: error,
       });
     }

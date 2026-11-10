@@ -7,7 +7,9 @@ export type AuthErrorCode =
   | "CONFIGURATION"
   | "PROVIDER"
   | "SESSION"
-  | "INVALID_TOKEN";
+  | "INVALID_TOKEN"
+  | "MFA_CHALLENGE"
+  | "MFA_FACTOR";
 
 export class AuthError extends Error {
   readonly code: AuthErrorCode;
@@ -48,17 +50,10 @@ export class AuthInvalidCredentialsError extends AuthError {
 export class AuthEmailVerificationRequiredError extends AuthError {
   constructor() {
     super("EMAIL_NOT_VERIFIED", "Verify your email address before signing in.");
-
     this.name = "AuthEmailVerificationRequiredError";
   }
 }
 
-/**
- * Does not disclose whether the email address already exists.
- *
- * Public registration endpoints should map this to the same generic
- * response used for other account-creation outcomes.
- */
 export class AuthAccountConflictError extends AuthError {
   constructor(options?: { readonly cause?: unknown }) {
     super(
@@ -113,5 +108,35 @@ export class AuthTokenError extends AuthError {
   constructor() {
     super("INVALID_TOKEN", "This link is invalid or has expired.");
     this.name = "AuthTokenError";
+  }
+}
+
+/**
+ * Deliberately generic.
+ *
+ * Do not expose whether a challenge exists, which factor failed,
+ * or whether a recovery code belonged to another account.
+ */
+export class AuthMfaChallengeError extends AuthError {
+  constructor(options?: { readonly cause?: unknown }) {
+    super(
+      "MFA_CHALLENGE",
+      "The authentication challenge is invalid or has expired.",
+      options,
+    );
+
+    this.name = "AuthMfaChallengeError";
+  }
+}
+
+export class AuthMfaFactorError extends AuthError {
+  constructor(
+    message = "The authentication factor could not be used.",
+    options?: {
+      readonly cause?: unknown;
+    },
+  ) {
+    super("MFA_FACTOR", message, options);
+    this.name = "AuthMfaFactorError";
   }
 }
