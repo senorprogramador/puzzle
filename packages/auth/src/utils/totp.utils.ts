@@ -5,6 +5,15 @@ import {
 
 const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
+type TotpOptions = {
+  readonly digits: number;
+  readonly periodSeconds: number;
+};
+
+type TotpVerificationOptions = TotpOptions & {
+  readonly window: number;
+};
+
 const getCrypto = (): Crypto => {
   const cryptoApi = globalThis.crypto;
 
@@ -17,10 +26,7 @@ const getCrypto = (): Crypto => {
   return cryptoApi;
 };
 
-const validateTotpOptions = (options: {
-  readonly digits: number;
-  readonly periodSeconds: number;
-}): void => {
+const validateTotpOptions = (options: TotpOptions): void => {
   if (
     !Number.isInteger(options.digits) ||
     options.digits < 6 ||
@@ -40,8 +46,42 @@ const validateTotpOptions = (options: {
   }
 };
 
+const getTimeStep = (timestamp: number, periodSeconds: number): number => {
+  if (!Number.isFinite(timestamp) || timestamp < 0) {
+    throw new AuthValidationError("A valid TOTP timestamp is required.");
+  }
+
+  const step = Math.floor(timestamp / 1000 / periodSeconds);
+
+  if (!Number.isSafeInteger(step)) {
+    throw new AuthValidationError("The TOTP timestamp is out of range.");
+  }
+
+  return step;
+};
+
+/**
+ * Copies bytes into an ArrayBuffer.
+ *
+ * Web Crypto APIs accept BufferSource values backed by ArrayBuffer.
+ * This avoids ArrayBufferLike incompatibilities with newer TypeScript
+ * typed-array definitions.
+ */
+const toArrayBuffer = (bytes: Uint8Array): ArrayBuffer => {
+  const buffer = new ArrayBuffer(bytes.byteLength);
+  const target = new Uint8Array(buffer);
+
+  for (let index = 0; index < bytes.length; index++) {
+    target[index] = bytes[index]!;
+  }
+
+  return buffer;
+};
+
 const constantTimeEqual = (left: string, right: string): boolean => {
-  if (left.length !== right.length) return false;
+  if (left.length !== right.length) {
+    return false;
+  }
 
   let difference = 0;
 
@@ -63,12 +103,12 @@ export const encodeBase32 = (input: Uint8Array): string => {
 
     while (bits >= 5) {
       bits -= 5;
-      output += BASE32_ALPHABET[(buffer >>> bits) & 31];
+      output += BASE32_ALPHABET.charAt((buffer >>> bits) & 31);
     }
   }
 
   if (bits > 0) {
-    output += BASE32_ALPHABET[(buffer << (5 - bits)) & 31];
+    output += BASE32_ALPHABET.charAt((buffer << (5 - bits)) & 31);
   }
 
   return output;
@@ -80,6 +120,10 @@ export const decodeBase32 = (input: string): Uint8Array => {
   }
 
   const normalized = input.toUpperCase().replace(/[\s=-]/g, "");
+
+  if (normalized.length === 0) {
+    throw new AuthValidationError("The TOTP secret is invalid.");
+  }
 
   const output: number[] = [];
   let buffer = 0;
@@ -101,6 +145,11 @@ export const decodeBase32 = (input: string): Uint8Array => {
     }
   }
 
+  // Remaining bits are padding bits and must be zero.
+  if (bits > 0 && (buffer & ((1 << bits) - 1)) !== 0) {
+    throw new AuthValidationError("The TOTP secret is invalid.");
+  }
+
   if (output.length === 0) {
     throw new AuthValidationError("The TOTP secret is invalid.");
   }
@@ -119,30 +168,28 @@ export const generateTotpSecret = (): string => {
 export const generateTotpCode = async (
   secret: string,
   timestamp: number,
-  options: { readonly digits: number; readonly periodSeconds: number },
+  options: TotpOptions,
 ): Promise<string> => {
   validateTotpOptions(options);
 
-  if (!Number.isFinite(timestamp) || timestamp < 0) {
-    throw new AuthValidationError("A valid TOTP timestamp is required.");
-  }
+  const counter = BigInt(getTimeStep(timestamp, options.periodSeconds));
 
-  const counter = BigInt(Math.floor(timestamp / 1000 / options.periodSeconds));
-
-  const counterBytes = new Uint8Array(8);
+  const counterBuffer = new ArrayBuffer(8);
+  const counterView = new DataView(counterBuffer);
 
   let remaining = counter;
 
   for (let index = 7; index >= 0; index--) {
-    counterBytes[index] = Number(remaining & 255n);
+    counterView.setUint8(index, Number(remaining & 255n));
     remaining >>= 8n;
   }
 
   const cryptoApi = getCrypto();
+  const secretBytes = decodeBase32(secret);
 
   const key = await cryptoApi.subtle.importKey(
     "raw",
-    decodeBase32(secret),
+    toArrayBuffer(secretBytes),
     {
       name: "HMAC",
       hash: "SHA-1",
@@ -151,9 +198,16 @@ export const generateTotpCode = async (
     ["sign"],
   );
 
-  const signature = await cryptoApi.subtle.sign("HMAC", key, counterBytes);
+  const signature = await cryptoApi.subtle.sign("HMAC", key, counterBuffer);
 
   const hash = new Uint8Array(signature);
+
+  if (hash.length < 20) {
+    throw new AuthConfigurationError(
+      "The runtime returned an invalid HMAC signature.",
+    );
+  }
+
   const offset = hash[hash.length - 1]! & 0x0f;
 
   const binary =
@@ -163,8 +217,9 @@ export const generateTotpCode = async (
     hash[offset + 3]!;
 
   const modulus = 10 ** options.digits;
+  const value = (binary >>> 0) % modulus;
 
-  return String((binary >>> 0) % modulus).padStart(options.digits, "0");
+  return String(value).padStart(options.digits, "0");
 };
 
 /**
@@ -177,11 +232,7 @@ export const verifyTotpCode = async (
   secret: string,
   code: string,
   timestamp: number,
-  options: {
-    readonly digits: number;
-    readonly periodSeconds: number;
-    readonly window: number;
-  },
+  options: TotpVerificationOptions,
 ): Promise<number | null> => {
   validateTotpOptions(options);
 
@@ -202,7 +253,7 @@ export const verifyTotpCode = async (
     return null;
   }
 
-  const currentStep = Math.floor(timestamp / 1000 / options.periodSeconds);
+  const currentStep = getTimeStep(timestamp, options.periodSeconds);
 
   let matchedStep: number | null = null;
 
@@ -211,7 +262,9 @@ export const verifyTotpCode = async (
     step <= currentStep + options.window;
     step++
   ) {
-    if (step < 0) continue;
+    if (step < 0) {
+      continue;
+    }
 
     const expected = await generateTotpCode(
       secret,
@@ -234,11 +287,32 @@ export const createTotpUri = (input: {
   readonly digits: number;
   readonly periodSeconds: number;
 }): string => {
-  const label = encodeURIComponent(`${input.issuer}:${input.account}`);
+  validateTotpOptions({
+    digits: input.digits,
+    periodSeconds: input.periodSeconds,
+  });
+
+  if (
+    typeof input.issuer !== "string" ||
+    input.issuer.trim().length === 0 ||
+    typeof input.account !== "string" ||
+    input.account.trim().length === 0
+  ) {
+    throw new AuthValidationError(
+      "A TOTP issuer and account name are required.",
+    );
+  }
+
+  // Validate the secret before exposing it in a provisioning URI.
+  decodeBase32(input.secret);
+
+  const label = encodeURIComponent(
+    `${input.issuer.trim()}:${input.account.trim()}`,
+  );
 
   const parameters = new URLSearchParams({
     secret: input.secret,
-    issuer: input.issuer,
+    issuer: input.issuer.trim(),
     algorithm: "SHA1",
     digits: String(input.digits),
     period: String(input.periodSeconds),

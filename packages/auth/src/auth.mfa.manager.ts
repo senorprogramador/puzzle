@@ -14,8 +14,11 @@ import type {
 
 import type {
   AuthSecretProtector,
+  ProtectedAuthSecret,
   WebAuthnProvider,
   WebAuthnRegistrationCredential,
+  WebAuthnRegistrationVerification,
+  WebAuthnAuthenticationVerification,
 } from "./providers/mfa-provider.types";
 
 import type {
@@ -124,7 +127,7 @@ const DEFAULT_TOTP = {
   window: 1,
 } as const;
 
-const whereEquals = (value: unknown) => ({
+const whereEquals = <const T>(value: T) => ({
   operator: "eq" as const,
   value,
 });
@@ -167,7 +170,9 @@ const toPublicFactor = (record: AuthMfaFactorStorageRecord): AuthMfaFactor => ({
 });
 
 const normalizeRecoveryCode = (value: string): string | null => {
-  if (typeof value !== "string") return null;
+  if (typeof value !== "string") {
+    return null;
+  }
 
   const normalized = value.replace(/[\s-]/g, "").toUpperCase();
 
@@ -212,24 +217,24 @@ const encodeBase64Url = (bytes: Uint8Array): string => {
     const b = bytes[index++]!;
     const c = bytes[index++]!;
 
-    result += alphabet[a >> 2];
-    result += alphabet[((a & 3) << 4) | (b >> 4)];
-    result += alphabet[((b & 15) << 2) | (c >> 6)];
-    result += alphabet[c & 63];
+    result += alphabet.charAt(a >> 2);
+    result += alphabet.charAt(((a & 3) << 4) | (b >> 4));
+    result += alphabet.charAt(((b & 15) << 2) | (c >> 6));
+    result += alphabet.charAt(c & 63);
   }
 
   if (index < bytes.length) {
     const a = bytes[index++]!;
 
-    result += alphabet[a >> 2];
+    result += alphabet.charAt(a >> 2);
 
     if (index < bytes.length) {
       const b = bytes[index]!;
 
-      result += alphabet[((a & 3) << 4) | (b >> 4)];
-      result += alphabet[(b & 15) << 2];
+      result += alphabet.charAt(((a & 3) << 4) | (b >> 4));
+      result += alphabet.charAt((b & 15) << 2);
     } else {
-      result += alphabet[(a & 3) << 4];
+      result += alphabet.charAt((a & 3) << 4);
     }
   }
 
@@ -237,8 +242,16 @@ const encodeBase64Url = (bytes: Uint8Array): string => {
 };
 
 const generateWebAuthnChallenge = (): string => {
+  const cryptoApi = globalThis.crypto;
+
+  if (!cryptoApi?.getRandomValues) {
+    throw new AuthConfigurationError(
+      "This runtime does not provide the required Web Crypto APIs.",
+    );
+  }
+
   const bytes = new Uint8Array(32);
-  globalThis.crypto.getRandomValues(bytes);
+  cryptoApi.getRandomValues(bytes);
 
   return encodeBase64Url(bytes);
 };
@@ -408,7 +421,7 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
   async revokeChallenges(userId: string): Promise<void> {
     this.assertInitialized();
 
-    if (!userId.trim()) {
+    if (typeof userId !== "string" || userId.trim().length === 0) {
       throw new AuthValidationError("A valid user ID is required.");
     }
 
@@ -424,7 +437,9 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
         },
       );
 
-    if (challenges.length === 0) return;
+    if (challenges.length === 0) {
+      return;
+    }
 
     const now = this.now();
 
@@ -464,11 +479,14 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       throw new AuthConfigurationError("WebAuthn origin must be a valid URL.");
     }
 
+    const isLocalhost =
+      origin.hostname === "localhost" ||
+      origin.hostname === "127.0.0.1" ||
+      origin.hostname === "[::1]";
+
     if (
       origin.origin !== config.origin ||
-      (origin.protocol !== "https:" &&
-        origin.hostname !== "localhost" &&
-        origin.hostname !== "127.0.0.1")
+      (origin.protocol !== "https:" && !isLocalhost)
     ) {
       throw new AuthConfigurationError(
         "WebAuthn requires an exact HTTPS origin, except for localhost development.",
@@ -565,7 +583,10 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       ? { limit: 5, windowSeconds: 300 }
       : { limit: 10, windowSeconds: 900 };
 
-    const scopes = [
+    const scopes: readonly {
+      readonly type: "ip" | "user";
+      readonly value: string;
+    }[] = [
       {
         type: "ip",
         value: ipAddress.trim(),
@@ -573,7 +594,7 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       ...(userId
         ? [
             {
-              type: "user",
+              type: "user" as const,
               value: userId,
             },
           ]
@@ -691,14 +712,16 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       );
     }
 
-    const credential = await this.storage.findOne<
-      import("./types/credential.types").PasswordCredentialStorageRecord
-    >(this.credentialsCollection, {
-      where: {
-        userId: whereEquals(userId),
-        kind: whereEquals("password"),
-      },
-    });
+    const credential =
+      await this.storage.findOne<PasswordCredentialStorageRecord>(
+        this.credentialsCollection,
+        {
+          where: {
+            userId: whereEquals(userId),
+            kind: whereEquals("password"),
+          },
+        },
+      );
 
     if (!credential || credential.revokedAt !== null) {
       throw new AuthInvalidCredentialsError();
@@ -1107,7 +1130,9 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
   ): Promise<AuthRecoveryCodeStorageRecord | null> {
     const normalized = normalizeRecoveryCode(code);
 
-    if (!normalized) return null;
+    if (!normalized) {
+      return null;
+    }
 
     const codeHash = await hashAuthToken(normalized);
 
@@ -1322,7 +1347,7 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
 
     const secret = generateTotpSecret();
 
-    let protectedSecret;
+    let protectedSecret: ProtectedAuthSecret;
 
     try {
       protectedSecret = await this.secretProtector.encrypt(secret);
@@ -1337,7 +1362,9 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       typeof protectedSecret.ciphertext !== "string" ||
       protectedSecret.ciphertext.length === 0 ||
       typeof protectedSecret.iv !== "string" ||
-      protectedSecret.iv.length === 0
+      protectedSecret.iv.length === 0 ||
+      typeof protectedSecret.keyId !== "string" ||
+      protectedSecret.keyId.length === 0
     ) {
       throw new AuthProviderError(
         "The secret protector returned an invalid encrypted secret.",
@@ -1739,9 +1766,17 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       },
     );
 
+    const firstFactor = factors[0];
+
+    if (!firstFactor) {
+      throw new AuthMfaFactorError(
+        "An active MFA factor is required to generate recovery codes.",
+      );
+    }
+
     const bundle = await this.createRecoveryCodeBundle(
       context.user.id,
-      factors[0]!.id,
+      firstFactor.id,
       true,
     );
 
@@ -2031,13 +2066,9 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       throw new AuthMfaChallengeError();
     }
 
-    if (!challenge.webAuthnChallenge) {
-      throw new AuthMfaChallengeError();
-    }
-
     const { provider, config } = this.getWebAuthn();
 
-    let verification;
+    let verification: WebAuthnRegistrationVerification;
 
     try {
       verification = await provider.verifyRegistrationResponse({
@@ -2246,7 +2277,7 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
 
     const { provider, config } = this.getWebAuthn();
 
-    let verification;
+    let verification: WebAuthnAuthenticationVerification;
 
     try {
       verification = await provider.verifyAuthenticationResponse({
@@ -2389,7 +2420,7 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
 
     this.assertWebAuthnOptions(options, webAuthnChallenge);
 
-    const updated = await this.storage.update(
+    const updated = await this.storage.update<AuthMfaChallengeStorageRecord>(
       this.challengesCollection,
       challenge.id,
       {

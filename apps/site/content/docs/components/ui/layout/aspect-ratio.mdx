@@ -1,0 +1,364 @@
+---
+title: Aspect Ratio
+description: Maintain consistent proportions for images, videos, and other content.
+---
+
+The AspectRatio component maintains a consistent width-to-height proportion for its content.
+
+It uses the native CSS aspect-ratio property, making it suitable for responsive media containers, image galleries, video embeds, and other layouts where predictable proportions are important.
+
+## Import
+
+```tsx
+import { AspectRatio } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+By default, AspectRatio uses a square (1:1) ratio.
+
+<Preview
+  height={320}
+  align="center"
+  justify="center"
+  code={`\
+<AspectRatio>
+  <div
+    style={{
+      background: "var(--puzzle-color-primary)",
+      display: "grid",
+      placeItems: "center",
+      color: "white",
+    }}
+  >
+    1:1
+  </div>
+</AspectRatio>
+`}
+>
+  <div style={{ width: "100%", maxWidth: "240px" }}>
+    <AspectRatio>
+      <div
+        style={{
+          background: "var(--puzzle-color-primary)",
+          display: "grid",
+          placeItems: "center",
+          color: "white",
+          fontWeight: 600,
+        }}
+      >
+        1:1
+      </div>
+    </AspectRatio>
+  </div>
+</Preview>
+
+## Aspect ratios
+
+Use the `ratio` prop to define the desired width-to-height proportion.
+
+The ratio is expressed as a number. For example, `16 / 9` represents a widescreen aspect ratio, while `4 / 3` represents a traditional display ratio.
+
+<Preview
+  height={520}
+  code={`\
+<Stack gap="lg" style={{ width: "100%", maxWidth: "240px" }}>
+  <AspectRatio ratio={16 / 9}>
+    <div style={{ background: "var(--puzzle-color-primary)", display: "grid", placeItems: "center", color: "white" }}>
+      16:9
+    </div>
+  </AspectRatio>
+
+<AspectRatio ratio={4 / 3}>
+  <div
+    style={{
+      background: "var(--puzzle-color-secondary)",
+      display: "grid",
+      placeItems: "center",
+      color: "white",
+    }}
+  >
+    4:3
+  </div>
+</AspectRatio>
+
+  <AspectRatio ratio={21 / 9}>
+    <div style={{ background: "var(--puzzle-color-accent)", display: "grid", placeItems: "center", color: "white" }}>
+      21:9
+    </div>
+  </AspectRatio>
+</Stack>
+`}
+>
+  <Stack gap="lg" style={{ width: "100%", maxWidth: "240px" }}>
+    <AspectRatio ratio={16 / 9}>
+      <div style={{ background: "var(--puzzle-color-primary)", display: "grid", placeItems: "center", color: "white" }}>
+        16:9
+      </div>
+    </AspectRatio>
+    <AspectRatio ratio={4 / 3}>
+      <div style={{ background: "var(--puzzle-color-secondary)", display: "grid", placeItems: "center", color: "white" }}>
+        4:3
+      </div>
+    </AspectRatio>
+    <AspectRatio ratio={21 / 9}>
+      <div style={{ background: "var(--puzzle-color-accent)", display: "grid", placeItems: "center", color: "white" }}>
+        21:9
+      </div>
+    </AspectRatio>
+  </Stack>
+</Preview>
+
+The aspect ratio is maintained automatically as the container width changes.
+
+## Images
+
+AspectRatio is particularly useful for responsive images.
+
+Combine it with `object-fit: cover` to fill the container while preserving the image's proportions.
+
+<Preview
+  height={360}
+  code={`\
+<AspectRatio ratio={16 / 9}>
+  <img
+    src="/images/landscape.jpg"
+    alt="Landscape"
+    style={{ objectFit: "cover" }}
+  />
+</AspectRatio>
+`}
+>
+  <div style={{ width: "100%" }}>
+    <AspectRatio ratio={16 / 9}>
+      <div
+        style={{
+          background: "linear-gradient(135deg, #527b66, #b9c8a1)",
+          display: "grid",
+          placeItems: "center",
+          color: "white",
+          fontSize: "1.25rem",
+        }}
+      >
+        Landscape image · 16:9
+      </div>
+    </AspectRatio>
+  </div>
+</Preview>
+
+For square images, such as avatars or product thumbnails, use the default ratio.
+
+<Preview
+  height={280}
+  align="center"
+  justify="center"
+  code={`\
+<AspectRatio>
+  <img
+    src="/images/avatar.jpg"
+    alt="Profile"
+    style={{
+      objectFit: "cover",
+      borderRadius: "50%",
+    }}
+  />
+</AspectRatio>
+`}
+>
+  <div style={{ width: "160px" }}>
+    <AspectRatio>
+      <div
+        style={{
+          background: "var(--puzzle-color-secondary)",
+          display: "grid",
+          placeItems: "center",
+          borderRadius: "50%",
+          color: "white",
+          fontSize: "2rem",
+        }}
+      >
+        P
+      </div>
+    </AspectRatio>
+  </div>
+</Preview>
+
+## Video embeds
+
+Use AspectRatio to maintain the correct proportions of embedded videos.
+
+For example, a 16:9 container is suitable for most YouTube and other widescreen video embeds.
+
+<Preview
+  height={584}
+  code={`\
+<AspectRatio ratio={16 / 9}>
+    <iframe
+        width="100%"
+        height="100%"
+        src="https://www.youtube.com/embed/yXxj7-DqLXw?si=RFXlnCoVs7Zc04Mr"
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerPolicy="strict-origin-when-cross-origin"
+        allowFullScreen
+    />
+</AspectRatio>
+`}
+>
+  <div style={{ width: "100%" }}>
+    <AspectRatio ratio={16 / 9}>
+      <iframe
+        width="100%"
+        height="100%"
+        src="https://www.youtube.com/embed/yXxj7-DqLXw?si=RFXlnCoVs7Zc04Mr"
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerPolicy="strict-origin-when-cross-origin"
+        allowFullScreen
+      />
+    </AspectRatio>
+  </div>
+</Preview>
+
+## Custom elements
+
+Use the `as` prop to change the underlying HTML element.
+
+All native properties supported by the selected element are forwarded to the root element.
+
+<Preview
+  height={240}
+  align="center"
+  justify="center"
+  code={`\
+<AspectRatio
+  as="section"
+  ratio={4 / 3}
+  className="media-section"
+  aria-label="Media section"
+>
+  <div>
+    Content
+  </div>
+</AspectRatio>
+`}
+>
+  <div style={{ width: "100%", maxWidth: "280px" }}>
+    <AspectRatio as="section" ratio={4 / 3} aria-label="Media section">
+      <div
+        style={{
+          background: "var(--puzzle-color-surface)",
+          border: "1px solid var(--puzzle-color-border)",
+          display: "grid",
+          placeItems: "center",
+        }}
+      >
+        Custom section element
+      </div>
+    </AspectRatio>
+  </div>
+</Preview>
+
+## Styling
+
+AspectRatio supports both `className` and `style`.
+
+Custom styles are merged with the component's internal styles. The `ratio` prop takes precedence over `style.aspectRatio`.
+
+<Preview
+  height={280}
+  align="center"
+  justify="center"
+  code={`\
+<AspectRatio
+  ratio={4 / 3}
+  style={{
+    maxWidth: "320px",
+    borderRadius: "var(--puzzle-radius-lg)",
+    overflow: "hidden",
+  }}
+>
+  <div
+    style={{
+      background: "var(--puzzle-color-primary)",
+      display: "grid",
+      placeItems: "center",
+      color: "white",
+    }}
+  >
+    Custom styling
+  </div>
+</AspectRatio>
+`}
+>
+  <div style={{ width: "100%", maxWidth: "320px" }}>
+    <AspectRatio
+      ratio={4 / 3}
+      style={{
+        borderRadius: "var(--puzzle-radius-lg)",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          background: "var(--puzzle-color-primary)",
+          display: "grid",
+          placeItems: "center",
+          color: "white",
+        }}
+      >
+        Custom styling
+      </div>
+    </AspectRatio>
+  </div>
+</Preview>
+
+## API
+
+### Props
+
+| Prop        | Type            | Default | Description                                              |
+| ----------- | --------------- | ------- | -------------------------------------------------------- |
+| `ratio`     | `number`        | `1`     | Width-to-height ratio. Must be a positive finite number. |
+| `as`        | `ElementType`   | `"div"` | HTML element or component used as the root.              |
+| `className` | `string`        | —       | Additional CSS class names.                              |
+| `style`     | `CSSProperties` | —       | Additional inline styles.                                |
+| `children`  | `ReactNode`     | —       | Content displayed inside the aspect ratio container.     |
+
+All other native props supported by the selected root element are forwarded.
+
+### TypeScript types
+
+```tsx
+type AspectRatioProps<C extends ElementType = "div"> = AspectRatioOwnProps<C> &
+  Omit<ComponentPropsWithRef<C>, keyof AspectRatioOwnProps<C> | "as">;
+```
+
+The component also exports `AspectRatioProps` for use in custom components and wrappers.
+
+## Behavior
+
+- The default ratio is `1`, producing a square container.
+- The `ratio` prop accepts any positive finite number.
+- Invalid ratios, including zero, negative values, `NaN`, and infinity, throw a `RangeError`.
+- The component uses the native CSS aspect-ratio property.
+- The container fills the available width of its parent.
+- Direct children are positioned to fill the container.
+- Custom styles and classes are supported.
+- The component does not require JavaScript layout calculations or browser observers.
+
+## Accessibility
+
+AspectRatio is a layout primitive and does not introduce additional ARIA roles or keyboard interactions.
+
+The underlying HTML element determines its semantics.
+
+When displaying images:
+
+- Always provide meaningful `alt` text for informative images.
+- Use an empty `alt` attribute for purely decorative images.
+- Avoid using CSS backgrounds for images that convey meaningful information.
+
+When embedding videos or iframes, provide an accessible title and ensure that the embedded content remains usable with a keyboard.

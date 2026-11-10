@@ -187,6 +187,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/layout/app-bar",
               },
               {
+                id: "aspect-ratio",
+                label: "Aspect Ratio",
+                href: "/docs/components/ui/layout/aspect-ratio",
+              },
+              {
                 id: "background",
                 label: "Background",
                 href: "/docs/components/ui/layout/background",
