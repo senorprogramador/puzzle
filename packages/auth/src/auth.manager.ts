@@ -498,6 +498,22 @@ export class StorageAuthManager implements AuthManager {
     return false;
   }
 
+  private async hasSatisfiedMfaPolicy(user: AuthUser): Promise<boolean> {
+    const required = await this.isMfaRequired(user);
+
+    if (!required) {
+      return true;
+    }
+
+    if (!this.mfa) {
+      throw new AuthConfigurationError(
+        "MFA is required by policy, but no MFA manager is configured.",
+      );
+    }
+
+    return this.mfa.hasActiveFactor(user.id);
+  }
+
   private async createAuthenticatedSession(
     userId: string,
     metadata?: Readonly<Record<string, unknown>>,
@@ -813,7 +829,13 @@ export class StorageAuthManager implements AuthManager {
       return null;
     }
 
-    return toPublicUser(user);
+    const publicUser = toPublicUser(user);
+
+    if (!(await this.hasSatisfiedMfaPolicy(publicUser))) {
+      return null;
+    }
+
+    return publicUser;
   }
 
   async getAuthState(token: string): Promise<AuthState> {
@@ -847,6 +869,16 @@ export class StorageAuthManager implements AuthManager {
 
     if (this.requireVerifiedEmail && !user.emailVerifiedAt) {
       return { status: "unauthenticated" };
+    }
+
+    const publicUser = toPublicUser(user);
+
+    if (!(await this.hasSatisfiedMfaPolicy(publicUser))) {
+      return {
+        status: "mfa-enrollment-required",
+        userId: user.id,
+        sessionId: session.id,
+      };
     }
 
     return {

@@ -2371,6 +2371,26 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
     });
   }
 
+  async hasActiveFactor(userId: string): Promise<boolean> {
+    this.assertInitialized();
+
+    if (typeof userId !== "string" || userId.trim().length === 0) {
+      return false;
+    }
+
+    const factor = await this.storage.findOne<AuthMfaFactorStorageRecord>(
+      this.factorsCollection,
+      {
+        where: {
+          userId: whereEquals(userId),
+          status: whereEquals("active"),
+        },
+      },
+    );
+
+    return factor !== null;
+  }
+
   async listFactors(sessionToken: string): Promise<readonly AuthMfaFactor[]> {
     this.assertInitialized();
 

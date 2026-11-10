@@ -744,3 +744,76 @@ test("required MFA sign-in challenges an enrolled factor instead of starting enr
 
   assert.equal(state.status, "mfa-pending");
 });
+
+test("an existing session becomes enrollment-restricted when policy requires MFA and its last factor is removed", async () => {
+  let requireMfa = false;
+
+  const harness = await createHarness({
+    mfaPolicy: {
+      requiredFor: () => requireMfa,
+    },
+  });
+
+  const enrollment = await enrollTotp(harness);
+
+  const sessionToken = harness.registered.token;
+  const userId = harness.registered.user.id;
+
+  assert.equal(
+    (await harness.auth.getAuthState(sessionToken)).status,
+    "authenticated",
+  );
+
+  requireMfa = true;
+
+  // The existing factor satisfies the newly enabled policy.
+  assert.equal(
+    (await harness.auth.getAuthState(sessionToken)).status,
+    "authenticated",
+  );
+
+  await harness.mfa.removeFactor({
+    sessionToken,
+    factorId: enrollment.completed.factor.id,
+    currentPassword: PASSWORD,
+    ipAddress: "127.0.0.1",
+  });
+
+  // The session remains available only for the restricted enrollment flow.
+  const restricted = await harness.auth.getAuthState(sessionToken);
+
+  assert.equal(restricted.status, "mfa-enrollment-required");
+  assert.equal(restricted.userId, userId);
+  assert.equal(restricted.sessionId, harness.registered.session.id);
+
+  // A restricted session must not resolve to an authenticated user.
+  assert.equal(await harness.auth.getCurrentUser(sessionToken), null);
+
+  // The user can still enroll a new factor after confirming the password.
+  const started = await harness.mfa.beginTotpEnrollment({
+    sessionToken,
+    currentPassword: PASSWORD,
+    ipAddress: "127.0.0.1",
+    label: "Replacement authenticator",
+  });
+
+  const code = await harness.createCurrentTotpCode(started.secret);
+
+  const completed = await harness.mfa.verifyTotpEnrollment({
+    sessionToken,
+    factorId: started.factorId,
+    code,
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(completed.factor.status, "active");
+
+  // The same session is restored to normal authentication only after
+  // a new active factor exists.
+  assert.equal(
+    (await harness.auth.getAuthState(sessionToken)).status,
+    "authenticated",
+  );
+
+  assert.equal((await harness.auth.getCurrentUser(sessionToken)).id, userId);
+});

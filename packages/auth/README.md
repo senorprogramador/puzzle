@@ -1,878 +1,264 @@
-# @puzzle-ui/auth
+## Multi-factor authentication, passkeys and step-up
 
-Framework-independent authentication core for Puzzle.
+The authentication package includes a framework-independent MFA implementation.
 
-`@puzzle-ui/auth` provides password-based authentication, account lifecycle management, email verification, password recovery, session integration, rate limiting and security auditing. It is designed to work with different storage adapters and runtime environments without depending on a specific web framework or database.
+Supported authentication factors:
 
-The package separates authentication logic from framework-specific concerns. Applications provide storage, password hashing, email delivery, rate limiting and session management through explicit provider interfaces.
+- TOTP authenticators.
+- WebAuthn passkeys.
+- Single-use recovery codes.
 
-## Features
+The MFA manager supports:
 
-### Authentication
+- TOTP factor enrollment and verification.
+- Passkey registration and authentication.
+- Discoverable passkey sign-in.
+- Password-backed MFA enrollment.
+- Mandatory first-factor enrollment.
+- Recovery code generation, verification and regeneration.
+- Factor listing and removal.
+- Challenge expiration and attempt limits.
+- TOTP replay protection.
+- WebAuthn challenge, origin and RP ID verification.
+- Authenticator counter validation.
+- MFA audit events.
+- MFA-specific rate limiting.
 
-- Email and password registration.
-- Email and password sign-in.
-- Configurable email verification requirement.
-- Normalized email addresses and unique email constraints.
-- Configurable password length validation.
-- Argon2id password hashing through an injected provider.
-- Timing-resistant sign-in behavior for unknown accounts.
-- Generic invalid-credentials errors.
-- Current-user retrieval.
-- Authentication-state retrieval.
-- Sign out and sign out everywhere.
+### MFA policy
 
-### Account lifecycle
+MFA is optional by default.
 
-- Email verification with expiring, single-use tokens.
-- Resending verification emails invalidates previous outstanding verification tokens.
-- Password reset with enumeration-safe responses.
-- Password change with current-password verification.
-- Profile updates.
-- Email address changes with confirmation.
-- Account deactivation.
-- Permanent account deletion.
-- Session invalidation after sensitive account changes.
-
-### Security
-
-- Cryptographically secure action tokens.
-- Action tokens are hashed before storage.
-- Atomic token consumption and account mutations.
-- Conditional writes to prevent concurrent token reuse.
-- Atomic user and credential creation.
-- HMAC-protected rate-limit identifiers.
-- Storage-backed rate limiting.
-- Configurable rate-limit policies.
-- Audit events for authentication and account lifecycle operations.
-- Fail-closed session validation after sensitive account changes.
-- No plaintext password persistence.
-- No weaker password-hashing fallback.
-
-### Runtime and architecture
-
-- Framework-independent implementation.
-- Database-independent implementation through `@puzzle-ui/storage`.
-- Session integration through `@puzzle-ui/session`.
-- Node.js-compatible APIs.
-- Cloudflare Workers-compatible APIs.
-- Explicit dependency injection.
-- No dependency on browser APIs or framework-specific request objects.
-
-## Installation
-
-Install the authentication package and its peer architecture packages:
-
-```sh
-bun add @puzzle-ui/auth @puzzle-ui/session @puzzle-ui/storage
-```
-
-You also need:
-
-- A compatible `StorageAdapter` implementation.
-- An Argon2id `PasswordHasher` implementation.
-- A session manager.
-- A rate-limit provider.
-- An email provider for lifecycle workflows.
-
-## Architecture
-
-The authentication package is built around two managers.
-
-| Manager                       | Responsibility                                                                     |
-| ----------------------------- | ---------------------------------------------------------------------------------- |
-| `StorageAuthManager`          | Registration, sign-in, authentication state and session operations                 |
-| `StorageAuthLifecycleManager` | Email verification, password recovery, account management and lifecycle operations |
-
-Additional infrastructure:
-
-| Component                  | Responsibility                              |
-| -------------------------- | ------------------------------------------- |
-| `StorageRateLimitProvider` | Atomic storage-backed rate limiting         |
-| `PasswordHasher`           | Argon2id password hashing and verification  |
-| `EmailProvider`            | Sending authentication-related emails       |
-| `SessionManager`           | Session creation, validation and revocation |
-| `StorageAdapter`           | Persistent storage and atomic operations    |
-
-The application owns the concrete implementations of these dependencies. The authentication package does not assume a particular database, email service, password-hashing library or framework.
-
-## Initialization
-
-Both managers must be initialized before they can be used.
-
-The following example assumes that the application has already configured a storage adapter, session manager, Argon2id password hasher and email provider.
+Configure a global requirement through `AuthManagerOptions`:
 
 ```ts
-import {
-  StorageAuthManager,
-  StorageAuthLifecycleManager,
-  StorageRateLimitProvider,
-} from "@puzzle-ui/auth";
-
-import { StorageSessionManager } from "@puzzle-ui/session";
-
-// Supplied by the application.
-import { storage } from "./storage";
-import { passwordHasher } from "./password-hasher";
-import { emailProvider } from "./email-provider";
-
-const rateLimitKeySecret = env.AUTH_RATE_LIMIT_SECRET;
-
-if (!rateLimitKeySecret || rateLimitKeySecret.length < 32) {
-  throw new Error(
-    "AUTH_RATE_LIMIT_SECRET must contain at least 32 characters.",
-  );
-}
-
-const sessions = new StorageSessionManager(storage, {
-  lifetime: {
-    idleTimeoutSeconds: 60 * 60 * 24 * 7,
-    absoluteLifetimeSeconds: 60 * 60 * 24 * 30,
-  },
-  maximumSessionsPerUser: 10,
-});
-
-await sessions.initialize();
-
-const rateLimitProvider = new StorageRateLimitProvider(storage);
-
 const auth = new StorageAuthManager(
   {
     storage,
     passwordHasher,
     rateLimitProvider,
     sessions,
+    mfa,
   },
   {
     rateLimitKeySecret,
-    requireVerifiedEmail: true,
+    mfaPolicy: {
+      required: true,
+    },
   },
 );
+```
 
-const lifecycle = new StorageAuthLifecycleManager(
+For user-specific requirements, configure `requiredFor`:
+
+```ts
+const auth = new StorageAuthManager(
   {
     storage,
     passwordHasher,
-    emailProvider,
-    sessions,
     rateLimitProvider,
+    sessions,
+    mfa,
   },
   {
     rateLimitKeySecret,
-    requireVerifiedEmail: true,
+    mfaPolicy: {
+      requiredFor: async (user) => {
+        const account = await roleRepository.findByUserId(user.id);
+
+        return account?.role === "admin";
+      },
+    },
   },
 );
-
-await auth.initialize();
-await lifecycle.initialize();
 ```
 
-### Configuration consistency
+The callback receives the public `AuthUser`. It can return a boolean or a promise.
 
-When email verification is required, configure both managers with the same `requireVerifiedEmail` value.
+When neither `required` nor `requiredFor` requires MFA, users without enrolled factors can sign in normally. Existing active factors are still challenged during sign-in.
 
-The lifecycle manager independently enforces this setting when validating authenticated sessions for protected account-management operations.
+### Mandatory first-factor enrollment
 
-Registration still creates a session. However, when verification is required, the unverified account cannot retrieve an authenticated current-user state or perform protected lifecycle operations until verification is complete.
+When MFA is required and the user has no active factor:
 
-### Password hasher
+1. Password authentication succeeds.
+2. The manager creates an enrollment challenge.
+3. No normal authenticated session is issued.
+4. The user enrolls either a TOTP authenticator or a passkey.
+5. The first factor is verified.
+6. Recovery codes are generated.
+7. The factor, recovery codes and challenge consumption are committed.
+8. Only then is an authenticated session issued.
 
-The application must provide a `PasswordHasher` implementation.
+The temporary enrollment token is server-only and must be transported through a short-lived, secure, HttpOnly cookie.
 
-The provider contract is:
+The browser must never receive the raw challenge token in JSON, local storage or session storage.
 
-```ts
-export type PasswordHash = {
-  readonly hash: string;
-  readonly algorithm: "argon2id";
-  readonly parameters: Readonly<Record<string, number | string>>;
-};
+The authentication state is `mfa-enrollment-pending` until the enrollment has completed.
 
-export interface PasswordHasher {
-  hash(password: string): Promise<PasswordHash>;
-  verify(password: string, stored: PasswordHash): Promise<boolean>;
-  needsRehash?(stored: PasswordHash): boolean | Promise<boolean>;
-}
-```
+### Existing sessions and policy changes
 
-The authentication package validates that generated hashes identify the `argon2id` algorithm. It does not silently fall back to another algorithm.
+The MFA policy is evaluated when an existing session is inspected.
 
-Use a maintained Argon2id implementation with parameters appropriate for your deployment environment.
+If a policy now requires MFA and the user has no active factor, the authentication state becomes `mfa-enrollment-required`.
 
-### Email provider
+This is a restricted state, not an authenticated application session:
 
-The application provides email delivery through this interface:
+- `getCurrentUser()` returns `null`.
+- `getAuthState()` returns `mfa-enrollment-required`.
+- Applications must not authorize protected operations for this state.
+- The user can use the enrollment flow after confirming their current password.
+- Normal authentication is restored after an active factor exists.
 
-```ts
-export type EmailMessage = {
-  readonly to: string;
-  readonly subject: string;
-  readonly template: string;
-  readonly variables: Readonly<Record<string, string>>;
-};
+Removing the last active factor therefore cannot silently preserve full application access when MFA is required.
 
-export interface EmailProvider {
-  send(message: EmailMessage): Promise<void>;
-}
-```
+### TOTP enrollment
 
-The package supplies a template identifier and variables. The application is responsible for rendering and delivering the email.
-
-The default template identifiers are:
-
-| Workflow           | Template                         |
-| ------------------ | -------------------------------- |
-| Email verification | `auth/email-verification`        |
-| Password reset     | `auth/password-reset`            |
-| Email change       | `auth/email-change-verification` |
-
-Each template receives:
-
-- `url`: the generated callback URL containing the action token.
-- `expiresAt`: the token expiration timestamp in ISO 8601 format.
-
-Template identifiers and email subjects can be overridden through `AuthLifecycleManagerOptions`.
-
-## Registration
-
-Use `StorageAuthManager.register()` to create an account.
+For an authenticated user with a normal session:
 
 ```ts
-const result = await auth.register({
-  email: "user@example.com",
-  password: "a-secure-password",
-  name: "Example User",
-  ipAddress: trustedClientIp,
-});
-```
-
-The result contains:
-
-- The public user record.
-- The authenticated session metadata.
-- The raw session token.
-
-The raw session token is server-only. It must only be delivered through a secure, HttpOnly cookie.
-
-Never expose the token through client-side JSON responses, browser storage or client-side application state.
-
-### Registration input
-
-```ts
-type AuthRegisterInput = {
-  readonly email: string;
-  readonly password: string;
-  readonly name?: string | null;
-  readonly ipAddress: string;
-  readonly sessionMetadata?: Readonly<Record<string, unknown>>;
-};
-```
-
-The IP address must be obtained from a trusted source in the framework integration. Do not blindly trust arbitrary `X-Forwarded-For` values.
-
-### Email verification after registration
-
-Registration does not automatically send a verification email.
-
-When verification is required, request verification explicitly:
-
-```ts
-await lifecycle.sendEmailVerification({
-  userId: result.user.id,
-  verificationUrl: "https://example.com/verify-email",
-  ipAddress: trustedClientIp,
-});
-```
-
-The application should deliver the resulting callback URL to the user through its email provider.
-
-Requesting another verification email invalidates previously outstanding verification tokens for that account.
-
-## Sign in
-
-Use `StorageAuthManager.signIn()` to authenticate an existing account.
-
-```ts
-const result = await auth.signIn({
-  email: "user@example.com",
-  password: "a-secure-password",
-  ipAddress: trustedClientIp,
-});
-```
-
-Invalid credentials produce the same public authentication error, regardless of whether the email address exists.
-
-When `requireVerifiedEmail` is enabled, valid credentials are still rejected until the account has completed email verification.
-
-Deactivated accounts cannot sign in. Their sign-in attempts return the generic invalid-credentials error.
-
-### Sign-in input
-
-```ts
-type AuthSignInInput = {
-  readonly email: string;
-  readonly password: string;
-  readonly ipAddress: string;
-  readonly sessionMetadata?: Readonly<Record<string, unknown>>;
-};
-```
-
-## Current user
-
-Retrieve the current authenticated user from a session token:
-
-```ts
-const user = await auth.getCurrentUser(sessionToken);
-```
-
-The method returns `null` when:
-
-- The session is invalid.
-- The session has expired.
-- The session has been revoked.
-- The account no longer exists.
-- The account has been deactivated.
-- The session was invalidated by a sensitive account change.
-- Email verification is required but has not been completed.
-
-The returned user contains only public account fields.
-
-```ts
-export type AuthUser = {
-  readonly id: string;
-  readonly email: string;
-  readonly emailVerifiedAt: Date | null;
-  readonly name: string | null;
-  readonly image: string | null;
-  readonly createdAt: Date;
-  readonly updatedAt: Date;
-};
-```
-
-Internal storage fields and password credentials are never included.
-
-## Authentication state
-
-Retrieve the current authentication state:
-
-```ts
-const state = await auth.getAuthState(sessionToken);
-
-if (state.status === "authenticated") {
-  console.log(state.userId);
-  console.log(state.sessionId);
-}
-```
-
-The current authentication state type is:
-
-```ts
-export type AuthState =
-  | { readonly status: "unauthenticated" }
-  | { readonly status: "primary-authenticated"; readonly userId: string }
-  | {
-      readonly status: "mfa-pending";
-      readonly userId: string;
-      readonly challengeId: string;
-      readonly expiresAt: Date;
-    }
-  | {
-      readonly status: "authenticated";
-      readonly userId: string;
-      readonly sessionId: string;
-    };
-```
-
-The additional authentication states provide room for future multi-factor authentication workflows.
-
-## Email verification
-
-### Request verification
-
-```ts
-await lifecycle.sendEmailVerification({
-  userId: user.id,
-  verificationUrl: "https://example.com/verify-email",
-  ipAddress: trustedClientIp,
-});
-```
-
-The verification URL must be an HTTPS URL. HTTP is accepted for localhost development.
-
-The email contains a cryptographically secure, single-use token.
-
-Default token lifetime: **1 hour**.
-
-### Verify email
-
-The application extracts the token from the callback URL and passes it to the lifecycle manager:
-
-```ts
-const verifiedUser = await lifecycle.verifyEmail(token);
-```
-
-The token is consumed atomically with the account update and audit event.
-
-A token cannot be reused, has a limited lifetime and is rejected if it has been revoked.
-
-### Verification settings
-
-```ts
-const lifecycle = new StorageAuthLifecycleManager(dependencies, {
-  rateLimitKeySecret,
-  emailVerificationTokenLifetimeSeconds: 60 * 60,
-  requireVerifiedEmail: true,
-});
-```
-
-## Password recovery
-
-### Request a password reset
-
-```ts
-await lifecycle.requestPasswordReset({
-  email: "user@example.com",
-  resetUrl: "https://example.com/reset-password",
-  ipAddress: trustedClientIp,
-});
-```
-
-The method deliberately returns the same public result whether or not the email address belongs to an account.
-
-This prevents the password-reset endpoint from becoming an account-enumeration mechanism.
-
-Email delivery errors are suppressed from the public response and can be observed through `onEmailDeliveryError`.
-
-### Reset password
-
-After the user follows the email link, pass the token and new password to the lifecycle manager:
-
-```ts
-await lifecycle.resetPassword({
-  token,
-  newPassword: "a-new-secure-password",
-});
-```
-
-The operation:
-
-- Validates the action token.
-- Validates the new password.
-- Hashes the new password using Argon2id.
-- Consumes the action token.
-- Updates the password credential.
-- Invalidates outstanding password-reset tokens.
-- Invalidates existing sessions.
-- Records an audit event.
-
-These changes are committed atomically.
-
-Default token lifetime: **1 hour**.
-
-## Change password
-
-An authenticated user can change their password after confirming the current password.
-
-```ts
-await lifecycle.changePassword({
+const enrollment = await mfa.beginTotpEnrollment({
   sessionToken,
-  currentPassword: "current-secure-password",
-  newPassword: "a-new-secure-password",
+  currentPassword,
+  ipAddress,
+  label: "Authenticator",
 });
 ```
 
-The operation updates the password credential, invalidates outstanding password-reset tokens and invalidates existing sessions.
+Display the returned `otpauthUrl` as a QR code or allow the user to enter the secret manually.
 
-The current password must be correct.
-
-The operation records an audit event and commits its credential and account changes atomically.
-
-## Profile management
-
-Update the user's public profile:
+Verify the first code:
 
 ```ts
-const updatedUser = await lifecycle.updateProfile({
+const completed = await mfa.verifyTotpEnrollment({
   sessionToken,
-  name: "Updated Name",
-  image: "https://example.com/profile.webp",
+  factorId: enrollment.factorId,
+  code,
+  ipAddress,
 });
 ```
 
-Both fields are optional.
+The result includes the public factor and recovery codes. Display recovery codes once and ask the user to store them securely.
 
-The image URL must use HTTPS and cannot contain embedded credentials.
+### Passkey enrollment
 
-The method returns the updated public user record.
+Passkey registration is a two-step WebAuthn ceremony:
 
-## Email address changes
+1. Generate registration options.
+2. Verify the browser's registration response on the server.
 
-Changing an email address requires the current password and confirmation of the new address.
+The server must validate the expected challenge, origin, RP ID and user verification result.
 
-### Request an email change
+Never trust browser-provided credential metadata without server-side verification.
 
-```ts
-await lifecycle.requestEmailChange({
-  sessionToken,
-  currentPassword: "current-secure-password",
-  email: "new-address@example.com",
-  verificationUrl: "https://example.com/verify-email-change",
-  ipAddress: trustedClientIp,
-});
-```
+### MFA sign-in
 
-The operation:
+Password-backed sign-in returns `mfa-pending` when the account has active factors.
 
-- Validates the authenticated session.
-- Verifies the current password.
-- Normalizes the new email address.
-- Rejects an address that is already in use.
-- Creates a single-use confirmation token.
-- Sends the confirmation email.
+The user can complete the challenge using:
 
-Default token lifetime: **1 hour**.
+- TOTP.
+- A registered passkey.
+- A recovery code.
 
-### Confirm the new address
+Discoverable passkey sign-in is also supported without requiring an email and password first.
 
-```ts
-const updatedUser = await lifecycle.verifyEmailChange(token);
-```
+A successful MFA challenge creates the authenticated session. The challenge is single-use and expires after its configured lifetime.
 
-The email address is changed only after successful token verification.
+### Recovery codes
 
-The account update, token consumption and audit event are atomic.
+Recovery codes are generated during successful factor enrollment.
 
-Changing the email address invalidates existing sessions.
+Store only their hashes. A recovery code:
 
-## Account deactivation
+- Can be used once.
+- Is consumed atomically with successful authentication.
+- Must never be written to audit metadata or application logs.
 
-An authenticated user can deactivate their account after confirming their password.
+Users can regenerate their recovery codes after confirming their current password. Regeneration invalidates the previous unused codes.
 
-```ts
-await lifecycle.deactivateAccount({
-  sessionToken,
-  password: "current-secure-password",
-});
-```
+### Step-up authentication
 
-Deactivation is a soft-deactivation. The account record and audit history remain stored.
+The step-up manager requires a recent MFA verification for sensitive operations.
 
-The operation:
+Supported methods:
 
-- Requires an authenticated session.
-- Requires password confirmation.
-- Sets `deactivatedAt`.
-- Invalidates existing sessions.
-- Records an `account-deactivated` audit event.
+- TOTP.
+- Passkey.
+- Recovery code.
 
-A deactivated account cannot sign in or use protected lifecycle operations.
+A step-up challenge is bound to the current authenticated session. Successful verification rotates that session and records the authentication method and verification timestamp in session metadata.
 
-The package does not currently expose an account-reactivation method.
-
-## Account deletion
-
-An authenticated user can permanently delete their account after confirming their password.
+Use `hasRecentStepUp()` or `requireRecentStepUp()` in server-side actions that require recent MFA verification.
 
 ```ts
-await lifecycle.deleteAccount({
-  sessionToken,
-  password: "current-secure-password",
-});
+const session = await requireRecentStepUp(request, sessionOptions, 300);
 ```
 
-The operation removes:
+The default maximum age is five minutes. The accepted maximum is one hour.
 
-- The user record.
-- Associated password credentials.
-- Associated action tokens.
+### MFA configuration
 
-An `account-deleted` audit event is retained.
+`AuthMfaManagerOptions` supports:
 
-All existing sessions are revoked after the successful storage operation.
+| Option                     | Purpose                                          |
+| -------------------------- | ------------------------------------------------ |
+| `rateLimitKeySecret`       | HMAC secret for rate-limit identifiers           |
+| `factorsCollection`        | MFA factor records                               |
+| `challengesCollection`     | MFA challenge records                            |
+| `recoveryCodesCollection`  | Hashed recovery codes                            |
+| `challengeLifetimeSeconds` | Challenge lifetime                               |
+| `recoveryCodeCount`        | Number of recovery codes generated               |
+| `issuer`                   | TOTP issuer displayed in authenticator apps      |
+| `totp`                     | TOTP digits, period and verification window      |
+| `webAuthn`                 | RP ID, RP name and expected origin               |
+| `requireVerifiedEmail`     | Require verified email before MFA authentication |
+| `clock`                    | Injectable clock for deterministic tests         |
 
-## Session management
+WebAuthn must use an exact expected origin and RP ID. Production deployments must use HTTPS.
 
-The package delegates session lifecycle operations to `@puzzle-ui/session`.
+TOTP secrets must be protected using a configured `AuthSecretProtector`. Do not store plaintext TOTP secrets.
 
-The authentication manager exposes:
+### Fullstack integration
 
-### Sign out
+`@puzzle-ui/fullstack` provides framework-independent server handlers and a browser client.
 
-```ts
-await auth.signOut(sessionToken);
-```
+Use the explicit package entry points:
 
-The session is revoked and a sign-out audit event is recorded.
+- `@puzzle-ui/fullstack/auth/server`
+- `@puzzle-ui/fullstack/auth/client`
+- `@puzzle-ui/fullstack/auth/shared`
+- `@puzzle-ui/fullstack/auth/next`
+- `@puzzle-ui/fullstack/auth/tanstack`
 
-The framework integration remains responsible for clearing the corresponding browser cookie.
+The server owns cookies, challenge tokens and session tokens. The browser client receives public state and factor data only.
 
-### Sign out everywhere
+The client authentication statuses include:
 
-```ts
-await auth.signOutEverywhere(user.id);
-```
+- `unauthenticated`
+- `mfa-pending`
+- `mfa-enrollment-pending`
+- `mfa-enrollment-required`
+- `step-up-pending`
+- `authenticated`
 
-All sessions belonging to the user are revoked and an audit event is recorded.
+Applications must treat only `authenticated` as normal authenticated access.
 
-### Session invalidation after account changes
+### MFA security requirements
 
-Password resets, password changes, email changes, account deactivation and account deletion invalidate existing sessions.
+Production deployments must:
 
-For operations that update an existing account record, the package stores a `sessionsInvalidatedAt` timestamp as part of the same atomic storage batch.
+1. Use HTTPS.
+2. Keep session and challenge tokens in secure, HttpOnly cookies.
+3. Keep TOTP secrets encrypted at rest.
+4. Keep recovery codes hashed at rest.
+5. Configure exact WebAuthn origins and RP IDs.
+6. Use shared, persistent rate limiting.
+7. Preserve conditional writes and atomic storage operations.
+8. Reject expired, consumed and over-attempted challenges.
+9. Never expose tokens, TOTP secrets, recovery codes or provider errors in logs.
+10. Restrict application access when a required MFA factor is missing.
 
-Authentication and lifecycle validation reject sessions created at or before that timestamp.
-
-This provides a fail-closed security boundary even if the underlying session provider cannot physically revoke every session immediately.
-
-New sessions created after the invalidation timestamp can authenticate normally, provided the account is active and all authentication requirements are satisfied.
-
-## Rate limiting
-
-The package supports configurable rate limiting for registration, sign-in and lifecycle operations.
-
-The `RateLimitProvider` contract is:
-
-```ts
-export interface RateLimitProvider {
-  consume(input: {
-    readonly key: string;
-    readonly limit: number;
-    readonly windowSeconds: number;
-  }): Promise<{
-    readonly allowed: boolean;
-    readonly remaining: number;
-    readonly resetAt: Date;
-  }>;
-}
-```
-
-### Storage-backed rate limiting
-
-`StorageRateLimitProvider` provides a shared, storage-backed implementation.
-
-```ts
-const rateLimitProvider = new StorageRateLimitProvider(storage, {
-  collectionName: "auth_rate_limits",
-  maximumRetries: 12,
-});
-```
-
-The provider uses conditional writes and unique constraints to handle concurrent requests.
-
-It does not silently fall back to unrestricted access when storage is unavailable.
-
-### Default policies
-
-The default registration and sign-in policies are:
-
-| Action       | Scope | Limit |     Window |
-| ------------ | ----- | ----: | ---------: |
-| Registration | Email |     5 |     1 hour |
-| Registration | IP    |    10 |     1 hour |
-| Sign-in      | Email |    10 | 15 minutes |
-| Sign-in      | IP    |    30 | 15 minutes |
-
-Lifecycle defaults:
-
-| Action             | Scope | Limit | Window |
-| ------------------ | ----- | ----: | -----: |
-| Email verification | Email |     3 | 1 hour |
-| Email verification | IP    |    10 | 1 hour |
-| Password reset     | Email |     3 | 1 hour |
-| Password reset     | IP    |    10 | 1 hour |
-| Email change       | Email |     3 | 1 hour |
-| Email change       | IP    |    10 | 1 hour |
-
-Policies can be overridden through `rateLimits` in the respective manager options.
-
-Rate-limit identifiers are HMAC-hashed using the configured `rateLimitKeySecret`.
-
-The secret must contain at least 32 characters and must remain stable across application instances.
-
-## Storage requirements
-
-The authentication package uses the `StorageAdapter` interface from `@puzzle-ui/storage`.
-
-The authentication manager requires:
-
-- Unique constraints.
-- Atomic batch operations.
-
-The lifecycle manager additionally requires:
-
-- Conditional writes.
-- Unique constraints.
-- Atomic batch operations.
-
-The storage adapter must implement these capabilities correctly. In particular, atomic batches must not partially apply account changes or token consumption.
-
-### Collections
-
-The default collection names are:
-
-| Collection           | Purpose                                                    |
-| -------------------- | ---------------------------------------------------------- |
-| `auth_users`         | User accounts                                              |
-| `auth_credentials`   | Password credentials                                       |
-| `auth_action_tokens` | Email verification, password reset and email change tokens |
-| `auth_audit_events`  | Authentication and lifecycle audit events                  |
-| `auth_rate_limits`   | Rate-limit counters                                        |
-
-Collection names can be overridden through the manager options.
-
-### User records
-
-The internal user storage record extends the public user model with:
-
-- `normalizedEmail`
-- `deactivatedAt`
-- `sessionsInvalidatedAt`
-
-These internal fields are not exposed through `AuthUser`.
-
-### Credentials
-
-Password credentials are stored separately from user records.
-
-The credential record contains:
-
-- User ID.
-- Credential kind.
-- Argon2id password hash.
-- Password update timestamp.
-- Revocation timestamp.
-
-The storage layer enforces uniqueness for a user's credential kind.
-
-### Action tokens
-
-Action tokens are stored as hashes, never as plaintext tokens.
-
-Each token contains:
-
-- User ID.
-- Purpose.
-- Token hash.
-- Expiration timestamp.
-- Consumption timestamp.
-- Optional target email.
-- Revocation timestamp.
-
-The storage layer enforces unique token hashes.
-
-## Audit events
-
-The package records audit events for authentication and account lifecycle operations.
-
-Supported actions include:
-
-- `account-registered`
-- `sign-in`
-- `sign-in-failed`
-- `sign-out`
-- `sign-out-everywhere`
-- `email-verification-requested`
-- `email-verified`
-- `password-reset-requested`
-- `password-reset-completed`
-- `password-changed`
-- `profile-updated`
-- `email-change-requested`
-- `email-changed`
-- `account-deactivated`
-- `account-deleted`
-
-Audit records can contain a user ID, session ID and non-secret metadata.
-
-Never add passwords, raw session tokens, action tokens or password hashes to audit metadata.
-
-## Error handling
-
-Authentication errors extend `AuthError`.
-
-```ts
-export type AuthErrorCode =
-  | "INVALID_INPUT"
-  | "INVALID_CREDENTIALS"
-  | "EMAIL_NOT_VERIFIED"
-  | "RATE_LIMITED"
-  | "CONFLICT"
-  | "CONFIGURATION"
-  | "PROVIDER"
-  | "SESSION"
-  | "INVALID_TOKEN";
-```
-
-Available error classes:
-
-| Error                                | Code                  | Purpose                                                   |
-| ------------------------------------ | --------------------- | --------------------------------------------------------- |
-| `AuthValidationError`                | `INVALID_INPUT`       | Invalid input or validation failure                       |
-| `AuthInvalidCredentialsError`        | `INVALID_CREDENTIALS` | Invalid email/password combination                        |
-| `AuthEmailVerificationRequiredError` | `EMAIL_NOT_VERIFIED`  | Email verification is required                            |
-| `AuthAccountConflictError`           | `CONFLICT`            | Account creation or email conflict                        |
-| `AuthRateLimitError`                 | `RATE_LIMITED`        | Rate limit exceeded                                       |
-| `AuthConfigurationError`             | `CONFIGURATION`       | Invalid configuration or unsupported storage capabilities |
-| `AuthProviderError`                  | `PROVIDER`            | Provider or storage operation failure                     |
-| `AuthSessionError`                   | `SESSION`             | Session validation or management failure                  |
-| `AuthTokenError`                     | `INVALID_TOKEN`       | Invalid, expired, consumed or revoked action token        |
-
-Errors expose a stable error code and can include a cause and structured details.
-
-Applications should map these errors to appropriate HTTP responses in their framework integration. Avoid exposing internal provider errors or sensitive implementation details to clients.
-
-## Configuration reference
-
-### `AuthManagerOptions`
-
-| Option                  | Type         | Default                 |
-| ----------------------- | ------------ | ----------------------- |
-| `rateLimitKeySecret`    | `string`     | Required                |
-| `usersCollection`       | `string`     | `auth_users`            |
-| `credentialsCollection` | `string`     | `auth_credentials`      |
-| `auditCollection`       | `string`     | `auth_audit_events`     |
-| `minimumPasswordLength` | `number`     | `8`                     |
-| `maximumPasswordLength` | `number`     | `1024`                  |
-| `requireVerifiedEmail`  | `boolean`    | `false`                 |
-| `rateLimits`            | `object`     | See rate-limit defaults |
-| `clock`                 | `() => Date` | Current time            |
-
-### `AuthLifecycleManagerOptions`
-
-| Option                                  | Type              | Default                       |
-| --------------------------------------- | ----------------- | ----------------------------- |
-| `rateLimitKeySecret`                    | `string`          | Required                      |
-| `usersCollection`                       | `string`          | `auth_users`                  |
-| `credentialsCollection`                 | `string`          | `auth_credentials`            |
-| `actionTokensCollection`                | `string`          | `auth_action_tokens`          |
-| `auditCollection`                       | `string`          | `auth_audit_events`           |
-| `rateLimitsCollection`                  | `string`          | `auth_rate_limits`            |
-| `minimumPasswordLength`                 | `number`          | `8`                           |
-| `maximumPasswordLength`                 | `number`          | `1024`                        |
-| `emailVerificationTokenLifetimeSeconds` | `number`          | `3600`                        |
-| `passwordResetTokenLifetimeSeconds`     | `number`          | `3600`                        |
-| `emailChangeTokenLifetimeSeconds`       | `number`          | `3600`                        |
-| `emailTemplates`                        | `object`          | Built-in template identifiers |
-| `emailSubjects`                         | `object`          | Built-in email subjects       |
-| `rateLimits`                            | `object`          | See rate-limit defaults       |
-| `requireVerifiedEmail`                  | `boolean`         | `false`                       |
-| `clock`                                 | `() => Date`      | Current time                  |
-| `onEmailDeliveryError`                  | `(error) => void` | Not configured                |
-| `onSessionRevocationError`              | `(error) => void` | Not configured                |
-
-The lifecycle manager's `rateLimitProvider` dependency is optional. When omitted, it creates a `StorageRateLimitProvider` using the configured storage adapter.
-
-### `StorageRateLimitProviderOptions`
-
-| Option           | Type         | Default            |
-| ---------------- | ------------ | ------------------ |
-| `collectionName` | `string`     | `auth_rate_limits` |
-| `clock`          | `() => Date` | Current time       |
-| `maximumRetries` | `number`     | `12`               |
-
-## Testing
-
-The package uses Node.js' built-in test runner.
+### MFA testing
 
 Run the authentication package tests:
 
@@ -880,51 +266,37 @@ Run the authentication package tests:
 bun run --filter @puzzle-ui/auth test
 ```
 
-Run the package typecheck:
+Run the fullstack tests:
+
+```sh
+bun run --filter @puzzle-ui/fullstack test
+```
+
+Run typechecks:
 
 ```sh
 bun run --filter @puzzle-ui/auth typecheck
+bun run --filter @puzzle-ui/fullstack typecheck
 ```
 
-Build the package:
+Build both packages:
 
 ```sh
 bun run --filter @puzzle-ui/auth build
+bun run --filter @puzzle-ui/fullstack build
 ```
-
-The test suite covers authentication behavior, lifecycle workflows, storage behavior, token handling, rate limiting and security-sensitive cases.
-
-## Security considerations
-
-Applications integrating this package must observe the following requirements:
-
-1. **Session tokens are secrets.** Deliver raw session tokens exclusively through secure, HttpOnly cookies. Never expose them to browser JavaScript or serialize them into client-side JSON.
-2. **Use HTTPS.** Authentication callback URLs and profile image URLs must use HTTPS. Localhost HTTP is supported for development callback URLs.
-3. **Use Argon2id.** Supply a maintained Argon2id implementation. Do not replace it with a weaker algorithm or an ad hoc fallback.
-4. **Protect the rate-limit secret.** Use a dedicated secret with at least 32 characters and keep it stable across application instances.
-5. **Use shared rate limiting.** Production rate limiting must be backed by shared persistent storage rather than per-process in-memory counters.
-6. **Trust client IP addresses carefully.** Framework integrations must derive IP addresses from trusted proxy configuration.
-7. **Preserve atomic storage semantics.** User, credential, token and audit mutations must use the required atomic and conditional storage operations.
-8. **Do not expose action tokens.** Raw action tokens should only be delivered through the intended email workflow. Persist only their hashes.
-9. **Avoid account enumeration.** Keep password-reset responses generic and do not expose whether an email address belongs to an account.
-10. **Keep internal errors private.** Do not expose provider errors, storage details or sensitive causes to clients.
-11. **Keep verification settings aligned.** Configure `requireVerifiedEmail` consistently on both authentication managers.
-12. **Observe delivery and revocation failures.** Use `onEmailDeliveryError` and `onSessionRevocationError` for operational logging and monitoring.
 
 ## Scope and roadmap
 
-`@puzzle-ui/auth` currently provides the framework-independent authentication core and account lifecycle workflows described above.
+`@puzzle-ui/auth` provides the framework-independent authentication core, account lifecycle workflows, MFA, passkeys, recovery codes and step-up authentication.
 
-The following features are outside the current package scope:
+`@puzzle-ui/fullstack` provides the browser client, server handlers and Next.js and TanStack Start integration entry points.
 
-- TOTP multi-factor authentication.
-- WebAuthn and passkeys.
-- Recovery codes.
+The following features remain outside the current authentication scope:
+
 - OAuth and external identity providers.
-- Framework-specific authentication endpoints.
-- Framework-specific browser cookie handling.
 - Ready-made authentication pages and UI components.
+- Application-specific authorization and role management.
+- Application-specific email templates and delivery workflows.
 
-These capabilities belong to separate Puzzle Auth features and the `@puzzle-ui/fullstack` integration layer.
-
-The authentication core is designed to remain reusable by those future integrations without coupling its storage or business logic to a specific framework.
+These capabilities can be built on top of the authentication primitives without coupling the core package to a specific application or framework.

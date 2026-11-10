@@ -32,6 +32,9 @@ const createHarness = async () => {
   const current = await sessions.create({
     userId: "user-1",
     kind: "authenticated",
+    metadata: {
+      originalSessionMetadata: true,
+    },
   });
 
   const challenge = {
@@ -43,6 +46,7 @@ const createHarness = async () => {
   };
 
   let verificationCalls = 0;
+  let temporarySessionId = null;
 
   const createVerifiedSession = async () => {
     verificationCalls++;
@@ -55,6 +59,8 @@ const createHarness = async () => {
         mfaVerifiedAt: new Date().toISOString(),
       },
     });
+
+    temporarySessionId = created.session.id;
 
     return {
       user: createUser(),
@@ -125,8 +131,14 @@ const createHarness = async () => {
     current,
     challenge,
     getVerificationCalls: () => verificationCalls,
+    getTemporarySessionId: () => temporarySessionId,
   };
 };
+
+const getActiveSessions = (sessions, userId) =>
+  [...sessions.sessions.values()].filter(
+    (session) => session.userId === userId && session.revokedAt === null,
+  );
 
 test("step-up challenge is bound to the existing authenticated session", async () => {
   const harness = await createHarness();
@@ -160,7 +172,7 @@ test("step-up challenge is bound to the existing authenticated session", async (
   );
 });
 
-test("successful TOTP step-up rotates and marks the session", async () => {
+test("successful TOTP step-up atomically rotates the original session", async () => {
   const harness = await createHarness();
 
   const challenge = await harness.manager.beginStepUp({
@@ -178,6 +190,7 @@ test("successful TOTP step-up rotates and marks the session", async () => {
   assert.equal(result.user.id, "user-1");
   assert.notEqual(result.session.id, harness.current.session.id);
 
+  // The original session is revoked by SessionManager.rotate().
   assert.equal(await harness.sessions.validate(harness.current.token), null);
 
   const activeSession = await harness.sessions.validate(result.token);
@@ -188,8 +201,24 @@ test("successful TOTP step-up rotates and marks the session", async () => {
     activeSession.metadata.stepUpOfSessionId,
     harness.current.session.id,
   );
-
+  assert.equal(activeSession.metadata.originalSessionMetadata, true);
   assert.equal(typeof activeSession.metadata.stepUpVerifiedAt, "string");
+
+  // The MFA manager's intermediate session must not remain active.
+  const temporarySessionId = harness.getTemporarySessionId();
+
+  assert.ok(temporarySessionId);
+  assert.notEqual(temporarySessionId, result.session.id);
+
+  const temporarySession = await harness.sessions.get(temporarySessionId);
+
+  assert.equal(temporarySession.revokedAt instanceof Date, true);
+
+  // Exactly one authenticated session remains active.
+  const activeSessions = getActiveSessions(harness.sessions, "user-1");
+
+  assert.equal(activeSessions.length, 1);
+  assert.equal(activeSessions[0].id, result.session.id);
 });
 
 test("a consumed step-up challenge cannot be reused", async () => {
@@ -276,6 +305,8 @@ test("concurrent step-up completion allows only one winner", async () => {
     results.filter((result) => result.status === "rejected").length,
     1,
   );
+
+  assert.equal(getActiveSessions(harness.sessions, "user-1").length, 1);
 });
 
 test("step-up passkey options are obtained only for the bound session", async () => {
@@ -294,4 +325,31 @@ test("step-up passkey options are obtained only for the bound session", async ()
 
   assert.equal(started.options.challenge, "B".repeat(43));
   assert.equal(started.expiresAt.getTime(), challenge.expiresAt.getTime());
+});
+
+test("successful passkey step-up rotates the original session", async () => {
+  const harness = await createHarness();
+
+  const challenge = await harness.manager.beginStepUp({
+    sessionToken: harness.current.token,
+    ipAddress: "127.0.0.1",
+  });
+
+  const result = await harness.manager.finishPasskey({
+    challengeToken: challenge.challengeToken,
+    sessionToken: harness.current.token,
+    response: {
+      id: "test-passkey",
+    },
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(result.user.id, "user-1");
+  assert.notEqual(result.session.id, harness.current.session.id);
+  assert.equal(await harness.sessions.validate(harness.current.token), null);
+
+  const activeSession = await harness.sessions.validate(result.token);
+
+  assert.equal(activeSession.metadata.authenticationMethod, "passkey");
+  assert.equal(getActiveSessions(harness.sessions, "user-1").length, 1);
 });

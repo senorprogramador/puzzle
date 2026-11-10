@@ -389,6 +389,46 @@ export class StorageAuthStepUpManager {
     return this.mfa.beginPasskeyMfa(input.challengeToken, input.ipAddress);
   }
 
+  private async consumeChallenge(
+    challenge: AuthStepUpChallengeStorageRecord,
+  ): Promise<void> {
+    const now = this.now();
+
+    try {
+      const consumed =
+        await this.storage.update<AuthStepUpChallengeStorageRecord>(
+          this.collectionName,
+          challenge.id,
+          {
+            consumedAt: now,
+            updatedAt: now,
+          },
+          {
+            expectedRevision: challenge.revision,
+          },
+        );
+
+      if (!consumed) {
+        throw new StorageConflictError(
+          "The step-up challenge was already consumed.",
+        );
+      }
+    } catch (error) {
+      throw new AuthMfaChallengeError({ cause: error });
+    }
+  }
+
+  private async revokeTemporarySession(sessionId: string): Promise<void> {
+    try {
+      await this.sessions.revoke(sessionId);
+    } catch (error) {
+      throw new AuthSessionError(
+        "Could not revoke the temporary MFA verification session.",
+        { cause: error },
+      );
+    }
+  }
+
   private async completeStepUp(
     input: {
       readonly challengeToken: string;
@@ -405,59 +445,45 @@ export class StorageAuthStepUpManager {
       input.sessionToken,
     );
 
+    // The MFA manager consumes its own challenge and creates a short-lived
+    // internal session after successful factor verification. That token is
+    // never returned to the caller.
     const verified = await verify(input.challengeToken);
 
     if (verified.user.id !== context.challenge.userId) {
-      try {
-        await this.sessions.revoke(verified.session.id);
-      } catch {
-        // The result is never returned when the account does not match.
-      }
-
+      await this.revokeTemporarySession(verified.session.id);
       throw new AuthMfaChallengeError();
     }
 
-    const now = this.now();
-
+    // Consume the step-up wrapper challenge before rotating the original
+    // session. Conditional revision checking ensures that concurrent
+    // requests cannot both proceed to session rotation.
     try {
-      const consumed =
-        await this.storage.update<AuthStepUpChallengeStorageRecord>(
-          this.collectionName,
-          context.challenge.id,
-          {
-            consumedAt: now,
-            updatedAt: now,
-          },
-          {
-            expectedRevision: context.challenge.revision,
-          },
-        );
-
-      if (!consumed) {
-        throw new StorageConflictError(
-          "The step-up challenge was already consumed.",
-        );
-      }
+      await this.consumeChallenge(context.challenge);
     } catch (error) {
       try {
-        await this.sessions.revoke(verified.session.id);
+        await this.revokeTemporarySession(verified.session.id);
       } catch (revokeError) {
         throw new AuthSessionError(
-          "Could not revoke a temporary step-up session.",
+          "The step-up challenge failed and its temporary session could not be revoked.",
           { cause: revokeError },
         );
       }
 
-      throw new AuthMfaChallengeError({ cause: error });
+      throw error;
     }
 
-    let replacement: Awaited<ReturnType<SessionManager["create"]>>;
+    const now = this.now();
+
+    let replacement: Awaited<ReturnType<SessionManager["rotate"]>>;
 
     try {
-      replacement = await this.sessions.create({
-        userId: context.challenge.userId,
-        kind: "authenticated",
+      // SessionManager.rotate() atomically inserts the replacement session
+      // and revokes the original session in a single storage batch.
+      replacement = await this.sessions.rotate({
+        sessionId: context.session.id,
         metadata: {
+          ...(context.session.metadata ?? {}),
           authenticationMethod: input.method,
           mfaVerifiedAt: now.toISOString(),
           stepUpVerifiedAt: now.toISOString(),
@@ -466,34 +492,36 @@ export class StorageAuthStepUpManager {
       });
     } catch (error) {
       try {
-        await this.sessions.revoke(verified.session.id);
-      } catch {
-        // The temporary token remains server-only and is never returned.
-      }
-
-      throw new AuthSessionError(
-        "Could not create the upgraded authentication session.",
-        { cause: error },
-      );
-    }
-
-    try {
-      await this.sessions.revoke(verified.session.id);
-      await this.sessions.revoke(context.session.id);
-    } catch (error) {
-      try {
-        await this.sessions.revoke(replacement.session.id);
+        await this.revokeTemporarySession(verified.session.id);
       } catch (revokeError) {
         throw new AuthSessionError(
-          "Could not revoke an incomplete step-up session.",
+          "Session rotation failed and the temporary MFA session could not be revoked.",
           { cause: revokeError },
         );
       }
 
       throw new AuthSessionError(
-        "Could not replace the previous authentication session.",
+        "Could not atomically rotate the session after step-up verification.",
         { cause: error },
       );
+    }
+
+    // The temporary session created by the MFA manager is not the session
+    // returned to the application. Revoke it after the original session has
+    // been atomically rotated.
+    try {
+      await this.revokeTemporarySession(verified.session.id);
+    } catch (error) {
+      try {
+        await this.sessions.revoke(replacement.session.id);
+      } catch (revokeError) {
+        throw new AuthSessionError(
+          "Could not revoke the replacement session after temporary-session cleanup failed.",
+          { cause: revokeError },
+        );
+      }
+
+      throw error;
     }
 
     return {

@@ -739,6 +739,13 @@ export const createAuthMfaHandlers = (
 
     const state = await options.auth.getAuthState(sessionToken);
 
+    if (state.status === "mfa-enrollment-required") {
+      return jsonResponse({
+        status: "mfa-enrollment-required",
+        user: null,
+      });
+    }
+
     if (state.status !== "authenticated") {
       return jsonResponse({
         status: "unauthenticated",

@@ -3,6 +3,7 @@ export type AuthClientStatus =
   | "unauthenticated"
   | "mfa-pending"
   | "mfa-enrollment-pending"
+  | "mfa-enrollment-required"
   | "step-up-pending"
   | "authenticated";
 

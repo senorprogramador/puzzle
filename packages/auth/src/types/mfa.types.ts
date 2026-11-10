@@ -176,6 +176,12 @@ export type AuthMfaGateway = {
     readonly ipAddress: string;
   }): Promise<AuthMfaEnrollmentPendingResult>;
 
+  /**
+   * Returns whether the user currently has at least one active MFA factor.
+   * Used by AuthManager to enforce policy against existing sessions.
+   */
+  hasActiveFactor(userId: string): Promise<boolean>;
+
   getPendingAuthState(token: string): Promise<AuthState | null>;
 
   revokeChallenges(userId: string): Promise<void>;
