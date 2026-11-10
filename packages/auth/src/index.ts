@@ -22,11 +22,32 @@ export {
 } from "./auth.rate-limit";
 
 export {
+  StorageAuthMfaManager,
+  type StorageAuthMfaManagerDependencies,
+} from "./auth.mfa.manager";
+
+export {
+  StorageAuthStepUpManager,
+  AUTH_MFA_STEP_UP_COLLECTION,
+  type AuthStepUpChallengeStorageRecord,
+  type AuthStepUpManagerOptions,
+  type StorageAuthStepUpManagerDependencies,
+  type BeginStepUpInput,
+  type CompleteStepUpInput,
+  type BeginStepUpPasskeyInput,
+  type FinishStepUpPasskeyInput,
+  type AuthStepUpPendingState,
+} from "./auth.step-up.manager";
+
+export {
   AUTH_USER_COLLECTION,
   AUTH_CREDENTIAL_COLLECTION,
   AUTH_ACTION_TOKEN_COLLECTION,
   AUTH_AUDIT_COLLECTION,
   AUTH_RATE_LIMIT_COLLECTION,
+  AUTH_MFA_FACTOR_COLLECTION,
+  AUTH_MFA_CHALLENGE_COLLECTION,
+  AUTH_RECOVERY_CODE_COLLECTION,
   initializeAuthStorage,
 } from "./auth.storage";
 
@@ -72,35 +93,6 @@ export type {
   RateLimitProvider,
 } from "./providers/provider.types";
 
-export {
-  AuthError,
-  AuthValidationError,
-  AuthInvalidCredentialsError,
-  AuthEmailVerificationRequiredError,
-  AuthAccountConflictError,
-  AuthRateLimitError,
-  AuthConfigurationError,
-  AuthProviderError,
-  AuthSessionError,
-  AuthTokenError,
-} from "./errors/auth.errors";
-
-export type { AuthErrorCode } from "./errors/auth.errors";
-
-export { normalizeEmail, normalizeDisplayName } from "./utils/email.utils";
-
-export {
-  generateAuthId,
-  generateSecureAuthToken,
-  hashAuthToken,
-  createRateLimitKey,
-} from "./utils/auth-crypto.utils";
-
-export {
-  StorageAuthMfaManager,
-  type StorageAuthMfaManagerDependencies,
-} from "./auth.mfa.manager";
-
 export type {
   ProtectedAuthSecret,
   AuthSecretProtector,
@@ -112,9 +104,28 @@ export type {
 } from "./providers/mfa-provider.types";
 
 export {
+  WebCryptoAuthSecretProtector,
+  type WebCryptoAuthSecretProtectorOptions,
+} from "./providers/webcrypto-secret-protector";
+
+export { SimpleWebAuthnProvider } from "./providers/simplewebauthn-provider";
+
+export {
+  AuthError,
+  AuthValidationError,
+  AuthInvalidCredentialsError,
+  AuthEmailVerificationRequiredError,
+  AuthAccountConflictError,
+  AuthRateLimitError,
+  AuthConfigurationError,
+  AuthProviderError,
+  AuthSessionError,
+  AuthTokenError,
   AuthMfaChallengeError,
   AuthMfaFactorError,
 } from "./errors/auth.errors";
+
+export type { AuthErrorCode } from "./errors/auth.errors";
 
 export type {
   AuthMfaFactorType,
@@ -145,6 +156,15 @@ export type {
   RemoveMfaFactorInput,
   RegenerateRecoveryCodesInput,
 } from "./types/mfa.types";
+
+export { normalizeEmail, normalizeDisplayName } from "./utils/email.utils";
+
+export {
+  generateAuthId,
+  generateSecureAuthToken,
+  hashAuthToken,
+  createRateLimitKey,
+} from "./utils/auth-crypto.utils";
 
 export {
   encodeBase32,

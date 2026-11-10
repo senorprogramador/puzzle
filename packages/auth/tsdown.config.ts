@@ -1,9 +1,7 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: [
-    "src/index.ts",
-  ],
+  entry: ["src/index.ts"],
   unbundle: true,
   format: ["esm", "cjs"],
   fixedExtension: false,
@@ -12,6 +10,10 @@ export default defineConfig({
   sourcemap: true,
   copy: ["../../LICENSE"],
   deps: {
-    neverBundle: ["@puzzle-ui/storage", "@puzzle-ui/session"],
+    neverBundle: [
+      "@puzzle-ui/storage",
+      "@puzzle-ui/session",
+      "@simplewebauthn/server",
+    ],
   },
 });

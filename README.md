@@ -89,6 +89,20 @@ cat package.json
 For package-specific commands, inspect the `package.json` in the
 relevant workspace.
 
+### Tests
+
+Run all package test suites from the repository root:
+
+```bash
+bun run vitest
+```
+
+This builds the packages first because some tests import compiled output,
+then runs the workspace suites, CLI tests, and UI browser tests. MongoDB
+conformance tests require Docker with Compose; their runner starts and
+removes a dedicated test container and its volume. Browser tests require
+Playwright's Chromium browser.
+
 ## Design principles
 
 Puzzle aims to provide a foundation for interfaces that are:

@@ -79,7 +79,8 @@
   "dependencies": {
     "@puzzle-ui/ui": "^0.4.0",
     "@puzzle-ui/auth": "^0.4.0",
-    "@puzzle-ui/session": "^0.4.0"
+    "@puzzle-ui/session": "^0.4.0",
+    "@simplewebauthn/browser": "^14.0.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

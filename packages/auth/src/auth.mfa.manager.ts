@@ -43,6 +43,7 @@ import type {
   PasskeyMfaCompletedInput,
   RemoveMfaFactorInput,
   RegenerateRecoveryCodesInput,
+  AuthMfaAvailableFactor,
 } from "./types/mfa.types";
 
 import type { AuthSession, AuthResult } from "./types/auth-manager.types";
@@ -1032,6 +1033,53 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       challengeId: challenge.id,
       expiresAt: challenge.expiresAt,
     };
+  }
+
+  async getAvailableFactors(
+    challengeToken: string,
+  ): Promise<readonly AuthMfaAvailableFactor[]> {
+    this.assertInitialized();
+
+    const challenge = await this.getChallenge(challengeToken, "sign-in");
+
+    if (!challenge.userId) {
+      throw new AuthMfaChallengeError();
+    }
+
+    const factors = await this.findActiveFactors(challenge.userId);
+
+    // A factor added after challenge creation cannot be used to complete
+    // this challenge. Only the original factor snapshot is accepted.
+    const challengeFactors = factors.filter((factor) =>
+      challenge.factorIds.includes(factor.id),
+    );
+
+    const available = new Set<AuthMfaAvailableFactor>();
+
+    for (const factor of challengeFactors) {
+      available.add(factor.type);
+    }
+
+    const recoveryCodes =
+      await this.storage.findMany<AuthRecoveryCodeStorageRecord>(
+        this.recoveryCodesCollection,
+        {
+          where: {
+            userId: whereEquals(challenge.userId),
+            consumedAt: whereEquals(null),
+          },
+        },
+      );
+
+    if (
+      recoveryCodes.some((record) =>
+        challenge.factorIds.includes(record.factorId),
+      )
+    ) {
+      available.add("recovery-code");
+    }
+
+    return [...available];
   }
 
   private async failChallenge(
