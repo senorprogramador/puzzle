@@ -1,6 +1,7 @@
 export type AuthErrorCode =
   | "INVALID_INPUT"
   | "INVALID_CREDENTIALS"
+  | "EMAIL_NOT_VERIFIED"
   | "RATE_LIMITED"
   | "CONFLICT"
   | "CONFIGURATION"
@@ -41,6 +42,14 @@ export class AuthInvalidCredentialsError extends AuthError {
   constructor() {
     super("INVALID_CREDENTIALS", "Invalid email or password.");
     this.name = "AuthInvalidCredentialsError";
+  }
+}
+
+export class AuthEmailVerificationRequiredError extends AuthError {
+  constructor() {
+    super("EMAIL_NOT_VERIFIED", "Verify your email address before signing in.");
+
+    this.name = "AuthEmailVerificationRequiredError";
   }
 }
 

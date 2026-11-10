@@ -1,4 +1,7 @@
-import { StorageDuplicateError } from "@puzzle-ui/storage";
+import {
+  StorageConflictError,
+  StorageDuplicateError,
+} from "@puzzle-ui/storage";
 
 import { StorageAuthManager } from "../../dist/index.js";
 
@@ -73,6 +76,47 @@ export class MemoryStorage {
     });
   }
 
+  checkCondition(record, condition) {
+    if (!condition) return;
+
+    if (
+      condition.expectedRevision !== undefined &&
+      record.revision !== condition.expectedRevision
+    ) {
+      throw new StorageConflictError("Revision conflict.");
+    }
+
+    if (
+      condition.expectedUpdatedAt !== undefined &&
+      record.updatedAt.getTime() !== condition.expectedUpdatedAt.getTime()
+    ) {
+      throw new StorageConflictError("Updated-at conflict.");
+    }
+  }
+
+  assertUnique(collection, record, excludedId) {
+    const definition = this.definitions.get(collection);
+    const records = this.getCollection(collection);
+
+    if (record.id !== excludedId && records.has(record.id)) {
+      throw new StorageDuplicateError("primary_key");
+    }
+
+    for (const index of definition?.indexes ?? []) {
+      if (!index.unique) continue;
+
+      const duplicate = [...records.values()].some((existing) => {
+        if (existing.id === excludedId) return false;
+
+        return index.fields.every((field) => existing[field] === record[field]);
+      });
+
+      if (duplicate) {
+        throw new StorageDuplicateError(index.name);
+      }
+    }
+  }
+
   async findById(collection, id) {
     return this.getCollection(collection).get(id) ?? null;
   }
@@ -90,28 +134,25 @@ export class MemoryStorage {
       records = records.filter((record) => this.matches(record, query.where));
     }
 
-    return records;
-  }
+    if (query.orderBy) {
+      for (const order of [...query.orderBy].reverse()) {
+        records.sort((a, b) => {
+          const left = a[order.field];
+          const right = b[order.field];
 
-  assertUnique(collection, record) {
-    const definition = this.definitions.get(collection);
-    const records = this.getCollection(collection);
+          const leftValue = left instanceof Date ? left.getTime() : left;
+          const rightValue = right instanceof Date ? right.getTime() : right;
 
-    if (records.has(record.id)) {
-      throw new StorageDuplicateError("primary_key");
-    }
+          if (leftValue === rightValue) return 0;
 
-    for (const index of definition?.indexes ?? []) {
-      if (!index.unique) continue;
+          const comparison = leftValue < rightValue ? -1 : 1;
 
-      const duplicate = [...records.values()].some((existing) =>
-        index.fields.every((field) => existing[field] === record[field]),
-      );
-
-      if (duplicate) {
-        throw new StorageDuplicateError(index.name);
+          return order.direction === "desc" ? -comparison : comparison;
+        });
       }
     }
+
+    return records;
   }
 
   async atomicBatch(operations) {
@@ -136,28 +177,102 @@ export class MemoryStorage {
 
     try {
       for (const operation of operations) {
-        if (operation.type !== "insert") {
-          throw new Error(`Unsupported test operation: ${operation.type}`);
+        const records = this.getCollection(operation.collection);
+
+        if (operation.type === "insert") {
+          const record = operation.record;
+
+          this.assertUnique(operation.collection, record);
+
+          const stored = {
+            ...record,
+            createdAt: record.createdAt ?? new Date(),
+            updatedAt: record.updatedAt ?? new Date(),
+            revision: record.revision ?? 1,
+          };
+
+          records.set(stored.id, stored);
+
+          results.push({
+            type: "insert",
+            record: stored,
+          });
+
+          continue;
         }
 
-        const records = this.getCollection(operation.collection);
-        const record = operation.record;
+        if (operation.type === "update") {
+          const current = records.get(operation.id) ?? null;
 
-        this.assertUnique(operation.collection, record);
+          if (!current) {
+            if (operation.condition) {
+              throw new StorageConflictError(
+                "The record for a conditional update no longer exists.",
+              );
+            }
 
-        const stored = {
-          ...record,
-          createdAt: record.createdAt ?? new Date(),
-          updatedAt: record.updatedAt ?? new Date(),
-          revision: record.revision ?? 1,
-        };
+            results.push({
+              type: "update",
+              record: null,
+            });
 
-        records.set(stored.id, stored);
+            continue;
+          }
 
-        results.push({
-          type: "insert",
-          record: stored,
-        });
+          this.checkCondition(current, operation.condition);
+
+          const updated = {
+            ...current,
+            ...operation.changes,
+            id: current.id,
+            createdAt: current.createdAt,
+            updatedAt: operation.changes.updatedAt ?? new Date(),
+            revision: current.revision + 1,
+          };
+
+          this.assertUnique(operation.collection, updated, current.id);
+
+          records.set(updated.id, updated);
+
+          results.push({
+            type: "update",
+            record: updated,
+          });
+
+          continue;
+        }
+
+        if (operation.type === "delete") {
+          const current = records.get(operation.id) ?? null;
+
+          if (!current) {
+            if (operation.condition) {
+              throw new StorageConflictError(
+                "The record for a conditional delete no longer exists.",
+              );
+            }
+
+            results.push({
+              type: "delete",
+              deleted: false,
+            });
+
+            continue;
+          }
+
+          this.checkCondition(current, operation.condition);
+
+          records.delete(operation.id);
+
+          results.push({
+            type: "delete",
+            deleted: true,
+          });
+
+          continue;
+        }
+
+        throw new Error(`Unsupported test operation: ${operation.type}`);
       }
 
       if (this.failNextBatch) {
@@ -175,7 +290,78 @@ export class MemoryStorage {
     }
   }
 
-  async count(collection) {
+  async insert(collection, record) {
+    const result = await this.atomicBatch([
+      {
+        type: "insert",
+        collection,
+        record,
+      },
+    ]);
+
+    return result.results[0].record;
+  }
+
+  async update(collection, id, changes, condition) {
+    const result = await this.atomicBatch([
+      {
+        type: "update",
+        collection,
+        id,
+        changes,
+        condition,
+      },
+    ]);
+
+    return result.results[0].record;
+  }
+
+  async updateMany(collection, query, changes) {
+    const records = await this.findMany(collection, query);
+
+    for (const record of records) {
+      await this.update(collection, record.id, changes, {
+        expectedRevision: record.revision,
+      });
+    }
+
+    return records.length;
+  }
+
+  async delete(collection, id, condition) {
+    const result = await this.atomicBatch([
+      {
+        type: "delete",
+        collection,
+        id,
+        condition,
+      },
+    ]);
+
+    return result.results[0].deleted;
+  }
+
+  async deleteMany(collection, query) {
+    const records = await this.findMany(collection, query);
+
+    for (const record of records) {
+      await this.delete(collection, record.id, {
+        expectedRevision: record.revision,
+      });
+    }
+
+    return records.length;
+  }
+
+  async exists(collection, query) {
+    return (await this.findOne(collection, query)) !== null;
+  }
+
+  async count(collection, query = {}) {
+    if (query.where) {
+      return (await this.findMany(collection, query)).length;
+    }
+
     return this.getCollection(collection).size;
   }
 }
@@ -203,6 +389,20 @@ export class FakePasswordHasher {
     });
 
     return stored.hash === `test-hash:${password}`;
+  }
+}
+
+export class FakeEmailProvider {
+  messages = [];
+  failNextSend = false;
+
+  async send(message) {
+    if (this.failNextSend) {
+      this.failNextSend = false;
+      throw new Error("Simulated email delivery failure.");
+    }
+
+    this.messages.push(message);
   }
 }
 
@@ -235,6 +435,7 @@ export class FakeSessionManager {
   sessions = new Map();
   sequence = 0;
   failNextCreate = false;
+  failNextRevokeAll = false;
 
   async create(input) {
     if (this.failNextCreate) {
@@ -317,6 +518,11 @@ export class FakeSessionManager {
   }
 
   async revokeAll(userId) {
+    if (this.failNextRevokeAll) {
+      this.failNextRevokeAll = false;
+      throw new Error("Simulated session revocation failure.");
+    }
+
     for (const [token, session] of this.sessions) {
       if (session.userId === userId) {
         this.sessions.set(token, {

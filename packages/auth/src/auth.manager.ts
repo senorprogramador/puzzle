@@ -23,11 +23,17 @@ import type {
   AuthRateLimitRule,
 } from "./types/auth-manager.types";
 
+import type {
+  AuthAuditAction,
+  AuthAuditEventStorageRecord,
+} from "./types/auth-lifecycle.types";
+
 import type { AuthState } from "./types/state.types";
 import type { AuthUser } from "./types/user.types";
 import type { PasswordCredentialStorageRecord } from "./types/credential.types";
 
 import {
+  AUTH_AUDIT_COLLECTION,
   AUTH_CREDENTIAL_COLLECTION,
   AUTH_USER_COLLECTION,
   initializeAuthStorage,
@@ -37,6 +43,7 @@ import {
 import {
   AuthAccountConflictError,
   AuthConfigurationError,
+  AuthEmailVerificationRequiredError,
   AuthInvalidCredentialsError,
   AuthProviderError,
   AuthRateLimitError,
@@ -171,12 +178,14 @@ export class StorageAuthManager implements AuthManager {
 
   private readonly usersCollection: string;
   private readonly credentialsCollection: string;
+  private readonly auditCollection: string;
 
   private readonly minimumPasswordLength: number;
   private readonly maximumPasswordLength: number;
 
   private readonly rateLimitPolicies: AuthRateLimitPolicies;
   private readonly rateLimitKeySecret: string;
+  private readonly requireVerifiedEmail: boolean;
   private readonly clock: () => Date;
 
   private initializationPromise: Promise<void> | null = null;
@@ -201,11 +210,14 @@ export class StorageAuthManager implements AuthManager {
     }
 
     this.rateLimitKeySecret = options.rateLimitKeySecret;
+    this.requireVerifiedEmail = options.requireVerifiedEmail ?? false;
 
     this.usersCollection = options.usersCollection ?? AUTH_USER_COLLECTION;
 
     this.credentialsCollection =
       options.credentialsCollection ?? AUTH_CREDENTIAL_COLLECTION;
+
+    this.auditCollection = options.auditCollection ?? AUTH_AUDIT_COLLECTION;
 
     this.minimumPasswordLength =
       options.minimumPasswordLength ?? DEFAULT_MINIMUM_PASSWORD_LENGTH;
@@ -270,6 +282,7 @@ export class StorageAuthManager implements AuthManager {
         await initializeAuthStorage(this.storage, {
           usersCollection: this.usersCollection,
           credentialsCollection: this.credentialsCollection,
+          auditCollection: this.auditCollection,
         });
 
         this.dummyPasswordHash = await this.hashPassword(
@@ -304,6 +317,45 @@ export class StorageAuthManager implements AuthManager {
     }
 
     return now;
+  }
+
+  private createAuditRecord(
+    action: AuthAuditAction,
+    userId: string | null,
+    sessionId: string | null = null,
+    metadata?: AuthAuditEventStorageRecord["metadata"],
+  ): AuthAuditEventStorageRecord {
+    const now = this.now();
+
+    return {
+      id: generateAuthId("auth-audit"),
+      action,
+      userId,
+      sessionId,
+      metadata,
+      createdAt: now,
+      updatedAt: now,
+      revision: 1,
+    };
+  }
+
+  private async recordAudit(
+    action: AuthAuditAction,
+    userId: string | null,
+    sessionId: string | null = null,
+    metadata?: AuthAuditEventStorageRecord["metadata"],
+  ): Promise<void> {
+    try {
+      await this.storage.insert<AuthAuditEventStorageRecord>(
+        this.auditCollection,
+        this.createAuditRecord(action, userId, sessionId, metadata),
+      );
+    } catch (error) {
+      throw new AuthProviderError(
+        "Could not record the authentication audit event.",
+        { cause: error },
+      );
+    }
   }
 
   private async hashPassword(password: string): Promise<PasswordHash> {
@@ -373,7 +425,6 @@ export class StorageAuthManager implements AuthManager {
           windowSeconds: check.rule.windowSeconds,
         });
       } catch (error) {
-        // Never silently bypass a failed rate limiter.
         throw new AuthProviderError(
           "The authentication rate limiter is unavailable.",
           { cause: error },
@@ -494,8 +545,12 @@ export class StorageAuthManager implements AuthManager {
       revision: 1,
     };
 
+    const auditRecord = this.createAuditRecord("account-registered", userId);
+
     const operations: StorageBatchOperation<
-      AuthUserStorageRecord | PasswordCredentialStorageRecord
+      | AuthUserStorageRecord
+      | PasswordCredentialStorageRecord
+      | AuthAuditEventStorageRecord
     >[] = [
       {
         type: "insert",
@@ -507,11 +562,18 @@ export class StorageAuthManager implements AuthManager {
         collection: this.credentialsCollection,
         record: credentialRecord,
       },
+      {
+        type: "insert",
+        collection: this.auditCollection,
+        record: auditRecord,
+      },
     ];
 
     try {
       await this.storage.atomicBatch<
-        AuthUserStorageRecord | PasswordCredentialStorageRecord
+        | AuthUserStorageRecord
+        | PasswordCredentialStorageRecord
+        | AuthAuditEventStorageRecord
       >(operations);
     } catch (error) {
       if (error instanceof StorageDuplicateError) {
@@ -521,8 +583,6 @@ export class StorageAuthManager implements AuthManager {
       throw error;
     }
 
-    // A session failure does not roll back an already-created account.
-    // The account can still authenticate through signIn().
     const authenticated = await this.createAuthenticatedSession(
       userId,
       input.sessionMetadata,
@@ -568,8 +628,6 @@ export class StorageAuthManager implements AuthManager {
     const activeCredential =
       credential && credential.revokedAt === null ? credential : null;
 
-    // Always perform password verification, including for unknown users
-    // and accounts without an active password credential.
     const passwordHash =
       activeCredential?.passwordHash ?? this.dummyPasswordHash!;
 
@@ -579,13 +637,44 @@ export class StorageAuthManager implements AuthManager {
     );
 
     if (!userRecord || !activeCredential || !passwordMatches) {
+      await this.recordAudit("sign-in-failed", userRecord?.id ?? null, null, {
+        reason: "invalid-credentials",
+      });
+
       throw new AuthInvalidCredentialsError();
+    }
+
+    if (this.requireVerifiedEmail && !userRecord.emailVerifiedAt) {
+      await this.recordAudit("sign-in-failed", userRecord.id, null, {
+        reason: "email-not-verified",
+      });
+
+      throw new AuthEmailVerificationRequiredError();
     }
 
     const authenticated = await this.createAuthenticatedSession(
       userRecord.id,
       input.sessionMetadata,
     );
+
+    try {
+      await this.recordAudit(
+        "sign-in",
+        userRecord.id,
+        authenticated.session.id,
+      );
+    } catch (error) {
+      try {
+        await this.sessions.revoke(authenticated.session.id);
+      } catch (revokeError) {
+        throw new AuthSessionError(
+          "Could not revoke a session after an audit failure.",
+          { cause: revokeError },
+        );
+      }
+
+      throw error;
+    }
 
     return {
       user: toPublicUser(userRecord),
@@ -623,7 +712,13 @@ export class StorageAuthManager implements AuthManager {
       session.userId,
     );
 
-    return user ? toPublicUser(user) : null;
+    if (!user) return null;
+
+    if (this.requireVerifiedEmail && !user.emailVerifiedAt) {
+      return null;
+    }
+
+    return toPublicUser(user);
   }
 
   async getAuthState(token: string): Promise<AuthState> {
@@ -644,6 +739,10 @@ export class StorageAuthManager implements AuthManager {
       return { status: "unauthenticated" };
     }
 
+    if (this.requireVerifiedEmail && !user.emailVerifiedAt) {
+      return { status: "unauthenticated" };
+    }
+
     return {
       status: "authenticated",
       userId: user.id,
@@ -656,9 +755,7 @@ export class StorageAuthManager implements AuthManager {
 
     const session = await this.validateSession(token);
 
-    if (!session) {
-      return;
-    }
+    if (!session) return;
 
     try {
       await this.sessions.revoke(session.id);
@@ -668,6 +765,8 @@ export class StorageAuthManager implements AuthManager {
         { cause: error },
       );
     }
+
+    await this.recordAudit("sign-out", session.userId, session.id);
   }
 
   async signOutEverywhere(userId: string): Promise<void> {
@@ -684,5 +783,7 @@ export class StorageAuthManager implements AuthManager {
         cause: error,
       });
     }
+
+    await this.recordAudit("sign-out-everywhere", userId);
   }
 }

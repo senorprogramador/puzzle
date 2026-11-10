@@ -96,6 +96,7 @@ export type UpdateAuthProfileInput = {
 
 export type RequestEmailChangeInput = {
   readonly sessionToken: string;
+  readonly currentPassword: string;
   readonly email: string;
   readonly verificationUrl: string;
   readonly ipAddress: string;
@@ -150,7 +151,10 @@ const DEFAULT_RATE_LIMITS = {
   },
 } satisfies Record<
   AuthLifecycleRateLimitAction,
-  { readonly email: RateLimitRule; readonly ip: RateLimitRule }
+  {
+    readonly email: RateLimitRule;
+    readonly ip: RateLimitRule;
+  }
 >;
 
 const toPublicUser = (record: AuthUserStorageRecord): AuthUser => ({
@@ -286,6 +290,7 @@ export class StorageAuthLifecycleManager {
   private readonly credentialsCollection: string;
   private readonly actionTokensCollection: string;
   private readonly auditCollection: string;
+  private readonly rateLimitsCollection: string;
 
   private readonly emailTemplates: {
     readonly emailVerification: string;
@@ -299,16 +304,15 @@ export class StorageAuthLifecycleManager {
     readonly emailChange: string;
   };
 
-  private initialized = false;
-  private readonly rateLimitsCollection: string;
-
   private readonly minimumPasswordLength: number;
   private readonly maximumPasswordLength: number;
+
   private readonly tokenLifetimes: typeof DEFAULT_TOKEN_LIFETIMES;
   private readonly rateLimits: typeof DEFAULT_RATE_LIMITS;
   private readonly clock: () => Date;
   private readonly onEmailDeliveryError?: (error: unknown) => void;
 
+  private initialized = false;
   private initializationPromise: Promise<void> | null = null;
 
   constructor(
@@ -318,6 +322,32 @@ export class StorageAuthLifecycleManager {
     this.storage = dependencies.storage;
     this.passwordHasher = dependencies.passwordHasher;
     this.emailProvider = dependencies.emailProvider;
+    this.sessions = dependencies.sessions;
+
+    if (
+      typeof options.rateLimitKeySecret !== "string" ||
+      options.rateLimitKeySecret.length < 32
+    ) {
+      throw new AuthConfigurationError(
+        "rateLimitKeySecret must contain at least 32 characters.",
+      );
+    }
+
+    this.rateLimitKeySecret = options.rateLimitKeySecret;
+
+    this.usersCollection = options.usersCollection ?? AUTH_USER_COLLECTION;
+
+    this.credentialsCollection =
+      options.credentialsCollection ?? AUTH_CREDENTIAL_COLLECTION;
+
+    this.actionTokensCollection =
+      options.actionTokensCollection ?? AUTH_ACTION_TOKEN_COLLECTION;
+
+    this.auditCollection = options.auditCollection ?? AUTH_AUDIT_COLLECTION;
+
+    this.rateLimitsCollection =
+      options.rateLimitsCollection ?? AUTH_RATE_LIMIT_COLLECTION;
+
     this.emailTemplates = {
       emailVerification:
         options.emailTemplates?.emailVerification ?? "auth/email-verification",
@@ -334,53 +364,6 @@ export class StorageAuthLifecycleManager {
         options.emailSubjects?.passwordReset ?? "Reset your password",
       emailChange:
         options.emailSubjects?.emailChange ?? "Confirm your new email address",
-    };
-
-    this.sessions = dependencies.sessions;
-
-    this.usersCollection = options.usersCollection ?? AUTH_USER_COLLECTION;
-    this.credentialsCollection =
-      options.credentialsCollection ?? AUTH_CREDENTIAL_COLLECTION;
-    this.actionTokensCollection =
-      options.actionTokensCollection ?? AUTH_ACTION_TOKEN_COLLECTION;
-    this.auditCollection = options.auditCollection ?? AUTH_AUDIT_COLLECTION;
-
-    if (
-      typeof options.rateLimitKeySecret !== "string" ||
-      options.rateLimitKeySecret.length < 32
-    ) {
-      throw new AuthConfigurationError(
-        "rateLimitKeySecret must contain at least 32 characters.",
-      );
-    }
-    this.rateLimitsCollection =
-      options.rateLimitsCollection ?? AUTH_RATE_LIMIT_COLLECTION;
-    this.rateLimitKeySecret = options.rateLimitKeySecret;
-    this.rateLimits = {
-      emailVerification: {
-        email:
-          options.rateLimits?.emailVerification?.email ??
-          DEFAULT_RATE_LIMITS.emailVerification.email,
-        ip:
-          options.rateLimits?.emailVerification?.ip ??
-          DEFAULT_RATE_LIMITS.emailVerification.ip,
-      },
-      passwordReset: {
-        email:
-          options.rateLimits?.passwordReset?.email ??
-          DEFAULT_RATE_LIMITS.passwordReset.email,
-        ip:
-          options.rateLimits?.passwordReset?.ip ??
-          DEFAULT_RATE_LIMITS.passwordReset.ip,
-      },
-      emailChange: {
-        email:
-          options.rateLimits?.emailChange?.email ??
-          DEFAULT_RATE_LIMITS.emailChange.email,
-        ip:
-          options.rateLimits?.emailChange?.ip ??
-          DEFAULT_RATE_LIMITS.emailChange.ip,
-      },
     };
 
     this.minimumPasswordLength = options.minimumPasswordLength ?? 8;
@@ -453,7 +436,7 @@ export class StorageAuthLifecycleManager {
     this.rateLimitProvider =
       dependencies.rateLimitProvider ??
       new StorageRateLimitProvider(this.storage, {
-        collectionName: options.rateLimitsCollection,
+        collectionName: this.rateLimitsCollection,
         clock: this.clock,
       });
   }
@@ -603,11 +586,56 @@ export class StorageAuthLifecycleManager {
     };
   }
 
+  /**
+   * All operations in a lifecycle batch must succeed.
+   *
+   * Storage adapters may report a missing conditional update or delete
+   * through the batch result rather than by throwing an error. Treat those
+   * results as conflicts so a token cannot be consumed without its related
+   * account or credential mutation.
+   */
   private async atomic(
     operations: readonly LifecycleBatchOperation[],
   ): Promise<void> {
     try {
-      await this.storage.atomicBatch<LifecycleRecord>(operations);
+      const result =
+        await this.storage.atomicBatch<LifecycleRecord>(operations);
+
+      for (const [index, operation] of operations.entries()) {
+        const operationResult = result.results[index];
+
+        if (operation.type === "update") {
+          if (
+            !operationResult ||
+            operationResult.type !== "update" ||
+            !operationResult.record
+          ) {
+            throw new StorageConflictError(
+              "A conditional authentication update did not match its record.",
+            );
+          }
+        }
+
+        if (operation.type === "delete") {
+          if (
+            !operationResult ||
+            operationResult.type !== "delete" ||
+            !operationResult.deleted
+          ) {
+            throw new StorageConflictError(
+              "A conditional authentication delete did not match its record.",
+            );
+          }
+        }
+
+        if (operation.type === "insert") {
+          if (!operationResult || operationResult.type !== "insert") {
+            throw new StorageConflictError(
+              "An authentication insert did not return its record.",
+            );
+          }
+        }
+      }
     } catch (error) {
       if (error instanceof StorageDuplicateError) {
         throw new AuthAccountConflictError({ cause: error });
@@ -748,9 +776,7 @@ export class StorageAuthLifecycleManager {
 
       return result;
     } catch (error) {
-      throw new AuthProviderError("Password hashing failed.", {
-        cause: error,
-      });
+      throw new AuthProviderError("Password hashing failed.", { cause: error });
     }
   }
 
@@ -771,6 +797,7 @@ export class StorageAuthLifecycleManager {
     this.assertInitialized();
 
     const ipAddress = validateIpAddress(input.ipAddress);
+
     const user = await this.storage.findById<AuthUserStorageRecord>(
       this.usersCollection,
       input.userId,
@@ -780,9 +807,7 @@ export class StorageAuthLifecycleManager {
       throw new AuthValidationError("The account does not exist.");
     }
 
-    if (user.emailVerifiedAt) {
-      return;
-    }
+    if (user.emailVerifiedAt) return;
 
     await this.enforceRateLimits(
       "emailVerification",
@@ -796,11 +821,6 @@ export class StorageAuthLifecycleManager {
       lifetimeSeconds: this.tokenLifetimes.emailVerification,
     });
 
-    const audit = this.createAuditRecord(
-      "email-verification-requested",
-      user.id,
-    );
-
     await this.atomic([
       {
         type: "insert",
@@ -810,7 +830,7 @@ export class StorageAuthLifecycleManager {
       {
         type: "insert",
         collection: this.auditCollection,
-        record: audit,
+        record: this.createAuditRecord("email-verification-requested", user.id),
       },
     ]);
 
@@ -843,36 +863,42 @@ export class StorageAuthLifecycleManager {
       actionToken.userId,
     );
 
-    if (!user) {
-      throw new AuthTokenError();
-    }
+    if (!user) throw new AuthTokenError();
 
     const now = this.now();
 
-    await this.atomic([
-      {
-        type: "update",
-        collection: this.actionTokensCollection,
-        id: actionToken.id,
-        condition: { expectedRevision: actionToken.revision },
-        changes: { consumedAt: now },
-      },
-      {
-        type: "update",
-        collection: this.usersCollection,
-        id: user.id,
-        condition: { expectedRevision: user.revision },
-        changes: {
-          emailVerifiedAt: now,
-          updatedAt: now,
+    try {
+      await this.atomic([
+        {
+          type: "update",
+          collection: this.actionTokensCollection,
+          id: actionToken.id,
+          condition: { expectedRevision: actionToken.revision },
+          changes: { consumedAt: now },
         },
-      },
-      {
-        type: "insert",
-        collection: this.auditCollection,
-        record: this.createAuditRecord("email-verified", user.id),
-      },
-    ]);
+        {
+          type: "update",
+          collection: this.usersCollection,
+          id: user.id,
+          condition: { expectedRevision: user.revision },
+          changes: {
+            emailVerifiedAt: now,
+            updatedAt: now,
+          },
+        },
+        {
+          type: "insert",
+          collection: this.auditCollection,
+          record: this.createAuditRecord("email-verified", user.id),
+        },
+      ]);
+    } catch (error) {
+      if (error instanceof StorageConflictError) {
+        throw new AuthTokenError();
+      }
+
+      throw error;
+    }
 
     const updated = await this.storage.findById<AuthUserStorageRecord>(
       this.usersCollection,
@@ -989,8 +1015,6 @@ export class StorageAuthLifecycleManager {
         },
       );
 
-    await this.revokeAllSessions(actionToken.userId);
-
     const operations: LifecycleBatchOperation[] = [
       {
         type: "update",
@@ -1047,6 +1071,8 @@ export class StorageAuthLifecycleManager {
 
       throw error;
     }
+
+    await this.revokeAllSessions(actionToken.userId);
   }
 
   async changePassword(input: ChangePasswordInput): Promise<void> {
@@ -1088,8 +1114,6 @@ export class StorageAuthLifecycleManager {
         },
       );
 
-    await this.revokeAllSessions(user.id);
-
     const operations: LifecycleBatchOperation[] = [
       {
         type: "update",
@@ -1122,6 +1146,8 @@ export class StorageAuthLifecycleManager {
     }
 
     await this.atomic(operations);
+
+    await this.revokeAllSessions(user.id);
   }
 
   async updateProfile(input: UpdateAuthProfileInput): Promise<AuthUser> {
@@ -1145,7 +1171,7 @@ export class StorageAuthLifecycleManager {
       changes.image = validateImageUrl(input.image);
     }
 
-    const operations: LifecycleBatchOperation[] = [
+    await this.atomic([
       {
         type: "update",
         collection: this.usersCollection,
@@ -1158,9 +1184,7 @@ export class StorageAuthLifecycleManager {
         collection: this.auditCollection,
         record: this.createAuditRecord("profile-updated", user.id, session.id),
       },
-    ];
-
-    await this.atomic(operations);
+    ]);
 
     const updated = await this.storage.findById<AuthUserStorageRecord>(
       this.usersCollection,
@@ -1180,6 +1204,19 @@ export class StorageAuthLifecycleManager {
     this.assertInitialized();
 
     const { session, user } = await this.getSessionContext(input.sessionToken);
+
+    const credential = await this.findCredential(user.id);
+
+    if (
+      !credential ||
+      credential.revokedAt !== null ||
+      !(await this.verifyPassword(
+        input.currentPassword,
+        credential.passwordHash,
+      ))
+    ) {
+      throw new AuthValidationError("The current password is incorrect.");
+    }
 
     const newEmail = normalizeEmail(input.email);
 
@@ -1263,50 +1300,41 @@ export class StorageAuthLifecycleManager {
       actionToken.userId,
     );
 
-    if (!user) {
-      throw new AuthTokenError();
-    }
+    if (!user) throw new AuthTokenError();
 
     const newEmail = normalizeEmail(actionToken.targetEmail);
     const now = this.now();
 
-    await this.revokeAllSessions(user.id);
-
-    const operations: LifecycleBatchOperation[] = [
-      {
-        type: "update",
-        collection: this.actionTokensCollection,
-        id: actionToken.id,
-        condition: { expectedRevision: actionToken.revision },
-        changes: { consumedAt: now },
-      },
-      {
-        type: "update",
-        collection: this.usersCollection,
-        id: user.id,
-        condition: { expectedRevision: user.revision },
-        changes: {
-          email: newEmail,
-          normalizedEmail: newEmail,
-          emailVerifiedAt: now,
-          updatedAt: now,
-        },
-      },
-      {
-        type: "insert",
-        collection: this.auditCollection,
-        record: this.createAuditRecord("email-changed", user.id),
-      },
-    ];
-
     try {
-      await this.atomic(operations);
+      await this.atomic([
+        {
+          type: "update",
+          collection: this.actionTokensCollection,
+          id: actionToken.id,
+          condition: { expectedRevision: actionToken.revision },
+          changes: { consumedAt: now },
+        },
+        {
+          type: "update",
+          collection: this.usersCollection,
+          id: user.id,
+          condition: { expectedRevision: user.revision },
+          changes: {
+            email: newEmail,
+            normalizedEmail: newEmail,
+            emailVerifiedAt: now,
+            updatedAt: now,
+          },
+        },
+        {
+          type: "insert",
+          collection: this.auditCollection,
+          record: this.createAuditRecord("email-changed", user.id),
+        },
+      ]);
     } catch (error) {
-      if (
-        error instanceof StorageDuplicateError ||
-        error instanceof AuthAccountConflictError
-      ) {
-        throw new AuthAccountConflictError({ cause: error });
+      if (error instanceof AuthAccountConflictError) {
+        throw error;
       }
 
       if (error instanceof StorageConflictError) {
@@ -1315,6 +1343,8 @@ export class StorageAuthLifecycleManager {
 
       throw error;
     }
+
+    await this.revokeAllSessions(user.id);
 
     const updated = await this.storage.findById<AuthUserStorageRecord>(
       this.usersCollection,
@@ -1365,8 +1395,6 @@ export class StorageAuthLifecycleManager {
         },
       );
 
-    await this.revokeAllSessions(user.id);
-
     const operations: LifecycleBatchOperation[] = [
       {
         type: "delete",
@@ -1400,5 +1428,7 @@ export class StorageAuthLifecycleManager {
     }
 
     await this.atomic(operations);
+
+    await this.revokeAllSessions(user.id);
   }
 }
