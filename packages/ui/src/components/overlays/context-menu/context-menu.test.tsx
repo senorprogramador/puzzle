@@ -231,4 +231,33 @@ describe("ContextMenu", () => {
       screen.getByRole("menuitem", { name: "Sub action" }),
     ).toBeInTheDocument();
   });
+
+  it("closes when the trigger is clicked while the menu is open", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ContextMenu>
+        <ContextMenu.Trigger>Right-click area</ContextMenu.Trigger>
+        <ContextMenu.Content aria-label="Area actions">
+          <ContextMenu.Item>Edit</ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu>,
+    );
+
+    const trigger = screen.getByText("Right-click area");
+
+    openContextMenu(trigger);
+
+    expect(
+      await screen.findByRole("menu", { name: "Area actions" }),
+    ).toBeInTheDocument();
+
+    await user.click(trigger);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole("menu", { name: "Area actions" }),
+      ).not.toBeInTheDocument();
+    });
+  });
 });

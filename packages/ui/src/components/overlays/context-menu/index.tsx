@@ -410,21 +410,23 @@ const ContextMenuTrigger = ({
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     onClick?.(event);
 
-    if (
-      event.defaultPrevented ||
-      isDisabled ||
-      !event.ctrlKey ||
-      event.button !== 0
-    ) {
+    if (event.defaultPrevented || isDisabled || event.button !== 0) {
       return;
     }
 
-    event.preventDefault();
-    context.triggerRef.current = event.currentTarget;
-    context.openAt({
-      x: event.clientX,
-      y: event.clientY,
-    });
+    if (event.ctrlKey) {
+      event.preventDefault();
+      context.triggerRef.current = event.currentTarget;
+      context.openAt({
+        x: event.clientX,
+        y: event.clientY,
+      });
+      return;
+    }
+
+    if (context.open) {
+      context.close(false);
+    }
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
