@@ -1,0 +1,172 @@
+---
+title: Context Menu
+description: An accessible contextual menu opened at the pointer or through keyboard and touch interaction.
+---
+
+A Context Menu displays actions related to a specific area or element. It opens at the pointer location on right-click, and also supports keyboard activation and touch long-press.
+
+## Import
+
+```tsx
+import { ContextMenu } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Wrap the target area in `ContextMenu.Trigger ` and provide the menu in `ContextMenu.Content `.
+
+<Preview
+  height={260}
+  code={`\\
+<ContextMenu>
+  <ContextMenu.Trigger>
+    Right-click this area
+  </ContextMenu.Trigger>
+  <ContextMenu.Content aria-label="Area actions">
+    <ContextMenu.Item onSelect={() => editItem()}>
+      Edit
+    </ContextMenu.Item>
+    <ContextMenu.Item onSelect={() => duplicateItem()}>
+      Duplicate
+    </ContextMenu.Item>
+    <ContextMenu.Separator />
+    <ContextMenu.Item variant="danger" onSelect={() => deleteItem()}>
+      Delete
+    </ContextMenu.Item>
+  </ContextMenu.Content>
+</ContextMenu>
+ `}
+>
+  <ContextMenu>
+    <ContextMenu.Trigger>
+      <div
+        style={{
+          display: "grid",
+          minHeight: "8rem",
+          placeItems: "center",
+          border: "1px dashed var(--puzzle-color-border)",
+          borderRadius: "var(--puzzle-radius-md)",
+          color: "var(--puzzle-color-text-muted)",
+        }}
+      >
+        Right-click this area
+      </div>
+    </ContextMenu.Trigger>
+    <ContextMenu.Content aria-label="Area actions">
+      <ContextMenu.Item onSelect={() => {}}>Edit</ContextMenu.Item>
+      <ContextMenu.Item onSelect={() => {}}>Duplicate</ContextMenu.Item>
+      <ContextMenu.Separator />
+      <ContextMenu.Item variant="danger" onSelect={() => {}}>
+        Delete
+      </ContextMenu.Item>
+    </ContextMenu.Content>
+  </ContextMenu>
+</Preview>
+
+## Custom trigger
+
+Use `asChild ` to attach the context-menu behavior to an existing element.
+
+```tsx
+<ContextMenu>
+  <ContextMenu.Trigger asChild>
+    <div className="canvas-card">Right-click this card</div>
+  </ContextMenu.Trigger>
+  <ContextMenu.Content aria-label="Card actions">
+    <ContextMenu.Item>Open</ContextMenu.Item>
+    <ContextMenu.Item>Rename</ContextMenu.Item>
+  </ContextMenu.Content>
+</ContextMenu>
+```
+
+## Groups and labels
+
+Use groups, labels, and separators to organize related actions.
+
+```tsx
+<ContextMenu.Content aria-label="File actions">
+  <ContextMenu.Label>File</ContextMenu.Label>
+  <ContextMenu.Group aria-label="File actions">
+    <ContextMenu.Item>Open</ContextMenu.Item>
+    <ContextMenu.Item>Rename</ContextMenu.Item>
+  </ContextMenu.Group>
+  <ContextMenu.Separator />
+  <ContextMenu.Item variant="danger">Delete</ContextMenu.Item>
+</ContextMenu.Content>
+```
+
+## Checkbox and radio items
+
+Checkbox items are uncontrolled by default and remain open after selection. Set `closeOnSelect ` to close the menu after changing a checkbox.
+
+```tsx
+<ContextMenu.CheckboxItem checked={showHidden} onCheckedChange={setShowHidden}>
+  Show hidden files
+</ContextMenu.CheckboxItem>
+```
+
+Radio items belong to a radio group and close the menu after selection by default.
+
+```tsx
+<ContextMenu.RadioGroup value={view} onValueChange={setView}>
+  <ContextMenu.RadioItem value="list">List view</ContextMenu.RadioItem>
+  <ContextMenu.RadioItem value="grid">Grid view</ContextMenu.RadioItem>
+</ContextMenu.RadioGroup>
+```
+
+## Controlled state
+
+Use `open ` and `onOpenChange ` when the visibility needs to be controlled externally. The menu still opens in response to a valid trigger interaction.
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<ContextMenu open={open} onOpenChange={setOpen}>
+  <ContextMenu.Trigger>Right-click here</ContextMenu.Trigger>
+  <ContextMenu.Content>
+    <ContextMenu.Item>Action</ContextMenu.Item>
+  </ContextMenu.Content>
+</ContextMenu>;
+```
+
+## Keyboard interaction and accessibility
+
+- Right-click opens the menu at the pointer location.
+- Touch long-press opens the menu after the press is held.
+- The Context Menu key or Shift+F10 opens the menu from the trigger.
+- Arrow Down and Arrow Up move between enabled items.
+- Home and End move to the first and last enabled items.
+- Typing characters moves focus using item text.
+- Enter and Space activate the focused item.
+- Escape closes the menu and restores focus to the trigger.
+- Tab and Shift+Tab close the menu and move focus outside it.
+- Disabled items cannot be activated or reached through menu navigation.
+- Give the trigger and menu meaningful accessible names. The menu is labelled by the trigger by default; use `aria-label ` on `ContextMenu.Content ` to provide a separate name.
+
+## API
+
+### ContextMenu
+
+| Prop            | Type                       | Default  | Description                           |
+| --------------- | -------------------------- | -------- | ------------------------------------- |
+| `children `     | `ReactNode `               | Required | A Trigger and Content component.      |
+| `open `         | `boolean `                 | —        | Controlled visibility.                |
+| `defaultOpen `  | `boolean `                 | `false ` | Initial visibility when uncontrolled. |
+| `onOpenChange ` | `(open: boolean) => void ` | —        | Called when visibility changes.       |
+| `disabled `     | `boolean `                 | `false ` | Prevents the menu from opening.       |
+
+### Compound components
+
+| Component                   | Important props                                                      | Description                                                           |
+| --------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `ContextMenu.Trigger `      | `asChild `, `disabled `                                              | Element that receives context-menu, keyboard, and touch interactions. |
+| `ContextMenu.Content `      | `maxHeight `, `aria-label `, `aria-labelledby `                      | Menu surface.                                                         |
+| `ContextMenu.Item `         | `disabled `, `textValue `, `closeOnSelect `, `variant `, `onSelect ` | Action item.                                                          |
+| `ContextMenu.Group `        | Standard div attributes                                              | Groups related items.                                                 |
+| `ContextMenu.Label `        | Standard div attributes                                              | Non-interactive section label.                                        |
+| `ContextMenu.Separator `    | Standard div attributes                                              | Visual separator.                                                     |
+| `ContextMenu.CheckboxItem ` | `checked `, `defaultChecked `, `onCheckedChange `, `closeOnSelect `  | Checkable option.                                                     |
+| `ContextMenu.RadioGroup `   | `value `, `defaultValue `, `onValueChange `                          | Holds mutually exclusive options.                                     |
+| `ContextMenu.RadioItem `    | `value `, `disabled `, `onSelect `                                   | Option within a radio group.                                          |
+
+Items accept standard button attributes. Content, groups, labels, and separators accept standard div attributes.

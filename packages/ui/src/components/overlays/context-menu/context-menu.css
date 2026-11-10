@@ -1,0 +1,159 @@
+.puzzle-context-menu__anchor {
+    position: fixed;
+    z-index: -1;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+}
+
+.puzzle-context-menu__trigger {
+    touch-action: manipulation;
+}
+
+.puzzle-context-menu__trigger:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-popout__content.puzzle-context-menu__popover {
+    min-width: 11rem;
+    padding: var(--puzzle-space-1, 0.25rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.puzzle-context-menu__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+    min-width: 0;
+    max-width: min(20rem, calc(100vw - 1rem));
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    outline: none;
+}
+
+.puzzle-context-menu__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+    min-width: 0;
+}
+
+.puzzle-context-menu__label {
+    padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+}
+
+.puzzle-context-menu__item {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: var(--puzzle-space-2, 0.5rem);
+    width: 100%;
+    min-width: 0;
+    min-height: 2.25rem;
+    padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+    border: 1px solid transparent;
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+    color: var(--puzzle-color-text);
+    background: transparent;
+    font: inherit;
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    transition:
+        color var(--puzzle-duration-fast, 150ms) ease,
+        background-color var(--puzzle-duration-fast, 150ms) ease,
+        border-color var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-context-menu__item:hover:not(:disabled):not([aria-disabled="true"]),
+.puzzle-context-menu__item:focus-visible:not(:disabled):not([aria-disabled="true"]) {
+    background: var(--puzzle-color-surface-sunken);
+    outline: none;
+}
+
+.puzzle-context-menu__item:focus-visible:not(:disabled):not([aria-disabled="true"]) {
+    border-color: var(--puzzle-color-ring);
+}
+
+.puzzle-context-menu__item:disabled,
+.puzzle-context-menu__item[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.puzzle-context-menu__item--danger {
+    color: var(--puzzle-color-danger);
+}
+
+.puzzle-context-menu__item--danger:hover:not(:disabled):not([aria-disabled="true"]),
+.puzzle-context-menu__item--danger:focus-visible:not(:disabled):not([aria-disabled="true"]) {
+    background: color-mix(in srgb, var(--puzzle-color-danger), transparent 92%);
+}
+
+.puzzle-context-menu__item-label {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.puzzle-context-menu__indicator {
+    display: inline-flex;
+    flex: 0 0 1rem;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    min-height: 1rem;
+    color: var(--puzzle-color-primary);
+    font-size: 0.875rem;
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-context-menu__submenu-indicator {
+    flex: 0 0 auto;
+    margin-inline-start: var(--puzzle-space-2, 0.5rem);
+    color: var(--puzzle-color-text-muted);
+    font-size: 1.125rem;
+    line-height: 1;
+}
+
+.puzzle-context-menu__separator {
+    flex: 0 0 auto;
+    height: 1px;
+    margin-block: var(--puzzle-space-1, 0.25rem);
+    background: var(--puzzle-color-border);
+}
+
+.puzzle-context-menu__submenu-popover {
+    z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-context-menu__item,
+    .puzzle-context-menu__trigger {
+        transition: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .puzzle-context-menu__item:focus-visible:not(:disabled),
+    .puzzle-context-menu__trigger:focus-visible {
+        outline: 2px solid Highlight;
+        outline-offset: 2px;
+    }
+
+    .puzzle-context-menu__separator {
+        background: CanvasText;
+    }
+}

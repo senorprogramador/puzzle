@@ -394,6 +394,40 @@ export {
   type CommandDialogProps,
 } from "./components/overlays/command";
 
+export {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuGroup,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuCheckboxItem,
+  ContextMenuRadioGroup,
+  ContextMenuRadioItem,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+} from "./components/overlays/context-menu";
+
+export type {
+  ContextMenuProps,
+  ContextMenuTriggerProps,
+  ContextMenuContentProps,
+  ContextMenuItemProps,
+  ContextMenuGroupProps,
+  ContextMenuLabelProps,
+  ContextMenuSeparatorProps,
+  ContextMenuCheckboxItemProps,
+  ContextMenuRadioGroupProps,
+  ContextMenuRadioItemProps,
+  ContextMenuSubProps,
+  ContextMenuSubTriggerProps,
+  ContextMenuSubContentProps,
+  ContextMenuItemVariant,
+  ContextMenuCheckedState,
+} from "./components/overlays/context-menu";
+
 export { Dialog, type DialogProps } from "./components/overlays/dialog";
 
 export { Drawer, type DrawerProps } from "./components/overlays/drawer";

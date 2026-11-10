@@ -294,6 +294,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/overlays/command",
               },
               {
+                id: "context-menu",
+                label: "Context Menu",
+                href: "/docs/components/ui/overlays/context-menu",
+              },
+              {
                 id: "dialog",
                 label: "Dialog",
                 href: "/docs/components/ui/overlays/dialog",
