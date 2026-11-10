@@ -95,3 +95,62 @@ export {
   hashAuthToken,
   createRateLimitKey,
 } from "./utils/auth-crypto.utils";
+
+export {
+  StorageAuthMfaManager,
+  type StorageAuthMfaManagerDependencies,
+} from "./auth.mfa.manager";
+
+export type {
+  ProtectedAuthSecret,
+  AuthSecretProtector,
+  WebAuthnOptionsJSON,
+  WebAuthnRegistrationCredential,
+  WebAuthnRegistrationVerification,
+  WebAuthnAuthenticationVerification,
+  WebAuthnProvider,
+} from "./providers/mfa-provider.types";
+
+export {
+  AuthMfaChallengeError,
+  AuthMfaFactorError,
+} from "./errors/auth.errors";
+
+export type {
+  AuthMfaFactorType,
+  AuthMfaFactorStatus,
+  AuthMfaAvailableFactor,
+  AuthMfaFactor,
+  AuthMfaFactorStorageRecord,
+  AuthMfaChallengePurpose,
+  AuthMfaChallengeStorageRecord,
+  AuthRecoveryCodeStorageRecord,
+  AuthMfaPendingResult,
+  AuthMfaGateway,
+  AuthMfaTotpOptions,
+  AuthMfaWebAuthnOptions,
+  AuthMfaManagerOptions,
+  BeginTotpEnrollmentInput,
+  TotpEnrollmentStarted,
+  VerifyTotpEnrollmentInput,
+  MfaEnrollmentCompleted,
+  BeginPasskeyRegistrationInput,
+  PasskeyRegistrationStarted,
+  FinishPasskeyRegistrationInput,
+  BeginPasskeySignInInput,
+  PasskeySignInStarted,
+  CompleteMfaSignInInput,
+  PasskeyMfaStarted,
+  PasskeyMfaCompletedInput,
+  RemoveMfaFactorInput,
+  RegenerateRecoveryCodesInput,
+} from "./types/mfa.types";
+
+export {
+  encodeBase32,
+  decodeBase32,
+  generateTotpSecret,
+  generateTotpCode,
+  verifyTotpCode,
+  createTotpUri,
+} from "./utils/totp.utils";

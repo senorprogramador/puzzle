@@ -28,11 +28,6 @@ export type AuthMfaFactorStorageRecord = StorageRecord & {
    * Passkey: passkey:<credential-id>
    */
   readonly factorKey: string;
-  readonly factorLabel: string | null;
-
-  /** Snapshot of the account state when a password-backed MFA challenge is issued. */
-  readonly userRevision: number | null;
-  readonly credentialRevision: number | null;
 
   readonly type: AuthMfaFactorType;
   readonly status: AuthMfaFactorStatus;
@@ -78,6 +73,16 @@ export type AuthMfaChallengeStorageRecord = StorageRecord & {
 
   /** WebAuthn challenge, bound to this temporary record. */
   readonly webAuthnChallenge: string | null;
+
+  /** Label selected when a passkey registration was initiated. */
+  readonly factorLabel: string | null;
+
+  /**
+   * Account-state snapshot for password-backed sign-in challenges.
+   * A challenge becomes invalid if either record changes.
+   */
+  readonly userRevision: number | null;
+  readonly credentialRevision: number | null;
 
   readonly attemptCount: number;
   readonly maximumAttempts: number;
