@@ -203,13 +203,7 @@
   margin: 0;
   padding: 1.25rem 1.5rem;
   overflow: visible;
-  font-family: var(
-    --puzzle-font-family-monospace,
-    "SFMono-Regular",
-    Consolas,
-    "Liberation Mono",
-    monospace
-  );
+  font-family: var(--puzzle-font-family-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace);
   font-size: 0.8125rem;
   line-height: 1.7;
   tab-size: 2;
@@ -239,7 +233,7 @@
 }
 
 .puzzle-preview__token--number {
-  color: var(--puzzle-color-warning, #a16207);
+  color: var(--puzzle-color-warning, #fabc0a);
 }
 
 .puzzle-preview__token--type {

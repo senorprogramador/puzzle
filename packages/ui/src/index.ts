@@ -100,6 +100,12 @@ export {
 } from "./components/data-display/progress/linear-progress";
 
 export {
+  Rating,
+  type RatingProps,
+  type RatingSize,
+} from "./components/data-display/rating";
+
+export {
   Skeleton,
   type SkeletonProps,
   type SkeletonRadius,

@@ -80,6 +80,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/data-display/progress",
               },
               {
+                id: "rating",
+                label: "Rating",
+                href: "/docs/components/ui/data-display/rating",
+              },
+              {
                 id: "skeleton",
                 label: "Skeleton",
                 href: "/docs/components/ui/data-display/skeleton",

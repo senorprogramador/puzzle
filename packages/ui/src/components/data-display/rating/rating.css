@@ -1,0 +1,93 @@
+.puzzle-rating {
+    display: inline-flex;
+    align-items: center;
+
+    direction: ltr;
+
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    width: fit-content;
+
+    color: var(--puzzle-rating-color);
+
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.puzzle-rating__star {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    color: var(--puzzle-rating-empty-color);
+
+    line-height: 1;
+    user-select: none;
+}
+
+.puzzle-rating__star[data-state="full"],
+.puzzle-rating__star[data-state="half"] {
+    color: var(--puzzle-rating-color);
+}
+
+.puzzle-rating__star svg {
+    display: block;
+}
+
+.puzzle-rating:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 3px;
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+}
+
+/* Disabled */
+
+.puzzle-rating-disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+/* Read only */
+
+.puzzle-rating-readonly {
+    cursor: default;
+}
+
+/* Sizes */
+
+.puzzle-rating[data-size="sm"] {
+    gap: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-rating[data-size="lg"] {
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+/* High contrast */
+
+@media (forced-colors: active) {
+    .puzzle-rating__star {
+        color: GrayText;
+    }
+
+    .puzzle-rating__star[data-state="full"],
+    .puzzle-rating__star[data-state="half"] {
+        color: Highlight;
+    }
+
+    .puzzle-rating:focus-visible {
+        outline-color: Highlight;
+    }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-rating,
+    .puzzle-rating__star {
+        transition: none;
+    }
+}

@@ -39,7 +39,7 @@
     --puzzle-color-success: var(--puzzle-color-scheme-light-success, #15803d);
     --puzzle-color-success-foreground: var(--puzzle-color-scheme-light-success-foreground, #ffffff);
 
-    --puzzle-color-warning: var(--puzzle-color-scheme-light-warning, #a16207);
+    --puzzle-color-warning: var(--puzzle-color-scheme-light-warning, #fabc0a);
     --puzzle-color-warning-foreground: var(--puzzle-color-scheme-light-warning-foreground, #ffffff);
 
     --puzzle-color-danger: var(--puzzle-color-scheme-light-danger, #b91c1c);
@@ -79,7 +79,7 @@
     --puzzle-color-success: var(--puzzle-color-scheme-dark-success, #4ade80);
     --puzzle-color-success-foreground: var(--puzzle-color-scheme-dark-success-foreground, #052e16);
 
-    --puzzle-color-warning: var(--puzzle-color-scheme-dark-warning, #fbbf24);
+    --puzzle-color-warning: var(--puzzle-color-scheme-dark-warning, #fabc0a);
     --puzzle-color-warning-foreground: var(--puzzle-color-scheme-dark-warning-foreground, #422006);
 
     --puzzle-color-danger: var(--puzzle-color-scheme-dark-danger, #f87171);
@@ -120,7 +120,7 @@
         --puzzle-color-success: var(--puzzle-color-scheme-dark-success, #4ade80);
         --puzzle-color-success-foreground: var(--puzzle-color-scheme-dark-success-foreground, #052e16);
 
-        --puzzle-color-warning: var(--puzzle-color-scheme-dark-warning, #fbbf24);
+        --puzzle-color-warning: var(--puzzle-color-scheme-dark-warning, #fabc0a);
         --puzzle-color-warning-foreground: var(--puzzle-color-scheme-dark-warning-foreground, #422006);
 
         --puzzle-color-danger: var(--puzzle-color-scheme-dark-danger, #f87171);

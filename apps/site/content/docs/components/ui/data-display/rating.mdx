@@ -1,0 +1,144 @@
+---
+title: Rating
+description: Display and collect star-based ratings with keyboard and pointer support.
+---
+
+Use the Rating component to display a score or let users select one. It supports controlled and uncontrolled values, half-star precision, and a read-only display mode.
+
+## Import
+
+```tsx
+import { Rating } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Use `defaultValue` for an uncontrolled rating. The default maximum is five stars.
+
+<Preview
+  height={100}
+  align="center"
+  justify="center"
+  code={`\
+    <Rating defaultValue={3.5} />
+`}
+>
+  <Rating defaultValue={3.5} />
+</Preview>
+
+## Controlled value
+
+Pass `value` and update it through `onValueChange` when the user selects a rating.
+
+<Preview
+  height={120}
+  align="center"
+  justify="center"
+  code={`\
+    const [rating, setRating] = useState(4);
+
+    <Rating value={rating} onValueChange={setRating} />
+
+`}
+
+>
+
+  <Rating defaultValue={4} />
+</Preview>
+
+## Read-only
+
+Set `readOnly` when the rating is informational rather than interactive.
+
+<Preview
+  height={100}
+  align="center"
+  justify="center"
+  code={`\
+    <Rating value={4.5} readOnly aria-label="Product rating" />
+`}
+>
+  <Rating value={4.5} readOnly aria-label="Product rating" />
+</Preview>
+
+## Maximum and precision
+
+Set `max` to change the number of stars. `precision` controls the smallest selectable increment: `0.5` (default) or `1`.
+
+<Preview
+  height={100}
+  align="center"
+  justify="center"
+  code={`\
+    <Rating defaultValue={7} max={10} precision={1} />
+`}
+>
+  <Rating defaultValue={7} max={10} precision={1} />
+</Preview>
+
+## Size and color
+
+Use `size` to choose `sm`, `md` (default), or `lg`. Override `color` and `emptyColor` to match a particular context.
+
+<Preview
+  height={120}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "grid", gap: 12 }}>
+      <Rating value={4} readOnly size="sm" />
+      <Rating value={4} readOnly size="md" />
+      <Rating value={4} readOnly size="lg" color="#b66a4d" />
+    </div>
+`}
+>
+  <div style={{ display: "grid", gap: 12 }}>
+    <Rating value={4} readOnly size="sm" />
+    <Rating value={4} readOnly size="md" />
+    <Rating value={4} readOnly size="lg" color="#b66a4d" />
+  </div>
+</Preview>
+
+## Keyboard interaction
+
+When interactive, the component exposes the slider pattern:
+
+- **Arrow Right / Arrow Up:** increase by `precision`.
+- **Arrow Left / Arrow Down:** decrease by `precision`.
+- **Home:** set the value to zero.
+- **End:** set the value to `max`.
+
+The value is clamped to the range from zero to `max`.
+
+## API reference
+
+### Rating props
+
+| Prop            | Type                      | Default             | Description                                 |
+| --------------- | ------------------------- | ------------------- | ------------------------------------------- |
+| `value`         | `number`                  | —                   | Controlled rating value.                    |
+| `defaultValue`  | `number`                  | `0`                 | Initial uncontrolled rating value.          |
+| `onValueChange` | `(value: number) => void` | —                   | Called when the rating changes.             |
+| `max`           | `number`                  | `5`                 | Number of stars; integer from 1 to 10.      |
+| `precision`     | `0.5 \| 1`                | `0.5`               | Smallest selectable increment.              |
+| `size`          | `"sm" \| "md" \| "lg"`    | `"md"`              | Visual size of the stars.                   |
+| `readOnly`      | `boolean`                 | `false`             | Displays the value without interaction.     |
+| `disabled`      | `boolean`                 | `false`             | Disables interaction.                       |
+| `color`         | `string`                  | Theme warning color | Filled and half-filled star color.          |
+| `emptyColor`    | `string`                  | Theme border color  | Empty star color.                           |
+| `aria-label`    | `string`                  | `"Rating"`          | Accessible name for the control.            |
+| `className`     | `string`                  | —                   | Additional class names on the root element. |
+
+### TypeScript types
+
+The component exports `RatingProps` and `RatingSize`.
+
+## Accessibility
+
+Interactive Rating uses the slider pattern with a single tab stop, a meaningful accessible name, and an announced current value.
+
+Arrow keys change the value using the configured precision; Home and End move to the range boundaries.
+
+Read-only ratings are exposed as images with an accessible name that includes the current score.
+
+Star icons are decorative and hidden from assistive technology.
