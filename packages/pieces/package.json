@@ -1,0 +1,69 @@
+{
+  "name": "@puzzle-ui/pieces",
+  "version": "0.4.0",
+  "description": "UI pieces for Puzzle",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
+    "vitest": "bunx vitest run --project unit --project component",
+    "test:unit": "bunx vitest run --project unit",
+    "test:component": "bunx vitest run --project component",
+    "test:browser": "bunx vitest run --project browser",
+    "test:all": "bunx vitest run",
+    "vitest:watch": "bunx vitest run --watch --passWithNoTests",
+    "clean": "rm -rf dist",
+    "prepack": "tsdown"
+  },
+  "dependencies": {
+    "@puzzle-ui/core": "^0.4.0",
+    "@puzzle-ui/hooks": "^0.4.0",
+    "@puzzle-ui/icons": "^0.4.0",
+    "@puzzle-ui/theme": "^0.4.0",
+    "@puzzle-ui/ui": "^0.4.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@tsdown/css": "^0.23.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/browser-playwright": "^5.1.0",
+    "jsdom": "^26.1.0",
+    "playwright": "^1.65.0",
+    "tsdown": "^0.23.1",
+    "typescript": "^6.0.3",
+    "vitest": "latest"
+  }
+}

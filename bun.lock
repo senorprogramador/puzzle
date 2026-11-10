@@ -170,6 +170,35 @@
         "react-dom": "^19.0.0",
       },
     },
+    "packages/pieces": {
+      "name": "@puzzle-ui/pieces",
+      "version": "0.4.0",
+      "dependencies": {
+        "@puzzle-ui/core": "^0.4.0",
+        "@puzzle-ui/hooks": "^0.4.0",
+        "@puzzle-ui/icons": "^0.4.0",
+        "@puzzle-ui/theme": "^0.4.0",
+        "@puzzle-ui/ui": "^0.4.0",
+      },
+      "devDependencies": {
+        "@testing-library/jest-dom": "^7.0.1",
+        "@testing-library/react": "^16.3.3",
+        "@testing-library/user-event": "^14.6.8",
+        "@tsdown/css": "^0.23.1",
+        "@types/react": "^19.0.0",
+        "@types/react-dom": "^19.0.0",
+        "@vitest/browser-playwright": "^5.1.0",
+        "jsdom": "^26.1.0",
+        "playwright": "^1.65.0",
+        "tsdown": "^0.23.1",
+        "typescript": "^6.0.3",
+        "vitest": "latest",
+      },
+      "peerDependencies": {
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0",
+      },
+    },
     "packages/session": {
       "name": "@puzzle-ui/session",
       "version": "0.4.0",
@@ -676,6 +705,8 @@
     "@puzzle-ui/hooks": ["@puzzle-ui/hooks@workspace:packages/hooks"],
 
     "@puzzle-ui/icons": ["@puzzle-ui/icons@workspace:packages/icons"],
+
+    "@puzzle-ui/pieces": ["@puzzle-ui/pieces@workspace:packages/pieces"],
 
     "@puzzle-ui/playground": ["@puzzle-ui/playground@workspace:apps/playground"],
 

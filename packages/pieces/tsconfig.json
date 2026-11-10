@@ -1,0 +1,66 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": [
+            "ES2022",
+            "DOM"
+        ],
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "strict": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedIndexedAccess": true,
+        "noImplicitOverride": true,
+        "declaration": true,
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "verbatimModuleSyntax": true,
+        "noEmit": true,
+        "jsx": "react-jsx",
+        "types": [
+            "vitest/globals",
+            "@testing-library/jest-dom"
+        ],
+        "paths": {
+            "@puzzle-ui/core": [
+                "../core/src/index.ts"
+            ],
+            "@puzzle-ui/core /*": [
+                "../core/src/*"
+            ],
+            "@puzzle-ui/theme": [
+                "../theme/src/index.ts"
+            ],
+            "@puzzle-ui/theme/*": [
+                "../theme/src/*"
+            ],
+            "@puzzle-ui/ui": [
+                "../ui/src/index.ts"
+            ],
+            "@puzzle-ui/ui/*": [
+                "../ui/src/*"
+            ],
+            "@puzzle-ui/hooks": [
+                "../hooks/src/index.ts"
+            ],
+            "@puzzle-ui/hooks/*": [
+                "../hooks/src/*"
+            ],
+            "@puzzle-ui/icons": [
+                "../icons/src/index.ts"
+            ],
+            "@puzzle-ui/icons/*": [
+                "../icons/src/*"
+            ]
+        }
+    },
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}
