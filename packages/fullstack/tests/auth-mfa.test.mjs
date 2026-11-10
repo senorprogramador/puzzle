@@ -489,6 +489,74 @@ test("state endpoint returns an authenticated snapshot without an MFA cookie", a
   assert.equal(payload.status, "authenticated");
   assert.equal(payload.user.id, "user-1");
 });
+
+test("state endpoint returns a pending step-up challenge for the current session", async () => {
+  const harness = createHarness();
+
+  const response = await harness.handlers.getAuthState(
+    new Request("https://example.com/state", {
+      headers: {
+        cookie: `__Host-puzzle.session=session-token; __Host-puzzle.mfa=${challengeToken}`,
+      },
+    }),
+  );
+
+  assert.equal(response.status, 200);
+
+  const payload = await response.json();
+
+  assert.equal(payload.status, "step-up-pending");
+  assert.equal(payload.user, null);
+  assert.equal(payload.mfa.purpose, "step-up");
+  assert.equal(payload.mfa.challengeId, "challenge-1");
+  assert.equal(Object.hasOwn(payload.mfa, "challengeToken"), false);
+});
+
+for (const status of ["mfa-pending", "mfa-enrollment-pending"]) {
+  test(`state endpoint returns ${status} without a session cookie`, async () => {
+    const harness = createHarness({
+      auth: {
+        async getAuthState(token) {
+          assert.equal(token, challengeToken);
+
+          return {
+            status,
+            challengeId: "challenge-1",
+            expiresAt,
+            availableFactors: pendingChallenge.availableFactors,
+          };
+        },
+      },
+    });
+
+    const response = await harness.handlers.getAuthState(
+      new Request("https://example.com/state", {
+        headers: {
+          cookie: `__Host-puzzle.mfa=${challengeToken}`,
+        },
+      }),
+    );
+
+    assert.equal(response.status, 200);
+
+    const payload = await response.json();
+
+    assert.equal(payload.status, status);
+    assert.equal(payload.user, null);
+    assert.equal(
+      payload.mfa.purpose,
+      status === "mfa-pending" ? "sign-in" : "enrollment",
+    );
+    assert.equal(payload.mfa.challengeId, "challenge-1");
+    assert.equal(payload.mfa.expiresAt, expiresAt.toISOString());
+    assert.deepEqual(
+      payload.mfa.availableFactors,
+      pendingChallenge.availableFactors,
+    );
+    assert.equal(Object.hasOwn(payload.mfa, "challengeToken"), false);
+  });
+}
+
 test("a session-bound challenge cannot be completed through normal sign-in MFA", async () => {
   const harness = createHarness({
     stepUp: {

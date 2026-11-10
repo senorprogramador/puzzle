@@ -1,3 +1,5 @@
+import type { AuthResult } from "./auth-manager.types";
+
 import type { StorageRecord } from "@puzzle-ui/storage";
 
 import type { ProtectedAuthSecret } from "../providers/mfa-provider.types";
@@ -9,6 +11,53 @@ export type AuthMfaFactorType = "totp" | "passkey";
 export type AuthMfaFactorStatus = "pending" | "active";
 
 export type AuthMfaAvailableFactor = "totp" | "passkey" | "recovery-code";
+
+export type AuthMfaEnrollmentFactor = "totp" | "passkey";
+
+export type AuthMfaEnrollmentPendingResult = {
+  readonly status: "mfa-enrollment-pending";
+  readonly challengeId: string;
+
+  /**
+   * Server-only temporary credential.
+   *
+   * Deliver exclusively through a short-lived HttpOnly cookie.
+   * Never serialize this token into browser JSON or browser storage.
+   */
+  readonly challengeToken: string;
+
+  readonly expiresAt: Date;
+  readonly availableFactors: readonly AuthMfaEnrollmentFactor[];
+};
+
+export type AuthMfaEnrollmentCompleted = {
+  /**
+   * The authenticated result is only created after the first factor
+   * has been successfully verified and the enrollment transaction commits.
+   */
+  readonly auth: AuthResult;
+  readonly factor: AuthMfaFactor;
+  readonly recoveryCodes: readonly string[];
+};
+
+export type BeginRequiredMfaEnrollmentInput = {
+  readonly challengeToken: string;
+  readonly ipAddress: string;
+  readonly label?: string;
+};
+
+export type VerifyRequiredTotpEnrollmentInput = {
+  readonly challengeToken: string;
+  readonly factorId: string;
+  readonly code: string;
+  readonly ipAddress: string;
+};
+
+export type FinishRequiredPasskeyEnrollmentInput = {
+  readonly challengeToken: string;
+  readonly response: unknown;
+  readonly ipAddress: string;
+};
 
 export type AuthMfaFactor = {
   readonly id: string;
@@ -53,6 +102,7 @@ export type AuthMfaFactorStorageRecord = StorageRecord & {
 
 export type AuthMfaChallengePurpose =
   | "sign-in"
+  | "enrollment"
   | "passkey-registration"
   | "passkey-sign-in";
 
@@ -120,6 +170,11 @@ export type AuthMfaGateway = {
     readonly userId: string;
     readonly ipAddress: string;
   }): Promise<AuthMfaPendingResult | null>;
+
+  createEnrollmentChallenge(input: {
+    readonly userId: string;
+    readonly ipAddress: string;
+  }): Promise<AuthMfaEnrollmentPendingResult>;
 
   getPendingAuthState(token: string): Promise<AuthState | null>;
 

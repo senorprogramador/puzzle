@@ -110,6 +110,9 @@ export const createAuthRouteHandlers = (
   const handlers = server.handlers;
 
   return {
+    [route("/register")]: {
+      POST: handlers.register,
+    },
     [route("/sign-in")]: {
       POST: handlers.signIn,
     },
@@ -177,6 +180,19 @@ export const createAuthRouteHandlers = (
     },
     [route("/mfa/step-up/passkey/finish")]: {
       POST: handlers.finishStepUpPasskey,
+    },
+
+    [route("/mfa/enrollment/required/totp/start")]: {
+      POST: handlers.beginRequiredTotpEnrollment,
+    },
+    [route("/mfa/enrollment/required/totp/finish")]: {
+      POST: handlers.verifyRequiredTotpEnrollment,
+    },
+    [route("/mfa/enrollment/required/passkey/start")]: {
+      POST: handlers.beginRequiredPasskeyEnrollment,
+    },
+    [route("/mfa/enrollment/required/passkey/finish")]: {
+      POST: handlers.finishRequiredPasskeyEnrollment,
     },
   };
 };

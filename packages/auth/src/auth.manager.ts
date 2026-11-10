@@ -15,7 +15,6 @@ import type {
 import type {
   AuthManager,
   AuthManagerOptions,
-  AuthResult,
   AuthRegisterInput,
   AuthSignInInput,
   AuthSignInResult,
@@ -23,6 +22,7 @@ import type {
   AuthRateLimitPolicies,
   AuthRateLimitRule,
   AuthMfaPolicy,
+  AuthRegisterResult,
 } from "./types/auth-manager.types";
 
 import type {
@@ -47,7 +47,6 @@ import {
   AuthConfigurationError,
   AuthEmailVerificationRequiredError,
   AuthInvalidCredentialsError,
-  AuthMfaFactorError,
   AuthProviderError,
   AuthRateLimitError,
   AuthSessionError,
@@ -538,7 +537,7 @@ export class StorageAuthManager implements AuthManager {
     }
   }
 
-  async register(input: AuthRegisterInput): Promise<AuthResult> {
+  async register(input: AuthRegisterInput): Promise<AuthRegisterResult> {
     this.assertInitialized();
 
     const normalizedEmail = normalizeEmail(input.email);
@@ -585,6 +584,15 @@ export class StorageAuthManager implements AuthManager {
       revision: 1,
     };
 
+    const publicUser = toPublicUser(userRecord);
+    const mfaRequired = await this.isMfaRequired(publicUser);
+
+    if (mfaRequired && !this.mfa) {
+      throw new AuthConfigurationError(
+        "MFA is required by policy, but no MFA manager is configured.",
+      );
+    }
+
     const auditRecord = this.createAuditRecord("account-registered", userId);
 
     const operations: StorageBatchOperation<
@@ -619,13 +627,22 @@ export class StorageAuthManager implements AuthManager {
       throw error;
     }
 
+    if (mfaRequired) {
+      // No authenticated session is created here.
+      // The user must complete their first MFA enrollment first.
+      return this.mfa!.createEnrollmentChallenge({
+        userId,
+        ipAddress,
+      });
+    }
+
     const authenticated = await this.createAuthenticatedSession(
       userId,
       input.sessionMetadata,
     );
 
     return {
-      user: toPublicUser(userRecord),
+      user: publicUser,
       session: authenticated.session,
       token: authenticated.token,
     };
@@ -699,6 +716,8 @@ export class StorageAuthManager implements AuthManager {
     // CRITICAL:
     // When active factors exist, stop here.
     // Do not create a normal authenticated session yet.
+    // When active factors exist, the user must verify one before
+    // an authenticated session can be created.
     const publicUser = toPublicUser(userRecord);
     const mfaRequired = await this.isMfaRequired(publicUser);
 
@@ -712,9 +731,18 @@ export class StorageAuthManager implements AuthManager {
     }
 
     if (mfaRequired) {
-      throw new AuthMfaFactorError(
-        "MFA is required for this account, but no active MFA factor is enrolled.",
-      );
+      if (!this.mfa) {
+        throw new AuthConfigurationError(
+          "MFA is required by policy, but no MFA manager is configured.",
+        );
+      }
+
+      // The password was verified, but no active MFA factor exists.
+      // Return an enrollment challenge instead of creating a session.
+      return this.mfa.createEnrollmentChallenge({
+        userId: userRecord.id,
+        ipAddress,
+      });
     }
 
     const authenticated = await this.createAuthenticatedSession(

@@ -6,6 +6,7 @@ import type {
   AuthClientEnrollmentResult,
   AuthClientRecoveryCodesResult,
   AuthClientFactorList,
+  AuthClientRegisterInput,
 } from "../shared";
 
 import {
@@ -20,6 +21,7 @@ export type {
   AuthClientSnapshot,
   AuthClientMfaState,
   AuthClientSignInInput,
+  AuthClientRegisterInput,
   AuthClientMfaFactor,
   AuthClientTotpEnrollment,
   AuthClientEnrollmentResult,
@@ -54,6 +56,19 @@ export class AuthClientError extends Error {
 }
 
 export type AuthClient = {
+  register(input: AuthClientRegisterInput): Promise<AuthClientSnapshot>;
+
+  beginRequiredTotpEnrollment(
+    label?: string,
+  ): Promise<AuthClientTotpEnrollment>;
+
+  verifyRequiredTotpEnrollment(
+    factorId: string,
+    code: string,
+  ): Promise<AuthClientEnrollmentResult>;
+
+  registerRequiredPasskey(label?: string): Promise<AuthClientEnrollmentResult>;
+
   getSnapshot(): Promise<AuthClientSnapshot>;
 
   signIn(input: AuthClientSignInInput): Promise<AuthClientSnapshot>;
@@ -241,6 +256,14 @@ export const createAuthClient = (
     return refreshSnapshot();
   };
 
+  const register = async (
+    input: AuthClientRegisterInput,
+  ): Promise<AuthClientSnapshot> => {
+    await post("/register", input);
+
+    return refreshSnapshot();
+  };
+
   const signOut = async (): Promise<void> => {
     await post("/sign-out");
 
@@ -329,6 +352,56 @@ export const createAuthClient = (
     });
   };
 
+  const beginRequiredTotpEnrollment = async (
+    label?: string,
+  ): Promise<AuthClientTotpEnrollment> =>
+    post<AuthClientTotpEnrollment>("/mfa/enrollment/required/totp/start", {
+      ...(label === undefined ? {} : { label }),
+    });
+
+  const verifyRequiredTotpEnrollment = async (
+    factorId: string,
+    code: string,
+  ): Promise<AuthClientEnrollmentResult> => {
+    const result = await post<AuthClientEnrollmentResult>(
+      "/mfa/enrollment/required/totp/finish",
+      {
+        factorId,
+        code,
+      },
+    );
+
+    // The server only creates the authenticated session after the
+    // TOTP factor, recovery codes and challenge have been committed.
+    await refreshSnapshot();
+
+    return result;
+  };
+
+  const registerRequiredPasskey = async (
+    label?: string,
+  ): Promise<AuthClientEnrollmentResult> => {
+    const started = await post<PasskeyOptionsResponse>(
+      "/mfa/enrollment/required/passkey/start",
+      {
+        ...(label === undefined ? {} : { label }),
+      },
+    );
+
+    const response = await passkeys.startRegistration(started.options);
+
+    const completed = await post<AuthClientEnrollmentResult>(
+      "/mfa/enrollment/required/passkey/finish",
+      {
+        response,
+      },
+    );
+
+    await refreshSnapshot();
+
+    return completed;
+  };
+
   const listMfaFactors = (): Promise<AuthClientFactorList> =>
     get<AuthClientFactorList>("/mfa/factors");
 
@@ -386,6 +459,7 @@ export const createAuthClient = (
   };
 
   return {
+    register,
     getSnapshot,
     signIn,
     signOut,
@@ -398,7 +472,10 @@ export const createAuthClient = (
 
     beginTotpEnrollment,
     verifyTotpEnrollment,
+    beginRequiredTotpEnrollment,
+    verifyRequiredTotpEnrollment,
     registerPasskey,
+    registerRequiredPasskey,
 
     listMfaFactors,
     removeMfaFactor,

@@ -2,6 +2,7 @@ export type AuthClientStatus =
   | "loading"
   | "unauthenticated"
   | "mfa-pending"
+  | "mfa-enrollment-pending"
   | "step-up-pending"
   | "authenticated";
 
@@ -14,7 +15,7 @@ export type AuthClientUser = {
 };
 
 export type AuthClientMfaState = {
-  readonly purpose: "sign-in" | "step-up" | "passkey-sign-in";
+  readonly purpose: "sign-in" | "enrollment" | "step-up" | "passkey-sign-in";
   readonly challengeId: string;
   readonly expiresAt: string;
   readonly availableFactors?: readonly ("totp" | "passkey" | "recovery-code")[];
@@ -35,6 +36,12 @@ export type AuthClientSnapshot = {
 export type AuthClientSignInInput = {
   readonly email: string;
   readonly password: string;
+};
+
+export type AuthClientRegisterInput = {
+  readonly email: string;
+  readonly password: string;
+  readonly name?: string | null;
 };
 
 export type AuthClientMfaFactor = {

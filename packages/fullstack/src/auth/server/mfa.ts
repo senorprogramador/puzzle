@@ -4,6 +4,8 @@ import {
   AuthSessionError,
   AuthValidationError,
   type AuthManager,
+  type AuthMfaEnrollmentCompleted,
+  type AuthMfaEnrollmentPendingResult,
   type AuthMfaPendingResult,
   type AuthResult,
   type AuthUser,
@@ -65,6 +67,7 @@ export type AuthClientUserResponse = {
 };
 
 export type AuthMfaHandlers = {
+  readonly register: (request: Request) => Promise<Response>;
   readonly signIn: (request: Request) => Promise<Response>;
   readonly getAuthState: (request: Request) => Promise<Response>;
   readonly signOut: (request: Request) => Promise<Response>;
@@ -76,6 +79,17 @@ export type AuthMfaHandlers = {
 
   readonly beginPasskeyMfa: (request: Request) => Promise<Response>;
   readonly finishPasskeyMfa: (request: Request) => Promise<Response>;
+
+  readonly beginRequiredTotpEnrollment: (request: Request) => Promise<Response>;
+  readonly verifyRequiredTotpEnrollment: (
+    request: Request,
+  ) => Promise<Response>;
+  readonly beginRequiredPasskeyEnrollment: (
+    request: Request,
+  ) => Promise<Response>;
+  readonly finishRequiredPasskeyEnrollment: (
+    request: Request,
+  ) => Promise<Response>;
 
   readonly beginTotpEnrollment: (request: Request) => Promise<Response>;
   readonly verifyTotpEnrollment: (request: Request) => Promise<Response>;
@@ -98,6 +112,15 @@ type AuthEndpointHandler = (request: Request) => Promise<Response>;
 type JsonObject = Record<string, unknown>;
 
 type SignInResult = Awaited<ReturnType<AuthManager["signIn"]>>;
+
+type AuthFlowResult =
+  | SignInResult
+  | Awaited<ReturnType<AuthManager["register"]>>;
+
+const isMfaEnrollmentPendingResult = (
+  result: AuthFlowResult,
+): result is AuthMfaEnrollmentPendingResult =>
+  "status" in result && result.status === "mfa-enrollment-pending";
 
 const isRecord = (value: unknown): value is JsonObject =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -435,6 +458,38 @@ const createSessionResultResponse = (
   return withClearedMfaChallengeCookie(response);
 };
 
+const createMfaEnrollmentPendingResponse = (
+  challenge: AuthMfaEnrollmentPendingResult,
+): Response =>
+  createMfaChallengeResponse(challenge.challengeToken, challenge.expiresAt, {
+    status: "mfa-enrollment-pending",
+    purpose: "enrollment",
+    challengeId: challenge.challengeId,
+    expiresAt: challenge.expiresAt.toISOString(),
+    availableFactors: challenge.availableFactors,
+  });
+
+const createEnrollmentSessionResultResponse = (
+  completed: AuthMfaEnrollmentCompleted,
+  options: AuthMfaHandlersOptions,
+): Response => {
+  const response = createSessionResponse(
+    JSON.stringify({
+      status: "mfa-factor-added",
+      factor: completed.factor,
+      recoveryCodes: completed.recoveryCodes,
+    }),
+    completed.auth.token,
+    {
+      sessions: options.sessions,
+      cookie: options.cookie,
+    },
+    completed.auth.session.expiresAt,
+  );
+
+  return withClearedMfaChallengeCookie(response);
+};
+
 export const serializeMfaChallengeCookie = (
   challengeToken: string,
   maxAgeSeconds: number,
@@ -566,6 +621,27 @@ export const createAuthMfaHandlers = (
     cookie: options.cookie,
   };
 
+  const register = endpoint(async (request) => {
+    protectPost(request, options);
+
+    const body = await readJsonObject(request);
+
+    const result = await options.auth.register({
+      email: requiredString(body, "email", 320),
+      password: requiredString(body, "password", 4096),
+      name: optionalString(body, "name", 128),
+      ipAddress: getClientIp(request, options),
+    });
+
+    if (isMfaEnrollmentPendingResult(result)) {
+      const pending = createMfaEnrollmentPendingResponse(result);
+
+      return withClearedSessionCookie(pending, options.cookie);
+    }
+
+    return createSessionResultResponse(result, options);
+  });
+
   const signIn = endpoint(async (request) => {
     protectPost(request, options);
 
@@ -576,6 +652,12 @@ export const createAuthMfaHandlers = (
       password: requiredString(body, "password", 4096),
       ipAddress: getClientIp(request, options),
     });
+
+    if (isMfaEnrollmentPendingResult(result)) {
+      const pending = createMfaEnrollmentPendingResponse(result);
+
+      return withClearedSessionCookie(pending, options.cookie);
+    }
 
     if (isMfaPendingResult(result)) {
       const pending = createMfaPendingResponse(result, "sign-in");
@@ -630,6 +712,19 @@ export const createAuthMfaHandlers = (
             challengeId: pending.challengeId,
             expiresAt: pending.expiresAt.toISOString(),
             availableFactors,
+          },
+        });
+      }
+
+      if (pending.status === "mfa-enrollment-pending") {
+        return jsonResponse({
+          status: "mfa-enrollment-pending",
+          user: null,
+          mfa: {
+            purpose: "enrollment",
+            challengeId: pending.challengeId,
+            expiresAt: pending.expiresAt.toISOString(),
+            availableFactors: pending.availableFactors,
           },
         });
       }
@@ -798,6 +893,87 @@ export const createAuthMfaHandlers = (
     });
 
     return createSessionResultResponse(result, options);
+  });
+
+  const beginRequiredTotpEnrollment = endpoint(async (request) => {
+    protectPost(request, options);
+
+    const body = await readJsonObject(request);
+    const challengeToken = await requireSignInChallengeToken(request, options);
+
+    const enrollment = await options.mfa.beginRequiredTotpEnrollment({
+      challengeToken,
+      ipAddress: getClientIp(request, options),
+      label: optionalString(body, "label", 64),
+    });
+
+    return createMfaChallengeResponse(challengeToken, enrollment.expiresAt, {
+      status: "totp-enrollment-pending",
+      purpose: "enrollment",
+      factorId: enrollment.factorId,
+      secret: enrollment.secret,
+      otpauthUrl: enrollment.otpauthUrl,
+      expiresAt: enrollment.expiresAt.toISOString(),
+    });
+  });
+
+  const verifyRequiredTotpEnrollment = endpoint(async (request) => {
+    protectPost(request, options);
+
+    const body = await readJsonObject(request);
+    const challengeToken = await requireSignInChallengeToken(request, options);
+
+    const completed = await options.mfa.verifyRequiredTotpEnrollment({
+      challengeToken,
+      factorId: requiredString(body, "factorId", 256),
+      code: requiredString(body, "code", 16),
+      ipAddress: getClientIp(request, options),
+    });
+
+    return createEnrollmentSessionResultResponse(completed, options);
+  });
+
+  const beginRequiredPasskeyEnrollment = endpoint(async (request) => {
+    protectPost(request, options);
+
+    const body = await readJsonObject(request);
+    const challengeToken = await requireSignInChallengeToken(request, options);
+
+    const started = await options.mfa.beginRequiredPasskeyEnrollment({
+      challengeToken,
+      ipAddress: getClientIp(request, options),
+      label: optionalString(body, "label", 64),
+    });
+
+    return createMfaChallengeResponse(challengeToken, started.expiresAt, {
+      status: "passkey-enrollment-pending",
+      purpose: "enrollment",
+      challengeId: started.challengeId,
+      expiresAt: started.expiresAt.toISOString(),
+      options: started.options,
+    });
+  });
+
+  const finishRequiredPasskeyEnrollment = endpoint(async (request) => {
+    protectPost(request, options);
+
+    const body = await readJsonObject(request);
+
+    if (!isRecord(body.response)) {
+      throw new AuthValidationError(
+        "A valid passkey registration response is required.",
+      );
+    }
+
+    const challengeToken = await requireSignInChallengeToken(request, options);
+
+    const completed = await options.mfa.finishRequiredPasskeyEnrollment({
+      challengeToken,
+      response: body.response,
+      ipAddress: getClientIp(request, options),
+    });
+
+    return createEnrollmentSessionResultResponse(completed, options);
   });
 
   const beginTotpEnrollment = endpoint(async (request) => {
@@ -1042,6 +1218,7 @@ export const createAuthMfaHandlers = (
   });
 
   return {
+    register,
     signIn,
     getAuthState,
     signOut,
@@ -1053,6 +1230,11 @@ export const createAuthMfaHandlers = (
 
     beginPasskeyMfa,
     finishPasskeyMfa,
+
+    beginRequiredTotpEnrollment,
+    verifyRequiredTotpEnrollment,
+    beginRequiredPasskeyEnrollment,
+    finishRequiredPasskeyEnrollment,
 
     beginTotpEnrollment,
     verifyTotpEnrollment,

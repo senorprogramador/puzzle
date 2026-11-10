@@ -6,7 +6,11 @@ import type {
   RateLimitProvider,
 } from "../providers/provider.types";
 
-import type { AuthMfaGateway, AuthMfaPendingResult } from "./mfa.types";
+import type {
+  AuthMfaGateway,
+  AuthMfaPendingResult,
+  AuthMfaEnrollmentPendingResult,
+} from "./mfa.types";
 import type { AuthState } from "./state.types";
 import type { AuthUser } from "./user.types";
 
@@ -89,12 +93,24 @@ export type AuthResult = {
 };
 
 /**
- * A successful password check may result in either:
+ * Registration can complete immediately when MFA is optional.
+ *
+ * When MFA is required, registration creates the account but returns
+ * an enrollment challenge instead of an authenticated session.
+ */
+export type AuthRegisterResult = AuthResult | AuthMfaEnrollmentPendingResult;
+
+/**
+ * A successful password check can result in:
  *
  * 1. A fully authenticated session.
- * 2. An MFA-pending challenge without an authenticated session.
+ * 2. An MFA sign-in challenge.
+ * 3. A mandatory first-factor enrollment challenge.
  */
-export type AuthSignInResult = AuthResult | AuthMfaPendingResult;
+export type AuthSignInResult =
+  | AuthResult
+  | AuthMfaPendingResult
+  | AuthMfaEnrollmentPendingResult;
 
 export type AuthRegisterInput = {
   readonly email: string;
@@ -114,7 +130,7 @@ export type AuthSignInInput = {
 export interface AuthManager {
   initialize(): Promise<void>;
 
-  register(input: AuthRegisterInput): Promise<AuthResult>;
+  register(input: AuthRegisterInput): Promise<AuthRegisterResult>;
 
   signIn(input: AuthSignInInput): Promise<AuthSignInResult>;
 

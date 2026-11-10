@@ -92,7 +92,7 @@ const createWebAuthnProvider = () => ({
   },
 });
 
-const createHarness = async () => {
+const createHarness = async (authOptions = {}) => {
   let currentTime = new Date("2026-01-01T00:00:00.000Z");
 
   const clock = () => new Date(currentTime);
@@ -145,6 +145,7 @@ const createHarness = async () => {
       rateLimitKeySecret: RATE_LIMIT_SECRET,
       requireVerifiedEmail: false,
       clock,
+      ...authOptions,
     },
   );
 
@@ -549,4 +550,197 @@ test("concurrent TOTP completion has only one successful session", async () => {
     results.filter((result) => result.status === "rejected").length,
     1,
   );
+});
+
+test("required MFA registration creates no session before TOTP enrollment", async () => {
+  const harness = await createHarness({
+    mfaPolicy: {
+      required: true,
+    },
+  });
+
+  const sessionsBefore = harness.sessions.sessions.size;
+
+  const pending = await harness.auth.register({
+    email: "required-totp@example.com",
+    password: PASSWORD,
+    name: "Required TOTP",
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(pending.status, "mfa-enrollment-pending");
+  assert.equal(harness.sessions.sessions.size, sessionsBefore);
+
+  const state = await harness.auth.getAuthState(pending.challengeToken);
+
+  assert.equal(state.status, "mfa-enrollment-pending");
+  assert.equal(state.availableFactors.includes("totp"), true);
+
+  const started = await harness.mfa.beginRequiredTotpEnrollment({
+    challengeToken: pending.challengeToken,
+    ipAddress: "127.0.0.1",
+    label: "Required authenticator",
+  });
+
+  assert.equal(harness.sessions.sessions.size, sessionsBefore);
+
+  const code = await harness.createCurrentTotpCode(started.secret);
+
+  const completed = await harness.mfa.verifyRequiredTotpEnrollment({
+    challengeToken: pending.challengeToken,
+    factorId: started.factorId,
+    code,
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(completed.factor.type, "totp");
+  assert.equal(completed.factor.status, "active");
+  assert.equal(completed.recoveryCodes.length, 10);
+  assert.equal(completed.auth.user.email, "required-totp@example.com");
+
+  const authenticatedState = await harness.auth.getAuthState(
+    completed.auth.token,
+  );
+
+  assert.equal(authenticatedState.status, "authenticated");
+  assert.equal(harness.sessions.sessions.size, sessionsBefore + 1);
+});
+
+test("required MFA registration creates no session before passkey enrollment", async () => {
+  const harness = await createHarness({
+    mfaPolicy: {
+      required: true,
+    },
+  });
+
+  const sessionsBefore = harness.sessions.sessions.size;
+
+  const pending = await harness.auth.register({
+    email: "required-passkey@example.com",
+    password: PASSWORD,
+    name: "Required Passkey",
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(pending.status, "mfa-enrollment-pending");
+  assert.equal(harness.sessions.sessions.size, sessionsBefore);
+
+  const state = await harness.auth.getAuthState(pending.challengeToken);
+
+  assert.equal(state.status, "mfa-enrollment-pending");
+  assert.equal(state.availableFactors.includes("passkey"), true);
+
+  const started = await harness.mfa.beginRequiredPasskeyEnrollment({
+    challengeToken: pending.challengeToken,
+    ipAddress: "127.0.0.1",
+    label: "Required passkey",
+  });
+
+  assert.equal(harness.sessions.sessions.size, sessionsBefore);
+
+  const completed = await harness.mfa.finishRequiredPasskeyEnrollment({
+    challengeToken: pending.challengeToken,
+    response: {
+      id: "required-passkey-credential",
+      challenge: started.options.challenge,
+    },
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(completed.factor.type, "passkey");
+  assert.equal(completed.factor.status, "active");
+  assert.equal(completed.recoveryCodes.length, 10);
+  assert.equal(completed.auth.user.email, "required-passkey@example.com");
+
+  const authenticatedState = await harness.auth.getAuthState(
+    completed.auth.token,
+  );
+
+  assert.equal(authenticatedState.status, "authenticated");
+  assert.equal(harness.sessions.sessions.size, sessionsBefore + 1);
+});
+
+test("requiredFor can require first-factor enrollment at sign-in", async () => {
+  let requireMfa = false;
+
+  const harness = await createHarness({
+    mfaPolicy: {
+      requiredFor: (user) =>
+        requireMfa && user.email === "conditional@example.com",
+    },
+  });
+
+  const registered = await harness.auth.register({
+    email: "conditional@example.com",
+    password: PASSWORD,
+    name: "Conditional MFA",
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.ok(registered.token);
+
+  await harness.auth.signOut(registered.token);
+
+  const sessionsBefore = harness.sessions.sessions.size;
+
+  requireMfa = true;
+
+  const pending = await harness.auth.signIn({
+    email: "conditional@example.com",
+    password: PASSWORD,
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(pending.status, "mfa-enrollment-pending");
+  assert.equal(harness.sessions.sessions.size, sessionsBefore);
+
+  const state = await harness.auth.getAuthState(pending.challengeToken);
+
+  assert.equal(state.status, "mfa-enrollment-pending");
+});
+
+test("required MFA sign-in challenges an enrolled factor instead of starting enrollment again", async () => {
+  const harness = await createHarness({
+    mfaPolicy: {
+      required: true,
+    },
+  });
+
+  const pending = await harness.auth.register({
+    email: "required-signin@example.com",
+    password: PASSWORD,
+    name: "Required Sign-in",
+    ipAddress: "127.0.0.1",
+  });
+
+  const started = await harness.mfa.beginRequiredTotpEnrollment({
+    challengeToken: pending.challengeToken,
+    ipAddress: "127.0.0.1",
+  });
+
+  const code = await harness.createCurrentTotpCode(started.secret);
+
+  const enrolled = await harness.mfa.verifyRequiredTotpEnrollment({
+    challengeToken: pending.challengeToken,
+    factorId: started.factorId,
+    code,
+    ipAddress: "127.0.0.1",
+  });
+
+  await harness.auth.signOut(enrolled.auth.token);
+
+  const sessionsBefore = harness.sessions.sessions.size;
+
+  const signIn = await harness.auth.signIn({
+    email: "required-signin@example.com",
+    password: PASSWORD,
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(signIn.status, "mfa-pending");
+  assert.equal(harness.sessions.sessions.size, sessionsBefore);
+
+  const state = await harness.auth.getAuthState(signIn.challengeToken);
+
+  assert.equal(state.status, "mfa-pending");
 });

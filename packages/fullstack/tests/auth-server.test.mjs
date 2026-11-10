@@ -126,6 +126,28 @@ test("route handlers initialize the server before processing requests", async ()
     status: "unauthenticated",
     user: null,
   });
+
+  assert.equal(typeof routes["/api/auth/register"].POST, "function");
+
+  assert.equal(
+    typeof routes["/api/auth/mfa/enrollment/required/totp/start"].POST,
+    "function",
+  );
+
+  assert.equal(
+    typeof routes["/api/auth/mfa/enrollment/required/totp/finish"].POST,
+    "function",
+  );
+
+  assert.equal(
+    typeof routes["/api/auth/mfa/enrollment/required/passkey/start"].POST,
+    "function",
+  );
+
+  assert.equal(
+    typeof routes["/api/auth/mfa/enrollment/required/passkey/finish"].POST,
+    "function",
+  );
 });
 
 test("direct server handlers also initialize before processing requests", async () => {

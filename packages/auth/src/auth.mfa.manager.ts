@@ -44,6 +44,11 @@ import type {
   RemoveMfaFactorInput,
   RegenerateRecoveryCodesInput,
   AuthMfaAvailableFactor,
+  AuthMfaEnrollmentPendingResult,
+  VerifyRequiredTotpEnrollmentInput,
+  AuthMfaEnrollmentCompleted,
+  BeginRequiredMfaEnrollmentInput,
+  FinishRequiredPasskeyEnrollmentInput,
 } from "./types/mfa.types";
 
 import type { AuthSession, AuthResult } from "./types/auth-manager.types";
@@ -89,6 +94,7 @@ import {
 } from "./utils/totp.utils";
 
 import type { PasswordCredentialStorageRecord } from "./types/credential.types";
+import type { AuthState } from "./types/state.types";
 
 type MfaStorageRecord =
   | AuthMfaFactorStorageRecord
@@ -111,6 +117,8 @@ type RecoveryCodeBundle = {
 type FactorUpdate = {
   readonly factor: AuthMfaFactorStorageRecord;
   readonly changes: {
+    readonly status?: "pending" | "active";
+    readonly expiresAt?: Date | null;
     readonly lastUsedAt?: Date;
     readonly lastUsedStep?: number | null;
     readonly counter?: number;
@@ -426,8 +434,8 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       throw new AuthValidationError("A valid user ID is required.");
     }
 
-    const challenges =
-      await this.storage.findMany<AuthMfaChallengeStorageRecord>(
+    const [signInChallenges, enrollmentChallenges] = await Promise.all([
+      this.storage.findMany<AuthMfaChallengeStorageRecord>(
         this.challengesCollection,
         {
           where: {
@@ -436,7 +444,20 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
             consumedAt: whereEquals(null),
           },
         },
-      );
+      ),
+      this.storage.findMany<AuthMfaChallengeStorageRecord>(
+        this.challengesCollection,
+        {
+          where: {
+            userId: whereEquals(userId),
+            purpose: whereEquals("enrollment"),
+            consumedAt: whereEquals(null),
+          },
+        },
+      ),
+    ]);
+
+    const challenges = [...signInChallenges, ...enrollmentChallenges];
 
     if (challenges.length === 0) {
       return;
@@ -760,14 +781,14 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
     );
   }
 
-  private async getSignInSnapshot(
+  private async getPasswordSnapshot(
     challenge: AuthMfaChallengeStorageRecord,
   ): Promise<{
     readonly user: AuthUserStorageRecord;
     readonly credential: PasswordCredentialStorageRecord;
   } | null> {
     if (
-      challenge.purpose !== "sign-in" ||
+      (challenge.purpose !== "sign-in" && challenge.purpose !== "enrollment") ||
       !challenge.userId ||
       challenge.userRevision === null ||
       challenge.credentialRevision === null
@@ -874,7 +895,10 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       throw new AuthMfaChallengeError();
     }
 
-    if (purpose === "sign-in" && !(await this.getSignInSnapshot(record))) {
+    if (
+      (purpose === "sign-in" || purpose === "enrollment") &&
+      !(await this.getPasswordSnapshot(record))
+    ) {
       throw new AuthMfaChallengeError();
     }
 
@@ -994,7 +1018,102 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
     };
   }
 
-  async getPendingAuthState(token: string) {
+  async createEnrollmentChallenge(input: {
+    readonly userId: string;
+    readonly ipAddress: string;
+  }): Promise<AuthMfaEnrollmentPendingResult> {
+    this.assertInitialized();
+
+    await this.enforceRateLimit(
+      "enrollment-challenge",
+      input.ipAddress,
+      input.userId,
+    );
+
+    const activeFactors = await this.findActiveFactors(input.userId);
+
+    if (activeFactors.length > 0) {
+      throw new AuthMfaChallengeError();
+    }
+
+    const user = await this.storage.findById<AuthUserStorageRecord>(
+      this.usersCollection,
+      input.userId,
+    );
+
+    const credential =
+      await this.storage.findOne<PasswordCredentialStorageRecord>(
+        this.credentialsCollection,
+        {
+          where: {
+            userId: whereEquals(input.userId),
+            kind: whereEquals("password"),
+          },
+        },
+      );
+
+    if (
+      !user ||
+      user.deactivatedAt !== null ||
+      !credential ||
+      credential.revokedAt !== null
+    ) {
+      throw new AuthMfaChallengeError();
+    }
+
+    const created = await this.createChallengeRecord(
+      "enrollment",
+      input.userId,
+      [],
+      null,
+      {
+        userRevision: user.revision,
+        credentialRevision: credential.revision,
+      },
+    );
+
+    const audit = this.createAuditRecord(
+      "mfa-challenge-created",
+      input.userId,
+      {
+        purpose: "required-enrollment",
+      },
+    );
+
+    try {
+      await this.storage.atomicBatch<MfaStorageRecord>([
+        {
+          type: "insert",
+          collection: this.challengesCollection,
+          record: created.record,
+        },
+        {
+          type: "insert",
+          collection: this.auditCollection,
+          record: audit,
+        },
+      ]);
+    } catch (error) {
+      throw new AuthProviderError(
+        "Could not create the required MFA enrollment challenge.",
+        { cause: error },
+      );
+    }
+
+    const availableFactors: readonly ("totp" | "passkey")[] = this.webAuthn
+      ? ["totp", "passkey"]
+      : ["totp"];
+
+    return {
+      status: "mfa-enrollment-pending",
+      challengeId: created.record.id,
+      challengeToken: created.token,
+      expiresAt: created.record.expiresAt,
+      availableFactors,
+    };
+  }
+
+  async getPendingAuthState(token: string): Promise<AuthState | null> {
     this.assertInitialized();
 
     if (typeof token !== "string" || token.length === 0) {
@@ -1014,7 +1133,7 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
 
     if (
       !challenge ||
-      challenge.purpose !== "sign-in" ||
+      (challenge.purpose !== "sign-in" && challenge.purpose !== "enrollment") ||
       !challenge.userId ||
       challenge.consumedAt !== null ||
       challenge.expiresAt.getTime() <= this.now().getTime() ||
@@ -1023,12 +1142,26 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       return null;
     }
 
-    if (!(await this.getSignInSnapshot(challenge))) {
+    if (!(await this.getPasswordSnapshot(challenge))) {
       return null;
     }
 
+    if (challenge.purpose === "enrollment") {
+      const availableFactors: readonly ("totp" | "passkey")[] = this.webAuthn
+        ? ["totp", "passkey"]
+        : ["totp"];
+
+      return {
+        status: "mfa-enrollment-pending",
+        userId: challenge.userId,
+        challengeId: challenge.id,
+        expiresAt: challenge.expiresAt,
+        availableFactors,
+      };
+    }
+
     return {
-      status: "mfa-pending" as const,
+      status: "mfa-pending",
       userId: challenge.userId,
       challengeId: challenge.id,
       expiresAt: challenge.expiresAt,
@@ -1249,18 +1382,23 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
     readonly challenge: AuthMfaChallengeStorageRecord;
     readonly userId: string;
     readonly method: string;
+    readonly factorInsert?: AuthMfaFactorStorageRecord;
     readonly factorUpdate?: FactorUpdate;
     readonly recoveryCode?: AuthRecoveryCodeStorageRecord;
+    readonly recoveryRecords?: readonly AuthRecoveryCodeStorageRecord[];
     readonly auditAction?: AuthAuditEventStorageRecord["action"];
   }): Promise<AuthResult> {
     const now = this.now();
 
-    const signInSnapshot =
-      input.challenge.purpose === "sign-in"
-        ? await this.getSignInSnapshot(input.challenge)
-        : null;
+    const requiresPasswordSnapshot =
+      input.challenge.purpose === "sign-in" ||
+      input.challenge.purpose === "enrollment";
 
-    if (input.challenge.purpose === "sign-in" && !signInSnapshot) {
+    const passwordSnapshot = requiresPasswordSnapshot
+      ? await this.getPasswordSnapshot(input.challenge)
+      : null;
+
+    if (requiresPasswordSnapshot && !passwordSnapshot) {
       throw new AuthMfaChallengeError();
     }
 
@@ -1283,6 +1421,14 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
         },
       },
     ];
+
+    if (input.factorInsert) {
+      operations.push({
+        type: "insert",
+        collection: this.factorsCollection,
+        record: input.factorInsert,
+      });
+    }
 
     if (input.factorUpdate) {
       operations.push({
@@ -1311,29 +1457,37 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       });
     }
 
-    if (signInSnapshot) {
+    for (const recoveryRecord of input.recoveryRecords ?? []) {
+      operations.push({
+        type: "insert",
+        collection: this.recoveryCodesCollection,
+        record: recoveryRecord,
+      });
+    }
+
+    if (passwordSnapshot) {
       operations.push(
         {
           type: "update",
           collection: this.usersCollection,
-          id: signInSnapshot.user.id,
+          id: passwordSnapshot.user.id,
           condition: {
-            expectedRevision: signInSnapshot.user.revision,
+            expectedRevision: passwordSnapshot.user.revision,
           },
           changes: {
-            updatedAt: signInSnapshot.user.updatedAt,
+            updatedAt: passwordSnapshot.user.updatedAt,
           },
         },
         {
           type: "update",
           collection: this.credentialsCollection,
-          id: signInSnapshot.credential.id,
+          id: passwordSnapshot.credential.id,
           condition: {
-            expectedRevision: signInSnapshot.credential.revision,
+            expectedRevision: passwordSnapshot.credential.revision,
           },
           changes: {
-            updatedAt: signInSnapshot.credential.updatedAt,
-            passwordUpdatedAt: signInSnapshot.credential.passwordUpdatedAt,
+            updatedAt: passwordSnapshot.credential.updatedAt,
+            passwordUpdatedAt: passwordSnapshot.credential.passwordUpdatedAt,
           },
         },
       );
@@ -1380,6 +1534,481 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
     }
 
     return authenticated.result;
+  }
+
+  async beginRequiredTotpEnrollment(
+    input: BeginRequiredMfaEnrollmentInput,
+  ): Promise<TotpEnrollmentStarted> {
+    this.assertInitialized();
+
+    const challenge = await this.getChallenge(
+      input.challengeToken,
+      "enrollment",
+    );
+
+    if (!challenge.userId || challenge.factorIds.length > 0) {
+      throw new AuthMfaChallengeError();
+    }
+
+    if (challenge.webAuthnChallenge) {
+      throw new AuthMfaChallengeError();
+    }
+
+    await this.enforceRateLimit(
+      "required-enrollment",
+      input.ipAddress,
+      challenge.userId,
+    );
+
+    const snapshot = await this.getPasswordSnapshot(challenge);
+
+    if (!snapshot) {
+      throw new AuthMfaChallengeError();
+    }
+
+    const secret = generateTotpSecret();
+
+    let protectedSecret: ProtectedAuthSecret;
+
+    try {
+      protectedSecret = await this.secretProtector.encrypt(secret);
+    } catch (error) {
+      throw new AuthProviderError("Could not encrypt the TOTP secret.", {
+        cause: error,
+      });
+    }
+
+    if (
+      !protectedSecret ||
+      typeof protectedSecret.ciphertext !== "string" ||
+      protectedSecret.ciphertext.length === 0 ||
+      typeof protectedSecret.iv !== "string" ||
+      protectedSecret.iv.length === 0 ||
+      typeof protectedSecret.keyId !== "string" ||
+      protectedSecret.keyId.length === 0
+    ) {
+      throw new AuthProviderError(
+        "The secret protector returned an invalid encrypted secret.",
+      );
+    }
+
+    const now = this.now();
+    const factorId = generateAuthId("mfa-factor");
+
+    const factor: AuthMfaFactorStorageRecord = {
+      id: factorId,
+      userId: challenge.userId,
+      factorKey: `totp:${factorId}`,
+      type: "totp",
+      status: "pending",
+      label: validateLabel(input.label, "Authenticator app"),
+      secret: protectedSecret,
+      credentialId: null,
+      publicKey: null,
+      counter: 0,
+      transports: [],
+      lastUsedStep: null,
+      lastUsedAt: null,
+      expiresAt: challenge.expiresAt,
+      createdAt: now,
+      updatedAt: now,
+      revision: 1,
+    };
+
+    const operations: StorageBatchOperation<MfaStorageRecord>[] = [
+      {
+        type: "insert",
+        collection: this.factorsCollection,
+        record: factor,
+      },
+      {
+        type: "update",
+        collection: this.challengesCollection,
+        id: challenge.id,
+        condition: {
+          expectedRevision: challenge.revision,
+        },
+        changes: {
+          factorIds: [factor.id],
+          updatedAt: now,
+        },
+      },
+      {
+        type: "insert",
+        collection: this.auditCollection,
+        record: this.createAuditRecord(
+          "mfa-challenge-created",
+          challenge.userId,
+          {
+            purpose: "required-totp-enrollment",
+            factorId,
+          },
+        ),
+      },
+    ];
+
+    try {
+      await this.storage.atomicBatch<MfaStorageRecord>(operations);
+    } catch (error) {
+      if (
+        error instanceof StorageConflictError ||
+        error instanceof StorageDuplicateError
+      ) {
+        throw new AuthMfaChallengeError({ cause: error });
+      }
+
+      throw new AuthProviderError("Could not create the pending TOTP factor.", {
+        cause: error,
+      });
+    }
+
+    return {
+      factorId,
+      secret,
+      otpauthUrl: createTotpUri({
+        issuer: this.issuer,
+        account: snapshot.user.email,
+        secret,
+        digits: this.totp.digits,
+        periodSeconds: this.totp.periodSeconds,
+      }),
+      expiresAt: challenge.expiresAt,
+    };
+  }
+
+  async verifyRequiredTotpEnrollment(
+    input: VerifyRequiredTotpEnrollmentInput,
+  ): Promise<AuthMfaEnrollmentCompleted> {
+    this.assertInitialized();
+
+    const challenge = await this.getChallenge(
+      input.challengeToken,
+      "enrollment",
+    );
+
+    if (
+      !challenge.userId ||
+      challenge.factorIds.length !== 1 ||
+      !challenge.factorIds.includes(input.factorId)
+    ) {
+      throw new AuthMfaChallengeError();
+    }
+
+    await this.enforceRateLimit(
+      "verify-required-totp-enrollment",
+      input.ipAddress,
+      challenge.userId,
+    );
+
+    const factor = await this.storage.findById<AuthMfaFactorStorageRecord>(
+      this.factorsCollection,
+      input.factorId,
+    );
+
+    if (
+      !factor ||
+      factor.userId !== challenge.userId ||
+      factor.type !== "totp" ||
+      factor.status !== "pending" ||
+      !factor.secret ||
+      !factor.expiresAt ||
+      factor.expiresAt.getTime() <= this.now().getTime()
+    ) {
+      throw new AuthMfaFactorError(
+        "The pending TOTP enrollment is invalid or expired.",
+      );
+    }
+
+    let secret: string;
+
+    try {
+      secret = await this.secretProtector.decrypt(factor.secret);
+    } catch (error) {
+      throw new AuthProviderError("Could not decrypt the TOTP secret.", {
+        cause: error,
+      });
+    }
+
+    const now = this.now();
+
+    const matchedStep = await verifyTotpCode(
+      secret,
+      input.code,
+      now.getTime(),
+      this.totp,
+    );
+
+    if (
+      matchedStep === null ||
+      (factor.lastUsedStep !== null && matchedStep <= factor.lastUsedStep)
+    ) {
+      return this.failChallenge(challenge, "required-totp-enrollment");
+    }
+
+    const recovery = await this.createRecoveryCodeBundle(
+      challenge.userId,
+      factor.id,
+    );
+
+    const auth = await this.completeChallenge({
+      challenge,
+      userId: challenge.userId,
+      method: "totp",
+      factorUpdate: {
+        factor,
+        changes: {
+          status: "active",
+          lastUsedStep: matchedStep,
+          lastUsedAt: now,
+          expiresAt: null,
+          updatedAt: now,
+        },
+      },
+      recoveryRecords: recovery.records,
+      auditAction: "mfa-factor-added",
+    });
+
+    return {
+      auth,
+      factor: toPublicFactor({
+        ...factor,
+        status: "active",
+        lastUsedStep: matchedStep,
+        lastUsedAt: now,
+        expiresAt: null,
+        updatedAt: now,
+        revision: factor.revision + 1,
+      }),
+      recoveryCodes: recovery.codes,
+    };
+  }
+
+  async beginRequiredPasskeyEnrollment(
+    input: BeginRequiredMfaEnrollmentInput,
+  ): Promise<PasskeyRegistrationStarted> {
+    this.assertInitialized();
+
+    const challenge = await this.getChallenge(
+      input.challengeToken,
+      "enrollment",
+    );
+
+    if (
+      !challenge.userId ||
+      challenge.factorIds.length > 0 ||
+      challenge.webAuthnChallenge
+    ) {
+      throw new AuthMfaChallengeError();
+    }
+
+    await this.enforceRateLimit(
+      "required-passkey-enrollment",
+      input.ipAddress,
+      challenge.userId,
+    );
+
+    const snapshot = await this.getPasswordSnapshot(challenge);
+
+    if (!snapshot) {
+      throw new AuthMfaChallengeError();
+    }
+
+    const { provider, config } = this.getWebAuthn();
+
+    const activeFactors = await this.findActiveFactors(challenge.userId);
+
+    const excludeCredentialIds = activeFactors
+      .filter(
+        (factor) => factor.type === "passkey" && factor.credentialId !== null,
+      )
+      .map((factor) => factor.credentialId!);
+
+    const webAuthnChallenge = generateWebAuthnChallenge();
+
+    let options: Readonly<Record<string, unknown>>;
+
+    try {
+      options = await provider.generateRegistrationOptions({
+        challenge: webAuthnChallenge,
+        rpId: config.rpId,
+        rpName: config.rpName,
+        userId: challenge.userId,
+        userName: snapshot.user.email,
+        excludeCredentialIds,
+      });
+    } catch (error) {
+      throw new AuthProviderError(
+        "Could not create WebAuthn registration options.",
+        { cause: error },
+      );
+    }
+
+    this.assertWebAuthnOptions(options, webAuthnChallenge);
+
+    const now = this.now();
+    const factorLabel = validateLabel(input.label, "Passkey");
+
+    const operations: StorageBatchOperation<MfaStorageRecord>[] = [
+      {
+        type: "update",
+        collection: this.challengesCollection,
+        id: challenge.id,
+        condition: {
+          expectedRevision: challenge.revision,
+        },
+        changes: {
+          webAuthnChallenge,
+          factorLabel,
+          updatedAt: now,
+        },
+      },
+      {
+        type: "insert",
+        collection: this.auditCollection,
+        record: this.createAuditRecord(
+          "mfa-challenge-created",
+          challenge.userId,
+          {
+            purpose: "required-passkey-enrollment",
+          },
+        ),
+      },
+    ];
+
+    try {
+      await this.storage.atomicBatch<MfaStorageRecord>(operations);
+    } catch (error) {
+      if (
+        error instanceof StorageConflictError ||
+        error instanceof StorageDuplicateError
+      ) {
+        throw new AuthMfaChallengeError({ cause: error });
+      }
+
+      throw new AuthProviderError(
+        "Could not persist the required passkey enrollment challenge.",
+        { cause: error },
+      );
+    }
+
+    return {
+      challengeId: challenge.id,
+      challengeToken: input.challengeToken,
+      options,
+      expiresAt: challenge.expiresAt,
+    };
+  }
+
+  async finishRequiredPasskeyEnrollment(
+    input: FinishRequiredPasskeyEnrollmentInput,
+  ): Promise<AuthMfaEnrollmentCompleted> {
+    this.assertInitialized();
+
+    const challenge = await this.getChallenge(
+      input.challengeToken,
+      "enrollment",
+    );
+
+    if (
+      !challenge.userId ||
+      challenge.factorIds.length > 0 ||
+      !challenge.webAuthnChallenge
+    ) {
+      throw new AuthMfaChallengeError();
+    }
+
+    await this.enforceRateLimit(
+      "verify-required-passkey-enrollment",
+      input.ipAddress,
+      challenge.userId,
+    );
+
+    const snapshot = await this.getPasswordSnapshot(challenge);
+
+    if (!snapshot) {
+      throw new AuthMfaChallengeError();
+    }
+
+    const { provider, config } = this.getWebAuthn();
+
+    let verification: WebAuthnRegistrationVerification;
+
+    try {
+      verification = await provider.verifyRegistrationResponse({
+        response: input.response,
+        expectedChallenge: challenge.webAuthnChallenge,
+        expectedOrigin: config.origin,
+        expectedRpId: config.rpId,
+      });
+    } catch (error) {
+      throw new AuthProviderError(
+        "WebAuthn registration verification failed.",
+        { cause: error },
+      );
+    }
+
+    if (
+      !verification.verified ||
+      !verification.userVerified ||
+      !verification.credential
+    ) {
+      return this.failChallenge(challenge, "required-passkey-enrollment");
+    }
+
+    const credential: WebAuthnRegistrationCredential = verification.credential;
+    const responseCredentialId = getCredentialId(input.response);
+
+    if (
+      responseCredentialId !== credential.credentialId ||
+      !credential.publicKey ||
+      !Number.isSafeInteger(credential.counter) ||
+      credential.counter < 0
+    ) {
+      return this.failChallenge(challenge, "required-passkey-enrollment");
+    }
+
+    const now = this.now();
+    const factorId = generateAuthId("mfa-factor");
+
+    const factor: AuthMfaFactorStorageRecord = {
+      id: factorId,
+      userId: challenge.userId,
+      factorKey: `passkey:${credential.credentialId}`,
+      type: "passkey",
+      status: "active",
+      label: challenge.factorLabel ?? "Passkey",
+      secret: null,
+      credentialId: credential.credentialId,
+      publicKey: credential.publicKey,
+      counter: credential.counter,
+      transports: credential.transports ?? [],
+      lastUsedStep: null,
+      lastUsedAt: now,
+      expiresAt: null,
+      createdAt: now,
+      updatedAt: now,
+      revision: 1,
+    };
+
+    const recovery = await this.createRecoveryCodeBundle(
+      challenge.userId,
+      factor.id,
+    );
+
+    const auth = await this.completeChallenge({
+      challenge,
+      userId: challenge.userId,
+      method: "passkey",
+      factorInsert: factor,
+      recoveryRecords: recovery.records,
+      auditAction: "passkey-registered",
+    });
+
+    return {
+      auth,
+      factor: toPublicFactor(factor),
+      recoveryCodes: recovery.codes,
+    };
   }
 
   async beginTotpEnrollment(
