@@ -461,6 +461,22 @@ export class StorageAuthManager implements AuthManager {
     });
   }
 
+  private isSessionValidForUser(
+    session: SessionRecord,
+    user: AuthUserStorageRecord,
+  ): boolean {
+    if (user.deactivatedAt != null) return false;
+
+    if (
+      user.sessionsInvalidatedAt &&
+      session.createdAt.getTime() <= user.sessionsInvalidatedAt.getTime()
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
   private async createAuthenticatedSession(
     userId: string,
     metadata?: Readonly<Record<string, unknown>>,
@@ -528,6 +544,8 @@ export class StorageAuthManager implements AuthManager {
       emailVerifiedAt: null,
       name,
       image: null,
+      deactivatedAt: null,
+      sessionsInvalidatedAt: null,
       createdAt: now,
       updatedAt: now,
       revision: 1,
@@ -644,6 +662,14 @@ export class StorageAuthManager implements AuthManager {
       throw new AuthInvalidCredentialsError();
     }
 
+    if (userRecord.deactivatedAt != null) {
+      await this.recordAudit("sign-in-failed", userRecord.id, null, {
+        reason: "account-deactivated",
+      });
+
+      throw new AuthInvalidCredentialsError();
+    }
+
     if (this.requireVerifiedEmail && !userRecord.emailVerifiedAt) {
       await this.recordAudit("sign-in-failed", userRecord.id, null, {
         reason: "email-not-verified",
@@ -714,6 +740,8 @@ export class StorageAuthManager implements AuthManager {
 
     if (!user) return null;
 
+    if (!this.isSessionValidForUser(session, user)) return null;
+
     if (this.requireVerifiedEmail && !user.emailVerifiedAt) {
       return null;
     }
@@ -736,6 +764,10 @@ export class StorageAuthManager implements AuthManager {
     );
 
     if (!user) {
+      return { status: "unauthenticated" };
+    }
+
+    if (!this.isSessionValidForUser(session, user)) {
       return { status: "unauthenticated" };
     }
 

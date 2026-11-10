@@ -21,6 +21,13 @@ export const AUTH_RATE_LIMIT_COLLECTION = "auth_rate_limits";
 export type AuthUserStorageRecord = AuthUser &
   StorageRecord & {
     readonly normalizedEmail: string;
+    /** Account is blocked from authentication when this timestamp is set. */
+    readonly deactivatedAt: Date | null;
+    /**
+     * Sessions created at or before this timestamp are no longer valid.
+     * This is the fail-closed fallback when the session provider is unavailable.
+     */
+    readonly sessionsInvalidatedAt: Date | null;
   };
 
 export const authUserCollection: StorageCollection<AuthUserStorageRecord> = {

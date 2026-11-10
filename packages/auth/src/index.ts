@@ -13,6 +13,7 @@ export {
   type UpdateAuthProfileInput,
   type RequestEmailChangeInput,
   type DeleteAuthAccountInput,
+  type DeactivateAuthAccountInput,
 } from "./auth.lifecycle.manager";
 
 export {

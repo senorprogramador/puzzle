@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 
 import {
   AuthAccountConflictError,
+  AuthEmailVerificationRequiredError,
   AuthInvalidCredentialsError,
+  AuthSessionError,
   AuthTokenError,
   AuthValidationError,
   StorageAuthLifecycleManager,
@@ -29,7 +31,8 @@ const extractToken = (message) =>
   new URL(message.variables.url).searchParams.get("token");
 
 const createLifecycleHarness = async (options = {}) => {
-  const base = await createAuthHarness();
+  const { authOptions, ...lifecycleOptions } = options;
+  const base = await createAuthHarness(authOptions);
   const emailProvider = new FakeEmailProvider();
 
   const lifecycle = new StorageAuthLifecycleManager(
@@ -42,7 +45,7 @@ const createLifecycleHarness = async (options = {}) => {
     },
     {
       rateLimitKeySecret: "test-only-auth-rate-limit-secret-000000",
-      ...options,
+      ...lifecycleOptions,
     },
   );
 
@@ -652,4 +655,177 @@ test("records lifecycle audit events", async () => {
   assert.ok(events.includes("email-verification-requested"));
   assert.ok(events.includes("email-verified"));
   assert.ok(events.includes("password-reset-requested"));
+});
+
+test("invalidates previous email verification tokens when resending", async () => {
+  const { auth, lifecycle, emailProvider, storage } =
+    await createLifecycleHarness();
+
+  const registered = await registerUser(auth);
+
+  await lifecycle.sendEmailVerification({
+    userId: registered.user.id,
+    verificationUrl,
+    ipAddress: registrationInput.ipAddress,
+  });
+
+  const firstToken = extractToken(emailProvider.messages[0]);
+
+  await lifecycle.sendEmailVerification({
+    userId: registered.user.id,
+    verificationUrl,
+    ipAddress: registrationInput.ipAddress,
+  });
+
+  const secondToken = extractToken(emailProvider.messages[1]);
+
+  assert.notEqual(firstToken, secondToken);
+
+  await assert.rejects(() => lifecycle.verifyEmail(firstToken), AuthTokenError);
+
+  const verified = await lifecycle.verifyEmail(secondToken);
+
+  assert.ok(verified.emailVerifiedAt instanceof Date);
+
+  const tokens = await storage.findMany("auth_action_tokens", {
+    where: {
+      purpose: {
+        operator: "eq",
+        value: "email-verification",
+      },
+    },
+  });
+
+  assert.equal(tokens.length, 2);
+  assert.ok(tokens.some((token) => token.revokedAt instanceof Date));
+  assert.ok(tokens.some((token) => token.consumedAt instanceof Date));
+});
+
+test("blocks lifecycle operations for unverified accounts when verification is required", async () => {
+  const { auth, lifecycle, sessions } = await createLifecycleHarness({
+    authOptions: {
+      requireVerifiedEmail: true,
+    },
+    requireVerifiedEmail: true,
+  });
+
+  const registered = await registerUser(auth);
+
+  // Registration may create a session, but that session must not authorize
+  // protected account-management operations before email verification.
+  assert.ok(await sessions.validate(registered.token));
+
+  await assert.rejects(
+    () =>
+      lifecycle.updateProfile({
+        sessionToken: registered.token,
+        name: "Should Not Be Saved",
+      }),
+    AuthEmailVerificationRequiredError,
+  );
+
+  await assert.rejects(
+    () =>
+      lifecycle.changePassword({
+        sessionToken: registered.token,
+        currentPassword: registrationInput.password,
+        newPassword: "another-secure-password",
+      }),
+    AuthEmailVerificationRequiredError,
+  );
+
+  const signedInState = await auth.getAuthState(registered.token);
+
+  assert.equal(signedInState.status, "unauthenticated");
+});
+
+test("deactivates an account, blocks sign-in and invalidates existing sessions", async () => {
+  const { auth, lifecycle, sessions, storage } = await createLifecycleHarness();
+
+  const registered = await registerUser(auth);
+
+  const secondSession = await auth.signIn({
+    email: registrationInput.email,
+    password: registrationInput.password,
+    ipAddress: registrationInput.ipAddress,
+  });
+
+  await lifecycle.deactivateAccount({
+    sessionToken: registered.token,
+    password: registrationInput.password,
+  });
+
+  const user = await storage.findById("auth_users", registered.user.id);
+
+  assert.ok(user.deactivatedAt instanceof Date);
+  assert.ok(user.sessionsInvalidatedAt instanceof Date);
+
+  assert.equal(await auth.getCurrentUser(registered.token), null);
+  assert.equal(await auth.getCurrentUser(secondSession.token), null);
+
+  assert.equal(await sessions.validate(registered.token), null);
+  assert.equal(await sessions.validate(secondSession.token), null);
+
+  await assert.rejects(
+    () =>
+      auth.signIn({
+        email: registrationInput.email,
+        password: registrationInput.password,
+        ipAddress: registrationInput.ipAddress,
+      }),
+    AuthInvalidCredentialsError,
+  );
+
+  const events = await getAuditActions(storage, registered.user.id);
+
+  assert.ok(events.includes("account-deactivated"));
+});
+
+test("fails closed when physical session revocation fails after a password reset", async () => {
+  const { auth, lifecycle, sessions, emailProvider, storage } =
+    await createLifecycleHarness();
+
+  const registered = await registerUser(auth);
+
+  await lifecycle.requestPasswordReset({
+    email: registrationInput.email,
+    resetUrl,
+    ipAddress: registrationInput.ipAddress,
+  });
+
+  const token = extractToken(emailProvider.messages[0]);
+
+  sessions.failNextRevokeAll = true;
+
+  // The password change is committed. The failed session-provider call must
+  // not leave the previous session authorized through the auth layer.
+  await lifecycle.resetPassword({
+    token,
+    newPassword: "a-new-secure-password",
+  });
+
+  assert.ok(await sessions.validate(registered.token));
+
+  assert.equal(await auth.getCurrentUser(registered.token), null);
+
+  await assert.rejects(
+    () =>
+      lifecycle.updateProfile({
+        sessionToken: registered.token,
+        name: "Should Not Be Saved",
+      }),
+    AuthSessionError,
+  );
+
+  const user = await storage.findById("auth_users", registered.user.id);
+
+  assert.ok(user.sessionsInvalidatedAt instanceof Date);
+
+  const signedIn = await auth.signIn({
+    email: registrationInput.email,
+    password: "a-new-secure-password",
+    ipAddress: registrationInput.ipAddress,
+  });
+
+  assert.equal(signedIn.user.id, registered.user.id);
 });

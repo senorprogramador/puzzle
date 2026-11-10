@@ -23,6 +23,7 @@ import {
   AuthSessionError,
   AuthTokenError,
   AuthValidationError,
+  AuthEmailVerificationRequiredError,
 } from "./errors/auth.errors";
 
 import {
@@ -103,6 +104,11 @@ export type RequestEmailChangeInput = {
 };
 
 export type DeleteAuthAccountInput = {
+  readonly sessionToken: string;
+  readonly password: string;
+};
+
+export type DeactivateAuthAccountInput = {
   readonly sessionToken: string;
   readonly password: string;
 };
@@ -292,6 +298,9 @@ export class StorageAuthLifecycleManager {
   private readonly auditCollection: string;
   private readonly rateLimitsCollection: string;
 
+  private readonly requireVerifiedEmail: boolean;
+  private readonly onSessionRevocationError?: (error: unknown) => void;
+
   private readonly emailTemplates: {
     readonly emailVerification: string;
     readonly passwordReset: string;
@@ -347,6 +356,9 @@ export class StorageAuthLifecycleManager {
 
     this.rateLimitsCollection =
       options.rateLimitsCollection ?? AUTH_RATE_LIMIT_COLLECTION;
+
+    this.requireVerifiedEmail = options.requireVerifiedEmail ?? false;
+    this.onSessionRevocationError = options.onSessionRevocationError;
 
     this.emailTemplates = {
       emailVerification:
@@ -693,8 +705,21 @@ export class StorageAuthLifecycleManager {
       session.userId,
     );
 
-    if (!user) {
-      throw new AuthSessionError("The authenticated account no longer exists.");
+    if (!user || user.deactivatedAt != null) {
+      throw new AuthSessionError("The authenticated account is unavailable.");
+    }
+
+    if (
+      user.sessionsInvalidatedAt &&
+      session.createdAt.getTime() <= user.sessionsInvalidatedAt.getTime()
+    ) {
+      throw new AuthSessionError(
+        "The authentication session is no longer valid.",
+      );
+    }
+
+    if (this.requireVerifiedEmail && !user.emailVerifiedAt) {
+      throw new AuthEmailVerificationRequiredError();
     }
 
     return { session, user };
@@ -784,10 +809,14 @@ export class StorageAuthLifecycleManager {
     try {
       await this.sessions.revokeAll(userId);
     } catch (error) {
-      throw new AuthSessionError(
-        "Could not revoke all sessions for the account.",
-        { cause: error },
-      );
+      try {
+        this.onSessionRevocationError?.(error);
+      } catch {
+        // Operational logging must not change the authentication result.
+      }
+
+      // The storage-level sessionsInvalidatedAt check already blocks old
+      // sessions. Physical revocation is cleanup, not the security boundary.
     }
   }
 
@@ -821,7 +850,19 @@ export class StorageAuthLifecycleManager {
       lifetimeSeconds: this.tokenLifetimes.emailVerification,
     });
 
-    await this.atomic([
+    const outstandingTokens =
+      await this.storage.findMany<AuthActionTokenStorageRecord>(
+        this.actionTokensCollection,
+        {
+          where: {
+            userId: { operator: "eq", value: user.id },
+            purpose: { operator: "eq", value: "email-verification" },
+            consumedAt: { operator: "eq", value: null },
+          },
+        },
+      );
+
+    const operations: LifecycleBatchOperation[] = [
       {
         type: "insert",
         collection: this.actionTokensCollection,
@@ -832,7 +873,21 @@ export class StorageAuthLifecycleManager {
         collection: this.auditCollection,
         record: this.createAuditRecord("email-verification-requested", user.id),
       },
-    ]);
+    ];
+
+    for (const outstanding of outstandingTokens) {
+      if (outstanding.revokedAt != null) continue;
+
+      operations.push({
+        type: "update",
+        collection: this.actionTokensCollection,
+        id: outstanding.id,
+        condition: { expectedRevision: outstanding.revision },
+        changes: { revokedAt: created.record.createdAt },
+      });
+    }
+
+    await this.atomic(operations);
 
     const verificationUrl = createTokenUrl(
       input.verificationUrl,
@@ -994,6 +1049,15 @@ export class StorageAuthLifecycleManager {
       "password-reset",
     );
 
+    const user = await this.storage.findById<AuthUserStorageRecord>(
+      this.usersCollection,
+      actionToken.userId,
+    );
+
+    if (!user || user.deactivatedAt != null) {
+      throw new AuthTokenError();
+    }
+
     const credential = await this.findCredential(actionToken.userId);
 
     if (!credential || credential.revokedAt !== null) {
@@ -1033,6 +1097,16 @@ export class StorageAuthLifecycleManager {
           passwordUpdatedAt: now,
           updatedAt: now,
           revokedAt: null,
+        },
+      },
+      {
+        type: "update",
+        collection: this.usersCollection,
+        id: user.id,
+        condition: { expectedRevision: user.revision },
+        changes: {
+          sessionsInvalidatedAt: now,
+          updatedAt: now,
         },
       },
       {
@@ -1123,6 +1197,16 @@ export class StorageAuthLifecycleManager {
         changes: {
           passwordHash,
           passwordUpdatedAt: now,
+          updatedAt: now,
+        },
+      },
+      {
+        type: "update",
+        collection: this.usersCollection,
+        id: user.id,
+        condition: { expectedRevision: user.revision },
+        changes: {
+          sessionsInvalidatedAt: now,
           updatedAt: now,
         },
       },
@@ -1323,6 +1407,7 @@ export class StorageAuthLifecycleManager {
             email: newEmail,
             normalizedEmail: newEmail,
             emailVerifiedAt: now,
+            sessionsInvalidatedAt: now,
             updatedAt: now,
           },
         },
@@ -1358,6 +1443,49 @@ export class StorageAuthLifecycleManager {
     }
 
     return toPublicUser(updated);
+  }
+
+  async deactivateAccount(input: DeactivateAuthAccountInput): Promise<void> {
+    this.assertInitialized();
+
+    const { session, user } = await this.getSessionContext(input.sessionToken);
+
+    const credential = await this.findCredential(user.id);
+
+    if (
+      !credential ||
+      credential.revokedAt !== null ||
+      !(await this.verifyPassword(input.password, credential.passwordHash))
+    ) {
+      throw new AuthValidationError("The password confirmation is incorrect.");
+    }
+
+    const now = this.now();
+
+    await this.atomic([
+      {
+        type: "update",
+        collection: this.usersCollection,
+        id: user.id,
+        condition: { expectedRevision: user.revision },
+        changes: {
+          deactivatedAt: now,
+          sessionsInvalidatedAt: now,
+          updatedAt: now,
+        },
+      },
+      {
+        type: "insert",
+        collection: this.auditCollection,
+        record: this.createAuditRecord(
+          "account-deactivated",
+          user.id,
+          session.id,
+        ),
+      },
+    ]);
+
+    await this.revokeAllSessions(user.id);
   }
 
   async deleteAccount(input: DeleteAuthAccountInput): Promise<void> {

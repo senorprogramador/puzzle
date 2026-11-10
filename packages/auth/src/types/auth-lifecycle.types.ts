@@ -28,6 +28,7 @@ export type AuthAuditAction =
   | "profile-updated"
   | "email-change-requested"
   | "email-changed"
+  | "account-deactivated"
   | "account-deleted";
 
 export type AuthAuditEventStorageRecord = StorageRecord & {
@@ -94,8 +95,19 @@ export type AuthLifecycleManagerOptions = {
   readonly clock?: () => Date;
 
   /**
+   * Reject lifecycle operations for users whose email is not verified.
+   * Keep this aligned with AuthManagerOptions.requireVerifiedEmail.
+   */
+  readonly requireVerifiedEmail?: boolean;
+
+  /**
    * Receives delivery failures without exposing them to password-reset
    * callers. This hook should write to the application's operational logger.
    */
   readonly onEmailDeliveryError?: (error: unknown) => void;
+  /**
+   * Receives physical session-revocation failures.
+   * The account's sessionsInvalidatedAt timestamp already blocks old sessions.
+   */
+  readonly onSessionRevocationError?: (error: unknown) => void;
 };
