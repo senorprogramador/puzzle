@@ -827,85 +827,139 @@ export class StorageAuthLifecycleManager {
 
     const ipAddress = validateIpAddress(input.ipAddress);
 
-    const user = await this.storage.findById<AuthUserStorageRecord>(
+    const initialUser = await this.storage.findById<AuthUserStorageRecord>(
       this.usersCollection,
       input.userId,
     );
 
-    if (!user) {
+    if (!initialUser) {
       throw new AuthValidationError("The account does not exist.");
     }
 
-    if (user.emailVerifiedAt) return;
+    if (initialUser.emailVerifiedAt) return;
 
     await this.enforceRateLimits(
       "emailVerification",
-      user.normalizedEmail,
+      initialUser.normalizedEmail,
       ipAddress,
     );
 
-    const created = await this.createActionToken({
-      userId: user.id,
-      purpose: "email-verification",
-      lifetimeSeconds: this.tokenLifetimes.emailVerification,
-    });
+    const maximumAttempts = 5;
 
-    const outstandingTokens =
-      await this.storage.findMany<AuthActionTokenStorageRecord>(
-        this.actionTokensCollection,
-        {
-          where: {
-            userId: { operator: "eq", value: user.id },
-            purpose: { operator: "eq", value: "email-verification" },
-            consumedAt: { operator: "eq", value: null },
-          },
-        },
+    for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
+      // Always reload the user after a conflict. Another request may have
+      // successfully issued a newer verification token in the meantime.
+      const user = await this.storage.findById<AuthUserStorageRecord>(
+        this.usersCollection,
+        input.userId,
       );
 
-    const operations: LifecycleBatchOperation[] = [
-      {
-        type: "insert",
-        collection: this.actionTokensCollection,
-        record: created.record,
-      },
-      {
-        type: "insert",
-        collection: this.auditCollection,
-        record: this.createAuditRecord("email-verification-requested", user.id),
-      },
-    ];
+      if (!user) {
+        throw new AuthValidationError("The account does not exist.");
+      }
 
-    for (const outstanding of outstandingTokens) {
-      if (outstanding.revokedAt != null) continue;
+      if (user.emailVerifiedAt) return;
 
-      operations.push({
-        type: "update",
-        collection: this.actionTokensCollection,
-        id: outstanding.id,
-        condition: { expectedRevision: outstanding.revision },
-        changes: { revokedAt: created.record.createdAt },
+      const created = await this.createActionToken({
+        userId: user.id,
+        purpose: "email-verification",
+        lifetimeSeconds: this.tokenLifetimes.emailVerification,
       });
-    }
 
-    await this.atomic(operations);
+      const outstandingTokens =
+        await this.storage.findMany<AuthActionTokenStorageRecord>(
+          this.actionTokensCollection,
+          {
+            where: {
+              userId: { operator: "eq", value: user.id },
+              purpose: { operator: "eq", value: "email-verification" },
+              consumedAt: { operator: "eq", value: null },
+            },
+          },
+        );
 
-    const verificationUrl = createTokenUrl(
-      input.verificationUrl,
-      created.token,
-    );
-
-    await this.deliverEmail(
-      {
-        to: user.email,
-        subject: this.emailSubjects.emailVerification,
-        template: this.emailTemplates.emailVerification,
-        variables: {
-          url: verificationUrl,
-          expiresAt: created.record.expiresAt.toISOString(),
+      const operations: LifecycleBatchOperation[] = [
+        {
+          // This conditional update acts as the serialization point.
+          // Only one concurrent request can commit against this revision.
+          type: "update",
+          collection: this.usersCollection,
+          id: user.id,
+          condition: {
+            expectedRevision: user.revision,
+          },
+          changes: {
+            updatedAt: created.record.createdAt,
+          },
         },
-      },
-      false,
-    );
+        {
+          type: "insert",
+          collection: this.actionTokensCollection,
+          record: created.record,
+        },
+        {
+          type: "insert",
+          collection: this.auditCollection,
+          record: this.createAuditRecord(
+            "email-verification-requested",
+            user.id,
+          ),
+        },
+      ];
+
+      for (const outstanding of outstandingTokens) {
+        if (outstanding.revokedAt != null) continue;
+
+        operations.push({
+          type: "update",
+          collection: this.actionTokensCollection,
+          id: outstanding.id,
+          condition: {
+            expectedRevision: outstanding.revision,
+          },
+          changes: {
+            revokedAt: created.record.createdAt,
+          },
+        });
+      }
+
+      try {
+        await this.atomic(operations);
+      } catch (error) {
+        if (error instanceof StorageConflictError) {
+          if (attempt < maximumAttempts - 1) {
+            continue;
+          }
+
+          throw new AuthProviderError(
+            "Could not safely issue an email verification token due to concurrent account updates.",
+            { cause: error },
+          );
+        }
+
+        throw error;
+      }
+
+      const verificationUrl = createTokenUrl(
+        input.verificationUrl,
+        created.token,
+      );
+
+      await this.deliverEmail(
+        {
+          to: user.email,
+          subject: this.emailSubjects.emailVerification,
+          template: this.emailTemplates.emailVerification,
+          variables: {
+            url: verificationUrl,
+            expiresAt: created.record.expiresAt.toISOString(),
+          },
+        },
+        false,
+      );
+
+      return;
+    }
   }
 
   async verifyEmail(token: string): Promise<AuthUser> {

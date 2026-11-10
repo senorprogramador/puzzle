@@ -701,6 +701,121 @@ test("invalidates previous email verification tokens when resending", async () =
   assert.ok(tokens.some((token) => token.consumedAt instanceof Date));
 });
 
+test("serializes concurrent email verification requests and keeps only the latest token valid", async () => {
+  const { auth, lifecycle, emailProvider, storage } =
+    await createLifecycleHarness();
+
+  const registered = await registerUser(auth);
+
+  // Force both requests to read the same user revision before either
+  // request can proceed to its atomic batch.
+  const originalFindById = storage.findById.bind(storage);
+
+  let userReadCount = 0;
+  let releaseUserReadBarrier;
+
+  const userReadBarrier = new Promise((resolve) => {
+    releaseUserReadBarrier = resolve;
+  });
+
+  storage.findById = async (collection, id) => {
+    const record = await originalFindById(collection, id);
+
+    if (collection === "auth_users" && userReadCount < 2) {
+      userReadCount += 1;
+
+      if (userReadCount === 2) {
+        releaseUserReadBarrier();
+      }
+
+      await userReadBarrier;
+    }
+
+    return record;
+  };
+
+  await Promise.all([
+    lifecycle.sendEmailVerification({
+      userId: registered.user.id,
+      verificationUrl,
+      ipAddress: registrationInput.ipAddress,
+    }),
+    lifecycle.sendEmailVerification({
+      userId: registered.user.id,
+      verificationUrl,
+      ipAddress: registrationInput.ipAddress,
+    }),
+  ]);
+
+  assert.equal(emailProvider.messages.length, 2);
+
+  const tokens = emailProvider.messages.map(extractToken);
+
+  assert.notEqual(tokens[0], tokens[1]);
+
+  const storedTokens = await storage.findMany("auth_action_tokens", {
+    where: {
+      userId: {
+        operator: "eq",
+        value: registered.user.id,
+      },
+      purpose: {
+        operator: "eq",
+        value: "email-verification",
+      },
+    },
+  });
+
+  assert.equal(storedTokens.length, 2);
+
+  // Exactly one token must remain usable.
+  const results = await Promise.all(
+    tokens.map(async (token) => {
+      try {
+        await lifecycle.verifyEmail(token);
+        return "verified";
+      } catch (error) {
+        if (error instanceof AuthTokenError) {
+          return "invalid";
+        }
+
+        throw error;
+      }
+    }),
+  );
+
+  assert.equal(results.filter((result) => result === "verified").length, 1);
+
+  assert.equal(results.filter((result) => result === "invalid").length, 1);
+
+  const finalTokens = await storage.findMany("auth_action_tokens", {
+    where: {
+      userId: {
+        operator: "eq",
+        value: registered.user.id,
+      },
+      purpose: {
+        operator: "eq",
+        value: "email-verification",
+      },
+    },
+  });
+
+  assert.equal(
+    finalTokens.filter((token) => token.revokedAt instanceof Date).length,
+    1,
+  );
+
+  assert.equal(
+    finalTokens.filter((token) => token.consumedAt instanceof Date).length,
+    1,
+  );
+
+  const verifiedUser = await storage.findById("auth_users", registered.user.id);
+
+  assert.ok(verifiedUser.emailVerifiedAt instanceof Date);
+});
+
 test("blocks lifecycle operations for unverified accounts when verification is required", async () => {
   const { auth, lifecycle, sessions } = await createLifecycleHarness({
     authOptions: {
