@@ -1,0 +1,177 @@
+.puzzle-time-picker {
+    --puzzle-time-picker-height: 2.5rem;
+    --puzzle-time-picker-padding: var(--puzzle-space-3, 0.75rem);
+    --puzzle-time-picker-font-size: var(--puzzle-font-size-sm, 0.875rem);
+
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-1, 0.25rem);
+
+    min-width: 0;
+    color: var(--puzzle-color-text);
+    font-family: inherit;
+}
+
+.puzzle-time-picker[data-size-mobile="sm"] {
+    --puzzle-time-picker-height: 2rem;
+    --puzzle-time-picker-padding: var(--puzzle-space-2, 0.5rem);
+    --puzzle-time-picker-font-size: var(--puzzle-font-size-xs, 0.75rem);
+}
+
+.puzzle-time-picker[data-size-mobile="md"] {
+    --puzzle-time-picker-height: 2.5rem;
+    --puzzle-time-picker-padding: var(--puzzle-space-3, 0.75rem);
+    --puzzle-time-picker-font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-time-picker[data-size-mobile="lg"] {
+    --puzzle-time-picker-height: 3rem;
+    --puzzle-time-picker-padding: var(--puzzle-space-4, 1rem);
+    --puzzle-time-picker-font-size: var(--puzzle-font-size-base, 1rem);
+}
+
+@media (min-width: 768px) {
+    .puzzle-time-picker[data-size-tablet="sm"] {
+        --puzzle-time-picker-height: 2rem;
+        --puzzle-time-picker-padding: var(--puzzle-space-2, 0.5rem);
+        --puzzle-time-picker-font-size: var(--puzzle-font-size-xs, 0.75rem);
+    }
+
+    .puzzle-time-picker[data-size-tablet="md"] {
+        --puzzle-time-picker-height: 2.5rem;
+        --puzzle-time-picker-padding: var(--puzzle-space-3, 0.75rem);
+        --puzzle-time-picker-font-size: var(--puzzle-font-size-sm, 0.875rem);
+    }
+
+    .puzzle-time-picker[data-size-tablet="lg"] {
+        --puzzle-time-picker-height: 3rem;
+        --puzzle-time-picker-padding: var(--puzzle-space-4, 1rem);
+        --puzzle-time-picker-font-size: var(--puzzle-font-size-base, 1rem);
+    }
+
+    .puzzle-time-picker[data-full-width-tablet="true"] {
+        width: 100%;
+    }
+
+    .puzzle-time-picker[data-full-width-tablet="false"] {
+        width: auto;
+    }
+}
+
+@media (min-width: 1024px) {
+    .puzzle-time-picker[data-size-desktop="sm"] {
+        --puzzle-time-picker-height: 2rem;
+        --puzzle-time-picker-padding: var(--puzzle-space-2, 0.5rem);
+        --puzzle-time-picker-font-size: var(--puzzle-font-size-xs, 0.75rem);
+    }
+
+    .puzzle-time-picker[data-size-desktop="md"] {
+        --puzzle-time-picker-height: 2.5rem;
+        --puzzle-time-picker-padding: var(--puzzle-space-3, 0.75rem);
+        --puzzle-time-picker-font-size: var(--puzzle-font-size-sm, 0.875rem);
+    }
+
+    .puzzle-time-picker[data-size-desktop="lg"] {
+        --puzzle-time-picker-height: 3rem;
+        --puzzle-time-picker-padding: var(--puzzle-space-4, 1rem);
+        --puzzle-time-picker-font-size: var(--puzzle-font-size-base, 1rem);
+    }
+
+    .puzzle-time-picker[data-full-width-desktop="true"] {
+        width: 100%;
+    }
+
+    .puzzle-time-picker[data-full-width-desktop="false"] {
+        width: auto;
+    }
+}
+
+.puzzle-time-picker[data-full-width-mobile="true"] {
+    width: 100%;
+}
+
+.puzzle-time-picker__label {
+    display: block;
+
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+}
+
+.puzzle-time-picker__required {
+    margin-inline-start: 0.2em;
+    color: var(--puzzle-color-danger);
+}
+
+.puzzle-time-picker__input {
+    box-sizing: border-box;
+
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+    min-height: var(--puzzle-time-picker-height);
+
+    padding-inline: var(--puzzle-time-picker-padding);
+
+    border: 1px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface);
+
+    font-family: inherit;
+    font-size: var(--puzzle-time-picker-font-size);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+
+    transition:
+        background-color var(--puzzle-duration-fast, 150ms) ease,
+        border-color var(--puzzle-duration-fast, 150ms) ease,
+        box-shadow var(--puzzle-duration-fast, 150ms) ease;
+}
+
+.puzzle-time-picker__input:hover:not(:disabled) {
+    border-color: var(--puzzle-color-border-strong, var(--puzzle-color-border));
+}
+
+.puzzle-time-picker__input:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+    border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-time-picker[data-invalid="true"] .puzzle-time-picker__input {
+    border-color: var(--puzzle-color-danger);
+}
+
+.puzzle-time-picker[data-invalid="true"] .puzzle-time-picker__input:focus-visible {
+    outline-color: var(--puzzle-color-danger);
+}
+
+.puzzle-time-picker__input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.puzzle-time-picker__input:read-only {
+    cursor: default;
+}
+
+.puzzle-time-picker__description {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+}
+
+.puzzle-time-picker__error {
+    color: var(--puzzle-color-danger);
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-body2, 1.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-time-picker__input {
+        transition: none;
+    }
+}

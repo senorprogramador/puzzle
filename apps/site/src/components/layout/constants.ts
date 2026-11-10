@@ -176,6 +176,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/forms/text-input",
               },
               {
+                id: "time-picker",
+                label: "Time Picker",
+                href: "/docs/components/ui/forms/time-picker",
+              },
+              {
                 id: "token-input",
                 label: "Token Input",
                 href: "/docs/components/ui/forms/token-input",

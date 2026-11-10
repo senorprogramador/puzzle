@@ -246,6 +246,12 @@ export {
 } from "./components/forms/switch";
 
 export {
+  TimePicker,
+  type TimePickerProps,
+  type TimePickerSize,
+} from "./components/forms/time-picker";
+
+export {
   TokenInput,
   type TokenInputProps,
   type TokenInputMode,

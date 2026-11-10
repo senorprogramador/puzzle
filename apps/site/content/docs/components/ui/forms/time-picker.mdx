@@ -1,0 +1,258 @@
+---
+title: Time Picker
+description: Select a time using the native browser time picker.
+---
+
+Time Picker provides a consistently styled time input with native browser interaction, form integration, validation, and controlled or uncontrolled values.
+
+## Import
+
+```tsx
+import {
+  TimePicker,
+  type TimePickerProps,
+  type TimePickerSize,
+} from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Use `label` to provide an accessible name. The browser provides the native time selection interface.
+
+<Preview height={220}>
+  <Section>
+    <TimePicker
+      label="Appointment"
+      defaultValue="09:30"
+      description="Choose your preferred appointment time."
+    />
+  </Section>
+</Preview>
+
+```tsx
+<TimePicker
+  label="Appointment"
+  defaultValue="09:30"
+  description="Choose your preferred appointment time."
+/>
+```
+
+## Controlled values
+
+Use `value` and `onChange` to control the selected time. Use `null` for an empty value.
+
+````tsx
+const [time, setTime] = useState<string | null>("09:30");
+
+return (
+
+<Stack>
+  <TimePicker label="Appointment" value={time} onChange={setTime} />
+  <span role="status">{time ? "Selected: " + time : "No time selected"}</span>
+</Stack>
+); ```
+
+Omit `value` to use uncontrolled mode with `defaultValue`.
+
+The component returns values in 24-hour `HH:mm` format, regardless of how the browser presents the time picker.
+
+## Seconds
+
+Use `showSeconds` to include seconds in the selected value.
+
+<Preview height={220}>
+  <Section>
+    <TimePicker label="Precise time" defaultValue="09:30:45" showSeconds />
+  </Section>
+</Preview>
+
+```tsx
+
+<TimePicker label="Precise time" defaultValue="09:30:45" showSeconds />
+````
+
+The value uses `HH:mm:ss` format when seconds are enabled.
+
+## Minute and second intervals
+
+Use `minuteStep` to configure the interval between selectable minutes.
+
+<Preview height={300}>
+  <Section>
+    <Stack>
+      <TimePicker
+        label="15-minute intervals"
+        minuteStep={15}
+        defaultValue="09:00"
+      />
+      <TimePicker
+        label="30-minute intervals"
+        minuteStep={30}
+        defaultValue="09:00"
+      />
+    </Stack>
+  </Section>
+</Preview>
+
+```tsx
+<Stack>
+  <TimePicker
+    label="15-minute intervals"
+    minuteStep={15}
+    defaultValue="09:00"
+  />
+  <TimePicker
+    label="30-minute intervals"
+    minuteStep={30}
+    defaultValue="09:00"
+  />
+</Stack>
+```
+
+When `showSeconds` is enabled, use `secondStep` to configure the interval between selectable seconds.
+
+The native input uses its `step` attribute to enforce the interval.
+
+## Time constraints
+
+Use `minTime` and `maxTime` to define inclusive time boundaries.
+
+<Preview height={220}>
+  <Section>
+    <TimePicker
+      label="Business hours"
+      minTime="09:00"
+      maxTime="17:00"
+      defaultValue="12:00"
+    />
+  </Section>
+</Preview>
+
+```tsx
+<TimePicker
+  label="Business hours"
+  minTime="09:00"
+  maxTime="17:00"
+  defaultValue="12:00"
+/>
+```
+
+Both properties use 24-hour time strings. The browser prevents selecting values outside the allowed range and native form validation reports invalid values.
+
+## Form integration
+
+Time Picker integrates with native HTML forms.
+
+```tsx
+<form>
+  <Stack>
+    <TimePicker label="Start time" name="startTime" required />
+    <TimePicker label="End time" name="endTime" required />
+    <Button type="submit">Submit</Button>
+  </Stack>
+</form>
+```
+
+Use `name` to include the selected value in `FormData`. The browser handles required-field validation.
+
+## Sizes and responsive width
+
+`size` supports `sm`, `md`, and `lg`. `fullWidth` fills the available width.
+
+Both properties accept responsive values using `mobile`, `tablet`, and `desktop` keys.
+
+<Preview height={380}>
+  <Section>
+    <Stack>
+      <TimePicker label="Small" size="sm" />
+      <TimePicker label="Medium" size="md" />
+      <TimePicker label="Large" size="lg" />
+      <TimePicker
+        label="Responsive"
+        size={{ mobile: "sm", tablet: "md", desktop: "lg" }}
+        fullWidth
+      />
+    </Stack>
+  </Section>
+</Preview>
+
+```tsx
+<Stack>
+  <TimePicker label="Small" size="sm" />
+  <TimePicker label="Medium" size="md" />
+  <TimePicker label="Large" size="lg" />
+  <TimePicker
+    label="Responsive"
+    size={{ mobile: "sm", tablet: "md", desktop: "lg" }}
+    fullWidth
+  />
+</Stack>
+```
+
+## Required, disabled, and read-only
+
+Use `required` to enable native required validation.
+
+Use `disabled` to prevent interaction and exclude the input from form submission.
+
+Use `readOnly` to prevent editing while keeping the value available for form submission.
+
+<Preview height={300}>
+  <Section>
+    <Stack>
+      <TimePicker label="Required time" required />
+      <TimePicker label="Disabled time" disabled />
+      <TimePicker label="Read-only time" defaultValue="09:30" readOnly />
+    </Stack>
+  </Section>
+</Preview>
+
+```tsx
+<Stack>
+  <TimePicker label="Required time" required />
+  <TimePicker label="Disabled time" disabled />
+  <TimePicker label="Read-only time" defaultValue="09:30" readOnly />
+</Stack>
+```
+
+## Description and errors
+
+Use `description` to provide supporting information.
+
+Use `error` to display validation feedback and mark the input as invalid. Setting `error` to `true` displays the default message.
+
+<Preview height={300}>
+  <Section>
+    <Stack>
+      <TimePicker
+        label="Appointment"
+        description="Available Monday through Friday."
+      />
+      <TimePicker label="Appointment" error="Choose an available time." />
+    </Stack>
+  </Section>
+</Preview>
+
+```tsx
+<Stack>
+  <TimePicker
+    label="Appointment"
+    description="Available Monday through Friday."
+  />
+  <TimePicker label="Appointment" error="Choose an available time." />
+</Stack>
+```
+
+## Accessibility
+
+Time Picker uses a native HTML time input.
+
+- Native keyboard interaction.
+- Native browser time selection.
+- Accessible labels and descriptions.
+- Native required and range validation.
+- Correct disabled and read-only semantics.
+- Visible keyboard focus indicator.
+- Reduced-motion support.
+
+The visual time format and picker interface depend on the browser, operating system, and user locale.
