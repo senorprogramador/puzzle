@@ -113,6 +113,101 @@ describe("ContextMenu browser behavior", () => {
     });
   });
 
+  it("supports prefix typeahead inside a submenu", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ContextMenu>
+        <ContextMenu.Trigger>Right-click area</ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Sub>
+            <ContextMenu.SubTrigger>More options</ContextMenu.SubTrigger>
+            <ContextMenu.SubContent aria-label="More options">
+              <ContextMenu.Item>Duplicate item</ContextMenu.Item>
+              <ContextMenu.Item>Download file</ContextMenu.Item>
+              <ContextMenu.Item>Rename item</ContextMenu.Item>
+            </ContextMenu.SubContent>
+          </ContextMenu.Sub>
+        </ContextMenu.Content>
+      </ContextMenu>,
+    );
+
+    await user.pointer({
+      target: screen.getByText("Right-click area"),
+      keys: "[MouseRight]",
+    });
+
+    const subTrigger = await screen.findByRole("menuitem", {
+      name: "More options",
+    });
+
+    await waitFor(() => expect(subTrigger).toHaveFocus());
+    await user.keyboard("{ArrowRight}");
+    await screen.findByRole("menu", { name: "More options" });
+
+    const duplicateItem = screen.getByRole("menuitem", {
+      name: "Duplicate item",
+    });
+
+    await waitFor(() => expect(duplicateItem).toHaveFocus());
+    await user.keyboard("do");
+
+    expect(
+      screen.getByRole("menuitem", { name: "Download file" }),
+    ).toHaveFocus();
+  });
+
+  it("cycles matching submenu items when a character is repeated", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ContextMenu>
+        <ContextMenu.Trigger>Right-click area</ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Sub>
+            <ContextMenu.SubTrigger>More options</ContextMenu.SubTrigger>
+            <ContextMenu.SubContent aria-label="More options">
+              <ContextMenu.Item>Rename item</ContextMenu.Item>
+              <ContextMenu.Item>Refresh item</ContextMenu.Item>
+              <ContextMenu.Item>Remove item</ContextMenu.Item>
+            </ContextMenu.SubContent>
+          </ContextMenu.Sub>
+        </ContextMenu.Content>
+      </ContextMenu>,
+    );
+
+    await user.pointer({
+      target: screen.getByText("Right-click area"),
+      keys: "[MouseRight]",
+    });
+
+    const subTrigger = await screen.findByRole("menuitem", {
+      name: "More options",
+    });
+
+    await waitFor(() => expect(subTrigger).toHaveFocus());
+    await user.keyboard("{ArrowRight}");
+    await screen.findByRole("menu", { name: "More options" });
+
+    const renameItem = screen.getByRole("menuitem", {
+      name: "Rename item",
+    });
+    const refreshItem = screen.getByRole("menuitem", {
+      name: "Refresh item",
+    });
+    const removeItem = screen.getByRole("menuitem", {
+      name: "Remove item",
+    });
+
+    await waitFor(() => expect(renameItem).toHaveFocus());
+
+    await user.keyboard("r");
+    expect(refreshItem).toHaveFocus();
+
+    await user.keyboard("r");
+    expect(removeItem).toHaveFocus();
+  });
+
   it("closes on outside interaction without stealing focus", async () => {
     const user = userEvent.setup();
 

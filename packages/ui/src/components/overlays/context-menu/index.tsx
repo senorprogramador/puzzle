@@ -18,6 +18,7 @@ import {
   type HTMLAttributes,
   type KeyboardEvent,
   type MouseEvent,
+  type MutableRefObject,
   type PointerEvent,
   type ReactElement,
   type ReactNode,
@@ -89,7 +90,7 @@ type SubContextValue = {
   setOpen: (open: boolean) => void;
   triggerId: string;
   contentId: string;
-  triggerRef: React.MutableRefObject<HTMLButtonElement | null>;
+  triggerRef: MutableRefObject<HTMLButtonElement | null>;
   close: (restoreFocus?: boolean) => void;
 };
 
@@ -359,6 +360,7 @@ const ContextMenuTrigger = ({
   className,
   ref,
   onContextMenu,
+  onClick,
   onKeyDown,
   onPointerDown,
   onPointerMove,
@@ -399,6 +401,26 @@ const ContextMenuTrigger = ({
     event.preventDefault();
     context.triggerRef.current = event.currentTarget;
 
+    context.openAt({
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
+
+  const handleClick = (event: MouseEvent<HTMLElement>) => {
+    onClick?.(event);
+
+    if (
+      event.defaultPrevented ||
+      isDisabled ||
+      !event.ctrlKey ||
+      event.button !== 0
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    context.triggerRef.current = event.currentTarget;
     context.openAt({
       x: event.clientX,
       y: event.clientY,
@@ -497,6 +519,7 @@ const ContextMenuTrigger = ({
     "aria-disabled": isDisabled || undefined,
     "data-state": context.open ? "open" : "closed",
     onContextMenu: handleContextMenu,
+    onClick: handleClick,
     onKeyDown: handleKeyDown,
     onPointerDown: handlePointerDown,
     onPointerMove: handlePointerMove,
@@ -523,6 +546,7 @@ const ContextMenuTrigger = ({
     className?: string;
     disabled?: boolean;
     onContextMenu?: (event: MouseEvent<HTMLElement>) => void;
+    onClick?: (event: MouseEvent<HTMLElement>) => void;
     onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
     onPointerDown?: (event: PointerEvent<HTMLElement>) => void;
     onPointerMove?: (event: PointerEvent<HTMLElement>) => void;
@@ -561,6 +585,17 @@ const ContextMenuTrigger = ({
 
       if (!event.defaultPrevented) {
         handleContextMenu(event);
+      }
+    },
+    onClick: (event: MouseEvent<HTMLElement>) => {
+      if (childDisabled) {
+        return;
+      }
+
+      childProps.onClick?.(event);
+
+      if (!event.defaultPrevented) {
+        handleClick(event);
       }
     },
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
@@ -1303,13 +1338,30 @@ const ContextMenuSubContent = ({
   const context = useSubContext();
   const positioned = usePopoutPositioned();
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const typeaheadRef = useRef("");
+  const typeaheadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const initialFocusDoneRef = useRef(false);
 
   useEffect(() => {
     if (!context.open) {
       initialFocusDoneRef.current = false;
+      typeaheadRef.current = "";
+
+      if (typeaheadTimerRef.current !== null) {
+        clearTimeout(typeaheadTimerRef.current);
+        typeaheadTimerRef.current = null;
+      }
     }
   }, [context.open]);
+
+  useEffect(
+    () => () => {
+      if (typeaheadTimerRef.current !== null) {
+        clearTimeout(typeaheadTimerRef.current);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!context.open || !positioned || initialFocusDoneRef.current) {
@@ -1333,6 +1385,8 @@ const ContextMenuSubContent = ({
     if (event.defaultPrevented) {
       return;
     }
+
+    event.stopPropagation();
 
     if (event.key === "ArrowLeft") {
       event.preventDefault();
@@ -1379,7 +1433,55 @@ const ContextMenuSubContent = ({
 
     if (event.key === "Home" || event.key === "End") {
       event.preventDefault();
-      focusElement(event.key === "Home" ? items[0] : items[items.length - 1]);
+      const target = event.key === "Home" ? items[0] : items[items.length - 1];
+
+      if (target) {
+        focusElement(target);
+      }
+
+      return;
+    }
+
+    if (
+      event.key.length !== 1 ||
+      event.key === " " ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const nextBuffer = `${typeaheadRef.current}${event.key}`;
+    const repeatedCharacter = [...nextBuffer].every(
+      (character) =>
+        character.toLocaleLowerCase() === nextBuffer[0]!.toLocaleLowerCase(),
+    );
+    const query = repeatedCharacter ? event.key : nextBuffer;
+
+    typeaheadRef.current = query;
+
+    if (typeaheadTimerRef.current !== null) {
+      clearTimeout(typeaheadTimerRef.current);
+    }
+
+    typeaheadTimerRef.current = setTimeout(() => {
+      typeaheadRef.current = "";
+      typeaheadTimerRef.current = null;
+    }, 500);
+
+    const nextIndex = findMenuItemIndexByText(
+      items.map((item) => ({
+        text: getMenuItemText(item),
+      })),
+      query,
+      activeIndex,
+    );
+
+    if (nextIndex >= 0) {
+      focusElement(items[nextIndex]);
     }
   };
 

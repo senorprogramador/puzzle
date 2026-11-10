@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -52,6 +58,28 @@ describe("ContextMenu", () => {
     ).toBeInTheDocument();
 
     expect(screen.getByRole("menuitem", { name: "Edit" })).toBeInTheDocument();
+  });
+
+  it("opens from a Ctrl-click", async () => {
+    render(
+      <ContextMenu>
+        <ContextMenu.Trigger>Ctrl-click area</ContextMenu.Trigger>
+        <ContextMenu.Content aria-label="Area actions">
+          <ContextMenu.Item>Edit</ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu>,
+    );
+
+    fireEvent.click(screen.getByText("Ctrl-click area"), {
+      button: 0,
+      ctrlKey: true,
+      clientX: 140,
+      clientY: 100,
+    });
+
+    expect(
+      await screen.findByRole("menu", { name: "Area actions" }),
+    ).toBeInTheDocument();
   });
 
   it("does not open when the root is disabled", () => {
