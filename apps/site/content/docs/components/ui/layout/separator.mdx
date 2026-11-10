@@ -1,0 +1,158 @@
+---
+title: Separator
+description: Visually divide content into distinct sections with horizontal or vertical separators.
+---
+
+The Separator component provides a subtle visual boundary between content and groups of elements.
+
+It supports horizontal and vertical orientations and can be either decorative or semantically meaningful.
+
+## Import
+
+```tsx
+import { Separator } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Use a horizontal separator to divide sections of content.
+
+<Preview
+  height={180}
+  align="center"
+  justify="center"
+  code={`\
+<Stack gap="md">
+  <div>Account details</div>
+  <Separator />
+  <div>Security settings</div>
+</Stack>
+`}
+>
+  <Stack gap="md" style={{ width: "100%", maxWidth: 320 }}>
+    <div>Account details</div>
+    <Separator />
+    <div>Security settings</div>
+  </Stack>
+</Preview>
+
+The default orientation is horizontal.
+
+## Orientation
+
+Use the `orientation` prop to control the direction of the separator.
+
+- `horizontal`: spans the available width.
+- `vertical`: spans the available height.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+<Stack direction="row" alignV="center" gap="md" style={{ height: 64 }}>
+  <span>Overview</span>
+  <Separator orientation="vertical" />
+  <span>Settings</span>
+  <Separator orientation="vertical" />
+  <span>Activity</span>
+</Stack>
+`}
+>
+  <Stack direction="row" alignV="center" gap="md" style={{ height: 64 }}>
+    <span>Overview</span>
+    <Separator orientation="vertical" />
+    <span>Settings</span>
+    <Separator orientation="vertical" />
+    <span>Activity</span>
+  </Stack>
+</Preview>
+
+Vertical separators inherit their height from their containing element. Make sure the parent has a defined height.
+
+## Decorative and semantic separators
+
+By default, separators are decorative.
+
+Decorative separators use `role="none"` and are excluded from the accessibility tree.
+
+Use `decorative={false}` when the separator communicates a meaningful structural boundary.
+
+```tsx
+<Separator decorative={false} />
+
+<Separator
+  orientation="vertical"
+  decorative={false}
+/>
+```
+
+Semantic separators expose `role="separator"` to assistive technology.
+
+Vertical semantic separators additionally expose `aria-orientation="vertical"`.
+
+Horizontal separators use the implicit horizontal orientation.
+
+## API
+
+### Props
+
+| Prop          | Type                         | Default        | Description                             |
+| ------------- | ---------------------------- | -------------- | --------------------------------------- |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Orientation of the separator.           |
+| `decorative`  | `boolean`                    | `true`         | Whether the separator is purely visual. |
+| `className`   | `string`                     | -              | Additional CSS classes.                 |
+
+All standard HTML `div` attributes are supported, including:
+
+- `id`
+- `title`
+- `style`
+- `data-*`
+- `aria-*`
+- `ref`
+
+The component does not accept children.
+
+## Accessibility
+
+The Separator component follows the WAI-ARIA separator semantics.
+
+### Decorative separators
+
+Decorative separators:
+
+- Use `role="none"`.
+- Are excluded from the accessibility tree.
+- Do not introduce unnecessary announcements for screen reader users.
+
+This is the default behavior.
+
+### Semantic separators
+
+When `decorative={false}`:
+
+- The component exposes `role="separator"`.
+- Horizontal separators use the implicit horizontal orientation.
+- Vertical separators expose `aria-orientation="vertical"`.
+
+### Layout considerations
+
+A separator is not an interactive element.
+
+It does not receive keyboard focus and does not implement keyboard interaction.
+
+For vertical separators, ensure that the containing element provides a meaningful height.
+
+## Theming
+
+The Separator uses the following Puzzle theme tokens:
+
+| Token                   | Purpose             |
+| ----------------------- | ------------------- |
+| `--puzzle-color-border` | Separator color     |
+| `--puzzle-border-width` | Separator thickness |
+
+The component automatically follows light, dark, and scoped themes.
+
+There are no component-specific color variants or hardcoded colors.

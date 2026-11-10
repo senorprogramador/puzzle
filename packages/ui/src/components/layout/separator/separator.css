@@ -1,0 +1,19 @@
+.puzzle-separator {
+    display: block;
+    flex-shrink: 0;
+    background-color: var(--puzzle-color-border);
+}
+
+/* Horizontal */
+
+.puzzle-separator[data-orientation="horizontal"] {
+    width: 100%;
+    height: var(--puzzle-border-width, 1px);
+}
+
+/* Vertical */
+
+.puzzle-separator[data-orientation="vertical"] {
+    width: var(--puzzle-border-width, 1px);
+    height: 100%;
+}

@@ -322,6 +322,12 @@ export {
   type SectionStackProps,
 } from "./components/layout/section-stack";
 
+export {
+  Separator,
+  type SeparatorProps,
+  type SeparatorOrientation,
+} from "./components/layout/separator";
+
 export { Sidebar, type SidebarProps } from "./components/layout/sidebar";
 
 export {

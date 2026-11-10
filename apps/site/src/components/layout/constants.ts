@@ -237,6 +237,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/layout/section-stack",
               },
               {
+                id: "separator",
+                label: "Separator",
+                href: "/docs/components/ui/layout/separator",
+              },
+              {
                 id: "sidebar",
                 label: "Sidebar",
                 href: "/docs/components/ui/layout/sidebar",
