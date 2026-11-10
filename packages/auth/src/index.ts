@@ -71,6 +71,7 @@ export type {
   AuthResult,
   AuthRegisterInput,
   AuthSignInInput,
+  AuthMfaPolicy,
 } from "./types/auth-manager.types";
 
 export type {

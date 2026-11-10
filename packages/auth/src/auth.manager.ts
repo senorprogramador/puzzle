@@ -22,6 +22,7 @@ import type {
   AuthSession,
   AuthRateLimitPolicies,
   AuthRateLimitRule,
+  AuthMfaPolicy,
 } from "./types/auth-manager.types";
 
 import type {
@@ -46,6 +47,7 @@ import {
   AuthConfigurationError,
   AuthEmailVerificationRequiredError,
   AuthInvalidCredentialsError,
+  AuthMfaFactorError,
   AuthProviderError,
   AuthRateLimitError,
   AuthSessionError,
@@ -180,6 +182,7 @@ export class StorageAuthManager implements AuthManager {
   private readonly rateLimitProvider: RateLimitProvider;
   private readonly sessions: SessionManager;
   private readonly mfa?: AuthMfaGateway;
+  private readonly mfaPolicy: AuthMfaPolicy;
 
   private readonly usersCollection: string;
   private readonly credentialsCollection: string;
@@ -205,6 +208,7 @@ export class StorageAuthManager implements AuthManager {
     this.rateLimitProvider = dependencies.rateLimitProvider;
     this.sessions = dependencies.sessions;
     this.mfa = dependencies.mfa;
+    this.mfaPolicy = options.mfaPolicy ?? {};
 
     if (
       typeof options.rateLimitKeySecret !== "string" ||
@@ -483,6 +487,18 @@ export class StorageAuthManager implements AuthManager {
     return true;
   }
 
+  private async isMfaRequired(user: AuthUser): Promise<boolean> {
+    if (this.mfaPolicy.required === true) {
+      return true;
+    }
+
+    if (this.mfaPolicy.requiredFor) {
+      return Boolean(await this.mfaPolicy.requiredFor(user));
+    }
+
+    return false;
+  }
+
   private async createAuthenticatedSession(
     userId: string,
     metadata?: Readonly<Record<string, unknown>>,
@@ -683,6 +699,9 @@ export class StorageAuthManager implements AuthManager {
     // CRITICAL:
     // When active factors exist, stop here.
     // Do not create a normal authenticated session yet.
+    const publicUser = toPublicUser(userRecord);
+    const mfaRequired = await this.isMfaRequired(publicUser);
+
     const mfaPending = await this.mfa?.createSignInChallenge({
       userId: userRecord.id,
       ipAddress,
@@ -690,6 +709,12 @@ export class StorageAuthManager implements AuthManager {
 
     if (mfaPending) {
       return mfaPending;
+    }
+
+    if (mfaRequired) {
+      throw new AuthMfaFactorError(
+        "MFA is required for this account, but no active MFA factor is enrolled.",
+      );
     }
 
     const authenticated = await this.createAuthenticatedSession(

@@ -25,6 +25,21 @@ export type AuthRateLimitPolicies = {
   readonly signIn: AuthRateLimitScopePolicy;
 };
 
+/**
+ * Determines which users must authenticate with MFA.
+ *
+ * When required is true, MFA is required for every user.
+ * requiredFor can additionally enforce MFA for selected users.
+ *
+ * When neither option is configured, MFA remains optional for
+ * users without enrolled factors. Existing enrolled factors are
+ * still challenged during sign-in.
+ */
+export type AuthMfaPolicy = {
+  readonly required?: boolean;
+  readonly requiredFor?: (user: AuthUser) => boolean | Promise<boolean>;
+};
+
 export type AuthManagerOptions = {
   readonly rateLimitKeySecret: string;
 
@@ -36,6 +51,8 @@ export type AuthManagerOptions = {
   readonly maximumPasswordLength?: number;
 
   readonly requireVerifiedEmail?: boolean;
+
+  readonly mfaPolicy?: AuthMfaPolicy;
 
   readonly rateLimits?: {
     readonly registration?: Partial<AuthRateLimitScopePolicy>;
