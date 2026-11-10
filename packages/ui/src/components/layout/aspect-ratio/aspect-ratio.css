@@ -1,0 +1,14 @@
+.puzzle-aspect-ratio {
+    position: relative;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    aspect-ratio: 1;
+}
+
+.puzzle-aspect-ratio > * {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}

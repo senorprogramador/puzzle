@@ -257,6 +257,11 @@ export {
 } from "./components/layout/app-bar";
 
 export {
+  AspectRatio,
+  type AspectRatioProps,
+} from "./components/layout/aspect-ratio";
+
+export {
   Background,
   type BackgroundProps,
   type BackgroundPattern,
