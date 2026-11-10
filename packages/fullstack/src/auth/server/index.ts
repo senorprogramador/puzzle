@@ -33,45 +33,80 @@ export type AuthRouteHandlerMap = Readonly<
   >
 >;
 
+const createInitializationErrorResponse = (): Response =>
+  new Response(
+    JSON.stringify({
+      error: {
+        code: "AUTH_INITIALIZATION_FAILED",
+        message: "Authentication is temporarily unavailable.",
+      },
+    }),
+    {
+      status: 503,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+        Pragma: "no-cache",
+      },
+    },
+  );
+
 export const createAuthServer = (options: AuthServerOptions): AuthServer => {
   let initializationPromise: Promise<void> | null = null;
 
+  const initialize = (): Promise<void> => {
+    if (!initializationPromise) {
+      const initialization = (async () => {
+        await options.mfa.initialize();
+        await options.auth.initialize();
+        await options.stepUp.initialize();
+      })();
+
+      initializationPromise = initialization.catch((error) => {
+        // A failed initialization must not permanently poison the server.
+        // A subsequent request or explicit initialize() can retry it.
+        initializationPromise = null;
+        throw error;
+      });
+    }
+
+    return initializationPromise;
+  };
+
+  const rawHandlers = createAuthMfaHandlers(options);
+
+  const handlers = Object.fromEntries(
+    (
+      Object.entries(rawHandlers) as Array<
+        [keyof AuthMfaHandlers, (request: Request) => Promise<Response>]
+      >
+    ).map(([name, handler]) => [
+      name,
+      async (request: Request): Promise<Response> => {
+        try {
+          await initialize();
+        } catch {
+          return createInitializationErrorResponse();
+        }
+
+        return handler(request);
+      },
+    ]),
+  ) as unknown as AuthMfaHandlers;
+
   return {
     options,
-    handlers: createAuthMfaHandlers(options),
-
-    initialize: () => {
-      if (!initializationPromise) {
-        const initialization = (async () => {
-          const authServer = createAuthServer(options);
-
-          await authServer.initialize();
-
-          const routes = createAuthRouteHandlers(authServer, "/api/auth");
-          await options.auth.initialize();
-          await options.mfa.initialize();
-          await options.stepUp.initialize();
-        })();
-
-        initializationPromise = initialization.catch((error) => {
-          initializationPromise = null;
-          throw error;
-        });
-      }
-
-      return initializationPromise;
-    },
+    handlers,
+    initialize,
   };
 };
 
 export const createAuthRouteHandlers = (
   server: AuthServer,
-  basePath = "",
+  basePath = "/api/auth",
 ): AuthRouteHandlerMap => {
   const prefix = basePath.replace(/\/+$/, "");
-
   const route = (path: string): string => `${prefix}${path}`;
-
   const handlers = server.handlers;
 
   return {

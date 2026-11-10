@@ -489,3 +489,51 @@ test("state endpoint returns an authenticated snapshot without an MFA cookie", a
   assert.equal(payload.status, "authenticated");
   assert.equal(payload.user.id, "user-1");
 });
+test("a session-bound challenge cannot be completed through normal sign-in MFA", async () => {
+  const harness = createHarness({
+    stepUp: {
+      async getPendingAuthState() {
+        return null;
+      },
+    },
+  });
+
+  const response = await harness.handlers.verifySignInTotp(
+    postRequest(
+      "/mfa/sign-in/totp",
+      {
+        code: "123456",
+      },
+      `__Host-puzzle.session=session-token; __Host-puzzle.mfa=${challengeToken}`,
+    ),
+  );
+
+  assert.equal(response.status, 401);
+  assert.equal(harness.calls.verifyTotp.length, 0);
+});
+
+test("a stale step-up cookie is not interpreted as a sign-in MFA challenge", async () => {
+  const harness = createHarness({
+    stepUp: {
+      async getPendingAuthState() {
+        return null;
+      },
+    },
+  });
+
+  const request = new Request("https://example.com/state", {
+    method: "GET",
+    headers: {
+      cookie: `__Host-puzzle.session=session-token; __Host-puzzle.mfa=${challengeToken}`,
+    },
+  });
+
+  const response = await harness.handlers.getAuthState(request);
+
+  assert.equal(response.status, 200);
+
+  const payload = await response.json();
+
+  assert.equal(payload.status, "authenticated");
+  assert.equal(payload.user.id, "user-1");
+});

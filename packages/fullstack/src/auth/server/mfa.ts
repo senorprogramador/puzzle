@@ -297,25 +297,17 @@ const protectPost = (
   protectStateChangingRequest(request, options.csrf);
 };
 
-const requireSignInChallengeToken = async (
+const requireSignInChallengeToken = (
   request: Request,
   options: AuthMfaHandlersOptions,
-): Promise<string> => {
-  const token = requireMfaChallengeToken(request);
+): string => {
   const sessionToken = getSessionToken(request, options.cookie);
 
   if (sessionToken) {
-    const stepUp = await options.stepUp.getPendingAuthState(
-      token,
-      sessionToken,
-    );
-
-    if (stepUp) {
-      throw new AuthMfaChallengeError();
-    }
+    throw new AuthMfaChallengeError();
   }
 
-  return token;
+  return requireMfaChallengeToken(request);
 };
 
 const requireMfaChallengeToken = (request: Request): string => {
@@ -623,9 +615,7 @@ export const createAuthMfaHandlers = (
           },
         });
       }
-    }
-
-    if (challengeToken) {
+    } else if (challengeToken) {
       const pending = await options.auth.getAuthState(challengeToken);
 
       if (pending.status === "mfa-pending") {
