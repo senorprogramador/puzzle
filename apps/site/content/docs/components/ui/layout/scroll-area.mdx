@@ -1,0 +1,141 @@
+---
+title: Scroll Area
+description: Create accessible, theme-aware scrollable regions with native browser scrolling.
+---
+
+Scroll Area provides a constrained viewport for overflowing content. It keeps browser-native scrolling and keyboard behavior while applying Puzzle's scrollbar styling.
+
+## Import
+
+```tsx
+import { ScrollArea } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Give the component a height or max-height so vertical overflow can occur. The component fills its available width by default.
+
+<Preview
+  height={260}
+  align="center"
+  justify="center"
+  code={`\
+<ScrollArea aria-label="Recent activity" style={{ height: 180, width: 320 }}>
+  {Array.from({ length: 12 }, (_, index) => (
+    <div key={index} style={{ padding: "12px 16px", borderBottom: "1px solid var(--puzzle-color-border)" }}>
+      Activity item {index + 1}
+    </div>
+  ))}
+</ScrollArea>
+`}
+>
+  <ScrollArea aria-label="Recent activity" style={{ height: 180, width: 320 }}>
+    {Array.from({ length: 12 }, (_, index) => (
+      <div
+        key={index}
+        style={{
+          padding: "12px 16px",
+          borderBottom: "1px solid var(--puzzle-color-border)",
+        }}
+      >
+        Activity item {index + 1}
+      </div>
+    ))}
+  </ScrollArea>
+</Preview>
+
+## Scroll direction
+
+Use the `orientation` prop to choose which axis can scroll.
+
+- `vertical` (default): vertical scrolling only.
+- `horizontal`: horizontal scrolling only.
+- `both`: scrolling on both axes.
+
+<Preview
+  height={180}
+  code={`\
+<ScrollArea
+  orientation="horizontal"
+  aria-label="Scrollable cards"
+  style={{ width: "100%", height: 100 }}
+>
+  <div style={{ display: "flex", gap: 12, width: 720 }}>
+    {Array.from({ length: 8 }, (_, index) => (
+      <div
+        key={index}
+        style={{
+          flex: "0 0 120px",
+          padding: 16,
+          border: "1px solid var(--puzzle-color-border)",
+          borderRadius: 8,
+        }}
+      >
+        Card {index + 1}
+      </div>
+    ))}
+  </div>
+</ScrollArea>
+`}
+>
+  <ScrollArea
+    orientation="horizontal"
+    aria-label="Scrollable cards"
+    style={{ width: "100%", height: 100 }}
+  >
+    <div style={{ display: "flex", gap: 12, width: 720 }}>
+      {Array.from({ length: 8 }, (_, index) => (
+        <div
+          key={index}
+          style={{
+            flex: "0 0 120px",
+            padding: 16,
+            border: "1px solid var(--puzzle-color-border)",
+            borderRadius: 8,
+          }}
+        >
+          Card {index + 1}
+        </div>
+      ))}
+    </div>
+  </ScrollArea>
+</Preview>
+
+## Keyboard and accessibility
+
+The viewport is focusable by default, so users can scroll it with the keyboard using the browser's native scrolling keys (for example, Arrow keys, Page Up, Page Down, Home, and End).
+
+- Provide an accessible name with `aria-label` or `aria-labelledby` when the scrollable region is meaningful as a named region.
+- When an accessible name is provided and no explicit role is set, the component uses `role="region"`.
+- Use `tabIndex={-1}` to remove the viewport from sequential keyboard navigation while keeping it programmatically focusable.
+- Touch, trackpad, wheel, and pointer scrolling remain native.
+
+## API
+
+### Props
+
+| Prop          | Type                                   | Default               | Description                            |
+| ------------- | -------------------------------------- | --------------------- | -------------------------------------- |
+| `orientation` | `"vertical" \| "horizontal" \| "both"` | `"vertical"`          | Which scroll axes are enabled.         |
+| `children`    | `ReactNode`                            | -                     | Scrollable content.                    |
+| `className`   | `string`                               | -                     | Additional CSS classes.                |
+| `tabIndex`    | `number`                               | `0`                   | Keyboard focus order for the viewport. |
+| `role`        | `string`                               | `"region"` when named | Explicit semantic role.                |
+
+All standard HTML `div` attributes are supported, including `id`, `title`, `style`, `data-*`, `aria-*`, event handlers, and `ref`.
+
+Caller-provided styles can override the orientation's default overflow styles.
+
+## Layout
+
+A Scroll Area needs a constrained dimension to overflow:
+
+- For vertical scrolling, set `height` or `maxHeight`.
+- For horizontal scrolling, constrain the width and make the inner content wider than the viewport.
+- For both axes, constrain both dimensions as needed.
+
+## Theming
+
+The scrollbar thumb uses `--puzzle-color-border` and follows the active light, dark, or scoped theme.
+
+Scrollbar rendering and visibility remain subject to the browser and operating-system settings.

@@ -237,6 +237,11 @@ const items: TreeViewItem[] = [
                 href: "/docs/components/ui/layout/resizable-panels",
               },
               {
+                id: "scroll-area",
+                label: "Scroll Area",
+                href: "/docs/components/ui/layout/scroll-area",
+              },
+              {
                 id: "section",
                 label: "Section",
                 href: "/docs/components/ui/layout/section",

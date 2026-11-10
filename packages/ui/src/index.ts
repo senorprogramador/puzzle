@@ -324,6 +324,12 @@ export {
   type ResizablePanelsOrientation,
 } from "./components/layout/resizable-panels";
 
+export {
+  ScrollArea,
+  type ScrollAreaProps,
+  type ScrollAreaOrientation,
+} from "./components/layout/scroll-area";
+
 export { Section } from "./components/layout/section";
 export type {
   SectionTheme,
