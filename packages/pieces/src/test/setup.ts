@@ -22,6 +22,23 @@ afterEach(() => {
   cleanup();
 });
 
+if (typeof window.matchMedia !== "function") {
+  window.matchMedia = (media) =>
+    ({
+      matches: false,
+      media,
+      onchange: null,
+      addListener() {},
+      removeListener() {},
+      addEventListener() {},
+      removeEventListener() {},
+      dispatchEvent: () => true,
+    }) as MediaQueryList;
+}
+
+HTMLMediaElement.prototype.play = () => Promise.resolve();
+HTMLMediaElement.prototype.pause = () => {};
+
 if (typeof window.CSS === "undefined") {
   Object.defineProperty(window, "CSS", {
     configurable: true,

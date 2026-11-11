@@ -512,6 +512,158 @@ test("state endpoint returns a pending step-up challenge for the current session
   assert.equal(Object.hasOwn(payload.mfa, "challengeToken"), false);
 });
 
+test("required TOTP enrollment starts from the protected enrollment cookie", async () => {
+  const calls = [];
+  const harness = createHarness({
+    mfa: {
+      async beginRequiredTotpEnrollment(input) {
+        calls.push(input);
+
+        return {
+          factorId: "required-factor-1",
+          secret: "JBSWY3DPEHPK3PXP",
+          otpauthUrl: "otpauth://totp/Puzzle:user",
+          expiresAt,
+        };
+      },
+    },
+  });
+
+  const response = await harness.handlers.beginRequiredTotpEnrollment(
+    postRequest(
+      "/mfa/enrollment/totp/start",
+      { label: "Authenticator" },
+      `__Host-puzzle.mfa=${challengeToken}`,
+    ),
+  );
+
+  assert.equal(response.status, 200);
+
+  const payload = await response.json();
+
+  assert.equal(payload.status, "totp-enrollment-pending");
+  assert.equal(payload.factorId, "required-factor-1");
+  assert.equal(Object.hasOwn(payload, "challengeToken"), false);
+  assert.equal(calls[0].challengeToken, challengeToken);
+  assert.equal(readMfaChallengeCookie(response.headers.get("set-cookie")), challengeToken);
+});
+
+test("required TOTP enrollment completes into a session and clears the challenge cookie", async () => {
+  const calls = [];
+  const factor = {
+    id: "required-factor-1",
+    type: "totp",
+    status: "active",
+    label: "Authenticator",
+    createdAt: new Date(),
+    lastUsedAt: new Date(),
+  };
+  const harness = createHarness({
+    mfa: {
+      async verifyRequiredTotpEnrollment(input) {
+        calls.push(input);
+
+        return {
+          auth: authResult,
+          factor,
+          recoveryCodes: ["AAAA-BBBB"],
+        };
+      },
+    },
+  });
+
+  const response = await harness.handlers.verifyRequiredTotpEnrollment(
+    postRequest(
+      "/mfa/enrollment/totp/verify",
+      { factorId: factor.id, code: "123456" },
+      `__Host-puzzle.mfa=${challengeToken}`,
+    ),
+  );
+
+  assert.equal(response.status, 200);
+
+  const payload = await response.json();
+  const setCookie = response.headers.get("set-cookie");
+
+  assert.equal(payload.status, "mfa-factor-added");
+  assert.equal(payload.factor.id, factor.id);
+  assert.deepEqual(payload.recoveryCodes, ["AAAA-BBBB"]);
+  assert.equal(calls[0].challengeToken, challengeToken);
+  assert.equal(calls[0].factorId, factor.id);
+  assert.match(setCookie, /__Host-puzzle\.session=/);
+  assert.match(setCookie, /__Host-puzzle\.mfa=/);
+  assert.match(setCookie, /Max-Age=0/);
+});
+
+test("state endpoint exposes required MFA enrollment as a restricted state", async () => {
+  const harness = createHarness({
+    auth: {
+      async getAuthState(token) {
+        assert.equal(token, "session-token");
+
+        return {
+          status: "mfa-enrollment-required",
+          userId: "user-1",
+          sessionId: "session-1",
+        };
+      },
+    },
+  });
+
+  const response = await harness.handlers.getAuthState(
+    new Request("https://example.com/state", {
+      headers: {
+        cookie: "__Host-puzzle.session=session-token",
+      },
+    }),
+  );
+
+  assert.equal(response.status, 200);
+
+  const payload = await response.json();
+
+  assert.deepEqual(payload, {
+    status: "mfa-enrollment-required",
+    user: null,
+  });
+});
+
+test("a restricted session can start TOTP enrollment after password confirmation", async () => {
+  const calls = [];
+  const harness = createHarness({
+    mfa: {
+      async beginTotpEnrollment(input) {
+        calls.push(input);
+
+        return {
+          factorId: "factor-required-1",
+          secret: "JBSWY3DPEHPK3PXP",
+          otpauthUrl: "otpauth://totp/Puzzle:user",
+          expiresAt,
+        };
+      },
+    },
+  });
+
+  const response = await harness.handlers.beginTotpEnrollment(
+    postRequest(
+      "/mfa/totp/enrollment/start",
+      { currentPassword: "correct-password" },
+      "__Host-puzzle.session=session-token",
+    ),
+  );
+
+  assert.equal(response.status, 200);
+
+  const payload = await response.json();
+
+  assert.equal(payload.status, "totp-enrollment-pending");
+  assert.equal(payload.factorId, "factor-required-1");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].sessionToken, "session-token");
+  assert.equal(calls[0].currentPassword, "correct-password");
+});
+
 for (const status of ["mfa-pending", "mfa-enrollment-pending"]) {
   test(`state endpoint returns ${status} without a session cookie`, async () => {
     const harness = createHarness({
