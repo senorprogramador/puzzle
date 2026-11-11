@@ -524,6 +524,13 @@ bun run --filter @puzzle-ui/fullstack build
 bun run --filter @puzzle-ui/fullstack test
 ```
 
+The required TOTP and passkey enrollment end-to-end tests live in this package
+because they exercise the HTTP handlers together with the auth managers:
+
+```bash
+node --test packages/fullstack/tests/auth-mfa.e2e.test.mjs
+```
+
 ## Security boundaries
 
 The package maintains separate public entry points for:

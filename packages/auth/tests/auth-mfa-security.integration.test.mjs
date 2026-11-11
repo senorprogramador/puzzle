@@ -6,6 +6,7 @@ import {
   StorageAuthMfaManager,
   WebCryptoAuthSecretProtector,
   AUTH_MFA_FACTOR_COLLECTION,
+  AUTH_MFA_CHALLENGE_COLLECTION,
   generateTotpCode,
 } from "../dist/index.js";
 
@@ -198,17 +199,32 @@ test("repeated invalid TOTP attempts consume the challenge at the configured lim
 
   await harness.auth.signOut(harness.registered.token);
 
-  const pending = await signInWithPassword(harness);
+  harness.advanceTime(30_000);
 
-  for (let attempt = 0; attempt < 5; attempt++) {
+  const pending = await signInWithPassword(harness);
+  const sessionsBefore = harness.sessions.sessions.size;
+  const challenge = await harness.storage.findById(
+    AUTH_MFA_CHALLENGE_COLLECTION,
+    pending.challengeId,
+  );
+
+  for (let attempt = 0; attempt < challenge.maximumAttempts; attempt++) {
     await assert.rejects(() =>
       harness.mfa.verifySignInTotp({
         challengeToken: pending.challengeToken,
-        code: "000000",
+        code: "invalid",
         ipAddress: "127.0.0.1",
       }),
     );
   }
+
+  const consumedChallenge = await harness.storage.findById(
+    AUTH_MFA_CHALLENGE_COLLECTION,
+    pending.challengeId,
+  );
+
+  assert.equal(consumedChallenge.attemptCount, challenge.maximumAttempts);
+  assert.ok(consumedChallenge.consumedAt instanceof Date);
 
   const validCode = await harness.createCurrentTotpCode(
     enrollment.started.secret,
@@ -222,7 +238,8 @@ test("repeated invalid TOTP attempts consume the challenge at the configured lim
     }),
   );
 
-  assert.equal(harness.sessions.sessions.size, 0);
+  assert.equal(harness.sessions.sessions.size, sessionsBefore);
+  assert.equal(await harness.sessions.validate(harness.registered.token), null);
 });
 
 test("a recovery code can only be consumed once across concurrent challenges", async () => {

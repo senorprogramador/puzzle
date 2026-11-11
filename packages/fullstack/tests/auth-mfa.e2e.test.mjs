@@ -35,7 +35,8 @@ const ORIGIN = "https://example.com";
 const RP_ID = "example.com";
 
 const createHarness = async ({ webAuthn = false } = {}) => {
-  let currentTime = new Date("2026-01-01T00:00:00.000Z");
+  // HTTP cookie lifetimes use the real clock, so challenges must start current.
+  let currentTime = new Date();
 
   const clock = () => new Date(currentTime);
 
