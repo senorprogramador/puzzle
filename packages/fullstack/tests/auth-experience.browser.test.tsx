@@ -516,6 +516,62 @@ describe("AuthExperience browser behavior", () => {
     );
   });
 
+  it("submits values from Puzzle UI custom controls and native input types", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn(async () => authenticatedSnapshot);
+
+    renderExperience({
+      mode: "sign-up",
+      onSubmit,
+      config: {
+        fields: [
+          { name: "notes", label: "Notes", type: "textarea" },
+          { name: "terms", label: "Accept terms", type: "checkbox", required: true },
+          {
+            name: "country",
+            label: "Country",
+            type: "select",
+            options: [{ label: "Netherlands", value: "nl" }],
+          },
+          { name: "phone", label: "Phone", type: "tel" },
+          { name: "website", label: "Website", type: "url" },
+          { name: "seats", label: "Seats", type: "number" },
+        ],
+      },
+    });
+
+    await user.type(screen.getByLabelText(/Email/), "person@example.com");
+    await user.type(screen.getByLabelText(/^Password/), "a-strong-password");
+    await user.type(screen.getByLabelText(/Confirm password/), "a-strong-password");
+    await user.type(screen.getByLabelText("Notes"), "Hello Puzzle");
+    await user.click(screen.getByRole("checkbox", { name: "Accept terms" }));
+    await user.click(screen.getByRole("combobox", { name: "Country" }));
+    await user.click(await screen.findByRole("option", { name: "Netherlands" }));
+    await user.type(screen.getByLabelText("Phone"), "123456");
+    await user.type(screen.getByLabelText("Website"), "https://example.com");
+    await user.type(screen.getByLabelText("Seats"), "3");
+
+    expect(screen.getByLabelText("Website")).toHaveAttribute("type", "url");
+    expect(screen.getByLabelText("Seats")).toHaveAttribute("type", "number");
+
+    await user.click(screen.getByRole("button", { name: "Create an account" }));
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          fields: {
+            notes: "Hello Puzzle",
+            terms: true,
+            country: "nl",
+            phone: "123456",
+            website: "https://example.com",
+            seats: "3",
+          },
+        }),
+      );
+    });
+  });
+
   it("uses the real browser keyboard event path", async () => {
     renderExperience({
       mode: "sign-up",

@@ -159,14 +159,7 @@
     width: 100%;
 }
 
-.puzzle-auth__custom-field label {
-    font: inherit;
-    font-weight: 500;
-}
-
-.puzzle-auth__custom-field input:not([type="checkbox"]),
-.puzzle-auth__custom-field textarea,
-.puzzle-auth__custom-field select {
+.puzzle-auth__custom-field input {
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
@@ -178,14 +171,7 @@
     font: inherit;
 }
 
-.puzzle-auth__custom-field textarea {
-    min-height: 6rem;
-    resize: vertical;
-}
-
-.puzzle-auth__custom-field input:not([type="checkbox"]),
-.puzzle-auth__custom-field textarea,
-.puzzle-auth__custom-field select {
+.puzzle-auth__custom-field input {
     color: inherit;
     background: var(--puzzle-surface, #fff);
     border: 1px solid var(--puzzle-border, #e5e7eb);
@@ -193,19 +179,9 @@
     font: inherit;
 }
 
-.puzzle-auth__custom-field :is(input, textarea, select):focus-visible {
+.puzzle-auth__custom-field input:focus-visible {
     outline: 2px solid var(--puzzle-focus, #2563eb);
     outline-offset: 2px;
-}
-
-.puzzle-auth__field-description {
-    color: var(--puzzle-text-secondary, #737373);
-    font-size: 0.875em;
-}
-
-.puzzle-auth__field-error {
-    color: var(--puzzle-danger, #b42318);
-    font-size: 0.875em;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -236,13 +212,11 @@
     .puzzle-auth__recovery-codes li {
         border-color: CanvasText;
     }
-    .puzzle-auth__custom-field input,
-    .puzzle-auth__custom-field textarea,
-    .puzzle-auth__custom-field select {
+    .puzzle-auth__custom-field input {
         border: 1px solid CanvasText;
     }
 
-    .puzzle-auth__custom-field :is(input, textarea, select):focus-visible {
+    .puzzle-auth__custom-field input:focus-visible {
         outline: 2px solid Highlight;
     }
 }

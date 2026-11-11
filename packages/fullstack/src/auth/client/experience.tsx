@@ -9,7 +9,17 @@ import {
   type ReactNode,
 } from "react";
 
-import { Alert, Button } from "@puzzle-ui/ui";
+import {
+  Alert,
+  Button,
+  Checkbox,
+  FormField,
+  Heading,
+  Select,
+  Text,
+  TextAreaInput,
+  TextInput,
+} from "@puzzle-ui/ui";
 
 import type { AuthClient, AuthClientSnapshot } from "./index";
 import { SignInForm, useAuth } from "./react";
@@ -235,68 +245,58 @@ const AuthCustomFields = ({
     <>
       {fields.map((field) => {
         const id = `${generatedId}-${field.name}`;
-        const descriptionId = `${id}-description`;
-        const errorId = `${id}-error`;
         const value = values[field.name] ?? "";
         const error = errors[field.name];
-        const describedBy =
-          [field.description ? descriptionId : null, error ? errorId : null]
-            .filter(Boolean)
-            .join(" ") || undefined;
 
         const commonProps = {
-          id,
           name: field.name,
           disabled: disabled || field.disabled,
           required: field.required,
-          "aria-invalid": Boolean(error),
-          "aria-describedby": describedBy,
         };
 
         return (
-          <div className="puzzle-auth__custom-field" key={field.name}>
-            <label className="puzzle-auth__custom-label" htmlFor={id}>
-              {field.label}
-              {field.required ? <span aria-hidden="true"> *</span> : null}
-            </label>
-
+          <FormField
+            key={field.name}
+            controlId={id}
+            label={field.label}
+            description={field.description}
+            error={error}
+            required={field.required}
+            disabled={commonProps.disabled}
+            className={
+              field.type === "url" || field.type === "number"
+                ? "puzzle-auth__custom-field"
+                : undefined
+            }
+          >
             {field.type === "textarea" ? (
-              <textarea
+              <TextAreaInput
                 {...commonProps}
                 value={String(value)}
                 placeholder={field.placeholder}
+                resizable
                 onChange={(event) =>
                   onChange(field.name, event.currentTarget.value)
                 }
               />
             ) : field.type === "select" ? (
-              <select
+              <Select
                 {...commonProps}
+                fullWidth
                 value={String(value)}
-                onChange={(event) =>
-                  onChange(field.name, event.currentTarget.value)
-                }
-              >
-                <option value="">
-                  {field.placeholder ?? "Select an option"}
-                </option>
-
-                {field.options?.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                placeholder={field.placeholder ?? "Select an option"}
+                options={field.options ?? []}
+                onChange={(value) => onChange(field.name, value ?? "")}
+              />
             ) : field.type === "checkbox" ? (
-              <input
+              <Checkbox
                 {...commonProps}
-                type="checkbox"
                 checked={Boolean(value)}
                 onChange={(event) =>
                   onChange(field.name, event.currentTarget.checked)
                 }
               />
-            ) : (
+            ) : field.type === "url" || field.type === "number" ? (
               <input
                 {...commonProps}
                 type={field.type}
@@ -307,27 +307,19 @@ const AuthCustomFields = ({
                   onChange(field.name, event.currentTarget.value)
                 }
               />
+            ) : (
+              <TextInput
+                {...commonProps}
+                type={field.type === "tel" ? "phone" : field.type}
+                value={String(value)}
+                placeholder={field.placeholder}
+                autoComplete={field.autoComplete}
+                onChange={(event) =>
+                  onChange(field.name, event.currentTarget.value)
+                }
+              />
             )}
-
-            {field.description ? (
-              <span
-                className="puzzle-auth__field-description"
-                id={descriptionId}
-              >
-                {field.description}
-              </span>
-            ) : null}
-
-            {error ? (
-              <span
-                className="puzzle-auth__field-error"
-                id={errorId}
-                role="alert"
-              >
-                {error}
-              </span>
-            ) : null}
-          </div>
+          </FormField>
         );
       })}
     </>
@@ -527,8 +519,12 @@ const AuthExperience = ({
 
       <div className="puzzle-auth-experience__branding">
         {branding?.logo}
-        {branding?.title ? <h1>{branding.title}</h1> : null}
-        {branding?.description ? <p>{branding.description}</p> : null}
+        {branding?.title ? (
+          <Heading as="h1" level="headline2">
+            {branding.title}
+          </Heading>
+        ) : null}
+        {branding?.description ? <Text as="p">{branding.description}</Text> : null}
       </div>
 
       <div className={contentClassName}>
@@ -552,12 +548,11 @@ const AuthExperience = ({
               onSubmit={(event) => void handleSubmit(event)}
               noValidate
             >
-              <div className="puzzle-auth__custom-field">
-                <label htmlFor="puzzle-auth-experience-name">
-                  {messages.name}
-                </label>
-                <input
-                  id="puzzle-auth-experience-name"
+              <FormField
+                label={messages.name}
+                controlId="puzzle-auth-experience-name"
+              >
+                <TextInput
                   name="name"
                   type="text"
                   autoComplete="name"
@@ -565,69 +560,54 @@ const AuthExperience = ({
                   disabled={loading}
                   onChange={(event) => setName(event.currentTarget.value)}
                 />
-              </div>
+              </FormField>
 
-              <div className="puzzle-auth__custom-field">
-                <label htmlFor="puzzle-auth-experience-email">
-                  {messages.email}
-                  <span aria-hidden="true"> *</span>
-                </label>
-                <input
-                  id="puzzle-auth-experience-email"
+              <FormField
+                label={messages.email}
+                controlId="puzzle-auth-experience-email"
+                required
+                error={emailError}
+              >
+                <TextInput
                   name="email"
                   type="email"
                   autoComplete="email"
                   required
                   value={email}
                   disabled={loading}
-                  aria-invalid={Boolean(emailError)}
-                  aria-describedby={
-                    emailError
-                      ? "puzzle-auth-experience-email-error"
-                      : undefined
-                  }
                   onChange={(event) =>
                     handleEmailChange(event.currentTarget.value)
                   }
                 />
 
-                {emailError ? (
-                  <span
-                    id="puzzle-auth-experience-email-error"
-                    className="puzzle-auth__field-error"
-                    role="alert"
-                  >
-                    {emailError}
-                  </span>
-                ) : null}
-              </div>
+              </FormField>
 
-              <div className="puzzle-auth__custom-field">
-                <label htmlFor="puzzle-auth-experience-password">
-                  {messages.password}
-                  <span aria-hidden="true"> *</span>
-                </label>
-                <input
-                  id="puzzle-auth-experience-password"
+              <FormField
+                label={messages.password}
+                controlId="puzzle-auth-experience-password"
+                required
+              >
+                <TextInput
                   name="new-password"
                   type="password"
+                  suffix={null}
                   autoComplete="new-password"
                   required
                   value={password}
                   disabled={loading}
                   onChange={(event) => setPassword(event.currentTarget.value)}
                 />
-              </div>
+              </FormField>
 
-              <div className="puzzle-auth__custom-field">
-                <label htmlFor="puzzle-auth-experience-confirm">
-                  {messages.confirmPassword}
-                  <span aria-hidden="true"> *</span>
-                </label>
-                <input
-                  id="puzzle-auth-experience-confirm"
+              <FormField
+                label={messages.confirmPassword}
+                controlId="puzzle-auth-experience-confirm"
+                required
+              >
+                <TextInput
                   name="confirm-password"
                   type="password"
+                  suffix={null}
                   autoComplete="new-password"
                   required
                   value={confirmation}
@@ -636,7 +616,7 @@ const AuthExperience = ({
                     setConfirmation(event.currentTarget.value)
                   }
                 />
-              </div>
+              </FormField>
 
               <AuthCustomFields
                 fields={fields}
@@ -660,14 +640,14 @@ const AuthExperience = ({
 
             {onSignIn ? (
               <footer className="puzzle-auth__footer">
-                <span>{messages.existingAccount}</span>
-                <button
+                <Text>{messages.existingAccount}</Text>
+                <Button
                   type="button"
-                  className="puzzle-auth__text-button"
+                  variant="link"
                   onClick={onSignIn}
                 >
                   {messages.signIn}
-                </button>
+                </Button>
               </footer>
             ) : null}
           </>

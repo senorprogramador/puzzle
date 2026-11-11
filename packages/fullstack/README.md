@@ -176,6 +176,10 @@ export const SignUpPage = () => (
 
 Custom fields are UI-only extensions. They are not automatically added to the authentication user model or persisted by the auth engine.
 
+The experience uses Puzzle UI form fields, text inputs, text areas, checkboxes,
+selects, buttons and typography. URL and number fields retain native inputs to
+preserve their input types and string values, which `TextInput` does not support.
+
 Use `onSubmit` to receive the standard registration input and custom field values. The callback can call `signUp` to execute the normal registration flow.
 
 ```tsx
