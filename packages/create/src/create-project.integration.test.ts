@@ -33,6 +33,7 @@ describe("createProject", () => {
         framework: "react",
         packageManager: "bun",
         tailwind: true,
+        auth: false,
       },
       {
         cwd,
@@ -86,6 +87,104 @@ describe("createProject", () => {
     );
   });
 
+  it("generates a React application with Puzzle Auth", async () => {
+    const runner = vi.fn().mockResolvedValue(undefined);
+
+    await createProject(
+      {
+        name: "auth-app",
+        directory: "auth-app",
+        framework: "react",
+        packageManager: "bun",
+        tailwind: false,
+        auth: true,
+      },
+      {
+        cwd,
+        runner,
+      },
+    );
+
+    const projectDirectory = path.join(cwd, "auth-app");
+
+    const main = await readFile(
+      path.join(projectDirectory, "src/main.tsx"),
+      "utf8",
+    );
+
+    const signIn = await readFile(
+      path.join(projectDirectory, "src/auth/sign-in.tsx"),
+      "utf8",
+    );
+
+    const signUp = await readFile(
+      path.join(projectDirectory, "src/auth/sign-up.tsx"),
+      "utf8",
+    );
+
+    expect(main).toContain("@puzzle-ui/fullstack/auth/client");
+    expect(main).toContain("<AuthProvider");
+
+    expect(signIn).toContain('mode="sign-in"');
+    expect(signUp).toContain('mode="sign-up"');
+
+    expect(runner).toHaveBeenCalledWith(
+      "bun",
+      [
+        "add",
+        "@puzzle-ui/ui@latest",
+        "@puzzle-ui/theme@latest",
+        "@puzzle-ui/auth@latest",
+        "@puzzle-ui/fullstack@latest",
+        "@puzzle-ui/session@latest",
+      ],
+      {
+        cwd: projectDirectory,
+      },
+    );
+  });
+
+  it.each(["bun", "npm", "pnpm", "yarn"] as PackageManager[])(
+    "installs Puzzle Auth with %s",
+    async (packageManager) => {
+      const runner = vi.fn().mockResolvedValue(undefined);
+
+      await createProject(
+        {
+          name: "auth-app",
+          directory: "auth-app",
+          framework: "react",
+          packageManager,
+          tailwind: false,
+          auth: true,
+        },
+        {
+          cwd,
+          runner,
+        },
+      );
+
+      const projectDirectory = path.join(cwd, "auth-app");
+
+      expect(runner).toHaveBeenCalledTimes(1);
+
+      expect(runner).toHaveBeenCalledWith(
+        packageManager,
+        [
+          ...(packageManager === "npm" ? ["install"] : ["add"]),
+          "@puzzle-ui/ui@latest",
+          "@puzzle-ui/theme@latest",
+          "@puzzle-ui/auth@latest",
+          "@puzzle-ui/fullstack@latest",
+          "@puzzle-ui/session@latest",
+        ],
+        {
+          cwd: projectDirectory,
+        },
+      );
+    },
+  );
+
   it.each(["bun", "npm", "pnpm", "yarn"] as PackageManager[])(
     "installs Puzzle with %s when Tailwind is disabled",
     async (packageManager) => {
@@ -98,6 +197,7 @@ describe("createProject", () => {
           framework: "react",
           packageManager,
           tailwind: false,
+          auth: false,
         },
         {
           cwd,
@@ -144,6 +244,7 @@ describe("createProject", () => {
           framework: "react",
           packageManager: "bun",
           tailwind: true,
+          auth: false,
         },
         {
           cwd,

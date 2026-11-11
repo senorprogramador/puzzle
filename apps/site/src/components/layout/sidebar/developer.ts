@@ -12,6 +12,11 @@ export const developer: TreeViewItem = {
       href: `${folder}/create-project`,
     },
     {
+      id: "developer-authentication",
+      label: "Authentication Setup",
+      href: `${folder}/authentication`,
+    },
+    {
       id: "developer-contributing",
       label: "Contributing",
       href: `${folder}/contributing`,

@@ -1,6 +1,6 @@
 ---
 title: Create a Project
-description: Scaffold a new React application with Puzzle UI using the interactive project generator.
+description: Scaffold a React application with Puzzle UI, Theme, optional Tailwind CSS, and optional Puzzle Auth.
 ---
 
 The <code>@puzzle-ui/create</code> package creates a new React application with Puzzle UI installed and configured.
@@ -15,64 +15,41 @@ It supports Next.js, TanStack Start, and a basic React + Vite application.
 
 ## Run the generator
 
-Choose the command for your package manager.
-
-<PackageManagerTabs>
-  <PackageManagerTab value="npm">
+### npm
 
 ```bash
 npx @puzzle-ui/create
 ```
 
-  </PackageManagerTab>
-  <PackageManagerTab value="bun">
+### Bun
 
 ```bash
 bunx @puzzle-ui/create
 ```
 
-  </PackageManagerTab>
-  <PackageManagerTab value="pnpm">
+### pnpm
 
 ```bash
 pnpm dlx @puzzle-ui/create
 ```
 
-  </PackageManagerTab>
-  <PackageManagerTab value="yarn">
+### Yarn
 
 ```bash
 yarn dlx @puzzle-ui/create
 ```
 
-  </PackageManagerTab>
-</PackageManagerTabs>
-
 Yarn's <code>dlx</code> command requires Yarn 2 or later. With Yarn Classic, use the npm command.
-
-The generator detects the package manager from the execution environment and uses it for framework generation and dependency installation.
 
 ## Interactive setup
 
-The generator asks for three options.
+The generator asks for four options.
 
 ### Project name
 
 Enter a project name. The generator converts it to kebab-case and uses it for the target directory and package name.
 
-For example:
-
-| Input          | Generated name |
-| -------------- | -------------- |
-| My Dashboard   | my-dashboard   |
-| Puzzle Website | puzzle-website |
-| myApp          | my-app         |
-
-The target directory must not already exist. The generator never overwrites an existing directory.
-
 ### Framework
-
-Choose one of the supported frameworks.
 
 | Framework      | Generated application              |
 | -------------- | ---------------------------------- |
@@ -88,23 +65,53 @@ You can optionally configure Tailwind CSS v4.
 
 When enabled, the generator configures the appropriate integration for the selected framework and installs the required development dependencies.
 
-When disabled, the application still uses Puzzle's theme and component styling.
+### Puzzle Auth
+
+You can optionally add Puzzle authentication.
+
+When enabled, the generator installs:
+
+- <code>@puzzle-ui/auth</code>
+- <code>@puzzle-ui/fullstack</code>
+- <code>@puzzle-ui/session</code>
+
+For Next.js and TanStack Start, it also creates:
+
+- An application-level <code>AuthProvider</code>.
+- A sign-in page.
+- A sign-up page.
+- A framework-specific authentication API route.
+- A server-only AuthServer registration module.
+- An application bootstrap function.
+
+For Basic React, it creates the AuthProvider and sign-in/sign-up components. A Basic React application has no server runtime, so its authentication API must be hosted separately.
+
+<Callout type="warn" title="Complete server configuration is required">
+  Puzzle Auth requires application-specific security dependencies. The generator
+  does not create an insecure password hasher, fake storage adapter, or
+  process-local production rate limiter. The generated API route returns HTTP
+  503 until you register a real AuthServer.
+</Callout>
+
+See [Authentication Setup](/docs/developer/authentication) for the required server configuration.
 
 ## What gets configured
 
 After framework generation, the CLI:
 
-1. Adds the Puzzle theme provider.
-2. Creates a starter page using the Puzzle UI package.
-3. Sets the generated package name.
-4. Optionally configures Tailwind CSS.
-5. Installs <code>@puzzle-ui/ui</code> and <code>@puzzle-ui/theme</code>.
+1. Configures framework package transpilation.
+2. Adds the Puzzle theme provider.
+3. Creates a starter page using the Puzzle UI package.
+4. Sets the generated package name.
+5. Optionally configures and installs Tailwind CSS.
+6. Optionally creates the Puzzle Auth client and server integration files.
+7. Installs the selected Puzzle packages.
 
-The generated application uses the system color scheme by default.
+The target directory must not already exist. The generator never overwrites an existing project.
 
 ## Start developing
 
-Move into the generated directory and run its development script.
+Move into the generated directory and run its development server.
 
 ```bash
 cd my-dashboard
@@ -120,7 +127,7 @@ bun run dev
 
 ## Manual installation
 
-The generator is optional. You can install Puzzle in an existing React project.
+Install the UI and theme packages:
 
 ```bash
 npm install @puzzle-ui/ui @puzzle-ui/theme
@@ -144,7 +151,13 @@ const App = () => (
 export default App;
 ```
 
-See [Getting Started](/docs/getting-started) for the manual setup guide.
+To add the authentication packages:
+
+```bash
+npm install @puzzle-ui/auth @puzzle-ui/fullstack @puzzle-ui/session
+```
+
+Follow [Authentication Setup](/docs/developer/authentication) before exposing authentication routes.
 
 ## Troubleshooting
 
@@ -158,7 +171,13 @@ The generator downloads the framework CLI through your selected package manager.
 
 ### Dependency installation fails
 
-Run the failed installation command manually from the generated project directory. Check the package manager output for registry, network, and version errors.
+Run the failed installation command manually from the generated project directory. Check the package manager output for registry, network, or version errors.
+
+### Authentication returns HTTP 503
+
+The server bootstrap is intentionally incomplete. Configure the storage adapter, password hasher, rate limiter, session manager, MFA manager, step-up manager, cookies, CSRF policy, and trusted client IP resolver.
+
+Register the resulting <code>AuthServer</code> with <code>configureAuthServer</code>.
 
 ### Tailwind styles are missing
 

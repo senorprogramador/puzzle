@@ -7,6 +7,12 @@ export const PUZZLE_PACKAGES = [
   "@puzzle-ui/theme@latest",
 ] as const;
 
+export const PUZZLE_AUTH_PACKAGES = [
+  "@puzzle-ui/auth@latest",
+  "@puzzle-ui/fullstack@latest",
+  "@puzzle-ui/session@latest",
+] as const;
+
 export const FRAMEWORKS: {
   value: Framework;
   label: string;

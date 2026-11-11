@@ -1,16 +1,22 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-const configureNext = async (directory: string) => {
+import type { Framework } from "../types";
+
+const getTranspiledPackages = (auth: boolean) => [
+  "@puzzle-ui/ui",
+  "@puzzle-ui/theme",
+  ...(auth ? ["@puzzle-ui/fullstack"] : []),
+];
+
+const configureNext = async (directory: string, auth: boolean) => {
   const configPath = path.join(directory, "next.config.ts");
+  const packages = getTranspiledPackages(auth);
 
   const config = `import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: [
-    "@puzzle-ui/ui",
-    "@puzzle-ui/theme",
-  ],
+  transpilePackages: ${JSON.stringify(packages, null, 4)},
 };
 
 export default nextConfig;
@@ -19,18 +25,25 @@ export default nextConfig;
   await writeFile(configPath, config, "utf8");
 };
 
-const configureTanStack = async (directory: string) => {
+const configureTanStack = async (directory: string, auth: boolean) => {
   const configPath = path.join(directory, "vite.config.ts");
 
   let config = await readFile(configPath, "utf8");
+
+  const packages = getTranspiledPackages(auth);
 
   if (!config.includes("noExternal")) {
     config = config.replace(
       /defineConfig\(\s*\{/,
       `defineConfig({
   ssr: {
-    noExternal: ["@puzzle-ui/ui", "@puzzle-ui/theme"],
+    noExternal: ${JSON.stringify(packages)},
   },`,
+    );
+  } else if (auth && !config.includes('"@puzzle-ui/fullstack"')) {
+    config = config.replace(
+      /noExternal:\s*\[([^\]]*)\]/,
+      `noExternal: [$1, "@puzzle-ui/fullstack"]`,
     );
   }
 
@@ -39,15 +52,16 @@ const configureTanStack = async (directory: string) => {
 
 const configureFramework = async (
   directory: string,
-  framework: "next" | "tanstack" | "react",
+  framework: Framework,
+  auth = false,
 ) => {
   if (framework === "next") {
-    await configureNext(directory);
+    await configureNext(directory, auth);
     return;
   }
 
   if (framework === "tanstack") {
-    await configureTanStack(directory);
+    await configureTanStack(directory, auth);
   }
 };
 

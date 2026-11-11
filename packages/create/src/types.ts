@@ -8,6 +8,7 @@ export type ProjectOptions = {
   framework: Framework;
   packageManager: PackageManager;
   tailwind: boolean;
+  auth: boolean;
 };
 
 export type CommandOptions = {

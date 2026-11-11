@@ -54,12 +54,23 @@ const getProjectOptions = async (): Promise<ProjectOptions | null> => {
     return null;
   }
 
+  const auth = await p.confirm({
+    message: "Would you like to add Puzzle Auth?",
+    initialValue: false,
+  });
+
+  if (p.isCancel(auth)) {
+    p.cancel("Project creation cancelled.");
+    return null;
+  }
+
   return {
     name: directory,
     directory,
     framework: framework as Framework,
     packageManager: detectPackageManager(),
     tailwind,
+    auth,
   };
 };
 
