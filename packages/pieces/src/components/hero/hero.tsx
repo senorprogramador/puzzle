@@ -1,14 +1,12 @@
-import type { ElementType } from "react";
-
 import { HeroVideo } from "./hero-video";
 
 import type { HeroProps } from "./hero.types";
 
-import styles from "./hero.module.css";
+import "./hero.css";
 
 const Hero = ({
   as: Component = "section",
-  titleAs = "h1",
+  titleAs: Heading = "h1",
 
   id,
   testId,
@@ -53,15 +51,15 @@ const Hero = ({
     (mediaPosition === "background" && media),
   );
 
-  const Heading = titleAs as ElementType;
+  const rootClassName = ["puzzle-hero", className].filter(Boolean).join(" ");
 
-  const rootClassName = [styles.hero, className].filter(Boolean).join(" ");
-
-  const contentClasses = [styles.content, contentClassName]
+  const contentClasses = ["puzzle-hero__content", contentClassName]
     .filter(Boolean)
     .join(" ");
 
-  const mediaClasses = [styles.media, mediaClassName].filter(Boolean).join(" ");
+  const mediaClasses = ["puzzle-hero__media", mediaClassName]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <Component
@@ -69,7 +67,6 @@ const Hero = ({
       data-testid={testId}
       className={rootClassName}
       style={style}
-      data-hero
       data-layout={layout}
       data-media-position={mediaPosition}
       data-alignment={alignment}
@@ -85,10 +82,14 @@ const Hero = ({
       role={role}
     >
       {hasBackground && (
-        <div className={styles.background} aria-hidden="true">
+        <div
+          className="puzzle-hero__background"
+          aria-hidden="true"
+          data-hero-background
+        >
           {backgroundImage && (
             <img
-              className={styles.backgroundImage}
+              className="puzzle-hero__background-image"
               src={backgroundImage}
               alt=""
               loading="eager"
@@ -100,19 +101,19 @@ const Hero = ({
           {backgroundVideo && (
             <HeroVideo
               source={backgroundVideo}
-              className={styles.backgroundVideo}
+              className="puzzle-hero__background-video"
             />
           )}
 
           {mediaPosition === "background" && media && (
-            <div className={styles.backgroundMedia}>{media}</div>
+            <div className="puzzle-hero__background-media">{media}</div>
           )}
 
-          <div className={styles.overlay} />
+          <div className="puzzle-hero__overlay" />
         </div>
       )}
 
-      <div className={styles.inner} data-hero-inner>
+      <div className="puzzle-hero__inner" data-hero-inner>
         {media && mediaPosition !== "background" && (
           <div className={mediaClasses} data-hero-media>
             {media}
@@ -120,21 +121,21 @@ const Hero = ({
         )}
 
         <div className={contentClasses} data-hero-content>
-          {eyebrow && <div className={styles.eyebrow}>{eyebrow}</div>}
+          {eyebrow && <div className="puzzle-hero__eyebrow">{eyebrow}</div>}
 
-          {title && <Heading className={styles.title}>{title}</Heading>}
+          {title && <Heading className="puzzle-hero__title">{title}</Heading>}
 
           {description && (
-            <div className={styles.description}>{description}</div>
+            <div className="puzzle-hero__description">{description}</div>
           )}
 
-          {children && <div className={styles.children}>{children}</div>}
+          {children && <div className="puzzle-hero__children">{children}</div>}
 
-          {actions && <div className={styles.actions}>{actions}</div>}
+          {actions && <div className="puzzle-hero__actions">{actions}</div>}
 
-          {search && <div className={styles.search}>{search}</div>}
+          {search && <div className="puzzle-hero__search">{search}</div>}
 
-          {meta && <div className={styles.meta}>{meta}</div>}
+          {meta && <div className="puzzle-hero__meta">{meta}</div>}
         </div>
       </div>
     </Component>

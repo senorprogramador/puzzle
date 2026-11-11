@@ -1,0 +1,1097 @@
+---
+title: Heroes
+description: Responsive hero sections and layouts for websites, applications and landing pages.
+---
+
+# Heroes
+
+Heroes are introductory sections that establish the visual identity of a page.
+
+Puzzle Pieces provides a flexible Hero component and a collection of specialized presets. All presets share the same underlying implementation, making them easy to customize without maintaining separate layouts.
+
+## Installation
+
+Import the Hero components from Puzzle Pieces:
+
+```tsx
+import {
+  Hero,
+  SplitHero,
+  CenteredHero,
+  FullScreenHero,
+  ImageHero,
+  VideoHero,
+} from "@puzzle-ui/pieces";
+```
+
+## Components
+
+| Component            | Description                      |
+| -------------------- | -------------------------------- |
+| Hero                 | Generic hero component           |
+| SplitHero            | Text and media side by side      |
+| CenteredHero         | Centered introduction            |
+| FullScreenHero       | Full viewport introduction       |
+| VideoHero            | Background video                 |
+| ImageHero            | Background image with overlay    |
+| MinimalHero          | Minimal introduction             |
+| EditorialHero        | Editorial layout                 |
+| AgencyHero           | Agency and consultancy websites  |
+| ProductHero          | Product introductions            |
+| SaaSHero             | SaaS product websites            |
+| StoreHero            | Online stores and collections    |
+| RestaurantHero       | Restaurants and hospitality      |
+| AccommodationHero    | Hotels and holiday accommodation |
+| PrintShopHero        | Printing businesses              |
+| DashboardWelcomeHero | Dashboard introductions          |
+| AppHero              | Web application introductions    |
+| CampaignHero         | Campaign landing pages           |
+| ComingSoonHero       | Pre-launch pages                 |
+| SearchHero           | Search-oriented websites         |
+
+## Basic usage
+
+Use Hero for complete control over the layout and content.
+
+<Preview
+  code={`\
+  <Hero
+    eyebrow="Welcome to Puzzle"
+    title="Build better digital experiences."
+    description="Create beautiful and responsive interfaces with reusable components."
+    actions={<Button>Get started</Button>}
+  />
+`}
+>
+  <Hero
+    eyebrow="Welcome to Puzzle"
+    title="Build better digital experiences."
+    description="Create beautiful and responsive interfaces with reusable components."
+    actions={<Button>Get started</Button>}
+  />
+</Preview>
+
+## Layouts
+
+The Hero component supports four layout configurations.
+
+### Split
+
+Text and media are displayed in separate columns.
+
+<Preview
+  code={`\
+<Hero
+  layout="split"
+  title="A better way to work."
+  description="Bring everything together in one place."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Product preview" />}
+/>
+`}
+>
+  <Hero
+    layout="split"
+    title="A better way to work."
+    description="Bring everything together in one place."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Product preview"
+      />
+    }
+  />
+</Preview>
+
+### Centered
+
+Content is centered horizontally.
+
+<Preview
+  code={`\
+<Hero
+  layout="centered"
+  alignment="center"
+  title="Discover something new."
+  description="Explore everything we have to offer."
+/>
+`}
+>
+  <Hero
+    layout="centered"
+    alignment="center"
+    title="Discover something new."
+    description="Explore everything we have to offer."
+  />
+</Preview>
+
+### Full width
+
+The inner container uses the full available width.
+
+<Preview
+  code={`\
+<Hero
+  layout="full-width"
+  title="Make an impression."
+  mediaPosition="background"
+/>
+`}
+>
+  <Hero
+    layout="full-width"
+    title="Make an impression."
+    mediaPosition="background"
+  />
+</Preview>
+
+### Asymmetric
+
+The media and content columns use different proportions.
+
+<Preview
+  code={`\
+<Hero
+  layout="asymmetric"
+  title="Designed for ambitious teams."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Team collaborating" />}
+/>
+`}
+>
+  <Hero
+    layout="asymmetric"
+    title="Designed for ambitious teams."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Team collaborating"
+      />
+    }
+  />
+</Preview>
+
+## Media positioning
+
+Control where media is displayed using mediaPosition.
+
+| Value      | Description          |
+| ---------- | -------------------- |
+| left       | Media before content |
+| right      | Media after content  |
+| background | Media behind content |
+
+<Preview
+  code={`\
+<Hero
+  layout="split"
+  mediaPosition="left"
+  title="Media on the left."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Example" />}
+/>
+`}
+>
+  <Hero
+    layout="split"
+    mediaPosition="left"
+    title="Media on the left."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Example"
+      />
+    }
+  />
+</Preview>
+
+Background media can also be supplied directly.
+
+<Preview
+  code={`\
+<Hero
+  mediaPosition="background"
+  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  title="Explore the world."
+  overlay="gradient"
+/>
+`}
+>
+  <Hero
+    mediaPosition="background"
+    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    title="Explore the world."
+    overlay="gradient"
+  />
+</Preview>
+
+## Height
+
+Control the minimum height of the hero.
+
+| Value    | Description                    |
+| -------- | ------------------------------ |
+| auto     | Content determines the height  |
+| large    | Large introductory section     |
+| viewport | Minimum height of the viewport |
+
+<Preview
+  code={`\
+<Hero height="viewport" title="Welcome." />
+`}
+>
+  <Hero height="viewport" title="Welcome." />
+</Preview>
+
+## Themes
+
+Hero supports four theme configurations.
+
+| Value    | Description                    |
+| -------- | ------------------------------ |
+| light    | Standard light appearance      |
+| dark     | Dark appearance                |
+| contrast | Contrasting surface appearance |
+| brand    | Primary brand appearance       |
+
+<Preview
+  code={`\
+<Hero theme="brand" title="Your brand, your experience." />
+`}
+>
+  <Hero theme="brand" title="Your brand, your experience." />
+</Preview>
+
+Hero consumes semantic Puzzle Theme tokens for its background, foreground, typography and spacing.
+
+## Overlays
+
+Overlays improve text readability when using background media.
+
+| Value    | Description          |
+| -------- | -------------------- |
+| none     | No overlay           |
+| subtle   | Subtle overlay       |
+| strong   | Strong overlay       |
+| gradient | Directional gradient |
+
+<Preview
+  code={`\
+<Hero
+  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  overlay="gradient"
+  theme="dark"
+  title="Discover new places."
+/>
+`}
+>
+  <Hero
+    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    overlay="gradient"
+    theme="dark"
+    title="Discover new places."
+  />
+</Preview>
+
+## Content
+
+Hero supports several content slots.
+
+### Eyebrow
+
+A short introductory label above the heading.
+
+<Preview
+  code={`\
+<Hero eyebrow="Digital experiences" title="Build something remarkable." />
+`}
+>
+  <Hero eyebrow="Digital experiences" title="Build something remarkable." />
+</Preview>
+
+### Description
+
+Additional introductory text.
+
+<Preview
+  code={`\
+<Hero
+  title="Everything in one place."
+  description="A flexible platform for modern teams."
+/>
+`}
+>
+  <Hero
+    title="Everything in one place."
+    description="A flexible platform for modern teams."
+  />
+</Preview>
+
+### Actions
+
+Use existing Puzzle UI components for buttons and other actions.
+
+<Preview
+  code={`\
+<Hero
+  title="Get started."
+  actions={
+    <>
+      <Button>Get started</Button>
+      <Button variant="secondary">Learn more</Button>
+    </>
+  }
+/>
+`}
+>
+  <Hero
+    title="Get started."
+    actions={
+      <>
+        <Button>Get started</Button>
+        <Button variant="secondary">Learn more</Button>
+      </>
+    }
+  />
+</Preview>
+
+### Search
+
+The search slot can contain any existing Puzzle form components.
+
+<Preview
+  code={`\
+<Hero
+  layout="centered"
+  title="Find your next destination."
+  search={<TextInput type="search" aria-label="Search destinations" placeholder="Search destinations" />}
+/>
+`}
+>
+  <Hero
+    layout="centered"
+    title="Find your next destination."
+    search={
+      <TextInput
+        type="search"
+        aria-label="Search destinations"
+        placeholder="Search destinations"
+      />
+    }
+  />
+</Preview>
+
+### Meta
+
+Use meta for supplementary information such as availability, opening hours or product details.
+
+<Preview
+  code={`\
+<Hero
+  title="Stay somewhere special."
+  meta={
+    <>
+      <span>3 apartments</span>
+      <span>Up to 9 guests</span>
+    </>
+  }
+/>
+`}
+>
+  <Hero
+    title="Stay somewhere special."
+    meta={
+      <>
+        <span>3 apartments</span>
+        <span>Up to 9 guests</span>
+      </>
+    }
+  />
+</Preview>
+
+### Children
+
+Additional content can be placed between the description and the action slots.
+
+<Preview
+  code={`\
+<Hero title="Welcome">
+  <p>Additional content goes here.</p>
+</Hero>
+`}
+>
+  <Hero title="Welcome">
+    <p>Additional content goes here.</p>
+  </Hero>
+</Preview>
+
+## Responsive behavior
+
+Hero automatically adapts its layout to smaller screens.
+
+- Split layouts become single-column layouts.
+- Asymmetric layouts become single-column layouts.
+- Media can move before content on mobile.
+- Typography uses responsive sizing.
+- Horizontal and vertical spacing adapt to available screen space.
+
+Use reverseOnMobile to control the order of content and media.
+
+<Preview
+  code={`\
+<Hero
+  layout="split"
+  reverseOnMobile
+  title="Mobile-first experiences."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Example" />}
+/>
+`}
+>
+  <Hero
+    layout="split"
+    reverseOnMobile
+    title="Mobile-first experiences."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Example"
+      />
+    }
+  />
+</Preview>
+
+Disable reversal when the content should remain before the media.
+
+<Preview
+  code={`\
+<Hero
+  layout="split"
+  reverseOnMobile={false}
+  title="Content first."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Example" />}
+/>
+`}
+>
+  <Hero
+    layout="split"
+    reverseOnMobile={false}
+    title="Content first."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Example"
+      />
+    }
+  />
+</Preview>
+
+## Specialized presets
+
+Presets provide sensible defaults for common website types.
+
+All presets inherit the properties of Hero and can be customized.
+
+### SplitHero
+
+<Preview
+  code={`\
+<SplitHero
+  eyebrow="Our services"
+  title="Solutions built around your needs."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Services" />}
+  actions={<Button>Explore services</Button>}
+/>
+`}
+>
+  <SplitHero
+    eyebrow="Our services"
+    title="Solutions built around your needs."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Services"
+      />
+    }
+    actions={<Button>Explore services</Button>}
+  />
+</Preview>
+
+### CenteredHero
+
+<Preview
+  code={`\
+<CenteredHero
+  title="Welcome to our platform."
+  description="Everything you need to get started."
+  actions={<Button>Get started</Button>}
+/>
+`}
+>
+  <CenteredHero
+    title="Welcome to our platform."
+    description="Everything you need to get started."
+    actions={<Button>Get started</Button>}
+  />
+</Preview>
+
+### FullScreenHero
+
+<Preview
+  code={`\
+<FullScreenHero
+  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  title="Experience something different."
+  actions={<Button>Discover more</Button>}
+/>
+`}
+>
+  <FullScreenHero
+    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    title="Experience something different."
+    actions={<Button>Discover more</Button>}
+  />
+</Preview>
+
+### VideoHero
+
+<Preview
+  code={`\
+<VideoHero
+  backgroundVideo={{
+    src: "/videos/intro.mp4",
+    type: "video/mp4",
+    poster: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format",
+  }}
+  title="A world of possibilities."
+/>
+`}
+>
+  <VideoHero
+    backgroundVideo={{
+      src: "/videos/intro.mp4",
+      type: "video/mp4",
+      poster:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format",
+    }}
+    title="A world of possibilities."
+  />
+</Preview>
+
+Background videos are muted, loop automatically and respect the user's reduced-motion preference.
+
+### ImageHero
+
+<Preview
+  code={`\
+<ImageHero
+  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  title="Find your inspiration."
+  overlay="gradient"
+/>
+`}
+>
+  <ImageHero
+    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    title="Find your inspiration."
+    overlay="gradient"
+  />
+</Preview>
+
+### MinimalHero
+
+<Preview
+  code={`\
+<MinimalHero
+  eyebrow="About us"
+  title="A simpler approach."
+  description="Discover our philosophy."
+/>
+`}
+>
+  <MinimalHero
+    eyebrow="About us"
+    title="A simpler approach."
+    description="Discover our philosophy."
+  />
+</Preview>
+
+### EditorialHero
+
+<Preview
+  code={`\
+<EditorialHero
+  eyebrow="Travel journal"
+  title="The beauty of slowing down."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Landscape" />}
+/>
+`}
+>
+  <EditorialHero
+    eyebrow="Travel journal"
+    title="The beauty of slowing down."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Landscape"
+      />
+    }
+  />
+</Preview>
+
+### AgencyHero
+
+<Preview
+  code={`\
+<AgencyHero
+  eyebrow="Digital agency"
+  title="We build products that move businesses forward."
+  description="Engineering, design and strategy."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Agency workspace" />}
+  actions={<Button>Start a project</Button>}
+/>
+`}
+>
+  <AgencyHero
+    eyebrow="Digital agency"
+    title="We build products that move businesses forward."
+    description="Engineering, design and strategy."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Agency workspace"
+      />
+    }
+    actions={<Button>Start a project</Button>}
+  />
+</Preview>
+
+### ProductHero
+
+<Preview
+  code={`\
+<ProductHero
+  eyebrow="Introducing"
+  title="Meet your new favorite product."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Product" />}
+  actions={<Button>Explore product</Button>}
+/>
+`}
+>
+  <ProductHero
+    eyebrow="Introducing"
+    title="Meet your new favorite product."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Product"
+      />
+    }
+    actions={<Button>Explore product</Button>}
+  />
+</Preview>
+
+### SaaSHero
+
+<Preview
+  code={`\
+<SaaSHero
+  eyebrow="Project management"
+  title="Work smarter together."
+  description="Everything your team needs in one place."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Dashboard preview" />}
+  actions={<Button>Start free trial</Button>}
+/>
+`}
+>
+  <SaaSHero
+    eyebrow="Project management"
+    title="Work smarter together."
+    description="Everything your team needs in one place."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Dashboard preview"
+      />
+    }
+    actions={<Button>Start free trial</Button>}
+  />
+</Preview>
+
+### StoreHero
+
+<Preview
+  code={`\
+<StoreHero
+  eyebrow="New collection"
+  title="Discover the latest collection."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Collection" />}
+  actions={<Button>Shop now</Button>}
+/>
+`}
+>
+  <StoreHero
+    eyebrow="New collection"
+    title="Discover the latest collection."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Collection"
+      />
+    }
+    actions={<Button>Shop now</Button>}
+  />
+</Preview>
+
+### RestaurantHero
+
+<Preview
+  code={`\
+<RestaurantHero
+  eyebrow="Restaurant"
+  title="Good food. Great company."
+  description="Seasonal ingredients and memorable evenings."
+  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  actions={<Button>Reserve a table</Button>}
+/>
+`}
+>
+  <RestaurantHero
+    eyebrow="Restaurant"
+    title="Good food. Great company."
+    description="Seasonal ingredients and memorable evenings."
+    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    actions={<Button>Reserve a table</Button>}
+  />
+</Preview>
+
+### AccommodationHero
+
+<Preview
+  code={`\
+<AccommodationHero
+  eyebrow="Boutique accommodation"
+  title="Find your place in the world."
+  description="Discover beautiful places to stay."
+  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  actions={<Button>Explore apartments</Button>}
+/>
+`}
+>
+  <AccommodationHero
+    eyebrow="Boutique accommodation"
+    title="Find your place in the world."
+    description="Discover beautiful places to stay."
+    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    actions={<Button>Explore apartments</Button>}
+  />
+</Preview>
+
+### PrintShopHero
+
+<Preview
+  code={`\
+<PrintShopHero
+  eyebrow="Professional printing"
+  title="Bring your ideas to life."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Printed materials" />}
+  actions={<Button>Explore products</Button>}
+/>
+`}
+>
+  <PrintShopHero
+    eyebrow="Professional printing"
+    title="Bring your ideas to life."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Printed materials"
+      />
+    }
+    actions={<Button>Explore products</Button>}
+  />
+</Preview>
+
+### DashboardWelcomeHero
+
+<Preview
+  code={`\
+<DashboardWelcomeHero
+  eyebrow="Dashboard"
+  title="Good morning."
+  description="Here is an overview of your workspace."
+  actions={<Button>Create project</Button>}
+/>
+`}
+>
+  <DashboardWelcomeHero
+    eyebrow="Dashboard"
+    title="Good morning."
+    description="Here is an overview of your workspace."
+    actions={<Button>Create project</Button>}
+  />
+</Preview>
+
+### AppHero
+
+<Preview
+  code={`\
+<AppHero
+  eyebrow="Your workspace"
+  title="Everything you need to get things done."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Application preview" />}
+  actions={<Button>Open application</Button>}
+/>
+`}
+>
+  <AppHero
+    eyebrow="Your workspace"
+    title="Everything you need to get things done."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Application preview"
+      />
+    }
+    actions={<Button>Open application</Button>}
+  />
+</Preview>
+
+### CampaignHero
+
+<Preview
+  code={`\
+<CampaignHero
+  eyebrow="Limited offer"
+  title="Something special is waiting for you."
+  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  actions={<Button>Discover offer</Button>}
+/>
+`}
+>
+  <CampaignHero
+    eyebrow="Limited offer"
+    title="Something special is waiting for you."
+    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    actions={<Button>Discover offer</Button>}
+  />
+</Preview>
+
+### ComingSoonHero
+
+<Preview
+  code={`\
+<ComingSoonHero
+  eyebrow="Coming soon"
+  title="Something exciting is on its way."
+  description="Be the first to know when we launch."
+>
+  <TextInput type="email" aria-label="Email address" placeholder="you@example.com" />
+  <Button>Notify me</Button>
+</ComingSoonHero>
+`}
+>
+  <ComingSoonHero
+    eyebrow="Coming soon"
+    title="Something exciting is on its way."
+    description="Be the first to know when we launch."
+  >
+    <TextInput
+      type="email"
+      aria-label="Email address"
+      placeholder="you@example.com"
+    />
+    <Button>Notify me</Button>
+  </ComingSoonHero>
+</Preview>
+
+### SearchHero
+
+<Preview
+  code={`\
+<SearchHero
+  eyebrow="Discover"
+  title="Find exactly what you are looking for."
+  search={<TextInput type="search" aria-label="Search" placeholder="Search" />}
+/>
+`}
+>
+  <SearchHero
+    eyebrow="Discover"
+    title="Find exactly what you are looking for."
+    search={
+      <TextInput type="search" aria-label="Search" placeholder="Search" />
+    }
+  />
+</Preview>
+
+## Customization
+
+All presets inherit the full Hero API.
+
+For example, an AccommodationHero can use a split layout instead of its default background layout.
+
+<Preview
+  code={`\
+<AccommodationHero
+  layout="split"
+  mediaPosition="right"
+  height="large"
+  theme="light"
+  overlay="none"
+  title="A different kind of stay."
+  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Apartment" />}
+/>
+`}
+>
+  <AccommodationHero
+    layout="split"
+    mediaPosition="right"
+    height="large"
+    theme="light"
+    overlay="none"
+    title="A different kind of stay."
+    media={
+      <img
+        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+        alt="Apartment"
+      />
+    }
+  />
+</Preview>
+
+### CSS customization
+
+Hero uses regular CSS and semantic Puzzle Theme tokens.
+
+The root element has the `puzzle-hero` class.
+
+You can customize its appearance through CSS variables.
+
+```css
+.custom-hero {
+  --puzzle-hero-padding-inline: var(--puzzle-space-8);
+  --puzzle-hero-padding-block: var(--puzzle-space-16);
+  --puzzle-hero-gap: var(--puzzle-space-10);
+  --puzzle-hero-background: var(--puzzle-color-surface);
+  --puzzle-hero-foreground: var(--puzzle-color-text);
+}
+```
+
+You can also target individual elements using their class names.
+
+| Class                      | Element                   |
+| -------------------------- | ------------------------- |
+| puzzle-hero                | Root element              |
+| puzzle-hero\_\_inner       | Layout container          |
+| puzzle-hero\_\_content     | Content container         |
+| puzzle-hero\_\_title       | Main heading              |
+| puzzle-hero\_\_description | Description               |
+| puzzle-hero\_\_eyebrow     | Eyebrow                   |
+| puzzle-hero\_\_media       | Media container           |
+| puzzle-hero\_\_background  | Background container      |
+| puzzle-hero\_\_overlay     | Background overlay        |
+| puzzle-hero\_\_actions     | Action container          |
+| puzzle-hero\_\_search      | Search container          |
+| puzzle-hero\_\_meta        | Supplementary information |
+
+## Accessibility
+
+Hero is designed to work with assistive technologies.
+
+- Uses semantic section elements by default.
+- Supports custom semantic elements through the as property.
+- Supports configurable heading levels through titleAs.
+- Supports accessible labels.
+- Decorative background images have empty alternative text.
+- Background videos are hidden from assistive technology.
+- Background videos respect prefers-reduced-motion.
+- Interactive content remains accessible through its original Puzzle components.
+
+Always provide meaningful alternative text for informative images.
+
+Use one primary heading per page where appropriate.
+
+## API reference
+
+### Hero properties
+
+| Property         | Type              | Default |
+| ---------------- | ----------------- | ------- |
+| as               | ElementType       | section |
+| titleAs          | ElementType       | h1      |
+| id               | string            | -       |
+| testId           | string            | -       |
+| className        | string            | -       |
+| contentClassName | string            | -       |
+| mediaClassName   | string            | -       |
+| style            | CSSProperties     | -       |
+| layout           | HeroLayout        | split   |
+| mediaPosition    | HeroMediaPosition | right   |
+| alignment        | HeroAlignment     | start   |
+| height           | HeroHeight        | auto    |
+| theme            | HeroTheme         | light   |
+| overlay          | HeroOverlay       | none    |
+| contentWidth     | HeroContentWidth  | normal  |
+| reverseOnMobile  | boolean           | true    |
+| eyebrow          | ReactNode         | -       |
+| title            | ReactNode         | -       |
+| description      | ReactNode         | -       |
+| media            | ReactNode         | -       |
+| backgroundImage  | string            | -       |
+| backgroundVideo  | HeroVideoSource   | -       |
+| actions          | ReactNode         | -       |
+| search           | ReactNode         | -       |
+| meta             | ReactNode         | -       |
+| children         | ReactNode         | -       |
+| role             | AriaRole          | -       |
+| ariaLabel        | string            | -       |
+| ariaLabelledBy   | string            | -       |
+
+### HeroLayout
+
+```ts
+type HeroLayout = "centered" | "split" | "full-width" | "asymmetric";
+```
+
+### HeroMediaPosition
+
+```ts
+type HeroMediaPosition = "left" | "right" | "background";
+```
+
+### HeroAlignment
+
+```ts
+type HeroAlignment = "start" | "center" | "end";
+```
+
+### HeroHeight
+
+```ts
+type HeroHeight = "auto" | "large" | "viewport";
+```
+
+### HeroTheme
+
+```ts
+type HeroTheme = "light" | "dark" | "contrast" | "brand";
+```
+
+### HeroOverlay
+
+```ts
+type HeroOverlay = "none" | "subtle" | "strong" | "gradient";
+```
+
+### HeroContentWidth
+
+```ts
+type HeroContentWidth = "narrow" | "normal" | "wide" | "full";
+```
+
+### HeroVideoSource
+
+```ts
+type HeroVideoSource = {
+  src: string;
+  type?: string;
+  poster?: string;
+};
+```

@@ -8,6 +8,7 @@ import { useMatchRoute, useNavigate } from "@tanstack/react-router";
 import { Autocomplete, Stack } from "@puzzle-ui/ui";
 import { stringWithCasing } from "@puzzle-ui/core";
 import { items } from "./constants";
+import { ALL_UI_GROUP_IDS } from "./sidebar/ui";
 
 const findComponentItems = (
   items: TreeViewItem[] | TreeViewItem,
@@ -45,19 +46,7 @@ const Sidebar = () => {
           aria-label="Navigation"
           items={items}
           selectionMode="single"
-          defaultExpandedIds={[
-            "components",
-            "ui",
-            "actions",
-            "data-display",
-            "forms",
-            "layout",
-            "navigation",
-            "overlays",
-            "typography",
-            "utilities",
-            "theme",
-          ]}
+          defaultExpandedIds={[...ALL_UI_GROUP_IDS, "pieces-components"]}
           selectedIds={selectedIds}
           onSelectionChange={setSelectedIds}
           getItemActive={(item) =>

@@ -46,6 +46,7 @@
         "@puzzle-ui/core": "workspace:*",
         "@puzzle-ui/hooks": "workspace:*",
         "@puzzle-ui/icons": "workspace:*",
+        "@puzzle-ui/pieces": "workspace:*",
         "@puzzle-ui/theme": "workspace:*",
         "@puzzle-ui/ui": "workspace:*",
         "@tailwindcss/vite": "^4.3.3",

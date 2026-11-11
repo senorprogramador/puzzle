@@ -48,6 +48,12 @@
       "@puzzle-ui/ui/*": [
         "../../packages/ui/src/*"
       ],
+      "@puzzle-ui/pieces": [
+        "../../packages/pieces/src/index.ts"
+      ],
+      "@puzzle-ui/pieces/*": [
+        "../../packages/pieces/src/*"
+      ],
       "@puzzle-ui/hooks": [
         "../../packages/hooks/src/index.ts"
       ],

@@ -2,6 +2,7 @@ import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { ComponentProps, ComponentType } from "react";
 import type { MDXComponents } from "mdx/types";
 import * as PuzzleUI from "@puzzle-ui/ui";
+import * as PuzzlePieces from "@puzzle-ui/pieces";
 import * as PuzzleIcons from "@puzzle-ui/icons";
 import { cn } from "@puzzle-ui/core";
 import { PackageManagerTab, PackageManagerTabs } from "./package-manager-tabs";
@@ -10,6 +11,7 @@ import { PackageManagerTab, PackageManagerTabs } from "./package-manager-tabs";
 // treat as components; keep only capitalized exports.
 const puzzleComponentEntries = [
   Object.entries(PuzzleUI),
+  Object.entries(PuzzlePieces),
   Object.entries(PuzzleIcons),
 ].flat();
 

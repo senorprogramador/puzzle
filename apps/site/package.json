@@ -13,6 +13,7 @@
     "@puzzle-ui/hooks": "workspace:*",
     "@puzzle-ui/icons": "workspace:*",
     "@puzzle-ui/theme": "workspace:*",
+    "@puzzle-ui/pieces": "workspace:*",
     "@puzzle-ui/ui": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-router": "^1.170.41",
