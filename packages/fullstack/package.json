@@ -69,8 +69,8 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p .",
-    "test": "node --test",
-    "vitest": "node --test",
+    "test": "node --import ./tests/setup.mjs --test",
+    "vitest": "node --import ./tests/setup.mjs --test",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
   },

@@ -148,27 +148,154 @@ export default function SecurityPage() {
 
 ### Localization
 
-Supported built-in locales:
+Puzzle Fullstack includes English messages as its default locale and fallback.
 
-- English (`en`)
-- German (`de`)
-- Spanish (`es`)
+Applications can define their own locale identifiers by extending the `AuthLocale` type. Every custom locale must provide a complete `AuthMessages` object. English messages are optional because the built-in English messages are used whenever no application-provided English messages are available.
 
-Unknown locales fall back to English.
-
-Individual messages can be overridden:
+For example, an application can add Dutch and German:
 
 ```tsx
-<AuthProvider
-  locale="en"
-  messages={{
-    signIn: "Welcome back",
-    signUp: "Join us",
-  }}
->
-  {children}
-</AuthProvider>
+import { AuthProvider } from "@puzzle-ui/fullstack/auth/client";
+
+import {
+  getAuthLocale,
+  resolveAuthMessages,
+  type AuthLocale,
+  type AuthLocaleMessages,
+} from "@puzzle-ui/fullstack/auth/client";
+
+type AppLocale = AuthLocale<"nl" | "de">;
+
+const appMessages: AuthLocaleMessages<"nl" | "de"> = {
+  nl: {
+    // Supply every AuthMessages field in Dutch.
+    // For example:
+    signIn: "Inloggen",
+    signUp: "Account aanmaken",
+    email: "E-mailadres",
+    password: "Wachtwoord",
+    name: "Naam",
+    confirmPassword: "Bevestig wachtwoord",
+    submit: "Doorgaan",
+    signingIn: "Inloggen...",
+    signingUp: "Account aanmaken...",
+    forgotPassword: "Wachtwoord vergeten?",
+    createAccount: "Account aanmaken",
+    existingAccount: "Heb je al een account?",
+    noAccount: "Nog geen account?",
+    mfaTitle: "Verifieer je identiteit",
+    mfaDescription: "Voer je authenticatiecode in om door te gaan.",
+    verificationCode: "Authenticatiecode",
+    recoveryCode: "Herstelcode",
+    verify: "Verifiëren",
+    verifying: "Verifiëren...",
+    useRecoveryCode: "Gebruik een herstelcode",
+    useAuthenticator: "Gebruik authenticator-app",
+    usePasskey: "Doorgaan met passkey",
+    passkeyUnavailable: "Passkeys zijn niet beschikbaar in deze browser.",
+    loading: "Laden...",
+    signOut: "Uitloggen",
+    unexpectedError: "Er is iets misgegaan. Probeer het opnieuw.",
+    invalidCredentials: "Het e-mailadres of wachtwoord is onjuist.",
+    passwordMismatch: "De wachtwoorden komen niet overeen.",
+    passwordRequired: "Een wachtwoord is verplicht.",
+    requestPasswordReset: "Wachtwoord herstellen aanvragen",
+    resetPassword: "Wachtwoord herstellen",
+    newPassword: "Nieuw wachtwoord",
+    sendResetLink: "Verstuur herstellink",
+    passwordResetSent: "De herstellink is verstuurd",
+    verificationSent: "Verificatiemail is verstuurd",
+    verifyEmail: "E-mailadres verifiëren",
+    changePassword: "Wachtwoord wijzigen",
+    passwordChanged: "Wachtwoord gewijzigd",
+    emailRequired: "Een e-mailadres is verplicht.",
+    nameRequired: "Een naam is verplicht.",
+    authenticated: "Je bent ingelogd.",
+    mfaSettings: "Beveiligingsinstellingen",
+    addTotp: "Authenticator toevoegen",
+    addPasskey: "Passkey toevoegen",
+    removeFactor: "Verwijderen",
+    recoveryCodes: "Herstelcodes",
+    saveRecoveryCodes: "Bewaar deze codes op een veilige plek.",
+    currentPassword: "Huidig wachtwoord",
+    totpSecret: "Authenticator-geheim",
+    verifyTotp: "Authenticator verifiëren",
+    cancel: "Annuleren",
+  },
+  // Optionally (partially)override messages for English:
+  en: {
+    signUp: "Create your account",
+  }
+  de: {
+    // Supply every AuthMessages field in German.
+    // The same complete set of fields as the Dutch example is required.
+  },
+};
+
+// The locale type can be used throughout the application.
+const requestedLocale: string = "nl";
+
+const locale: AppLocale = getAuthLocale(requestedLocale, appMessages);
+
+// Resolve the complete message set before passing it to the provider.
+// Built-in English messages are used for any missing English fallback.
+const messages = resolveAuthMessages(locale, appMessages);
+
+export const Providers = ({ children }: { children: React.ReactNode }) => (
+  <AuthProvider
+    locale={locale}
+    messages={messages}
+    options={{
+      basePath: "/api/auth",
+    }}
+  >
+    {children}
+  </AuthProvider>
+);
 ```
+
+The `AuthLocale` type accepts custom locale identifiers:
+
+```ts
+type AppLocale = AuthLocale<"nl" | "de" | "es">;
+```
+
+The corresponding message map requires a complete message set for every declared custom locale:
+
+```ts
+const messages: AuthLocaleMessages<"nl" | "de"> = {
+  nl: dutchMessages,
+  de: germanMessages,
+
+  // Optional: English overrides.
+  // Without this property, Puzzle's built-in English messages are used.
+  // en: englishMessages,
+};
+```
+
+The locale resolver only selects a custom locale when its messages are available:
+
+```ts
+const locale = getAuthLocale("nl-NL", messages);
+// "en", because "nl-NL" is not a configured locale.
+
+const dutchLocale = getAuthLocale("nl", messages);
+// "nl"
+
+const fallbackLocale = getAuthLocale("fr", messages);
+// "en"
+```
+
+Locale identifiers are exact matches. If an application wants to support regional identifiers such as `nl-NL` or `en-GB`, it should declare and provide those locales explicitly.
+
+Messages are resolved in this order:
+
+1. Built-in English messages.
+2. Optional application-provided English messages.
+3. Messages for the selected custom locale.
+4. Optional per-message overrides.
+
+This means a custom locale always has a complete message set, while English can remain entirely implicit.
 
 ## Server
 
@@ -286,7 +413,11 @@ bun run --filter @puzzle-ui/fullstack typecheck
 
 ## Tests
 
+Tests run against the built package with Node's test runner. The test setup
+ignores CSS imports so client components can be rendered without a browser.
+
 ```bash
+bun run --filter @puzzle-ui/fullstack build
 bun run --filter @puzzle-ui/fullstack test
 ```
 

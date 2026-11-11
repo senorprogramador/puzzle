@@ -295,7 +295,7 @@ const AuthProvider = ({
   const locale = getAuthLocale(localeInput);
 
   const resolvedMessages = useMemo(
-    () => resolveAuthMessages(locale, messageOverrides),
+    () => resolveAuthMessages(locale, undefined, messageOverrides),
     [locale, messageOverrides],
   );
 

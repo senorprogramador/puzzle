@@ -287,18 +287,67 @@ test("MfaSettings renders its security management heading", () => {
   assert.match(html, /Security settings/);
 });
 
-test("locale resolution supports the required languages", () => {
+test("locale resolution falls back to English without configured messages", () => {
+  assert.equal(getAuthLocale(), "en");
+  assert.equal(getAuthLocale(null), "en");
   assert.equal(getAuthLocale("en-US"), "en");
-  assert.equal(getAuthLocale("de-DE"), "de");
-  assert.equal(getAuthLocale("es-ES"), "es");
+  assert.equal(getAuthLocale("de-DE"), "en");
+  assert.equal(getAuthLocale("es-ES"), "en");
   assert.equal(getAuthLocale("nl-NL"), "en");
 });
 
+test("locale resolution selects only exact configured locale identifiers", () => {
+  const localeMessages = {
+    nl: { ...resolveAuthMessages(), signIn: "Inloggen" },
+  };
+
+  assert.equal(getAuthLocale("nl", localeMessages), "nl");
+  assert.equal(getAuthLocale("nl-NL", localeMessages), "en");
+  assert.equal(getAuthLocale("toString", localeMessages), "en");
+  assert.equal(resolveAuthMessages("nl", localeMessages).signIn, "Inloggen");
+});
+
 test("message overrides replace individual translations", () => {
-  const result = resolveAuthMessages("en", {
+  const result = resolveAuthMessages("en", undefined, {
     signIn: "Welcome back",
   });
 
   assert.equal(result.signIn, "Welcome back");
   assert.equal(result.signUp, "Create account");
+});
+
+test("message resolution applies English, custom locale and per-message overrides in order", () => {
+  const result = resolveAuthMessages(
+    "nl",
+    {
+      en: { ...resolveAuthMessages(), signIn: "English override" },
+      nl: { ...resolveAuthMessages(), signIn: "Inloggen" },
+    },
+    { signUp: "Registreren" },
+  );
+
+  assert.equal(result.signIn, "Inloggen");
+  assert.equal(result.signUp, "Registreren");
+  assert.equal(
+    resolveAuthMessages("en", {
+      en: { ...resolveAuthMessages(), signIn: "English override" },
+    }).signIn,
+    "English override",
+  );
+});
+
+test("AuthProvider applies per-message overrides to its forms", () => {
+  const html = renderToStaticMarkup(
+    React.createElement(
+      AuthProvider,
+      {
+        client: createClient(),
+        initialSnapshot: { status: "unauthenticated", user: null },
+        messages: { signIn: "Welcome back" },
+      },
+      React.createElement(SignInForm),
+    ),
+  );
+
+  assert.match(html, /Welcome back/);
 });
