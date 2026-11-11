@@ -124,10 +124,102 @@
     font-size: 1.25rem;
 }
 
+.puzzle-auth-experience {
+    display: flex;
+    flex-direction: column;
+    align-items: var(--puzzle-auth-experience-align, center);
+    width: 100%;
+    max-width: var(--puzzle-auth-experience-width, 32rem);
+    margin-inline: auto;
+}
+
+.puzzle-auth-experience__branding {
+    display: flex;
+    flex-direction: column;
+    align-items: inherit;
+    width: 100%;
+    gap: var(--puzzle-spacing-2, 0.5rem);
+    margin-block-end: var(--puzzle-spacing-6, 1.5rem);
+    text-align: center;
+}
+
+.puzzle-auth-experience__branding h1,
+.puzzle-auth-experience__branding p {
+    margin: 0;
+}
+
+.puzzle-auth-experience__content {
+    width: 100%;
+}
+
+.puzzle-auth__custom-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-spacing-2, 0.5rem);
+    width: 100%;
+}
+
+.puzzle-auth__custom-field label {
+    font: inherit;
+    font-weight: 500;
+}
+
+.puzzle-auth__custom-field input:not([type="checkbox"]),
+.puzzle-auth__custom-field textarea,
+.puzzle-auth__custom-field select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding: var(--puzzle-spacing-3, 0.75rem);
+    color: var(--puzzle-color-text, inherit);
+    background: var(--puzzle-color-surface, transparent);
+    border: 1px solid var(--puzzle-color-border, currentColor);
+    border-radius: var(--puzzle-radius-md, 0.375rem);
+    font: inherit;
+}
+
+.puzzle-auth__custom-field textarea {
+    min-height: 6rem;
+    resize: vertical;
+}
+
+.puzzle-auth__custom-field input:not([type="checkbox"]),
+.puzzle-auth__custom-field textarea,
+.puzzle-auth__custom-field select {
+    color: inherit;
+    background: var(--puzzle-surface, #fff);
+    border: 1px solid var(--puzzle-border, #e5e7eb);
+    border-radius: var(--puzzle-radius-sm, 0.375rem);
+    font: inherit;
+}
+
+.puzzle-auth__custom-field :is(input, textarea, select):focus-visible {
+    outline: 2px solid var(--puzzle-focus, #2563eb);
+    outline-offset: 2px;
+}
+
+.puzzle-auth__field-description {
+    color: var(--puzzle-text-secondary, #737373);
+    font-size: 0.875em;
+}
+
+.puzzle-auth__field-error {
+    color: var(--puzzle-danger, #b42318);
+    font-size: 0.875em;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .puzzle-auth *,
     .puzzle-auth *::before,
     .puzzle-auth *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .puzzle-auth-experience *,
+    .puzzle-auth-experience *::before,
+    .puzzle-auth-experience *::after {
         scroll-behavior: auto !important;
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
@@ -143,5 +235,14 @@
     .puzzle-auth__factor-list li,
     .puzzle-auth__recovery-codes li {
         border-color: CanvasText;
+    }
+    .puzzle-auth__custom-field input,
+    .puzzle-auth__custom-field textarea,
+    .puzzle-auth__custom-field select {
+        border: 1px solid CanvasText;
+    }
+
+    .puzzle-auth__custom-field :is(input, textarea, select):focus-visible {
+        outline: 2px solid Highlight;
     }
 }

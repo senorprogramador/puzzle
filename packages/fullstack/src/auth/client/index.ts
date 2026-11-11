@@ -571,6 +571,21 @@ export {
 } from "./react";
 
 export {
+  AuthExperience,
+  type AuthExperienceProps,
+  type AuthExperienceConfig,
+  type AuthExperienceBranding,
+  type AuthExperienceLayout,
+  type AuthExperienceRedirects,
+  type AuthCustomField,
+  type AuthFieldOption,
+  type AuthFieldValue,
+  type AuthFieldValues,
+  type AuthRegistrationInput,
+  type AuthExperienceSubmitInput,
+} from "./experience";
+
+export {
   getAuthLocale,
   resolveAuthMessages,
   type AuthLocale,

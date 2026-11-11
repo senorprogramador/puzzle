@@ -1,0 +1,576 @@
+"use client";
+
+import {
+  useId,
+  useState,
+  type CSSProperties,
+  type FormEvent,
+  type ReactNode,
+} from "react";
+
+import { Alert, Button } from "@puzzle-ui/ui";
+
+import type { AuthClient, AuthClientSnapshot } from "./index";
+import { SignInForm, useAuth } from "./react";
+
+export type AuthFieldValue = string | boolean;
+
+export type AuthFieldValues = Readonly<Record<string, AuthFieldValue>>;
+
+export type AuthFieldOption = {
+  readonly label: string;
+  readonly value: string;
+};
+
+export type AuthCustomField = {
+  readonly name: string;
+  readonly label: string;
+  readonly type:
+    | "text"
+    | "email"
+    | "tel"
+    | "url"
+    | "number"
+    | "checkbox"
+    | "select"
+    | "textarea";
+  readonly description?: string;
+  readonly placeholder?: string;
+  readonly autoComplete?: string;
+  readonly required?: boolean;
+  readonly disabled?: boolean;
+  readonly defaultValue?: AuthFieldValue;
+  readonly options?: readonly AuthFieldOption[];
+  readonly validate?: (
+    value: AuthFieldValue,
+    values: AuthFieldValues,
+  ) => string | null | undefined | Promise<string | null | undefined>;
+};
+
+export type AuthRegistrationInput = {
+  readonly name: string | null;
+  readonly email: string;
+  readonly password: string;
+};
+
+export type AuthExperienceSubmitInput = {
+  readonly registration: AuthRegistrationInput;
+  readonly fields: AuthFieldValues;
+  readonly signUp: AuthClient["register"];
+};
+
+export type AuthExperienceBranding = {
+  readonly logo?: ReactNode;
+  readonly title?: ReactNode;
+  readonly description?: ReactNode;
+};
+
+export type AuthExperienceLayout = {
+  readonly className?: string;
+  readonly contentClassName?: string;
+  readonly header?: ReactNode;
+  readonly footer?: ReactNode;
+  readonly width?: "sm" | "md" | "lg" | "full";
+  readonly align?: "left" | "center";
+};
+
+export type AuthExperienceRedirects = {
+  readonly afterSignIn?: string;
+  readonly afterSignUp?: string;
+};
+
+export type AuthExperienceConfig = {
+  readonly branding?: AuthExperienceBranding;
+  readonly layout?: AuthExperienceLayout;
+  readonly redirects?: AuthExperienceRedirects;
+  readonly fields?: readonly AuthCustomField[];
+};
+
+export type AuthExperienceProps = {
+  readonly mode?: "sign-in" | "sign-up";
+  readonly config?: AuthExperienceConfig;
+  readonly className?: string;
+  readonly onSubmit?: (
+    input: AuthExperienceSubmitInput,
+  ) => Promise<AuthClientSnapshot>;
+  readonly onSuccess?: () => void;
+  readonly onSignIn?: () => void;
+  readonly onSignUp?: () => void;
+  readonly onForgotPassword?: () => void;
+};
+
+type FieldErrors = Readonly<Record<string, string>>;
+
+const isSafeRedirect = (value: string | undefined): value is string =>
+  Boolean(
+    value &&
+    value.startsWith("/") &&
+    !value.startsWith("//") &&
+    !value.includes("\\") &&
+    !/[\u0000-\u001f\u007f]/.test(value),
+  );
+
+const redirectAfterSuccess = (value: string | undefined) => {
+  if (!isSafeRedirect(value) || typeof window === "undefined") {
+    return;
+  }
+
+  window.location.assign(value);
+};
+
+const getInitialValues = (
+  fields: readonly AuthCustomField[],
+): Record<string, AuthFieldValue> =>
+  Object.fromEntries(
+    fields.map((field) => [
+      field.name,
+      field.defaultValue ?? (field.type === "checkbox" ? false : ""),
+    ]),
+  );
+
+const validateFieldDefinition = (fields: readonly AuthCustomField[]): void => {
+  const names = new Set<string>();
+
+  for (const field of fields) {
+    if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(field.name)) {
+      throw new Error(`Invalid custom auth field name: "${field.name}".`);
+    }
+
+    if (["name", "email", "password", "confirmPassword"].includes(field.name)) {
+      throw new Error(`Custom auth field name "${field.name}" is reserved.`);
+    }
+
+    if (names.has(field.name)) {
+      throw new Error(`Duplicate custom auth field name: "${field.name}".`);
+    }
+
+    if (
+      field.type === "select" &&
+      (!field.options || field.options.length === 0)
+    ) {
+      throw new Error(
+        `Select field "${field.name}" requires at least one option.`,
+      );
+    }
+
+    names.add(field.name);
+  }
+};
+
+const validateFields = async (
+  fields: readonly AuthCustomField[],
+  values: AuthFieldValues,
+): Promise<FieldErrors> => {
+  const errors: Record<string, string> = {};
+
+  for (const field of fields) {
+    const value = values[field.name];
+
+    if (
+      field.required &&
+      (value === undefined ||
+        value === "" ||
+        (typeof value === "boolean" && !value))
+    ) {
+      errors[field.name] = `${field.label} is required.`;
+      continue;
+    }
+
+    if (!field.validate) continue;
+
+    const message = await field.validate(value ?? "", values);
+
+    if (message) {
+      errors[field.name] = message;
+    }
+  }
+
+  return errors;
+};
+
+const AuthCustomFields = ({
+  fields,
+  values,
+  errors,
+  disabled,
+  onChange,
+}: {
+  readonly fields: readonly AuthCustomField[];
+  readonly values: AuthFieldValues;
+  readonly errors: FieldErrors;
+  readonly disabled: boolean;
+  readonly onChange: (name: string, value: AuthFieldValue) => void;
+}) => {
+  const generatedId = useId();
+
+  return (
+    <>
+      {fields.map((field) => {
+        const id = `${generatedId}-${field.name}`;
+        const descriptionId = `${id}-description`;
+        const errorId = `${id}-error`;
+        const value = values[field.name] ?? "";
+        const error = errors[field.name];
+        const describedBy =
+          [field.description ? descriptionId : null, error ? errorId : null]
+            .filter(Boolean)
+            .join(" ") || undefined;
+
+        const commonProps = {
+          id,
+          name: field.name,
+          disabled: disabled || field.disabled,
+          required: field.required,
+          "aria-invalid": Boolean(error),
+          "aria-describedby": describedBy,
+        };
+
+        return (
+          <div className="puzzle-auth__custom-field" key={field.name}>
+            <label className="puzzle-auth__custom-label" htmlFor={id}>
+              {field.label}
+              {field.required ? <span aria-hidden="true"> *</span> : null}
+            </label>
+
+            {field.type === "textarea" ? (
+              <textarea
+                {...commonProps}
+                value={String(value)}
+                placeholder={field.placeholder}
+                onChange={(event) =>
+                  onChange(field.name, event.currentTarget.value)
+                }
+              />
+            ) : field.type === "select" ? (
+              <select
+                {...commonProps}
+                value={String(value)}
+                onChange={(event) =>
+                  onChange(field.name, event.currentTarget.value)
+                }
+              >
+                <option value="">
+                  {field.placeholder ?? "Select an option"}
+                </option>
+
+                {field.options?.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : field.type === "checkbox" ? (
+              <input
+                {...commonProps}
+                type="checkbox"
+                checked={Boolean(value)}
+                onChange={(event) =>
+                  onChange(field.name, event.currentTarget.checked)
+                }
+              />
+            ) : (
+              <input
+                {...commonProps}
+                type={field.type}
+                value={String(value)}
+                placeholder={field.placeholder}
+                autoComplete={field.autoComplete}
+                onChange={(event) =>
+                  onChange(field.name, event.currentTarget.value)
+                }
+              />
+            )}
+
+            {field.description ? (
+              <span
+                className="puzzle-auth__field-description"
+                id={descriptionId}
+              >
+                {field.description}
+              </span>
+            ) : null}
+
+            {error ? (
+              <span
+                className="puzzle-auth__field-error"
+                id={errorId}
+                role="alert"
+              >
+                {error}
+              </span>
+            ) : null}
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
+const AuthExperience = ({
+  mode = "sign-in",
+  config = {},
+  className,
+  onSubmit,
+  onSuccess,
+  onSignIn,
+  onSignUp,
+  onForgotPassword,
+}: AuthExperienceProps) => {
+  const { signUp, messages } = useAuth();
+
+  const fields = config.fields ?? [];
+  const branding = config.branding;
+  const layout = config.layout;
+  const redirects = config.redirects;
+
+  validateFieldDefinition(fields);
+
+  const [values, setValues] = useState<Record<string, AuthFieldValue>>(() =>
+    getInitialValues(fields),
+  );
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+
+  const updateField = (fieldName: string, value: AuthFieldValue) => {
+    setValues((current) => ({
+      ...current,
+      [fieldName]: value,
+    }));
+
+    setErrors((current) => {
+      if (!(fieldName in current)) return current;
+
+      const next = { ...current };
+      delete next[fieldName];
+      return next;
+    });
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setFormError(null);
+    setErrors({});
+
+    if (password !== confirmation) {
+      setFormError(messages.passwordMismatch);
+      return;
+    }
+
+    if (!password) {
+      setFormError(messages.passwordRequired);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const nextErrors = await validateFields(fields, values);
+
+      if (Object.keys(nextErrors).length > 0) {
+        setErrors(nextErrors);
+        return;
+      }
+
+      const registration: AuthRegistrationInput = {
+        name: name.trim() || null,
+        email: email.trim(),
+        password,
+      };
+
+      const result = onSubmit
+        ? await onSubmit({
+            registration,
+            fields: { ...values },
+            signUp,
+          })
+        : await signUp(registration);
+
+      if (result.status === "authenticated") {
+        onSuccess?.();
+        redirectAfterSuccess(redirects?.afterSignUp);
+      }
+    } catch (cause) {
+      setFormError(
+        cause instanceof Error ? cause.message : messages.unexpectedError,
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const wrapperClassName = [
+    "puzzle-auth",
+    "puzzle-auth-experience",
+    layout?.className,
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const contentClassName = [
+    "puzzle-auth-experience__content",
+    layout?.contentClassName,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const style = {
+    "--puzzle-auth-experience-width":
+      layout?.width === "sm"
+        ? "24rem"
+        : layout?.width === "lg"
+          ? "48rem"
+          : layout?.width === "full"
+            ? "100%"
+            : "32rem",
+    "--puzzle-auth-experience-align":
+      layout?.align === "left" ? "flex-start" : "center",
+  } as CSSProperties;
+
+  return (
+    <section className={wrapperClassName} style={style}>
+      {layout?.header}
+
+      <div className="puzzle-auth-experience__branding">
+        {branding?.logo}
+        {branding?.title ? <h1>{branding.title}</h1> : null}
+        {branding?.description ? <p>{branding.description}</p> : null}
+      </div>
+
+      <div className={contentClassName}>
+        {mode === "sign-in" ? (
+          <SignInForm
+            redirectTo={redirects?.afterSignIn}
+            onSuccess={onSuccess}
+            onForgotPassword={onForgotPassword}
+            onSignUp={onSignUp}
+          />
+        ) : (
+          <>
+            {formError ? (
+              <div role="alert" aria-live="assertive">
+                <Alert severity="error">{formError}</Alert>
+              </div>
+            ) : null}
+
+            <form
+              className="puzzle-auth__form"
+              onSubmit={(event) => void handleSubmit(event)}
+              noValidate
+            >
+              <div className="puzzle-auth__custom-field">
+                <label htmlFor="puzzle-auth-experience-name">
+                  {messages.name}
+                </label>
+                <input
+                  id="puzzle-auth-experience-name"
+                  name="name"
+                  type="text"
+                  autoComplete="name"
+                  value={name}
+                  disabled={loading}
+                  onChange={(event) => setName(event.currentTarget.value)}
+                />
+              </div>
+
+              <div className="puzzle-auth__custom-field">
+                <label htmlFor="puzzle-auth-experience-email">
+                  {messages.email}
+                  <span aria-hidden="true"> *</span>
+                </label>
+                <input
+                  id="puzzle-auth-experience-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  disabled={loading}
+                  onChange={(event) => setEmail(event.currentTarget.value)}
+                />
+              </div>
+
+              <div className="puzzle-auth__custom-field">
+                <label htmlFor="puzzle-auth-experience-password">
+                  {messages.password}
+                  <span aria-hidden="true"> *</span>
+                </label>
+                <input
+                  id="puzzle-auth-experience-password"
+                  name="new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={password}
+                  disabled={loading}
+                  onChange={(event) => setPassword(event.currentTarget.value)}
+                />
+              </div>
+
+              <div className="puzzle-auth__custom-field">
+                <label htmlFor="puzzle-auth-experience-confirm">
+                  {messages.confirmPassword}
+                  <span aria-hidden="true"> *</span>
+                </label>
+                <input
+                  id="puzzle-auth-experience-confirm"
+                  name="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  required
+                  value={confirmation}
+                  disabled={loading}
+                  onChange={(event) =>
+                    setConfirmation(event.currentTarget.value)
+                  }
+                />
+              </div>
+
+              <AuthCustomFields
+                fields={fields}
+                values={values}
+                errors={errors}
+                disabled={loading}
+                onChange={updateField}
+              />
+
+              <Button
+                type="submit"
+                fullWidth
+                loading={loading}
+                disabled={
+                  loading || !email.trim() || !password || !confirmation
+                }
+              >
+                {loading ? messages.signingUp : messages.createAccount}
+              </Button>
+            </form>
+
+            {onSignIn ? (
+              <footer className="puzzle-auth__footer">
+                <span>{messages.existingAccount}</span>
+                <button
+                  type="button"
+                  className="puzzle-auth__text-button"
+                  onClick={onSignIn}
+                >
+                  {messages.signIn}
+                </button>
+              </footer>
+            ) : null}
+          </>
+        )}
+      </div>
+
+      {layout?.footer}
+    </section>
+  );
+};
+
+export { AuthExperience };

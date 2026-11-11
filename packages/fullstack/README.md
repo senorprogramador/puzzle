@@ -116,6 +116,105 @@ All components support className customization.
 
 Redirects are opt-in through `redirectTo` and restricted to same-origin paths.
 
+## Configurable authentication experience
+
+`@puzzle-ui/fullstack` provides an optional `AuthExperience` component for building branded sign-in and sign-up pages without having to implement the standard authentication flow yourself.
+
+The experience supports:
+
+- Custom branding, including a logo, title, description and footer.
+- Layout configuration, including content width and alignment.
+- Configurable redirects after successful authentication.
+- Custom registration fields with validation.
+- Custom submit callbacks for integrating application-specific registration logic.
+- Existing Puzzle authentication messages and form behavior.
+
+### Basic usage
+
+```tsx
+import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";
+
+export const SignUpPage = () => (
+  <AuthExperience
+    mode="sign-up"
+    config={{
+      branding: {
+        title: "Create your account",
+        description: "Get started with your new account.",
+      },
+      layout: {
+        maxWidth: "32rem",
+        align: "center",
+      },
+      redirects: {
+        afterSignUp: "/dashboard",
+      },
+      fields: [
+        {
+          name: "company",
+          label: "Company",
+          type: "text",
+          required: true,
+        },
+        {
+          name: "role",
+          label: "Your role",
+          type: "select",
+          options: [
+            { label: "Developer", value: "developer" },
+            { label: "Designer", value: "designer" },
+            { label: "Other", value: "other" },
+          ],
+        },
+      ],
+    }}
+  />
+);
+```
+
+### Custom registration handling
+
+Custom fields are UI-only extensions. They are not automatically added to the authentication user model or persisted by the auth engine.
+
+Use `onSubmit` to receive the standard registration input and custom field values. The callback can call `signUp` to execute the normal registration flow.
+
+```tsx
+import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";
+
+export const SignUpPage = () => (
+  <AuthExperience
+    mode="sign-up"
+    config={{
+      fields: [
+        {
+          name: "company",
+          label: "Company",
+          type: "text",
+          required: true,
+        },
+      ],
+    }}
+    onSubmit={async ({ registration, fields, signUp }) => {
+      await signUp(registration);
+
+      // Handle application-specific values separately.
+      await saveCompanyInformation({
+        email: registration.email,
+        company: fields.company,
+      });
+    }}
+  />
+);
+```
+
+### Browser tests
+
+Run the Fullstack authentication experience browser tests with:
+
+```bash
+bun run --filter @puzzle-ui/fullstack test:browser
+```
+
 ### AuthScreen
 
 ```tsx
