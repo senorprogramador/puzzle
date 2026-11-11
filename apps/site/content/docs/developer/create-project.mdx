@@ -1,0 +1,171 @@
+---
+title: Create a Project
+description: Scaffold a new React application with Puzzle UI using the interactive project generator.
+---
+
+The <code>@puzzle-ui/create</code> package creates a new React application with Puzzle UI installed and configured.
+
+It supports Next.js, TanStack Start, and a basic React + Vite application.
+
+## Requirements
+
+- Node.js 20.19 or later.
+- npm, Bun, pnpm, or Yarn.
+- An internet connection to download framework templates and dependencies.
+
+## Run the generator
+
+Choose the command for your package manager.
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npx @puzzle-ui/create
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bunx @puzzle-ui/create
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm dlx @puzzle-ui/create
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn dlx @puzzle-ui/create
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+Yarn's <code>dlx</code> command requires Yarn 2 or later. With Yarn Classic, use the npm command.
+
+The generator detects the package manager from the execution environment and uses it for framework generation and dependency installation.
+
+## Interactive setup
+
+The generator asks for three options.
+
+### Project name
+
+Enter a project name. The generator converts it to kebab-case and uses it for the target directory and package name.
+
+For example:
+
+| Input          | Generated name |
+| -------------- | -------------- |
+| My Dashboard   | my-dashboard   |
+| Puzzle Website | puzzle-website |
+| myApp          | my-app         |
+
+The target directory must not already exist. The generator never overwrites an existing directory.
+
+### Framework
+
+Choose one of the supported frameworks.
+
+| Framework      | Generated application              |
+| -------------- | ---------------------------------- |
+| Next.js        | Next.js App Router with TypeScript |
+| TanStack Start | Full-stack React application       |
+| Basic React    | React, Vite, and TypeScript        |
+
+Next.js and TanStack Start projects are generated using their official CLI tools. The Basic React template is generated directly by Puzzle.
+
+### Tailwind CSS
+
+You can optionally configure Tailwind CSS v4.
+
+When enabled, the generator configures the appropriate integration for the selected framework and installs the required development dependencies.
+
+When disabled, the application still uses Puzzle's theme and component styling.
+
+## What gets configured
+
+After framework generation, the CLI:
+
+1. Adds the Puzzle theme provider.
+2. Creates a starter page using the Puzzle UI package.
+3. Sets the generated package name.
+4. Optionally configures Tailwind CSS.
+5. Installs <code>@puzzle-ui/ui</code> and <code>@puzzle-ui/theme</code>.
+
+The generated application uses the system color scheme by default.
+
+## Start developing
+
+Move into the generated directory and run its development script.
+
+```bash
+cd my-dashboard
+npm run dev
+```
+
+Use the package manager selected during setup. For example:
+
+```bash
+cd my-dashboard
+bun run dev
+```
+
+## Manual installation
+
+The generator is optional. You can install Puzzle in an existing React project.
+
+```bash
+npm install @puzzle-ui/ui @puzzle-ui/theme
+```
+
+Add the theme provider at the root of your application.
+
+```tsx
+import { Theme } from "@puzzle-ui/theme";
+import { Button } from "@puzzle-ui/ui";
+
+const App = () => (
+  <Theme theme="system">
+    <main>
+      <h1>My application</h1>
+      <Button>Continue</Button>
+    </main>
+  </Theme>
+);
+
+export default App;
+```
+
+See [Getting Started](/docs/getting-started) for the manual setup guide.
+
+## Troubleshooting
+
+### The project directory already exists
+
+Choose a different project name or remove the existing directory yourself. The generator deliberately refuses to overwrite existing files.
+
+### Framework generation fails
+
+The generator downloads the framework CLI through your selected package manager. Verify that the package manager is installed and can access the package registry.
+
+### Dependency installation fails
+
+Run the failed installation command manually from the generated project directory. Check the package manager output for registry, network, and version errors.
+
+### Tailwind styles are missing
+
+Check that Tailwind was enabled during setup and that the generated CSS entry point is imported by the application.
+
+## Package details
+
+The generator is published as <code>@puzzle-ui/create</code>. Its executable is named <code>create-puzzle</code>.
+
+The package requires Node.js 20.19 or later.

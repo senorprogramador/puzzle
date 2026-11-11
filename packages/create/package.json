@@ -1,7 +1,7 @@
 {
   "name": "@puzzle-ui/create",
   "version": "0.4.0",
-  "description": "Create Beautiful React applications fast with Puzzle UI",
+  "description": "Create React applications with Puzzle UI.",
   "license": "MIT",
   "type": "module",
   "bin": {
@@ -10,6 +10,13 @@
   "files": [
     "dist",
     "README.md"
+  ],
+  "keywords": [
+    "puzzle-ui",
+    "react",
+    "create",
+    "scaffolding",
+    "cli"
   ],
   "engines": {
     "node": ">=20.19.0"

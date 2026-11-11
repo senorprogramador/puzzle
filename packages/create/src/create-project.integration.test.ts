@@ -1,9 +1,11 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm, mkdir } from "node:fs/promises";
 
 import os from "node:os";
 import path from "node:path";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import type { PackageManager } from "./types";
 
 import { createProject } from "./create-project";
 
@@ -21,7 +23,7 @@ describe("createProject", () => {
     });
   });
 
-  it("creates a complete React project with Puzzle installed", async () => {
+  it("creates a complete React project with Puzzle and Tailwind installed", async () => {
     const runner = vi.fn().mockResolvedValue(undefined);
 
     await createProject(
@@ -54,18 +56,22 @@ describe("createProject", () => {
       "utf8",
     );
 
-    expect(packageJson.name).toBe("my-awesome-app");
+    const css = await readFile(
+      path.join(projectDirectory, "src/index.css"),
+      "utf8",
+    );
 
+    expect(packageJson.name).toBe("my-awesome-app");
     expect(main).toContain("@puzzle-ui/theme");
     expect(main).toContain('<Theme theme="system">');
-
     expect(app).toContain("@puzzle-ui/ui");
+    expect(css).toContain('@import "tailwindcss";');
 
     expect(runner).toHaveBeenCalledTimes(2);
 
     expect(runner).toHaveBeenCalledWith(
       "bun",
-      ["add", "-d", "tailwindcss@latest", "@tailwindcss/vite@latest"],
+      ["add", "-D", "tailwindcss@latest", "@tailwindcss/vite@latest"],
       {
         cwd: projectDirectory,
       },
@@ -80,12 +86,53 @@ describe("createProject", () => {
     );
   });
 
+  it.each(["bun", "npm", "pnpm", "yarn"] as PackageManager[])(
+    "installs Puzzle with %s when Tailwind is disabled",
+    async (packageManager) => {
+      const runner = vi.fn().mockResolvedValue(undefined);
+
+      await createProject(
+        {
+          name: "my-app",
+          directory: "my-app",
+          framework: "react",
+          packageManager,
+          tailwind: false,
+        },
+        {
+          cwd,
+          runner,
+        },
+      );
+
+      const projectDirectory = path.join(cwd, "my-app");
+
+      const css = await readFile(
+        path.join(projectDirectory, "src/index.css"),
+        "utf8",
+      );
+
+      expect(css).not.toContain('@import "tailwindcss";');
+      expect(runner).toHaveBeenCalledTimes(1);
+
+      expect(runner).toHaveBeenCalledWith(
+        packageManager,
+        [
+          ...(packageManager === "npm" ? ["install"] : ["add"]),
+          "@puzzle-ui/ui@latest",
+          "@puzzle-ui/theme@latest",
+        ],
+        {
+          cwd: projectDirectory,
+        },
+      );
+    },
+  );
+
   it("does not overwrite an existing project", async () => {
     const runner = vi.fn();
 
     const existingDirectory = path.join(cwd, "existing-app");
-
-    const { mkdir } = await import("node:fs/promises");
 
     await mkdir(existingDirectory);
 

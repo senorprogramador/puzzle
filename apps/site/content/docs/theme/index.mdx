@@ -1,26 +1,29 @@
 ---
 title: Theme
-description: The "@puzzle-ui/theme package owns Puzzle's design tokens, color themes, typography, fonts, and theme scoping.
+description: The @puzzle-ui/theme package owns Puzzle's design tokens, color themes, typography, fonts, and theme scoping.
 ---
 
-`"@puzzle-ui/theme` is the source of truth for Puzzle's visual design. It turns a typed token object into `--puzzle-*` CSS custom properties, loads Google Fonts, resolves light and dark color schemes, and lets you scope a theme to the whole document or a single subtree. All `"@puzzle-ui/ui` components consume these CSS custom properties, so a single `Theme` provider styles your entire application.
+<code>@puzzle-ui/theme</code> is the source of truth for Puzzle's visual design.
+It turns a typed token object into CSS custom properties, loads configured
+fonts, resolves light and dark color schemes, and lets you scope a theme to the
+whole document or a single subtree.
 
-## Import
+All <code>@puzzle-ui/ui</code> components consume these CSS custom properties, so a single <code>Theme</code> provider styles your application.
 
-Install the theme package with your preferred package manager:
+## Install
 
 <PackageManagerTabs>
   <PackageManagerTab value="npm">
-    ```bash npm install "@puzzle-ui/theme ```
+    ~~~bash npm install @puzzle-ui/theme ~~~
   </PackageManagerTab>
   <PackageManagerTab value="bun">
-    ```bash bun add "@puzzle-ui/theme ```
+    ~~~bash bun add @puzzle-ui/theme ~~~
   </PackageManagerTab>
   <PackageManagerTab value="pnpm">
-    ```bash pnpm add "@puzzle-ui/theme ```
+    ~~~bash pnpm add @puzzle-ui/theme ~~~
   </PackageManagerTab>
   <PackageManagerTab value="yarn">
-    ```bash yarn add "@puzzle-ui/theme ```
+    ~~~bash yarn add @puzzle-ui/theme ~~~
   </PackageManagerTab>
 </PackageManagerTabs>
 
@@ -30,7 +33,7 @@ import { Theme } from "@puzzle-ui/theme";
 
 ## Quick start
 
-Wrap your application in a single `Theme` at the root. Without any props it applies the default tokens, follows the user's system color scheme, and injects Puzzle's global styles.
+Wrap your application in a single <code>Theme</code> at the root. Without any props it applies the default tokens, follows the user's system color scheme, and injects Puzzle's global styles.
 
 ```tsx
 import { Theme } from "@puzzle-ui/theme";
@@ -42,7 +45,7 @@ const App = () => (
 );
 ```
 
-A customized root theme typically combines a color theme, fonts, and a few token overrides:
+A customized root theme can combine a color theme, fonts, and token overrides.
 
 ```tsx
 <Theme
@@ -62,14 +65,14 @@ A customized root theme typically combines a color theme, fonts, and a few token
 
 ## What the package provides
 
-| Area                | Description                                                                                       | Read more                                     |
-| ------------------- | ------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| `Theme` provider    | Injects token CSS variables, loads fonts, and applies global styles at root or local scope.       | [Theme Provider](/docs/theme/theme-provider)  |
-| Design tokens       | Typed token groups for spacing, radius, shadows, elevation, borders, layout, motion, and z-index. | [Design Tokens](/docs/theme/tokens)           |
-| Colors              | Semantic color roles, light/dark color schemes, and built-in color themes.                        | [Colors](/docs/theme/colors)                  |
-| Typography & fonts  | Named typography roles, fluid font sizes, and Google Font loading.                                | [Typography & Fonts](/docs/theme/typography)  |
-| Breakpoints         | Shared responsive breakpoints for JavaScript and CSS.                                             | [Breakpoints](/docs/theme/breakpoints)        |
-| Component overrides | Global link and image component overrides for router and framework integration.                   | [Component Overrides](/docs/theme/components) |
+| Area                 | Description                                                                                       | Documentation                                  |
+| -------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Theme provider       | Injects token CSS variables, loads fonts, and applies global styles at root or local scope.       | [Theme Provider](/docs/theme/theme-provider)   |
+| Design tokens        | Typed token groups for spacing, radius, shadows, elevation, borders, layout, motion, and z-index. | [Design Tokens](/docs/theme/tokens)            |
+| Colors               | Semantic color roles, light/dark color schemes, and built-in color themes.                        | [Colors](/docs/theme/colors)                   |
+| Typography and fonts | Named typography roles, fluid font sizes, and Google Font loading.                                | [Typography and Fonts](/docs/theme/typography) |
+| Breakpoints          | Shared responsive breakpoints for JavaScript and CSS.                                             | [Breakpoints](/docs/theme/breakpoints)         |
+| Component overrides  | Global link and image component overrides for router and framework integration.                   | [Component Overrides](/docs/theme/components)  |
 
 ## Exports
 
@@ -109,6 +112,9 @@ import type {
 
 ## How it works
 
-`Theme` resolves the default tokens, the optional `colorTheme`, and your `tokens` overrides into a flat map of `--puzzle-*` CSS custom properties. It renders a `<style>` element that assigns those variables to `:root` (root scope) or to a generated scope attribute (local scope). Static CSS shipped with the package maps the scheme-specific variables—such as `--puzzle-color-scheme-light-primary` and `--puzzle-color-scheme-dark-primary`—onto the semantic variables like `--puzzle-color-primary` based on the active mode, including automatic `prefers-color-scheme` handling in `system` mode.
+<code>Theme</code> resolves the default tokens, the optional color theme, and
+your token overrides into a flat map of CSS custom properties.
 
-Every token value is validated before it is written into CSS, so unsafe values and unknown token names throw instead of silently producing broken styles.
+It renders a style element that assigns those variables to the document root or to a generated scope attribute. Static CSS shipped with the package maps scheme-specific variables onto semantic variables based on the active mode, including automatic <code>prefers-color-scheme</code> handling in system mode.
+
+Token values are validated before they are written into CSS. Unknown token names and invalid values should be corrected rather than silently ignored.

@@ -3,11 +3,9 @@ import type { PackageManager } from "../types";
 const detectPackageManager = (
   userAgent = process.env.npm_config_user_agent ?? "",
 ): PackageManager => {
-  if (userAgent.startsWith("bun/")) {
-    return "bun";
-  }
+  const match = userAgent.match(/(?:^|\s)(bun|pnpm|yarn|npm)\/[^\s]+/);
 
-  return "npm";
+  return (match?.[1] as PackageManager | undefined) ?? "npm";
 };
 
 export { detectPackageManager };

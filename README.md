@@ -1,74 +1,162 @@
 # Puzzle
 
-**Puzzle is an early-stage React UI component library and design
-system.**
+**Puzzle is an early-stage React UI library and application toolkit.**
 
-It is being built to help developers create consistent, responsive
-interfaces using reusable components, hooks, and theme utilities.
+It provides reusable UI components, design tokens, theme utilities, composed interface sections, and tools for building React applications.
 
-> \[!WARNING\] **Puzzle is not ready for production use.**
+> [!WARNING]
+> **Puzzle is not ready for production use.**
 >
-> This project is under active development. APIs, component props,
-> package exports, styling, and internal implementation may change
-> without notice. Components may be incomplete, and testing,
-> accessibility, documentation, and framework compatibility are not yet
-> guaranteed. Use it for experimentation and evaluation only---not for
-> production applications.
+> The project is under active development. APIs, component props, package exports, styling, and package boundaries may change without notice. Components may be incomplete, and testing, accessibility, documentation, and framework compatibility are not guaranteed. Use Puzzle for experimentation and evaluation only, not for production applications.
 
 ## Project status
 
-Puzzle is a work in progress. The current focus is on establishing the
-foundations of the library, including:
+Puzzle is a work in progress. Its current focus includes:
 
-- Reusable React UI components
-- Theme and design-token utilities
-- Shared hooks and utilities
-- Responsive layout primitives
-- A Storybook-based development and preview environment
+- Reusable React UI components.
+- Shared design tokens and theme utilities.
+- Composed UI sections and larger building blocks.
+- Authentication and session infrastructure.
+- Framework integrations.
+- A project generator and developer tooling.
+- Documentation and component previews.
 
-Features and package boundaries may change as the project evolves. Do
-not assume that an existing component or API is stable.
+Do not assume that every package or API is stable.
 
-## Repository structure
+## Packages
 
-The repository is organised as a Bun workspace monorepo. Its packages
-and applications currently include:
+Puzzle is organized as a Bun workspace monorepo.
 
-Package / app Purpose
+### UI and design system
 
----
+| Package                        | Purpose                                               |
+| ------------------------------ | ----------------------------------------------------- |
+| <code>@puzzle-ui/core</code>   | Framework-independent utilities                       |
+| <code>@puzzle-ui/hooks</code>  | Reusable React hooks                                  |
+| <code>@puzzle-ui/icons</code>  | Icon components and utilities                         |
+| <code>@puzzle-ui/theme</code>  | Theme provider, design tokens, colors, and typography |
+| <code>@puzzle-ui/ui</code>     | Reusable React UI components                          |
+| <code>@puzzle-ui/pieces</code> | Composed UI sections and larger building blocks       |
 
-`"@puzzle-ui/core` Core UI components and shared primitives
-`"@puzzle-ui/theme` Theme and design-token functionality
-`"@puzzle-ui/hooks` Reusable React hooks
-`"@puzzle-ui/playground` Playground and component exploration
+### Developer tooling
 
-The exact structure and package responsibilities may evolve during
-development.
+| Package                        | Purpose                                 |
+| ------------------------------ | --------------------------------------- |
+| <code>@puzzle-ui/create</code> | Interactive React application generator |
+
+### Authentication and storage
+
+| Package                                 | Purpose                                                   |
+| --------------------------------------- | --------------------------------------------------------- |
+| <code>@puzzle-ui/auth</code>            | Framework-independent authentication core                 |
+| <code>@puzzle-ui/fullstack</code>       | Authentication client, server, and framework integrations |
+| <code>@puzzle-ui/session</code>         | Session management                                        |
+| <code>@puzzle-ui/storage</code>         | Storage contracts                                         |
+| <code>@puzzle-ui/storage-d1</code>      | Cloudflare D1 storage adapter                             |
+| <code>@puzzle-ui/storage-mongodb</code> | MongoDB storage adapter                                   |
+
+### Applications
+
+| Path                         | Purpose                            |
+| ---------------------------- | ---------------------------------- |
+| <code>apps/site</code>       | Documentation website              |
+| <code>apps/playground</code> | Storybook and component playground |
 
 ## Tech stack
 
-The project is built around:
+- React 19 and TypeScript.
+- Bun workspaces.
+- tsdown for package builds.
+- Vite and TanStack Start.
+- Fumadocs for documentation.
+- Vitest and Node's test runner.
+- Playwright for browser-level testing.
+- Docker Compose for MongoDB integration tests.
 
-- React and TypeScript
-- Bun workspaces
-- Tailwind CSS
-- Storybook
-- Playwright for browser-level testing
-
-Individual packages and development tooling may use additional
-technologies.
+Individual packages may use additional dependencies.
 
 ## Getting started
 
-### Prerequisites
+### Create a new application
 
-Install a recent version of [Bun](https://bun.sh/) that supports the
-version and workspace setup used by this repository.
+The easiest way to start a new application is the interactive project generator.
 
-### Install dependencies
+With npm:
 
-Clone the repository and install its dependencies:
+```bash
+npx @puzzle-ui/create
+```
+
+With Bun:
+
+```bash
+bunx @puzzle-ui/create
+```
+
+With pnpm:
+
+```bash
+pnpm dlx @puzzle-ui/create
+```
+
+With Yarn 2 or later:
+
+```bash
+yarn dlx @puzzle-ui/create
+```
+
+The generator supports:
+
+- Next.js App Router.
+- TanStack Start.
+- Basic React with Vite and TypeScript.
+
+It configures the Puzzle theme and optionally installs Tailwind CSS v4.
+
+The generator requires Node.js 20.19 or later.
+
+See the [Create a Project guide](https://github.com/senorprogramador/puzzle/tree/main/apps/site/content/docs/developer) for details.
+
+### Install Puzzle manually
+
+For an existing React application, install the UI and theme packages.
+
+```bash
+npm install @puzzle-ui/ui @puzzle-ui/theme
+```
+
+Wrap your application in the theme provider.
+
+```tsx
+import { Theme } from "@puzzle-ui/theme";
+import { Button } from "@puzzle-ui/ui";
+
+const App = () => (
+  <Theme theme="system">
+    <main>
+      <h1>Welcome to Puzzle</h1>
+      <Button>Get started</Button>
+    </main>
+  </Theme>
+);
+
+export default App;
+```
+
+Your bundler must support CSS imports. Puzzle's component styles are imported by the components themselves.
+
+See the [Getting Started documentation](https://github.com/senorprogramador/puzzle/tree/main/apps/site/content/docs/getting-started.mdx).
+
+## Development
+
+### Requirements
+
+- Git.
+- Bun 1.4.4 or a compatible newer version.
+- Node.js 20.19 or later for the project generator and related tooling.
+- Docker with Compose for MongoDB integration tests.
+
+### Clone the repository
 
 ```bash
 git clone https://github.com/senorprogramador/puzzle.git
@@ -76,133 +164,117 @@ cd puzzle
 bun install
 ```
 
-### Development
-
-Development and Storybook commands may change while the project is being
-built. Check the relevant `package.json` files and workspace scripts for
-the commands currently available:
+### Run the documentation site
 
 ```bash
-cat package.json
+bun run site
 ```
 
-For package-specific commands, inspect the `package.json` in the
-relevant workspace.
+### Run the playground
 
-### Tests
+```bash
+bun run dev
+```
 
-Run all package test suites from the repository root:
+### Run Storybook
+
+```bash
+bun run storybook
+```
+
+### Build packages
+
+```bash
+bun run build
+```
+
+### Type check packages and documentation
+
+```bash
+bun run typecheck
+```
+
+### Run the repository test command
 
 ```bash
 bun run vitest
 ```
 
-This builds the packages first because some tests import compiled output,
-then runs the workspace suites, CLI tests, and UI browser tests. MongoDB
-conformance tests require Docker with Compose; their runner starts and
-removes a dedicated test container and its volume. Browser tests require
-Playwright's Chromium browser.
+This command builds the packages first, runs package test scripts, runs the project generator tests, and runs the UI browser tests.
+
+MongoDB integration tests require Docker with Compose. Browser tests require Playwright's Chromium browser.
+
+See the [Testing guide](https://github.com/senorprogramador/puzzle/tree/main/apps/site/content/docs/developer/testing.mdx) for package-specific commands.
 
 ## Design principles
 
-Puzzle aims to provide a foundation for interfaces that are:
+Puzzle aims to provide interfaces that are:
 
-- **Consistent** --- shared components and theme tokens help keep
-  visual decisions aligned.
-- **Composable** --- components should be reusable and fit into
-  different application layouts.
-- **Responsive** --- layout primitives should adapt to different
-  screen sizes.
-- **Accessible** --- semantic HTML and appropriate accessibility
-  attributes are important design goals.
-- **Developer-friendly** --- TypeScript types and component previews
-  should make APIs easier to understand.
+- **Consistent** — shared components and tokens keep visual decisions aligned.
+- **Composable** — components should fit different application layouts.
+- **Responsive** — layout primitives should adapt to different screen sizes.
+- **Accessible** — semantic HTML and appropriate accessibility behavior are core requirements.
+- **Developer-friendly** — TypeScript types, documentation, examples, and tooling should make APIs easier to understand.
 
-These are project goals, not a claim that every component currently
-meets them.
+These are project goals, not a claim that every component currently meets them.
 
 ## Compatibility
 
-Compatibility with specific React frameworks, rendering modes, and build
-setups is still being developed and verified. Do not assume that every
-component works in every environment, including server-side rendering
-(SSR), Next.js App Router, or TanStack Start, unless that support has
-been tested for the specific component and release.
+Puzzle targets React 19.
+
+Compatibility with specific React frameworks, rendering modes, and build setups is still being developed and verified. Do not assume that every component works in every environment, including server-side rendering, Next.js App Router, or TanStack Start, unless that support has been tested for the specific component and release.
 
 ## Contributing
 
-Contributions, bug reports, and suggestions are welcome. Since the
-project is still evolving, please open an issue or discussion before
-investing in a large change so that the proposed direction can be agreed
-upon.
+Contributions, bug reports, and suggestions are welcome.
+
+Before investing in a large change, open an issue or discussion so that the proposed direction can be agreed upon.
 
 When reporting a bug, include:
 
-- The package and component involved
-- A minimal reproduction
-- Expected behaviour and actual behaviour
-- Relevant framework and runtime versions
+- The package and component involved.
+- A minimal reproduction.
+- Expected behavior and actual behavior.
+- Relevant framework and runtime versions.
 
-## Versioning and breaking changes
+Follow the repository conventions in <code>AGENTS.md</code>.
+
+## Versioning and releases
 
 Until Puzzle reaches a more stable stage:
 
-- Public APIs may change at any time.
-- Breaking changes may be introduced without a migration guide.
+- Public APIs may change.
+- Breaking changes may be introduced.
 - Documentation may lag behind implementation.
 - Tests and examples may not cover every use case.
 
-Pin versions or use a specific commit if you are experimenting with the
-project.
+Pin versions or use a specific commit if you are experimenting with the project.
 
-### Publishing packages
+The release script currently publishes the following packages together:
 
-The library packages are published separately as public packages on npmjs.
-The repository root and applications are private and are not published.
+- <code>@puzzle-ui/core</code>
+- <code>@puzzle-ui/theme</code>
+- <code>@puzzle-ui/hooks</code>
+- <code>@puzzle-ui/icons</code>
+- <code>@puzzle-ui/ui</code>
+- <code>@puzzle-ui/create</code>
 
-From the repository root, validate a package's build and tarball without
-publishing it:
+Run a release dry run:
 
 ```bash
-npm pack --workspace=@puzzle-ui/core --dry-run
-npm publish --workspace=@puzzle-ui/core --dry-run
+npm run release:dry-run
 ```
 
-Every library package runs `tsdown` in `prepack`, so packing and publishing
-rebuild its JavaScript, ESM/CommonJS declarations, styles where applicable,
-and included MIT license. Runtime dependencies use registry-compatible
-version ranges; consumers do not need Bun or workspace links.
-
-### Releasing
-
-Release all library packages together from the repository root:
+Run a release:
 
 ```bash
 npm run release
 ```
 
-The script requires a clean git working tree and asks whether the release is
-`major`, `minor`, or `patch`. It then:
+The release script requires a clean Git working tree. It updates package versions and workspace dependency ranges, refreshes the lockfile, validates types, runs tests, builds packages, publishes them, commits the release, creates a tag, and pushes the release.
 
-1. Updates the version and internal `@puzzle-ui/*` dependency ranges of every
-   library package, and refreshes `bun.lock`.
-2. Type checks all packages and the documentation site.
-3. Runs all package tests, including the UI browser tests.
-4. Builds all packages.
-5. Publishes core, theme, hooks, icons, UI, and create in that order, prompting for
-   npm login, one-time passwords, or browser authentication when needed.
-6. Commits the version changes as `Release v<version>` and creates the
-   annotated tag `v<version>`.
-
-The script stops at the first failing type check, test, build, or publish. If it stops
-before anything is published, the version changes are restored. Push the
-release afterwards with `git push --follow-tags`.
-
-Run `npm run release:dry-run` to perform every step with `npm publish
---dry-run`, without publishing, committing, or tagging. Releasing requires Bun,
-Git, npm, Playwright's Chromium browser, and publish access to the
-`@puzzle-ui` scope.
+The release script publishes only the packages listed above. Other packages in the repository are not included in its current release sequence.
 
 ## License
 
-See the [`LICENSE`](./LICENSE) file for the project's current license.
+See the [LICENSE](./LICENSE) file for the project's current license.

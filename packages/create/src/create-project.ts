@@ -13,7 +13,7 @@ import { configureTailwind } from "./tailwind/configure-tailwind";
 import { installTailwind } from "./tailwind/install-tailwind";
 
 type CreateProjectContext = {
-  /** Directory the project directory is resolved from. Defaults to `process.cwd()`. */
+  /** Directory the project directory is resolved from. Defaults to process.cwd(). */
   cwd?: string;
   /** Runs external commands. Defaults to spawning a child process. */
   runner?: CommandRunner;
@@ -25,13 +25,12 @@ const installDependencies = async (
   runner: CommandRunner,
 ) => {
   const packages = [...PUZZLE_PACKAGES];
+  const args =
+    packageManager === "npm" ? ["install", ...packages] : ["add", ...packages];
 
-  if (packageManager === "bun") {
-    await runner("bun", ["add", ...packages], { cwd: directory });
-    return;
-  }
-
-  await runner("npm", ["install", ...packages], { cwd: directory });
+  await runner(packageManager, args, {
+    cwd: directory,
+  });
 };
 
 const configureProjectName = async (directory: string, projectName: string) => {
@@ -55,8 +54,6 @@ const createProject = async (
   options: ProjectOptions,
   { cwd = process.cwd(), runner = runCommand }: CreateProjectContext = {},
 ) => {
-  // Validate before starting the spinner, so nothing is generated or reported
-  // as a failed step when the target directory cannot be used.
   const targetDirectory = await validateProjectDirectory(
     options.directory,
     cwd,
@@ -82,14 +79,12 @@ const createProject = async (
     startStep("Generating framework");
 
     if (options.framework === "react") {
-      // The Basic React generator writes directly into its target directory.
       await frameworkGenerators.react(
         targetDirectory,
         options.packageManager,
         runner,
       );
     } else {
-      // Next.js and TanStack CLI create their own project directory.
       await frameworkGenerators[options.framework](
         projectName,
         options.packageManager,
@@ -134,7 +129,7 @@ const createProject = async (
   p.log.success(`Project "${projectName}" created successfully.`);
 
   p.outro(
-    `Next steps:\n\n  cd ${path.relative(process.cwd(), targetDirectory) || "."}\n  ${options.packageManager} run dev`,
+    `Next steps:\n\n  cd ${path.relative(cwd, targetDirectory) || "."}\n  ${options.packageManager} run dev`,
   );
 };
 

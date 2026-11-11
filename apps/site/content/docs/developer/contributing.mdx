@@ -1,0 +1,175 @@
+---
+title: Contributing
+description: Set up the Puzzle repository, understand its structure, and contribute changes consistently.
+---
+
+Puzzle is developed as a Bun workspace monorepo. Contributions should be focused, tested, accessible, and consistent with the existing component and package conventions.
+
+Puzzle is not production-ready. Public APIs and package boundaries may change while the project evolves.
+
+## Prerequisites
+
+- Git.
+- Bun 1.4.4 or a compatible newer version.
+- Node.js 20.19 or later for the project generator and related tooling.
+- Docker with Compose for MongoDB integration tests.
+
+## Clone the repository
+
+```bash
+git clone https://github.com/senorprogramador/puzzle.git
+cd puzzle
+bun install
+```
+
+## Repository structure
+
+| Path                     | Responsibility                                            |
+| ------------------------ | --------------------------------------------------------- |
+| apps/site                | Documentation website                                     |
+| apps/playground          | Storybook and component playground                        |
+| packages/core            | Framework-independent utilities                           |
+| packages/hooks           | Reusable React hooks                                      |
+| packages/icons           | Icon components and utilities                             |
+| packages/theme           | Theme provider and design tokens                          |
+| packages/ui              | Reusable UI components                                    |
+| packages/pieces          | Composed UI sections and larger building blocks           |
+| packages/create          | Interactive project generator                             |
+| packages/auth            | Framework-independent authentication core                 |
+| packages/session         | Session management                                        |
+| packages/storage         | Storage contracts                                         |
+| packages/storage-d1      | Cloudflare D1 storage adapter                             |
+| packages/storage-mongodb | MongoDB storage adapter                                   |
+| packages/fullstack       | Authentication client, server, and framework integrations |
+
+## Start developing
+
+Start the documentation site:
+
+```bash
+bun run site
+```
+
+Start the component playground:
+
+```bash
+bun run dev
+```
+
+Start Storybook:
+
+```bash
+bun run storybook
+```
+
+## Project conventions
+
+Before changing a package, inspect its existing implementation and the closest related example. Prefer established patterns over introducing new abstractions.
+
+### Components
+
+- Use functional React components and arrow functions.
+- Use named exports.
+- Keep components generic and router-independent.
+- Prefer semantic HTML and native browser behavior.
+- Keep public APIs small and composable.
+- Preserve existing behavior unless a breaking change is intentional.
+
+### Styling and themes
+
+- Use existing <code>--puzzle-\*</code> CSS variables.
+- Prefer semantic theme tokens over hardcoded values.
+- Keep component styles scoped to the component.
+- Respect light and dark themes.
+- Respect reduced-motion preferences.
+- Avoid adding dependencies for small styling or interaction requirements.
+
+### Accessibility
+
+Interactive components should cover:
+
+- Keyboard navigation.
+- Focus management and visible focus.
+- Screen-reader support.
+- Correct ARIA roles and relationships.
+- Touch and pointer interactions.
+- High-contrast environments.
+- Reduced-motion preferences.
+
+Use native HTML semantics where possible. Do not add ARIA attributes that duplicate native browser behavior.
+
+### Tests
+
+Add tests for meaningful behavior and regressions. Follow the test organization used by the package.
+
+Use unit tests for isolated logic, component tests for rendered behavior, and browser tests for interactions that depend on a real browser.
+
+See [Testing](/docs/developer/testing) for the available commands.
+
+## Documentation
+
+The documentation site lives in <code>apps/site</code>.
+
+UI component pages are organized by category under:
+
+```text
+apps/site/content/docs/ui/
+```
+
+Theme documentation lives under:
+
+```text
+apps/site/content/docs/theme/
+```
+
+Developer guides live under:
+
+```text
+apps/site/content/docs/developer/
+```
+
+When adding a documentation page:
+
+1. Add the MDX page in the appropriate category.
+2. Include a title and description in its frontmatter.
+3. Include installation or import instructions where relevant.
+4. Document the public API and important behavior.
+5. Include practical examples.
+6. Explain accessibility behavior where relevant.
+7. Add the page to the corresponding sidebar configuration.
+8. Verify that all documented imports exist.
+
+Use the existing Fumadocs and Puzzle documentation components. Stateful examples should be reusable components rather than duplicated inline implementations.
+
+## Validate your changes
+
+Run the narrowest relevant checks first.
+
+For a full repository validation:
+
+```bash
+bun run typecheck
+bun run build
+bun run vitest
+```
+
+For documentation changes:
+
+```bash
+bun run --filter "@puzzle-ui/site" typecheck
+bun run --filter "@puzzle-ui/site" build
+```
+
+See [Testing](/docs/developer/testing) for package-specific test commands and requirements.
+
+## Pull requests
+
+Keep pull requests focused and explain:
+
+- What changed.
+- Why the change is needed.
+- Which packages or public APIs are affected.
+- Which tests and checks were run.
+- Any known limitations or follow-up work.
+
+Include screenshots or short recordings when a visual or interaction change is difficult to understand from code alone.

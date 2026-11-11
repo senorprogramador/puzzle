@@ -3,55 +3,68 @@ title: Getting Started
 description: Install Puzzle in your React app, build your first interface, and customize the theme.
 ---
 
-Puzzle is a TypeScript and React UI component library built around reusable components and shared design tokens. Its components are composable and router-independent, with styling supplied by `"@puzzle-ui/theme`. The framework is setup to be compatible with `Next.js`, `Tanstack Start` and `react-router`.
+Puzzle is a TypeScript and React UI component library built around reusable components and shared design tokens. Its components are composable and router-independent, with styling supplied by <code>@puzzle-ui/theme</code>.
 
-**Puzzle is under active development and is not ready for production use.** APIs, props, exports, and styling may change without notice. Accessibility and framework compatibility are still being tested. Use the project for experimentation and evaluation.
+<Callout type="warn" title="Early development">
+  Puzzle is under active development and is not ready for production use. APIs,
+  props, exports, and styling may change without notice. Accessibility and
+  framework compatibility are still being tested. Use the project for
+  experimentation and evaluation.
+</Callout>
 
 ## Prerequisites
 
 - A package manager: npm, Bun, pnpm, or Yarn.
 - An existing React application with a bundler that supports CSS imports, such as Vite.
-- Familiarity with React and TypeScript. The UI and theme packages require React and React DOM 19 or later within the supported React 19 range.
+- React and React DOM 19.
 
-## Set up the project
+## Install Puzzle
 
-Install the UI library and theme package in your application's directory. Choose your package manager below; all package-manager tabs in the documentation switch together and remember your selection.
+Install the UI and theme packages in your application's directory.
 
 <PackageManagerTabs>
   <PackageManagerTab value="npm">
-    ```bash
-    npm install @puzzle-ui/ui @puzzle-ui/theme
-    ```
+
+```bash
+npm install @puzzle-ui/ui @puzzle-ui/theme
+```
+
   </PackageManagerTab>
   <PackageManagerTab value="bun">
-    ```bash
-    bun add @puzzle-ui/ui @puzzle-ui/theme
-    ```
+
+```bash
+bun add @puzzle-ui/ui @puzzle-ui/theme
+```
+
   </PackageManagerTab>
   <PackageManagerTab value="pnpm">
-    ```bash
-    pnpm add @puzzle-ui/ui @puzzle-ui/theme
-    ```
+
+```bash
+pnpm add @puzzle-ui/ui @puzzle-ui/theme
+```
+
   </PackageManagerTab>
   <PackageManagerTab value="yarn">
-    ```bash
-    yarn add @puzzle-ui/ui @puzzle-ui/theme
-    ```
+
+```bash
+yarn add @puzzle-ui/ui @puzzle-ui/theme
+```
+
   </PackageManagerTab>
 </PackageManagerTabs>
 
-These commands install published packages; they do not clone the repository or build its workspaces. Puzzle does not require Bun in your application. React and React DOM are peer dependencies and should already be installed in your app.
+These commands install published packages. They do not clone the repository or build its workspaces. Puzzle does not require Bun in your application.
 
 ## Your first interface
 
-Import components from `"@puzzle-ui/ui` and wrap your application in `Theme` from `"@puzzle-ui/theme`:
+Import components from <code>@puzzle-ui/ui</code> and wrap your application in <code>Theme</code> from <code>@puzzle-ui/theme</code>.
 
 ```tsx
 import { Theme } from "@puzzle-ui/theme";
 import { Button } from "@puzzle-ui/ui";
 
 export const App = () => (
-  <Theme>
+  <Theme theme="system">
     <main>
       <h1>Hello, Puzzle</h1>
       <p>Build your interface with reusable components and shared tokens.</p>
@@ -63,28 +76,16 @@ export const App = () => (
 );
 ```
 
-`Theme` applies default tokens and global styles, and follows the user's system light/dark preference. Use one root theme for your application. Component styles are imported by the components themselves; your application bundler must support CSS imports, as the repository's Vite apps do.
+<code>Theme</code> applies the default tokens and global styles, and follows the
+user's system light/dark preference. Use one root theme for your application.
 
-The button below uses the documentation site's existing theme:
+Component styles are imported by the components themselves. Your application bundler must support CSS imports.
 
-<Preview
-  height={140}
-  align="center"
-  justify="center"
-  code={`<Button onClick={() => window.alert("Welcome to Puzzle!")}>
-  Get started
-</Button>`}
->
-  <Button onClick={() => window.alert("Welcome to Puzzle!")}>
-    Get started
-  </Button>
-</Preview>
-
-See [Button](/docs/components/ui/actions/button) for variants, sizes, and API details.
+See [Button](/docs/ui/actions/button) for variants, sizes, and API details.
 
 ## Customize your theme
 
-Set the color mode, choose a color palette, load fonts, or override individual tokens:
+Set the color mode, choose a color palette, load fonts, or override individual tokens.
 
 ```tsx
 <Theme
@@ -102,9 +103,9 @@ Set the color mode, choose a color palette, load fonts, or override individual t
 </Theme>
 ```
 
-Font configuration loads stylesheets from Google Fonts. Omit `fonts` if you do not want external font requests.
+Font configuration can load stylesheets from Google Fonts. Omit <code>fonts</code> if you do not want external font requests.
 
-In your own CSS, use the same semantic tokens as Puzzle components:
+In your own CSS, use the same semantic tokens as Puzzle components.
 
 ```css
 .welcome-panel {
@@ -115,37 +116,50 @@ In your own CSS, use the same semantic tokens as Puzzle components:
 }
 ```
 
-Read the [Theme overview](/docs/theme), [Theme Provider](/docs/theme/theme-provider), and [Design Tokens](/docs/theme/tokens) guides for configuration details. Use [Component Overrides](/docs/theme/components) to integrate your router's link component or a framework image component.
-
-## Run your application
-
-If your app has a `dev` script, start its development server with:
-
-<PackageManagerTabs>
-  <PackageManagerTab value="npm">```bash npm run dev ```</PackageManagerTab>
-  <PackageManagerTab value="bun">```bash bun run dev ```</PackageManagerTab>
-  <PackageManagerTab value="pnpm">```bash pnpm run dev ```</PackageManagerTab>
-  <PackageManagerTab value="yarn">```bash yarn run dev ```</PackageManagerTab>
-</PackageManagerTabs>
-
-Open the URL printed by your development server.
+Read the [Theme overview](/docs/theme), [Theme Provider](/docs/theme/theme-provider), and [Design Tokens](/docs/theme/tokens) guides for configuration details.
 
 ## Build your application
 
-Puzzle ships compiled JavaScript and CSS, so you do not need to build the library yourself. Use your app's `build` script to bundle it:
+Puzzle ships compiled JavaScript and CSS, so you do not need to build the library yourself. Use your application's existing build script.
 
 <PackageManagerTabs>
-  <PackageManagerTab value="npm">```bash npm run build ```</PackageManagerTab>
-  <PackageManagerTab value="bun">```bash bun run build ```</PackageManagerTab>
-  <PackageManagerTab value="pnpm">```bash pnpm run build ```</PackageManagerTab>
-  <PackageManagerTab value="yarn">```bash yarn run build ```</PackageManagerTab>
+  <PackageManagerTab value="npm">
+
+```bash
+npm run build
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun run build
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm run build
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn run build
+```
+
+  </PackageManagerTab>
 </PackageManagerTabs>
 
-Your app must retain CSS imports when bundling Puzzle. No separate Puzzle stylesheet import or Tailwind setup is required. Framework and server-rendering compatibility is still being evaluated; test your chosen components in your application's environment.
+Your application must retain CSS imports when bundling Puzzle. No separate Puzzle stylesheet import or Tailwind setup is required.
+
+Framework and server-rendering compatibility is still being evaluated. Test your chosen components in your application's environment.
 
 ## Next steps
 
-- Explore [Buttons](/docs/components/ui/actions/button), [Cards](/docs/components/ui/data-display/card), and [Text Inputs](/docs/components/ui/forms/text-input).
-- Learn how to configure [light/dark colors](/docs/theme/colors) and [typography and fonts](/docs/theme/typography).
+- Explore [Buttons](/docs/ui/actions/button), [Cards](/docs/ui/data-display/card), and [Text Inputs](/docs/ui/forms/text-input).
+- Learn how to configure [colors](/docs/theme/colors) and [typography and fonts](/docs/theme/typography).
 - Try the interactive documentation examples before composing a larger interface.
-- Report bugs with a minimal reproduction, expected and actual behavior, and your framework and runtime versions.
+- Use the [project generator](/docs/developer/create-project) to scaffold a new application.

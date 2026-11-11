@@ -1,6 +1,6 @@
 export type Framework = "next" | "tanstack" | "react";
 
-export type PackageManager = "bun" | "npm";
+export type PackageManager = "bun" | "npm" | "pnpm" | "yarn";
 
 export type ProjectOptions = {
   name: string;

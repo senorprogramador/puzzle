@@ -12,6 +12,21 @@ const getTailwindPackages = (framework: Framework) => {
   return ["tailwindcss@latest", "@tailwindcss/vite@latest"];
 };
 
+const getInstallArguments = (
+  packageManager: PackageManager,
+  packages: string[],
+) => {
+  if (packageManager === "npm") {
+    return ["install", "--save-dev", ...packages];
+  }
+
+  if (packageManager === "yarn") {
+    return ["add", "--dev", ...packages];
+  }
+
+  return ["add", "-D", ...packages];
+};
+
 const installTailwind = async ({
   directory,
   framework,
@@ -24,14 +39,9 @@ const installTailwind = async ({
   runner: CommandRunner;
 }) => {
   const packages = getTailwindPackages(framework);
+  const args = getInstallArguments(packageManager, packages);
 
-  if (packageManager === "bun") {
-    await runner("bun", ["add", "-d", ...packages], { cwd: directory });
-
-    return;
-  }
-
-  await runner("npm", ["install", "--save-dev", ...packages], {
+  await runner(packageManager, args, {
     cwd: directory,
   });
 };

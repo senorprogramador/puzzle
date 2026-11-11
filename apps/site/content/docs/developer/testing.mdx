@@ -1,0 +1,161 @@
+---
+title: Testing
+description: Run unit, component, browser, integration, and documentation checks in the Puzzle monorepo.
+---
+
+Puzzle uses several test runners depending on the package and the type of behavior being tested.
+
+The repository includes:
+
+- Vitest for unit and component tests.
+- Node's test runner for several server-side packages.
+- Playwright-backed browser tests through Vitest.
+- Docker Compose for MongoDB integration tests.
+
+## Install dependencies
+
+From the repository root:
+
+```bash
+bun install
+```
+
+## Run the repository test command
+
+The root test script builds the packages first, runs package test scripts, runs the project generator tests, and runs the UI browser tests.
+
+```bash
+bun run vitest
+```
+
+This is the broadest standard test command in the repository.
+
+## Package-specific tests
+
+### UI components
+
+Run unit and component tests:
+
+```bash
+bun run --filter "@puzzle-ui/ui" vitest
+```
+
+Run only unit tests:
+
+```bash
+bun run --filter "@puzzle-ui/ui" test:unit
+```
+
+Run only component tests:
+
+```bash
+bun run --filter "@puzzle-ui/ui" test:component
+```
+
+Run browser tests:
+
+```bash
+bun run --filter "@puzzle-ui/ui" test:browser
+```
+
+### Pieces
+
+```bash
+bun run --filter "@puzzle-ui/pieces" vitest
+bun run --filter "@puzzle-ui/pieces" test:browser
+```
+
+### Project generator
+
+```bash
+bun run --filter "@puzzle-ui/create" test
+```
+
+### Fullstack authentication
+
+Run server-side and unit tests:
+
+```bash
+bun run --filter "@puzzle-ui/fullstack" test
+```
+
+Run browser tests:
+
+```bash
+bun run --filter "@puzzle-ui/fullstack" test:browser
+```
+
+### Authentication and storage
+
+Several backend packages use Node's built-in test runner.
+
+```bash
+bun run --filter "@puzzle-ui/auth" test
+bun run --filter "@puzzle-ui/session" test
+bun run --filter "@puzzle-ui/storage" test
+bun run --filter "@puzzle-ui/storage-d1" test
+```
+
+## MongoDB integration tests
+
+The MongoDB storage adapter uses a dedicated test runner.
+
+```bash
+bun run --filter "@puzzle-ui/storage-mongodb" test
+```
+
+Docker with Compose must be available. The test script starts its MongoDB test environment and cleans up the container and volume when it finishes.
+
+## Type checking
+
+Run type checks for all packages and the documentation site:
+
+```bash
+bun run typecheck
+```
+
+Run the documentation site's type check independently:
+
+```bash
+bun run --filter "@puzzle-ui/site" typecheck
+```
+
+## Build checks
+
+Build all packages:
+
+```bash
+bun run build
+```
+
+Build the documentation site:
+
+```bash
+bun run --filter "@puzzle-ui/site" build
+```
+
+The site build also validates its MDX pages and documentation examples.
+
+## Browser test requirements
+
+Browser tests require the Playwright Chromium browser to be installed.
+
+If a browser test fails before reaching the test assertions, verify the Playwright browser installation and the local browser dependencies first.
+
+## Recommended workflow
+
+For a component change:
+
+1. Run the component's unit tests.
+2. Run its component tests.
+3. Run its browser tests if keyboard, pointer, focus, or other browser behavior changed.
+4. Run the package type check.
+5. Build the package.
+
+For a documentation change:
+
+1. Verify all imports and links.
+2. Run the site type check.
+3. Build the documentation site.
+
+For changes affecting shared packages or public APIs, run the broader repository checks.
