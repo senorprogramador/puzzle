@@ -6,7 +6,8 @@
     "dev": "bun run --filter '@puzzle-ui/playground' dev",
     "build": "bun run --filter './packages/*' build",
     "typecheck": "bun run --filter './packages/*' --filter './apps/site' typecheck",
-    "vitest": "bun run build && bun run --filter './packages/*' vitest && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser",
+    "test:all": "bun run build && bun run --filter './packages/*' vitest && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser && bun run --filter '@puzzle-ui/pieces' test:browser",
+    "benchmark:auth": "bun run build && node scripts/benchmark-auth.mjs",
     "storybook": "bun run --filter './apps/playground' storybook",
     "release": "node scripts/release.mjs",
     "release:dry-run": "node scripts/release.mjs --dry-run"

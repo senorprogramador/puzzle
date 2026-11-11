@@ -9,6 +9,7 @@ import {
   type AuthMfaHandlers,
   type AuthMfaHandlersOptions,
 } from "./mfa";
+
 import {
   createAuthLifecycleHandlers,
   type AuthLifecycleHandlers,
@@ -118,19 +119,24 @@ export const createAuthRouteHandlers = (
   basePath = "/api/auth",
 ): AuthRouteHandlerMap => {
   const prefix = basePath.replace(/\/+$/, "");
+
   const route = (path: string): string => `${prefix}${path}`;
+
   const handlers = server.handlers;
 
   return {
     [route("/register")]: {
       POST: handlers.register,
     },
+
     [route("/sign-in")]: {
       POST: handlers.signIn,
     },
+
     [route("/state")]: {
       GET: handlers.getAuthState,
     },
+
     [route("/sign-out")]: {
       POST: handlers.signOut,
     },
@@ -138,12 +144,15 @@ export const createAuthRouteHandlers = (
     [route("/mfa/sign-in/totp")]: {
       POST: handlers.verifySignInTotp,
     },
+
     [route("/mfa/sign-in/recovery-code")]: {
       POST: handlers.verifySignInRecoveryCode,
     },
+
     [route("/mfa/passkey/sign-in/start")]: {
       POST: handlers.beginPasskeySignIn,
     },
+
     [route("/mfa/passkey/sign-in/finish")]: {
       POST: handlers.finishPasskeySignIn,
     },
@@ -151,6 +160,7 @@ export const createAuthRouteHandlers = (
     [route("/mfa/passkey/challenge/start")]: {
       POST: handlers.beginPasskeyMfa,
     },
+
     [route("/mfa/passkey/challenge/finish")]: {
       POST: handlers.finishPasskeyMfa,
     },
@@ -158,12 +168,15 @@ export const createAuthRouteHandlers = (
     [route("/mfa/totp/enrollment/start")]: {
       POST: handlers.beginTotpEnrollment,
     },
+
     [route("/mfa/totp/enrollment/finish")]: {
       POST: handlers.verifyTotpEnrollment,
     },
+
     [route("/mfa/passkey/enrollment/start")]: {
       POST: handlers.beginPasskeyRegistration,
     },
+
     [route("/mfa/passkey/enrollment/finish")]: {
       POST: handlers.finishPasskeyRegistration,
     },
@@ -171,9 +184,11 @@ export const createAuthRouteHandlers = (
     [route("/mfa/factors")]: {
       GET: handlers.listMfaFactors,
     },
+
     [route("/mfa/factors/remove")]: {
       POST: handlers.removeMfaFactor,
     },
+
     [route("/mfa/recovery-codes/regenerate")]: {
       POST: handlers.regenerateRecoveryCodes,
     },
@@ -181,15 +196,19 @@ export const createAuthRouteHandlers = (
     [route("/mfa/step-up/start")]: {
       POST: handlers.beginStepUp,
     },
+
     [route("/mfa/step-up/totp")]: {
       POST: handlers.verifyStepUpTotp,
     },
+
     [route("/mfa/step-up/recovery-code")]: {
       POST: handlers.verifyStepUpRecoveryCode,
     },
+
     [route("/mfa/step-up/passkey/start")]: {
       POST: handlers.beginStepUpPasskey,
     },
+
     [route("/mfa/step-up/passkey/finish")]: {
       POST: handlers.finishStepUpPasskey,
     },
@@ -197,12 +216,15 @@ export const createAuthRouteHandlers = (
     [route("/mfa/enrollment/required/totp/start")]: {
       POST: handlers.beginRequiredTotpEnrollment,
     },
+
     [route("/mfa/enrollment/required/totp/finish")]: {
       POST: handlers.verifyRequiredTotpEnrollment,
     },
+
     [route("/mfa/enrollment/required/passkey/start")]: {
       POST: handlers.beginRequiredPasskeyEnrollment,
     },
+
     [route("/mfa/enrollment/required/passkey/finish")]: {
       POST: handlers.finishRequiredPasskeyEnrollment,
     },
@@ -286,3 +308,11 @@ export type {
   AuthLifecycleHandlers,
   AuthLifecycleHandlersOptions,
 } from "./lifecycle";
+
+export { createAuthReadinessHandler } from "./health";
+
+export type {
+  AuthReadinessCheck,
+  AuthReadinessOptions,
+  AuthReadinessResult,
+} from "./health";

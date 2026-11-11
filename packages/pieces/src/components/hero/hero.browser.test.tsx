@@ -166,7 +166,7 @@ describe("Hero browser behavior", () => {
     const video = container.querySelector("video");
 
     expect(video).not.toBeNull();
-    expect(video).toHaveAttribute("muted");
+    expect(video).toHaveProperty("muted", true);
     expect(video).toHaveAttribute("loop");
     expect(video).toHaveAttribute("playsinline");
   });

@@ -54,6 +54,76 @@ test("normalizes default ports", () => {
   assert.doesNotThrow(() => validateRequestOrigin(request, options));
 });
 
+test("rejects origin values containing paths", () => {
+  const request = new Request("https://example.com/api", {
+    method: "POST",
+    headers: {
+      origin: "https://example.com/untrusted-path",
+    },
+  });
+
+  assert.throws(
+    () => validateRequestOrigin(request, options),
+    /Invalid request origin/,
+  );
+});
+
+test("rejects origin values containing query strings", () => {
+  const request = new Request("https://example.com/api", {
+    method: "POST",
+    headers: {
+      origin: "https://example.com/?redirect=https://attacker.example",
+    },
+  });
+
+  assert.throws(
+    () => validateRequestOrigin(request, options),
+    /Invalid request origin/,
+  );
+});
+
+test("rejects origin values containing fragments", () => {
+  const request = new Request("https://example.com/api", {
+    method: "POST",
+    headers: {
+      origin: "https://example.com/#attacker",
+    },
+  });
+
+  assert.throws(
+    () => validateRequestOrigin(request, options),
+    /Invalid request origin/,
+  );
+});
+
+test("rejects origin values containing credentials", () => {
+  const request = new Request("https://example.com/api", {
+    method: "POST",
+    headers: {
+      origin: "https://user:password@example.com",
+    },
+  });
+
+  assert.throws(
+    () => validateRequestOrigin(request, options),
+    /Invalid request origin/,
+  );
+});
+
+test("rejects unsupported origin protocols", () => {
+  const request = new Request("https://example.com/api", {
+    method: "POST",
+    headers: {
+      origin: "ftp://example.com",
+    },
+  });
+
+  assert.throws(
+    () => validateRequestOrigin(request, options),
+    /Invalid request origin/,
+  );
+});
+
 test("rejects cross-site state-changing requests", () => {
   const request = new Request("https://example.com/api", {
     method: "POST",
@@ -87,4 +157,35 @@ test("allows same-origin state-changing requests", () => {
   });
 
   assert.doesNotThrow(() => protectStateChangingRequest(request, options));
+});
+
+test("allows explicitly configured missing origins", () => {
+  const request = new Request("https://example.com/api", {
+    method: "POST",
+  });
+
+  assert.doesNotThrow(() =>
+    validateRequestOrigin(request, {
+      ...options,
+      allowMissingOrigin: true,
+    }),
+  );
+});
+
+test("does not allow an untrusted origin when missing origins are permitted", () => {
+  const request = new Request("https://example.com/api", {
+    method: "POST",
+    headers: {
+      origin: "https://attacker.example",
+    },
+  });
+
+  assert.throws(
+    () =>
+      validateRequestOrigin(request, {
+        ...options,
+        allowMissingOrigin: true,
+      }),
+    /not allowed/,
+  );
 });

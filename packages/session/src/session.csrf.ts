@@ -12,6 +12,18 @@ const normalizeOrigin = (value: string): string => {
     throw new SessionSecurityError("Unsupported request origin.");
   }
 
+  if (
+    url.username.length > 0 ||
+    url.password.length > 0 ||
+    url.pathname !== "/" ||
+    url.search.length > 0 ||
+    url.hash.length > 0
+  ) {
+    throw new SessionSecurityError(
+      "The request origin must contain only an origin.",
+    );
+  }
+
   return url.origin;
 };
 
