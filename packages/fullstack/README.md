@@ -143,7 +143,7 @@ export const SignUpPage = () => (
         description: "Get started with your new account.",
       },
       layout: {
-        maxWidth: "32rem",
+        width: "md",
         align: "center",
       },
       redirects: {
