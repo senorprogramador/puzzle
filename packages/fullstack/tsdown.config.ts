@@ -12,6 +12,9 @@ export default defineConfig({
   root: "src",
   format: ["esm", "cjs"],
   fixedExtension: false,
+  css: {
+    inject: true,
+  },
   dts: true,
   clean: true,
   sourcemap: true,
@@ -28,4 +31,5 @@ export default defineConfig({
       "@tanstack/react-start",
     ],
   },
+  suppressWarnings: [/MODULE_LEVEL_DIRECTIVE/],
 });

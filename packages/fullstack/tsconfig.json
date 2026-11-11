@@ -9,6 +9,7 @@
     "noImplicitOverride": true,
     "declaration": true,
     "skipLibCheck": true,
+    "jsx": "react-jsx",
     "verbatimModuleSyntax": true,
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,

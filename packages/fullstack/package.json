@@ -63,7 +63,9 @@
   "files": [
     "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p .",
@@ -73,6 +75,8 @@
     "prepack": "tsdown"
   },
   "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "tsdown": "^0.23.1",
     "typescript": "^6.0.3"
   },

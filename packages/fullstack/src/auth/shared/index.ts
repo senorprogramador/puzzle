@@ -77,3 +77,12 @@ export type AuthClientFactorList = {
   readonly factors: readonly AuthClientMfaFactor[];
   readonly recoveryCodeCount: number;
 };
+
+export type AuthClientLifecycleResult = {
+  readonly status:
+    | "verification-requested"
+    | "email-verified"
+    | "password-reset-requested"
+    | "password-reset"
+    | "password-changed";
+};

@@ -9,16 +9,25 @@ import {
   type AuthMfaHandlers,
   type AuthMfaHandlersOptions,
 } from "./mfa";
+import {
+  createAuthLifecycleHandlers,
+  type AuthLifecycleHandlers,
+  type AuthLifecycleHandlersOptions,
+} from "./lifecycle";
 
 export type AuthServerOptions = AuthMfaHandlersOptions & {
   readonly passwordHasher?: PasswordHasher;
   readonly emailProvider?: EmailProvider;
   readonly rateLimitProvider?: RateLimitProvider;
+  readonly lifecycle?: AuthLifecycleHandlersOptions;
 };
+
+export type AuthServerHandlers = AuthMfaHandlers &
+  Partial<AuthLifecycleHandlers>;
 
 export type AuthServer = {
   readonly options: AuthServerOptions;
-  readonly handlers: AuthMfaHandlers;
+  readonly handlers: AuthServerHandlers;
   initialize(): Promise<void>;
 };
 
@@ -60,11 +69,13 @@ export const createAuthServer = (options: AuthServerOptions): AuthServer => {
         await options.mfa.initialize();
         await options.auth.initialize();
         await options.stepUp.initialize();
+
+        if (options.lifecycle) {
+          await options.lifecycle.lifecycle.initialize();
+        }
       })();
 
       initializationPromise = initialization.catch((error) => {
-        // A failed initialization must not permanently poison the server.
-        // A subsequent request or explicit initialize() can retry it.
         initializationPromise = null;
         throw error;
       });
@@ -73,14 +84,15 @@ export const createAuthServer = (options: AuthServerOptions): AuthServer => {
     return initializationPromise;
   };
 
-  const rawHandlers = createAuthMfaHandlers(options);
+  const rawHandlers: AuthServerHandlers = {
+    ...createAuthMfaHandlers(options),
+    ...(options.lifecycle
+      ? createAuthLifecycleHandlers(options.lifecycle)
+      : {}),
+  };
 
   const handlers = Object.fromEntries(
-    (
-      Object.entries(rawHandlers) as Array<
-        [keyof AuthMfaHandlers, (request: Request) => Promise<Response>]
-      >
-    ).map(([name, handler]) => [
+    Object.entries(rawHandlers).map(([name, handler]) => [
       name,
       async (request: Request): Promise<Response> => {
         try {
@@ -89,10 +101,10 @@ export const createAuthServer = (options: AuthServerOptions): AuthServer => {
           return createInitializationErrorResponse();
         }
 
-        return handler(request);
+        return handler!(request);
       },
     ]),
-  ) as unknown as AuthMfaHandlers;
+  ) as AuthServerHandlers;
 
   return {
     options,
@@ -194,6 +206,46 @@ export const createAuthRouteHandlers = (
     [route("/mfa/enrollment/required/passkey/finish")]: {
       POST: handlers.finishRequiredPasskeyEnrollment,
     },
+
+    ...(handlers.requestEmailVerification
+      ? {
+          [route("/email/verification/request")]: {
+            POST: handlers.requestEmailVerification,
+          },
+        }
+      : {}),
+
+    ...(handlers.verifyEmail
+      ? {
+          [route("/email/verification/verify")]: {
+            POST: handlers.verifyEmail,
+          },
+        }
+      : {}),
+
+    ...(handlers.requestPasswordReset
+      ? {
+          [route("/password/reset/request")]: {
+            POST: handlers.requestPasswordReset,
+          },
+        }
+      : {}),
+
+    ...(handlers.resetPassword
+      ? {
+          [route("/password/reset/finish")]: {
+            POST: handlers.resetPassword,
+          },
+        }
+      : {}),
+
+    ...(handlers.changePassword
+      ? {
+          [route("/password/change")]: {
+            POST: handlers.changePassword,
+          },
+        }
+      : {}),
   };
 };
 
@@ -227,3 +279,10 @@ export type {
   AuthMfaPendingResponse,
   AuthClientUserResponse,
 } from "./mfa";
+
+export { createAuthLifecycleHandlers } from "./lifecycle";
+
+export type {
+  AuthLifecycleHandlers,
+  AuthLifecycleHandlersOptions,
+} from "./lifecycle";

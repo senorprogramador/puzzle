@@ -1,3 +1,5 @@
+"use client";
+
 import type {
   AuthClientOptions,
   AuthClientSnapshot,
@@ -7,6 +9,7 @@ import type {
   AuthClientRecoveryCodesResult,
   AuthClientFactorList,
   AuthClientRegisterInput,
+  AuthClientLifecycleResult,
 } from "../shared";
 
 import {
@@ -109,6 +112,22 @@ export type AuthClient = {
   verifyStepUpWithPasskey(): Promise<AuthClientSnapshot>;
 
   isPasskeySupported(): boolean;
+
+  requestEmailVerification(): Promise<AuthClientLifecycleResult>;
+
+  verifyEmail(token: string): Promise<AuthClientLifecycleResult>;
+
+  requestPasswordReset(email: string): Promise<AuthClientLifecycleResult>;
+
+  resetPassword(
+    token: string,
+    newPassword: string,
+  ): Promise<AuthClientLifecycleResult>;
+
+  changePassword(
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<AuthClientLifecycleResult>;
 };
 
 type AuthApiErrorResponse = {
@@ -458,6 +477,41 @@ export const createAuthClient = (
     return refreshSnapshot();
   };
 
+  const requestEmailVerification = () =>
+    post<AuthClientLifecycleResult>("/email/verification/request");
+
+  const verifyEmail = (token: string) =>
+    post<AuthClientLifecycleResult>("/email/verification/verify", {
+      token,
+    });
+
+  const requestPasswordReset = (email: string) =>
+    post<AuthClientLifecycleResult>("/password/reset/request", {
+      email,
+    });
+
+  const resetPassword = (token: string, newPassword: string) =>
+    post<AuthClientLifecycleResult>("/password/reset/finish", {
+      token,
+      newPassword,
+    });
+
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string,
+  ) => {
+    const result = await post<AuthClientLifecycleResult>("/password/change", {
+      currentPassword,
+      newPassword,
+    });
+
+    // Password changes invalidate existing sessions.
+    // The server remains authoritative about the resulting state.
+    await refreshSnapshot();
+
+    return result;
+  };
+
   return {
     register,
     getSnapshot,
@@ -487,5 +541,39 @@ export const createAuthClient = (
     verifyStepUpWithPasskey,
 
     isPasskeySupported: passkeys.isSupported,
+
+    requestEmailVerification,
+    verifyEmail,
+    requestPasswordReset,
+    resetPassword,
+    changePassword,
   };
 };
+
+export {
+  AuthProvider,
+  useAuth,
+  useSession,
+  useUser,
+  SignInForm,
+  SignUpForm,
+  MfaChallengeForm,
+  AuthScreen,
+  MfaSettings,
+  type AuthProviderProps,
+  type AuthContextValue,
+  type AuthFormProps,
+  type SignInFormProps,
+  type SignUpFormProps,
+  type MfaChallengeFormProps,
+  type AuthScreenProps,
+  type MfaSettingsProps,
+} from "./react";
+
+export {
+  getAuthLocale,
+  resolveAuthMessages,
+  type AuthLocale,
+  type AuthMessages,
+  type AuthMessageOverrides,
+} from "./messages";
