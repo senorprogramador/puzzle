@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useId,
   useState,
   type CSSProperties,
@@ -100,6 +101,33 @@ export type AuthExperienceProps = {
 };
 
 type FieldErrors = Readonly<Record<string, string>>;
+
+const EMPTY_FIELDS: readonly AuthCustomField[] = [];
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const isValidEmail = (value: string): boolean => {
+  const email = value.trim();
+
+  return email.length <= 254 && EMAIL_PATTERN.test(email);
+};
+
+const getEmailError = (
+  value: string,
+  messages: ReturnType<typeof useAuth>["messages"],
+): string | null => {
+  const email = value.trim();
+
+  if (!email) {
+    return messages.emailRequired;
+  }
+
+  if (!isValidEmail(email)) {
+    return "Enter a valid email address.";
+  }
+
+  return null;
+};
 
 const isSafeRedirect = (value: string | undefined): value is string =>
   Boolean(
@@ -318,7 +346,7 @@ const AuthExperience = ({
 }: AuthExperienceProps) => {
   const { signUp, messages } = useAuth();
 
-  const fields = config.fields ?? [];
+  const fields = config.fields ?? EMPTY_FIELDS;
   const branding = config.branding;
   const layout = config.layout;
   const redirects = config.redirects;
@@ -330,12 +358,56 @@ const AuthExperience = ({
   );
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
+
+  useEffect(() => {
+    setValues((current) => {
+      const next: Record<string, AuthFieldValue> = {};
+
+      for (const field of fields) {
+        const currentValue = Object.prototype.hasOwnProperty.call(
+          current,
+          field.name,
+        )
+          ? current[field.name]
+          : undefined;
+
+        next[field.name] =
+          currentValue ??
+          field.defaultValue ??
+          (field.type === "checkbox" ? false : "");
+      }
+
+      const currentNames = Object.keys(current);
+      const nextNames = Object.keys(next);
+
+      const unchanged =
+        currentNames.length === nextNames.length &&
+        nextNames.every((fieldName) => current[fieldName] === next[fieldName]);
+
+      return unchanged ? current : next;
+    });
+
+    setErrors((current) => {
+      const activeNames = new Set(fields.map((field) => field.name));
+
+      const next = Object.fromEntries(
+        Object.entries(current).filter(([fieldName]) =>
+          activeNames.has(fieldName),
+        ),
+      );
+
+      return Object.keys(next).length === Object.keys(current).length
+        ? current
+        : next;
+    });
+  }, [fields]);
 
   const updateField = (fieldName: string, value: AuthFieldValue) => {
     setValues((current) => ({
@@ -352,10 +424,26 @@ const AuthExperience = ({
     });
   };
 
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+
+    if (emailError) {
+      setEmailError(getEmailError(value, messages));
+    }
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setFormError(null);
     setErrors({});
+
+    const nextEmailError = getEmailError(email, messages);
+
+    setEmailError(nextEmailError);
+
+    if (nextEmailError) {
+      return;
+    }
 
     if (password !== confirmation) {
       setFormError(messages.passwordMismatch);
@@ -492,8 +580,26 @@ const AuthExperience = ({
                   required
                   value={email}
                   disabled={loading}
-                  onChange={(event) => setEmail(event.currentTarget.value)}
+                  aria-invalid={Boolean(emailError)}
+                  aria-describedby={
+                    emailError
+                      ? "puzzle-auth-experience-email-error"
+                      : undefined
+                  }
+                  onChange={(event) =>
+                    handleEmailChange(event.currentTarget.value)
+                  }
                 />
+
+                {emailError ? (
+                  <span
+                    id="puzzle-auth-experience-email-error"
+                    className="puzzle-auth__field-error"
+                    role="alert"
+                  >
+                    {emailError}
+                  </span>
+                ) : null}
               </div>
 
               <div className="puzzle-auth__custom-field">

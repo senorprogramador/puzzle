@@ -315,6 +315,207 @@ describe("AuthExperience browser behavior", () => {
     });
   });
 
+  it("rejects an invalid email address before calling the submit callback", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn(async () => authenticatedSnapshot);
+
+    renderExperience({
+      mode: "sign-up",
+      onSubmit,
+    });
+
+    const email = screen.getByLabelText(/Email/);
+
+    await user.type(email, "not-an-email");
+    await user.type(screen.getByLabelText(/^Password/), "a-strong-password");
+    await user.type(
+      screen.getByLabelText(/Confirm password/),
+      "a-strong-password",
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Create an account",
+      }),
+    );
+
+    expect(
+      await screen.findByText("Enter a valid email address."),
+    ).toBeInTheDocument();
+
+    expect(email).toHaveAttribute("aria-invalid", "true");
+    expect(email).toHaveAttribute(
+      "aria-describedby",
+      "puzzle-auth-experience-email-error",
+    );
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("clears the email validation error when the address is corrected", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn(async () => authenticatedSnapshot);
+
+    renderExperience({
+      mode: "sign-up",
+      onSubmit,
+    });
+
+    const email = screen.getByLabelText(/Email/);
+
+    await user.type(email, "not-an-email");
+    await user.type(screen.getByLabelText(/^Password/), "a-strong-password");
+    await user.type(
+      screen.getByLabelText(/Confirm password/),
+      "a-strong-password",
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Create an account",
+      }),
+    );
+
+    expect(
+      await screen.findByText("Enter a valid email address."),
+    ).toBeInTheDocument();
+
+    await user.clear(email);
+    await user.type(email, "person@example.com");
+
+    expect(
+      screen.queryByText("Enter a valid email address."),
+    ).not.toBeInTheDocument();
+
+    expect(email).not.toHaveAttribute("aria-invalid", "true");
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Create an account",
+      }),
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("preserves, initializes and removes custom field values when config.fields changes", async () => {
+    const user = userEvent.setup();
+    const client = createClient();
+    const onSubmit = vi.fn(async () => authenticatedSnapshot);
+
+    const initialConfig = {
+      fields: [
+        {
+          name: "company",
+          label: "Company",
+          type: "text" as const,
+          defaultValue: "Puzzle",
+        },
+      ],
+    };
+
+    const { rerender } = render(
+      <AuthProvider
+        client={client as never}
+        initialSnapshot={unauthenticatedSnapshot}
+      >
+        <AuthExperience
+          mode="sign-up"
+          config={initialConfig}
+          onSubmit={onSubmit}
+        />
+      </AuthProvider>,
+    );
+
+    const company = screen.getByLabelText("Company");
+
+    await user.clear(company);
+    await user.type(company, "Puzzle Labs");
+
+    rerender(
+      <AuthProvider
+        client={client as never}
+        initialSnapshot={unauthenticatedSnapshot}
+      >
+        <AuthExperience
+          mode="sign-up"
+          config={{
+            fields: [
+              {
+                name: "company",
+                label: "Company",
+                type: "text",
+                defaultValue: "Another company",
+              },
+              {
+                name: "department",
+                label: "Department",
+                type: "text",
+                defaultValue: "Engineering",
+              },
+            ],
+          }}
+          onSubmit={onSubmit}
+        />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Company")).toHaveValue("Puzzle Labs");
+      expect(screen.getByLabelText("Department")).toHaveValue("Engineering");
+    });
+
+    rerender(
+      <AuthProvider
+        client={client as never}
+        initialSnapshot={unauthenticatedSnapshot}
+      >
+        <AuthExperience
+          mode="sign-up"
+          config={{
+            fields: [
+              {
+                name: "company",
+                label: "Company",
+                type: "text",
+              },
+            ],
+          }}
+          onSubmit={onSubmit}
+        />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByLabelText("Department")).not.toBeInTheDocument();
+      expect(screen.getByLabelText("Company")).toHaveValue("Puzzle Labs");
+    });
+
+    await user.type(screen.getByLabelText(/Email/), "person@example.com");
+    await user.type(screen.getByLabelText(/^Password/), "a-strong-password");
+    await user.type(
+      screen.getByLabelText(/Confirm password/),
+      "a-strong-password",
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Create an account",
+      }),
+    );
+
+    await waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fields: { company: "Puzzle Labs" },
+      }),
+    );
+  });
+
   it("uses the real browser keyboard event path", async () => {
     renderExperience({
       mode: "sign-up",
