@@ -61,7 +61,7 @@ jobs:
         run: bunx playwright install --with-deps chromium
 
       - name: Run all package tests
-        run: bun run vitest
+        run: bun run test:all
 
       - name: Build documentation site
         run: bun run --filter '@puzzle-ui/site' build
