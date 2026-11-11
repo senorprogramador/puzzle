@@ -17,6 +17,15 @@ cleanup() {
 
   trap - EXIT
 
+  if [[ "$exit_code" -ne 0 ]]; then
+    echo ""
+    echo "MongoDB test setup or conformance tests failed (exit $exit_code)."
+    echo "Container status:"
+    compose ps -a || true
+    echo "MongoDB container logs:"
+    compose logs --no-color --timestamps mongodb || true
+  fi
+
   echo ""
   echo "Stopping MongoDB test container..."
 
