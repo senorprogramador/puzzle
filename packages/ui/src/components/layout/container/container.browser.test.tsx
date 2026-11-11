@@ -10,6 +10,20 @@ afterEach(() => {
 });
 
 describe("Container (browser)", () => {
+  it("limits the base class without a width preset", () => {
+    document.documentElement.style.setProperty("--puzzle-container-width", "800px");
+
+    const { container } = render(
+      <div style={{ width: 1200 }}>
+        <div className="puzzle-container">Content</div>
+      </div>,
+    );
+    const element = container.querySelector(".puzzle-container")!;
+
+    expect(getComputedStyle(element).maxWidth).toBe("800px");
+    expect(element.getBoundingClientRect().width).toBe(800);
+  });
+
   it("uses the configured container width token", () => {
     document.documentElement.style.setProperty(
       "--puzzle-container-width",

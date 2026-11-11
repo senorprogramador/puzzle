@@ -5,19 +5,19 @@
  * Local themes do not activate these rules.
  */
 
-:root:has(style[data-puzzle-global-styles]) *,
-:root:has(style[data-puzzle-global-styles]) *::before,
-:root:has(style[data-puzzle-global-styles]) *::after {
+:root *,
+:root *::before,
+:root *::after {
     box-sizing: border-box;
 }
 
 /* Document defaults */
 
-:root:has(style[data-puzzle-global-styles]) {
+:root {
     color-scheme: light;
 }
 
-:root:has(style[data-puzzle-global-styles]) body {
+:root body {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     margin: 0;
@@ -34,11 +34,11 @@
 
 /* Form controls */
 
-:root:has(style[data-puzzle-global-styles]) :where(input, textarea, select, button) {
+:where(input, textarea, select, button) {
     font: inherit;
 }
 
-:root:has(style[data-puzzle-global-styles]) :where(button) {
+:where(button) {
     cursor: pointer;
     font-family: var(--puzzle-font-family-button, inherit);
     font-size: var(--puzzle-font-size-button, inherit);
@@ -47,18 +47,17 @@
     letter-spacing: var(--puzzle-font-letter-spacing-button, inherit);
 }
 
-:root:has(style[data-puzzle-global-styles])
-    :where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
+:where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
     cursor: not-allowed;
 }
 
 /* Headings */
 
-:root:has(style[data-puzzle-global-styles]) :where(h1, h2, h3, h4, p) {
+:where(h1, h2, h3, h4, p) {
     margin-block: 0;
 }
 
-:root:has(style[data-puzzle-global-styles]) :where(h1) {
+:where(h1) {
     font-family: var(--puzzle-font-family-headline1, inherit);
     font-size: var(--puzzle-font-size-headline1, 2.25rem);
     font-weight: var(--puzzle-font-weight-headline1, 700);
@@ -66,7 +65,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-headline1, -0.025em);
 }
 
-:root:has(style[data-puzzle-global-styles]) :where(h2) {
+:where(h2) {
     font-family: var(--puzzle-font-family-headline2, inherit);
     font-size: var(--puzzle-font-size-headline2, 1.875rem);
     font-weight: var(--puzzle-font-weight-headline2, 700);
@@ -74,7 +73,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-headline2, -0.025em);
 }
 
-:root:has(style[data-puzzle-global-styles]) :where(h3) {
+:where(h3) {
     font-family: var(--puzzle-font-family-headline3, inherit);
     font-size: var(--puzzle-font-size-headline3, 1.5rem);
     font-weight: var(--puzzle-font-weight-headline3, 600);
@@ -82,7 +81,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-headline3, 0);
 }
 
-:root:has(style[data-puzzle-global-styles]) :where(h4) {
+:where(h4) {
     font-family: var(--puzzle-font-family-headline4, inherit);
     font-size: var(--puzzle-font-size-headline4, 1.25rem);
     font-weight: var(--puzzle-font-weight-headline4, 600);
@@ -92,29 +91,29 @@
 
 /* Text vertical rhythm */
 
-:root:has(style[data-puzzle-global-styles]) :where(h1, h2, h3, h4) + :where(h1, h2, h3, h4) {
+:where(h1, h2, h3, h4) + :where(h1, h2, h3, h4) {
     margin-block-start: var(--puzzle-font-gap-heading-stack-gap, 0.3em);
 }
 
-:root:has(style[data-puzzle-global-styles]) :where(h1, h2, h3, h4) + :where(p) {
+:where(h1, h2, h3, h4) + :where(p) {
     margin-block-start: var(--puzzle-font-gap-heading-paragraph-gap, 0.65em);
 }
 
-:root:has(style[data-puzzle-global-styles]) :where(p) + :where(p) {
+:where(p) + :where(p) {
     margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
 }
 
-:root:has(style[data-puzzle-global-styles]) :where(p) + :where(h1, h2, h3, h4) {
+:where(p) + :where(h1, h2, h3, h4) {
     margin-block-start: var(--puzzle-font-gap-section-gap, 1.5em);
 }
 
 /* Links and focus */
 
-:where(:root:has(style[data-puzzle-global-styles])) :where(a) {
+:where(:root) :where(a) {
     color: var(--puzzle-color-primary, #2563eb);
 }
 
-:root:has(style[data-puzzle-global-styles]) :where(:focus-visible) {
+:where(:focus-visible) {
     outline: 2px solid var(--puzzle-color-ring, #2563eb);
     outline-offset: 2px;
 }
@@ -122,9 +121,9 @@
 /* Reduced motion */
 
 @media (prefers-reduced-motion: reduce) {
-    :root:has(style[data-puzzle-global-styles]) *,
-    :root:has(style[data-puzzle-global-styles]) *::before,
-    :root:has(style[data-puzzle-global-styles]) *::after {
+    :root *,
+    :root *::before,
+    :root *::after {
         scroll-behavior: auto !important;
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
@@ -135,31 +134,29 @@
 /* Forced colors / high contrast */
 
 @media (forced-colors: active) {
-    :root:has(style[data-puzzle-global-styles]) :where(:focus-visible) {
+    :where(:focus-visible) {
         outline: 2px solid Highlight;
         outline-offset: 2px;
     }
 
-    :root:has(style[data-puzzle-global-styles]) :where(a) {
+    :where(a) {
         color: LinkText;
     }
 
-    :root:has(style[data-puzzle-global-styles])
-        :where(button, input, textarea, select, [role="button"], [role="option"]) {
+    :where(button, input, textarea, select, [role="button"], [role="option"]) {
         forced-color-adjust: auto;
     }
 
-    :root:has(style[data-puzzle-global-styles]) :where(input, textarea, select) {
+    :where(input, textarea, select) {
         border-color: ButtonText;
     }
 
-    :root:has(style[data-puzzle-global-styles])
-        :where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
+    :where(button:disabled, input:disabled, textarea:disabled, select:disabled) {
         color: GrayText;
         border-color: GrayText;
     }
 
-    :root:has(style[data-puzzle-global-styles]) :where([aria-invalid="true"], [data-invalid="true"]) {
+    :where([aria-invalid="true"], [data-invalid="true"]) {
         outline-color: Mark;
     }
 }

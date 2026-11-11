@@ -32,8 +32,8 @@ describe("Stack", () => {
       "puzzle-stack",
       "direction-mobile-row",
       "gap-lg",
-      "align-h-between",
-      "align-v-center",
+      "align-h-mobile-between",
+      "align-v-mobile-center",
       "reverse",
     );
   });

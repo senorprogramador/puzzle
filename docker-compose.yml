@@ -1,0 +1,25 @@
+services:
+  puzzle-site:
+    image: puzzle-site:${IMAGE_TAG:-latest}
+    container_name: puzzle-site
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+
+      VIRTUAL_HOST: ${PUZZLE_DOMAIN}
+      VIRTUAL_PORT: 3000
+      LETSENCRYPT_HOST: ${PUZZLE_DOMAIN}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+
+    expose:
+      - "3000"
+
+    networks:
+      - webproxy
+
+networks:
+  webproxy:
+    external: true

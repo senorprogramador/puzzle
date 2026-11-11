@@ -5,6 +5,10 @@ description: Badges attach a small count, label, or status indicator to another 
 
 Use the Badge component to annotate an element, such as an avatar or icon, with a count or status. Badge wraps its children and positions the indicator on a corner.
 
+Without children, Badge renders as an inline label. `anchorOrigin` and
+`anchorOverlap` apply only when the badge wraps an element. Text stays on one
+line, and the indicator grows to fit its content with padding.
+
 ## Import
 
 ```tsx
@@ -156,7 +160,7 @@ The component exports `BadgeProps`, `BadgeColor`, `AnchorOrigin` and `AnchorOver
 
 ## Theming
 
-Role colors use the `--puzzle-color-<role>` and `--puzzle-color-<role>-foreground` tokens, so badges follow light, dark, and scoped themes. Hex colors bypass the theme.
+Role colors use the `--puzzle-color-<role>` and `--puzzle-color-<role>-foreground` tokens, so badges follow light, dark, and scoped themes. The default palette uses distinct colors for each role; custom themes can choose their own. Hex colors bypass the theme.
 
 ## Accessibility
 

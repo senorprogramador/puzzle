@@ -81,22 +81,16 @@
 
 .puzzle-checkbox .puzzle-checkbox__check,
 .puzzle-checkbox .puzzle-checkbox__mixed {
+    display: none;
     transform-origin: center;
     transform: scale(0.8);
 }
 
-.puzzle-checkbox--checked .puzzle-checkbox__check {
+.puzzle-checkbox__control input:checked:not(:indeterminate) + .puzzle-checkbox__indicator .puzzle-checkbox__check {
     display: block;
     fill: currentColor;
 }
-.puzzle-checkbox--checked .puzzle-checkbox__mixed {
-    display: none;
-}
-
-.puzzle-checkbox--indeterminate .puzzle-checkbox__indicator .puzzle-checkbox__check {
-    display: none;
-}
-.puzzle-checkbox--indeterminate .puzzle-checkbox__indicator .puzzle-checkbox__mixed {
+.puzzle-checkbox__control input:indeterminate + .puzzle-checkbox__indicator .puzzle-checkbox__mixed {
     display: block;
     fill: currentColor;
 }

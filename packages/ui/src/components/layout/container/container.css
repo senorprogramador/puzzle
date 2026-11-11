@@ -3,6 +3,7 @@
 
     box-sizing: border-box;
     width: 100%;
+    max-width: var(--puzzle-container-width, 80rem);
     margin-inline: auto;
     padding-inline: var(--_container-gutter);
     min-width: 0;

@@ -1,4 +1,5 @@
 import { createLogger, defineConfig } from "vite";
+import { nitro } from "nitro/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -32,7 +33,7 @@ export default defineConfig({
   },
   plugins: [
     tanstackStart(),
-    // react's vite plugin must come after start's vite plugin
+    nitro(),
     viteReact(),
     tailwindcss({ optimize: false }),
     fumadocsMdx(),

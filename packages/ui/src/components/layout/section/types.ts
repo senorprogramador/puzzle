@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ComponentPropsWithRef, type ElementType } from "react";
 
 export type SectionTheme =
   | "default"
@@ -8,9 +8,8 @@ export type SectionTheme =
   | "secondary"
   | "accent";
 
-export type SectionProps = {
-  children?: ReactNode;
-  className?: string;
+export type SectionOwnProps<C extends ElementType = "section"> = {
+  as?: C;
   theme?: SectionTheme;
   fullWidth?: boolean;
   noPadding?: boolean;
@@ -20,3 +19,9 @@ export type SectionProps = {
   compactBottom?: boolean;
   divider?: boolean;
 };
+
+export type SectionProps<C extends ElementType = "section"> = Omit<
+  ComponentPropsWithRef<C>,
+  keyof SectionOwnProps<C> | "as"
+> &
+  SectionOwnProps<C>;

@@ -85,6 +85,18 @@ const dataDisplay: TreeViewItem = {
 } as const;
 //#endregion Data Display
 
+const editors: TreeViewItem = {
+  id: "ui-editors",
+  label: "Editors",
+  children: [
+    {
+      id: "ui-text-editor",
+      label: "Text Editor",
+      href: `${folder}/editors/text-editor`,
+    },
+  ],
+};
+
 //#region Forms
 const forms: TreeViewItem = {
   id: "ui-forms",
@@ -418,8 +430,14 @@ export const ui: TreeViewItem = {
   id: "ui",
   label: "UI",
   children: [
+    {
+      id: "ui-overview",
+      label: "Overview",
+      href: folder,
+    },
     actions,
     dataDisplay,
+    editors,
     forms,
     layout,
     navigation,
@@ -433,6 +451,7 @@ export const ALL_UI_GROUP_IDS = [
   "ui",
   "ui-actions",
   "ui-data-display",
+  "ui-editors",
   "ui-forms",
   "ui-layout",
   "ui-navigation",

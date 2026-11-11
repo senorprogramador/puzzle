@@ -41,9 +41,12 @@ const Badge = ({
 
   const classes = cn(
     "puzzle-badge",
-    anchorOrigin.vertical,
-    anchorOrigin.horizontal,
-    anchorOverlap,
+    children != null && [
+      anchorOrigin.vertical,
+      anchorOrigin.horizontal,
+      anchorOverlap,
+    ],
+    children == null && "puzzle-badge-standalone",
     !isHex && `puzzle-badge-${color}`,
     className,
   );

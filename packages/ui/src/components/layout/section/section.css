@@ -5,7 +5,7 @@
 }
 
 .puzzle-section {
-    --section-padding-y: var(--puzzle-container-gutter, clamp(1rem, 3vw, 3rem));
+    --section-padding-y: var(--puzzle-container-gutter, clamp(2rem, 6vw, 6rem));
 
     --section-gap: var(--puzzle-space-4, 1rem);
 
@@ -20,6 +20,12 @@
 
     background-color: var(--section-background);
     color: var(--section-color);
+}
+
+.puzzle-section__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-gap);
 }
 
 .puzzle-section--divider {

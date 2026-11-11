@@ -3,7 +3,7 @@
 :root {
     color-scheme: light;
 
-    --puzzle-container-gutter: clamp(1rem, 3vw, 3rem);
+    --puzzle-container-gutter: clamp(2rem, 6vw, 6rem);
 
     --puzzle-color-background: var(--puzzle-color-scheme-light-background, #f7f4ea);
     --puzzle-color-surface: var(--puzzle-color-scheme-light-surface, #ffffff);
@@ -129,23 +129,23 @@
 
 /* Typography utility classes */
 
-.puzzle-typography-display1,
-.puzzle-typography-display2,
-.puzzle-typography-headline1,
-.puzzle-typography-headline2,
-.puzzle-typography-headline3,
-.puzzle-typography-headline4,
-.puzzle-typography-subtitle1,
-.puzzle-typography-subtitle2,
-.puzzle-typography-body1,
-.puzzle-typography-body2,
-.puzzle-typography-button,
-.puzzle-typography-caption,
-.puzzle-typography-overline {
+:root .puzzle-typography-display1,
+:root .puzzle-typography-display2,
+:root .puzzle-typography-headline1,
+:root .puzzle-typography-headline2,
+:root .puzzle-typography-headline3,
+:root .puzzle-typography-headline4,
+:root .puzzle-typography-subtitle1,
+:root .puzzle-typography-subtitle2,
+:root .puzzle-typography-body1,
+:root .puzzle-typography-body2,
+:root .puzzle-typography-button,
+:root .puzzle-typography-caption,
+:root .puzzle-typography-overline {
     font-family: var(--puzzle-font-family-body, inherit);
 }
 
-.puzzle-typography-display1 {
+:root .puzzle-typography-display1 {
     font-family: var(--puzzle-font-family-display1, inherit);
     font-size: var(--puzzle-font-size-display1, inherit);
     font-weight: var(--puzzle-font-weight-display1, inherit);
@@ -153,7 +153,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-display1, inherit);
 }
 
-.puzzle-typography-display2 {
+:root .puzzle-typography-display2 {
     font-family: var(--puzzle-font-family-display2, inherit);
     font-size: var(--puzzle-font-size-display2, inherit);
     font-weight: var(--puzzle-font-weight-display2, inherit);
@@ -161,7 +161,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-display2, inherit);
 }
 
-.puzzle-typography-headline1 {
+:root .puzzle-typography-headline1 {
     font-family: var(--puzzle-font-family-headline1, inherit);
     font-size: var(--puzzle-font-size-headline1, inherit);
     font-weight: var(--puzzle-font-weight-headline1, inherit);
@@ -169,7 +169,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-headline1, inherit);
 }
 
-.puzzle-typography-headline2 {
+:root .puzzle-typography-headline2 {
     font-family: var(--puzzle-font-family-headline2, inherit);
     font-size: var(--puzzle-font-size-headline2, inherit);
     font-weight: var(--puzzle-font-weight-headline2, inherit);
@@ -177,7 +177,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-headline2, inherit);
 }
 
-.puzzle-typography-headline3 {
+:root .puzzle-typography-headline3 {
     font-family: var(--puzzle-font-family-headline3, inherit);
     font-size: var(--puzzle-font-size-headline3, inherit);
     font-weight: var(--puzzle-font-weight-headline3, inherit);
@@ -185,7 +185,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-headline3, inherit);
 }
 
-.puzzle-typography-headline4 {
+:root .puzzle-typography-headline4 {
     font-family: var(--puzzle-font-family-headline4, inherit);
     font-size: var(--puzzle-font-size-headline4, inherit);
     font-weight: var(--puzzle-font-weight-headline4, inherit);
@@ -193,7 +193,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-headline4, inherit);
 }
 
-.puzzle-typography-subtitle1 {
+:root .puzzle-typography-subtitle1 {
     font-family: var(--puzzle-font-family-subtitle1, inherit);
     font-size: var(--puzzle-font-size-subtitle1, inherit);
     font-weight: var(--puzzle-font-weight-subtitle1, inherit);
@@ -201,7 +201,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-subtitle1, inherit);
 }
 
-.puzzle-typography-subtitle2 {
+:root .puzzle-typography-subtitle2 {
     font-family: var(--puzzle-font-family-subtitle2, inherit);
     font-size: var(--puzzle-font-size-subtitle2, inherit);
     font-weight: var(--puzzle-font-weight-subtitle2, inherit);
@@ -209,7 +209,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-subtitle2, inherit);
 }
 
-.puzzle-typography-body1 {
+:root .puzzle-typography-body1 {
     font-family: var(--puzzle-font-family-body1, inherit);
     font-size: var(--puzzle-font-size-body1, inherit);
     font-weight: var(--puzzle-font-weight-body1, inherit);
@@ -217,7 +217,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-body1, inherit);
 }
 
-.puzzle-typography-body2 {
+:root .puzzle-typography-body2 {
     font-family: var(--puzzle-font-family-body2, inherit);
     font-size: var(--puzzle-font-size-body2, inherit);
     font-weight: var(--puzzle-font-weight-body2, inherit);
@@ -225,7 +225,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-body2, inherit);
 }
 
-.puzzle-typography-button {
+:root .puzzle-typography-button {
     font-family: var(--puzzle-font-family-button, inherit);
     font-size: var(--puzzle-font-size-button, inherit);
     font-weight: var(--puzzle-font-weight-button, inherit);
@@ -233,7 +233,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-button, inherit);
 }
 
-.puzzle-typography-caption {
+:root .puzzle-typography-caption {
     font-family: var(--puzzle-font-family-caption, inherit);
     font-size: var(--puzzle-font-size-caption, inherit);
     font-weight: var(--puzzle-font-weight-caption, inherit);
@@ -241,7 +241,7 @@
     letter-spacing: var(--puzzle-font-letter-spacing-caption, inherit);
 }
 
-.puzzle-typography-overline {
+:root .puzzle-typography-overline {
     font-family: var(--puzzle-font-family-overline, inherit);
     font-size: var(--puzzle-font-size-overline, inherit);
     font-weight: var(--puzzle-font-weight-overline, inherit);

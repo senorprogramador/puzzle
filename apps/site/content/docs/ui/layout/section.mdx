@@ -11,7 +11,12 @@ import { Section } from "@puzzle-ui/ui";
 
 ## Themes and width
 
-Section applies section colors and vertical spacing. Use `fullWidth` to remove the inner width constraint or `noPadding` to remove its padding.
+Section applies section colors and vertical spacing. A non-default `theme`
+paints the background across the available width while its children sit in a
+centered `puzzle-container` limited by `--puzzle-container-width`, with horizontal
+gutters. Default sections apply the container classes directly to their root.
+Use `fullWidth` to leave content unconstrained without container gutters, or
+`noPadding` to remove vertical padding.
 
 <Preview
   height={500}
@@ -42,8 +47,8 @@ Section applies section colors and vertical spacing. Use `fullWidth` to remove t
 | ----------- | ------------------------------------------------------------------------ | ----------- | ---------------------------------- |
 | `children`  | `ReactNode`                                                              | -           | Section content.                   |
 | `theme`     | `"default" \| "light" \| "dark" \| "primary" \| "secondary" \| "accent"` | `"default"` | Theme treatment.                   |
-| `fullWidth` | `boolean`                                                                | `false`     | Unconstrained inner content width. |
-| `noPadding` | `boolean`                                                                | `false`     | Removes section padding.           |
+| `fullWidth` | `boolean`                                                                | `false`     | Removes the content width constraint and horizontal gutters. Themed backgrounds always fill the available width. |
+| `noPadding` | `boolean`                                                                | `false`     | Removes vertical section padding. |
 | `className` | `string`                                                                 | -           | Root class.                        |
 
 `compactTop`, `compactBottom`, and `divider` are internal coordination props set by `SectionStack`; prefer composing sections rather than setting them manually. Section does not forward arbitrary native DOM attributes.

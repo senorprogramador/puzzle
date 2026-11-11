@@ -1,4 +1,4 @@
-name: CI
+name: CI & Deploy
 
 on:
   push:
@@ -65,3 +65,105 @@ jobs:
 
       - name: Build documentation site
         run: bun run --filter '@puzzle-ui/site' build
+
+  changes:
+    name: Detect website changes
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    outputs:
+      site: ${{ steps.filter.outputs.site }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed files
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            site:
+              - 'apps/site/**'
+              - 'packages/core/**'
+              - 'packages/hooks/**'
+              - 'packages/icons/**'
+              - 'packages/theme/**'
+              - 'packages/ui/**'
+              - 'packages/pieces/**'
+              - 'package.json'
+              - 'bun.lock'
+              - 'Dockerfile'
+              - '.dockerignore'
+
+  deploy-site:
+    name: Build & Deploy Puzzle website
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    needs:
+      - test
+      - changes
+
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.changes.outputs.site == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --pull \
+            -t puzzle-site:${{ github.sha }} \
+            .
+
+      - name: Export Docker image
+        run: |
+          mkdir -p docker-images
+
+          docker save puzzle-site:${{ github.sha }} \
+            -o docker-images/puzzle-site.tar
+
+          chmod -R a+r docker-images
+
+      - name: Upload Docker image to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: docker-images/puzzle-site.tar
+          target: /deploy
+
+      - name: Deploy on server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "Loading Puzzle Docker image..."
+            docker load -i /deploy/docker-images/puzzle-site.tar
+
+            echo "Updating server configuration..."
+            cd /opt
+            git pull --ff-only
+
+            echo "Deploying Puzzle..."
+            cd /opt/sites/puzzle
+
+            IMAGE_TAG=${{ github.sha }} \
+              docker compose up -d --no-deps --force-recreate puzzle-site
+
+            echo "Puzzle deployment complete!"

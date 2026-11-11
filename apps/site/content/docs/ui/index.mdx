@@ -1,0 +1,149 @@
+---
+title: UI Components
+description: Browse all Puzzle UI component documentation, grouped by purpose.
+---
+
+<code>@puzzle-ui/ui</code> provides reusable React components for building
+interfaces with consistent theme tokens, layout, and interaction patterns.
+Use this index to find a component's examples, props, and accessibility guidance.
+
+## Getting started
+
+Follow the [Getting Started guide](/docs/getting-started) for installation and
+wrap your application in the [Theme provider](/docs/theme/theme-provider).
+Import components from <code>@puzzle-ui/ui</code>:
+
+```tsx
+import { Theme } from "@puzzle-ui/theme";
+import { Button, Stack, Text } from "@puzzle-ui/ui";
+
+const App = () => (
+  <Theme>
+    <Stack direction="col" gap="sm">
+      <Text>Build your interface with Puzzle.</Text>
+      <Button>Get started</Button>
+    </Stack>
+  </Theme>
+);
+```
+
+## Actions
+
+Trigger actions and group related controls.
+
+- [Button](/docs/ui/actions/button)
+- [Button Group](/docs/ui/actions/button-group)
+- [Toggle Group](/docs/ui/actions/toggle-group)
+
+## Data display
+
+Present content, identities, status, and loading states.
+
+- [Alert](/docs/ui/data-display/alert)
+- [Avatar](/docs/ui/data-display/avatar)
+- [Badge](/docs/ui/data-display/badge)
+- [Card](/docs/ui/data-display/card)
+- [Empty State](/docs/ui/data-display/empty-state)
+- [Image](/docs/ui/data-display/image)
+- [Paper](/docs/ui/data-display/paper)
+- [Progress](/docs/ui/data-display/progress)
+- [Rating](/docs/ui/data-display/rating)
+- [Skeleton](/docs/ui/data-display/skeleton)
+
+## Editors
+
+Edit rich text and display structured documents.
+
+- [Text Editor, Toolbar, and Renderer](/docs/ui/editors/text-editor)
+
+## Forms
+
+Collect input, offer choices, and compose labeled fields.
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Color Picker](/docs/ui/forms/color-picker)
+- [Date Picker](/docs/ui/forms/date-picker)
+- [File Upload](/docs/ui/forms/file-upload)
+- [Form Field](/docs/ui/forms/form-field)
+- [Input Group](/docs/ui/forms/input-group)
+- [Label](/docs/ui/forms/label)
+- [Number Input](/docs/ui/forms/number-input)
+- [Radio Group](/docs/ui/forms/radio-group)
+- [Select](/docs/ui/forms/select)
+- [Slider](/docs/ui/forms/slider)
+- [Stepper](/docs/ui/forms/stepper)
+- [Switch](/docs/ui/forms/switch)
+- [Text Area Input](/docs/ui/forms/text-area-input)
+- [Text Input](/docs/ui/forms/text-input)
+- [Time Picker](/docs/ui/forms/time-picker)
+- [Token Input](/docs/ui/forms/token-input)
+
+## Layout
+
+Structure pages, arrange content, and manage scrolling or resizable regions.
+
+- [App Bar](/docs/ui/layout/app-bar)
+- [Aspect Ratio](/docs/ui/layout/aspect-ratio)
+- [Background](/docs/ui/layout/background)
+- [Bottom Navigation](/docs/ui/layout/bottom-navigation)
+- [Breadcrumbs](/docs/ui/layout/breadcrumbs)
+- [Collapsable Sidebar](/docs/ui/layout/collapsable-sidebar)
+- [Container](/docs/ui/layout/container)
+- [Page Layout](/docs/ui/layout/page-layout)
+- [Resizable Panels](/docs/ui/layout/resizable-panels)
+- [Scroll Area](/docs/ui/layout/scroll-area)
+- [Section](/docs/ui/layout/section)
+- [Section Stack](/docs/ui/layout/section-stack)
+- [Separator](/docs/ui/layout/separator)
+- [Sidebar](/docs/ui/layout/sidebar)
+- [Stack](/docs/ui/layout/stack)
+
+## Navigation
+
+Move between destinations, browse collections, and organize related content.
+
+- [Accordion](/docs/ui/navigation/accordion)
+- [Carousel](/docs/ui/navigation/carousel)
+- [Link](/docs/ui/navigation/link)
+- [Pagination](/docs/ui/navigation/pagination)
+- [Tabs](/docs/ui/navigation/tabs)
+- [Tree View](/docs/ui/navigation/tree-view)
+
+## Overlays
+
+Show contextual content, modal interactions, menus, and notifications.
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Command](/docs/ui/overlays/command)
+- [Context Menu](/docs/ui/overlays/context-menu)
+- [Dialog](/docs/ui/overlays/dialog)
+- [Drawer](/docs/ui/overlays/drawer)
+- [Dropdown Menu](/docs/ui/overlays/dropdown-menu)
+- [Notification](/docs/ui/overlays/notification)
+- [Popout](/docs/ui/overlays/popout)
+- [Popover](/docs/ui/overlays/popover)
+- [Portal](/docs/ui/overlays/portal)
+- [Tooltip](/docs/ui/overlays/tooltip)
+
+## Typography
+
+Apply theme typography while keeping semantic headings and readable body copy.
+
+- [Heading](/docs/ui/typography/heading)
+- [Text](/docs/ui/typography/text)
+
+## Utilities
+
+Preview components, control document scrolling, and animate transitions.
+
+- [Preview](/docs/ui/utilities/preview)
+- [Scroll Lock](/docs/ui/utilities/scroll-lock)
+- [Transition](/docs/ui/utilities/transition)
+
+## Theming
+
+Components consume shared CSS custom properties rather than defining a separate
+theme system. See [Theme](/docs/theme) for an overview,
+[Design Tokens](/docs/theme/tokens) for customization, and
+[Colors](/docs/theme/colors) for light, dark, and scoped color schemes.

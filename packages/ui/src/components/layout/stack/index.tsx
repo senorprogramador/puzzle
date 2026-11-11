@@ -9,7 +9,7 @@ import {
   type ElementType,
   type ReactNode,
 } from "react";
-import type { ResponsiveValue } from "@puzzle-ui/core";
+import type { ResponsiveConfig, ResponsiveValue } from "@puzzle-ui/core";
 import "./stack.css";
 
 type StackDirection = "row" | "col";
@@ -26,22 +26,25 @@ type StackMainAlignment =
 
 type StackCrossAlignment = "start" | "center" | "end" | "stretch";
 
+type ResponsiveMainAlignment = ResponsiveValue<StackMainAlignment>;
+type ResponsiveCrossAlignment = ResponsiveValue<StackCrossAlignment>;
+
 type StackRowProps = {
   direction: "row";
-  alignH?: StackMainAlignment;
-  alignV?: StackCrossAlignment;
+  alignH?: ResponsiveMainAlignment;
+  alignV?: ResponsiveCrossAlignment;
 };
 
 type StackColProps = {
   direction?: "col";
-  alignH?: StackCrossAlignment;
-  alignV?: StackMainAlignment;
+  alignH?: ResponsiveCrossAlignment;
+  alignV?: ResponsiveMainAlignment;
 };
 
 type StackResponsiveProps = {
   direction: ResponsiveDirection;
-  alignH?: StackMainAlignment;
-  alignV?: StackMainAlignment;
+  alignH?: ResponsiveMainAlignment;
+  alignV?: ResponsiveMainAlignment;
 };
 
 type StackOwnProps<C extends ElementType> = {
@@ -68,7 +71,7 @@ const Stack = ({
   className,
   ...props
 }: StackProps<ElementType>) => {
-  const directions: ResponsiveDirection =
+  const directions: ResponsiveConfig<StackDirection> =
     typeof direction === "string"
       ? { mobile: direction }
       : {
@@ -84,14 +87,34 @@ const Stack = ({
 
   const hasAlignment = alignH !== undefined || alignV !== undefined;
 
+  const responsiveAlignH: ResponsiveConfig<StackMainAlignment> =
+    typeof alignH === "string"
+      ? { mobile: alignH }
+      : { ...alignH, mobile: alignH?.mobile ?? "start" };
+  const responsiveAlignV: ResponsiveConfig<StackMainAlignment> =
+    typeof alignV === "string"
+      ? { mobile: alignV }
+      : { ...alignV, mobile: alignV?.mobile ?? "start" };
+  const responsiveAlignHClasses = BREAKPOINTS.flatMap((breakpoint) => {
+    const value = responsiveAlignH[breakpoint];
+
+    return value ? [`align-h-${breakpoint}-${value}`] : [];
+  });
+
+  const responsiveAlignVClasses = BREAKPOINTS.flatMap((breakpoint) => {
+    const value = responsiveAlignV[breakpoint];
+
+    return value ? [`align-v-${breakpoint}-${value}`] : [];
+  });
+
   const classes = cn(
     "puzzle-stack",
     ...directionClasses,
     reverse && "reverse",
     wrap,
     `gap-${gap}`,
-    alignH && `align-h-${alignH}`,
-    alignV && `align-v-${alignV}`,
+    ...responsiveAlignHClasses,
+    ...responsiveAlignVClasses,
     hasAlignment && "has-alignment",
     className,
   );

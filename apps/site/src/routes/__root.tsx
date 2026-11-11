@@ -7,11 +7,7 @@ import {
 } from "@tanstack/react-router";
 import appCss from "../styles/app.css?url";
 import { Theme } from "@puzzle-ui/theme";
-import { PageLayout } from "@puzzle-ui/ui/components/layout/page-layout";
-import { AppBar } from "@puzzle-ui/ui/components/layout/app-bar";
-import { Sidebar } from "@/components/layout/sidebar";
 import { TanStackLink } from "../components/navigation/link/link";
-import { RootProvider } from "fumadocs-ui/provider/tanstack";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -110,36 +106,7 @@ function RootDocument({
             },
           }}
         >
-          <PageLayout>
-            <PageLayout.Header className="puzzle-site-header">
-              <AppBar
-                logo={
-                  <img
-                    src="/favicon.svg"
-                    width="48"
-                    height="48"
-                    alt="Logo"
-                    className="h-12 w-12"
-                  />
-                }
-                title="Puzzle"
-                navigationItems={[
-                  { label: "Home", href: "/", current: true },
-                  { label: "Components", href: "/components" },
-                  { label: "Docs", href: "/docs" },
-                ]}
-                sticky
-              />
-            </PageLayout.Header>
-
-            <PageLayout.LeftSidebar>
-              <Sidebar />
-            </PageLayout.LeftSidebar>
-
-            <PageLayout.Main>
-              <RootProvider theme={{ enabled: false }}>{children}</RootProvider>
-            </PageLayout.Main>
-          </PageLayout>
+          {children}
           <Scripts />
         </Theme>
       </body>

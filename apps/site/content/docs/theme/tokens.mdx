@@ -29,39 +29,39 @@ Every value is validated as a safe CSS value before it is injected.
 
 Emitted as `--puzzle-space-{key}`.
 
-| Key | Default |
-| --- | --- |
-| `0` | `0` |
-| `px` | `1px` |
+| Key   | Default    |
+| ----- | ---------- |
+| `0`   | `0`        |
+| `px`  | `1px`      |
 | `0.5` | `0.125rem` |
-| `1` | `0.25rem` |
+| `1`   | `0.25rem`  |
 | `1.5` | `0.375rem` |
-| `2` | `0.5rem` |
-| `3` | `0.75rem` |
-| `4` | `1rem` |
-| `5` | `1.25rem` |
-| `6` | `1.5rem` |
-| `8` | `2rem` |
-| `10` | `2.5rem` |
-| `12` | `3rem` |
-| `16` | `4rem` |
-| `20` | `5rem` |
-| `24` | `6rem` |
+| `2`   | `0.5rem`   |
+| `3`   | `0.75rem`  |
+| `4`   | `1rem`     |
+| `5`   | `1.25rem`  |
+| `6`   | `1.5rem`   |
+| `8`   | `2rem`     |
+| `10`  | `2.5rem`   |
+| `12`  | `3rem`     |
+| `16`  | `4rem`     |
+| `20`  | `5rem`     |
+| `24`  | `6rem`     |
 
 ### Radius
 
 Emitted as `--puzzle-radius-{key}`.
 
-| Key | Default |
-| --- | --- |
-| `none` | `0` |
-| `sm` | `0.125rem` |
-| `md` | `0.375rem` |
-| `lg` | `0.5rem` |
-| `xl` | `0.75rem` |
-| `2xl` | `1rem` |
-| `3xl` | `1.5rem` |
-| `full` | `9999px` |
+| Key    | Default    |
+| ------ | ---------- |
+| `none` | `0`        |
+| `sm`   | `0.125rem` |
+| `md`   | `0.375rem` |
+| `lg`   | `0.5rem`   |
+| `xl`   | `0.75rem`  |
+| `2xl`  | `1rem`     |
+| `3xl`  | `1.5rem`   |
+| `full` | `9999px`   |
 
 ### Shadows
 
@@ -73,21 +73,21 @@ A finer-grained elevation scale emitted as `--puzzle-elevation-{key}` with keys 
 
 ### Borders
 
-| Token | CSS variable | Default |
-| --- | --- | --- |
-| `borders.width` | `--puzzle-border-width` | `1px` |
-| `borders.widthStrong` | `--puzzle-border-width-strong` | `2px` |
-| `borders.style` | `--puzzle-border-style` | `solid` |
+| Token                 | CSS variable                   | Default |
+| --------------------- | ------------------------------ | ------- |
+| `borders.width`       | `--puzzle-border-width`        | `1px`   |
+| `borders.widthStrong` | `--puzzle-border-width-strong` | `2px`   |
+| `borders.style`       | `--puzzle-border-style`        | `solid` |
 
 ### Layout
 
-| Token | CSS variable | Default |
-| --- | --- | --- |
+| Token              | CSS variable               | Default |
+| ------------------ | -------------------------- | ------- |
 | `layout.container` | `--puzzle-container-width` | `80rem` |
-| `layout.content` | `--puzzle-content-width` | `64rem` |
-| `layout.prose` | `--puzzle-prose-width` | `65ch` |
+| `layout.content`   | `--puzzle-content-width`   | `64rem` |
+| `layout.prose`     | `--puzzle-prose-width`     | `65ch`  |
 
-A responsive gutter, `--puzzle-container-gutter: clamp(1rem, 3vw, 3rem)`, is provided by the base stylesheet.
+A responsive gutter, `--puzzle-container-gutter: clamp(2rem, 6vw, 6rem)`, is provided by the base stylesheet.
 
 ### Breakpoints
 
@@ -95,37 +95,37 @@ Emitted as `--puzzle-breakpoint-{key}` with keys `tablet` (`768px`), `desktop` (
 
 ### Overlays
 
-| Token | CSS variable | Default |
-| --- | --- | --- |
-| `overlays.backdrop` | `--puzzle-overlay-backdrop` | `rgb(0 0 0 / 0.35)` |
-| `overlays.backdropBlur` | `--puzzle-overlay-backdrop-blur` | `2px` |
+| Token                   | CSS variable                     | Default             |
+| ----------------------- | -------------------------------- | ------------------- |
+| `overlays.backdrop`     | `--puzzle-overlay-backdrop`      | `rgb(0 0 0 / 0.35)` |
+| `overlays.backdropBlur` | `--puzzle-overlay-backdrop-blur` | `2px`               |
 
 ### Motion
 
-| Token | CSS variable | Default |
-| --- | --- | --- |
-| `motion.fast` | `--puzzle-duration-fast` | `120ms` |
-| `motion.normal` | `--puzzle-duration-normal` | `200ms` |
-| `motion.slow` | `--puzzle-duration-slow` | `320ms` |
+| Token                   | CSS variable               | Default                      |
+| ----------------------- | -------------------------- | ---------------------------- |
+| `motion.fast`           | `--puzzle-duration-fast`   | `120ms`                      |
+| `motion.normal`         | `--puzzle-duration-normal` | `200ms`                      |
+| `motion.slow`           | `--puzzle-duration-slow`   | `320ms`                      |
 | `motion.easingStandard` | `--puzzle-easing-standard` | `cubic-bezier(0.2, 0, 0, 1)` |
-| `motion.easingIn` | `--puzzle-easing-in` | `cubic-bezier(0.4, 0, 1, 1)` |
-| `motion.easingOut` | `--puzzle-easing-out` | `cubic-bezier(0, 0, 0.2, 1)` |
+| `motion.easingIn`       | `--puzzle-easing-in`       | `cubic-bezier(0.4, 0, 1, 1)` |
+| `motion.easingOut`      | `--puzzle-easing-out`      | `cubic-bezier(0, 0, 0.2, 1)` |
 
 ### Z-index
 
 Emitted as `--puzzle-z-index-{key}`.
 
-| Key | Default |
-| --- | --- |
-| `base` | `0` |
-| `dropdown` | `100` |
-| `sticky` | `200` |
-| `navigation` | `250` |
-| `overlay` | `300` |
-| `modal` | `400` |
-| `popover` | `500` |
-| `toast` | `600` |
-| `tooltip` | `700` |
+| Key          | Default |
+| ------------ | ------- |
+| `base`       | `0`     |
+| `dropdown`   | `100`   |
+| `sticky`     | `200`   |
+| `navigation` | `250`   |
+| `overlay`    | `300`   |
+| `modal`      | `400`   |
+| `popover`    | `500`   |
+| `toast`      | `600`   |
+| `tooltip`    | `700`   |
 
 ### Colors and typography
 

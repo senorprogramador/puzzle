@@ -58,3 +58,9 @@ Stack defaults to a column. Horizontal and vertical alignment remain physical ax
 | `divider`          | `ReactNode`                                   | -          | Content inserted between children. |
 
 Main-axis alignment accepts `start`, `center`, `end`, `stretch`, `around`, `between`, `evenly`; cross-axis alignment accepts `start`, `center`, `end`, `stretch`. Native props are forwarded. Reversing visual order does not change DOM/keyboard order.
+
+Both `alignH` and `alignV` also accept responsive objects, such as
+`alignH={{ mobile: "start", tablet: "center", desktop: "end" }}`.
+Each prop changes independently of `direction` and inherits its last specified
+value at larger breakpoints. Horizontal and vertical alignment stay on their
+physical axes when direction changes.

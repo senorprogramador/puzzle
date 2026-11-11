@@ -1,6 +1,8 @@
 .puzzle-badge {
     position: relative;
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .puzzle-badge > .puzzle-badge-indicator {
@@ -9,13 +11,14 @@
     align-items: center;
     justify-content: center;
 
-    aspect-ratio: 1 / 1;
-    padding: 0.25em;
+    box-sizing: border-box;
+    padding: var(--puzzle-space-1) var(--puzzle-space-2);
     border-radius: var(--puzzle-radius-full, 50%);
 
     font-weight: var(--puzzle-font-weight-normal, 400);
     line-height: var(--puzzle-font-line-height-none, 1);
     text-align: center;
+    white-space: nowrap;
     vertical-align: middle;
 }
 
@@ -90,4 +93,9 @@
     top: calc(50% - sin(315deg) * 50%);
     left: calc(50% + cos(315deg) * 50%);
     transform: translate(-50%, -50%);
+}
+
+.puzzle-badge.puzzle-badge-standalone > .puzzle-badge-indicator {
+    position: static;
+    transform: none;
 }

@@ -1,555 +1,545 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button, Preview, Section } from "@puzzle-ui/ui";
+import { Theme, ThemeMode } from "@puzzle-ui/theme";
+import {
+  Button,
+  Badge,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Switch,
+  Checkbox,
+  TextInput,
+  PageLayout,
+  SectionStack,
+  Section,
+  Link,
+  Stack,
+  Text,
+  Heading,
+} from "@puzzle-ui/ui";
+import "./home.css";
+import { Header } from "@/components/layout/header";
+import { useState } from "react";
+import { Icon } from "@puzzle-ui/icons/icon";
+import { components } from "@/components/component-catalog";
 
-export const Route = createFileRoute("/")({
-  component: RouteComponent,
-});
+const features = [
+  {
+    number: "01",
+    title: "Designed to compose",
+    description:
+      "Build interfaces from small, predictable building blocks. Compose complex experiences without fighting the framework.",
+  },
+  {
+    number: "02",
+    title: "Accessibility first",
+    description:
+      "Keyboard navigation, focus management, semantic markup and screen reader support are part of the foundation.",
+  },
+  {
+    number: "03",
+    title: "Developer experience",
+    description:
+      "TypeScript-first APIs, predictable behavior and a consistent design system make development enjoyable.",
+  },
+];
 
-const variants = [
-  "primary",
-  "secondary",
-  "outline",
-  "ghost",
-  "danger",
-  "link",
-] as const;
+const codeExample = `import { Button, Card } from "@puzzle/ui";
 
-const sizes = ["xs", "sm", "md", "lg"] as const;
-
-const variantCode = `<Button variant="primary">Primary</Button>
-<Button variant="secondary">Secondary</Button>
-<Button variant="outline">Outline</Button>
-<Button variant="ghost">Ghost</Button>
-<Button variant="danger">Delete</Button>
-<Button variant="link">Learn more</Button>`;
-
-const sizeCode = `<Button size="xs">Extra small</Button>
-<Button size="sm">Small</Button>
-<Button size="md">Medium</Button>
-<Button size="lg">Large</Button>
-<Button size="icon" aria-label="Settings">
-  <SettingsIcon />
-</Button>`;
-
-const linkCode = `<Button as="a" href="/docs">
-  Documentation
-</Button>
-
-<Button as="a" href="https://example.com" target="_blank" rel="noopener noreferrer">
-  External link
-</Button>`;
-
-const loadingCode = `<Button loading>Saving...</Button>
-<Button disabled>Unavailable</Button>`;
-
-const iconCode = `<Button leading={<SaveIcon />}>
-  Save changes
-</Button>
-
-<Button trailing={<ArrowRightIcon />}>
-  Continue
-</Button>`;
-
-function ToggleExample() {
-  const [active, setActive] = useState(false);
-
+export function Welcome() {
   return (
-    <Button
-      variant={active ? "toggle-active" : "toggle"}
-      aria-pressed={active}
-      onClick={() => setActive((value) => !value)}
-    >
-      {active ? "Enabled" : "Disabled"}
-    </Button>
+    <Card>
+      <h2>Welcome to Puzzle</h2>
+      <p>Build something wonderful.</p>
+      <Button variant="primary">
+        Get started
+      </Button>
+    </Card>
   );
-}
+}`;
 
-function RouteComponent() {
-  return (
-    <div className="space-y-12">
-      <Section>
-        <div className="space-y-4">
-          <p className="text-sm font-semibold text-(--puzzle-color-primary)">
-            Actions
-          </p>
-          <h1 className="text-4xl font-bold">Button</h1>
-          <p className="max-w-3xl text-lg text-(--puzzle-color-text-muted)">
-            Buttons allow users to trigger actions, submit forms, navigate
-            between pages, and interact with your application.
-          </p>
-        </div>
-      </Section>
+const ArrowIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    width="18"
+    height="18"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </svg>
+);
 
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Import</h2>
-          <pre className="overflow-x-auto rounded-lg bg-(--puzzle-color-surface-sunken) p-4 text-sm">
-            <code>{`import { Button } from "@puzzle-ui/ui";`}</code>
-          </pre>
-          <p>
-            Button is available as a named export from the Puzzle UI package.
-            The <code>ButtonProps</code>, <code>ButtonVariant</code>, and{" "}
-            <code>ButtonSize</code> types are also exported.
-          </p>
-        </div>
-      </Section>
+const CodeIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    width="18"
+    height="18"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="m8 17-5-5 5-5M16 7l5 5-5 5M14 4l-4 16" />
+  </svg>
+);
 
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Variants</h2>
-          <p>
-            Use the <code>variant</code> property to communicate the purpose and
-            visual importance of an action.
-          </p>
-
-          <Preview code={variantCode}>
-            <div className="flex flex-wrap items-center gap-3">
-              {variants.map((variant) => (
-                <Button key={variant} variant={variant}>
-                  {variant === "danger"
-                    ? "Delete"
-                    : variant === "link"
-                      ? "Learn more"
-                      : variant.charAt(0).toUpperCase() + variant.slice(1)}
-                </Button>
-              ))}
-            </div>
-          </Preview>
-
-          <ul className="list-disc space-y-2 pl-6">
-            <li>
-              <strong>primary</strong> – The main action. Use sparingly for the
-              most important action in a context.
-            </li>
-            <li>
-              <strong>secondary</strong> – A less prominent alternative action.
-            </li>
-            <li>
-              <strong>outline</strong> – A bordered action with a transparent
-              background.
-            </li>
-            <li>
-              <strong>ghost</strong> – A subtle action without a visible border.
-            </li>
-            <li>
-              <strong>danger</strong> – An action that performs a potentially
-              destructive operation.
-            </li>
-            <li>
-              <strong>link</strong> – An action styled like a text link.
-            </li>
-          </ul>
-        </div>
-      </Section>
-
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Sizes</h2>
-          <p>
-            The <code>size</code> property controls the dimensions and
-            typography of the button.
-          </p>
-
-          <Preview code={sizeCode}>
-            <div className="flex flex-wrap items-center gap-3">
-              {sizes.map((size) => (
-                <Button key={size} size={size}>
-                  {size.toUpperCase()}
-                </Button>
-              ))}
-              <Button size="icon" aria-label="Settings">
-                ⚙
-              </Button>
-            </div>
-          </Preview>
-
-          <ul className="list-disc space-y-2 pl-6">
-            <li>
-              <strong>xs</strong> – Extra small, for compact interfaces.
-            </li>
-            <li>
-              <strong>sm</strong> – Small, for secondary or dense layouts.
-            </li>
-            <li>
-              <strong>md</strong> – Medium, the default size.
-            </li>
-            <li>
-              <strong>lg</strong> – Large, for prominent actions.
-            </li>
-            <li>
-              <strong>icon</strong> – Square button intended for icons.
-            </li>
-          </ul>
-
-          <p>
-            When using <code>size="icon"</code>, provide an accessible name
-            through <code>aria-label</code> if the button has no visible text.
-          </p>
-        </div>
-      </Section>
-
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Links</h2>
-          <p>
-            Button supports polymorphic rendering through the <code>as</code>{" "}
-            property. Use it to render an anchor instead of a native button. The
-            properties of the selected element are inferred by TypeScript.
-          </p>
-
-          <Preview code={linkCode}>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button href="/docs">Documentation</Button>
-              <Button
-                href="https://example.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="outline"
-              >
-                External link
-              </Button>
-            </div>
-          </Preview>
-
-          <p>
-            When rendering an anchor, use <code>href</code> and the appropriate
-            navigation component for your routing framework when necessary. For
-            example, Next.js applications can use their own Link component
-            through <code>as</code>.
-          </p>
-        </div>
-      </Section>
-
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">
-            Leading and trailing content
-          </h2>
-          <p>
-            Add icons or other React elements before or after the button label
-            using <code>leading</code> and <code>trailing</code>.
-          </p>
-
-          <Preview code={iconCode}>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button leading={<span aria-hidden="true">↓</span>}>
-                Download
-              </Button>
-              <Button
-                trailing={<span aria-hidden="true">→</span>}
-                variant="secondary"
-              >
-                Continue
-              </Button>
-            </div>
-          </Preview>
-
-          <p>
-            Both properties accept any <code>ReactNode</code>, so you can use
-            Puzzle icons, custom SVGs, or other React components.
-          </p>
-        </div>
-      </Section>
-
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">
-            Loading and disabled states
-          </h2>
-          <p>
-            Use <code>loading</code> to indicate that an action is being
-            processed. The button displays a spinner and prevents further
-            interaction while loading.
-          </p>
-
-          <Preview code={loadingCode}>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button loading>Saving...</Button>
-              <Button disabled variant="secondary">
-                Unavailable
-              </Button>
-            </div>
-          </Preview>
-
-          <p>
-            A loading button automatically receives <code>aria-busy</code> and
-            behaves as disabled. You can also explicitly disable a button using{" "}
-            <code>disabled</code>.
-          </p>
-        </div>
-      </Section>
-
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Full width</h2>
-          <p>
-            Set <code>fullWidth</code> to make the button fill the available
-            width of its container.
-          </p>
-
-          <Preview code={`<Button fullWidth>Continue</Button>`}>
-            <div className="w-full max-w-md">
-              <Button fullWidth>Continue</Button>
-            </div>
-          </Preview>
-        </div>
-      </Section>
-
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Toggle buttons</h2>
-          <p>
-            The <code>toggle</code> and <code>toggle-active</code> variants
-            provide visual styles for toggle-like actions. Manage the active
-            state in your application and expose it with{" "}
-            <code>aria-pressed</code>.
-          </p>
-
-          <Preview
-            code={`const [active, setActive] = useState(false);
-
-<Button
-  variant={active ? "toggle-active" : "toggle"}
-  aria-pressed={active}
-  onClick={() => setActive((value) => !value)}
->
-  Toggle
-</Button>`}
-          >
-            <ToggleExample />
-          </Preview>
-        </div>
-      </Section>
-
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">Form buttons</h2>
-          <p>
-            Buttons render as native HTML buttons by default. Use the{" "}
-            <code>type</code> property to specify their behavior inside forms.
-          </p>
-
-          <Preview
-            code={`<form onSubmit={handleSubmit}>
-  <Button type="submit">Save</Button>
-  <Button type="reset" variant="outline">Reset</Button>
-  <Button type="button" variant="ghost">Cancel</Button>
-</form>`}
-          >
-            <div className="flex flex-wrap items-center gap-3">
-              <Button type="submit">Submit</Button>
-              <Button type="reset" variant="outline">
-                Reset
-              </Button>
-              <Button type="button" variant="ghost">
-                Cancel
-              </Button>
-            </div>
-          </Preview>
-
-          <p>
-            The default type is <code>button</code>, preventing accidental form
-            submissions when a button is used inside a form.
-          </p>
-        </div>
-      </Section>
-
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">API</h2>
-          <p>
-            Button accepts the following component-specific properties.
-            Additional properties are inherited from the HTML element selected
-            through <code>as</code>.
-          </p>
-
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left text-sm">
-              <thead>
-                <tr className="border-b border-[var(--puzzle-color-border)]">
-                  <th className="px-3 py-3">Property</th>
-                  <th className="px-3 py-3">Type</th>
-                  <th className="px-3 py-3">Default</th>
-                  <th className="px-3 py-3">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                <ApiRow
-                  name="as"
-                  type="ElementType"
-                  defaultValue='"button"'
-                  description="The HTML element or React component to render."
-                />
-                <ApiRow
-                  name="variant"
-                  type="ButtonVariant"
-                  defaultValue='"primary"'
-                  description="Visual style of the button."
-                />
-                <ApiRow
-                  name="size"
-                  type="ButtonSize"
-                  defaultValue='"md"'
-                  description="Controls the button dimensions."
-                />
-                <ApiRow
-                  name="leading"
-                  type="ReactNode"
-                  defaultValue="—"
-                  description="Content displayed before the label."
-                />
-                <ApiRow
-                  name="trailing"
-                  type="ReactNode"
-                  defaultValue="—"
-                  description="Content displayed after the label."
-                />
-                <ApiRow
-                  name="loading"
-                  type="boolean"
-                  defaultValue="false"
-                  description="Displays a loading indicator and prevents interaction."
-                />
-                <ApiRow
-                  name="disabled"
-                  type="boolean"
-                  defaultValue="false"
-                  description="Disables the button."
-                />
-                <ApiRow
-                  name="fullWidth"
-                  type="boolean"
-                  defaultValue="false"
-                  description="Makes the button fill its container width."
-                />
-                <ApiRow
-                  name="className"
-                  type="string"
-                  defaultValue="—"
-                  description="Additional CSS class names."
-                />
-                <ApiRow
-                  name="children"
-                  type="ReactNode"
-                  defaultValue="—"
-                  description="The button content."
-                />
-                <ApiRow
-                  name="type"
-                  type='"button" | "submit" | "reset"'
-                  defaultValue='"button"'
-                  description="Native button type. Only applied when rendering a native button."
-                />
-                <ApiRow
-                  name="tabIndex"
-                  type="number"
-                  defaultValue="—"
-                  description="Controls the element's position in sequential keyboard navigation."
-                />
-                <ApiRow
-                  name="aria-label"
-                  type="string"
-                  defaultValue="—"
-                  description="Accessible name, especially useful for icon-only buttons."
-                />
-                <ApiRow
-                  name="aria-busy"
-                  type="boolean"
-                  defaultValue="—"
-                  description="Indicates that the element is being updated."
-                />
-                <ApiRow
-                  name="aria-disabled"
-                  type="boolean"
-                  defaultValue="—"
-                  description="Exposes the disabled state through ARIA."
-                />
-                <ApiRow
-                  name="onClick"
-                  type="ElementProp<C, 'onClick'>"
-                  defaultValue="—"
-                  description="Click handler, typed according to the rendered element."
-                />
-                <ApiRow
-                  name="onKeyDown"
-                  type="ElementProp<C, 'onKeyDown'>"
-                  defaultValue="—"
-                  description="Keyboard event handler, typed according to the rendered element."
-                />
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </Section>
-
-      <Section>
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold">TypeScript types</h2>
-
-          <h3 className="text-lg font-semibold">ButtonVariant</h3>
-          <pre className="overflow-x-auto rounded-lg bg-[var(--puzzle-color-surface-sunken)] p-4 text-sm">
-            <code>{`type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outline"
-  | "ghost"
-  | "danger"
-  | "link"
-  | "toggle"
-  | "toggle-active";`}</code>
-          </pre>
-
-          <h3 className="text-lg font-semibold">ButtonSize</h3>
-          <pre className="overflow-x-auto rounded-lg bg-[var(--puzzle-color-surface-sunken)] p-4 text-sm">
-            <code>{`type ButtonSize =
-  | "xs"
-  | "sm"
-  | "md"
-  | "lg"
-  | "icon";`}</code>
-          </pre>
-
-          <h3 className="text-lg font-semibold">ButtonProps</h3>
-          <pre className="overflow-x-auto rounded-lg bg-[var(--puzzle-color-surface-sunken)] p-4 text-sm">
-            <code>{`type ButtonProps<C extends ElementType = "button"> =
-  ButtonOwnProps<C> &
-  Omit<
-    ComponentPropsWithRef<C>,
-    keyof ButtonOwnProps<C> | "as"
-  >;`}</code>
-          </pre>
-
-          <p>
-            The generic <code>C</code> determines the rendered element.
-            Consequently, native attributes and event handlers are automatically
-            inferred. For example, <code>href</code> is available when using{" "}
-            <code>as="a"</code>.
-          </p>
-        </div>
-      </Section>
-    </div>
-  );
-}
-
-type ApiRowProps = {
-  name: string;
-  type: string;
-  defaultValue: string;
-  description: string;
+type ComponentPreviewProps = {
+  onToggleTheme: () => void;
 };
 
-function ApiRow({ name, type, defaultValue, description }: ApiRowProps) {
+const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
+  <div className="home-preview">
+    <div className="home-preview__topbar">
+      <div className="home-preview__dots">
+        <span />
+        <span />
+        <span />
+      </div>
+      <span>puzzle / playground</span>
+      <Badge color="secondary" content="Interactive" />
+    </div>
+
+    <div className="home-preview__content">
+      <Stack direction="col" alignH="start" gap="sm">
+        <Badge color="secondary" content="Component showcase" />
+        <Stack direction="col" alignH="start" gap="0">
+          <Heading level="headline3">Everything in its place.</Heading>
+          <Text>A glimpse into what you can build.</Text>
+        </Stack>
+      </Stack>
+
+      <Card className="home-preview__card">
+        <div className="home-preview__section-heading">
+          <span>Buttons</span>
+          <Badge color="secondary" content="Button" />
+        </div>
+
+        <Stack direction="row" alignV="center" gap="sm">
+          <Button variant="primary">Get started</Button>
+          <Button variant="secondary">Explore</Button>
+          <Button variant="outline">Documentation</Button>
+        </Stack>
+      </Card>
+
+      <div className="home-preview__columns">
+        <Card className="home-preview__card">
+          <div className="home-preview__section-heading">
+            <span>Preferences</span>
+            <Badge color="secondary" content="Switch" />
+          </div>
+
+          <div className="home-preview__control">
+            <div>
+              <strong>Dark mode</strong>
+              <span>Use dark appearance</span>
+            </div>
+            <Switch defaultChecked onChange={onToggleTheme} />
+          </div>
+
+          <div className="home-preview__control">
+            <div>
+              <strong>Notifications</strong>
+              <span>Receive updates</span>
+            </div>
+            <Switch />
+          </div>
+        </Card>
+
+        <Card className="home-preview__card">
+          <div className="home-preview__section-heading">
+            <span>Tasks</span>
+            <Badge color="secondary" content="Checkbox" />
+          </div>
+
+          <div className="home-preview__tasks">
+            <Checkbox defaultChecked>
+              <span>Build components</span>
+            </Checkbox>
+            <Checkbox defaultChecked>
+              <span>Write documentation</span>
+            </Checkbox>
+            <Checkbox defaultChecked>
+              <span>Ship your product</span>
+            </Checkbox>
+          </div>
+        </Card>
+      </div>
+
+      <Card className="home-preview__card">
+        <div className="home-preview__section-heading">
+          <span>Project settings</span>
+          <Badge color="secondary" content="Input" />
+        </div>
+        <label className="home-preview__input-label">Project name</label>
+        <TextInput placeholder="My awesome project" defaultValue="Puzzle UI" />
+      </Card>
+
+      <div className="home-preview__footer">
+        <span>
+          <span className="home-preview__status" />
+          All components ready
+        </span>
+        <span>Built with Puzzle</span>
+      </div>
+    </div>
+  </div>
+);
+
+const PuzzleLogo = ({ size = 36 }: { size?: number }) => (
+  <img
+    src="/favicon.svg"
+    width={size}
+    height={size}
+    alt="Logo"
+    className="h-12 w-12"
+  />
+);
+
+const Home = () => {
+  const [theme, setTheme] = useState<ThemeMode>("dark");
   return (
-    <tr className="border-b border-[var(--puzzle-color-border)] align-top">
-      <td className="px-3 py-3 font-mono font-medium whitespace-nowrap">
-        {name}
-      </td>
-      <td className="px-3 py-3 font-mono text-[var(--puzzle-color-text-muted)]">
-        {type}
-      </td>
-      <td className="px-3 py-3 font-mono">{defaultValue}</td>
-      <td className="px-3 py-3">{description}</td>
-    </tr>
+    <Theme theme={theme} scope="root">
+      <PageLayout>
+        <PageLayout.Header className="puzzle-site-header">
+          <Header />
+        </PageLayout.Header>
+        <PageLayout.Main>
+          <SectionStack>
+            <Section>
+              <div className="home-hero__background" />
+              <Stack
+                direction={{ mobile: "col", desktop: "row" }}
+                alignV="center"
+                alignH={{ mobile: "center", desktop: "evenly" }}
+                gap="xl"
+              >
+                <Stack
+                  className="home-hero__content"
+                  direction="col"
+                  alignV="center"
+                  alignH="center"
+                >
+                  <Stack direction="col" alignV="center" alignH="start">
+                    <Heading level="headline1" as="h1">
+                      Interfaces,
+                      <br />
+                      <span>beautifully</span> composed.
+                    </Heading>
+
+                    <Text className="home-hero__description">
+                      A thoughtfully crafted React UI framework for developers
+                      who care about the details. Build accessible, consistent
+                      and beautiful interfaces without getting in your way.
+                    </Text>
+                  </Stack>
+                  <Stack
+                    className="home-hero__actions"
+                    direction="row"
+                    alignV="center"
+                    wrap="wrap"
+                  >
+                    <Button
+                      variant="primary"
+                      onClick={() => {
+                        window.location.href = "/docs/getting-started";
+                      }}
+                    >
+                      Start building <ArrowIcon />
+                    </Button>
+
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        window.location.href = "/docs/ui";
+                      }}
+                    >
+                      <CodeIcon /> Explore components
+                    </Button>
+                  </Stack>
+
+                  <Stack
+                    className="home-hero__meta"
+                    direction="row"
+                    alignV="center"
+                    wrap="wrap"
+                  >
+                    <span>
+                      <span className="home-hero__check">✓</span>
+                      TypeScript first
+                    </span>
+                    <span>
+                      <span className="home-hero__check">✓</span>
+                      Accessibility focused
+                    </span>
+                    <span>
+                      <span className="home-hero__check">✓</span>
+                      Open source
+                    </span>
+                  </Stack>
+                </Stack>
+
+                <div className="home-hero__visual">
+                  <div className="home-hero__visual-glow" />
+                  <ComponentPreview
+                    onToggleTheme={() =>
+                      setTheme(theme === "dark" ? "light" : "dark")
+                    }
+                  />
+                  <div className="home-hero__floating home-hero__floating--top">
+                    <span className="home-floating-icon">✳</span>
+                    <div>
+                      <strong>Thoughtful by design</strong>
+                      <span>Every detail matters.</span>
+                    </div>
+                  </div>
+                  <div className="home-hero__floating home-hero__floating--bottom">
+                    <span className="home-floating-check">✓</span>
+                    <div>
+                      <strong>Accessible by default</strong>
+                      <span>Built for everyone.</span>
+                    </div>
+                  </div>
+                </div>
+              </Stack>
+            </Section>
+
+            <Section theme="dark">
+              <Stack
+                direction={{ mobile: "col", tablet: "row" }}
+                alignV="center"
+                alignH="center"
+                wrap="wrap"
+                gap="md"
+              >
+                <span>ONE DESIGN SYSTEM</span>
+                <span className="home-strip__line" />
+                <span>ENDLESS POSSIBILITIES</span>
+                <span className="home-strip__line" />
+                <span>BUILT FOR REACT</span>
+                <span className="home-strip__line" />
+                <span>BUILT FOR NEXT.JS</span>
+                <span className="home-strip__line" />
+                <span>BUILT FOR TANSTACK START</span>
+              </Stack>
+            </Section>
+
+            <Section id="features">
+              <Stack direction="col" alignV="center" alignH="center" gap="xl">
+                <Stack direction="col" alignV="center" alignH="start">
+                  <Badge color="secondary" content="Why Puzzle" />
+                  <Heading level="headline1" as="h2">
+                    Less boilerplate.
+                    <br />
+                    <span>More building.</span>
+                  </Heading>
+                  <Text className="home-hero__description">
+                    The foundations of a great interface, thoughtfully
+                    implemented so you can focus on creating great products.
+                  </Text>
+                </Stack>
+
+                <Stack
+                  direction={{ mobile: "col", tablet: "row" }}
+                  wrap="nowrap"
+                  gap="md"
+                >
+                  {features.map((feature) => (
+                    <Card key={feature.number}>
+                      <div className="home-feature-card__icon">
+                        {feature.number === "01" ? (
+                          <Icon name="hugeicons:infinity-circle" size={32} />
+                        ) : feature.number === "02" ? (
+                          <Icon
+                            name="hugeicons:universal-access-circle"
+                            size={32}
+                          />
+                        ) : (
+                          <Icon name="griddy-icons:code-circle" size={32} />
+                        )}
+                      </div>
+                      <h3>{feature.title}</h3>
+                      <p>{feature.description}</p>
+                    </Card>
+                  ))}
+                </Stack>
+              </Stack>
+            </Section>
+
+            <Section theme="dark" id="components">
+              <Stack
+                direction="col"
+                alignV="center"
+                alignH={{ mobile: "center", desktop: "center" }}
+                gap="xl"
+              >
+                <Stack direction="col" alignV="center" alignH="start">
+                  <Badge color="secondary" content="The building blocks" />
+                  <Heading level="headline1" as="h2">
+                    Everything you need.
+                    <br />
+                    <span>Nothing you don't.</span>
+                  </Heading>
+                  <Text className="home-hero__description">
+                    A growing collection of carefully designed components. Each
+                    one built to work together as part of a consistent design
+                    system.
+                  </Text>
+                  <Button
+                    variant="outline"
+                    href="/docs/ui"
+                    className="home-text-link"
+                  >
+                    Explore all components <ArrowIcon />
+                  </Button>
+                </Stack>
+
+                <div className="home-component-grid">
+                  {components.map((component) => (
+                    <Card
+                      as="a"
+                      interactive
+                      className="home-component-card"
+                      href={component.href}
+                      key={component.href}
+                      aria-labelledby={`component-${component.href.split("/").at(-1)}`}
+                    >
+                      <span className="home-component-card__icon">
+                        <Icon name={component.icon} aria-hidden="true" />
+                      </span>
+                      <CardHeader>
+                        <CardTitle
+                          id={`component-${component.href.split("/").at(-1)}`}
+                        >
+                          {component.name}
+                        </CardTitle>
+                        <CardDescription>
+                          {component.description}
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  ))}
+                </div>
+              </Stack>
+            </Section>
+
+            <Section className="home-developer" id="developers">
+              <div className="home-developer__content">
+                <Badge color="secondary" content="Made for developers" />
+                <h2>
+                  Your ideas.
+                  <br />
+                  <span>Without the friction.</span>
+                </h2>
+                <p>
+                  Predictable APIs, powerful composition and a consistent design
+                  language. Puzzle gives you the building blocks to turn ideas
+                  into polished experiences.
+                </p>
+
+                <div className="home-developer__benefits">
+                  <div>
+                    <span>01</span>
+                    <strong>TypeScript-first</strong>
+                    <p>
+                      Excellent types and a predictable developer experience.
+                    </p>
+                  </div>
+                  <div>
+                    <span>02</span>
+                    <strong>Flexible by design</strong>
+                    <p>Customize and compose components to fit your product.</p>
+                  </div>
+                  <div>
+                    <span>03</span>
+                    <strong>Accessibility matters</strong>
+                    <p>
+                      Thoughtful interaction patterns and semantic foundations.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="home-code">
+                <div className="home-code__header">
+                  <div className="home-preview__dots">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span>Welcome.tsx</span>
+                  <Badge color="secondary" content="TSX" />
+                </div>
+                <pre>
+                  <code>{codeExample}</code>
+                </pre>
+                <div className="home-code__footer">
+                  <span>Simple. Composable. Predictable.</span>
+                  <span>⌘ + C</span>
+                </div>
+              </div>
+            </Section>
+
+            <Section className="home-cta">
+              <div className="home-cta__logo">
+                <PuzzleLogo size={54} />
+              </div>
+              <Badge
+                color="secondary"
+                content="Your next project starts here"
+              />
+              <h2>
+                Make something
+                <br />
+                <span>remarkable.</span>
+              </h2>
+              <p>
+                Start building with Puzzle. Explore the components, create your
+                design system and bring your ideas to life.
+              </p>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  window.location.href = "/getting-started";
+                }}
+              >
+                Get started with Puzzle <ArrowIcon />
+              </Button>
+            </Section>
+          </SectionStack>
+          <footer className="home-footer">
+            <Link className="home-brand" href="/">
+              <PuzzleLogo size={28} />
+              <span>puzzle-ui</span>
+            </Link>
+
+            <span>Made for developers who care about the details.</span>
+
+            <div>
+              <Link href="/docs/getting-started">Documentation</Link>
+              <Link
+                href="https://github.com/senorprogramador/puzzle"
+                target="_blank"
+                rel="noreferrer"
+              >
+                GitHub
+              </Link>
+              <span>© {new Date().getFullYear()} Puzzle UI</span>
+            </div>
+          </footer>
+        </PageLayout.Main>
+      </PageLayout>
+    </Theme>
   );
-}
+};
+
+export const Route = createFileRoute("/")({
+  component: Home,
+});

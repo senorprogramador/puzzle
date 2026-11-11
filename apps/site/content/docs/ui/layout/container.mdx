@@ -13,6 +13,10 @@ import { Container } from "@puzzle-ui/ui";
 
 Use Container for width constraints without introducing a surface or section theme.
 
+The base `puzzle-container` class limits its maximum width to
+`var(--puzzle-container-width, 80rem)`. Width preset classes override this limit
+for content, prose, or full-width containers.
+
 <Preview
   height={300}
   code={`\

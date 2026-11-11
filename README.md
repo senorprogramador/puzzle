@@ -170,6 +170,15 @@ bun install
 bun run site
 ```
 
+The documentation site serves `/sitemap.xml`, generated from the homepage and
+all Fumadocs pages (including documentation indexes). URLs use the request's
+origin, so reverse proxies should preserve the public host and scheme.
+The generated XML is cached in each server process for 24 hours and sent with
+`Cache-Control: public, max-age=86400, s-maxage=86400` for browser and shared caches.
+The process cache is refreshed on expiry, an origin change, or a server restart.
+
+Run the sitemap tests with `bun run --filter @puzzle-ui/site test:sitemap`.
+
 ### Run the playground
 
 ```bash

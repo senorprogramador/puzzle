@@ -12,6 +12,10 @@ import { baseOptions } from "@/lib/layout.shared";
 import { useFumadocsLoader } from "fumadocs-core/source/client";
 import { Suspense, use } from "react";
 import { useMDXComponents } from "@/components/mdx";
+import { RootProvider } from "fumadocs-ui/provider/tanstack";
+import { PageLayout } from "@puzzle-ui/ui/components/layout/page-layout";
+import { Sidebar } from "@/components/layout/sidebar";
+import { AppBar } from "@puzzle-ui/ui/components/layout/app-bar";
 
 export const Route = createFileRoute("/docs/$")({
   component: Page,
@@ -59,15 +63,47 @@ function Page() {
   const data = useFumadocsLoader(Route.useLoaderData());
 
   return (
-    <DocsLayout
-      {...baseOptions()}
-      containerProps={{ className: "puzzle-site-docs" }}
-      tree={data.pageTree}
-      sidebar={{ enabled: false }}
-    >
-      <Suspense>
-        <Content path={data.path} />
-      </Suspense>
-    </DocsLayout>
+    <PageLayout>
+      <PageLayout.Header className="puzzle-site-header">
+        <AppBar
+          logo={
+            <img
+              src="/favicon.svg"
+              width="48"
+              height="48"
+              alt="Logo"
+              className="h-12 w-12"
+            />
+          }
+          title="Puzzle"
+          navigationItems={[
+            { label: "Home", href: "/", current: true },
+            { label: "Components", href: "/components" },
+            { label: "Docs", href: "/docs" },
+          ]}
+          sticky
+        />
+      </PageLayout.Header>
+
+      <PageLayout.LeftSidebar>
+        <Sidebar />
+      </PageLayout.LeftSidebar>
+
+      <PageLayout.Main>
+        <RootProvider theme={{ enabled: false }}>
+          <DocsLayout
+            {...baseOptions()}
+            containerProps={{ className: "puzzle-site-docs" }}
+            tree={data.pageTree}
+            sidebar={{ enabled: false }}
+          >
+            <Suspense>
+              <Content path={data.path} />
+            </Suspense>
+          </DocsLayout>
+        </RootProvider>
+        ;
+      </PageLayout.Main>
+    </PageLayout>
   );
 }

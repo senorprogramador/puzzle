@@ -1,0 +1,111 @@
+---
+title: Text Editor
+description: Edit and render structured rich-text documents with an optional formatting toolbar.
+---
+
+Use `TextEditor` to edit a serializable `TextDocument`, `TextEditorToolbar` to
+provide formatting controls, and `TextRenderer` to display the saved document
+without editing controls.
+
+## Import
+
+```tsx
+import { TextEditor, TextEditorToolbar, TextRenderer } from "@puzzle-ui/ui";
+import type { TextDocument } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Pass `defaultValue` for an uncontrolled editor and place the toolbar in the
+`toolbar` prop so it receives the editor's formatting context.
+
+<Preview
+  height={240}
+  code={`\
+    <TextEditor
+      toolbar={<TextEditorToolbar />}
+      defaultValue={{
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            variant: "body1",
+            children: [{ text: "Start writing with Puzzle." }],
+          },
+        ],
+      }}
+    />
+`}
+>
+  <TextEditor
+    toolbar={<TextEditorToolbar />}
+    defaultValue={{
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          variant: "body1",
+          children: [{ text: "Start writing with Puzzle." }],
+        },
+      ],
+    }}
+  />
+</Preview>
+
+For controlled editing, pass `value` and update it with the same document object
+emitted by `onChange`.
+
+```tsx
+const [document, setDocument] = useState<TextDocument>({
+  type: "doc",
+  content: [],
+});
+
+<TextEditor
+  value={document}
+  onChange={setDocument}
+  toolbar={<TextEditorToolbar />}
+/>;
+```
+
+## Display a document
+
+```tsx
+<TextRenderer document={document} />
+```
+
+Documents support paragraphs, headings, and list items with theme typography
+variants. Inline marks include bold, italic, underline, and strike.
+`TextRenderer` renders text with semantic elements rather than inserting raw HTML.
+
+## API reference
+
+### TextEditor
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value` | `TextDocument` | Controlled document. |
+| `defaultValue` | `TextDocument` | Initial uncontrolled document. |
+| `onChange` | `(document: TextDocument) => void` | Called when the document changes. |
+| `toolbar` | `ReactNode` | Optional toolbar rendered in the editor context. |
+
+### TextEditorToolbar
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `className` | `string` | - | Additional toolbar classes. |
+| `ariaLabel` | `string` | `"Text formatting"` | Accessible toolbar name. |
+| `dir` | `"ltr" \| "rtl"` | `"ltr"` | Direction for keyboard navigation. |
+
+### TextRenderer
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `document` | `TextDocument` | Document to display. Required. |
+| `className` | `string` | Additional renderer classes. |
+
+## Accessibility
+
+The formatting toolbar uses labeled buttons, pressed states, and arrow-key
+navigation. Keep it inside the editor's `toolbar` prop and provide an
+`ariaLabel` when multiple formatting toolbars need distinct names.
