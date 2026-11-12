@@ -35,7 +35,11 @@ export default defineConfig({
     tanstackStart(),
     nitro(),
     viteReact(),
-    tailwindcss({ optimize: false }),
+    tailwindcss({
+      optimize: {
+        minify: false,
+      },
+    }),
     fumadocsMdx(),
   ],
 });

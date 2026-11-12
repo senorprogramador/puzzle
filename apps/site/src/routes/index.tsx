@@ -220,7 +220,7 @@ const PuzzleLogo = ({
 const Home = () => {
   const [theme, setTheme] = useState<ThemeMode>("dark");
   return (
-    <Theme theme={theme} scope="root">
+    <Theme theme={theme} scope="local">
       <PageLayout>
         <PageLayout.Header className="puzzle-site-header">
           <Header />

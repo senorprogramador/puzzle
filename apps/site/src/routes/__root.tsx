@@ -71,6 +71,13 @@ function RootComponent() {
   );
 }
 
+const siteFont = {
+  family: "Geist",
+  weights: [300, 400, 500, 600, 650, 700],
+  display: "optional",
+  fallback: ["system-ui", "sans-serif"],
+} as const;
+
 function RootDocument({
   children,
 }: Readonly<{
@@ -86,18 +93,9 @@ function RootDocument({
         <Theme
           theme="light"
           fonts={{
-            heading: {
-              family: "Geist",
-              weights: [600, 700],
-            },
-            body: {
-              family: "Inter",
-              weights: [400, 600],
-            },
-            accent: {
-              family: "Geist",
-              weights: [400, 500],
-            },
+            heading: siteFont,
+            body: siteFont,
+            accent: siteFont,
           }}
           components={{
             link: {

@@ -1,5 +1,5 @@
 export const DEFAULT_FONT_FALLBACKS = {
-  heading: ["Open Sans", "sans-serif"],
-  body: ["Open Sans", "sans-serif"],
-  accent: ["Open Sans", "sans-serif"],
+  heading: ["system-ui", "sans-serif"],
+  body: ["system-ui", "sans-serif"],
+  accent: ["system-ui", "sans-serif"],
 } as const;
