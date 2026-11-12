@@ -125,7 +125,12 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
           <Badge color="secondary" content="Button" />
         </div>
 
-        <Stack direction="row" alignV="center" gap="sm">
+        <Stack
+          direction={{ mobile: "col", tablet: "row" }}
+          wrap="wrap"
+          alignV="center"
+          gap="sm"
+        >
           <Button variant="primary" href="/docs/getting-started">
             Get started
           </Button>
@@ -248,6 +253,7 @@ const Home = () => {
             <Section>
               <div className="home-hero__background" />
               <Stack
+                className="home-hero__stack"
                 direction={{ mobile: "col", desktop: "row" }}
                 alignV="center"
                 alignH={{ mobile: "stretch", desktop: "evenly" }}

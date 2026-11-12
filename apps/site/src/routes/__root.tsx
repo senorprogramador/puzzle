@@ -29,9 +29,73 @@ export const Route = createRootRoute({
           "Puzzle UI is a React UI library for building modern web applications.",
       },
       {
+        name: "author",
+        content: "Señor Programador",
+      },
+      {
         name: "robots",
         content: "index, follow",
       },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        property: "og:site_name",
+        content: "Puzzle UI",
+      },
+      {
+        property: "og:locale",
+        content: "en_US",
+      },
+      {
+        property: "og:title",
+        content: "Puzzle UI",
+      },
+      {
+        property: "og:description",
+        content:
+          "Puzzle UI is a React UI library for building modern web applications.",
+      },
+      {
+        property: "og:image",
+        content: "https://puzzle-ui.com/puzzle_social.png",
+      },
+      {
+        property: "og:image:secure_url",
+        content: "https://puzzle-ui.com/puzzle_social.png",
+      },
+      {
+        property: "og:image:type",
+        content: "image/png",
+      },
+      {
+        property: "og:image:width",
+        content: "1200",
+      },
+      {
+        property: "og:image:height",
+        content: "675",
+      },
+      {
+        property: "og:image:alt",
+        content: "Puzzle UI Social Image",
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      { name: "twitter:title", content: "Puzzle UI" },
+      {
+        name: "twitter:description",
+        content:
+          "Puzzle UI is a React UI library for building modern web applications.",
+      },
+      {
+        name: "twitter:image",
+        content: "https://puzzle-ui.com/puzzle_social.png",
+      },
+      { name: "twitter:image:alt", content: "Puzzle UI Social Image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
