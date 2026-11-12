@@ -27,6 +27,10 @@ export const Route = createRootRoute({
         content:
           "Puzzle UI is a React UI library for building modern web applications.",
       },
+      {
+        name: "robots",
+        content: "index, follow",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
