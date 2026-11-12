@@ -65,7 +65,7 @@ test("all exports expose ESM, CJS and declarations", async () => {
 test("React supports the declared peer dependency versions", async () => {
   const manifest = await readManifest();
 
-  assert.equal(manifest.peerDependencies.react, "^18.0.0 || ^19.0.0");
+  assert.equal(manifest.peerDependencies.react, "^19.0.0");
 });
 
 test("published files are restricted to dist", async () => {
