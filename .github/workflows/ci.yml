@@ -6,6 +6,12 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: "Force deployment of the site"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -111,9 +117,19 @@ jobs:
       - changes
 
     if: |
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      needs.changes.outputs.site == 'true'
+      always() &&
+      (
+        (
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main' &&
+          needs.test.result == 'success' &&
+          needs.changes.outputs.site == 'true'
+        ) ||
+        (
+          github.event_name == 'workflow_dispatch' &&
+          inputs.force_deploy == true
+        )
+      )
 
     steps:
       - name: Checkout repository
