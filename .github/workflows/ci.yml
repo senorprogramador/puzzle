@@ -161,7 +161,7 @@ jobs:
             git pull --ff-only
 
             echo "Deploying Puzzle..."
-            cd /opt/sites/puzzle
+            cd /opt/sites/puzzle-ui.com
 
             IMAGE_TAG=${{ github.sha }} \
               docker compose up -d --no-deps --force-recreate puzzle-site
