@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { createServerFn } from "@tanstack/react-start";
+import { getCanonicalUrl } from "@/lib/seo";
 import { docs, source } from "@/lib/source";
 import {
   DocsBody,
@@ -24,6 +25,31 @@ export const Route = createFileRoute("/docs/$")({
     const data = await serverLoader({ data: slugs });
     await docs.getPage(data.path)?.preload();
     return data;
+  },
+  head: ({ params }) => {
+    const slug = params._splat ?? "";
+
+    const canonicalPath = slug
+      ? `/docs/${slug
+          .split("/")
+          .map((segment) => encodeURIComponent(segment))
+          .join("/")}`
+      : "/docs";
+
+    return {
+      links: [
+        {
+          rel: "canonical",
+          href: getCanonicalUrl(canonicalPath),
+        },
+      ],
+      meta: [
+        {
+          property: "og:url",
+          content: getCanonicalUrl(canonicalPath),
+        },
+      ],
+    };
   },
 });
 

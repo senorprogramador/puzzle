@@ -22,6 +22,11 @@ export const Route = createRootRoute({
       {
         title: "Puzzle UI",
       },
+      {
+        name: "description",
+        content:
+          "Puzzle UI is a React UI library for building modern web applications.",
+      },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

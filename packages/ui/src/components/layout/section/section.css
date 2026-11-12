@@ -46,12 +46,12 @@
     padding-block: 0;
 }
 
-.puzzle-section[data-theme="normal"] {
+.puzzle-section[data-theme="default"] {
     --section-background: var(--puzzle-color-background);
     --section-color: var(--puzzle-color-text);
 }
 
-.puzzle-section[data-theme="normal"] .puzzle-section--divider {
+.puzzle-section[data-theme="default"] .puzzle-section--divider {
     border-top-color: var(--puzzle-color-border);
 }
 

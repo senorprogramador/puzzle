@@ -8,33 +8,55 @@ const escapeXml = (value: string) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&apos;");
 
-export const createSitemapHandler = (getPaths: () => string[]) => {
-  let cache: { origin: string; body: string; expiresAt: number } | undefined;
+type SitemapHandlerOptions = {
+  siteUrl: string;
+  cacheDurationSeconds?: number;
+};
 
-  return (request: Request): Response => {
-    const origin = new URL(request.url).origin;
+export const createSitemapHandler = (
+  getPaths: () => string[],
+  options: SitemapHandlerOptions,
+) => {
+  const { siteUrl, cacheDurationSeconds = CACHE_DURATION_SECONDS } = options;
+
+  const origin = new URL(siteUrl).origin;
+
+  let cache:
+    | {
+        body: string;
+        expiresAt: number;
+      }
+    | undefined;
+
+  return (_request: Request): Response => {
     const now = Date.now();
 
-    if (!cache || cache.origin !== origin || now >= cache.expiresAt) {
+    if (!cache || now >= cache.expiresAt) {
       const locations = new Set(
         getPaths().map((path) => new URL(path, origin).href),
       );
+
       const entries = [...locations]
         .sort()
         .map((location) => `  <url><loc>${escapeXml(location)}</loc></url>`)
         .join("\n");
 
       cache = {
-        origin,
-        body: `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries}\n</urlset>\n`,
-        expiresAt: now + CACHE_DURATION_SECONDS * 1000,
+        body: [
+          '<?xml version="1.0" encoding="UTF-8"?>',
+          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+          entries,
+          "</urlset>",
+          "",
+        ].join("\n"),
+        expiresAt: now + cacheDurationSeconds * 1000,
       };
     }
 
     return new Response(cache.body, {
       headers: {
         "Content-Type": "application/xml; charset=utf-8",
-        "Cache-Control": `public, max-age=${CACHE_DURATION_SECONDS}, s-maxage=${CACHE_DURATION_SECONDS}`,
+        "Cache-Control": `public, max-age=${cacheDurationSeconds}, s-maxage=${cacheDurationSeconds}`,
       },
     });
   };

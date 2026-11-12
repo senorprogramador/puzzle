@@ -15,6 +15,9 @@ Section applies section colors and vertical spacing. A non-default `theme`
 paints the background across the available width while its children sit in a
 centered `puzzle-container` limited by `--puzzle-container-width`, with horizontal
 gutters. Default sections apply the container classes directly to their root.
+With `theme="default"` (or no `theme` prop), background and text colors use the
+nearest Theme provider's semantic tokens, including local light/dark scopes
+and mode changes.
 Use `fullWidth` to leave content unconstrained without container gutters, or
 `noPadding` to remove vertical padding.
 

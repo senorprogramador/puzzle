@@ -13,6 +13,10 @@ import { PageLayout } from "@puzzle-ui/ui";
 
 Place region components directly inside PageLayout. They become semantic header, main, aside, and footer elements. Sidebars appear below main content on mobile/tablet and beside it on desktop by default.
 
+`PageLayout.Main` uses `--puzzle-color-background` from the active theme,
+including local light/dark scopes and mode changes. Its `style` prop can
+override this background when needed.
+
 <Preview
   height={500}
   code={`\

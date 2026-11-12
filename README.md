@@ -179,6 +179,10 @@ The process cache is refreshed on expiry, an origin change, or a server restart.
 
 Run the sitemap tests with `bun run --filter @puzzle-ui/site test:sitemap`.
 
+The `/robots.txt` handler allows all crawlers and paths, advertises
+`https://puzzle-ui.com/sitemap.xml`, and sends 24-hour browser/shared cache headers.
+It returns static text without fetching or generating the sitemap.
+
 ### Run the playground
 
 ```bash

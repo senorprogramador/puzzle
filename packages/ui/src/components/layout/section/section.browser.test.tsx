@@ -3,6 +3,53 @@ import { describe, expect, it } from "vitest";
 import type { CSSProperties } from "react";
 import { Section } from "./index";
 import { SectionStack } from "../section-stack";
+import { Theme } from "@puzzle-ui/theme";
+
+describe("Section scoped colors (browser)", () => {
+  for (const rootTheme of ["light", "dark"] as const) {
+    it(`follows local colors independently of a ${rootTheme} root and enclosing section`, () => {
+      const renderSection = (theme: "light" | "dark") => (
+        <Theme theme={rootTheme}>
+          <Section theme="primary">
+            <Theme
+              scope="local"
+              theme={theme}
+              tokens={{
+                colorSchemes: {
+                  light: { background: "#ffffff", text: "#123456", border: "#aabbcc" },
+                  dark: { background: "#112233", text: "#eeeeee", border: "#445566" },
+                },
+              }}
+            >
+              <Section theme="default" divider>Scoped content</Section>
+              <Section>Implicit default</Section>
+            </Theme>
+          </Section>
+        </Theme>
+      );
+      const { rerender } = render(renderSection("light"));
+
+      for (const theme of ["light", "dark", "light"] as const) {
+        rerender(renderSection(theme));
+        const section = screen.getByText("Scoped content");
+        const implicit = screen.getByText("Implicit default");
+        const style = getComputedStyle(section);
+
+        expect(style.backgroundColor).toBe(
+          theme === "light" ? "rgb(255, 255, 255)" : "rgb(17, 34, 51)",
+        );
+        expect(style.color).toBe(
+          theme === "light" ? "rgb(18, 52, 86)" : "rgb(238, 238, 238)",
+        );
+        expect(getComputedStyle(implicit).backgroundColor).toBe(style.backgroundColor);
+        expect(getComputedStyle(implicit).color).toBe(style.color);
+        expect(getComputedStyle(section.querySelector("hr")!).borderTopColor).toBe(
+          theme === "light" ? "rgb(170, 187, 204)" : "rgb(68, 85, 102)",
+        );
+      }
+    });
+  }
+});
 
 describe("Section width (browser)", () => {
   for (const width of [320, 1200]) {

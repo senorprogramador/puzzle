@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { getCanonicalUrl } from "@/lib/seo";
 import { Theme, ThemeMode } from "@puzzle-ui/theme";
 import {
   Button,
@@ -603,4 +604,23 @@ const Home = () => {
 
 export const Route = createFileRoute("/")({
   component: Home,
+  head: () => ({
+    links: [
+      {
+        rel: "canonical",
+        href: getCanonicalUrl("/"),
+      },
+    ],
+    meta: [
+      {
+        name: "description",
+        content:
+          "A thoughtfully crafted React UI framework. Build accessible, consistent and beautiful interfaces with Puzzle UI.",
+      },
+      {
+        property: "og:url",
+        content: getCanonicalUrl("/"),
+      },
+    ],
+  }),
 });
