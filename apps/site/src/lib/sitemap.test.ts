@@ -10,12 +10,12 @@ const request = (origin = "https://puzzle.example") =>
 
 describe("sitemap", () => {
   it("generates an XML sitemap with unique, sorted absolute URLs", async () => {
-    const handler = createSitemapHandler(() => [
-      "/docs/ui",
-      "/",
-      "/docs/ui",
-      "/docs/getting-started",
-    ]);
+    const handler = createSitemapHandler(
+      () => ["/docs/ui", "/", "/docs/ui", "/docs/getting-started"],
+      {
+        siteUrl: "https://puzzle.example",
+      },
+    );
     const response = handler(request());
 
     expect(response.status).toBe(200);
@@ -36,7 +36,9 @@ describe("sitemap", () => {
   });
 
   it("escapes XML characters in URLs", async () => {
-    const handler = createSitemapHandler(() => ["/docs?q=one&next=two"]);
+    const handler = createSitemapHandler(() => ["/docs?q=one&next=two"], {
+      siteUrl: "https://puzzle.example",
+    });
     expect(await handler(request()).text()).toContain(
       "<loc>https://puzzle.example/docs?q=one&amp;next=two</loc>",
     );
@@ -45,7 +47,9 @@ describe("sitemap", () => {
   it("reuses the generated response until exactly 24 hours have passed", async () => {
     const clock = spyOn(Date, "now").mockReturnValue(1000);
     const getPaths = mock(() => ["/"]);
-    const handler = createSitemapHandler(getPaths);
+    const handler = createSitemapHandler(getPaths, {
+      siteUrl: "https://puzzle.example",
+    });
     const body = await handler(request()).text();
 
     clock.mockReturnValue(1000 + 86400 * 1000 - 1);
@@ -61,7 +65,9 @@ describe("sitemap", () => {
   });
 
   it("does not serve another origin's cached URLs", async () => {
-    const handler = createSitemapHandler(() => ["/"]);
+    const handler = createSitemapHandler(() => ["/"], {
+      siteUrl: "https://puzzle.example",
+    });
     await handler(request()).text();
     const body = await handler(request("https://other.example")).text();
 
@@ -73,11 +79,15 @@ describe("sitemap", () => {
     const getPaths = mock((): string[] => {
       throw new Error("Unable to load documentation");
     });
-    const handler = createSitemapHandler(getPaths);
+    const handler = createSitemapHandler(getPaths, {
+      siteUrl: "https://puzzle.example",
+    });
 
     expect(() => handler(request())).toThrow("Unable to load documentation");
     getPaths.mockReturnValue(["/"]);
-    expect(await handler(request()).text()).toContain("https://puzzle.example/");
+    expect(await handler(request()).text()).toContain(
+      "https://puzzle.example/",
+    );
     expect(getPaths).toHaveBeenCalledTimes(2);
   });
 });
