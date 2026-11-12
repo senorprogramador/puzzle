@@ -23,6 +23,7 @@ const releaseOrder = [
   "storage-mongodb",
   "auth",
   "fullstack",
+  "seo",
 ];
 
 const packages = releaseOrder.map((name) => {

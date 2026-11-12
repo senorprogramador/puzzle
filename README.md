@@ -290,7 +290,15 @@ The release script currently publishes the following packages together:
 - <code>@puzzle-ui/hooks</code>
 - <code>@puzzle-ui/icons</code>
 - <code>@puzzle-ui/ui</code>
+- <code>@puzzle-ui/pieces</code>
 - <code>@puzzle-ui/create</code>
+- <code>@puzzle-ui/storage</code>
+- <code>@puzzle-ui/session</code>
+- <code>@puzzle-ui/storage-d1</code>
+- <code>@puzzle-ui/storage-mongodb</code>
+- <code>@puzzle-ui/auth</code>
+- <code>@puzzle-ui/fullstack</code>
+- <code>@puzzle-ui/seo</code>
 
 Run a release dry run:
 
