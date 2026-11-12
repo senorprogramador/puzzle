@@ -147,18 +147,26 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
 
           <div className="home-preview__control">
             <div>
-              <strong>Dark mode</strong>
+              <strong>
+                <label htmlFor="home-dark-mode">Dark mode</label>
+              </strong>
               <span>Use dark appearance</span>
             </div>
-            <Switch defaultChecked onChange={onToggleTheme} />
+            <Switch
+              id="home-dark-mode"
+              defaultChecked
+              onChange={onToggleTheme}
+            />
           </div>
 
           <div className="home-preview__control">
             <div>
-              <strong>Notifications</strong>
+              <strong>
+                <label htmlFor="home-notifications">Notifications</label>
+              </strong>
               <span>Receive updates</span>
             </div>
-            <Switch />
+            <Switch id="home-notifications" />
           </div>
         </Card>
 
@@ -187,8 +195,17 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
           <span>Project settings</span>
           <Badge color="secondary" content="Input" />
         </div>
-        <label className="home-preview__input-label">Project name</label>
-        <TextInput placeholder="My awesome project" defaultValue="Puzzle UI" />
+        <label
+          className="home-preview__input-label"
+          htmlFor="home-project-name"
+        >
+          Project name
+        </label>
+        <TextInput
+          id="home-project-name"
+          placeholder="My awesome project"
+          defaultValue="Puzzle UI"
+        />
       </Card>
 
       <div className="home-preview__footer">
