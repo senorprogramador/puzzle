@@ -29,14 +29,15 @@ Puzzle is organized as a Bun workspace monorepo.
 
 ### UI and design system
 
-| Package                        | Purpose                                               |
-| ------------------------------ | ----------------------------------------------------- |
-| <code>@puzzle-ui/core</code>   | Framework-independent utilities                       |
-| <code>@puzzle-ui/hooks</code>  | Reusable React hooks                                  |
-| <code>@puzzle-ui/icons</code>  | Icon components and utilities                         |
-| <code>@puzzle-ui/theme</code>  | Theme provider, design tokens, colors, and typography |
-| <code>@puzzle-ui/ui</code>     | Reusable React UI components                          |
-| <code>@puzzle-ui/pieces</code> | Composed UI sections and larger building blocks       |
+| Package                        | Purpose                                                                                 |
+| ------------------------------ | --------------------------------------------------------------------------------------- |
+| <code>@puzzle-ui/core</code>   | Framework-independent utilities                                                         |
+| <code>@puzzle-ui/hooks</code>  | Reusable React hooks                                                                    |
+| <code>@puzzle-ui/icons</code>  | Icon components and utilities                                                           |
+| <code>@puzzle-ui/theme</code>  | Theme provider, design tokens, colors, and typography                                   |
+| <code>@puzzle-ui/ui</code>     | Reusable React UI components                                                            |
+| <code>@puzzle-ui/pieces</code> | Composed UI sections and larger building blocks                                         |
+| <code>@puzzle-ui/seo</code>    | Framework-independent SEO, metadata, Schema.org contracts, sitemap and robots utilities |
 
 ### Developer tooling
 
