@@ -1,3 +1,4 @@
+
 FROM oven/bun:1.4.4 AS builder
 
 WORKDIR /app
@@ -13,7 +14,8 @@ RUN bun run build
 RUN bun run --filter '@puzzle-ui/site' build
 
 
-FROM node:24-bookworm-slim AS runner
+# Production runner
+FROM oven/bun:1.4.4-slim AS runner
 
 ENV NODE_ENV=production
 ENV PORT=3000
@@ -21,9 +23,11 @@ ENV HOST=0.0.0.0
 
 WORKDIR /app
 
+# Create an unprivileged application user.
 RUN groupadd --system app \
-    && useradd --system --gid app app
+    && useradd --system --gid app --home-dir /app app
 
+# Copy the production build.
 COPY --from=builder --chown=app:app \
     /app/apps/site/.output \
     ./.output
@@ -32,4 +36,4 @@ USER app
 
 EXPOSE 3000
 
-CMD ["node", ".output/server/index.mjs"]
+CMD ["bun", ".output/server/index.mjs"]
