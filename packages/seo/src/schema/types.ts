@@ -1,0 +1,73 @@
+import type { JsonObject, SeoNode, SeoNodeId } from "../core/types";
+
+export type SchemaDefinitionSource = "generated" | "custom";
+
+export type SchemaPropertyType = string | string[];
+
+export interface SchemaPropertyDefinition {
+  name: string;
+
+  type: SchemaPropertyType;
+
+  required?: boolean;
+
+  multiple?: boolean;
+
+  description?: string;
+
+  expectedTypes?: string[];
+}
+
+export interface SchemaDefinition<T extends SeoNode = SeoNode> {
+  name: string;
+
+  type: string;
+
+  source: SchemaDefinitionSource;
+
+  description?: string;
+
+  properties?: SchemaPropertyDefinition[];
+
+  parentTypes?: string[];
+
+  nodeType?: string;
+
+  create?: (input: JsonObject) => T;
+}
+
+export interface SchemaExtension {
+  type: string;
+
+  properties: SchemaPropertyDefinition[];
+
+  description?: string;
+}
+
+export interface SchemaReference {
+  id: SeoNodeId | string;
+
+  type?: string;
+}
+
+export interface SchemaRegistryProvider {
+  get(type: string): SchemaDefinition | undefined;
+
+  has(type: string): boolean;
+
+  getAll(): readonly SchemaDefinition[];
+}
+
+export interface SchemaValidationOptions {
+  strict?: boolean;
+
+  allowUnknownProperties?: boolean;
+
+  validateRequiredProperties?: boolean;
+}
+
+export interface SchemaDefinitionCollection {
+  generated: readonly SchemaDefinition[];
+
+  custom: readonly SchemaDefinition[];
+}

@@ -210,6 +210,18 @@
         "react-dom": "^19.0.0",
       },
     },
+    "packages/seo": {
+      "name": "@puzzle-ui/seo",
+      "version": "0.4.0",
+      "devDependencies": {
+        "@types/react": "^19.0.0",
+        "tsdown": "^0.23.1",
+        "typescript": "^6.0.3",
+      },
+      "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+      },
+    },
     "packages/session": {
       "name": "@puzzle-ui/session",
       "version": "0.4.0",
@@ -720,6 +732,8 @@
     "@puzzle-ui/pieces": ["@puzzle-ui/pieces@workspace:packages/pieces"],
 
     "@puzzle-ui/playground": ["@puzzle-ui/playground@workspace:apps/playground"],
+
+    "@puzzle-ui/seo": ["@puzzle-ui/seo@workspace:packages/seo"],
 
     "@puzzle-ui/session": ["@puzzle-ui/session@workspace:packages/session"],
 

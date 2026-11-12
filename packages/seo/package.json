@@ -1,0 +1,141 @@
+{
+  "name": "@puzzle-ui/seo",
+  "version": "0.4.0",
+  "description": "Framework-independent SEO and structured data toolkit for Puzzle.",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./core": {
+      "import": {
+        "types": "./dist/core/index.d.ts",
+        "default": "./dist/core/index.js"
+      },
+      "require": {
+        "types": "./dist/core/index.d.cts",
+        "default": "./dist/core/index.cjs"
+      }
+    },
+    "./context": {
+      "import": {
+        "types": "./dist/context/index.d.ts",
+        "default": "./dist/context/index.js"
+      },
+      "require": {
+        "types": "./dist/context/index.d.cts",
+        "default": "./dist/context/index.cjs"
+      }
+    },
+    "./schema": {
+      "import": {
+        "types": "./dist/schema/index.d.ts",
+        "default": "./dist/schema/index.js"
+      },
+      "require": {
+        "types": "./dist/schema/index.d.cts",
+        "default": "./dist/schema/index.cjs"
+      }
+    },
+    "./metadata": {
+      "import": {
+        "types": "./dist/metadata/index.d.ts",
+        "default": "./dist/metadata/index.js"
+      },
+      "require": {
+        "types": "./dist/metadata/index.d.cts",
+        "default": "./dist/metadata/index.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      },
+      "require": {
+        "types": "./dist/react/index.d.cts",
+        "default": "./dist/react/index.cjs"
+      }
+    },
+    "./server": {
+      "import": {
+        "types": "./dist/server/index.d.ts",
+        "default": "./dist/server/index.js"
+      },
+      "require": {
+        "types": "./dist/server/index.d.cts",
+        "default": "./dist/server/index.cjs"
+      }
+    },
+    "./sitemap": {
+      "import": {
+        "types": "./dist/sitemap/index.d.ts",
+        "default": "./dist/sitemap/index.js"
+      },
+      "require": {
+        "types": "./dist/sitemap/index.d.cts",
+        "default": "./dist/sitemap/index.cjs"
+      }
+    },
+    "./robots": {
+      "import": {
+        "types": "./dist/robots/index.d.ts",
+        "default": "./dist/robots/index.js"
+      },
+      "require": {
+        "types": "./dist/robots/index.d.cts",
+        "default": "./dist/robots/index.cjs"
+      }
+    },
+    "./testing": {
+      "import": {
+        "types": "./dist/testing/index.d.ts",
+        "default": "./dist/testing/index.js"
+      },
+      "require": {
+        "types": "./dist/testing/index.d.cts",
+        "default": "./dist/testing/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
+    "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
+    "vitest": "bun run test:integration && bun run test:schema",
+    "test:unit": "node --test src/tests/boundaries.test.mjs",
+    "test:integration": "bun run build && node --test src/tests/*.test.mjs",
+    "test:boundaries": "node --test src/tests/boundaries.test.mjs",
+    "test:package": "bun run build && node --test src/tests/package.test.mjs",
+    "test:schema": "bun run typecheck:test",
+    "clean": "rm -rf dist",
+    "prepack": "tsdown"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "tsdown": "^0.23.1",
+    "typescript": "^6.0.3"
+  }
+}
