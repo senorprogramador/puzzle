@@ -17,6 +17,7 @@ const cachedPaths = [
   "/favicon-32x32.png",
   "/favicon-96x96.png",
   "/site.webmanifest",
+  "/puzzle_social.png",
   "/web-app-manifest-192x192.png",
   "/web-app-manifest-512x512.png",
   "/fonts/**",
