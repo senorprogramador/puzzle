@@ -19,7 +19,9 @@ const cachedPaths = [
   "/site.webmanifest",
   "/web-app-manifest-192x192.png",
   "/web-app-manifest-512x512.png",
+  "/fonts/**",
 ];
+
 const warn = logger.warn.bind(logger);
 logger.warn = (message, options) => {
   // Fumadocs shares this server runtime with its client macro; the fs import
