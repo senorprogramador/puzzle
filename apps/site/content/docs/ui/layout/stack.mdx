@@ -11,7 +11,15 @@ import { Stack } from "@puzzle-ui/ui";
 
 ## Direction, alignment, and wrapping
 
-Stack defaults to a column. Horizontal and vertical alignment remain physical axes when direction changes. Resize the preview to see a responsive column become a row.
+Stack defaults to a column. Alignment maps to CSS properties according to the
+current direction:
+
+| Direction | `alignH` | `alignV` |
+| --- | --- | --- |
+| `col` | `align-items` | `justify-content` |
+| `row` | `justify-content` | `align-items` |
+
+Resize the preview to see a responsive column become a row.
 
 <Preview
   height={400}
@@ -52,7 +60,7 @@ Stack defaults to a column. Horizontal and vertical alignment remain physical ax
 | `as`               | `ElementType`                                 | `"div"`    | Root element.                      |
 | `direction`        | `"row" \| "col"` or responsive object         | `"col"`    | Layout direction.                  |
 | `gap`              | `"0" \| "xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"md"`     | Theme spacing scale.               |
-| `alignH`, `alignV` | Axis-dependent alignment                      | -          | Horizontal/vertical alignment.     |
+| `alignH`, `alignV` | Axis-dependent alignment                      | -          | Alignment mapped by direction; see the table above. |
 | `wrap`             | `"wrap" \| "nowrap" \| "wrap-reverse"`        | `"nowrap"` | Flex wrapping.                     |
 | `reverse`          | `boolean`                                     | `false`    | Reverse visual direction.          |
 | `divider`          | `ReactNode`                                   | -          | Content inserted between children. |
@@ -62,5 +70,7 @@ Main-axis alignment accepts `start`, `center`, `end`, `stretch`, `around`, `betw
 Both `alignH` and `alignV` also accept responsive objects, such as
 `alignH={{ mobile: "start", tablet: "center", desktop: "end" }}`.
 Each prop changes independently of `direction` and inherits its last specified
-value at larger breakpoints. Horizontal and vertical alignment stay on their
-physical axes when direction changes.
+value at larger breakpoints. When direction changes, the mapping to
+`justify-content` and `align-items` changes with it. Distribution values
+(`around`, `between`, `evenly`) belong to `alignH` in rows and `alignV` in columns;
+use cross-axis values at breakpoints where a prop maps to `align-items`.

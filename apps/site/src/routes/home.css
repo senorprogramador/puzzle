@@ -127,6 +127,15 @@
     z-index: 1;
 }
 
+.home-brand.puzzle-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--puzzle-space-4);
+    text-decoration-line: none;
+    color: var(--puzzle-color-text);
+}
+
 .home-hero__visual-glow {
     position: absolute;
     width: 500px;
@@ -346,8 +355,7 @@
 }
 
 .home-features,
-.home-components,
-.home-developer {
+.home-components {
     width: min(1160px, calc(100% - 64px));
     margin: 0 auto;
     padding: 120px 0;
@@ -447,15 +455,13 @@
     font-weight: 650;
 }
 
-.home-component-grid {
-    display: grid;
-    width: 100%;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--puzzle-space-4);
+.home-component-panel {
+    height: 100%;
 }
 
 .home-component-card {
     align-items: flex-start;
+    flex: 1;
 }
 
 .home-component-card__icon {
@@ -473,24 +479,22 @@
     height: var(--puzzle-space-6);
 }
 
-@media (min-width: 768px) {
-    .home-component-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+.home-developer {
+    border-top: 1px solid var(--home-border);
+}
+
+.home-developer__layout,
+.home-developer__content,
+.home-developer .home-code {
+    width: 100%;
+    min-width: 0;
 }
 
 @media (min-width: 1024px) {
-    .home-component-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+    .home-developer__content,
+    .home-developer .home-code {
+        flex: 1 1 0;
     }
-}
-
-.home-developer {
-    border-top: 1px solid var(--home-border);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: 90px;
 }
 
 .home-developer__benefits {
@@ -610,8 +614,7 @@
         right: -5px;
     }
 
-    .home-components,
-    .home-developer {
+    .home-components {
         gap: 40px;
     }
 
@@ -641,7 +644,6 @@
     }
 
     .home-hero__visual {
-        max-width: 620px;
         width: 100%;
         margin: 0 auto;
     }
@@ -651,8 +653,7 @@
     }
 
     .home-features,
-    .home-components,
-    .home-developer {
+    .home-components {
         width: calc(100% - 40px);
         padding: 85px 0;
     }
@@ -665,16 +666,11 @@
         min-height: 220px;
     }
 
-    .home-components,
-    .home-developer {
+    .home-components {
         grid-template-columns: 1fr;
     }
 
     .home-components {
-        gap: 45px;
-    }
-
-    .home-developer {
         gap: 45px;
     }
 

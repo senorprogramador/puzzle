@@ -59,6 +59,9 @@ Provide `getItemKey` when items can be inserted, removed, or reordered. Stable k
 
 `panelsPerView` controls how many items fit at once. Responsive values use `mobile`, `tablet`, and `desktop`, inheriting smaller breakpoints when omitted. Change the preview device to compare layouts.
 
+Changing `gap` recalculates panel offsets and pagination, including when panel
+widths remain fixed. The active panel stays aligned to its updated position.
+
 <Preview
   defaultDevice="tablet"
   height={360}

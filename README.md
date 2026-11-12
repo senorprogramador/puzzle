@@ -217,6 +217,19 @@ See the [Testing guide](https://github.com/senorprogramador/puzzle/tree/main/app
 
 ## Design principles
 
+### Icon loading
+
+`Icon` from `@puzzle-ui/icons` reserves its dimensions during server rendering
+and loading to avoid layout shifts. It defaults to `1em` square; use `size` for
+pixel dimensions or `width`, `height`, and `style` for custom sizing. Styles and
+accessible SVG attributes are preserved on the loading placeholder.
+
+Use `<Icon name="lucide:star" size={24} showLoader />` for an optional animated
+12-bar placeholder. It uses the current text color and respects reduced motion.
+Keep decorative icons `aria-hidden`; provide an accessible label for meaningful
+icons. The placeholder retains that same accessibility treatment without adding
+repeated loading announcements.
+
 Puzzle aims to provide interfaces that are:
 
 - **Consistent** — shared components and tokens keep visual decisions aligned.

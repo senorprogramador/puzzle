@@ -1,0 +1,1368 @@
+import { ControlledSelectExample, fruitOptions } from "./doc-examples-C9EkJsBz.mjs";
+import { require_jsx_runtime } from "../_libs/react2.mjs";
+// node_modules/.nitro/vite/services/ssr/assets/select.mdx_macro_id_src_2Flib_2Fsource-FVamxw5c.js
+var import_jsx_runtime = require_jsx_runtime();
+var frontmatter = {
+	"title": "Select",
+	"description": "Choose one or more options from a popup list."
+};
+var structuredData = {
+	"contents": [
+		{
+			"heading": void 0,
+			"content": "Select exposes a select-only combobox with a listbox popup. It supports single and multiple selection, grouped options, custom rendering, and native form integration."
+		},
+		{
+			"heading": "basic-usage",
+			"content": "Provide a visible `label` and an array of options with `value` and plain-text `label`. `placeholder` is shown until a value is selected. Disabled options remain visible but cannot be chosen."
+		},
+		{
+			"heading": "multiple-selection-and-clearing",
+			"content": "`multiple` changes the value to an array and keeps the popup open after selection by default. `maxSelected` limits the number of selected options. `clearable` adds a clear action; customize its accessible name with `clearLabel`."
+		},
+		{
+			"heading": "multiple-selection-and-clearing",
+			"content": "Clearing returns `undefined` in single mode and `[]` in multiple mode. Set `closeOnSelect` explicitly to override either mode's default popup behavior."
+		},
+		{
+			"heading": "sizes-and-width",
+			"content": "`size` supports `sm`, `md`, and `lg`. `fullWidth` fills the available width. Both accept responsive objects with `mobile`, `tablet`, and `desktop` keys."
+		},
+		{
+			"heading": "groups-descriptions-and-custom-rendering",
+			"content": "`group` adds headings within the list. An option's `description` adds supporting text. Use `renderOption` to customize its contents without adding nested interactive controls. Its state includes `selected`, `active`, and `multiple`."
+		},
+		{
+			"heading": "groups-descriptions-and-custom-rendering",
+			"content": "`renderValue` receives one selected option or `undefined` in single mode, and an array in multiple mode."
+		},
+		{
+			"heading": "groups-descriptions-and-custom-rendering",
+			"content": "Custom option rendering replaces the default description display. Include `option.description` in your renderer, as above, to keep it visible."
+		},
+		{
+			"heading": "controlled-value",
+			"content": "Pair `value` with `onChange`. In single mode the callback receives `T | undefined`; in multiple mode it receives `T[]`. Passing `value={undefined}` represents a controlled empty selection. Use `defaultValue` only for uncontrolled selection."
+		},
+		{
+			"heading": "popup-placement-and-empty-options",
+			"content": "Control popup visibility with `open` and `onOpenChange`, or set its initial visibility with `defaultOpen`. Placement may fall back when space is limited. `menuMaxHeight` constrains the scrollable list; `matchTriggerWidth={false}` allows a narrower menu."
+		},
+		{
+			"heading": "validation-and-disabled-state",
+			"content": "`required` participates in native validation when `name` enables the hidden native select. `error` displays a message and marks the control invalid; `error={true}` uses \"Invalid value\". `disabled` prevents interaction."
+		},
+		{
+			"heading": "validation-and-disabled-state",
+			"content": "Select combines `aria-invalid` with its own `error`, and `data-invalid` matches the result. An external `aria-describedby` is preserved before its own description and error IDs, so Select composes with `FormField`."
+		},
+		{
+			"heading": "object-values-and-native-forms",
+			"content": "For object values, use `isOptionEqualToValue` to compare stable identifiers instead of object identity. Supply `serializeValue` with a unique string for native form submission. `name` enables a visually hidden native select; `form` associates it with a form elsewhere in the document."
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "`SelectProps<T>` distinguishes single and multiple modes. `ResponsiveValue<T>` accepts a value or a `mobile`/`tablet`/`desktop` object."
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop      | Type                         | Default  | Description        |\n| --------- | ---------------------------- | -------- | ------------------ |\n| `options` | `readonly SelectOption<T>[]` | Required | Available options. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop       | Type      | Default | Description                     |\n| ---------- | --------- | ------- | ------------------------------- |\n| `multiple` | `boolean` | `false` | Enables array-valued selection. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop    | Type                               | Default | Description                               |\n| ------- | ---------------------------------- | ------- | ----------------------------------------- |\n| `value` | `T \\| undefined` or `readonly T[]` | -       | Controlled selection for the chosen mode. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop           | Type                               | Default             | Description                     |\n| -------------- | ---------------------------------- | ------------------- | ------------------------------- |\n| `defaultValue` | `T \\| undefined` or `readonly T[]` | `undefined` or `[]` | Initial uncontrolled selection. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop       | Type                                                        | Default | Description                      |\n| ---------- | ----------------------------------------------------------- | ------- | -------------------------------- |\n| `onChange` | `(value: T \\| undefined) => void` or `(value: T[]) => void` | -       | Next selection, not a DOM event. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop    | Type        | Default | Description          |\n| ------- | ----------- | ------- | -------------------- |\n| `label` | `ReactNode` | -       | Visible field label. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop          | Type        | Default              | Description                       |\n| ------------- | ----------- | -------------------- | --------------------------------- |\n| `placeholder` | `ReactNode` | `\"Select an option\"` | Content when nothing is selected. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop          | Type        | Default | Description            |\n| ------------- | ----------- | ------- | ---------------------- |\n| `description` | `ReactNode` | -       | Supporting field text. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop    | Type                   | Default | Description                                 |\n| ------- | ---------------------- | ------- | ------------------------------------------- |\n| `error` | `ReactNode \\| boolean` | -       | Error message; `true` uses \"Invalid value\". |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop       | Type      | Default | Description           |\n| ---------- | --------- | ------- | --------------------- |\n| `disabled` | `boolean` | `false` | Disables the control. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop       | Type      | Default | Description               |\n| ---------- | --------- | ------- | ------------------------- |\n| `required` | `boolean` | `false` | Marks the field required. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop        | Type      | Default | Description                    |\n| ----------- | --------- | ------- | ------------------------------ |\n| `clearable` | `boolean` | `false` | Adds a clear-selection action. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop         | Type     | Default             | Description                          |\n| ------------ | -------- | ------------------- | ------------------------------------ |\n| `clearLabel` | `string` | `\"Clear selection\"` | Accessible name of the clear action. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop          | Type     | Default | Description                                       |\n| ------------- | -------- | ------- | ------------------------------------------------- |\n| `maxSelected` | `number` | -       | Maximum simultaneous selections in multiple mode. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop   | Type                                    | Default | Description   |\n| ------ | --------------------------------------- | ------- | ------------- |\n| `size` | `ResponsiveValue<\"sm\" \\| \"md\" \\| \"lg\">` | `\"md\"`  | Control size. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "selection-and-field-props",
+			"content": "| Prop        | Type                       | Default | Description            |\n| ----------- | -------------------------- | ------- | ---------------------- |\n| `fullWidth` | `ResponsiveValue<boolean>` | `false` | Fills available width. |",
+			"table": "table-0"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop   | Type      | Default | Description                  |\n| ------ | --------- | ------- | ---------------------------- |\n| `open` | `boolean` | -       | Controlled popup visibility. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop          | Type      | Default | Description                            |\n| ------------- | --------- | ------- | -------------------------------------- |\n| `defaultOpen` | `boolean` | `false` | Initial uncontrolled popup visibility. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop           | Type                      | Default | Description                   |\n| -------------- | ------------------------- | ------- | ----------------------------- |\n| `onOpenChange` | `(open: boolean) => void` | -       | Requested visibility changes. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop       | Type                                     | Default    | Description           |\n| ---------- | ---------------------------------------- | ---------- | --------------------- |\n| `position` | `\"top\" \\| \"right\" \\| \"bottom\" \\| \"left\"` | `\"bottom\"` | Preferred popup side. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop    | Type                           | Default   | Description      |\n| ------- | ------------------------------ | --------- | ---------------- |\n| `align` | `\"start\" \\| \"center\" \\| \"end\"` | `\"start\"` | Popup alignment. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop     | Type     | Default | Description                     |\n| -------- | -------- | ------- | ------------------------------- |\n| `offset` | `number` | `8`     | Gap from the trigger in pixels. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop               | Type     | Default | Description                               |\n| ------------------ | -------- | ------- | ----------------------------------------- |\n| `collisionPadding` | `number` | `8`     | Minimum viewport-edge distance in pixels. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop            | Type      | Default     | Description                       |\n| --------------- | --------- | ----------- | --------------------------------- |\n| `closeOnSelect` | `boolean` | `!multiple` | Closes the popup after selection. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop                | Type      | Default | Description                                 |\n| ------------------- | --------- | ------- | ------------------------------------------- |\n| `matchTriggerWidth` | `boolean` | `true`  | Matches popup minimum width to the trigger. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop            | Type                         | Default   | Description          |\n| --------------- | ---------------------------- | --------- | -------------------- |\n| `menuMaxHeight` | `CSSProperties[\"maxHeight\"]` | `\"18rem\"` | Maximum list height. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "popup-props",
+			"content": "| Prop            | Type        | Default        | Description         |\n| --------------- | ----------- | -------------- | ------------------- |\n| `noOptionsText` | `ReactNode` | `\"No options\"` | Empty-list content. |",
+			"table": "table-1"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop           | Type                                                                     | Default | Description             |\n| -------------- | ------------------------------------------------------------------------ | ------- | ----------------------- |\n| `renderOption` | `(option: SelectOption<T>, state: SelectOptionRenderState) => ReactNode` | -       | Custom option contents. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop          | Type                                                                                  | Default | Description                     |\n| ------------- | ------------------------------------------------------------------------------------- | ------- | ------------------------------- |\n| `renderValue` | `(selected: SelectOption<T> \\| readonly SelectOption<T>[] \\| undefined) => ReactNode` | -       | Custom selected-value contents. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop                   | Type                                             | Default             | Description                            |\n| ---------------------- | ------------------------------------------------ | ------------------- | -------------------------------------- |\n| `isOptionEqualToValue` | `(option: SelectOption<T>, value: T) => boolean` | Identity comparison | Compares options with selected values. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop             | Type                   | Default           | Description                                   |\n| ---------------- | ---------------------- | ----------------- | --------------------------------------------- |\n| `serializeValue` | `(value: T) => string` | String conversion | Serializes values for native form submission. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop   | Type     | Default | Description                                 |\n| ------ | -------- | ------- | ------------------------------------------- |\n| `name` | `string` | -       | Enables and names the hidden native select. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop   | Type     | Default | Description         |\n| ------ | -------- | ------- | ------------------- |\n| `form` | `string` | -       | Associated form ID. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop           | Type     | Default | Description                           |\n| -------------- | -------- | ------- | ------------------------------------- |\n| `autoComplete` | `string` | -       | Native select autocomplete attribute. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop        | Type     | Default | Description                               |\n| ----------- | -------- | ------- | ----------------------------------------- |\n| `className` | `string` | -       | Additional class on the combobox trigger. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop            | Type     | Default | Description                          |\n| --------------- | -------- | ------- | ------------------------------------ |\n| `rootClassName` | `string` | -       | Additional class on the outer field. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop               | Type     | Default | Description                        |\n| ------------------ | -------- | ------- | ---------------------------------- |\n| `popoverClassName` | `string` | -       | Additional class on popup content. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "| Prop            | Type     | Default | Description                      |\n| --------------- | -------- | ------- | -------------------------------- |\n| `menuClassName` | `string` | -       | Additional class on the listbox. |",
+			"table": "table-2"
+		},
+		{
+			"heading": "rendering-forms-and-styling",
+			"content": "Other supported button attributes, including `id`, `aria-label`, `aria-labelledby`, and `aria-describedby`, apply to the trigger."
+		},
+		{
+			"heading": "selectoption-and-render-state",
+			"content": "| Option prop | Type               | Default | Description                              |\n| ----------- | ------------------ | ------- | ---------------------------------------- |\n| `id`        | `string \\| number` | -       | Stable identifier for reordered options. |",
+			"table": "table-3"
+		},
+		{
+			"heading": "selectoption-and-render-state",
+			"content": "| Option prop | Type | Default  | Description                  |\n| ----------- | ---- | -------- | ---------------------------- |\n| `value`     | `T`  | Required | Value returned on selection. |",
+			"table": "table-3"
+		},
+		{
+			"heading": "selectoption-and-render-state",
+			"content": "| Option prop | Type     | Default  | Description                                                 |\n| ----------- | -------- | -------- | ----------------------------------------------------------- |\n| `label`     | `string` | Required | Plain-text label for display, typeahead, and accessibility. |",
+			"table": "table-3"
+		},
+		{
+			"heading": "selectoption-and-render-state",
+			"content": "| Option prop   | Type        | Default | Description             |\n| ------------- | ----------- | ------- | ----------------------- |\n| `description` | `ReactNode` | -       | Supporting option text. |",
+			"table": "table-3"
+		},
+		{
+			"heading": "selectoption-and-render-state",
+			"content": "| Option prop | Type     | Default | Description    |\n| ----------- | -------- | ------- | -------------- |\n| `group`     | `string` | -       | Group heading. |",
+			"table": "table-3"
+		},
+		{
+			"heading": "selectoption-and-render-state",
+			"content": "| Option prop | Type      | Default | Description         |\n| ----------- | --------- | ------- | ------------------- |\n| `disabled`  | `boolean` | `false` | Prevents selection. |",
+			"table": "table-3"
+		},
+		{
+			"heading": "selectoption-and-render-state",
+			"content": "`SelectOptionRenderState` contains three booleans: `selected` (chosen value), `active` (keyboard-highlighted option), and `multiple` (selection mode)."
+		},
+		{
+			"heading": "accessibility",
+			"content": "Prefer a visible `label`; when omitted, provide `aria-label` or `aria-labelledby`. The combobox keeps DOM focus while its popup is open and exposes the highlighted option with `aria-activedescendant`. It supports arrow-key navigation, Home/End, typeahead, and Enter/Space to open or select. Escape closes the list. Keep custom option content non-interactive."
+		}
+	],
+	"headings": [
+		{
+			"id": "import",
+			"content": "Import"
+		},
+		{
+			"id": "basic-usage",
+			"content": "Basic usage"
+		},
+		{
+			"id": "multiple-selection-and-clearing",
+			"content": "Multiple selection and clearing"
+		},
+		{
+			"id": "sizes-and-width",
+			"content": "Sizes and width"
+		},
+		{
+			"id": "groups-descriptions-and-custom-rendering",
+			"content": "Groups, descriptions, and custom rendering"
+		},
+		{
+			"id": "controlled-value",
+			"content": "Controlled value"
+		},
+		{
+			"id": "popup-placement-and-empty-options",
+			"content": "Popup placement and empty options"
+		},
+		{
+			"id": "validation-and-disabled-state",
+			"content": "Validation and disabled state"
+		},
+		{
+			"id": "object-values-and-native-forms",
+			"content": "Object values and native forms"
+		},
+		{
+			"id": "api",
+			"content": "API"
+		},
+		{
+			"id": "selection-and-field-props",
+			"content": "Selection and field props"
+		},
+		{
+			"id": "popup-props",
+			"content": "Popup props"
+		},
+		{
+			"id": "rendering-forms-and-styling",
+			"content": "Rendering, forms, and styling"
+		},
+		{
+			"id": "selectoption-and-render-state",
+			"content": "SelectOption and render state"
+		},
+		{
+			"id": "accessibility",
+			"content": "Accessibility"
+		}
+	]
+};
+var toc = [
+	{
+		depth: 2,
+		url: "#import",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Import" })
+	},
+	{
+		depth: 2,
+		url: "#basic-usage",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Basic usage" })
+	},
+	{
+		depth: 2,
+		url: "#multiple-selection-and-clearing",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Multiple selection and clearing" })
+	},
+	{
+		depth: 2,
+		url: "#sizes-and-width",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Sizes and width" })
+	},
+	{
+		depth: 2,
+		url: "#groups-descriptions-and-custom-rendering",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Groups, descriptions, and custom rendering" })
+	},
+	{
+		depth: 2,
+		url: "#controlled-value",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Controlled value" })
+	},
+	{
+		depth: 2,
+		url: "#popup-placement-and-empty-options",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Popup placement and empty options" })
+	},
+	{
+		depth: 2,
+		url: "#validation-and-disabled-state",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Validation and disabled state" })
+	},
+	{
+		depth: 2,
+		url: "#object-values-and-native-forms",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Object values and native forms" })
+	},
+	{
+		depth: 2,
+		url: "#api",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "API" })
+	},
+	{
+		depth: 3,
+		url: "#selection-and-field-props",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Selection and field props" })
+	},
+	{
+		depth: 3,
+		url: "#popup-props",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Popup props" })
+	},
+	{
+		depth: 3,
+		url: "#rendering-forms-and-styling",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Rendering, forms, and styling" })
+	},
+	{
+		depth: 3,
+		url: "#selectoption-and-render-state",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "SelectOption and render state" })
+	},
+	{
+		depth: 2,
+		url: "#accessibility",
+		title: (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: "Accessibility" })
+	}
+];
+function _createMdxContent(props) {
+	const _components = {
+		code: "code",
+		h2: "h2",
+		h3: "h3",
+		p: "p",
+		pre: "pre",
+		small: "small",
+		span: "span",
+		table: "table",
+		tbody: "tbody",
+		td: "td",
+		th: "th",
+		thead: "thead",
+		tr: "tr",
+		...props.components
+	}, { Preview, Section, Select, Stack } = _components;
+	if (!Preview) _missingMdxReference("Preview", true);
+	if (!Section) _missingMdxReference("Section", true);
+	if (!Select) _missingMdxReference("Select", true);
+	if (!Stack) _missingMdxReference("Stack", true);
+	return (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+		(0, import_jsx_runtime.jsx)(_components.p, { children: "Select exposes a select-only combobox with a listbox popup. It supports single and multiple selection, grouped options, custom rendering, and native form integration." }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "import",
+			children: "Import"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: (0, import_jsx_runtime.jsx)(_components.pre, {
+			className: "shiki shiki-themes github-light github-dark",
+			style: {
+				"--shiki-light": "#24292e",
+				"--shiki-dark": "#e1e4e8",
+				"--shiki-light-bg": "#fff",
+				"--shiki-dark-bg": "#24292e"
+			},
+			tabIndex: "0",
+			icon: "<svg viewBox=\"0 0 24 24\"><path d=\"M14.23 12.004a2.236 2.236 0 0 1-2.235 2.236 2.236 2.236 0 0 1-2.236-2.236 2.236 2.236 0 0 1 2.235-2.236 2.236 2.236 0 0 1 2.236 2.236zm2.648-10.69c-1.346 0-3.107.96-4.888 2.622-1.78-1.653-3.542-2.602-4.887-2.602-.41 0-.783.093-1.106.278-1.375.793-1.683 3.264-.973 6.365C1.98 8.917 0 10.42 0 12.004c0 1.59 1.99 3.097 5.043 4.03-.704 3.113-.39 5.588.988 6.38.32.187.69.275 1.102.275 1.345 0 3.107-.96 4.888-2.624 1.78 1.654 3.542 2.603 4.887 2.603.41 0 .783-.09 1.106-.275 1.374-.792 1.683-3.263.973-6.365C22.02 15.096 24 13.59 24 12.004c0-1.59-1.99-3.097-5.043-4.032.704-3.11.39-5.587-.988-6.38-.318-.184-.688-.277-1.092-.278zm-.005 1.09v.006c.225 0 .406.044.558.127.666.382.955 1.835.73 3.704-.054.46-.142.945-.25 1.44-.96-.236-2.006-.417-3.107-.534-.66-.905-1.345-1.727-2.035-2.447 1.592-1.48 3.087-2.292 4.105-2.295zm-9.77.02c1.012 0 2.514.808 4.11 2.28-.686.72-1.37 1.537-2.02 2.442-1.107.117-2.154.298-3.113.538-.112-.49-.195-.964-.254-1.42-.23-1.868.054-3.32.714-3.707.19-.09.4-.127.563-.132zm4.882 3.05c.455.468.91.992 1.36 1.564-.44-.02-.89-.034-1.345-.034-.46 0-.915.01-1.36.034.44-.572.895-1.096 1.345-1.565zM12 8.1c.74 0 1.477.034 2.202.093.406.582.802 1.203 1.183 1.86.372.64.71 1.29 1.018 1.946-.308.655-.646 1.31-1.013 1.95-.38.66-.773 1.288-1.18 1.87-.728.063-1.466.098-2.21.098-.74 0-1.477-.035-2.202-.093-.406-.582-.802-1.204-1.183-1.86-.372-.64-.71-1.29-1.018-1.946.303-.657.646-1.313 1.013-1.954.38-.66.773-1.286 1.18-1.868.728-.064 1.466-.098 2.21-.098zm-3.635.254c-.24.377-.48.763-.704 1.16-.225.39-.435.782-.635 1.174-.265-.656-.49-1.31-.676-1.947.64-.15 1.315-.283 2.015-.386zm7.26 0c.695.103 1.365.23 2.006.387-.18.632-.405 1.282-.66 1.933-.2-.39-.41-.783-.64-1.174-.225-.392-.465-.774-.705-1.146zm3.063.675c.484.15.944.317 1.375.498 1.732.74 2.852 1.708 2.852 2.476-.005.768-1.125 1.74-2.857 2.475-.42.18-.88.342-1.355.493-.28-.958-.646-1.956-1.1-2.98.45-1.017.81-2.01 1.085-2.964zm-13.395.004c.278.96.645 1.957 1.1 2.98-.45 1.017-.812 2.01-1.086 2.964-.484-.15-.944-.318-1.37-.5-1.732-.737-2.852-1.706-2.852-2.474 0-.768 1.12-1.742 2.852-2.476.42-.18.88-.342 1.356-.494zm11.678 4.28c.265.657.49 1.312.676 1.948-.64.157-1.316.29-2.016.39.24-.375.48-.762.705-1.158.225-.39.435-.788.636-1.18zm-9.945.02c.2.392.41.783.64 1.175.23.39.465.772.705 1.143-.695-.102-1.365-.23-2.006-.386.18-.63.406-1.282.66-1.933zM17.92 16.32c.112.493.2.968.254 1.423.23 1.868-.054 3.32-.714 3.708-.147.09-.338.128-.563.128-1.012 0-2.514-.807-4.11-2.28.686-.72 1.37-1.536 2.02-2.44 1.107-.118 2.154-.3 3.113-.54zm-11.83.01c.96.234 2.006.415 3.107.532.66.905 1.345 1.727 2.035 2.446-1.595 1.483-3.092 2.295-4.11 2.295-.22-.005-.406-.05-.553-.132-.666-.38-.955-1.834-.73-3.703.054-.46.142-.944.25-1.438zm4.56.64c.44.02.89.034 1.345.034.46 0 .915-.01 1.36-.034-.44.572-.895 1.095-1.345 1.565-.455-.47-.91-.993-1.36-1.565z\" fill=\"currentColor\" /></svg>",
+			children: (0, import_jsx_runtime.jsx)(_components.code, { children: (0, import_jsx_runtime.jsxs)(_components.span, {
+				className: "line",
+				children: [
+					(0, import_jsx_runtime.jsx)(_components.span, {
+						style: {
+							"--shiki-light": "#D73A49",
+							"--shiki-dark": "#F97583"
+						},
+						children: "import"
+					}),
+					(0, import_jsx_runtime.jsx)(_components.span, {
+						style: {
+							"--shiki-light": "#24292E",
+							"--shiki-dark": "#E1E4E8"
+						},
+						children: " { Select } "
+					}),
+					(0, import_jsx_runtime.jsx)(_components.span, {
+						style: {
+							"--shiki-light": "#D73A49",
+							"--shiki-dark": "#F97583"
+						},
+						children: "from"
+					}),
+					(0, import_jsx_runtime.jsx)(_components.span, {
+						style: {
+							"--shiki-light": "#032F62",
+							"--shiki-dark": "#9ECBFF"
+						},
+						children: " \"@puzzle-ui/ui\""
+					}),
+					(0, import_jsx_runtime.jsx)(_components.span, {
+						style: {
+							"--shiki-light": "#24292E",
+							"--shiki-dark": "#E1E4E8"
+						},
+						children: ";"
+					})
+				]
+			}) })
+		}) }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "basic-usage",
+			children: "Basic usage"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			"Provide a visible ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "label" }),
+			" and an array of options with ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "value" }),
+			" and plain-text ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "label" }),
+			". ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "placeholder" }),
+			" is shown until a value is selected. Disabled options remain visible but cannot be chosen."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(Preview, {
+			height: 420,
+			code: `\
+const options = [
+{ value: "apple", label: "Apple" },
+{ value: "pear", label: "Pear" },
+{ value: "orange", label: "Orange" },
+{ value: "mango", label: "Mango", disabled: true },
+];
+
+<Select
+label="Fruit"
+options={options}
+placeholder="Choose a fruit"
+description="Choose one item for your basket."
+/>
+`,
+			children: (0, import_jsx_runtime.jsx)(Section, { children: (0, import_jsx_runtime.jsx)(Select, {
+				label: "Fruit",
+				options: fruitOptions,
+				placeholder: "Choose a fruit",
+				description: "Choose one item for your basket."
+			}) })
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "multiple-selection-and-clearing",
+			children: "Multiple selection and clearing"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "multiple" }),
+			" changes the value to an array and keeps the popup open after selection by default. ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "maxSelected" }),
+			" limits the number of selected options. ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "clearable" }),
+			" adds a clear action; customize its accessible name with ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "clearLabel" }),
+			"."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(Preview, {
+			height: 440,
+			code: `\
+<Select
+label="Fruit basket"
+options={options}
+multiple
+defaultValue={["apple", "pear"]}
+maxSelected={3}
+clearable
+clearLabel="Clear fruit basket"
+description="Choose up to three fruits."
+/>
+`,
+			children: (0, import_jsx_runtime.jsx)(Section, { children: (0, import_jsx_runtime.jsx)(Select, {
+				label: "Fruit basket",
+				options: fruitOptions,
+				multiple: true,
+				defaultValue: ["apple", "pear"],
+				maxSelected: 3,
+				clearable: true,
+				clearLabel: "Clear fruit basket",
+				description: "Choose up to three fruits."
+			}) })
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			"Clearing returns ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "undefined" }),
+			" in single mode and ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "[]" }),
+			" in multiple mode. Set ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "closeOnSelect" }),
+			" explicitly to override either mode's default popup behavior."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "sizes-and-width",
+			children: "Sizes and width"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "size" }),
+			" supports ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "sm" }),
+			", ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "md" }),
+			", and ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "lg" }),
+			". ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "fullWidth" }),
+			" fills the available width. Both accept responsive objects with ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "mobile" }),
+			", ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "tablet" }),
+			", and ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "desktop" }),
+			" keys."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(Preview, {
+			height: 540,
+			code: `\
+<Stack>
+<Select label="Small" size="sm" options={options} defaultValue="apple" />
+<Select label="Medium" size="md" options={options} defaultValue="pear" />
+<Select label="Large" size="lg" options={options} defaultValue="orange" />
+<Select
+  label="Responsive"
+  size={{ mobile: "sm", tablet: "md", desktop: "lg" }}
+  fullWidth
+  options={options}
+/>
+</Stack>
+`,
+			children: (0, import_jsx_runtime.jsx)(Section, { children: (0, import_jsx_runtime.jsxs)(Stack, { children: [
+				(0, import_jsx_runtime.jsx)(Select, {
+					label: "Small",
+					size: "sm",
+					options: fruitOptions,
+					defaultValue: "apple"
+				}),
+				(0, import_jsx_runtime.jsx)(Select, {
+					label: "Medium",
+					size: "md",
+					options: fruitOptions,
+					defaultValue: "pear"
+				}),
+				(0, import_jsx_runtime.jsx)(Select, {
+					label: "Large",
+					size: "lg",
+					options: fruitOptions,
+					defaultValue: "orange"
+				}),
+				(0, import_jsx_runtime.jsx)(Select, {
+					label: "Responsive",
+					size: {
+						mobile: "sm",
+						tablet: "md",
+						desktop: "lg"
+					},
+					fullWidth: true,
+					options: fruitOptions
+				})
+			] }) })
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "groups-descriptions-and-custom-rendering",
+			children: "Groups, descriptions, and custom rendering"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "group" }),
+			" adds headings within the list. An option's ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "description" }),
+			" adds supporting text. Use ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "renderOption" }),
+			" to customize its contents without adding nested interactive controls. Its state includes ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "selected" }),
+			", ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "active" }),
+			", and ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "multiple" }),
+			"."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "renderValue" }),
+			" receives one selected option or ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "undefined" }),
+			" in single mode, and an array in multiple mode."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(Preview, {
+			height: 440,
+			code: `\
+<Select
+label="Plan"
+options={[
+  { value: "personal", label: "Personal", group: "Individual", description: "For side projects" },
+  { value: "team", label: "Team", group: "Business", description: "For collaboration" },
+  { value: "enterprise", label: "Enterprise", group: "Business", disabled: true },
+]}
+defaultValue="team"
+renderOption={(option, state) => (
+  <Stack gap="xs">
+    <span>{option.label}{state.selected ? " (selected)" : ""}</span>
+    {option.description && <small>{option.description}</small>}
+  </Stack>
+)}
+renderValue={(selected) => selected && "label" in selected ? "Plan: " + selected.label : "Choose a plan"}
+/>
+`,
+			children: (0, import_jsx_runtime.jsx)(Section, { children: (0, import_jsx_runtime.jsx)(Select, {
+				label: "Plan",
+				options: [
+					{
+						value: "personal",
+						label: "Personal",
+						group: "Individual",
+						description: "For side projects"
+					},
+					{
+						value: "team",
+						label: "Team",
+						group: "Business",
+						description: "For collaboration"
+					},
+					{
+						value: "enterprise",
+						label: "Enterprise",
+						group: "Business",
+						disabled: true
+					}
+				],
+				defaultValue: "team",
+				renderOption: (option, state) => (0, import_jsx_runtime.jsxs)(Stack, {
+					gap: "xs",
+					children: [(0, import_jsx_runtime.jsxs)(_components.span, { children: [option.label, state.selected ? " (selected)" : ""] }), option.description && (0, import_jsx_runtime.jsx)(_components.small, { children: option.description })]
+				}),
+				renderValue: (selected) => selected && "label" in selected ? "Plan: " + selected.label : "Choose a plan"
+			}) })
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			"Custom option rendering replaces the default description display. Include ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "option.description" }),
+			" in your renderer, as above, to keep it visible."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "controlled-value",
+			children: "Controlled value"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			"Pair ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "value" }),
+			" with ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "onChange" }),
+			". In single mode the callback receives ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "T | undefined" }),
+			"; in multiple mode it receives ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "T[]" }),
+			". Passing ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "value={undefined}" }),
+			" represents a controlled empty selection. Use ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "defaultValue" }),
+			" only for uncontrolled selection."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(Preview, {
+			height: 420,
+			code: `\
+const [fruit, setFruit] = useState<string | undefined>("apple");
+
+return (
+
+<Stack>
+  <Select label="Favorite fruit" options={options} value={fruit} onChange={setFruit} />
+  <span role="status">Selected: {fruit ?? "none"}</span>
+</Stack>
+);
+`,
+			children: (0, import_jsx_runtime.jsx)(Section, { children: (0, import_jsx_runtime.jsx)(ControlledSelectExample, {}) })
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "popup-placement-and-empty-options",
+			children: "Popup placement and empty options"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			"Control popup visibility with ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "open" }),
+			" and ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "onOpenChange" }),
+			", or set its initial visibility with ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "defaultOpen" }),
+			". Placement may fall back when space is limited. ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "menuMaxHeight" }),
+			" constrains the scrollable list; ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "matchTriggerWidth={false}" }),
+			" allows a narrower menu."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(Preview, {
+			height: 420,
+			code: `\
+<Stack>
+<Select
+  label="Open above"
+  options={options}
+  position="top"
+  align="end"
+  offset={12}
+  collisionPadding={16}
+  matchTriggerWidth={false}
+  menuMaxHeight="12rem"
+/>
+<Select label="Assignee" options={[]} noOptionsText="No team members available" />
+</Stack>
+`,
+			children: (0, import_jsx_runtime.jsx)(Section, { children: (0, import_jsx_runtime.jsxs)(Stack, { children: [(0, import_jsx_runtime.jsx)(Select, {
+				label: "Open above",
+				options: fruitOptions,
+				position: "top",
+				align: "end",
+				offset: 12,
+				collisionPadding: 16,
+				matchTriggerWidth: false,
+				menuMaxHeight: "12rem"
+			}), (0, import_jsx_runtime.jsx)(Select, {
+				label: "Assignee",
+				options: [],
+				noOptionsText: "No team members available"
+			})] }) })
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "validation-and-disabled-state",
+			children: "Validation and disabled state"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "required" }),
+			" participates in native validation when ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "name" }),
+			" enables the hidden native select. ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "error" }),
+			" displays a message and marks the control invalid; ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "error={true}" }),
+			" uses \"Invalid value\". ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "disabled" }),
+			" prevents interaction."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(Preview, {
+			height: 440,
+			code: `\
+<Stack>
+<Select label="Required fruit" name="fruit" required options={options} error="Choose a fruit to continue." />
+<Select label="Unavailable fruit" options={options} disabled defaultValue="apple" />
+</Stack>
+`,
+			children: (0, import_jsx_runtime.jsx)(Section, { children: (0, import_jsx_runtime.jsxs)(Stack, { children: [(0, import_jsx_runtime.jsx)(Select, {
+				label: "Required fruit",
+				name: "fruit",
+				required: true,
+				options: fruitOptions,
+				error: "Choose a fruit to continue."
+			}), (0, import_jsx_runtime.jsx)(Select, {
+				label: "Unavailable fruit",
+				options: fruitOptions,
+				disabled: true,
+				defaultValue: "apple"
+			})] }) })
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			"Select combines ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "aria-invalid" }),
+			" with its own ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "error" }),
+			", and ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "data-invalid" }),
+			" matches the result. An external ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "aria-describedby" }),
+			" is preserved before its own description and error IDs, so Select composes with ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "FormField" }),
+			"."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "object-values-and-native-forms",
+			children: "Object values and native forms"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			"For object values, use ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "isOptionEqualToValue" }),
+			" to compare stable identifiers instead of object identity. Supply ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "serializeValue" }),
+			" with a unique string for native form submission. ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "name" }),
+			" enables a visually hidden native select; ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "form" }),
+			" associates it with a form elsewhere in the document."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(Preview, {
+			height: 420,
+			code: `\
+<Select
+label="Workspace"
+name="workspace"
+options={[
+  { id: "design", value: { id: "design" }, label: "Design" },
+  { id: "engineering", value: { id: "engineering" }, label: "Engineering" },
+]}
+defaultValue={{ id: "design" }}
+isOptionEqualToValue={(option, value) => option.value.id === value.id}
+serializeValue={(value) => value.id}
+/>
+`,
+			children: (0, import_jsx_runtime.jsx)(Section, { children: (0, import_jsx_runtime.jsx)(Select, {
+				label: "Workspace",
+				name: "workspace",
+				options: [{
+					id: "design",
+					value: { id: "design" },
+					label: "Design"
+				}, {
+					id: "engineering",
+					value: { id: "engineering" },
+					label: "Engineering"
+				}],
+				defaultValue: { id: "design" },
+				isOptionEqualToValue: (option, value) => option.value.id === value.id,
+				serializeValue: (value) => value.id
+			}) })
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "api",
+			children: "API"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h3, {
+			id: "selection-and-field-props",
+			children: "Selection and field props"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "SelectProps<T>" }),
+			" distinguishes single and multiple modes. ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "ResponsiveValue<T>" }),
+			" accepts a value or a ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "mobile" }),
+			"/",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "tablet" }),
+			"/",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "desktop" }),
+			" object."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.table, { children: [(0, import_jsx_runtime.jsx)(_components.thead, { children: (0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Prop" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Type" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Default" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Description" })
+		] }) }), (0, import_jsx_runtime.jsxs)(_components.tbody, { children: [
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "options" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "readonly SelectOption<T>[]" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Required" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Available options." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "multiple" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "false" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Enables array-valued selection." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "value" }) }),
+				(0, import_jsx_runtime.jsxs)(_components.td, { children: [
+					(0, import_jsx_runtime.jsx)(_components.code, { children: "T | undefined" }),
+					" or ",
+					(0, import_jsx_runtime.jsx)(_components.code, { children: "readonly T[]" })
+				] }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Controlled selection for the chosen mode." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "defaultValue" }) }),
+				(0, import_jsx_runtime.jsxs)(_components.td, { children: [
+					(0, import_jsx_runtime.jsx)(_components.code, { children: "T | undefined" }),
+					" or ",
+					(0, import_jsx_runtime.jsx)(_components.code, { children: "readonly T[]" })
+				] }),
+				(0, import_jsx_runtime.jsxs)(_components.td, { children: [
+					(0, import_jsx_runtime.jsx)(_components.code, { children: "undefined" }),
+					" or ",
+					(0, import_jsx_runtime.jsx)(_components.code, { children: "[]" })
+				] }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Initial uncontrolled selection." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "onChange" }) }),
+				(0, import_jsx_runtime.jsxs)(_components.td, { children: [
+					(0, import_jsx_runtime.jsx)(_components.code, { children: "(value: T | undefined) => void" }),
+					" or ",
+					(0, import_jsx_runtime.jsx)(_components.code, { children: "(value: T[]) => void" })
+				] }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Next selection, not a DOM event." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "label" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "ReactNode" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Visible field label." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "placeholder" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "ReactNode" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "\"Select an option\"" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Content when nothing is selected." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "description" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "ReactNode" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Supporting field text." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "error" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "ReactNode | boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsxs)(_components.td, { children: [
+					"Error message; ",
+					(0, import_jsx_runtime.jsx)(_components.code, { children: "true" }),
+					" uses \"Invalid value\"."
+				] })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "disabled" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "false" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Disables the control." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "required" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "false" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Marks the field required." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "clearable" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "false" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Adds a clear-selection action." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "clearLabel" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "\"Clear selection\"" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Accessible name of the clear action." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "maxSelected" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "number" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Maximum simultaneous selections in multiple mode." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "size" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "ResponsiveValue<\"sm\" | \"md\" | \"lg\">" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "\"md\"" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Control size." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "fullWidth" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "ResponsiveValue<boolean>" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "false" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Fills available width." })
+			] })
+		] })] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h3, {
+			id: "popup-props",
+			children: "Popup props"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.table, { children: [(0, import_jsx_runtime.jsx)(_components.thead, { children: (0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Prop" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Type" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Default" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Description" })
+		] }) }), (0, import_jsx_runtime.jsxs)(_components.tbody, { children: [
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "open" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Controlled popup visibility." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "defaultOpen" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "false" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Initial uncontrolled popup visibility." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "onOpenChange" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "(open: boolean) => void" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Requested visibility changes." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "position" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "\"top\" | \"right\" | \"bottom\" | \"left\"" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "\"bottom\"" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Preferred popup side." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "align" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "\"start\" | \"center\" | \"end\"" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "\"start\"" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Popup alignment." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "offset" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "number" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "8" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Gap from the trigger in pixels." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "collisionPadding" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "number" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "8" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Minimum viewport-edge distance in pixels." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "closeOnSelect" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "!multiple" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Closes the popup after selection." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "matchTriggerWidth" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "true" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Matches popup minimum width to the trigger." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "menuMaxHeight" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "CSSProperties[\"maxHeight\"]" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "\"18rem\"" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Maximum list height." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "noOptionsText" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "ReactNode" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "\"No options\"" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Empty-list content." })
+			] })
+		] })] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h3, {
+			id: "rendering-forms-and-styling",
+			children: "Rendering, forms, and styling"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.table, { children: [(0, import_jsx_runtime.jsx)(_components.thead, { children: (0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Prop" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Type" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Default" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Description" })
+		] }) }), (0, import_jsx_runtime.jsxs)(_components.tbody, { children: [
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "renderOption" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "(option: SelectOption<T>, state: SelectOptionRenderState) => ReactNode" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Custom option contents." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "renderValue" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "(selected: SelectOption<T> | readonly SelectOption<T>[] | undefined) => ReactNode" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Custom selected-value contents." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "isOptionEqualToValue" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "(option: SelectOption<T>, value: T) => boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Identity comparison" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Compares options with selected values." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "serializeValue" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "(value: T) => string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "String conversion" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Serializes values for native form submission." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "name" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Enables and names the hidden native select." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "form" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Associated form ID." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "autoComplete" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Native select autocomplete attribute." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "className" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Additional class on the combobox trigger." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "rootClassName" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Additional class on the outer field." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "popoverClassName" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Additional class on popup content." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "menuClassName" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Additional class on the listbox." })
+			] })
+		] })] }),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			"Other supported button attributes, including ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "id" }),
+			", ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "aria-label" }),
+			", ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "aria-labelledby" }),
+			", and ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "aria-describedby" }),
+			", apply to the trigger."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h3, {
+			id: "selectoption-and-render-state",
+			children: "SelectOption and render state"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.table, { children: [(0, import_jsx_runtime.jsx)(_components.thead, { children: (0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Option prop" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Type" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Default" }),
+			(0, import_jsx_runtime.jsx)(_components.th, { children: "Description" })
+		] }) }), (0, import_jsx_runtime.jsxs)(_components.tbody, { children: [
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "id" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string | number" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Stable identifier for reordered options." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "value" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "T" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Required" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Value returned on selection." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "label" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Required" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Plain-text label for display, typeahead, and accessibility." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "description" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "ReactNode" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Supporting option text." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "group" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "string" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "-" }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Group heading." })
+			] }),
+			(0, import_jsx_runtime.jsxs)(_components.tr, { children: [
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "disabled" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "boolean" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: (0, import_jsx_runtime.jsx)(_components.code, { children: "false" }) }),
+				(0, import_jsx_runtime.jsx)(_components.td, { children: "Prevents selection." })
+			] })
+		] })] }),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "SelectOptionRenderState" }),
+			" contains three booleans: ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "selected" }),
+			" (chosen value), ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "active" }),
+			" (keyboard-highlighted option), and ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "multiple" }),
+			" (selection mode)."
+		] }),
+		"\n",
+		(0, import_jsx_runtime.jsx)(_components.h2, {
+			id: "accessibility",
+			children: "Accessibility"
+		}),
+		"\n",
+		(0, import_jsx_runtime.jsxs)(_components.p, { children: [
+			"Prefer a visible ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "label" }),
+			"; when omitted, provide ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "aria-label" }),
+			" or ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "aria-labelledby" }),
+			". The combobox keeps DOM focus while its popup is open and exposes the highlighted option with ",
+			(0, import_jsx_runtime.jsx)(_components.code, { children: "aria-activedescendant" }),
+			". It supports arrow-key navigation, Home/End, typeahead, and Enter/Space to open or select. Escape closes the list. Keep custom option content non-interactive."
+		] })
+	] });
+}
+function MDXContent(props = {}) {
+	const { wrapper: MDXLayout } = props.components || {};
+	return MDXLayout ? (0, import_jsx_runtime.jsx)(MDXLayout, {
+		...props,
+		children: (0, import_jsx_runtime.jsx)(_createMdxContent, { ...props })
+	}) : _createMdxContent(props);
+}
+function _missingMdxReference(id, component) {
+	throw new Error("Expected " + (component ? "component" : "object") + " `" + id + "` to be defined: you likely forgot to import, pass, or provide it.");
+}
+export { MDXContent as default, frontmatter, structuredData, toc };

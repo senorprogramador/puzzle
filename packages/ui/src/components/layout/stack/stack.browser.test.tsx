@@ -36,7 +36,7 @@ for (const direction of ["row", "col"] as const) {
   });
 }
 
-it("preserves physical alignment when direction changes and alignment values are inherited", async () => {
+it("remaps alignment when direction changes and alignment values are inherited", async () => {
   render(
     <Stack
       data-testid="stack"
@@ -67,6 +67,34 @@ const box = (label: string) => (
 );
 
 describe("Stack (browser)", () => {
+  for (const direction of ["col", "row"] as const) {
+    it(`supports main-axis distribution and cross-axis stretching in a ${direction}`, () => {
+      render(
+        <Stack
+          data-testid="stack"
+          direction={direction}
+          alignH={direction === "row" ? "between" : "stretch"}
+          alignV={direction === "row" ? "stretch" : "between"}
+        />,
+      );
+      const style = getComputedStyle(screen.getByTestId("stack"));
+      expect(style.justifyContent).toBe("space-between");
+      expect(style.alignItems).toBe("stretch");
+    });
+  }
+
+  it("spaces row items horizontally and centers them vertically", () => {
+    render(
+      <Stack direction="row" alignH="between" alignV="center" data-testid="stack">
+        {box("a")}
+        {box("b")}
+      </Stack>,
+    );
+    const style = getComputedStyle(screen.getByTestId("stack"));
+    expect(style.justifyContent).toBe("space-between");
+    expect(style.alignItems).toBe("center");
+  });
+
   it("lays children out in a column by default", () => {
     render(
       <Stack>

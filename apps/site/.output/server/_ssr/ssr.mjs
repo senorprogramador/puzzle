@@ -1,5 +1,5 @@
 import "../_runtime.mjs";
-import { getServerFnById } from "../__23tanstack-start-server-fn-resolver-C8IoJ4j5.mjs";
+import { getServerFnById } from "../__23tanstack-start-server-fn-resolver-DrUWgd5v.mjs";
 import { MAX_FRAMED_STREAMS, MAX_FRAME_PAYLOAD_SIZE, TSS_CONTENT_TYPE_FRAMED_VERSIONED, TSS_FORMDATA_CONTEXT, TSS_SERVER_FUNCTION, X_TSS_RAW_RESPONSE, X_TSS_SERIALIZED, createNullProtoObject, flattenMiddlewares, getStartContext, getStartOptions, runWithStartContext, safeObjectMerge } from "./createServerFn-DRXAnLP9.mjs";
 import { require_react } from "../_libs/react.mjs";
 import { RouterProvider, defineHandlerCallback, renderRouterToStream } from "../_libs/@tanstack/react-router+[4...].mjs";
@@ -488,7 +488,7 @@ var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 * the dev styles URL for route-scoped CSS collection.
 */
 async function getStartManifest(matchedRoutes) {
-	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-BzMEUmBy.mjs");
+	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-5rBHmadl.mjs");
 	const startManifest = tsrStartManifest();
 	let routes = startManifest.routes;
 	routes[rootRouteId];
@@ -1733,7 +1733,7 @@ var getBaseManifest = getProdBaseManifest;
 var createEarlyHintsForRequest = createEarlyHintsCollector;
 async function loadEntries() {
 	const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-		import("./router-ByAQOaML.mjs"),
+		import("./router-5Rmk-yl4.mjs"),
 		import("./start-8LVib1U0.mjs"),
 		import("./empty-plugin-adapters-Cipd4ZH4.mjs")
 	]);

@@ -399,7 +399,14 @@ const Carousel = <T,>({
     });
 
     return () => observer.disconnect();
-  }, [items.length, itemOrderSignature, measureLayout]);
+  }, [
+    items.length,
+    itemOrderSignature,
+    measureLayout,
+    gaps.mobile,
+    gaps.tablet,
+    gaps.desktop,
+  ]);
 
   /**
    * currentPanel is always an item index.

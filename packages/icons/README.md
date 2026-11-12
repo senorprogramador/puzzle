@@ -42,16 +42,6 @@ For icon-only controls, label the control and keep its icon decorative:
 </button>
 ```
 
-## Server rendering
-
-The package also exports `SSRIcon` and `SSRIconProps`. `SSRIcon` is an async
-component that fetches icon data on the server and falls back to Iconify's
-client-side loading when data is unavailable.
-
-Use it only in rendering environments that support async components, such
-as an appropriate React Server Component setup. It is not a drop-in async
-component for ordinary client-side React rendering.
-
 Icon loading can make external requests to Iconify. Account for network
 availability and your Content Security Policy. Framework compatibility is
 still being evaluated.
@@ -59,7 +49,6 @@ still being evaluated.
 ## Exports
 
 - `Icon`, `IconProps`
-- `SSRIcon`, `SSRIconProps`
 
 Import from `@puzzle-ui/icons`; generated internal icon-set files are not
 exported package entry points. ESM and CommonJS builds and TypeScript

@@ -42,6 +42,23 @@ import { Text } from "@puzzle-ui/ui";
   </Section>
 </Preview>
 
+## Text alignment
+
+Use `textAlign` to control text alignment independently of typography.
+Use a block element such as `as="p"` so alignment can take effect across its width.
+Logical values `start` and `end` follow the text direction.
+
+<Preview
+  height={160}
+  code={`<Text as="p" textAlign="center">Centered text.</Text>`}
+>
+  <Text as="p" textAlign="center">Centered text.</Text>
+</Preview>
+
+When omitted, alignment inherits normally or follows `style.textAlign`.
+An explicit `textAlign` prop takes precedence over `style.textAlign`; other
+inline styles are preserved.
+
 ## API
 
 | Prop       | Type          | Default   | Description                     |
@@ -49,5 +66,6 @@ import { Text } from "@puzzle-ui/ui";
 | `type`     | `TextType`    | `"body1"` | Typography role from the theme. |
 | `as`       | `ElementType` | `"span"`  | Semantic root element.          |
 | `children` | `ReactNode`   | -         | Text content.                   |
+| `textAlign` | `CSSProperties["textAlign"]` | - | CSS text alignment, including `left`, `center`, `right`, `justify`, `start`, and `end`. |
 
 Common roles are `body1`, `body2`, `subtitle1`, `subtitle2`, `button`, `caption`, and `overline`. Native props, classes, styles, and refs for the selected element are forwarded. Use `Heading` for semantic headings and preserve legible contrast when overriding text colors.

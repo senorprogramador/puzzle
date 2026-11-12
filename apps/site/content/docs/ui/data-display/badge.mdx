@@ -6,7 +6,7 @@ description: Badges attach a small count, label, or status indicator to another 
 Use the Badge component to annotate an element, such as an avatar or icon, with a count or status. Badge wraps its children and positions the indicator on a corner.
 
 Without children, Badge renders as an inline label. `anchorOrigin` and
-`anchorOverlap` apply only when the badge wraps an element. Text stays on one
+`anchorOverlap` and `anchorOffset` apply only when the badge wraps an element. Text stays on one
 line, and the indicator grows to fit its content with padding.
 
 ## Import
@@ -140,6 +140,29 @@ Use `anchorOrigin` to choose the corner (`vertical`: `top` | `bottom`, `horizont
   </div>
 </Preview>
 
+## Anchor offset
+
+Use `anchorOffset={{ vertical: 8, horizontal: 12 }}` to move the indicator
+in pixels from its normal anchor position. Positive values move inward from
+the selected corner; negative values move outward. The default is zero on
+both axes. Offsets work with rectangular and circular overlap and are ignored
+for standalone labels.
+
+<Preview
+  height={160}
+  align="center"
+  justify="center"
+  code={`\
+<Badge content="4" anchorOffset={{ vertical: 8, horizontal: 12 }}>
+  <Avatar alt="Ada Lovelace" size={48} shape="square" />
+</Badge>
+`}
+>
+  <Badge content="4" anchorOffset={{ vertical: 8, horizontal: 12 }}>
+    <Avatar alt="Ada Lovelace" size={48} shape="square" />
+  </Badge>
+</Preview>
+
 ## API reference
 
 ### Badge props
@@ -150,13 +173,14 @@ Use `anchorOrigin` to choose the corner (`vertical`: `top` | `bottom`, `horizont
 | `size`          | `number`                                                         | `20`                                       | Minimum width and height in pixels. Values below `16` become `16`.                     |
 | `color`         | `BadgeColor`                                                     | `"primary"`                                | `primary`, `secondary`, `accent`, `danger`, `info`, or a hex string such as `#7c3aed`. |
 | `anchorOrigin`  | `{ vertical: "top" \| "bottom"; horizontal: "left" \| "right" }` | `{ vertical: "top", horizontal: "right" }` | Corner where the badge is placed.                                                      |
+| `anchorOffset` | `{ vertical: number; horizontal: number }` | `{ vertical: 0, horizontal: 0 }` | Finite pixel offsets; positive moves inward, negative outward. |
 | `anchorOverlap` | `"rectangular" \| "circular"`                                    | `"rectangular"`                            | Positioning relative to a rectangular or round child.                                  |
 | `className`     | `string`                                                         | —                                          | Additional CSS class names on the wrapper.                                             |
 | `children`      | `ReactNode`                                                      | —                                          | Element the badge is attached to.                                                      |
 
 ### TypeScript types
 
-The component exports `BadgeProps`, `BadgeColor`, `AnchorOrigin` and `AnchorOverlap`.
+The component exports `BadgeProps`, `BadgeColor`, `AnchorOrigin`, `AnchorOffset` and `AnchorOverlap`.
 
 ## Theming
 

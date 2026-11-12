@@ -7,6 +7,11 @@ type AnchorOrigin = {
   horizontal: "left" | "right";
 };
 
+type AnchorOffset = {
+  vertical: number;
+  horizontal: number;
+};
+
 type AnchorOverlap = "rectangular" | "circular";
 type BadgeColor =
   | "primary"
@@ -21,6 +26,7 @@ type BadgeProps = {
   size?: number;
   color?: BadgeColor;
   anchorOrigin?: AnchorOrigin;
+  anchorOffset?: AnchorOffset;
   anchorOverlap?: AnchorOverlap;
   className?: string;
   children?: ReactNode;
@@ -31,10 +37,15 @@ const Badge = ({
   size = 20,
   color = "primary",
   anchorOrigin = { vertical: "top", horizontal: "right" },
+  anchorOffset = { vertical: 0, horizontal: 0 },
   anchorOverlap = "rectangular",
   className,
   children,
 }: BadgeProps) => {
+  if (!Number.isFinite(anchorOffset.vertical) || !Number.isFinite(anchorOffset.horizontal)) {
+    throw new TypeError("Badge anchorOffset values must be finite numbers.");
+  }
+
   const resolvedSize = Math.max(size, 16);
   const isHex = isHexColor(color);
   const isDark = isHex ? isDarkColor(color) : false;
@@ -60,6 +71,9 @@ const Badge = ({
           fontSize: `clamp(0.7rem, calc(${resolvedSize}px - 1em), 4rem)`,
           minHeight: `${resolvedSize}px`,
           minWidth: `${resolvedSize}px`,
+          translate: children != null
+            ? `${anchorOffset.horizontal * (anchorOrigin.horizontal === "left" ? 1 : -1)}px ${anchorOffset.vertical * (anchorOrigin.vertical === "top" ? 1 : -1)}px`
+            : undefined,
           backgroundColor: isHex ? color : undefined,
           color: isHex
             ? isDark
@@ -79,5 +93,6 @@ export {
   type BadgeProps,
   type BadgeColor,
   type AnchorOrigin,
+  type AnchorOffset,
   type AnchorOverlap,
 };

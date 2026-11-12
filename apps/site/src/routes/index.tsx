@@ -7,6 +7,8 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  Carousel,
+  CarouselController,
   Switch,
   Checkbox,
   TextInput,
@@ -22,7 +24,7 @@ import "./home.css";
 import { Header } from "@/components/layout/header";
 import { useState } from "react";
 import { Icon } from "@puzzle-ui/icons/icon";
-import { components } from "@/components/component-catalog";
+import { componentPanels } from "@/components/component-catalog";
 
 const features = [
   {
@@ -45,13 +47,13 @@ const features = [
   },
 ];
 
-const codeExample = `import { Button, Card } from "@puzzle/ui";
+const codeExample = `import { Button, Card, Heading, Text } from "@puzzle/ui";
 
 export function Welcome() {
   return (
     <Card>
-      <h2>Welcome to Puzzle</h2>
-      <p>Build something wonderful.</p>
+      <Heading level="headline2">Welcome to Puzzle</Heading>
+      <Text>Build something wonderful.</Text>
       <Button variant="primary">
         Get started
       </Button>
@@ -123,9 +125,15 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
         </div>
 
         <Stack direction="row" alignV="center" gap="sm">
-          <Button variant="primary">Get started</Button>
-          <Button variant="secondary">Explore</Button>
-          <Button variant="outline">Documentation</Button>
+          <Button variant="primary" href="/docs/getting-started">
+            Get started
+          </Button>
+          <Button variant="secondary" href="/docs/ui">
+            Explore
+          </Button>
+          <Button variant="outline" href="/docs/getting-started">
+            Documentation
+          </Button>
         </Stack>
       </Card>
 
@@ -193,13 +201,19 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
   </div>
 );
 
-const PuzzleLogo = ({ size = 36 }: { size?: number }) => (
+const PuzzleLogo = ({
+  size = 36,
+  className = "",
+}: {
+  size?: number;
+  className?: string;
+}) => (
   <img
     src="/favicon.svg"
     width={size}
     height={size}
     alt="Logo"
-    className="h-12 w-12"
+    className={className}
   />
 );
 
@@ -218,14 +232,14 @@ const Home = () => {
               <Stack
                 direction={{ mobile: "col", desktop: "row" }}
                 alignV="center"
-                alignH={{ mobile: "center", desktop: "evenly" }}
+                alignH={{ mobile: "stretch", desktop: "evenly" }}
                 gap="xl"
               >
                 <Stack
                   className="home-hero__content"
                   direction="col"
+                  alignH="start"
                   alignV="center"
-                  alignH="center"
                 >
                   <Stack direction="col" alignV="center" alignH="start">
                     <Heading level="headline1" as="h1">
@@ -243,24 +257,14 @@ const Home = () => {
                   <Stack
                     className="home-hero__actions"
                     direction="row"
-                    alignV="center"
+                    alignH="center"
                     wrap="wrap"
                   >
-                    <Button
-                      variant="primary"
-                      onClick={() => {
-                        window.location.href = "/docs/getting-started";
-                      }}
-                    >
+                    <Button variant="primary" href="/docs/getting-started">
                       Start building <ArrowIcon />
                     </Button>
 
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        window.location.href = "/docs/ui";
-                      }}
-                    >
+                    <Button variant="outline" href="/docs/ui">
                       <CodeIcon /> Explore components
                     </Button>
                   </Stack>
@@ -268,7 +272,7 @@ const Home = () => {
                   <Stack
                     className="home-hero__meta"
                     direction="row"
-                    alignV="center"
+                    alignH="center"
                     wrap="wrap"
                   >
                     <span>
@@ -314,8 +318,8 @@ const Home = () => {
             <Section theme="dark">
               <Stack
                 direction={{ mobile: "col", tablet: "row" }}
-                alignV="center"
                 alignH="center"
+                alignV="center"
                 wrap="wrap"
                 gap="md"
               >
@@ -332,8 +336,8 @@ const Home = () => {
             </Section>
 
             <Section id="features">
-              <Stack direction="col" alignV="center" alignH="center" gap="xl">
-                <Stack direction="col" alignV="center" alignH="start">
+              <Stack direction="col" alignH="center" alignV="center" gap="xl">
+                <Stack direction="col" alignH="start" alignV="center">
                   <Badge color="secondary" content="Why Puzzle" />
                   <Heading level="headline1" as="h2">
                     Less boilerplate.
@@ -365,8 +369,10 @@ const Home = () => {
                           <Icon name="griddy-icons:code-circle" size={32} />
                         )}
                       </div>
-                      <h3>{feature.title}</h3>
-                      <p>{feature.description}</p>
+                      <Heading level="headline3" as="h3">
+                        {feature.title}
+                      </Heading>
+                      <Text>{feature.description}</Text>
                     </Card>
                   ))}
                 </Stack>
@@ -376,11 +382,11 @@ const Home = () => {
             <Section theme="dark" id="components">
               <Stack
                 direction="col"
-                alignV="center"
-                alignH={{ mobile: "center", desktop: "center" }}
+                alignH="center"
+                alignV={{ mobile: "center", desktop: "center" }}
                 gap="xl"
               >
-                <Stack direction="col" alignV="center" alignH="start">
+                <Stack direction="col" alignH="start" alignV="start">
                   <Badge color="secondary" content="The building blocks" />
                   <Heading level="headline1" as="h2">
                     Everything you need.
@@ -401,123 +407,178 @@ const Home = () => {
                   </Button>
                 </Stack>
 
-                <div className="home-component-grid">
-                  {components.map((component) => (
-                    <Card
-                      as="a"
-                      interactive
-                      className="home-component-card"
-                      href={component.href}
-                      key={component.href}
-                      aria-labelledby={`component-${component.href.split("/").at(-1)}`}
-                    >
-                      <span className="home-component-card__icon">
-                        <Icon name={component.icon} aria-hidden="true" />
-                      </span>
-                      <CardHeader>
-                        <CardTitle
-                          id={`component-${component.href.split("/").at(-1)}`}
-                        >
-                          {component.name}
-                        </CardTitle>
-                        <CardDescription>
-                          {component.description}
-                        </CardDescription>
-                      </CardHeader>
-                    </Card>
-                  ))}
-                </div>
+                <CarouselController items={componentPanels}>
+                  <Carousel<(typeof componentPanels)[number]>
+                    className="home-component-carousel"
+                    ariaLabel="UI components"
+                    panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+                    gap="1rem"
+                    getItemKey={(panel) => panel[0]!.href}
+                    backButton={
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-label="Previous component panels"
+                      >
+                        <Icon
+                          name="akar-icons:chevron-left"
+                          aria-hidden="true"
+                        />
+                      </Button>
+                    }
+                    nextButton={
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-label="Next component panels"
+                      >
+                        <Icon
+                          name="akar-icons:chevron-right"
+                          aria-hidden="true"
+                        />
+                      </Button>
+                    }
+                    buttonAlignment="aside"
+                    renderItem={(panel) => (
+                      <Stack
+                        direction="col"
+                        alignH="stretch"
+                        gap="md"
+                        className="home-component-panel"
+                      >
+                        {panel.map((component) => (
+                          <Card
+                            as="a"
+                            interactive
+                            className="home-component-card"
+                            href={component.href}
+                            key={component.href}
+                            aria-labelledby={`component-${component.href.split("/").at(-1)}`}
+                          >
+                            <span className="home-component-card__icon">
+                              <Icon name={component.icon} aria-hidden="true" />
+                            </span>
+                            <CardHeader>
+                              <CardTitle
+                                id={`component-${component.href.split("/").at(-1)}`}
+                              >
+                                {component.name}
+                              </CardTitle>
+                              <CardDescription>
+                                {component.description}
+                              </CardDescription>
+                            </CardHeader>
+                          </Card>
+                        ))}
+                      </Stack>
+                    )}
+                  />
+                </CarouselController>
               </Stack>
             </Section>
 
             <Section className="home-developer" id="developers">
-              <div className="home-developer__content">
-                <Badge color="secondary" content="Made for developers" />
-                <h2>
-                  Your ideas.
-                  <br />
-                  <span>Without the friction.</span>
-                </h2>
-                <p>
-                  Predictable APIs, powerful composition and a consistent design
-                  language. Puzzle gives you the building blocks to turn ideas
-                  into polished experiences.
-                </p>
-
-                <div className="home-developer__benefits">
-                  <div>
-                    <span>01</span>
-                    <strong>TypeScript-first</strong>
-                    <p>
-                      Excellent types and a predictable developer experience.
-                    </p>
+              <Stack
+                className="home-developer__layout"
+                direction={{ mobile: "col", desktop: "row" }}
+                alignV="start"
+                alignH={{ mobile: "center", desktop: "evenly" }}
+                gap="xl"
+              >
+                <Stack
+                  className="home-hero__content home-developer__content"
+                  direction="col"
+                  alignH={{ mobile: "stretch", desktop: "start" }}
+                  alignV="center"
+                >
+                  <Stack
+                    direction="col"
+                    alignV="center"
+                    alignH="start"
+                    className="desktop:max-w-105"
+                  >
+                    <Badge color="secondary" content="Made for developers" />
+                    <Heading level="display1" as="h2">
+                      Your ideas.
+                      <br />
+                      <span>Without the friction.</span>
+                    </Heading>
+                    <Text className="home-hero__description">
+                      Predictable APIs, powerful composition and a consistent
+                      design language. Puzzle gives you the building blocks to
+                      turn ideas into polished experiences.
+                    </Text>
+                  </Stack>
+                  <div className="home-developer__benefits">
+                    <div>
+                      <span>01</span>
+                      <strong>TypeScript-first</strong>
+                      <p>
+                        Excellent types and a predictable developer experience.
+                      </p>
+                    </div>
+                    <div>
+                      <span>02</span>
+                      <strong>Flexible by design</strong>
+                      <p>
+                        Customize and compose components to fit your product.
+                      </p>
+                    </div>
+                    <div>
+                      <span>03</span>
+                      <strong>Accessibility matters</strong>
+                      <p>
+                        Thoughtful interaction patterns and semantic
+                        foundations.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <span>02</span>
-                    <strong>Flexible by design</strong>
-                    <p>Customize and compose components to fit your product.</p>
+                </Stack>
+                <div className="home-code">
+                  <div className="home-code__header">
+                    <div className="home-preview__dots">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                    <span>Welcome.tsx</span>
+                    <Badge color="secondary" content="TSX" />
                   </div>
-                  <div>
-                    <span>03</span>
-                    <strong>Accessibility matters</strong>
-                    <p>
-                      Thoughtful interaction patterns and semantic foundations.
-                    </p>
+                  <pre>
+                    <code>{codeExample}</code>
+                  </pre>
+                  <div className="home-code__footer">
+                    <span>Simple. Composable. Predictable.</span>
+                    <span>⌘ + C</span>
                   </div>
                 </div>
-              </div>
-
-              <div className="home-code">
-                <div className="home-code__header">
-                  <div className="home-preview__dots">
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-                  <span>Welcome.tsx</span>
-                  <Badge color="secondary" content="TSX" />
-                </div>
-                <pre>
-                  <code>{codeExample}</code>
-                </pre>
-                <div className="home-code__footer">
-                  <span>Simple. Composable. Predictable.</span>
-                  <span>⌘ + C</span>
-                </div>
-              </div>
+              </Stack>
             </Section>
 
-            <Section className="home-cta">
-              <div className="home-cta__logo">
-                <PuzzleLogo size={54} />
-              </div>
-              <Badge
-                color="secondary"
-                content="Your next project starts here"
-              />
-              <h2>
-                Make something
-                <br />
-                <span>remarkable.</span>
-              </h2>
-              <p>
-                Start building with Puzzle. Explore the components, create your
-                design system and bring your ideas to life.
-              </p>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  window.location.href = "/getting-started";
-                }}
-              >
-                Get started with Puzzle <ArrowIcon />
-              </Button>
+            <Section theme="dark" className="home-cta">
+              <Stack direction="col" alignH="center">
+                <Stack direction="col" alignV="start" alignH="center" gap="0">
+                  <PuzzleLogo size={128} className="mt-4" />
+                  <Heading level="headline1">
+                    Make something
+                    <br />
+                    <span>remarkable.</span>
+                  </Heading>
+                  <Text className="home-hero__description">
+                    Start building with Puzzle. Explore the components, create
+                    your design system and bring your ideas to life.
+                  </Text>
+                </Stack>
+                <Button variant="primary" href="/docs/getting-started">
+                  Get started with Puzzle <ArrowIcon />
+                </Button>
+              </Stack>
             </Section>
           </SectionStack>
           <footer className="home-footer">
             <Link className="home-brand" href="/">
               <PuzzleLogo size={28} />
-              <span>puzzle-ui</span>
+              <Text as="span">puzzle-ui</Text>
             </Link>
 
             <span>Made for developers who care about the details.</span>

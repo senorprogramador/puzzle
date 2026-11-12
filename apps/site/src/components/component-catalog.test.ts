@@ -1,8 +1,16 @@
 import { describe, expect, it } from "bun:test";
 import { readdirSync, readFileSync } from "node:fs";
-import { components } from "./component-catalog";
+import { components, componentPanels } from "./component-catalog";
 
 describe("component catalog", () => {
+  it("pairs cards into panels without losing or duplicating components", () => {
+    expect(componentPanels.flat()).toEqual(components);
+    for (const panel of componentPanels.slice(0, -1)) {
+      expect(panel).toHaveLength(2);
+    }
+    expect(componentPanels.at(-1)?.length).toBe(components.length % 2 || 2);
+  });
+
   it("links to every component documentation page exactly once", () => {
     const docs = new URL("../../content/docs/ui/", import.meta.url);
     const pages = readdirSync(docs, { recursive: true, encoding: "utf8" })

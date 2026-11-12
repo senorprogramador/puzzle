@@ -42,6 +42,7 @@ export {
   type BadgeProps,
   type BadgeColor,
   type AnchorOrigin,
+  type AnchorOffset,
   type AnchorOverlap,
 } from "./components/data-display/badge";
 

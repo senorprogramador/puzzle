@@ -1,5 +1,5 @@
 import { cn } from "@puzzle-ui/core";
-import type { ComponentPropsWithRef, ElementType } from "react";
+import type { ComponentPropsWithRef, CSSProperties, ElementType } from "react";
 
 type HeadingLevel =
   | "display1"
@@ -15,6 +15,7 @@ type PolymorphicProps<E extends ElementType, OwnProps> = OwnProps & {
 
 type HeadingOwnProps = {
   level: HeadingLevel;
+  textAlign?: CSSProperties["textAlign"];
 };
 
 type HeadingProps<E extends ElementType = "h2"> = PolymorphicProps<
@@ -26,11 +27,19 @@ const Heading = <E extends ElementType = "h2">({
   level,
   as,
   className,
+  textAlign,
+  style,
   ...props
 }: HeadingProps<E>) => {
   const Component = as ?? "h2";
   const classes = cn("puzzle-heading", `puzzle-typography-${level}`, className);
-  return <Component className={classes} {...props}></Component>;
+  return (
+    <Component
+      {...props}
+      className={classes}
+      style={textAlign === undefined ? style : { ...style, textAlign }}
+    ></Component>
+  );
 };
 
 export { Heading, type HeadingProps, type HeadingLevel };

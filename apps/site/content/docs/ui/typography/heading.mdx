@@ -42,6 +42,22 @@ import { Heading } from "@puzzle-ui/ui";
   </Section>
 </Preview>
 
+## Text alignment
+
+Use `textAlign` to align heading text. Logical values `start` and `end` follow
+the text direction.
+
+<Preview
+  height={160}
+  code={`<Heading level="headline2" textAlign="center">Centered heading</Heading>`}
+>
+  <Heading level="headline2" textAlign="center">Centered heading</Heading>
+</Preview>
+
+When omitted, alignment inherits normally or follows `style.textAlign`.
+An explicit `textAlign` prop takes precedence over `style.textAlign`; other
+inline styles are preserved.
+
 ## API
 
 | Prop       | Type                                                                                   | Default  | Description            |
@@ -49,5 +65,6 @@ import { Heading } from "@puzzle-ui/ui";
 | `level`    | `"display1" \| "display2" \| "headline1" \| "headline2" \| "headline3" \| "headline4"` | Required | Theme typography role. |
 | `as`       | `ElementType`                                                                          | `"h2"`   | Semantic element.      |
 | `children` | `ReactNode`                                                                            | -        | Heading content.       |
+| `textAlign` | `CSSProperties["textAlign"]` | - | CSS text alignment, including `left`, `center`, `right`, `justify`, `start`, and `end`. |
 
 Native attributes, styles, classes, and refs for the chosen element are forwarded. Follow a logical heading hierarchy; do not choose semantic levels solely for appearance. Responsive typography comes from the active theme.

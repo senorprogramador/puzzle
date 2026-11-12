@@ -15,7 +15,7 @@ import { useMDXComponents } from "@/components/mdx";
 import { RootProvider } from "fumadocs-ui/provider/tanstack";
 import { PageLayout } from "@puzzle-ui/ui/components/layout/page-layout";
 import { Sidebar } from "@/components/layout/sidebar";
-import { AppBar } from "@puzzle-ui/ui/components/layout/app-bar";
+import { Header } from "@/components/layout/header";
 
 export const Route = createFileRoute("/docs/$")({
   component: Page,
@@ -65,24 +65,7 @@ function Page() {
   return (
     <PageLayout>
       <PageLayout.Header className="puzzle-site-header">
-        <AppBar
-          logo={
-            <img
-              src="/favicon.svg"
-              width="48"
-              height="48"
-              alt="Logo"
-              className="h-12 w-12"
-            />
-          }
-          title="Puzzle"
-          navigationItems={[
-            { label: "Home", href: "/", current: true },
-            { label: "Components", href: "/components" },
-            { label: "Docs", href: "/docs" },
-          ]}
-          sticky
-        />
+        <Header />
       </PageLayout.Header>
 
       <PageLayout.LeftSidebar>

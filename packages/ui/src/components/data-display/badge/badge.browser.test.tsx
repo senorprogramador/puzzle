@@ -115,6 +115,30 @@ describe("Badge layout (browser)", () => {
             expect(centerY).toBeCloseTo(target[vertical], 0);
           }
         });
+
+        it(`offsets ${overlap} badges inward and outward at ${vertical}-${horizontal}`, () => {
+          const badge = (offset: number) => (
+            <Theme>
+              <Badge
+                content="offset"
+                anchorOverlap={overlap}
+                anchorOrigin={{ vertical, horizontal }}
+                anchorOffset={{ vertical: offset, horizontal: offset * 2 }}
+              >
+                <div style={{ width: 100, height: 100 }} />
+              </Badge>
+            </Theme>
+          );
+          const { rerender } = render(badge(0));
+          const original = screen.getByText("offset").getBoundingClientRect();
+
+          for (const offset of [8, -8]) {
+            rerender(badge(offset));
+            const bounds = screen.getByText("offset").getBoundingClientRect();
+            expect(bounds.x - original.x).toBeCloseTo(offset * 2 * (horizontal === "left" ? 1 : -1), 1);
+            expect(bounds.y - original.y).toBeCloseTo(offset * (vertical === "top" ? 1 : -1), 1);
+          }
+        });
       }
     }
   }
@@ -143,5 +167,23 @@ describe("Badge layout (browser)", () => {
     expect(text.right).toBeLessThan(bounds.right);
     expect(text.top).toBeGreaterThanOrEqual(bounds.top);
     expect(text.bottom).toBeLessThanOrEqual(bounds.bottom);
+  });
+
+  it("ignores offsets for standalone badges", () => {
+    const { rerender } = render(<Badge content="Standalone" />);
+    const original = screen.getByText("Standalone").getBoundingClientRect();
+    rerender(
+      <Badge content="Standalone" anchorOffset={{ vertical: 30, horizontal: -20 }} />,
+    );
+    const bounds = screen.getByText("Standalone").getBoundingClientRect();
+    expect(bounds.x).toBe(original.x);
+    expect(bounds.y).toBe(original.y);
+    expect(getComputedStyle(screen.getByText("Standalone")).translate).toBe("none");
+  });
+
+  it("rejects non-finite offsets", () => {
+    expect(() => render(
+      <Badge content="Invalid" anchorOffset={{ vertical: Infinity, horizontal: 0 }} />,
+    )).toThrow("Badge anchorOffset values must be finite numbers.");
   });
 });

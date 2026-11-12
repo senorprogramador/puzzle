@@ -76,3 +76,8 @@ export const components = [
   { name: "Scroll Lock", href: "/docs/ui/utilities/scroll-lock", icon: "lucide:lock", description: "Prevent background scrolling while an overlay is active." },
   { name: "Transition", href: "/docs/ui/utilities/transition", icon: "lucide:repeat", description: "Animate mounting and unmounting with transition templates." },
 ] satisfies ComponentEntry[];
+
+export const componentPanels = Array.from(
+  { length: Math.ceil(components.length / 2) },
+  (_, index) => components.slice(index * 2, index * 2 + 2),
+);
