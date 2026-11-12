@@ -183,6 +183,13 @@ The `/robots.txt` handler allows all crawlers and paths, advertises
 `https://puzzle-ui.com/sitemap.xml`, and sends 24-hour browser/shared cache headers.
 It returns static text without fetching or generating the sitemap.
 
+The homepage, `/docs` and its sub-pages, and all current public icons and the
+web manifest also send `Cache-Control: public, max-age=86400, s-maxage=86400`.
+These responses can be reused by browsers and shared caches for 24 hours;
+updates may remain cached until that period expires. The paths are configured
+in `apps/site/vite.config.ts`; add a rule there when adding a new public file.
+API responses are not covered by this policy.
+
 ### Run the playground
 
 ```bash

@@ -1,4 +1,4 @@
-// node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-BEzb94Qr.js
+// node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-Da-GBnVH.js
 var tsrStartManifest = () => ({ routes: {
 	__root__: {
 		filePath: "/Users/sjoerd/Documents/puzzle/apps/site/src/routes/__root.tsx",
@@ -11,22 +11,22 @@ var tsrStartManifest = () => ({ routes: {
 		],
 		css: ["/assets/theme-DLIraU-v.css", "/assets/home-COxC0NU-.css"],
 		preloads: [
-			"/assets/index-o-5QA_ZW.js",
+			"/assets/index-_2EvqQxo.js",
 			"/assets/rolldown-runtime-XKyaHtl9.js",
 			"/assets/react-DlmbjZJV.js",
 			"/assets/react-dom-1flDk5uq.js",
-			"/assets/_-7ir4bFDq.js",
+			"/assets/_-Cpn02wzU.js",
 			"/assets/jsx-runtime-LKYXHABd.js",
 			"/assets/preload-helper-7y9sWmk5.js",
 			"/assets/url-BF81yL4m-Cs729U5G.js",
-			"/assets/theme-_t0r1gN-.js",
+			"/assets/theme-Bcmepirk.js",
 			"/assets/scope-context-BWzRIaDm.js",
 			"/assets/casing-DS73apSf.js"
 		],
 		scripts: [{ attrs: {
 			type: "module",
 			async: !0,
-			src: "/assets/index-o-5QA_ZW.js"
+			src: "/assets/index-_2EvqQxo.js"
 		} }]
 	},
 	"/": {
@@ -38,7 +38,7 @@ var tsrStartManifest = () => ({ routes: {
 			"/assets/header-Bx-FroL_.css"
 		],
 		preloads: [
-			"/assets/routes-CiqcWpu0.js",
+			"/assets/routes-oyOgX9MN.js",
 			"/assets/carousel-BFdcIdwy.js",
 			"/assets/section-CLTTdVW_.js",
 			"/assets/header-BB7N2Em-.js"
@@ -56,7 +56,7 @@ var tsrStartManifest = () => ({ routes: {
 			"/assets/_-Dcj_rxLA.css"
 		],
 		preloads: [
-			"/assets/_-DuKs5RB4.js",
+			"/assets/_-BAHADl7K.js",
 			"/assets/dist-DUI9TJPX.js",
 			"/assets/carousel-BFdcIdwy.js",
 			"/assets/section-CLTTdVW_.js",

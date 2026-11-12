@@ -17,7 +17,17 @@ export const resolveFontConfig = (
   input: FontConfig,
 ): ResolvedFontConfig => {
   const family = validateFamilyName(input.family);
-  const rawWeights = input.weights ?? [400, 700];
+  const weightRange = input.weightRange;
+  if (
+    weightRange !== undefined &&
+    (!Array.isArray(weightRange) ||
+      weightRange.length !== 2 ||
+      weightRange.some((weight) => !Number.isInteger(weight) || weight < 1 || weight > 1000) ||
+      weightRange[0] > weightRange[1])
+  ) {
+    throw new RangeError(`font ${family}.weightRange must be an ascending pair of integers between 1 and 1000.`);
+  }
+  const rawWeights = weightRange ?? input.weights ?? [400, 700];
   const rawStyles = input.styles ?? ["normal"];
   const display = input.display ?? "swap";
   const fallback = input.fallback ?? [
@@ -57,6 +67,7 @@ export const resolveFontConfig = (
 
   return {
     family,
+    weightRange,
     weights: [...new Set(rawWeights)].sort((a, b) => a - b),
     styles: [...new Set(rawStyles)].sort(
       (a, b) => (a === "normal" ? 0 : 1) - (b === "normal" ? 0 : 1),

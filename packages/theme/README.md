@@ -76,6 +76,49 @@ yarn add @puzzle-ui/ui
 
 These commands install published packages; they do not clone the repository or build its workspaces. Puzzle does not require Bun in your application. React and React DOM are peer dependencies and should already be installed in your app.
 
+## Download fonts with the theme CLI
+
+The `@puzzle-ui/theme` package includes the `puzzle-theme` executable.
+It requires Node.js 20.19 or later.
+
+```bash
+npm install @puzzle-ui/theme
+npm exec -- puzzle-theme --help
+```
+
+Create `puzzle-fonts.json` in your application's working directory:
+
+```json
+{
+  "body": {
+    "family": "Inter",
+    "weights": [400, 700]
+  }
+}
+```
+
+Download the fonts with either package manager:
+
+```bash
+npm exec -- puzzle-theme fonts download
+# Or, with the package installed using Bun:
+bun run puzzle-theme fonts download
+```
+
+The command writes WOFF2 files and `puzzle-fonts.css` to `public/fonts`.
+Use `--config <path>` or `--out-dir <path>` to change these locations.
+Unchanged downloads are skipped; `--force` downloads them again.
+For variable fonts, use `"weightRange": [300, 700]` instead of `weights`
+to request a continuous range. Only use ranges supported by the font family.
+Discrete `weights` remain supported; when both are provided, the range is used.
+The downloader keeps all language subsets by default. Pass
+`--subsets latin,latin-ext` to retain only Latin and Latin Extended;
+missing requested subsets produce an error. Other scripts will use fallback
+fonts. Subset choices are included in the download cache key.
+To load the generated stylesheet, set `fontSource="local"` on `Theme` and
+pass the same configuration to its `fonts` prop. The default local stylesheet
+URL is `/fonts/puzzle-fonts.css`.
+
 ## Your first interface
 
 Import components from `"@puzzle-ui/ui` and wrap your application in `Theme` from `"@puzzle-ui/theme`:

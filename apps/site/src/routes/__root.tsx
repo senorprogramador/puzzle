@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import fonts from "../puzzle-fonts.json";
 import {
   Outlet,
   createRootRoute,
@@ -80,13 +81,6 @@ function RootComponent() {
   );
 }
 
-const siteFont = {
-  family: "Geist",
-  weights: [300, 400, 500, 600, 650, 700],
-  display: "optional",
-  fallback: ["system-ui", "sans-serif"],
-} as const;
-
 function RootDocument({
   children,
 }: Readonly<{
@@ -101,11 +95,8 @@ function RootDocument({
       <body>
         <Theme
           theme="light"
-          fonts={{
-            heading: siteFont,
-            body: siteFont,
-            accent: siteFont,
-          }}
+          fonts={fonts}
+          fontSource="local"
           components={{
             link: {
               component: TanStackLink,

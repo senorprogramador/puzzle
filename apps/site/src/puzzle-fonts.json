@@ -1,0 +1,23 @@
+{
+  "heading": {
+    "family": "Geist",
+    "weightRange": [300, 700],
+    "styles": ["normal", "italic"],
+    "display": "optional",
+    "fallback": ["system-ui", "sans-serif"]
+  },
+  "body": {
+    "family": "Geist",
+    "weightRange": [300, 700],
+    "styles": ["normal", "italic"],
+    "display": "optional",
+    "fallback": ["system-ui", "sans-serif"]
+  },
+  "accent": {
+    "family": "Geist",
+    "weightRange": [300, 700],
+    "styles": ["normal", "italic"],
+    "display": "optional",
+    "fallback": ["system-ui", "sans-serif"]
+  }
+}

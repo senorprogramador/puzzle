@@ -1,6 +1,6 @@
 {
-  "name": "Puzzle",
-  "short_name": "Puzzle",
+  "name": "Puzzle UI",
+  "short_name": "Puzzle UI",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

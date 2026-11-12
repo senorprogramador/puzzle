@@ -1,12 +1,11 @@
 import { __commonJSMin, __require, __toESM } from "../../_runtime.mjs";
 import { require_react } from "../react.mjs";
-import { require_jsx_runtime } from "../react2.mjs";
-import { require_react_dom } from "../react-dom.mjs";
 import { hasKeys, routerContext, waitForReason } from "./react-router+[...].mjs";
+import { require_jsx_runtime } from "../react2.mjs";
 import { Matches } from "../tanstack__react-router.mjs";
+import { require_react_dom } from "../react-dom.mjs";
 import { PassThrough, Readable } from "node:stream";
 require_react();
-var import_jsx_runtime = require_jsx_runtime();
 var MIN_JSON_STRINGIFY_LENGTH = 64;
 var NEEDS_ESCAPE = /["\\\n\r\b\t\f<\u2028\u2029]/;
 var JSON_ESCAPE_DIFFERENCES = /[\x00-\x07\x0b\x0e-\x1f\ud800-\udfff]/;
@@ -60,6 +59,7 @@ function getCrossReferenceHeader(id) {
 	return `(${GLOBAL_CONTEXT_R}=${GLOBAL_CONTEXT_R}||{})["${serializeString(id)}"]=[]`;
 }
 // ../../node_modules/.bun/@tanstack+react-router@1.170.46+ab9c01e4ccdf52df/node_modules/@tanstack/react-router/dist/esm/RouterProvider.js
+var import_jsx_runtime = require_jsx_runtime();
 /**
 * Low-level provider that places the router into React context and optionally
 * updates router options from props. Most apps should use `RouterProvider`.

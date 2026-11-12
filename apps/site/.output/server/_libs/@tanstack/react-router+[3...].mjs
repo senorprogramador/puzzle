@@ -1,7 +1,7 @@
 import { __toESM } from "../../_runtime.mjs";
 import { require_react } from "../react.mjs";
-import { require_jsx_runtime } from "../react2.mjs";
 import { RouterCore, _getAssetMatches, createNonReactiveMutableStore, createNonReactiveReadonlyStore, escapeHtml, useHydrated, useRouter } from "./react-router+[...].mjs";
+import { require_jsx_runtime } from "../react2.mjs";
 // ../../node_modules/.bun/@tanstack+router-core@1.171.39/node_modules/@tanstack/router-core/dist/esm/manifest.js
 function getAssetCrossOrigin(assetCrossOrigin, kind) {
 	if (!assetCrossOrigin) return;

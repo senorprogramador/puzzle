@@ -1,7 +1,7 @@
 import { TSS_SERVER_FUNCTION, createServerFn } from "./_ssr/createServerFn-DRXAnLP9.mjs";
-import { source } from "./_ssr/source-n7jHvPA7.mjs";
+import { source } from "./_ssr/source-DxywneDS.mjs";
 import { notFound } from "./_libs/tanstack__router-core.mjs";
-// node_modules/.nitro/vite/services/ssr/assets/_-DKyhME7o.js
+// node_modules/.nitro/vite/services/ssr/assets/_-CK1V6la8.js
 var createServerRpc = (serverFnMeta, splitImportFn) => {
 	const url = "/_serverFn/" + serverFnMeta.id;
 	return Object.assign(splitImportFn, {

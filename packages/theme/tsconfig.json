@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "target": "ES2022",
+        "types": ["node"],
         "lib": [
             "ES2022",
             "DOM"
@@ -32,10 +33,6 @@
         "src/**/*.tsx"
     ],
     "exclude": [
-        "**/*.spec.ts",
-        "**/*.spec.tsx",
-        "**/*.test.ts",
-        "**/*.test.tsx",
         "node_modules",
         "dist"
     ]

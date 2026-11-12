@@ -1,7 +1,7 @@
 import { __toESM } from "../_runtime.mjs";
 import { normalizeUrl } from "./url-BF81yL4m-CIPmfM51.mjs";
 import { require_react } from "../_libs/react.mjs";
-// node_modules/.nitro/vite/services/ssr/assets/source-n7jHvPA7.js
+// node_modules/.nitro/vite/services/ssr/assets/source-DxywneDS.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var frontmatter$84 = {
 	"title": "Authentication Setup",
@@ -1560,7 +1560,7 @@ var docs = await docsAsync({
 		"./ui/layout/app-bar.mdx": () => import("./app-bar.mdx_macro_id_src_2Flib_2Fsource-D4501egI.mjs"),
 		"./ui/layout/aspect-ratio.mdx": () => import("./aspect-ratio.mdx_macro_id_src_2Flib_2Fsource-U64naGgF.mjs"),
 		"./ui/layout/background.mdx": () => import("./background.mdx_macro_id_src_2Flib_2Fsource-Cg11gZI5.mjs"),
-		"./ui/layout/bottom-navigation.mdx": () => import("./bottom-navigation.mdx_macro_id_src_2Flib_2Fsource-8dUa9ZcG.mjs"),
+		"./ui/layout/bottom-navigation.mdx": () => import("./bottom-navigation.mdx_macro_id_src_2Flib_2Fsource-CAa81yd_.mjs"),
 		"./ui/layout/breadcrumbs.mdx": () => import("./breadcrumbs.mdx_macro_id_src_2Flib_2Fsource-PGJ2nd53.mjs"),
 		"./ui/layout/collapsable-sidebar.mdx": () => import("./collapsable-sidebar.mdx_macro_id_src_2Flib_2Fsource-Buy-LM9A.mjs"),
 		"./ui/layout/container.mdx": () => import("./container.mdx_macro_id_src_2Flib_2Fsource-DS7L1fUp.mjs"),

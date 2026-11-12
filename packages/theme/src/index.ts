@@ -4,6 +4,7 @@ export type {
   FontRole,
   FontStyle,
   FontDisplay,
+  FontSource,
   FontConfig,
   ResolvedFontConfig,
   FontStylesheet,

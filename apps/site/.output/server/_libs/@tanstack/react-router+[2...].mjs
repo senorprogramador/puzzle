@@ -1,7 +1,7 @@
 import { __toESM } from "../../_runtime.mjs";
 import { require_react } from "../react.mjs";
-import { require_jsx_runtime } from "../react2.mjs";
 import { cleanPath, deepEqual, dummyMatchContext, functionalUpdate, getUrlScheme, invariant, isDangerousProtocol, isModuleNotFoundError, matchContext, reactUse, redirect, removeTrailingSlash, replaceEqualDeep, rootRouteId, trimPathLeft, trimPathRight, useRouter } from "./react-router+[...].mjs";
+import { require_jsx_runtime } from "../react2.mjs";
 // ../../node_modules/.bun/@tanstack+router-core@1.171.39/node_modules/@tanstack/router-core/dist/esm/route.js
 var BaseRoute = class {
 	get to() {

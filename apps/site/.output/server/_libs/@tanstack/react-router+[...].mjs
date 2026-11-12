@@ -1,8 +1,8 @@
 import { __commonJSMin, __toESM } from "../../_runtime.mjs";
 import { require_react } from "../react.mjs";
-import { require_jsx_runtime } from "../react2.mjs";
 import { isNotFound } from "../tanstack__router-core.mjs";
 import { normalizeProtocolRelative, parseHref } from "../tanstack__history2.mjs";
+import { require_jsx_runtime } from "../react2.mjs";
 // ../../node_modules/.bun/@tanstack+router-core@1.171.39/node_modules/@tanstack/router-core/dist/esm/root.js
 /** Stable identifier used for the root route in a route tree. */
 var rootRouteId = "__root__";

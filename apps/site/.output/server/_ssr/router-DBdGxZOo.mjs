@@ -1,15 +1,38 @@
-import { Theme } from "./theme-vjuhMOMB.mjs";
-import { basename, extname, source } from "./source-n7jHvPA7.mjs";
+import { Theme } from "./theme-KxcCAAuZ.mjs";
+import { Route as Route$5, getCanonicalUrl } from "../_-DAwSJOMB.mjs";
+import { basename, extname, source } from "./source-DxywneDS.mjs";
 import { addSearchablePropertyToIndex, addSortablePropertyToSorter, create, createError, getInternalDocumentId, getNested, isArrayType, isAsyncFunction, isGeoPointType, isVectorType, runMultipleHook, runSingleHook, save, searchAdvanced, searchSimple, yieldToEventLoop } from "./advanced-8SKrWgR9-D5hjLeTM.mjs";
 import { createEndpoint, defaultReadOptions } from "./endpoint-H7rb4eeq-e9k_OSbI.mjs";
-import { Route as Route$5 } from "../_-DkvFcALJ.mjs";
 import { HeadContent, Scripts, createRouter } from "../_libs/@tanstack/react-router+[3...].mjs";
 import { Link, createFileRoute, createRootRoute, lazyRouteComponent } from "../_libs/@tanstack/react-router+[2...].mjs";
 import { Outlet } from "../_libs/@tanstack/react-router+[...].mjs";
 import { require_jsx_runtime } from "../_libs/react2.mjs";
-// node_modules/.nitro/vite/services/ssr/assets/router-DT_9Bjbo.js
+// node_modules/.nitro/vite/services/ssr/assets/router-DBdGxZOo.js
 var import_jsx_runtime = require_jsx_runtime();
-var app_default = "/assets/app-WEwr59-l.css";
+var puzzle_fonts_default = {
+	heading: {
+		"family": "Geist",
+		"weightRange": [300, 700],
+		"styles": ["normal", "italic"],
+		"display": "optional",
+		"fallback": ["system-ui", "sans-serif"]
+	},
+	body: {
+		"family": "Geist",
+		"weightRange": [300, 700],
+		"styles": ["normal", "italic"],
+		"display": "optional",
+		"fallback": ["system-ui", "sans-serif"]
+	},
+	accent: {
+		"family": "Geist",
+		"weightRange": [300, 700],
+		"styles": ["normal", "italic"],
+		"display": "optional",
+		"fallback": ["system-ui", "sans-serif"]
+	}
+};
+var app_default = "/assets/app-DlJ5Ffag.css";
 var Route$4 = createRootRoute({
 	head: () => ({
 		meta: [
@@ -18,7 +41,15 @@ var Route$4 = createRootRoute({
 				name: "viewport",
 				content: "width=device-width, initial-scale=1"
 			},
-			{ title: "Puzzle UI" }
+			{ title: "Puzzle UI" },
+			{
+				name: "description",
+				content: "Puzzle UI is a React UI library for building modern web applications."
+			},
+			{
+				name: "robots",
+				content: "index, follow"
+			}
 		],
 		links: [
 			{
@@ -68,29 +99,13 @@ var Route$4 = createRootRoute({
 function RootComponent() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(RootDocument, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {}) });
 }
-var siteFont = {
-	family: "Geist",
-	weights: [
-		300,
-		400,
-		500,
-		600,
-		650,
-		700
-	],
-	display: "optional",
-	fallback: ["system-ui", "sans-serif"]
-};
 function RootDocument({ children }) {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("html", {
 		lang: "en",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("head", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(HeadContent, {}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("body", { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Theme, {
 			theme: "light",
-			fonts: {
-				heading: siteFont,
-				body: siteFont,
-				accent: siteFont
-			},
+			fonts: puzzle_fonts_default,
+			fontSource: "local",
 			components: { link: {
 				component: Link,
 				hrefProp: "to"
@@ -99,8 +114,23 @@ function RootDocument({ children }) {
 		}) })]
 	});
 }
-var $$splitComponentImporter = () => import("./routes-C7_3ntsp.mjs");
-var Route$3 = createFileRoute("/")({ component: lazyRouteComponent($$splitComponentImporter, "component") });
+var $$splitComponentImporter = () => import("./routes-5Qw4PpsE.mjs");
+var Route$3 = createFileRoute("/")({
+	component: lazyRouteComponent($$splitComponentImporter, "component"),
+	head: () => ({
+		links: [{
+			rel: "canonical",
+			href: getCanonicalUrl("/")
+		}],
+		meta: [{
+			name: "description",
+			content: "A thoughtfully crafted React UI framework. Build accessible, consistent and beautiful interfaces with Puzzle UI."
+		}, {
+			property: "og:url",
+			content: getCanonicalUrl("/")
+		}]
+	})
+});
 var robots = [
 	"User-agent: *",
 	"Allow: /",

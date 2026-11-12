@@ -1,8 +1,8 @@
-import { Theme } from "./theme-vjuhMOMB.mjs";
+import { Theme } from "./theme-KxcCAAuZ.mjs";
 import { Icon$1, Section } from "./section-BhsGlFRU.mjs";
 import { BottomNavigation, BottomNavigationItem } from "./bottom-navigation-Bfm20zFO.mjs";
 import { require_jsx_runtime } from "../_libs/react2.mjs";
-// node_modules/.nitro/vite/services/ssr/assets/bottom-navigation.mdx_macro_id_src_2Flib_2Fsource-8dUa9ZcG.js
+// node_modules/.nitro/vite/services/ssr/assets/bottom-navigation.mdx_macro_id_src_2Flib_2Fsource-CAa81yd_.js
 var import_jsx_runtime = require_jsx_runtime();
 var BottomNavigationPreview = () => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Theme, {
 	scope: "local",

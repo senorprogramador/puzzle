@@ -35,7 +35,7 @@ describe("breakpoints", () => {
 
       for (const match of mediaQueries) {
         expect(
-          allowedValues.has(match[1]),
+          match[1] !== undefined && allowedValues.has(match[1]),
           `${stylesheet} uses ${match[1]}, which is not defined in BREAKPOINTS`,
         ).toBe(true);
       }

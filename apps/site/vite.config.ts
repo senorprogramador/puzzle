@@ -6,6 +6,20 @@ import tailwindcss from "@tailwindcss/vite";
 import { fumadocsMdx } from "fumadocs-mdx/vite";
 
 const logger = createLogger();
+const cachedPaths = [
+  "/",
+  "/docs",
+  "/docs/**",
+  "/apple-touch-icon.png",
+  "/favicon.ico",
+  "/favicon.svg",
+  "/favicon-16x16.png",
+  "/favicon-32x32.png",
+  "/favicon-96x96.png",
+  "/site.webmanifest",
+  "/web-app-manifest-192x192.png",
+  "/web-app-manifest-512x512.png",
+];
 const warn = logger.warn.bind(logger);
 logger.warn = (message, options) => {
   // Fumadocs shares this server runtime with its client macro; the fs import
@@ -33,7 +47,18 @@ export default defineConfig({
   },
   plugins: [
     tanstackStart(),
-    nitro(),
+    nitro({
+      routeRules: Object.fromEntries(
+        cachedPaths.map((path) => [
+          path,
+          {
+            headers: {
+              "cache-control": "public, max-age=86400, s-maxage=86400",
+            },
+          },
+        ]),
+      ),
+    }),
     viteReact(),
     tailwindcss({
       optimize: {

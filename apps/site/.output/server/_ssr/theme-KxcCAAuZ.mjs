@@ -3,7 +3,7 @@ import { ThemeComponentsProvider, ThemeScopeProvider } from "./scope-context-gET
 import { stringWithCasing } from "./casing-BRvB1fDS.mjs";
 import { require_react } from "../_libs/react.mjs";
 import { require_jsx_runtime } from "../_libs/react2.mjs";
-// node_modules/.nitro/vite/services/ssr/assets/theme-vjuhMOMB.js
+// node_modules/.nitro/vite/services/ssr/assets/theme-KxcCAAuZ.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var assertSafeCssValue = (value, label) => {
@@ -24,7 +24,9 @@ var validateFamilyName = (value) => {
 };
 var resolveFontConfig = (input) => {
 	const family = validateFamilyName(input.family);
-	const rawWeights = input.weights ?? [400, 700];
+	const weightRange = input.weightRange;
+	if (weightRange !== void 0 && (!Array.isArray(weightRange) || weightRange.length !== 2 || weightRange.some((weight) => !Number.isInteger(weight) || weight < 1 || weight > 1e3) || weightRange[0] > weightRange[1])) throw new RangeError(`font ${family}.weightRange must be an ascending pair of integers between 1 and 1000.`);
+	const rawWeights = weightRange ?? input.weights ?? [400, 700];
 	const rawStyles = input.styles ?? ["normal"];
 	const display = input.display ?? "swap";
 	const fallback = input.fallback ?? [...DEFAULT_FONT_FALLBACKS[input.role ?? "body"]];
@@ -33,6 +35,7 @@ var resolveFontConfig = (input) => {
 	if (fallback.length === 0 || fallback.some((value) => typeof value !== "string" || !value.trim() || /[\u0000-\u001f\u007f<>;]/.test(value))) throw new TypeError(`font ${family}.fallback must be a non-empty array of font-family names.`);
 	return {
 		family,
+		weightRange,
 		weights: [...new Set(rawWeights)].sort((a, b) => a - b),
 		styles: [...new Set(rawStyles)].sort((a, b) => (a === "normal" ? 0 : 1) - (b === "normal" ? 0 : 1)),
 		display,
@@ -44,7 +47,8 @@ var GOOGLE_FONTS_CSS2_URL = "https://fonts.googleapis.com/css2";
 var createGoogleFontUrl = (options) => {
 	const font = resolveFontConfig(options);
 	const hasItalic = font.styles.includes("italic");
-	const tuples = font.styles.flatMap((style) => font.weights.map((weight) => ({
+	const weights = font.weightRange ? [font.weightRange.join("..")] : font.weights.map(String);
+	const tuples = font.styles.flatMap((style) => weights.map((weight) => ({
 		italic: style === "italic" ? 1 : 0,
 		weight
 	})));
@@ -55,7 +59,7 @@ var createGoogleFontUrl = (options) => {
 	].join("") : [
 		font.family,
 		":wght@",
-		font.weights.join(";")
+		weights.join(";")
 	].join("");
 	const params = new URLSearchParams();
 	params.set("family", familySpec);
@@ -936,11 +940,16 @@ var resolveFontStylesheets = (fonts) => {
 				family: font.family,
 				display: font.display,
 				weights: /* @__PURE__ */ new Set(),
-				styles: /* @__PURE__ */ new Set()
+				styles: /* @__PURE__ */ new Set(),
+				variable: false
 			};
 			groups.set(key, group);
 		}
 		font.weights.forEach((weight) => group.weights.add(weight));
+		if (font.weightRange) {
+			group.variable = true;
+			font.weightRange.forEach((weight) => group.weights.add(weight));
+		}
 		font.styles.forEach((style) => group.styles.add(style));
 	}
 	return [...groups.values()].map((group) => ({
@@ -949,17 +958,25 @@ var resolveFontStylesheets = (fonts) => {
 		href: createGoogleFontUrl({
 			family: group.family,
 			weights: [...group.weights].sort((a, b) => a - b),
+			weightRange: group.variable ? [Math.min(...group.weights), Math.max(...group.weights)] : void 0,
 			styles: [...group.styles].sort((a, b) => (a === "normal" ? 0 : 1) - (b === "normal" ? 0 : 1)),
 			display: group.display
 		})
 	}));
 };
+var LOCAL_FONT_STYLESHEET_NAME = "puzzle-fonts.css";
+var createLocalFontStylesheetUrl = (basePath = "/fonts") => {
+	if (typeof basePath !== "string" || !basePath.startsWith("/") || basePath.startsWith("//") || /[\u0000-\u0020\u007f?#\\]/.test(basePath)) throw new TypeError("fontBasePath must be a root-relative URL path, such as \"/fonts\".");
+	if (basePath.split("/").filter(Boolean).some((segment) => segment === "." || segment === "..")) throw new TypeError("fontBasePath must not contain relative path segments.");
+	return `${basePath.replace(/\/+$/, "")}/${LOCAL_FONT_STYLESHEET_NAME}`;
+};
 var createThemeCss = (variables) => {
 	return `${Object.entries(variables).map(([name, value]) => `  ${name}: ${value};`).join("\n")}\n`;
 };
-var Theme = ({ nonce, fonts, theme = "system", scope = "root", globalStyles, tokens, colorTheme, components, children }) => {
+var Theme = ({ nonce, fonts, fontSource = "google", fontBasePath = "/fonts", theme = "system", scope = "root", globalStyles, tokens, colorTheme, components, children }) => {
 	const scopeId = (0, import_react.useId)();
 	const fontStylesheets = resolveFontStylesheets(fonts);
+	const localFontStylesheet = fontSource === "local" && fontStylesheets.length > 0 ? createLocalFontStylesheetUrl(fontBasePath) : null;
 	const cssVariables = createThemeVariables(fonts, tokens, theme, colorTheme);
 	const css = `${scope === "root" ? ":root" : `[data-puzzle-theme-scope="${scopeId}"]`} {\n${createThemeCss(cssVariables)}\n}`;
 	const shouldApplyGlobalStyles = scope === "root" && (globalStyles ?? true);
@@ -971,8 +988,9 @@ var Theme = ({ nonce, fonts, theme = "system", scope = "root", globalStyles, tok
 			children
 		})
 	});
+	const usesGoogleFonts = fontSource === "google" && fontStylesheets.length > 0;
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-		fontStylesheets.length > 0 ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("link", {
+		usesGoogleFonts ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("link", {
 			rel: "preconnect",
 			href: "https://fonts.googleapis.com"
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("link", {
@@ -980,11 +998,16 @@ var Theme = ({ nonce, fonts, theme = "system", scope = "root", globalStyles, tok
 			href: "https://fonts.gstatic.com",
 			crossOrigin: "anonymous"
 		})] }) : null,
-		fontStylesheets.map(({ href }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("link", {
+		fontSource === "google" ? fontStylesheets.map(({ href }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("link", {
 			rel: "stylesheet",
 			href,
 			precedence: "default"
-		}, href)),
+		}, href)) : null,
+		localFontStylesheet ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("link", {
+			rel: "stylesheet",
+			href: localFontStylesheet,
+			precedence: "default"
+		}, localFontStylesheet) : null,
 		shouldApplyGlobalStyles ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("style", {
 			nonce,
 			"data-puzzle-global-styles": ""

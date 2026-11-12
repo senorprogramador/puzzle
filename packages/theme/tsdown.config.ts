@@ -5,6 +5,7 @@ export default defineConfig({
     "src/index.ts",
     "src/components-context.tsx",
     "src/scope-context.tsx",
+    "src/cli.ts",
   ],
   unbundle: true,
   format: ["esm", "cjs"],

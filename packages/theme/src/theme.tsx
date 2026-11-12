@@ -1,13 +1,17 @@
 import { useId, type PropsWithChildren } from "react";
 
-import type { FontRole, FontConfig } from "./fonts";
+import type { FontRole, FontConfig, FontSource } from "./fonts";
+
 import type { ColorThemes, ThemeMode, ThemeTokenOverrides } from "./types";
+
 import type { ThemeComponents } from "./components.types";
 
 import { ThemeComponentsProvider } from "./components-context";
 import { ThemeScopeProvider } from "./scope-context";
 
 import { resolveFontStylesheets } from "./fonts/resolve-font-stylesheets";
+import { createLocalFontStylesheetUrl } from "./fonts/create-local-font-stylesheet-url";
+
 import { createThemeVariables } from "./create-theme-variables";
 import { createThemeCss } from "./create-theme-css";
 
@@ -22,7 +26,24 @@ export type ThemeProps = {
   theme?: ThemeMode;
   scope?: ThemeScope;
   globalStyles?: boolean;
-  fonts?: Partial<Record<FontRole, FontConfig>>;
+
+  fonts?: Partial<Record<FontRole, FontConfig>> | Record<string, unknown>;
+
+  /**
+   * Determines how configured fonts are loaded.
+   *
+   * - google: Load fonts from Google Fonts (default).
+   * - local: Load public/fonts/puzzle-fonts.css.
+   */
+  fontSource?: FontSource;
+
+  /**
+   * Public URL directory containing puzzle-fonts.css.
+   *
+   * Defaults to "/fonts".
+   */
+  fontBasePath?: string;
+
   tokens?: ThemeTokenOverrides;
   colorTheme?: ColorThemes;
   components?: ThemeComponents;
@@ -31,6 +52,8 @@ export type ThemeProps = {
 const Theme = ({
   nonce,
   fonts,
+  fontSource = "google",
+  fontBasePath = "/fonts",
   theme = "system",
   scope = "root",
   globalStyles,
@@ -42,6 +65,12 @@ const Theme = ({
   const scopeId = useId();
 
   const fontStylesheets = resolveFontStylesheets(fonts);
+
+  const localFontStylesheet =
+    fontSource === "local" && fontStylesheets.length > 0
+      ? createLocalFontStylesheetUrl(fontBasePath)
+      : null;
+
   const cssVariables = createThemeVariables(fonts, tokens, theme, colorTheme);
 
   const cssSelector =
@@ -69,11 +98,14 @@ const Theme = ({
     </ThemeScopeProvider>
   );
 
+  const usesGoogleFonts = fontSource === "google" && fontStylesheets.length > 0;
+
   return (
     <>
-      {fontStylesheets.length > 0 ? (
+      {usesGoogleFonts ? (
         <>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
+
           <link
             rel="preconnect"
             href="https://fonts.gstatic.com"
@@ -82,9 +114,25 @@ const Theme = ({
         </>
       ) : null}
 
-      {fontStylesheets.map(({ href }) => (
-        <link key={href} rel="stylesheet" href={href} precedence="default" />
-      ))}
+      {fontSource === "google"
+        ? fontStylesheets.map(({ href }) => (
+            <link
+              key={href}
+              rel="stylesheet"
+              href={href}
+              precedence="default"
+            />
+          ))
+        : null}
+
+      {localFontStylesheet ? (
+        <link
+          key={localFontStylesheet}
+          rel="stylesheet"
+          href={localFontStylesheet}
+          precedence="default"
+        />
+      ) : null}
 
       {shouldApplyGlobalStyles ? (
         <style nonce={nonce} data-puzzle-global-styles="" />

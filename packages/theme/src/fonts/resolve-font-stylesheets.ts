@@ -30,6 +30,7 @@ export const resolveFontStylesheets = (
       display: FontDisplay;
       weights: Set<number>;
       styles: Set<FontStyle>;
+      variable: boolean;
     }
   >();
 
@@ -42,10 +43,15 @@ export const resolveFontStylesheets = (
         display: font.display,
         weights: new Set<number>(),
         styles: new Set<FontStyle>(),
+        variable: false,
       };
       groups.set(key, group);
     }
     font.weights.forEach((weight) => group!.weights.add(weight));
+    if (font.weightRange) {
+      group.variable = true;
+      font.weightRange.forEach((weight) => group!.weights.add(weight));
+    }
     font.styles.forEach((style) => group!.styles.add(style));
   }
 
@@ -55,6 +61,9 @@ export const resolveFontStylesheets = (
     href: createGoogleFontUrl({
       family: group.family,
       weights: [...group.weights].sort((a, b) => a - b),
+      weightRange: group.variable
+        ? [Math.min(...group.weights), Math.max(...group.weights)]
+        : undefined,
       styles: [...group.styles].sort(
         (a, b) => (a === "normal" ? 0 : 1) - (b === "normal" ? 0 : 1),
       ),

@@ -4,9 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
+    "dev": "bun run fonts:download && vite dev",
+    "build": "bun run fonts:download && vite build",
     "start": "node .output/server/index.mjs",
+    "fonts:download": "bun ../../packages/theme/src/cli.ts fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
     "test:sitemap": "bun test src/lib/sitemap.test.ts",
     "test:catalog": "bun test src/components/component-catalog.test.ts",
     "typecheck": "tsc --noEmit -p ."

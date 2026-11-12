@@ -1,11 +1,44 @@
 import { describe, expect, it } from "vitest";
 import { createGoogleFontUrl } from "./create-google-font-url";
+import { resolveFontStylesheets } from "./resolve-font-stylesheets";
 
 function getFamily(url: string): string | null {
   return new URL(url).searchParams.get("family");
 }
 
 describe("createGoogleFontUrl", () => {
+  it("requests variable weights for both styles", () => {
+    expect(getFamily(createGoogleFontUrl({
+      family: "Geist",
+      weightRange: [300, 700],
+      styles: ["italic", "normal"],
+    }))).toBe("Geist:ital,wght@0,300..700;1,300..700");
+    expect(getFamily(createGoogleFontUrl({
+      family: "Geist",
+      weightRange: [300, 700],
+    }))).toBe("Geist:wght@300..700");
+  });
+
+  it.each([[700, 300], [0, 700], [300, 1001], [300.5, 700]])(
+    "rejects invalid range %s..%s",
+    (start, end) => {
+      expect(() => createGoogleFontUrl({
+        family: "Geist",
+        weightRange: [start, end],
+      })).toThrow(RangeError);
+    },
+  );
+
+  it("merges ranges and discrete weights across roles", () => {
+    const sheets = resolveFontStylesheets({
+      heading: { family: "Geist", weightRange: [300, 600] },
+      body: { family: "Geist", weightRange: [400, 700] },
+      accent: { family: "Geist", weights: [800] },
+    });
+    expect(sheets).toHaveLength(1);
+    expect(getFamily(sheets[0]!.href)).toBe("Geist:wght@300..800");
+  });
+
   it("uses the default weights and display", () => {
     const url = createGoogleFontUrl({
       family: "Inter",
@@ -74,6 +107,7 @@ describe("createGoogleFontUrl", () => {
   it("rejects an empty family", () => {
     expect(() =>
       createGoogleFontUrl({
+        // @ts-expect-error Exercise runtime validation of an invalid family.
         family: " ",
       }),
     ).toThrow(TypeError);
