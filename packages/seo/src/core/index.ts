@@ -19,4 +19,22 @@ export type {
   SeoSerializationResult,
   SeoReference,
   SeoGraphRoot,
+  SeoNodeOptions,
+  SeoGraphConflictStrategy,
+  SeoGraphBuilderOptions,
+  SeoGraphBuilder,
+  SeoGraphValidationOptions,
+  SeoGraphSerializationOptions,
 } from "./types";
+
+export {
+  normalizeSeoId,
+  createSeoNode,
+  mergeSeoNodes,
+  createSeoGraphBuilder,
+  buildSeoGraph,
+  resolveSeoReferences,
+  validateSeoGraph,
+  serializeSeoGraph,
+  stringifySeoGraph,
+} from "./graph";

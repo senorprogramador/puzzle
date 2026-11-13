@@ -86,3 +86,37 @@ export interface SeoGraphRoot {
   id: SeoNodeId | string;
   primary?: boolean;
 }
+
+export type SeoGraphConflictStrategy =
+  | "deterministic"
+  | "first"
+  | "last"
+  | "error";
+
+export interface SeoNodeOptions extends SeoGraphOptions {
+  id?: string;
+  type?: string;
+}
+
+export interface SeoGraphBuilderOptions extends SeoGraphOptions {
+  conflictStrategy?: SeoGraphConflictStrategy;
+  strictReferences?: boolean;
+}
+
+export interface SeoGraphBuilder {
+  add(node: SeoNode): this;
+  addMany(nodes: readonly SeoNode[]): this;
+  build(): SeoGraph;
+  getIssues(): readonly SeoValidationIssue[];
+}
+
+export interface SeoGraphValidationOptions {
+  baseUrl?: string;
+  strictReferences?: boolean;
+  allowedExternalReferences?: boolean;
+}
+
+export interface SeoGraphSerializationOptions extends SeoSerializationOptions {
+  includeContext?: boolean;
+  validate?: boolean;
+}
