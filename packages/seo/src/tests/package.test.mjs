@@ -43,6 +43,7 @@ test("all public subpaths have explicit exports", async () => {
     "./server",
     "./sitemap",
     "./robots",
+    "./urls",
     "./testing",
   ];
 

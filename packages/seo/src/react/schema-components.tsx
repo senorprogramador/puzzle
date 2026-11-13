@@ -65,6 +65,32 @@ const useSchemaCollector = (): SchemaCollector => {
   return collector;
 };
 
+/**
+ * Throws when a strict validation report contains errors.
+ */
+export const assertSeoValidationReport = (report: SeoValidationReport): void => {
+  if (report.mode !== "strict" || report.valid) {
+    return;
+  }
+
+  const errors = report.issues.filter((issue) => issue.severity === "error");
+
+  const messages = errors.map(
+    (issue) => `[${issue.source}:${issue.code}] ${issue.message}`,
+  );
+
+  // Keep the established message when only schema rules failed.
+  const scope =
+    errors.length > 0 &&
+    errors.every(
+      (issue) => issue.source === "schema" || issue.source === "registry",
+    )
+      ? "schema validation"
+      : "validation";
+
+  throw new Error(`Puzzle SEO ${scope} failed:\n${messages.join("\n")}`);
+};
+
 interface SchemaGraphOutputProps {
   collector: SchemaCollector;
 }
@@ -104,23 +130,8 @@ const SchemaGraphOutput = ({ collector }: SchemaGraphOutputProps) => {
     );
   }
 
-  if (report?.mode === "strict" && !report.valid) {
-    const errors = report.issues.filter((issue) => issue.severity === "error");
-
-    const messages = errors.map(
-      (issue) => `[${issue.source}:${issue.code}] ${issue.message}`,
-    );
-
-    // Keep the established message when only schema rules failed.
-    const scope =
-      errors.length > 0 &&
-      errors.every(
-        (issue) => issue.source === "schema" || issue.source === "registry",
-      )
-        ? "schema validation"
-        : "validation";
-
-    throw new Error(`Puzzle SEO ${scope} failed:\n${messages.join("\n")}`);
+  if (report) {
+    assertSeoValidationReport(report);
   }
 
   // Metadata-only validation is supported. An empty graph simply means
@@ -155,7 +166,7 @@ const isLegacyValidation = (
 ): validation is SchemaValidationOptions =>
   "strict" in validation && !("mode" in validation);
 
-const normalizeValidation = (
+export const normalizeValidation = (
   validation: SeoValidationOptions | SchemaValidationOptions | false,
 ): SeoValidationOptions | false => {
   if (validation === false) {

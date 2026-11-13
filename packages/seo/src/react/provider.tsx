@@ -10,7 +10,13 @@ import type { SeoProviderProps } from "./types";
 
 import { SeoReactContext } from "./context";
 
-import { SeoProvider as SeoSchemaProvider } from "./schema-components";
+import {
+  assertSeoValidationReport,
+  normalizeValidation,
+  SeoProvider as SeoSchemaProvider,
+} from "./schema-components";
+
+import { validateSeo } from "../validation/validate";
 
 export const SeoProvider = ({
   config,
@@ -22,10 +28,29 @@ export const SeoProvider = ({
 }: SeoProviderProps) => {
   const resolvedConfig = useMemo(() => normalizeSeoConfig(config), [config]);
 
-  const resolvedMetadata = useMemo(
-    () => resolveSeoMetadata(metadata ?? {}, resolvedConfig),
-    [metadata, resolvedConfig],
-  );
+  const resolvedMetadata = useMemo(() => {
+    try {
+      return resolveSeoMetadata(metadata ?? {}, resolvedConfig);
+    } catch (error) {
+      // Report unresolvable metadata (e.g. unsafe URLs) as validation
+      // errors in strict mode instead of the raw resolution error.
+      const options = normalizeValidation(validation ?? {});
+
+      if (options !== false && metadata) {
+        assertSeoValidationReport(
+          validateSeo(
+            { metadata },
+            {
+              ...options,
+              baseUrl: options.baseUrl ?? resolvedConfig.siteUrl,
+            },
+          ),
+        );
+      }
+
+      throw error;
+    }
+  }, [metadata, resolvedConfig, validation]);
 
   const contextValue = useMemo(
     () => ({

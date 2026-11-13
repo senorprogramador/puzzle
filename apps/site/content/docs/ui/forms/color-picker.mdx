@@ -16,7 +16,8 @@ import { ColorPicker } from "@puzzle-ui/ui";
 Provide a visible `label` and optionally an initial `defaultValue`. Add preset colors with `colors`; a swatch can be a color string or an object with a `value` and optional accessible `label`.
 
 <Preview
-  fit="device"
+  height={600}
+  align="start"
   hideDevices={true}
   code={`\
 <ColorPicker
@@ -42,7 +43,8 @@ Provide a visible `label` and optionally an initial `defaultValue`. Add preset c
 Use labeled swatch objects when the color value alone is not a useful accessible name. CSS color values such as variables can also be used as swatches; the picker returns the original value when a swatch is selected.
 
 <Preview
-  fit="device"
+  height={600}
+  align="start"
   hideDevices={true}
   code={`\
 <ColorPicker
@@ -100,27 +102,27 @@ The picker is clearable by default. Set `clearable={false}` to remove the clear 
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `label` | `ReactNode` | - | Visible label and accessible name for the trigger and popup. |
-| `description` | `ReactNode` | - | Supporting text associated with the trigger. |
-| `value` | `string \| undefined` | - | Controlled color value. Pass `undefined` to represent no selection. |
-| `defaultValue` | `string` | - | Initial color for an uncontrolled picker. |
-| `onChange` | `(value: string \| undefined) => void` | - | Called when a color is chosen, adjusted, applied, or cleared. |
-| `placeholder` | `string` | `"Select color"` | Trigger text when no color is selected. |
-| `colors` | `readonly ColorPickerSwatch[]` | `[]` | Preset strings or `{ value, label? }` swatches. |
-| `format` | `"hex" \| "hexa" \| "rgb" \| "hsl"` | `"hexa"` | Output format for colors adjusted with the picker controls. |
-| `clearable` | `boolean` | `true` | Whether to show the clear-color action. |
-| `clearLabel` | `string` | `"Clear color"` | Accessible name for the clear action. |
-| `disabled` | `boolean` | `false` | Disables the trigger. |
-| `open` | `boolean` | - | Controlled popup visibility. |
-| `defaultOpen` | `boolean` | `false` | Initial popup visibility when uncontrolled. |
-| `onOpenChange` | `(open: boolean) => void` | - | Called when popup visibility changes. |
-| `position` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Preferred popup side. |
-| `align` | `"start" \| "center" \| "end"` | `"start"` | Popup alignment relative to the trigger. |
-| `className`, `style` | Native button props | - | Applied to the trigger button. |
-| `rootClassName` | `string` | - | Additional class for the root wrapper. |
-| `popoverClassName` | `string` | - | Additional class for the popup container. |
+| Prop                 | Type                                     | Default          | Description                                                         |
+| -------------------- | ---------------------------------------- | ---------------- | ------------------------------------------------------------------- |
+| `label`              | `ReactNode`                              | -                | Visible label and accessible name for the trigger and popup.        |
+| `description`        | `ReactNode`                              | -                | Supporting text associated with the trigger.                        |
+| `value`              | `string \| undefined`                    | -                | Controlled color value. Pass `undefined` to represent no selection. |
+| `defaultValue`       | `string`                                 | -                | Initial color for an uncontrolled picker.                           |
+| `onChange`           | `(value: string \| undefined) => void`   | -                | Called when a color is chosen, adjusted, applied, or cleared.       |
+| `placeholder`        | `string`                                 | `"Select color"` | Trigger text when no color is selected.                             |
+| `colors`             | `readonly ColorPickerSwatch[]`           | `[]`             | Preset strings or `{ value, label? }` swatches.                     |
+| `format`             | `"hex" \| "hexa" \| "rgb" \| "hsl"`      | `"hexa"`         | Output format for colors adjusted with the picker controls.         |
+| `clearable`          | `boolean`                                | `true`           | Whether to show the clear-color action.                             |
+| `clearLabel`         | `string`                                 | `"Clear color"`  | Accessible name for the clear action.                               |
+| `disabled`           | `boolean`                                | `false`          | Disables the trigger.                                               |
+| `open`               | `boolean`                                | -                | Controlled popup visibility.                                        |
+| `defaultOpen`        | `boolean`                                | `false`          | Initial popup visibility when uncontrolled.                         |
+| `onOpenChange`       | `(open: boolean) => void`                | -                | Called when popup visibility changes.                               |
+| `position`           | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"`       | Preferred popup side.                                               |
+| `align`              | `"start" \| "center" \| "end"`           | `"start"`        | Popup alignment relative to the trigger.                            |
+| `className`, `style` | Native button props                      | -                | Applied to the trigger button.                                      |
+| `rootClassName`      | `string`                                 | -                | Additional class for the root wrapper.                              |
+| `popoverClassName`   | `string`                                 | -                | Additional class for the popup container.                           |
 
 Other native button attributes, including `id`, `name`, and `aria-*`, are forwarded to the trigger.
 

@@ -1,5 +1,8 @@
 import type { SeoLocale, SeoUrl } from "../core/types";
+import { normalizeSeoPath } from "../urls/normalize";
 import type { SeoConfig, SeoResolvedConfig } from "./types";
+
+export { normalizeSeoPath };
 
 const DEFAULT_LOCALE = "en";
 const DEFAULT_TRAILING_SLASH = "never";
@@ -125,31 +128,6 @@ export const normalizeSeoConfig = (config: SeoConfig): SeoResolvedConfig => {
         }
       : undefined,
   };
-};
-
-export const normalizeSeoPath = (
-  path: string,
-  trailingSlash: SeoResolvedConfig["trailingSlash"],
-): string => {
-  if (!path) {
-    return "/";
-  }
-
-  const pathname = path.startsWith("/") ? path : `/${path}`;
-
-  if (pathname === "/") {
-    return "/";
-  }
-
-  if (trailingSlash === "always") {
-    return `${pathname.replace(/\/+$/, "")}/`;
-  }
-
-  if (trailingSlash === "never") {
-    return pathname.replace(/\/+$/, "");
-  }
-
-  return pathname;
 };
 
 export const resolveSeoUrl = (

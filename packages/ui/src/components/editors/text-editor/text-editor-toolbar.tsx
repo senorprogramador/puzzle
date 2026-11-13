@@ -141,7 +141,6 @@ const TextEditorToolbar = ({
 
       <Stack
         direction="row"
-        wrap="wrap"
         alignH="start"
         alignV="center"
         gap="xs"

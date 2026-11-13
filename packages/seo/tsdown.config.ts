@@ -11,6 +11,7 @@ export default defineConfig({
     "src/server/index.ts",
     "src/sitemap/index.ts",
     "src/robots/index.ts",
+    "src/urls/index.ts",
     "src/testing/index.ts",
     "src/validation/index.ts",
   ],

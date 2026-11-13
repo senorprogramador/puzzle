@@ -121,6 +121,16 @@
         "types": "./dist/validation/index.d.cts",
         "default": "./dist/validation/index.cjs"
       }
+    },
+    "./urls": {
+      "import": {
+        "types": "./dist/urls/index.d.ts",
+        "default": "./dist/urls/index.js"
+      },
+      "require": {
+        "types": "./dist/urls/index.d.cts",
+        "default": "./dist/urls/index.cjs"
+      }
     }
   },
   "files": [
@@ -134,7 +144,7 @@
     "typecheck": "tsc --noEmit -p .",
     "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
     "vitest": "bun run test:integration && bun run test:unit && bun run test:schema",
-    "test:unit": "vitest run src/tests/*.test.ts --exclude src/tests/public-api.test.ts",
+    "test:unit": "vitest run src/tests/*.test.ts src/tests/*.test.tsx --exclude src/tests/public-api.test.ts",
     "test:integration": "bun run build && node --test src/tests/*.test.mjs",
     "test:boundaries": "node --test src/tests/boundaries.test.mjs",
     "test:package": "bun run build && node --test src/tests/package.test.mjs",
