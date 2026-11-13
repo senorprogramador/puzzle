@@ -11,6 +11,7 @@ import { normalizeSeoUrl, normalizeSeoOrigin } from "../urls";
 
 import {
   createSitemapXml,
+  escapeXml,
   sitemapByteLength,
   validateSitemapEntries,
 } from "./xml";
@@ -119,7 +120,7 @@ export const serializeSitemap = (options: SitemapOptions): SitemapResult => {
 
 const createSitemapIndexXml = (files: readonly SitemapFile[]): string => {
   const content = files
-    .map((file) => `<sitemap><loc>${file.url}</loc></sitemap>`)
+    .map((file) => `<sitemap><loc>${escapeXml(file.url)}</loc></sitemap>`)
     .join("");
 
   return [
