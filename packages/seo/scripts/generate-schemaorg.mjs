@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { assertValidSchemaSource } from "./schemaorg/source-validation.mjs";
 
 const SCRIPT_DIRECTORY = dirname(fileURLToPath(import.meta.url));
 const PACKAGE_DIRECTORY = resolve(SCRIPT_DIRECTORY, "..");
@@ -250,6 +251,8 @@ const getGraph = (document) => {
 };
 
 const createSchemaDefinitions = (document) => {
+  assertValidSchemaSource(document);
+
   const resolver = createContextResolver(document);
   const graph = getGraph(document);
 

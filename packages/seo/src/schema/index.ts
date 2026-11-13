@@ -16,6 +16,7 @@ export type {
 
 export { createSchemaRegistry } from "./registry";
 export { createDefaultSchemaRegistry } from "./create-registry";
+export { validateSchemaNode } from "./validate";
 
 export {
   SCHEMAORG_VERSION,
