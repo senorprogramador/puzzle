@@ -74,14 +74,14 @@ const normalizeDefinition = (
   properties: definition.properties?.map(normalizeProperty),
 });
 
-const reportDuplicateProperties = (
+const deduplicateProperties = (
   definitions: Iterable<SchemaDefinition>,
   conflicts: SchemaRegistryConflict[],
 ): void => {
   for (const definition of definitions) {
     const seen = new Set<string>();
 
-    for (const property of definition.properties ?? []) {
+    definition.properties = definition.properties?.filter((property) => {
       if (seen.has(property.name)) {
         conflicts.push({
           type: definition.type,
@@ -90,11 +90,12 @@ const reportDuplicateProperties = (
           message: `Duplicate property ${property.name} on ${definition.type}.`,
         });
 
-        continue;
+        return false;
       }
 
       seen.add(property.name);
-    }
+      return true;
+    });
   }
 };
 
@@ -152,7 +153,7 @@ export const createSchemaRegistry = (
   // Validate the effective definitions before applying extensions. This also
   // catches duplicates in definitions that would otherwise be collapsed by
   // the extension merge operation.
-  reportDuplicateProperties(definitions.values(), conflicts);
+  deduplicateProperties(definitions.values(), conflicts);
 
   for (const extension of options.extensions ?? []) {
     const type = normalizeType(extension.type);
@@ -185,11 +186,7 @@ export const createSchemaRegistry = (
     const properties = new Map<string, SchemaPropertyDefinition>();
 
     for (const property of existing.properties ?? []) {
-      // Keep the first definition if the input contains duplicates.
-      // The duplicate has already been reported above.
-      if (!properties.has(property.name)) {
-        properties.set(property.name, property);
-      }
+      properties.set(property.name, property);
     }
 
     const extensionPropertyNames = new Set<string>();

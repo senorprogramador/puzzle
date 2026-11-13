@@ -404,6 +404,7 @@ describe("Schema Registry", () => {
       expect(registry.getProperty("Product", "name")?.type).toBe(
         "https://schema.org/Text",
       );
+      expect(registry.get("Product")?.properties).toHaveLength(1);
     });
 
     it("reports duplicate properties in custom definitions", () => {
@@ -428,6 +429,53 @@ describe("Schema Registry", () => {
           code: "duplicate-property",
         }),
       );
+      expect(
+        registry.getProperty("https://example.com/Product", "code")?.type,
+      ).toBe("https://schema.org/Text");
+    });
+
+    it("keeps the first inherited property while allowing child overrides", () => {
+      const registry = createSchemaRegistry({
+        generated: [
+          {
+            name: "Thing",
+            type: "Thing",
+            source: "generated",
+            properties: [
+              { name: "name", type: "Text" },
+              { name: "name", type: "URL" },
+              { name: "description", type: "Text" },
+            ],
+          },
+          {
+            name: "Product",
+            type: "Product",
+            source: "generated",
+            parentTypes: ["Thing"],
+            properties: [
+              { name: "description", type: "URL" },
+              { name: "description", type: "Text" },
+            ],
+          },
+        ],
+      });
+
+      expect(registry.getProperties("Product")).toEqual([
+        expect.objectContaining({
+          name: "name",
+          type: "https://schema.org/Text",
+        }),
+        expect.objectContaining({
+          name: "description",
+          type: "https://schema.org/URL",
+        }),
+      ]);
+      expect(registry.getProperties("Product", { inherited: false })).toEqual([
+        expect.objectContaining({
+          name: "description",
+          type: "https://schema.org/URL",
+        }),
+      ]);
     });
 
     it("reports duplicate properties within a single extension", () => {
