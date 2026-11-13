@@ -1,4 +1,5 @@
 "use client";
+
 import { createContext, createElement, Fragment, useContext } from "react";
 
 import { createSeoGraphBuilder, stringifySeoGraph } from "../core";
@@ -18,7 +19,10 @@ import type { SeoConfig } from "../context/types";
 
 import type {
   SchemaComponentProps,
+  SchemaComponentType,
+  SchemaGraphProps,
   SchemaProps,
+  SchemaReferenceProps,
   SeoJsonLdProps,
   SeoProviderProps,
 } from "./types";
@@ -166,10 +170,10 @@ export const SeoProvider = ({
  * All properties are preserved. The graph engine is responsible
  * for normalization, references, deduplication and ID generation.
  */
-const registerSchema = (
+const registerSchema = <Type extends SchemaComponentType>(
   collector: SchemaCollector,
-  type: string,
-  props: SchemaComponentProps,
+  type: Type,
+  props: SchemaComponentProps<Type>,
 ): null => {
   const { id, data, ...properties } = props;
 
@@ -212,10 +216,9 @@ export const Schema = ({ type, id, data, properties }: SchemaProps) => {
 };
 
 /**
- * Backwards-compatible generic JSON-LD registration component.
+ * Registers one or more Schema.org nodes into the central graph.
  *
- * Unlike standalone JSON-LD components, this component registers
- * nodes into the central graph.
+ * This component never renders its own script element.
  */
 export const SeoJsonLd = ({ data, id, nonce }: SeoJsonLdProps) => {
   const collector = useSchemaCollector();
@@ -262,13 +265,62 @@ export const SeoJsonLd = ({ data, id, nonce }: SeoJsonLdProps) => {
 };
 
 /**
+ * Explicitly named alias for the central JSON-LD registration component.
+ *
+ * The script itself is still rendered once by SeoProvider.
+ */
+export const SchemaScript = SeoJsonLd;
+
+/**
+ * Registers an existing collection of nodes or a complete graph.
+ *
+ * This makes it possible to compose graph data from separate modules
+ * without creating additional graph builders or JSON-LD scripts.
+ */
+export const SchemaGraph = (props: SchemaGraphProps) => {
+  const collector = useSchemaCollector();
+
+  if (props.graph !== undefined) {
+    collector.builder.addMany(props.graph["@graph"]);
+    return null;
+  }
+
+  collector.builder.addMany(props.nodes);
+
+  return null;
+};
+
+/**
+ * Registers an entity reference in the central graph.
+ *
+ * A reference without a matching node becomes a minimal Thing node.
+ * When a full node with the same @id is registered elsewhere, the graph
+ * engine merges the two nodes.
+ */
+export const SchemaReference = ({
+  id,
+  type = "Thing",
+}: SchemaReferenceProps) => {
+  const collector = useSchemaCollector();
+
+  collector.builder.add({
+    "@id": id,
+    "@type": type,
+  });
+
+  return null;
+};
+
+/**
  * Factory for strongly named Schema.org components.
  *
- * The component type is fixed. All data flows through the
- * shared Schema Registry and Graph Engine.
+ * The component type is fixed. Properties are derived from the generated
+ * Schema.org registry definitions, including inherited properties.
  */
-const createSchemaComponent = (type: string) => {
-  const Component = (props: SchemaComponentProps): null => {
+const createSchemaComponent = <Type extends SchemaComponentType>(
+  type: Type,
+) => {
+  const Component = (props: SchemaComponentProps<Type>): null => {
     const collector = useSchemaCollector();
 
     return registerSchema(collector, type, props);
@@ -278,7 +330,7 @@ const createSchemaComponent = (type: string) => {
 };
 
 // ---------------------------------------------------------------------------
-// E4.2 — Organization / Person
+// Organization / Person
 // ---------------------------------------------------------------------------
 
 export const LDOrganization = createSchemaComponent("Organization");
@@ -286,7 +338,7 @@ export const LDOrganization = createSchemaComponent("Organization");
 export const LDPerson = createSchemaComponent("Person");
 
 // ---------------------------------------------------------------------------
-// E4.3 — WebSite / WebPage
+// WebSite / WebPage
 // ---------------------------------------------------------------------------
 
 export const LDWebSite = createSchemaComponent("WebSite");
@@ -299,7 +351,7 @@ export const LDWebsite = LDWebSite;
 export const LDWebPage = createSchemaComponent("WebPage");
 
 // ---------------------------------------------------------------------------
-// E4.4 — Article / BlogPosting
+// Article / BlogPosting
 // ---------------------------------------------------------------------------
 
 export const LDArticle = createSchemaComponent("Article");
@@ -307,7 +359,7 @@ export const LDArticle = createSchemaComponent("Article");
 export const LDBlogPosting = createSchemaComponent("BlogPosting");
 
 // ---------------------------------------------------------------------------
-// E4.5 — BreadcrumbList
+// BreadcrumbList
 // ---------------------------------------------------------------------------
 
 export const LDBreadcrumbList = createSchemaComponent("BreadcrumbList");
@@ -315,7 +367,7 @@ export const LDBreadcrumbList = createSchemaComponent("BreadcrumbList");
 export const LDBreadcrumbs = LDBreadcrumbList;
 
 // ---------------------------------------------------------------------------
-// E4.6 — Product / Offer / AggregateRating / Review
+// Product / Offer / AggregateRating / Review
 // ---------------------------------------------------------------------------
 
 export const LDProduct = createSchemaComponent("Product");
@@ -327,7 +379,7 @@ export const LDAggregateRating = createSchemaComponent("AggregateRating");
 export const LDReview = createSchemaComponent("Review");
 
 // ---------------------------------------------------------------------------
-// E4.7 — LocalBusiness / Service
+// LocalBusiness / Service
 // ---------------------------------------------------------------------------
 
 export const LDLocalBusiness = createSchemaComponent("LocalBusiness");
@@ -335,7 +387,7 @@ export const LDLocalBusiness = createSchemaComponent("LocalBusiness");
 export const LDService = createSchemaComponent("Service");
 
 // ---------------------------------------------------------------------------
-// E4.8 — ImageObject / VideoObject / Event
+// ImageObject / VideoObject / Event
 // ---------------------------------------------------------------------------
 
 export const LDImageObject = createSchemaComponent("ImageObject");
@@ -345,7 +397,7 @@ export const LDVideoObject = createSchemaComponent("VideoObject");
 export const LDEvent = createSchemaComponent("Event");
 
 // ---------------------------------------------------------------------------
-// E4.9 — Additional Schema.org components
+// Additional Schema.org components
 // ---------------------------------------------------------------------------
 
 export const LDRecipe = createSchemaComponent("Recipe");
@@ -355,6 +407,12 @@ export const LDCourse = createSchemaComponent("Course");
 export const LDJobPosting = createSchemaComponent("JobPosting");
 
 export const LDPlace = createSchemaComponent("Place");
+
+export const LDPostalAddress = createSchemaComponent("PostalAddress");
+
+export const LDContactPoint = createSchemaComponent("ContactPoint");
+
+export const LDSearchAction = createSchemaComponent("SearchAction");
 
 export const LDItemList = createSchemaComponent("ItemList");
 

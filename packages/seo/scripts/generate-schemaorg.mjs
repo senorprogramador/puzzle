@@ -456,6 +456,36 @@ const createSchemaDefinitions = (document) => {
 
 const createGeneratedSource = (definitions, sourceHash) => {
   const serialized = JSON.stringify(definitions, null, 2);
+  const definitionsByType = new Map(
+    definitions.map((definition) => [definition.type, definition]),
+  );
+
+  const collectPropertyNames = (type, seen = new Set()) => {
+    if (seen.has(type)) {
+      return [];
+    }
+
+    seen.add(type);
+    const definition = definitionsByType.get(type);
+
+    return [
+      ...(definition?.properties ?? []).map((property) => property.name),
+      ...(definition?.parentTypes ?? []).flatMap((parent) =>
+        collectPropertyNames(parent, seen),
+      ),
+    ];
+  };
+
+  const propertyTypes = definitions
+    .filter((definition) => definition.type.startsWith(SCHEMA_PREFIX))
+    .map((definition) => {
+      const properties = unique(collectPropertyNames(definition.type))
+        .sort(compareStrings)
+        .map((name) => JSON.stringify(name))
+        .join(" | ");
+
+      return `  ${JSON.stringify(definition.name)}: ${properties || "never"};`;
+    });
 
   return [
     "/*",
@@ -469,7 +499,11 @@ const createGeneratedSource = (definitions, sourceHash) => {
     `export const SCHEMAORG_VERSION = "${SCHEMA_VERSION}";`,
     `export const SCHEMAORG_SOURCE_HASH = "${sourceHash}";`,
     "",
-    "export const generatedSchemaDefinitions =",
+    "export interface SchemaOrgPropertyNames {",
+    ...propertyTypes,
+    "}",
+    "",
+    "export const generatedSchemaDefinitions: readonly SchemaDefinition[] =",
     `${serialized} satisfies readonly SchemaDefinition[];`,
     "",
   ].join("\n");

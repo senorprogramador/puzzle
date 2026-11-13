@@ -1,3 +1,9 @@
+import { SchemaReference as SchemaReferenceComponent } from "./react";
+import type { SchemaReference as SchemaReferenceData } from "./schema";
+
+export const SchemaReference = SchemaReferenceComponent;
+export type SchemaReference = SchemaReferenceData;
+
 export * from "./core";
 
 export type * from "./context";
