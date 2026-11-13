@@ -15,6 +15,7 @@ dist/
 dist-ssr/
 build/
 .next/
+.output/
 .tanstack/
 coverage/
 *.local
