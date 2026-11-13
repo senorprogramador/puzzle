@@ -62,11 +62,19 @@ const normalizeProperty = (
     : normalizeType(property.type),
 });
 
+/**
+ * Normalizes a definition and assigns its authoritative source.
+ *
+ * The source is determined by the collection the definition came from,
+ * never by the caller-provided source property.
+ */
 const normalizeDefinition = (
   definition: SchemaDefinition,
+  source: SchemaDefinition["source"],
 ): SchemaDefinition => ({
   ...definition,
   type: normalizeType(definition.type),
+  source,
   parentTypes: definition.parentTypes?.map(normalizeType),
   enumerationValues: definition.enumerationValues?.map(
     normalizeEnumerationValue,
@@ -102,8 +110,17 @@ const deduplicateProperties = (
 export const createSchemaRegistry = (
   options: SchemaRegistryOptions = {},
 ): SchemaRegistry => {
-  const generated = (options.generated ?? []).map(normalizeDefinition);
-  const custom = (options.custom ?? []).map(normalizeDefinition);
+  // Collection membership is the source of truth. Ignore any source value
+  // supplied by callers to prevent custom definitions impersonating generated
+  // definitions (or vice versa).
+  const generated = (options.generated ?? []).map((definition) =>
+    normalizeDefinition(definition, "generated"),
+  );
+
+  const custom = (options.custom ?? []).map((definition) =>
+    normalizeDefinition(definition, "custom"),
+  );
+
   const conflicts: SchemaRegistryConflict[] = [];
 
   const definitions = new Map<string, SchemaDefinition>();

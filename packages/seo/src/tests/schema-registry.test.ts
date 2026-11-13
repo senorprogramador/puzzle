@@ -229,6 +229,32 @@ describe("Schema Registry", () => {
     expect(registry.getCollection().custom).toHaveLength(1);
   });
 
+  it("normalizes source according to the input collection", () => {
+    const registry = createSchemaRegistry({
+      generated: [
+        {
+          name: "Generated Product",
+          type: "GeneratedProduct",
+          source: "custom",
+        },
+      ],
+      custom: [
+        {
+          name: "Custom Product",
+          type: "CustomProduct",
+          source: "generated",
+        },
+      ],
+    });
+
+    expect(registry.get("GeneratedProduct")?.source).toBe("generated");
+    expect(registry.get("CustomProduct")?.source).toBe("custom");
+
+    expect(registry.getCollection().generated[0]?.source).toBe("generated");
+
+    expect(registry.getCollection().custom[0]?.source).toBe("custom");
+  });
+
   it("allows explicit generated overrides", () => {
     const registry = createSchemaRegistry({
       generated,
@@ -597,6 +623,42 @@ describe("Schema Registry", () => {
         expect.objectContaining({
           type: "https://schema.org/Product",
           code: "duplicate-type",
+        }),
+      );
+    });
+
+    it("does not allow custom definitions to impersonate generated definitions", () => {
+      const registry = createSchemaRegistry({
+        allowGeneratedOverrides: true,
+        custom: [
+          {
+            name: "First Custom Product",
+            type: "Product",
+            source: "generated",
+          },
+          {
+            name: "Second Custom Product",
+            type: "Product",
+            source: "generated",
+          },
+        ],
+      });
+
+      expect(registry.get("Product")?.name).toBe("First Custom Product");
+      expect(registry.get("Product")?.source).toBe("custom");
+
+      expect(registry.getCollection().custom).toHaveLength(2);
+      expect(
+        registry
+          .getCollection()
+          .custom.every((definition) => definition.source === "custom"),
+      ).toBe(true);
+
+      expect(registry.getConflicts()).toContainEqual(
+        expect.objectContaining({
+          type: "https://schema.org/Product",
+          code: "duplicate-type",
+          message: "Duplicate custom schema type: https://schema.org/Product",
         }),
       );
     });
