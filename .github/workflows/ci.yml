@@ -102,6 +102,7 @@ jobs:
               - 'packages/theme/**'
               - 'packages/ui/**'
               - 'packages/pieces/**'
+              - 'packages/seo/**'
               - 'package.json'
               - 'bun.lock'
               - 'Dockerfile'
