@@ -1,8 +1,15 @@
-import { SchemaReference as SchemaReferenceComponent } from "./react";
+import {
+  SchemaReference as SchemaReferenceComponent,
+  SeoMetadata as SeoMetadataComponent,
+} from "./react";
+import type { SeoMetadata as SeoMetadataData } from "./core";
 import type { SchemaReference as SchemaReferenceData } from "./schema";
 
 export const SchemaReference = SchemaReferenceComponent;
 export type SchemaReference = SchemaReferenceData;
+
+export const SeoMetadata = SeoMetadataComponent;
+export type SeoMetadata = SeoMetadataData;
 
 export * from "./core";
 

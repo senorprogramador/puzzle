@@ -16,7 +16,8 @@ import { Dialog } from "@puzzle-ui/ui";
 Dialog is controlled. Supply a title, update `open` from `onOpenChange`, and provide explicit footer actions when needed. This example portals into the host page.
 
 <Preview
-  height={300}
+  fit="device"
+  hideDevices={true}
   code={`\
 const [open, setOpen] = useState(false);
 <>

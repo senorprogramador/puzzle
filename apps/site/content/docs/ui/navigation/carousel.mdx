@@ -20,7 +20,7 @@ import { Carousel, CarouselController } from "@puzzle-ui/ui";
 
 Supply `items` to the controller and `renderItem` to the carousel. Navigation buttons are opt-in: pass `backButton` and `nextButton` to support click and keyboard navigation as well as dragging.
 
-<Preview height={340} code={`\
+<Preview hideDevices={true} code={`\
 const items = [
   { id: "design", title: "Design", description: "Start with a clear visual language." },
   { id: "build", title: "Build", description: "Compose reusable components." },
@@ -64,7 +64,6 @@ widths remain fixed. The active panel stays aligned to its updated position.
 
 <Preview
   defaultDevice="tablet"
-  height={360}
   code={`\
 <CarouselController items={items}>
   <Carousel<(typeof items)[number]>
@@ -105,7 +104,6 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
 
 <Preview
   defaultDevice="tablet"
-  height={300}
   code={`\
 <CarouselController items={items.slice(0, 2)}>
   <Carousel<(typeof items)[number]>
@@ -136,7 +134,7 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
 `buttonAlignment="over"` overlays navigation on the viewport; `"aside"` reserves space beside it. `pagerAlignment` supports `"under"` and `"over"`. Both accept responsive values. `renderPager` receives a zero-based page index and the page count.
 
 <Preview
-  height={320}
+  hideDevices={true}
   code={`\
 <CarouselController items={items} defaultPanel={1}>
   <Carousel<(typeof items)[number]>
@@ -186,7 +184,7 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
 
 `currentPanel` is the zero-based **first visible item index**, not a page number. Pair it with `onPanelChange` to keep application state synchronized. `defaultPanel` supplies an initial index for uncontrolled usage.
 
-<Preview height={400} code={`\
+<Preview hideDevices={true} code={`\
 const [panel, setPanel] = useState(0);
 
 return (

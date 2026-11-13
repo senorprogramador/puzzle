@@ -18,7 +18,8 @@ import { Popover } from "@puzzle-ui/ui";
 Name the dialog with a visible `title`. `closable` adds a close button alongside the title.
 
 <Preview
-  height={320}
+  fit="device"
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -41,7 +42,7 @@ Name the dialog with a visible `title`. `closable` adds a close button alongside
 `position` requests `top`, `right`, `bottom`, or `left`; placement can change when space is limited. `align` accepts `start`, `center`, or `end`. `offset` changes the gap in pixels.
 
 <Preview
-  height={320}
+  fit="device"
   align="center"
   justify="center"
   code={`\
@@ -83,7 +84,8 @@ Name the dialog with a visible `title`. `closable` adds a close button alongside
 When there is no visible title, provide `aria-label`. Customize `closeLabel` to describe the close action in the language of your application.
 
 <Preview
-  height={280}
+  fit="device"
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -110,7 +112,7 @@ When there is no visible title, provide `aria-label`. Customize `closeLabel` to 
 
 Pair `open` with `onOpenChange` to respond to trigger clicks and dismissal. Application actions inside the popover can close it through the same state. For uncontrolled usage, `defaultOpen` sets only the initial visibility.
 
-<Preview height={340} align="center" justify="center" code={`\
+<Preview fit="device" hideDevices={true} align="center" justify="center" code={`\
 const [open, setOpen] = useState(false);
 
 return (

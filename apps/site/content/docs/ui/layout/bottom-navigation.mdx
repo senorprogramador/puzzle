@@ -16,7 +16,8 @@ import { BottomNavigation, BottomNavigationItem } from "@puzzle-ui/ui";
 Use direct `BottomNavigationItem` children. Provide `href` for destinations or `onClick` for actions; active destinations receive `aria-current="page"`.
 
 <Preview
-  height={250}
+  fit="device"
+  hideDevices={true}
   code={`\
 <BottomNavigation ariaLabel="Primary destinations">
   <BottomNavigationItem icon={<Icon name="lucide:house" />} label="Home" href="#home" active />

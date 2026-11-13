@@ -16,7 +16,7 @@ import { ToggleGroup } from "@puzzle-ui/ui";
 Add a `ToggleGroup.Item` for each option. In single-selection mode, the default, selecting an item deselects the previously selected item. Selecting the active item again clears the selection.
 
 <Preview
-  height={160}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -41,7 +41,7 @@ Each item is rendered as a Button and exposes its selected state with `aria-pres
 Use the default `type="single"` mode when only one option can be active. Set `type="multiple"` to let users toggle options independently.
 
 <Preview
-  height={160}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -106,7 +106,7 @@ In single mode, `onValueChange` receives the selected value or `undefined` when 
 Use the `size` prop to set the size of every item in the group. It accepts the same values as Button: `xs`, `sm`, `md`, `lg`, and `icon`. The default is `md`.
 
 <Preview
-  height={160}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -140,7 +140,7 @@ Use `required` to prevent users from clearing the final selected value. It does 
 Use `orientation` to arrange items horizontally or vertically. The default is `horizontal`.
 
 <Preview
-  height={260}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -169,7 +169,7 @@ Use `orientation` to arrange items horizontally or vertically. The default is `h
 Set `attached` to join adjacent items, or `fullWidth` to make the group fill its container and let the items share the available width.
 
 <Preview
-  height={160}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\

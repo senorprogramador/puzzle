@@ -20,7 +20,7 @@ import { Accordion, type AccordionValue } from "@puzzle-ui/ui";
 
 Each item has a `title` and `content`. When using `defaultValue` or `value`, every item must also have a unique `id`.
 
-<Preview height={360} code={`\
+<Preview hideDevices={true} code={`\
 const items = [
   { id: "shipping", title: "Shipping", content: "Orders ship within two business days." },
   { id: "returns", title: "Returns", content: "Return unused items within 30 days." },
@@ -41,7 +41,7 @@ The Support item demonstrates `disabled`: its trigger cannot be activated.
 `type="multiple"` is the default. Pass an array of IDs to open more than one section. In multiple mode, `onValueChange` returns an array; in single mode it returns an ID or `null` when the last section closes.
 
 <Preview
-  height={380}
+  hideDevices={true}
   code={`\
 <Accordion items={items} type="multiple" defaultValue={["shipping", "returns"]} />
 `}
@@ -60,7 +60,7 @@ The Support item demonstrates `disabled`: its trigger cannot be activated.
 In single mode, `collapsible={false}` prevents the currently open section from being closed by its trigger. Set an initial value if a section should be open from the start.
 
 <Preview
-  height={360}
+  hideDevices={true}
   code={`\
 <Accordion items={items} type="single" collapsible={false} defaultValue="shipping" />
 `}
@@ -79,7 +79,7 @@ In single mode, `collapsible={false}` prevents the currently open section from b
 
 Pair `value` with `onValueChange`. Stable IDs keep open sections associated with the same items after reordering. Do not mix the ID-based and index-based selection APIs.
 
-<Preview height={420} code={`\
+<Preview hideDevices={true} code={`\
 const [value, setValue] = useState<AccordionValue>("shipping");
 
 return (
@@ -98,7 +98,7 @@ return (
 `headingLevel` matches the surrounding document hierarchy. `region` explicitly enables or disables panel landmarks. With `unMountOnClose`, content unmounts after the closing animation; reopening resets local state. Enter a note and close/reopen the section to try it.
 
 <Preview
-  height={320}
+  hideDevices={true}
   code={`\
 <Accordion
   headingLevel={4}

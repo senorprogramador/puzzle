@@ -16,7 +16,8 @@ import { Backdrop } from "@puzzle-ui/ui";
 Backdrop requests dismissal; your state must close it. Prefer `Dialog` or `Drawer` when their built-in semantics fit.
 
 <Preview
-  height={350}
+  fit="device"
+  hideDevices={true}
   code={`\
 const [open, setOpen] = useState(false);
 <>

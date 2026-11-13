@@ -18,7 +18,8 @@ import { Tooltip } from "@puzzle-ui/ui";
 Hover over the button or reach it with Tab. The tooltip closes on pointer leave, blur, or Escape.
 
 <Preview
-  height={200}
+  fit="device"
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -33,7 +34,7 @@ Hover over the button or reach it with Tab. The tooltip closes on pointer leave,
 `position` requests one of four sides. The popup can fall back to another side when there is not enough space.
 
 <Preview
-  height={300}
+  fit="device"
   align="center"
   justify="center"
   code={`\
@@ -72,7 +73,8 @@ Hover over the button or reach it with Tab. The tooltip closes on pointer leave,
 `align` aligns the popup along the trigger's edge. `offset` is the gap in pixels; `exitDelay` is the delay in milliseconds before closing on pointer leave.
 
 <Preview
-  height={260}
+  fit="device"
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -105,7 +107,7 @@ Hover over the button or reach it with Tab. The tooltip closes on pointer leave,
 
 Use `open` with `onOpenChange` when visibility belongs to application state. Use `defaultOpen` instead to start an uncontrolled tooltip open.
 
-<Preview height={240} align="center" justify="center" code={`\
+<Preview fit="device" hideDevices={true} align="center" justify="center" code={`\
 const [open, setOpen] = useState(false);
 
 return (

@@ -16,7 +16,8 @@ import { ScrollLock } from "@puzzle-ui/ui";
 Mount ScrollLock while an overlay is active, or toggle `enabled`. This example locks both the body and document-element scrolling in the preview iframe, not the surrounding docs page or independently scrollable elements. The control remains available to unlock it.
 
 <Preview
-  height={350}
+  fit="device"
+  hideDevices={true}
   code={`\
 const [enabled, setEnabled] = useState(false);
 <>

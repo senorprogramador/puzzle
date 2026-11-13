@@ -18,7 +18,7 @@ import { Tabs } from "@puzzle-ui/ui";
 `tab` supplies the trigger label, and `children` supplies the panel content. `initialActiveId` chooses the initial panel; otherwise the first enabled tab is selected.
 
 <Preview
-  height={240}
+  hideDevices={true}
   code={`\
 <Tabs initialActiveId="details">
   <Tabs.Tab id="overview" tab="Overview">A summary of your project.</Tabs.Tab>
@@ -43,7 +43,7 @@ import { Tabs } from "@puzzle-ui/ui";
 `tabBarPosition` supports `top`, `bottom`, `left`, and `right`. Left and right positions use vertical keyboard navigation.
 
 <Preview
-  height={540}
+  hideDevices={true}
   code={`\
 <Stack>
   <Tabs tabBarPosition="bottom">
@@ -95,7 +95,7 @@ import { Tabs } from "@puzzle-ui/ui";
 
 Use `activeId` with `onActivate` to own the selected tab. Do not combine controlled selection with `initialActiveId`.
 
-<Preview height={240} code={`\
+<Preview hideDevices={true} code={`\
 const [activeId, setActiveId] = useState("overview");
 
 return (
@@ -114,7 +114,7 @@ return (
 Inactive panel contents are unmounted by default. `forceMountContent` keeps them mounted but hidden, preserving local state and uncontrolled form values. Type a note, switch tabs, then return to see it preserved.
 
 <Preview
-  height={300}
+  hideDevices={true}
   code={`\
 <Tabs forceMountContent>
   <Tabs.Tab id="notes" tab="Notes">
@@ -143,7 +143,7 @@ Inactive panel contents are unmounted by default. `forceMountContent` keeps them
 Set `disabled` on a tab to prevent selection and skip it during keyboard navigation. Provide `dir="rtl"` on `Tabs` for right-to-left horizontal arrow-key behavior.
 
 <Preview
-  height={280}
+  hideDevices={true}
   code={`\
 <Tabs dir="rtl" initialActiveId="details">
   <Tabs.Tab id="overview" tab="Overview">Overview content</Tabs.Tab>

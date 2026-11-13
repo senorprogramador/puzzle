@@ -50,7 +50,7 @@ const getFrame = () =>
 describe("cross-document behavior (browser)", () => {
   it("locks Preview's explicit root scroller and restores it when disabled", async () => {
     const Example = ({ enabled }: { enabled: boolean }) => (
-      <Preview height={350}>
+      <Preview fit="device">
         <ScrollLock enabled={enabled} />
         <div style={{ minHeight: "200vh" }}>Scrollable preview content</div>
       </Preview>

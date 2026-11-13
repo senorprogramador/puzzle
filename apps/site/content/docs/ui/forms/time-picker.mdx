@@ -19,7 +19,7 @@ import {
 
 Use `label` to provide an accessible name. The browser provides the native time selection interface.
 
-<Preview height={220}>
+<Preview fit="device" hideDevices={true}>
   <Section>
     <TimePicker
       label="Appointment"
@@ -60,7 +60,7 @@ The component returns values in 24-hour `HH:mm` format, regardless of how the br
 
 Use `showSeconds` to include seconds in the selected value.
 
-<Preview height={220}>
+<Preview fit="device" hideDevices={true}>
   <Section>
     <TimePicker label="Precise time" defaultValue="09:30:45" showSeconds />
   </Section>
@@ -77,7 +77,7 @@ The value uses `HH:mm:ss` format when seconds are enabled.
 
 Use `minuteStep` to configure the interval between selectable minutes.
 
-<Preview height={300}>
+<Preview fit="device" hideDevices={true}>
   <Section>
     <Stack>
       <TimePicker
@@ -117,7 +117,7 @@ The native input uses its `step` attribute to enforce the interval.
 
 Use `minTime` and `maxTime` to define inclusive time boundaries.
 
-<Preview height={220}>
+<Preview fit="device" hideDevices={true}>
   <Section>
     <TimePicker
       label="Business hours"
@@ -161,7 +161,7 @@ Use `name` to include the selected value in `FormData`. The browser handles requ
 
 Both properties accept responsive values using `mobile`, `tablet`, and `desktop` keys.
 
-<Preview height={380}>
+<Preview fit="device">
   <Section>
     <Stack>
       <TimePicker label="Small" size="sm" />
@@ -197,7 +197,7 @@ Use `disabled` to prevent interaction and exclude the input from form submission
 
 Use `readOnly` to prevent editing while keeping the value available for form submission.
 
-<Preview height={300}>
+<Preview fit="device" hideDevices={true}>
   <Section>
     <Stack>
       <TimePicker label="Required time" required />
@@ -221,7 +221,7 @@ Use `description` to provide supporting information.
 
 Use `error` to display validation feedback and mark the input as invalid. Setting `error` to `true` displays the default message.
 
-<Preview height={300}>
+<Preview fit="device" hideDevices={true}>
   <Section>
     <Stack>
       <TimePicker

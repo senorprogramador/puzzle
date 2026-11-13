@@ -16,7 +16,6 @@ import { Image } from "@puzzle-ui/ui";
 Provide a source and alternative text. Set the intrinsic dimensions to reserve space while the image loads.
 
 <Preview
-  height={450}
   align="center"
   justify="center"
   code={`\
@@ -43,7 +42,6 @@ The `width` and `height` props describe the image's intrinsic dimensions in pixe
 Use `fit` to control how the image fills its box, and `position` to align the image content within that box. These correspond to CSS `object-fit` and `object-position`; the defaults are `"cover"` and `"center"`.
 
 <Preview
-  height={360}
   align="center"
   justify="center"
   code={`\
@@ -126,7 +124,7 @@ For native `<img>` elements, the component displays the blur preview behind the 
 Use `fallbackSrc` to try another image if the primary source fails. Use `fallback` to render custom content when no usable source is available or all image sources fail.
 
 <Preview
-  height={200}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\

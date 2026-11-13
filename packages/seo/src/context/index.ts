@@ -8,3 +8,5 @@ export type {
   SeoConfigOverride,
   SeoConfigContext,
 } from "./types";
+
+export { normalizeSeoConfig, normalizeSeoPath, resolveSeoUrl } from "./config";

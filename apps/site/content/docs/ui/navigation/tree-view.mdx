@@ -14,7 +14,7 @@ import { TreeView, type TreeViewItem } from "@puzzle-ui/ui";
 Each item needs a stable unique ID. Supply `textValue` for rich labels so typeahead can find them. Every tree requires an accessible name.
 
 <Preview
-  height={400}
+  hideDevices={true}
   code={`\
 <TreeView aria-label="Project files" defaultExpandedIds={["src"]} items={[
   { id: "src", label: "src", children: [
@@ -51,7 +51,7 @@ Each item needs a stable unique ID. Supply `textValue` for rich labels so typeah
 `selectionMode="none"` is useful for navigation trees. Link items can report route state with `getItemActive`. Use multiple selection for independent file-like choices.
 
 <Preview
-  height={300}
+  hideDevices={true}
   code={`\
 <TreeView aria-label="Choose resources" selectionMode="multiple" size="sm"
   defaultSelectedIds={["guides"]}

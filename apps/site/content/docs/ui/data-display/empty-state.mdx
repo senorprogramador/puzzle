@@ -23,7 +23,7 @@ import {
 Compose the message from a title, an optional description, and optional content such as an action. The component parts can be omitted when they are not needed.
 
 <Preview
-  height={250}
+  hideDevices={true}
   code={`\
 <EmptyState variant="outlined">
   <EmptyStateHeader>
@@ -56,7 +56,7 @@ Compose the message from a title, an optional description, and optional content 
 Use `size` (`sm`, `md`, or `lg`) to adjust the component's spacing. The default is `md`. Choose a `variant` of `default` (transparent), `outlined` (dashed border), or `filled` (sunken surface); the default is `default`.
 
 <Preview
-  height={300}
+  hideDevices={true}
   code={`\
 <Stack>
   <EmptyState size="sm" variant="default">

@@ -16,7 +16,7 @@ import { TokenInput } from "@puzzle-ui/ui";
 Use `label` to provide a visible label. The default configuration accepts six numeric characters and preserves leading zeroes.
 
 <Preview
-  height={220}
+  hideDevices={true}
   code={`\
 <TokenInput label="Verification code" name="code" required />
 `}
@@ -33,7 +33,7 @@ Typing replaces the character at the active slot and advances focus. Backspace a
 Set `length` to an integer from 1 through 32. Numeric mode accepts ASCII digits only. Alphanumeric mode accepts ASCII letters and digits, preserving letter case. Other characters are removed, and values are truncated to the configured length.
 
 <Preview
-  height={260}
+  hideDevices={true}
   code={`\
 <TokenInput label="Four-digit PIN" length={4} defaultValue="0123" />
 <TokenInput label="Recovery code" length={8} mode="alphanumeric" />
@@ -80,7 +80,7 @@ The first input defaults to `autoComplete="one-time-code"`. Pasting a complete t
 Choose `"sm"`, `"md"` (default), or `"lg"` for the slot size. Set `mask` to render password inputs.
 
 <Preview
-  height={320}
+  hideDevices={true}
   code={`\
 <TokenInput label="Small" size="sm" length={4} />
 <TokenInput label="Medium" size="md" length={4} />
@@ -101,7 +101,7 @@ Masking only changes the visual presentation; it does not encrypt the token.
 Use `FormField` to associate instructions and error messages with the inputs. `aria-invalid` applies the invalid state to the group and each slot.
 
 <Preview
-  height={360}
+  hideDevices={true}
   code={`\
 <FormField
   label="Verification code"

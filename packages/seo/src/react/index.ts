@@ -14,8 +14,13 @@ export type {
   SeoSchemaValidationError,
 } from "./types";
 
+export { SeoProvider } from "./provider";
+
+export { SeoMetadata, SeoHead } from "./metadata";
+
+export { useSeoConfig, useSeoMetadata } from "./context";
+
 export {
-  SeoProvider,
   SeoJsonLd,
   Schema,
   SchemaReference,

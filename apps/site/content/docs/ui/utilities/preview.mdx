@@ -1,6 +1,6 @@
 ---
 title: Preview
-description: Preview content in a resizable device frame.
+description: Preview content in an isolated frame sized to its content or device.
 ---
 
 Use `Preview` to display a component in an isolated iframe, with optional source code and device-size controls.
@@ -16,7 +16,7 @@ import { Preview } from "@puzzle-ui/ui";
 Pass the rendered example as `children` and its source as `code`. The source is displayed, not executed: keep it in sync with the rendered children. Switch to **Code** to inspect or copy it.
 
 <Preview
-  height={180}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -26,19 +26,39 @@ Pass the rendered example as `children` and its source as `code`. The source is 
   <Button>Save</Button>
 </Preview>
 
-## Device and height
+## Content and device sizing
+
+`fit="content"` is the default. The iframe grows and shrinks with its content,
+including when the selected device width changes. Its height is capped at the
+mobile device's 844px height for every device. Taller content scrolls inside the
+iframe; short content does not reserve a full device height or add unnecessary
+scrolling.
+
+With content fit, the server render includes an inline placeholder of the
+children at the device width. The placeholder sizes the preview before the
+iframe loads, so there is no full-height flash. It is `inert` and hidden from
+assistive technology. Once the iframe content is measured, the iframe replaces
+it before paint. The placeholder uses the page's styles and viewport, not the
+iframe's, so viewport media queries can render it differently. Examples whose
+initial layout depends on the device viewport should use `fit="device"` or an
+explicit `height`, which skip the placeholder.
 
 `defaultDevice` sets the initial viewport: `mobile` is 390px wide, `tablet` is 768px, and `desktop` is 1024px. The device selector changes the iframe viewport, so responsive styles can be tested without resizing the browser. The frame scales down to fit its container.
 
-`height` overrides the device height in pixels. Without it, mobile uses 844px, tablet 1024px, and desktop 768px.
+Use `fit="device"` for a full device viewport: mobile is 844px tall, tablet is
+1024px, and desktop is 768px. This is useful for overlays, fixed-position
+navigation, and examples using viewport-relative heights.
+
+An explicit `height` overrides either fit mode and the content-height cap.
+It is measured in pixels before scaling.
 
 <Preview
+  fit="device"
   defaultDevice="tablet"
-  height={220}
   align="center"
   justify="center"
   code={`\
-<Preview defaultDevice="tablet" height={220} align="center" justify="center">
+<Preview fit="device" defaultDevice="tablet" align="center" justify="center">
   <Button>Tablet preview</Button>
 </Preview>
 `}
@@ -48,16 +68,27 @@ Pass the rendered example as `children` and its source as `code`. The source is 
 
 The code on this page includes the `Preview` wrapper when demonstrating its props; it is not another nested preview.
 
+## Padding
+
+`padding` sets the space inside the preview frame, around the content. It defaults to
+`var(--puzzle-space-8, 2rem)`. Numbers are pixels; strings accept CSS padding
+values, including theme tokens and shorthand such as `"1rem 2rem"`.
+It is included in the measured content height. Use `padding={0}` to render content edge to edge.
+
 ## Content alignment
 
-`align` controls vertical alignment; `justify` controls horizontal distribution. Both are unset by default. Use `stretch` to let children fill the frame's height, or `between`, `around`, and `evenly` to distribute multiple children horizontally.
+`align` controls vertical alignment; `justify` controls horizontal distribution.
+Both default to `center`. Use `stretch` to let children fill the available height,
+or `between`, `around`, and `evenly` to distribute multiple children horizontally.
+Content fit measures the natural content height; device fit or an explicit height
+provides additional vertical space for alignment.
 
 <Preview
-  height={180}
+  hideDevices={true}
   align="center"
   justify="evenly"
   code={`\
-<Preview height={180} align="center" justify="evenly">
+<Preview hideDevices={true} align="center" justify="evenly">
   <Button variant="outline">Back</Button>
   <Button>Continue</Button>
 </Preview>
@@ -71,12 +102,18 @@ The code on this page includes the `Preview` wrapper when demonstrating its prop
 
 Use `hideDevices` for a fixed starting viewport. It hides the selector, not the iframe or its dimensions. Omitting `code` also removes the Code tab.
 
-<Preview hideDevices height={160} align="center" justify="center">
+Set `hideDevices={true}` for examples that demonstrate appearance, state, or interaction without viewport-dependent behavior. Leave device controls available when demonstrating responsive layouts, sizing, or popup placement.
+
+Device controls also adapt to the browser viewport: below 768px all device
+buttons are hidden; from 768px to below 1024px only Mobile and Tablet are shown.
+At 1024px and wider all three are shown. This does not change the selected device.
+
+<Preview hideDevices={true} align="center" justify="center">
   <Button variant="secondary">Preview only</Button>
 </Preview>
 
 ```tsx
-<Preview hideDevices height={160} align="center" justify="center">
+<Preview hideDevices={true} align="center" justify="center">
   <Button variant="secondary">Preview only</Button>
 </Preview>
 ```
@@ -88,9 +125,11 @@ Use `hideDevices` for a fixed starting viewport. It hides the selector, not the 
 | `children`      | `ReactNode`                                                         | Required      | Live content rendered inside the iframe.                                 |
 | `code`          | `string`                                                            | -             | Source shown in the Code tab, with syntax highlighting and copy support. |
 | `defaultDevice` | `"mobile" \| "tablet" \| "desktop"`                                 | `"mobile"`    | Initial device viewport.                                                 |
-| `height`        | `number`                                                            | Device height | Iframe height in pixels, before scaling.                                 |
-| `align`         | `"start" \| "center" \| "end" \| "stretch"`                         | -             | Vertical alignment of frame content.                                     |
-| `justify`       | `"start" \| "center" \| "end" \| "between" \| "around" \| "evenly"` | -             | Horizontal distribution of frame content.                                |
+| `fit`           | `"content" \| "device"`                                             | `"content"`   | Fit natural content up to 844px, or use the selected device height.       |
+| `height`        | `number`                                                            | -             | Iframe height in pixels, before scaling. Overrides fit and its cap.      |
+| `padding`       | `number \| string`                                                  | `var(--puzzle-space-8, 2rem)` | Space inside the frame, around the content. Numbers are pixels; strings accept CSS padding. |
+| `align`         | `"start" \| "center" \| "end" \| "stretch"`                         | `"center"`    | Vertical alignment of frame content.                                     |
+| `justify`       | `"start" \| "center" \| "end" \| "between" \| "around" \| "evenly"` | `"center"`    | Horizontal distribution of frame content.                                |
 | `hideDevices`   | `boolean`                                                           | `false`       | Hides the device selector.                                               |
 | `className`     | `string`                                                            | -             | Additional class on the outer section.                                   |
 

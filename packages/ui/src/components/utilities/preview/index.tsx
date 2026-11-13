@@ -17,7 +17,11 @@ import { createPortal } from "react-dom";
 import { cn } from "@puzzle-ui/core";
 import { useRovingFocus } from "@puzzle-ui/hooks";
 import { Icon } from "@puzzle-ui/icons";
-import { ThemeScopeProvider, useThemeScope } from "@puzzle-ui/theme/scope-context";
+import { BREAKPOINTS } from "@puzzle-ui/theme";
+import {
+  ThemeScopeProvider,
+  useThemeScope,
+} from "@puzzle-ui/theme/scope-context";
 
 import { Background } from "../../layout/background";
 import { highlightCode } from "./highlight";
@@ -47,8 +51,12 @@ type PreviewProps = {
   className?: string;
   defaultDevice?: PreviewDevice;
   code?: string;
-  /** Frame height in pixels. Defaults to the selected device's height. */
+  /** Size to content (capped at mobile height) or the selected device. */
+  fit?: "content" | "device";
+  /** Frame height in pixels. Overrides fit. */
   height?: number;
+  /** Space inside the preview frame, around the content. Numbers are pixels. */
+  padding?: number | string;
   /** Vertical alignment of the content within the frame. */
   align?: PreviewAlign;
   /** Horizontal distribution of the content within the frame. */
@@ -113,9 +121,11 @@ const Preview = ({
   className,
   defaultDevice = "mobile",
   code,
+  fit = "content",
   height,
-  align,
-  justify,
+  padding = "var(--puzzle-space-8, 2rem)",
+  align = "center",
+  justify = "center",
   hideDevices = false,
 }: PreviewProps) => {
   const generatedId = useId();
@@ -131,17 +141,32 @@ const Preview = ({
   const [frameRoot, setFrameRoot] = useState<HTMLElement | null>(null);
   const [scale, setScale] = useState(1);
   const [copied, setCopied] = useState(false);
+  const [contentHeight, setContentHeight] = useState(PREVIEW_DEVICES.mobile.height);
+  const [contentMeasured, setContentMeasured] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const config = PREVIEW_DEVICES[device];
-  const frameHeight = height ?? config.height;
+  const fitsContent = height === undefined && fit === "content";
+  const frameHeight = height ?? (fitsContent ? contentHeight : config.height);
+  // Until the iframe content is measured, an inert inline copy sizes the viewport so SSR has no height jump.
+  const showPlaceholder = fitsContent && !contentMeasured;
   const hasCode = code !== undefined;
   const [direction, setDirection] = useState<"ltr" | "rtl">("ltr");
+  const [desktopControlsVisible, setDesktopControlsVisible] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const isKeyboardNavigation = useRef(false);
+
+  useEffect(() => {
+    const query = window.matchMedia(`(min-width: ${BREAKPOINTS.desktop}px)`);
+    const update = () => setDesktopControlsVisible(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -162,7 +187,10 @@ const Preview = ({
   });
 
   const deviceFocus = useRovingFocus<HTMLButtonElement>({
-    items: PREVIEW_DEVICE_ITEMS,
+    items: PREVIEW_DEVICE_ITEMS.map((item) => ({
+      ...item,
+      disabled: item.id === "desktop" && !desktopControlsVisible,
+    })),
     dir: direction,
     initialActiveId: device,
   });
@@ -239,6 +267,7 @@ const Preview = ({
     targetRoot.style.setProperty("height", "100%", "important");
     targetRoot.style.setProperty("min-height", "100%", "important");
     targetRoot.style.setProperty("margin", "0", "important");
+    targetRoot.style.setProperty("padding", "0", "important");
     targetRoot.style.setProperty("overflow-x", "hidden", "important");
     targetRoot.style.setProperty("overflow-y", "auto", "important");
     targetRoot.style.setProperty("scrollbar-width", "none", "important");
@@ -251,6 +280,7 @@ const Preview = ({
     body.style.setProperty("height", "auto", "important");
     body.style.setProperty("min-height", "100%", "important");
     body.style.setProperty("margin", "0", "important");
+    body.style.setProperty("padding", "0", "important");
     body.style.setProperty("overflow", "visible", "important");
 
     const previewRoot = frameDocument.getElementById(frameRootId);
@@ -280,6 +310,8 @@ const Preview = ({
 
   const updateScale = useCallback(
     (availableWidth: number) => {
+      if (availableWidth <= 0) return;
+
       const nextScale = Math.min(1, Math.max(0, availableWidth) / config.width);
 
       setScale((current) =>
@@ -382,6 +414,41 @@ const Preview = ({
     initializeFrame();
   }, [initializeFrame]);
 
+  useIsomorphicLayoutEffect(() => {
+    const content = contentRef.current;
+
+    if (!fitsContent || !frameRoot || !content || activeTab !== "preview") return;
+
+    const measure = () => {
+      const measuredHeight = Math.ceil(
+        Math.max(content.getBoundingClientRect().height, content.scrollHeight),
+      );
+
+      setContentHeight(
+        Math.min(PREVIEW_DEVICES.mobile.height, Math.max(1, measuredHeight)),
+      );
+      setContentMeasured(true);
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(content);
+
+    const mutations = new MutationObserver(measure);
+    mutations.observe(content, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributes: true,
+    });
+
+    return () => {
+      observer.disconnect();
+      mutations.disconnect();
+    };
+  }, [activeTab, fitsContent, frameRoot]);
+
   const handleCopyCode = useCallback(async () => {
     if (code === undefined) return;
 
@@ -421,19 +488,30 @@ const Preview = ({
     height: frameHeight,
     transform: `scale(${scale})`,
     transformOrigin: "top left",
+    visibility: showPlaceholder ? "hidden" : undefined,
   };
 
   const contentStyle: CSSProperties = {
     display: "flex",
     boxSizing: "border-box",
-    minHeight: "100vh",
+    padding,
+    minHeight: fitsContent ? undefined : "100vh",
     alignItems: align ? ALIGN_VALUES[align] : undefined,
     justifyContent: justify ? JUSTIFY_VALUES[justify] : undefined,
   };
 
   const viewportStyle: CSSProperties = {
     width: config.width * scale,
-    aspectRatio: `${config.width} / ${frameHeight}`,
+    height: showPlaceholder ? undefined : frameHeight * scale,
+    maxHeight: showPlaceholder
+      ? PREVIEW_DEVICES.mobile.height * scale
+      : undefined,
+  };
+
+  const placeholderStyle: CSSProperties = {
+    ...contentStyle,
+    width: config.width,
+    zoom: scale === 1 ? undefined : scale,
   };
 
   const panelProps = {
@@ -503,6 +581,7 @@ const Preview = ({
                   (item) => (
                     <button
                       key={item}
+                      data-device={item}
                       ref={deviceFocus.getItemRef(item)}
                       type="button"
                       className={cn(
@@ -561,13 +640,25 @@ const Preview = ({
               style={frameStyle}
             />
 
+            {showPlaceholder && (
+              <div
+                className="puzzle-preview__placeholder"
+                style={placeholderStyle}
+                aria-hidden="true"
+                inert
+                data-preview-placeholder=""
+              >
+                {children}
+              </div>
+            )}
+
             {frameRoot &&
               createPortal(
                 <ThemeScopeProvider
                   scopeId={themeScope?.scopeId ?? null}
                   theme={themeScope?.theme ?? "system"}
                 >
-                  <div style={contentStyle}>{children}</div>
+                  <div ref={contentRef} style={contentStyle}>{children}</div>
                 </ThemeScopeProvider>,
                 frameRoot,
               )}

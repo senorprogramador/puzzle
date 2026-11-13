@@ -18,7 +18,7 @@ import { Slider } from "@puzzle-ui/ui";
 Wrap Slider in `FormField` to provide a visible label and supporting text. `defaultValue` sets its initial value; without it, Slider starts at the range midpoint, rounded to the allowed step.
 
 <Preview
-  height={200}
+  hideDevices={true}
   code={`\
   <FormField label="Volume" description="Adjust the audio volume.">
     <Slider name="volume" defaultValue={65} showValue />
@@ -37,7 +37,7 @@ Wrap Slider in `FormField` to provide a visible label and supporting text. `defa
 `min` and `max` define the bounds. `step` defines increments relative to `min`; use `"any"` to avoid step rounding. Values are clamped to the range and rounded to the nearest allowed increment.
 
 <Preview
-  height={340}
+  hideDevices={true}
   code={`\
 <Stack>
   <FormField label="Temperature" description="Between 16 and 30 degrees, in half-degree steps.">
@@ -83,7 +83,7 @@ Wrap Slider in `FormField` to provide a visible label and supporting text. `defa
 `size` changes the track and thumb size without changing the numeric range.
 
 <Preview
-  height={360}
+  hideDevices={true}
   code={`\
 <Stack>
   <FormField label="Small"><Slider size="sm" defaultValue={25} /></FormField>
@@ -114,7 +114,7 @@ Wrap Slider in `FormField` to provide a visible label and supporting text. `defa
 `showValue` displays the current number. `formatValue` formats that display and supplies `aria-valuetext`, even when `showValue` is off. An explicit `aria-valuetext` takes precedence.
 
 <Preview
-  height={260}
+  hideDevices={true}
   code={`\
 <FormField label="Storage budget">
   <Slider
@@ -156,7 +156,7 @@ Wrap Slider in `FormField` to provide a visible label and supporting text. `defa
 
 Use `value` with `onChange` to own the value. The callback receives a number, not a change event. Use either controlled `value` or uncontrolled `defaultValue`, not both.
 
-<Preview height={260} code={`\
+<Preview hideDevices={true} code={`\
 const [volume, setVolume] = useState(40);
 
 return (
@@ -177,7 +177,7 @@ return (
 `disabled` prevents interaction and native form submission. Use `FormField` to connect an error message, or supply `aria-invalid` and `aria-describedby` yourself. Invalid state does not disable the slider.
 
 <Preview
-  height={340}
+  hideDevices={true}
   code={`\
 <Stack>
   <FormField label="Locked volume" disabled>

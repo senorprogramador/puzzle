@@ -25,7 +25,8 @@ import {
 Use `label` for a visible, accessible field name. `placeholder` appears when nothing is selected, and `description` provides supporting text. Click the trigger or use Enter, Space, ArrowUp, or ArrowDown to open the calendar.
 
 <Preview
-  height={600}
+  fit="device"
+  hideDevices={true}
   code={`\
 <DatePicker
   label="Appointment date"
@@ -61,7 +62,7 @@ Use `value` with `onChange` to own the selection. Date Picker uses `null` for a 
 
 `clearable` adds a clear button when a date is selected. Customize its accessible name with `clearLabel`. Required fields cannot be cleared through this button.
 
-<Preview height={620} code={`\
+<Preview fit="device" hideDevices={true} code={`\
 const [date, setDate] = useState<Date | null>(new Date(2025, 2, 15));
 
 return (
@@ -90,7 +91,8 @@ return (
 `minDate` and `maxDate` define inclusive bounds. Use `disabledDates` for specific exclusions and `shouldDisableDate` for recurring rules such as weekends. All restrictions are combined; the callback receives a date normalized to local midnight.
 
 <Preview
-  height={600}
+  fit="device"
+  hideDevices={true}
   code={`\
 <DatePicker
   label="Delivery date"
@@ -127,7 +129,8 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 `dateFormat` customizes the trigger's date format without shortening the accessible names of day buttons. Translate `calendarLabel`, `previousMonthLabel`, `nextMonthLabel`, and `clearLabel` for your application. The built-in Today action and empty-calendar message currently use English text.
 
 <Preview
-  height={700}
+  fit="device"
+  hideDevices={true}
   code={`\
 <Stack>
   <DatePicker
@@ -180,7 +183,7 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 `size` supports `sm`, `md`, and `lg`. `fullWidth` fills the available width. Both accept responsive values using `mobile`, `tablet`, and `desktop` keys. Change the preview device to compare the responsive control.
 
 <Preview
-  height={760}
+  fit="device"
   code={`\
 <Stack>
   <DatePicker label="Small" size="sm" defaultValue={new Date(2025, 2, 15)} />
@@ -229,7 +232,7 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 `defaultOpen` sets initial uncontrolled visibility. Use `open` with `onOpenChange` for controlled visibility, independently of controlled selection.
 
 <Preview
-  height={650}
+  fit="device"
   align="end"
   code={`\
 <DatePicker
@@ -265,7 +268,8 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 `disabled` prevents interaction and excludes the native input from form submission. Supporting description and error IDs are combined with any external `aria-describedby`.
 
 <Preview
-  height={720}
+  fit="device"
+  hideDevices={true}
   code={`\
 <Stack>
   <DatePicker
@@ -305,7 +309,7 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 
 Supply `name` to include the selected date in native form submission as `YYYY-MM-DD`, regardless of the display locale. `form` associates the input with a form elsewhere in the document. The hidden native input carries required, minimum, maximum, and custom date-availability validation; invalid submission focuses the visible trigger.
 
-<Preview height={680} code={`\
+<Preview fit="device" hideDevices={true} code={`\
 const [submittedDate, setSubmittedDate] = useState("");
 
 return (

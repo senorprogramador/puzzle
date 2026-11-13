@@ -18,7 +18,7 @@ import { AspectRatio } from "@puzzle-ui/ui";
 By default, AspectRatio uses a square (1:1) ratio.
 
 <Preview
-  height={320}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -60,7 +60,7 @@ Use the `ratio` prop to define the desired width-to-height proportion.
 The ratio is expressed as a number. For example, `16 / 9` represents a widescreen aspect ratio, while `4 / 3` represents a traditional display ratio.
 
 <Preview
-  height={520}
+  hideDevices={true}
   code={`\
 <Stack gap="lg" style={{ width: "100%", maxWidth: "240px" }}>
   <AspectRatio ratio={16 / 9}>
@@ -118,7 +118,6 @@ AspectRatio is particularly useful for responsive images.
 Combine it with `object-fit: cover` to fill the container while preserving the image's proportions.
 
 <Preview
-  height={360}
   code={`\
 <AspectRatio ratio={16 / 9}>
   <img
@@ -149,7 +148,7 @@ Combine it with `object-fit: cover` to fill the container while preserving the i
 For square images, such as avatars or product thumbnails, use the default ratio.
 
 <Preview
-  height={280}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -190,7 +189,6 @@ Use AspectRatio to maintain the correct proportions of embedded videos.
 For example, a 16:9 container is suitable for most YouTube and other widescreen video embeds.
 
 <Preview
-  height={584}
   code={`\
 <AspectRatio ratio={16 / 9}>
     <iframe
@@ -229,7 +227,7 @@ Use the `as` prop to change the underlying HTML element.
 All native properties supported by the selected element are forwarded to the root element.
 
 <Preview
-  height={240}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -268,7 +266,7 @@ AspectRatio supports both `className` and `style`.
 Custom styles are merged with the component's internal styles. The `ratio` prop takes precedence over `style.aspectRatio`.
 
 <Preview
-  height={280}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\

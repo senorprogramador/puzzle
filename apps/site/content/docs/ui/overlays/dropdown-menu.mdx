@@ -18,7 +18,8 @@ import { DropdownMenu } from "@puzzle-ui/ui";
 Every menu requires exactly one `DropdownMenu.Trigger` and one `DropdownMenu.Content`. `asChild` lets the trigger use a custom element, such as a Puzzle `Button`.
 
 <Preview
-  height={340}
+  fit="device"
+  hideDevices={true}
   code={`\
 <DropdownMenu>
   <DropdownMenu.Trigger asChild>
@@ -48,7 +49,7 @@ The root can be controlled with `open` and `onOpenChange`, or initialized with `
 
 Use `Group` and `Label` to organize actions and `Separator` to divide sections. Checkbox items stay open by default so users can make multiple choices; radio items close the menu by default after selection.
 
-<Preview height={380} code={`\
+<Preview fit="device" hideDevices={true} code={`\
 <DropdownMenu.CheckboxItem
   checked={showArchived}
   onCheckedChange={setShowArchived}

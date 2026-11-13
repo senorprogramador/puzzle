@@ -20,20 +20,20 @@ validation and safe serialization.
 
 ### Creating nodes
 
-\`\`\`ts
+```ts
 import { createSeoNode } from "@puzzle-ui/seo";
 
 const organization = createSeoNode(
-{
-"@type": "Organization",
-name: "Example",
-url: "https://example.com",
-},
-{
-baseUrl: "https://example.com",
-},
+  {
+    "@type": "Organization",
+    name: "Example",
+    url: "https://example.com",
+  },
+  {
+    baseUrl: "https://example.com",
+  },
 );
-\`\`\`
+```
 
 Node IDs are generated deterministically using the node type and
 available identity properties.
@@ -42,25 +42,25 @@ An explicit ID overrides the generated ID.
 
 ### Building a graph
 
-\`\`\`ts
+```ts
 import { createSeoGraphBuilder } from "@puzzle-ui/seo";
 
 const builder = createSeoGraphBuilder({
-baseUrl: "https://example.com",
+  baseUrl: "https://example.com",
 });
 
 builder.add({
-"@type": "Organization",
-name: "Example",
+  "@type": "Organization",
+  name: "Example",
 });
 
 builder.add({
-"@type": "WebSite",
-name: "Example Website",
+  "@type": "WebSite",
+  name: "Example Website",
 });
 
 const graph = builder.build();
-\`\`\`
+```
 
 Every builder instance maintains its own state.
 
@@ -68,20 +68,20 @@ Every builder instance maintains its own state.
 
 Nested nodes are extracted into independent graph nodes.
 
-\`\`\`ts
+```ts
 const graph = createSeoGraphBuilder({
-baseUrl: "https://example.com",
+  baseUrl: "https://example.com",
 })
-.add({
-"@type": "WebPage",
-name: "Home",
-author: {
-"@type": "Person",
-name: "John Doe",
-},
-})
-.build();
-\`\`\`
+  .add({
+    "@type": "WebPage",
+    name: "Home",
+    author: {
+      "@type": "Person",
+      name: "John Doe",
+    },
+  })
+  .build();
+```
 
 The author is represented by an @id reference in the WebPage
 and registered as an independent graph node.
@@ -91,27 +91,27 @@ and registered as an independent graph node.
 References can point to nodes added before or after the referencing
 node. Self-references and cyclic references are supported through @id.
 
-\`\`\`ts
+```ts
 const graph = buildSeoGraph(
-[
-{
-"@type": "WebPage",
-"@id": "https://example.com/#page",
-publisher: {
-"@id": "https://example.com/#organization",
-},
-},
-{
-"@type": "Organization",
-"@id": "https://example.com/#organization",
-name: "Example",
-},
-],
-{
-baseUrl: "https://example.com",
-},
+  [
+    {
+      "@type": "WebPage",
+      "@id": "https://example.com/#page",
+      publisher: {
+        "@id": "https://example.com/#organization",
+      },
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://example.com/#organization",
+      name: "Example",
+    },
+  ],
+  {
+    baseUrl: "https://example.com",
+  },
 );
-\`\`\`
+```
 
 ### Merging
 
@@ -134,27 +134,27 @@ Available strategies:
 - last: retain the last conflicting value.
 - error: report conflicting values as validation errors.
 
-\`\`\`ts
+```ts
 const builder = createSeoGraphBuilder({
-baseUrl: "https://example.com",
-conflictStrategy: "error",
+  baseUrl: "https://example.com",
+  conflictStrategy: "error",
 });
-\`\`\`
+```
 
 ### Validation
 
-\`\`\`ts
+```ts
 import { validateSeoGraph } from "@puzzle-ui/seo";
 
 const result = validateSeoGraph(graph, {
-baseUrl: "https://example.com",
-strictReferences: true,
+  baseUrl: "https://example.com",
+  strictReferences: true,
 });
 
 if (!result.valid) {
-console.error(result.issues);
+  console.error(result.issues);
 }
-\`\`\`
+```
 
 Validation covers graph structure, node IDs, duplicate IDs,
 node types and unresolved local references.
@@ -163,20 +163,20 @@ External references are allowed by default.
 
 ### Serialization
 
-\`\`\`ts
+```ts
 import { serializeSeoGraph } from "@puzzle-ui/seo";
 
 const result = serializeSeoGraph(graph, {
-pretty: true,
-scriptSafe: true,
+  pretty: true,
+  scriptSafe: true,
 });
 
 if (result.errors.length > 0) {
-console.error(result.errors);
+  console.error(result.errors);
 }
 
 const jsonLd = result.value;
-\`\`\`
+```
 
 Serialization is deterministic and escapes HTML-sensitive
 characters by default.
@@ -196,25 +196,25 @@ registered in different components to reference and merge with each other.
 
 ### Provider setup
 
-\`\`\`tsx
+```tsx
 import {
-SeoProvider,
-LDOrganization,
-LDWebSite,
-LDWebPage,
+  SeoProvider,
+  LDOrganization,
+  LDWebSite,
+  LDWebPage,
 } from "@puzzle-ui/seo";
 
 const config = {
-siteUrl: "https://example.com",
-identity: {
-name: "Example",
-url: "https://example.com",
-},
+  siteUrl: "https://example.com",
+  identity: {
+    name: "Example",
+    url: "https://example.com",
+  },
 };
 
 export const Root = () => (
-<SeoProvider config={config}>
-<LDOrganization
+  <SeoProvider config={config}>
+    <LDOrganization
       id="#organization"
       name="Example"
       url="https://example.com"
@@ -237,10 +237,9 @@ export const Root = () => (
         "@id": "https://example.com/#website",
       }}
     />
-
   </SeoProvider>
 );
-\`\`\`
+```
 
 The provider creates an isolated graph builder for every render.
 
@@ -264,18 +263,15 @@ Every registered node receives a deterministic ID from the Graph Engine.
 
 You can override the generated ID with the id property:
 
-\`\`\`tsx
-<LDOrganization
-  id="#organization"
-  name="Example"
-/>
-\`\`\`
+```tsx
+<LDOrganization id="#organization" name="Example" />
+```
 
 The resulting ID is:
 
-\`\`\`text
+```text
 https://example.com/#organization
-\`\`\`
+```
 
 Use stable identifiers for entities that should be referenced by
 other nodes, such as organizations, websites, authors and pages.
@@ -325,16 +321,16 @@ The property names include inherited properties from parent types.
 For example, Organization receives the common properties inherited
 from Thing.
 
-\`\`\`tsx
+```tsx
 import {
-LDOrganization,
-LDSearchAction,
-LDPostalAddress,
+  LDOrganization,
+  LDSearchAction,
+  LDPostalAddress,
 } from "@puzzle-ui/seo";
 
 const StructuredData = () => (
-<>
-<LDOrganization
+  <>
+    <LDOrganization
       name="Example"
       legalName="Example Ltd"
       url="https://example.com"
@@ -344,8 +340,7 @@ const StructuredData = () => (
       query="required name"
       target={{
         "@type": "EntryPoint",
-        urlTemplate:
-          "https://example.com/search?q={search_term_string}",
+        urlTemplate: "https://example.com/search?q={search_term_string}",
       }}
     />
 
@@ -355,10 +350,9 @@ const StructuredData = () => (
       postalCode="28001"
       addressCountry="ES"
     />
-
-</>
+  </>
 );
-\`\`\`
+```
 
 Properties that do not belong to a component's Schema.org type
 are rejected by TypeScript.
@@ -369,32 +363,32 @@ inherited properties, so runtime definitions and TypeScript stay in sync.
 For properties not represented in the generated definitions,
 use the data property:
 
-\`\`\`tsx
+```tsx
 <LDOrganization
-name="Example"
-data={{
+  name="Example"
+  data={{
     customProperty: "custom-value",
   }}
 />
-\`\`\`
+```
 
 ### Generic Schema component
 
 Use Schema when you need a type that does not have a dedicated
 React component.
 
-\`\`\`tsx
+```tsx
 import { Schema } from "@puzzle-ui/seo";
 
 <Schema
-type="CustomType"
-id="#custom"
-data={{
+  type="CustomType"
+  id="#custom"
+  data={{
     name: "Example",
     customProperty: "custom-value",
   }}
 />;
-\`\`\`
+```
 
 The generic component accepts arbitrary Schema.org type names.
 The registry still controls validation.
@@ -404,43 +398,36 @@ The registry still controls validation.
 SchemaGraph registers an existing collection of nodes or a complete
 graph into the provider's central graph.
 
-\`\`\`tsx
-import {
-SchemaGraph,
-LDOrganization,
-} from "@puzzle-ui/seo";
+```tsx
+import { SchemaGraph, LDOrganization } from "@puzzle-ui/seo";
 
 const nodes = [
-{
-"@type": "Organization",
-"@id": "#organization",
-name: "Example",
-},
-{
-"@type": "WebSite",
-"@id": "#website",
-name: "Example Website",
-},
+  {
+    "@type": "Organization",
+    "@id": "#organization",
+    name: "Example",
+  },
+  {
+    "@type": "WebSite",
+    "@id": "#website",
+    name: "Example Website",
+  },
 ] as const;
 
 const StructuredData = () => (
-<>
-<SchemaGraph nodes={nodes} />
+  <>
+    <SchemaGraph nodes={nodes} />
 
-    <LDOrganization
-      id="#organization"
-      description="Example organization"
-    />
-
-</>
+    <LDOrganization id="#organization" description="Example organization" />
+  </>
 );
-\`\`\`
+```
 
 You can also supply an existing graph:
 
-\`\`\`tsx
+```tsx
 <SchemaGraph graph={existingGraph} />
-\`\`\`
+```
 
 All nodes are registered through the provider's existing graph builder.
 Duplicate IDs are handled by the Graph Engine.
@@ -449,18 +436,12 @@ Duplicate IDs are handled by the Graph Engine.
 
 SchemaReference registers a reference entity using its ID.
 
-\`\`\`tsx
-import {
-SchemaReference,
-LDWebPage,
-} from "@puzzle-ui/seo";
+```tsx
+import { SchemaReference, LDWebPage } from "@puzzle-ui/seo";
 
 const StructuredData = () => (
-<>
-<SchemaReference
-      id="#organization"
-      type="Organization"
-    />
+  <>
+    <SchemaReference id="#organization" type="Organization" />
 
     <LDWebPage
       name="About"
@@ -468,10 +449,9 @@ const StructuredData = () => (
         "@id": "https://example.com/#organization",
       }}
     />
-
-</>
+  </>
 );
-\`\`\`
+```
 
 The type is optional and defaults to Thing.
 
@@ -486,20 +466,17 @@ you can also use an ordinary @id object directly in a property.
 SchemaScript and SeoJsonLd are aliases for registering existing
 JSON-LD data into the central graph.
 
-\`\`\`tsx
-import {
-SchemaScript,
-SeoJsonLd,
-} from "@puzzle-ui/seo";
+```tsx
+import { SchemaScript, SeoJsonLd } from "@puzzle-ui/seo";
 
 const StructuredData = () => (
-<>
-<SchemaScript
-data={{
+  <>
+    <SchemaScript
+      data={{
         "@type": "Organization",
         name: "Example",
       }}
-/>
+    />
 
     <SeoJsonLd
       data={[
@@ -513,10 +490,9 @@ data={{
         },
       ]}
     />
-
-</>
+  </>
 );
-\`\`\`
+```
 
 Both components support:
 
@@ -532,21 +508,21 @@ The provider remains responsible for rendering the central JSON-LD script.
 Use useSeo to access the active SEO configuration and register
 additional nodes from custom components.
 
-\`\`\`tsx
+```tsx
 import { useSeo } from "@puzzle-ui/seo";
 
 const CustomStructuredData = () => {
-const seo = useSeo();
+  const seo = useSeo();
 
-seo.registerNode({
-"@type": "Organization",
-"@id": "#organization",
-name: seo.config.identity.name,
-});
+  seo.registerNode({
+    "@type": "Organization",
+    "@id": "#organization",
+    name: seo.config.identity.name,
+  });
 
-return null;
+  return null;
 };
-\`\`\`
+```
 
 The hook must be used inside SeoProvider.
 
@@ -556,7 +532,7 @@ Schema validation is enabled by default.
 
 Strict validation rejects unknown Schema.org types and properties.
 
-\`\`\`tsx
+````tsx
 <SeoProvider
 config={config}
 validation={{
@@ -565,12 +541,12 @@ validation={{
 
 >   <LDOrganization name="Example" />
 > </SeoProvider>
-> \`\`\`
+> ```
 
 Disable validation when integrating custom or non-standard
 Schema.org definitions:
 
-\`\`\`tsx
+```tsx
 <SeoProvider
 config={config}
 validation={false}
@@ -584,7 +560,7 @@ validation={false}
 
 />
 </SeoProvider>
-\`\`\`
+````
 
 A custom registry can be supplied through schemaRegistry.
 
@@ -592,14 +568,14 @@ A custom registry can be supplied through schemaRegistry.
 
 The central JSON-LD script supports a Content Security Policy nonce.
 
-\`\`\`tsx
+````tsx
 <SeoProvider
 config={config}
 nonce={requestNonce}
 
 >   <LDOrganization name="Example" />
 > </SeoProvider>
-> \`\`\`
+> ```
 
 The nonce is applied to the single central script element.
 
@@ -642,10 +618,10 @@ hand-written registry extensions.
 
 Run the following commands from the package directory:
 
-\`\`\`sh
+```sh
 bun run schema:generate
 bun run schema:check
-\`\`\`
+````
 
 The check command verifies that the committed generated definitions
 match the pinned Schema.org source data.

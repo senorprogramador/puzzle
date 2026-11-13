@@ -14,7 +14,7 @@ import { Heading } from "@puzzle-ui/ui";
 `level` selects typography; `as` selects the HTML heading level. The default element is always `h2`, regardless of visual style.
 
 <Preview
-  height={450}
+  hideDevices={true}
   code={`\
 <Stack>
   <Heading as="h1" level="headline1">Page title</Heading>
@@ -48,7 +48,7 @@ Use `textAlign` to align heading text. Logical values `start` and `end` follow
 the text direction.
 
 <Preview
-  height={160}
+  hideDevices={true}
   code={`<Heading level="headline2" textAlign="center">Centered heading</Heading>`}
 >
   <Heading level="headline2" textAlign="center">Centered heading</Heading>

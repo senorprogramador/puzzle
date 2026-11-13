@@ -20,7 +20,7 @@ Alternate `ResizablePanels.Panel` and `ResizablePanels.Handle` children, startin
 The group fills its parent, so give the parent a height. Panels scroll their own overflowing content.
 
 <Preview
-  height={280}
+  hideDevices={true}
   code={`\
 <div style={{ width: "100%", height: "14rem" }}>
   <ResizablePanels defaultSizes={[30, 70]}>
@@ -49,7 +49,7 @@ Sizes are percentages of the space left after handles and padding. Panel sizes a
 Use `minSize` and `maxSize` on a panel to limit it, in percentages. Initial sizes outside the limits are clamped, and the remaining space is redistributed proportionally across the other panels. The constraints of all panels must be able to add up to exactly 100%; otherwise a `RangeError` is thrown.
 
 <Preview
-  height={280}
+  hideDevices={true}
   code={`\
 <div style={{ width: "100%", height: "14rem" }}>
   <ResizablePanels defaultSizes={[25, 50, 25]}>
@@ -78,7 +78,7 @@ Use `minSize` and `maxSize` on a panel to limit it, in percentages. Initial size
 Set `orientation="vertical"` to stack panels from top to bottom. Handles then render as horizontal dividers.
 
 <Preview
-  height={340}
+  hideDevices={true}
   code={`\
 <div style={{ width: "100%", height: "18rem" }}>
   <ResizablePanels orientation="vertical" defaultSizes={[60, 40]}>
@@ -103,7 +103,7 @@ Set `orientation="vertical"` to stack panels from top to bottom. Handles then re
 Use `sizes` with `onSizesChange` to own the layout, for example to persist it. The callback receives normalized percentages. For uncontrolled usage, pass `defaultSizes` and optionally listen with `onSizesChange`.
 
 <Preview
-  height={320}
+  hideDevices={true}
   code={`\
 const [sizes, setSizes] = useState([30, 70]);
 
@@ -132,7 +132,7 @@ return (
 Set `disabled` on the group to lock every handle, or on a single handle to lock only that one. Disabled handles are removed from the tab order.
 
 <Preview
-  height={240}
+  hideDevices={true}
   code={`\
 <div style={{ width: "100%", height: "10rem" }}>
   <ResizablePanels disabled defaultSizes={[40, 60]}>

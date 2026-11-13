@@ -20,7 +20,7 @@ import { Command, CommandDialog } from "@puzzle-ui/ui";
 
 Pass commands as data. By default, search matches every query term against each command's label, description, keywords, and group, without case or accent sensitivity. Select an item with a click or the keyboard.
 
-<Preview height={440} code={`\
+<Preview fit="device" hideDevices={true} code={`\
 const commands = [
   { id: "new-file", label: "New file", group: "File", keywords: ["create"] },
   { id: "settings", label: "Settings", group: "Preferences" },
@@ -40,7 +40,8 @@ const commands = [
 `CommandDialog` wraps the list in a modal dialog. It opens with `⌘K` on macOS or `Ctrl+K` elsewhere by default, and closes after a command is selected. The shortcut is ignored while focus is in an editable field. Set `shortcut={false}` to disable it.
 
 <Preview
-  height={200}
+  fit="device"
+  hideDevices={true}
   code={`\
 <CommandDialog
   title="Project commands"

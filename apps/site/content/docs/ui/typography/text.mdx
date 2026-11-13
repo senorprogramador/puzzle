@@ -14,7 +14,7 @@ import { Text } from "@puzzle-ui/ui";
 `type` chooses a theme typography role; `as` chooses markup. Use `as="p"` for paragraphs rather than relying on the default inline span.
 
 <Preview
-  height={350}
+  hideDevices={true}
   code={`\
 <Stack>
   <Text as="p" type="body1">Primary body text for readable content.</Text>
@@ -49,7 +49,7 @@ Use a block element such as `as="p"` so alignment can take effect across its wid
 Logical values `start` and `end` follow the text direction.
 
 <Preview
-  height={160}
+  hideDevices={true}
   code={`<Text as="p" textAlign="center">Centered text.</Text>`}
 >
   <Text as="p" textAlign="center">Centered text.</Text>

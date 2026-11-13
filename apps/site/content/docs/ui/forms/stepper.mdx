@@ -18,7 +18,7 @@ import { Stepper } from "@puzzle-ui/ui";
 Compose direct `Stepper.Step` children. Steps before the active step are completed automatically. Stable IDs preserve selection when steps are reordered; every step needs a unique ID in ID-based mode, and the active ID must match an available step.
 
 <Preview
-  height={240}
+  hideDevices={true}
   code={`\
 <Stepper defaultActiveStepId="shipping" aria-label="Checkout progress">
   <Stepper.Step id="details" label="Details" />
@@ -41,7 +41,6 @@ Compose direct `Stepper.Step` children. Steps before the active step are complet
 `orientation` accepts `"horizontal"`, `"vertical"`, or a responsive object. Use `description` for supporting text and `optional` to identify a non-required step. Change device sizes to see the layout switch.
 
 <Preview
-  height={420}
   code={`\
 <Stepper
   orientation={{ mobile: "vertical", tablet: "horizontal" }}
@@ -70,7 +69,7 @@ Compose direct `Stepper.Step` children. Steps before the active step are complet
 `clickable` turns selectable steps into buttons. By default, `linear` allows only the current and earlier steps to be selected. Set `linear={false}` to allow navigation to future steps; `disabled` still prevents selection.
 
 <Preview
-  height={340}
+  hideDevices={true}
   code={`\
 <Stepper clickable linear={false} defaultActiveStepId="details" orientation="vertical">
   <Stepper.Step id="details" label="Details" />
@@ -103,7 +102,7 @@ Compose direct `Stepper.Step` children. Steps before the active step are complet
 `completed` overrides automatic completion. `error` takes precedence over other visual states. `icon` replaces the numeric or state indicator; keep the visible `label` meaningful because the indicator is hidden from assistive technology.
 
 <Preview
-  height={380}
+  hideDevices={true}
   code={`\
 <Stepper defaultActiveStep={1} orientation="vertical">
   <Stepper.Step label="Account" completed icon={<Icon name="akar-icons:check" size={20} />} />
@@ -137,7 +136,7 @@ Compose direct `Stepper.Step` children. Steps before the active step are complet
 
 Use `activeStep` with `onStepChange` for zero-based index selection. An external Continue action can advance progress while clickable steps allow returning to completed work. ID-based controlled selection uses `activeStepId` with `onStepIdChange` instead; do not mix the two modes.
 
-<Preview height={360} code={`\
+<Preview hideDevices={true} code={`\
 const [activeStep, setActiveStep] = useState(0);
 
 return (

@@ -20,7 +20,7 @@ import { Button } from "@puzzle-ui/ui";
 Use the Button component to trigger an action.
 
 <Preview
-  height={140}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -52,6 +52,7 @@ The `variant` prop controls the visual appearance and emphasis of the Button.
 The default variant is `primary`.
 
 <Preview
+  hideDevices={true}
   code={`\
   <Button variant="primary">Primary</Button>
   <Button variant="secondary">Secondary</Button>
@@ -96,7 +97,7 @@ Use the size prop to control the dimensions of the Button.
 The default size is `md`.
 
 <Preview
-  height={600}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -129,7 +130,7 @@ The `leading` and `trailing` props allow you to add content before or after the 
 They are useful for icons, indicators, or other supplementary content.
 
 <Preview
-  height={400}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -178,7 +179,7 @@ When `loading` is enabled, the leading content is replaced by the loading indica
 Use the `loading` prop to indicate that an action is being processed.
 
 <Preview
-  height={200}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -205,7 +206,7 @@ The loading state also prevents accidental repeated activation while an operatio
 Use the `disabled` prop when an action is currently unavailable.
 
 <Preview
-  height={200}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -220,7 +221,7 @@ Use the `disabled` prop when an action is currently unavailable.
 The disabled state can also be activated through `aria-disabled`.
 
 <Preview
-  height={200}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -243,7 +244,7 @@ A Button is also considered disabled while `loading` is active.
 Use `fullWidth` to make a Button fill the available width of its container.
 
 <Preview
-  height={200}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -262,7 +263,7 @@ This is useful for form actions, mobile layouts, and other situations where a fu
 The Button component automatically renders a Puzzle `Link` when an `href` is provided.
 
 <Preview
-  height={200}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\

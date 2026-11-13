@@ -24,39 +24,40 @@
 }
 
 .puzzle-button-group--attached {
+    --puzzle-button-group-divider-color: var(--puzzle-color-border);
+    isolation: isolate;
     gap: 0;
 }
 
-.puzzle-button-group--attached > *:not(:first-child) {
+/* Lift the interactive child so its focus ring and border sit above neighbors. */
+.puzzle-button-group--attached > :is(:hover, :focus-visible) {
+    position: relative;
+    z-index: 1;
+}
+
+/* Each child overlaps its predecessor by the border width, leaving a single divider. */
+.puzzle-button-group--horizontal.puzzle-button-group--attached > *:not(:first-child) {
     margin-inline-start: -1px;
-}
-
-.puzzle-button-group--horizontal .puzzle-button-group--attached {
-    border-radius: inherit;
-}
-
-.puzzle-button-group--attached > *:not(:first-child):not(:last-child) {
-    border-radius: 0;
-}
-
-.puzzle-button-group--horizontal .puzzle-button-group--attached > *:first-child {
-    border-start-end-radius: 0;
-    border-end-end-radius: 0;
-}
-
-.puzzle-button-group--horizontal .puzzle-button-group--attached > *:last-child {
+    border-inline-start: 1px solid var(--puzzle-button-group-divider-color);
     border-start-start-radius: 0;
     border-end-start-radius: 0;
 }
 
-.puzzle-button-group--vertical .puzzle-button-group--attached > *:first-child {
-    border-end-start-radius: 0;
+.puzzle-button-group--horizontal.puzzle-button-group--attached > *:not(:last-child) {
+    border-start-end-radius: 0;
     border-end-end-radius: 0;
 }
 
-.puzzle-button-group--vertical .puzzle-button-group--attached > *:last-child {
+.puzzle-button-group--vertical.puzzle-button-group--attached > *:not(:first-child) {
+    margin-block-start: -1px;
+    border-block-start: 1px solid var(--puzzle-button-group-divider-color);
     border-start-start-radius: 0;
     border-start-end-radius: 0;
+}
+
+.puzzle-button-group--vertical.puzzle-button-group--attached > *:not(:last-child) {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
 }
 
 .puzzle-button-group--disabled {

@@ -16,7 +16,8 @@ import { NotificationProvider, useNotification } from "@puzzle-ui/ui";
 Place a provider around the components that call the hook. Notifications portal to the host page; try the buttons below. Errors in this example remain until dismissed.
 
 <Preview
-  height={300}
+  fit="device"
+  hideDevices={true}
   code={`\
 const Controls = () => {
   const notification = useNotification();

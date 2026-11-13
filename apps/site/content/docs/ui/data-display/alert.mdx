@@ -14,7 +14,7 @@ import { Alert } from "@puzzle-ui/ui";
 Use `severity` to communicate the outcome, not color alone. Error alerts are assertive; other severities use polite status announcements.
 
 <Preview
-  height={500}
+  hideDevices={true}
   code={`\
 <Stack>
   <Alert severity="success" title="Saved">Your changes are ready.</Alert>
@@ -47,7 +47,7 @@ Use `severity` to communicate the outcome, not color alone. Error alerts are ass
 `closable` dismisses the alert internally and calls `onClose`. Set `icon={false}` to remove the icon, or provide a custom node.
 
 <Preview
-  height={400}
+  hideDevices={true}
   code={`\
 <Stack>
   <Alert variant="outlined" closable closeLabel="Dismiss update" title="Update">You can dismiss this message.</Alert>

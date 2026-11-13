@@ -1,14 +1,54 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { renderToString } from "react-dom/server";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Preview } from "./index";
+
+beforeEach(() => {
+  vi.stubGlobal("matchMedia", vi.fn((media: string) => ({
+    matches: true,
+    media,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })));
+});
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
 describe("Preview", () => {
+  it("server-renders an inert content placeholder instead of a device-height frame", () => {
+    const markup = renderToString(<Preview>Server content</Preview>);
+    const container = document.createElement("div");
+    container.innerHTML = markup;
+
+    const placeholder = container.querySelector("[data-preview-placeholder]");
+    const viewport = container.querySelector<HTMLElement>(".puzzle-preview__viewport");
+
+    expect(placeholder).toHaveTextContent("Server content");
+    expect(placeholder).toHaveAttribute("aria-hidden", "true");
+    expect(placeholder).toHaveAttribute("inert");
+    expect(viewport?.style.height).toBe("");
+    expect(container.querySelector("iframe")?.style.visibility).toBe("hidden");
+  });
+
+  it("does not render a placeholder when the frame height is known", () => {
+    for (const element of [
+      <Preview fit="device">Content</Preview>,
+      <Preview height={200}>Content</Preview>,
+    ]) {
+      const container = document.createElement("div");
+      container.innerHTML = renderToString(element);
+      expect(container.querySelector("[data-preview-placeholder]")).toBeNull();
+    }
+  });
+
   it("uses unique tab and panel IDs across instances", () => {
     render(
       <>

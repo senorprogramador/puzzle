@@ -16,7 +16,8 @@ import { ColorPicker } from "@puzzle-ui/ui";
 Provide a visible `label` and optionally an initial `defaultValue`. Add preset colors with `colors`; a swatch can be a color string or an object with a `value` and optional accessible `label`.
 
 <Preview
-  height={300}
+  fit="device"
+  hideDevices={true}
   code={`\
 <ColorPicker
   label="Brand color"
@@ -41,7 +42,8 @@ Provide a visible `label` and optionally an initial `defaultValue`. Add preset c
 Use labeled swatch objects when the color value alone is not a useful accessible name. CSS color values such as variables can also be used as swatches; the picker returns the original value when a swatch is selected.
 
 <Preview
-  height={280}
+  fit="device"
+  hideDevices={true}
   code={`\
 <ColorPicker
   label="Status color"

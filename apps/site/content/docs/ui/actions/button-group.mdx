@@ -16,7 +16,7 @@ import { ButtonGroup } from "@puzzle-ui/ui";
 Place related Button components inside a ButtonGroup.
 
 <Preview
-  height={160}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -39,7 +39,7 @@ ButtonGroup renders a `<div>` by default and gives it the `group` role. Provide 
 Use the `orientation` prop to arrange buttons horizontally or vertically. The default orientation is `horizontal`.
 
 <Preview
-  height={300}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -62,9 +62,13 @@ Orientation changes the visual layout only; it does not change the buttons' keyb
 ## Attached buttons
 
 Set `attached` to remove the space between buttons and visually join them.
+Only the outer corners remain rounded, in either orientation and text direction.
+A single button keeps all four rounded corners.
+Adjacent buttons share a single 1px divider drawn with `--puzzle-color-border`.
+Override `--puzzle-button-group-divider-color` on the group to change the color.
 
 <Preview
-  height={160}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -75,11 +79,22 @@ Set `attached` to remove the space between buttons and visually join them.
   </ButtonGroup>
 `}
 >
-  <ButtonGroup attached aria-label="Text alignment">
-    <Button variant="secondary">Left</Button>
-    <Button variant="secondary">Center</Button>
-    <Button variant="secondary">Right</Button>
-  </ButtonGroup>
+  <Stack direction="col">
+    <ButtonGroup attached aria-label="Text alignment in horizontal group">
+      <Button variant="secondary">Left</Button>
+      <Button variant="secondary">Center</Button>
+      <Button variant="secondary">Right</Button>
+    </ButtonGroup>
+    <ButtonGroup
+      attached
+      orientation="vertical"
+      aria-label="Text alignment in vertical group"
+    >
+      <Button variant="secondary">Left</Button>
+      <Button variant="secondary">Center</Button>
+      <Button variant="secondary">Right</Button>
+    </ButtonGroup>
+  </Stack>
 </Preview>
 
 ## Full width
@@ -87,7 +102,7 @@ Set `attached` to remove the space between buttons and visually join them.
 Use `fullWidth` to make the group fill its container and let its children flex to fill the available space.
 
 <Preview
-  height={160}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\

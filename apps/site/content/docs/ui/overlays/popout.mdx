@@ -14,7 +14,8 @@ import { Popout } from "@puzzle-ui/ui";
 Popout positions content and handles opening/dismissal without imposing menu, tooltip, or dialog semantics. Use `Popover` or `Tooltip` for their higher-level interactions.
 
 <Preview
-  height={350}
+  fit="device"
+  hideDevices={true}
   code={`\
 <Popout trigger={<Button>Open details</Button>} position="bottom" align="start" toggleOnClick>
   <Paper><Text as="p">Anchored information.</Text></Paper>

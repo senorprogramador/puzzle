@@ -16,7 +16,8 @@ import { Drawer } from "@puzzle-ui/ui";
 Provide controlled state and an accessible name. Drag the resize handle or use its keyboard interaction to resize. Dragging below the minimum dismisses the drawer.
 
 <Preview
-  height={450}
+  fit="device"
+  hideDevices={true}
   code={`\
 const [open, setOpen] = useState(false);
 <>

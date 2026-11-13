@@ -16,7 +16,7 @@ import { Pagination } from "@puzzle-ui/ui";
 Set `totalPages` to the number of pages and use `defaultPage` to choose the initial page for an uncontrolled pagination control. Page numbers start at 1.
 
 <Preview
-  height={160}
+  hideDevices={true}
   code={`\
 <Pagination totalPages={10} defaultPage={4} onPageChange={(page) => console.log(page)} />
 `}
@@ -43,7 +43,7 @@ Without `page`, `defaultPage` sets the initial page and the component updates it
 Provide `getPageHref` to render available pages as links, for example when each page has a URL. The callback receives a page number and should return its destination. Current and disabled controls are not links.
 
 <Preview
-  height={160}
+  hideDevices={true}
   code={`\
 <Pagination
   totalPages={8}

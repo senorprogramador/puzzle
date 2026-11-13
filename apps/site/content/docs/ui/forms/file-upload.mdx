@@ -21,7 +21,7 @@ import { FileUpload, type FileUploadUploadHandler } from "@puzzle-ui/ui";
 Click the dropzone, press Enter or Space while it is focused, or drop a file onto it. Use `title`, `description`, and `browseLabel` to explain what to select.
 
 <Preview
-  height={440}
+  hideDevices={true}
   code={`\
 <FileUpload
   title="Upload a document"
@@ -47,7 +47,7 @@ Set `multiple` to append accepted files across selections. `onChange` receives t
 
 The file list is managed internally; there are no controlled `value` or `defaultValue` props. Upload progress and completion do not call `onChange`.
 
-<Preview height={560} code={`\
+<Preview hideDevices={true} code={`\
 const [files, setFiles] = useState<File[]>([]);
 
 return (
@@ -70,7 +70,7 @@ return (
 `maxFileSize` limits each file, `maxTotalSize` limits the combined selected size, and `maxFiles` limits the count in multiple mode. Sizes are in bytes. Files are evaluated in selection order: valid files that fit are accepted, while rejected files are reported separately.
 
 <Preview
-  height={580}
+  hideDevices={true}
   code={`\
 <FileUpload
   multiple
@@ -117,7 +117,7 @@ Provide `onUpload` to start uploading each accepted file automatically. The hand
 
 The following local simulation intentionally fails each file's first attempt. Select a file to see progress and error feedback, then retry to complete it. **No file data is sent anywhere.**
 
-<Preview height={640} code={`\
+<Preview hideDevices={true} code={`\
 const attemptedFiles = useRef(new WeakSet<File>());
 
 return (
@@ -179,7 +179,7 @@ Wrap the component in `FormField` for an external label, supporting text, and va
 `required` sets the native file input's required attribute. It does **not** validate the internally managed file list: the native input is cleared after selection so the same file can be selected again. For form submission, validate the files received by `onChange` and send them explicitly using `FormData` or your upload handler. Do not rely on `name` and native form serialization to submit the displayed file list.
 
 <Preview
-  height={440}
+  hideDevices={true}
   code={`\
 <FormField
   label="Supporting documents"
@@ -214,7 +214,7 @@ Wrap the component in `FormField` for an external label, supporting text, and va
 `disabled` prevents file selection, dropping, removal, and retry, and removes the dropzone from keyboard navigation. It does not cancel uploads that are already running.
 
 <Preview
-  height={360}
+  hideDevices={true}
   code={`\
 <FileUpload
   disabled

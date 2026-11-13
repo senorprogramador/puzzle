@@ -16,7 +16,7 @@ import { ScrollArea } from "@puzzle-ui/ui";
 Give the component a height or max-height so vertical overflow can occur. The component fills its available width by default.
 
 <Preview
-  height={260}
+  hideDevices={true}
   align="center"
   justify="center"
   code={`\
@@ -53,7 +53,7 @@ Use the `orientation` prop to choose which axis can scroll.
 - `both`: scrolling on both axes.
 
 <Preview
-  height={180}
+  hideDevices={true}
   code={`\
 <ScrollArea
   orientation="horizontal"

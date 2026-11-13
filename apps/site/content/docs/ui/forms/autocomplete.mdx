@@ -16,7 +16,8 @@ import { Autocomplete } from "@puzzle-ui/ui";
 Options pair a display `label` with a typed `value`. Clearing a controlled single selection produces `undefined`, not `null`.
 
 <Preview
-  height={450}
+  fit="device"
+  hideDevices={true}
   code={`\
 const [value, setValue] = useState<string | undefined>();
 <Autocomplete
@@ -42,7 +43,8 @@ const [value, setValue] = useState<string | undefined>();
 `multiple` uses an array. `freeSolo` permits text not present in the options; Enter commits it. Use `maxSelected` to limit selections.
 
 <Preview
-  height={500}
+  fit="device"
+  hideDevices={true}
   code={`\
 <Stack>
   <Autocomplete label="Skills" multiple maxSelected={3} options={[
@@ -80,7 +82,8 @@ const [value, setValue] = useState<string | undefined>();
 ## Validation and loading
 
 <Preview
-  height={400}
+  fit="device"
+  hideDevices={true}
   code={`\
 <Stack>
   <Autocomplete label="Assignee" required error="Choose an assignee." options={[]} />
