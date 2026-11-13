@@ -6,6 +6,8 @@ export type FontStyle = "normal" | "italic";
 
 export type FontDisplay = "auto" | "block" | "swap" | "fallback" | "optional";
 
+export type FontPreload = FontRole | false;
+
 /**
  * Determines where configured fonts are loaded from.
  *
@@ -25,7 +27,9 @@ export type FontConfig = {
   nonce?: string;
 };
 
-export type ResolvedFontConfig = Required<Omit<FontConfig, "nonce" | "weightRange">> & {
+export type ResolvedFontConfig = Required<
+  Omit<FontConfig, "nonce" | "weightRange">
+> & {
   nonce?: string;
   weightRange?: readonly [number, number];
 };

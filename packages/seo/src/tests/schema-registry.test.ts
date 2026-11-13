@@ -80,9 +80,7 @@ describe("Schema Registry", () => {
 
   it("preserves custom namespace identifiers", () => {
     const registry = createSchemaRegistry({
-      custom: [
-        { name: "Product", type: "custom:Product", source: "custom" },
-      ],
+      custom: [{ name: "Product", type: "custom:Product", source: "custom" }],
     });
 
     expect(registry.get("custom:Product")?.type).toBe("custom:Product");
@@ -246,6 +244,340 @@ describe("Schema Registry", () => {
 
     expect(registry.get("Product")?.name).toBe("Custom Product");
     expect(registry.getConflicts()).toHaveLength(0);
+  });
+
+  describe("immutability", () => {
+    it("freezes definitions returned by get", () => {
+      const registry = createSchemaRegistry({ generated });
+      const product = registry.get("Product");
+
+      expect(product).toBeDefined();
+      expect(Object.isFrozen(product)).toBe(true);
+      expect(Object.isFrozen(product?.parentTypes)).toBe(true);
+      expect(Object.isFrozen(product?.properties)).toBe(true);
+      expect(Object.isFrozen(product?.properties?.[0])).toBe(true);
+
+      expect(Reflect.set(product!, "name", "Modified")).toBe(false);
+      expect(product?.name).toBe("Product");
+    });
+
+    it("freezes definitions returned by getAll", () => {
+      const registry = createSchemaRegistry({ generated });
+      const definitions = registry.getAll();
+
+      expect(Object.isFrozen(definitions[0])).toBe(true);
+      expect(Object.isFrozen(definitions)).toBe(false);
+
+      expect(Reflect.set(definitions[0]!, "name", "Modified")).toBe(false);
+      expect(registry.get("Thing")?.name).toBe("Thing");
+    });
+
+    it("freezes generated and custom collections", () => {
+      const registry = createSchemaRegistry({
+        generated,
+        custom: [
+          {
+            name: "Custom",
+            type: "https://example.com/Custom",
+            source: "custom",
+          },
+        ],
+      });
+
+      const collection = registry.getCollection();
+
+      expect(Object.isFrozen(collection)).toBe(true);
+      expect(Object.isFrozen(collection.generated)).toBe(true);
+      expect(Object.isFrozen(collection.custom)).toBe(true);
+
+      expect(Reflect.set(collection.generated[0]!, "name", "Modified")).toBe(
+        false,
+      );
+
+      expect(registry.get("Thing")?.name).toBe("Thing");
+    });
+
+    it("freezes nested property metadata", () => {
+      const registry = createSchemaRegistry({
+        generated: [
+          {
+            name: "Product",
+            type: "Product",
+            source: "generated",
+            properties: [
+              {
+                name: "offers",
+                type: ["Offer", "AggregateOffer"],
+                expectedTypes: ["Offer", "AggregateOffer"],
+                rangeTypes: ["Offer", "AggregateOffer"],
+                domainTypes: ["Product"],
+              },
+            ],
+          },
+        ],
+      });
+
+      const property = registry.getProperty("Product", "offers");
+
+      expect(Object.isFrozen(property)).toBe(true);
+      expect(Object.isFrozen(property?.type)).toBe(true);
+      expect(Object.isFrozen(property?.expectedTypes)).toBe(true);
+      expect(Object.isFrozen(property?.rangeTypes)).toBe(true);
+      expect(Object.isFrozen(property?.domainTypes)).toBe(true);
+
+      expect(Reflect.set(property!, "name", "modified")).toBe(false);
+      expect(registry.getProperty("Product", "offers")?.name).toBe("offers");
+    });
+
+    it("does not freeze the caller's original definitions", () => {
+      const input: SchemaDefinition[] = [
+        {
+          name: "Product",
+          type: "Product",
+          source: "generated",
+          properties: [
+            {
+              name: "name",
+              type: "Text",
+            },
+          ],
+        },
+      ];
+
+      createSchemaRegistry({ generated: input });
+
+      expect(Object.isFrozen(input)).toBe(false);
+      expect(Object.isFrozen(input[0])).toBe(false);
+      expect(Object.isFrozen(input[0]?.properties)).toBe(false);
+
+      input[0]!.name = "Changed outside registry";
+
+      expect(input[0]?.name).toBe("Changed outside registry");
+    });
+
+    it("freezes the registry instance and conflict collection", () => {
+      const registry = createSchemaRegistry({
+        generated: [
+          {
+            name: "Product",
+            type: "Product",
+            source: "generated",
+            properties: [
+              { name: "name", type: "Text" },
+              { name: "name", type: "URL" },
+            ],
+          },
+        ],
+      });
+
+      expect(Object.isFrozen(registry)).toBe(true);
+      expect(Object.isFrozen(registry.getConflicts())).toBe(true);
+      expect(Object.isFrozen(registry.getConflicts()[0])).toBe(true);
+    });
+  });
+
+  describe("duplicate properties", () => {
+    it("reports duplicate properties in generated definitions", () => {
+      const registry = createSchemaRegistry({
+        generated: [
+          {
+            name: "Product",
+            type: "Product",
+            source: "generated",
+            properties: [
+              { name: "name", type: "Text" },
+              { name: "name", type: "URL" },
+            ],
+          },
+        ],
+      });
+
+      expect(registry.getConflicts()).toContainEqual(
+        expect.objectContaining({
+          type: "https://schema.org/Product",
+          property: "name",
+          code: "duplicate-property",
+        }),
+      );
+
+      // The first property remains authoritative.
+      expect(registry.getProperty("Product", "name")?.type).toBe(
+        "https://schema.org/Text",
+      );
+    });
+
+    it("reports duplicate properties in custom definitions", () => {
+      const registry = createSchemaRegistry({
+        custom: [
+          {
+            name: "Custom Product",
+            type: "https://example.com/Product",
+            source: "custom",
+            properties: [
+              { name: "code", type: "Text" },
+              { name: "code", type: "URL" },
+            ],
+          },
+        ],
+      });
+
+      expect(registry.getConflicts()).toContainEqual(
+        expect.objectContaining({
+          type: "https://example.com/Product",
+          property: "code",
+          code: "duplicate-property",
+        }),
+      );
+    });
+
+    it("reports duplicate properties within a single extension", () => {
+      const registry = createSchemaRegistry({
+        generated,
+        extensions: [
+          {
+            type: "Product",
+            properties: [
+              { name: "sku", type: "Text" },
+              { name: "sku", type: "URL" },
+            ],
+          },
+        ],
+      });
+
+      expect(
+        registry
+          .getConflicts()
+          .filter(
+            (conflict) =>
+              conflict.code === "duplicate-property" &&
+              conflict.property === "sku",
+          ),
+      ).toHaveLength(1);
+
+      expect(registry.getProperty("Product", "sku")?.type).toBe(
+        "https://schema.org/Text",
+      );
+    });
+
+    it("does not let generated overrides hide duplicate custom properties", () => {
+      const registry = createSchemaRegistry({
+        generated,
+        allowGeneratedOverrides: true,
+        custom: [
+          {
+            name: "Custom Product",
+            type: "Product",
+            source: "custom",
+            properties: [
+              { name: "sku", type: "Text" },
+              { name: "sku", type: "URL" },
+            ],
+          },
+        ],
+      });
+
+      expect(registry.get("Product")?.name).toBe("Custom Product");
+
+      expect(registry.getConflicts()).toContainEqual(
+        expect.objectContaining({
+          type: "https://schema.org/Product",
+          property: "sku",
+          code: "duplicate-property",
+        }),
+      );
+    });
+
+    it("does not report duplicates from a generated definition that was overridden", () => {
+      const registry = createSchemaRegistry({
+        generated: [
+          {
+            name: "Product",
+            type: "Product",
+            source: "generated",
+            properties: [
+              { name: "name", type: "Text" },
+              { name: "name", type: "URL" },
+            ],
+          },
+        ],
+        allowGeneratedOverrides: true,
+        custom: [
+          {
+            name: "Custom Product",
+            type: "Product",
+            source: "custom",
+            properties: [{ name: "sku", type: "Text" }],
+          },
+        ],
+      });
+
+      expect(registry.get("Product")?.name).toBe("Custom Product");
+
+      expect(
+        registry
+          .getConflicts()
+          .some(
+            (conflict) =>
+              conflict.code === "duplicate-property" &&
+              conflict.property === "name",
+          ),
+      ).toBe(false);
+    });
+  });
+
+  describe("generated override behavior", () => {
+    it("does not allow duplicate custom definitions when overrides are enabled", () => {
+      const registry = createSchemaRegistry({
+        allowGeneratedOverrides: true,
+        custom: [
+          {
+            name: "First Custom Product",
+            type: "Product",
+            source: "custom",
+          },
+          {
+            name: "Second Custom Product",
+            type: "Product",
+            source: "custom",
+          },
+        ],
+      });
+
+      expect(registry.get("Product")?.name).toBe("First Custom Product");
+
+      expect(registry.getConflicts()).toContainEqual(
+        expect.objectContaining({
+          type: "https://schema.org/Product",
+          code: "duplicate-type",
+        }),
+      );
+    });
+
+    it("still allows a custom definition to override a generated definition", () => {
+      const registry = createSchemaRegistry({
+        generated,
+        allowGeneratedOverrides: true,
+        custom: [
+          {
+            name: "Custom Product",
+            type: "Product",
+            source: "custom",
+            properties: [
+              {
+                name: "sku",
+                type: "Text",
+              },
+            ],
+          },
+        ],
+      });
+
+      expect(registry.get("Product")?.name).toBe("Custom Product");
+      expect(registry.getProperty("Product", "sku")?.type).toBe(
+        "https://schema.org/Text",
+      );
+      expect(registry.getConflicts()).toEqual([]);
+    });
   });
 });
 

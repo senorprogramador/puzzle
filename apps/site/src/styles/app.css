@@ -1,7 +1,5 @@
 /* src/styles/app.css */
 @import "tailwindcss" source("../");
-@import "fumadocs-ui/css/neutral.css" source("../");
-@import "fumadocs-ui/css/preset.css" source("../");
 
 /*
  * Fumadocs reads --color-fd-* variables. Map them to Puzzle tokens so docs

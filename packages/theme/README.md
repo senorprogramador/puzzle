@@ -108,16 +108,28 @@ bun run puzzle-theme fonts download
 The command writes WOFF2 files and `puzzle-fonts.css` to `public/fonts`.
 Use `--config <path>` or `--out-dir <path>` to change these locations.
 Unchanged downloads are skipped; `--force` downloads them again.
+
 For variable fonts, use `"weightRange": [300, 700]` instead of `weights`
 to request a continuous range. Only use ranges supported by the font family.
 Discrete `weights` remain supported; when both are provided, the range is used.
+
 The downloader keeps all language subsets by default. Pass
 `--subsets latin,latin-ext` to retain only Latin and Latin Extended;
 missing requested subsets produce an error. Other scripts will use fallback
 fonts. Subset choices are included in the download cache key.
-To load the generated stylesheet, set `fontSource="local"` on `Theme` and
-pass the same configuration to its `fonts` prop. The default local stylesheet
-URL is `/fonts/puzzle-fonts.css`.
+
+To load the generated stylesheet, set `fontSource="local"` on `Theme`
+and pass the same configuration to its `fonts` prop. The default local
+stylesheet URL is `/fonts/puzzle-fonts.css`.
+
+When using local fonts, Puzzle automatically preloads the normal Latin
+variant of the body font. Use `fontPreload="heading"` or
+`fontPreload="accent"` to preload another configured role, or
+`fontPreload={false}` to disable preloading.
+
+The generated stylesheet and preload link use the same font URL, avoiding
+duplicate downloads. Preloading only applies to local fonts and only one
+font is preloaded per Theme instance.
 
 ## Your first interface
 

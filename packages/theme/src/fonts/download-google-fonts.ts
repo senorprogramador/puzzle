@@ -3,7 +3,8 @@ import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 import { resolveFontStylesheets } from "./resolve-font-stylesheets";
-import type { ThemeFonts } from "./types";
+import type { FontRole, ThemeFonts } from "./types";
+import { createFontPreloadFilename } from "./create-font-preload-filename";
 
 const GOOGLE_FONTS_USER_AGENT =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 " +
@@ -14,13 +15,18 @@ const GOOGLE_FONTS_CSS_HEADERS = {
   "user-agent": GOOGLE_FONTS_USER_AGENT,
 };
 
-const FONT_FACE_REGEX = /(?:\/\*\s*([^*]+?)\s*\*\/\s*)?@font-face\s*\{([^}]*)\}/gi;
+const FONT_FACE_REGEX =
+  /(?:\/\*\s*([^*]+?)\s*\*\/\s*)?@font-face\s*\{([^}]*)\}/gi;
 
 const FONT_URL_REGEX = /url\(\s*(?:"([^"]+)"|'([^']+)'|([^)"'\s]+))\s*\)/i;
 
 const FONT_FORMAT_REGEX = /format\(\s*["']?([^"')]+)["']?\s*\)/i;
 
+const FONT_STYLE_REGEX = /font-style\s*:\s*([^;]+)/i;
+
 const GENERATED_CSS_FILENAME = "puzzle-fonts.css";
+
+const FONT_ROLES: readonly FontRole[] = ["heading", "body", "accent"];
 
 const createHashValue = (value: string): string => {
   return createHash("sha256").update(value).digest("hex");
@@ -31,6 +37,7 @@ type ParsedFontFace = {
   url: string;
   originalUrl: string;
   subset?: string;
+  style: string;
 };
 
 type DownloadGoogleFontsOptions = {
@@ -108,6 +115,7 @@ const parseFontFaces = (css: string, family: string): ParsedFontFace[] => {
       url: fontUrl,
       originalUrl: urlMatch[0],
       subset: match[1]?.trim(),
+      style: body.match(FONT_STYLE_REGEX)?.[1]?.trim() ?? "normal",
     };
   });
 };
@@ -151,9 +159,16 @@ export const downloadGoogleFonts = async ({
   subsets,
   fetcher = fetch,
 }: DownloadGoogleFontsOptions): Promise<DownloadGoogleFontsResult> => {
-  if (subsets !== undefined && (subsets.length === 0 || subsets.some((subset) => !/^[a-z]+(?:-[a-z]+)*$/.test(subset)))) {
-    throw new TypeError("subsets must be a non-empty list of Google Fonts subset names.");
+  if (
+    subsets !== undefined &&
+    (subsets.length === 0 ||
+      subsets.some((subset) => !/^[a-z]+(?:-[a-z]+)*$/.test(subset)))
+  ) {
+    throw new TypeError(
+      "subsets must be a non-empty list of Google Fonts subset names.",
+    );
   }
+
   const stylesheets = resolveFontStylesheets(fonts);
 
   if (stylesheets.length === 0) {
@@ -168,6 +183,7 @@ export const downloadGoogleFonts = async ({
 
   const configHash = createHashValue(
     JSON.stringify([
+      "preload-v1",
       subsets ? [...new Set(subsets)].sort() : null,
       stylesheets.map((stylesheet) => stylesheet.href).sort(),
     ]),
@@ -185,7 +201,40 @@ export const downloadGoogleFonts = async ({
   }
 
   const fontFiles = new Map<string, string>();
+  const preloadFiles = new Map<string, string>();
   const generatedFaces: string[] = [];
+
+  const downloadFont = async (url: string, family: string): Promise<string> => {
+    const existing = fontFiles.get(url);
+
+    if (existing) {
+      return existing;
+    }
+
+    const filename = `font-${createHashValue(url).slice(0, 16)}.woff2`;
+
+    const response = await fetcher(url);
+
+    if (!response.ok) {
+      throw new Error(
+        `Could not download font "${family}": HTTP ${response.status}.`,
+      );
+    }
+
+    const buffer = new Uint8Array(await response.arrayBuffer());
+
+    if (buffer.byteLength === 0) {
+      throw new Error(
+        `Google Fonts returned an empty font file for "${family}".`,
+      );
+    }
+
+    await writeFile(join(outputDir, filename), buffer);
+
+    fontFiles.set(url, filename);
+
+    return filename;
+  };
 
   for (const stylesheet of stylesheets) {
     const response = await fetcher(stylesheet.href, {
@@ -209,45 +258,59 @@ export const downloadGoogleFonts = async ({
     const css = await response.text();
 
     const faces = parseFontFaces(css, stylesheet.family);
+
     if (subsets) {
       for (const subset of subsets) {
         if (!faces.some((face) => face.subset === subset)) {
-          throw new Error(`Google Fonts returned no "${subset}" subset for "${stylesheet.family}".`);
+          throw new Error(
+            `Google Fonts returned no "${subset}" subset for "${stylesheet.family}".`,
+          );
         }
       }
     }
 
-    for (const face of faces) {
-      if (subsets && (!face.subset || !subsets.includes(face.subset))) continue;
-      let filename = fontFiles.get(face.url);
+    const latinNormalFace = faces.find(
+      (face) =>
+        face.subset === "latin" && face.style.toLowerCase() === "normal",
+    );
 
-      if (!filename) {
-        filename = `font-${createHashValue(face.url).slice(0, 16)}.woff2`;
+    const preloadFilename =
+      latinNormalFace && (!subsets || subsets.includes("latin"))
+        ? createFontPreloadFilename(stylesheet.family)
+        : null;
 
-        const fontResponse = await fetcher(face.url);
+    if (latinNormalFace && preloadFilename) {
+      const originalFilename = await downloadFont(
+        latinNormalFace.url,
+        stylesheet.family,
+      );
 
-        if (!fontResponse.ok) {
-          throw new Error(
-            `Could not download font "${stylesheet.family}": HTTP ${fontResponse.status}.`,
-          );
-        }
+      const existingPreload = preloadFiles.get(stylesheet.family.toLowerCase());
 
-        const buffer = new Uint8Array(await fontResponse.arrayBuffer());
+      if (!existingPreload) {
+        const originalBytes = await readFile(join(outputDir, originalFilename));
 
-        if (buffer.byteLength === 0) {
-          throw new Error(
-            `Google Fonts returned an empty font file for "${stylesheet.family}".`,
-          );
-        }
+        await writeFile(join(outputDir, preloadFilename), originalBytes);
 
-        await writeFile(join(outputDir, filename), buffer);
-
-        fontFiles.set(face.url, filename);
+        preloadFiles.set(stylesheet.family.toLowerCase(), preloadFilename);
       }
+    }
+
+    for (const face of faces) {
+      if (subsets && (!face.subset || !subsets.includes(face.subset))) {
+        continue;
+      }
+
+      const filename = await downloadFont(face.url, stylesheet.family);
+
+      const isPreloadFace =
+        face === latinNormalFace && preloadFilename !== null;
+
+      const targetFilename = isPreloadFace ? preloadFilename : filename;
 
       const rewrittenBody = face.body.replace(
         face.originalUrl,
-        `url("./${filename}")`,
+        `url("./${targetFilename}")`,
       );
 
       generatedFaces.push(`@font-face {\n${rewrittenBody.trim()}\n}`);

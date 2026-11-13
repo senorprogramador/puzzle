@@ -13,6 +13,11 @@
     font-family: var(--puzzle-font-body, inherit);
 }
 
+.home-below-fold {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
+}
+
 .home-nav__links,
 .home-nav__actions {
     display: flex;

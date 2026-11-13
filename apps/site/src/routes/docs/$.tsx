@@ -17,6 +17,7 @@ import { RootProvider } from "fumadocs-ui/provider/tanstack";
 import { PageLayout } from "@puzzle-ui/ui/components/layout/page-layout";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import "./docs.css";
 
 export const Route = createFileRoute("/docs/$")({
   component: Page,

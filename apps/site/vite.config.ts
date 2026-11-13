@@ -6,10 +6,15 @@ import tailwindcss from "@tailwindcss/vite";
 import { fumadocsMdx } from "fumadocs-mdx/vite";
 
 const logger = createLogger();
-const cachedPaths = [
-  "/",
-  "/docs",
-  "/docs/**",
+
+const DAY = 60 * 60 * 24;
+const YEAR = DAY * 365;
+
+const cachedForADay = ["/", "/docs", "/docs/**", "/fonts/puzzle-fonts.css"];
+
+const cachedForAYear = [
+  "/fonts/*.{woff,woff2,ttf,otf}",
+  "/assets/**",
   "/apple-touch-icon.png",
   "/favicon.ico",
   "/favicon.svg",
@@ -20,8 +25,19 @@ const cachedPaths = [
   "/puzzle_social.png",
   "/web-app-manifest-192x192.png",
   "/web-app-manifest-512x512.png",
-  "/fonts/**",
 ];
+
+const dayCache = {
+  headers: {
+    "cache-control": `public, max-age=${DAY}, s-maxage=${DAY}`,
+  },
+};
+
+const immutableCache = {
+  headers: {
+    "cache-control": `public, max-age=${YEAR}, immutable`,
+  },
+};
 
 const warn = logger.warn.bind(logger);
 logger.warn = (message, options) => {
@@ -51,16 +67,10 @@ export default defineConfig({
   plugins: [
     tanstackStart(),
     nitro({
-      routeRules: Object.fromEntries(
-        cachedPaths.map((path) => [
-          path,
-          {
-            headers: {
-              "cache-control": "public, max-age=86400, s-maxage=86400",
-            },
-          },
-        ]),
-      ),
+      routeRules: Object.fromEntries([
+        ...cachedForADay.map((path) => [path, dayCache]),
+        ...cachedForAYear.map((path) => [path, immutableCache]),
+      ]),
     }),
     viteReact(),
     tailwindcss({

@@ -6,6 +6,7 @@ export type {
   FontStyle,
   FontDisplay,
   FontSource,
+  FontPreload,
   FontConfig,
   ResolvedFontConfig,
   FontStylesheet,

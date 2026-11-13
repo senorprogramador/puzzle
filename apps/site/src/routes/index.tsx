@@ -25,7 +25,10 @@ import "./home.css";
 import { Header } from "@/components/layout/header";
 import { useState } from "react";
 import { Icon } from "@puzzle-ui/icons/icon";
-import { componentPanels } from "@/components/component-catalog";
+import {
+  componentPanels,
+  randomComponentsOfLength,
+} from "@/components/component-catalog";
 
 const features = [
   {
@@ -241,6 +244,7 @@ const PuzzleLogo = ({
 );
 
 const Home = () => {
+  const panels = Route.useLoaderData();
   const [theme, setTheme] = useState<ThemeMode>("dark");
   return (
     <Theme theme={theme} scope="local">
@@ -351,15 +355,11 @@ const Home = () => {
                 <span className="home-strip__line" />
                 <span>ENDLESS POSSIBILITIES</span>
                 <span className="home-strip__line" />
-                <span>BUILT FOR REACT</span>
-                <span className="home-strip__line" />
-                <span>BUILT FOR NEXT.JS</span>
-                <span className="home-strip__line" />
-                <span>BUILT FOR TANSTACK START</span>
+                <span>BUILT FOR: REACT | NEXT.JS | TANSTACK START</span>
               </Stack>
             </Section>
 
-            <Section id="features">
+            <Section id="features" className="home-below-fold">
               <Stack direction="col" alignH="center" alignV="center" gap="xl">
                 <Stack direction="col" alignH="start" alignV="center">
                   <Badge color="secondary" content="Why Puzzle" />
@@ -403,7 +403,7 @@ const Home = () => {
               </Stack>
             </Section>
 
-            <Section theme="dark" id="components">
+            <Section theme="dark" id="components" className="home-below-fold">
               <Stack
                 direction="col"
                 alignH="center"
@@ -431,7 +431,7 @@ const Home = () => {
                   </Button>
                 </Stack>
 
-                <CarouselController items={componentPanels}>
+                <CarouselController items={panels}>
                   <Carousel<(typeof componentPanels)[number]>
                     className="home-component-carousel"
                     ariaLabel="UI components"
@@ -501,7 +501,7 @@ const Home = () => {
               </Stack>
             </Section>
 
-            <Section className="home-developer" id="developers">
+            <Section className="home-developer home-below-fold" id="developers">
               <Stack
                 className="home-developer__layout"
                 direction={{ mobile: "col", desktop: "row" }}
@@ -579,7 +579,7 @@ const Home = () => {
               </Stack>
             </Section>
 
-            <Section theme="dark" className="home-cta">
+            <Section theme="dark" className="home-cta home-below-fold">
               <Stack direction="col" alignH="center">
                 <Stack direction="col" alignV="start" alignH="center" gap="0">
                   <PuzzleLogo size={128} className="mt-4" />
@@ -602,7 +602,7 @@ const Home = () => {
           <footer className="home-footer">
             <Link className="home-brand" href="/">
               <PuzzleLogo size={28} />
-              <Text as="span">puzzle-ui</Text>
+              <Text as="span">puzzle-ui.com</Text>
             </Link>
 
             <span>Made for developers who care about the details.</span>
@@ -627,6 +627,7 @@ const Home = () => {
 
 export const Route = createFileRoute("/")({
   component: Home,
+  loader: () => randomComponentsOfLength(16),
   head: () => ({
     links: [
       {

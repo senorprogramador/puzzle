@@ -1,9 +1,27 @@
-.sidebar-mobile-hidden {
-    display: none;
-}
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source("../../");
 
-@media screen and (min-width: 768px) {
-    .sidebar-mobile-hidden {
-        display: block;
-    }
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+/* Fumadocs theme mapping */
+:root,
+.dark {
+    --color-fd-background: var(--puzzle-color-background);
+    --color-fd-foreground: var(--puzzle-color-text);
+    --color-fd-muted: var(--puzzle-color-surface-sunken);
+    --color-fd-muted-foreground: var(--puzzle-color-text-muted);
+    --color-fd-popover: var(--puzzle-color-surface-elevated);
+    --color-fd-popover-foreground: var(--puzzle-color-text);
+    --color-fd-card: var(--puzzle-color-surface);
+    --color-fd-card-foreground: var(--puzzle-color-text);
+    --color-fd-border: var(--puzzle-color-border);
+    --color-fd-primary: var(--puzzle-color-primary);
+    --color-fd-primary-foreground: var(--puzzle-color-primary-foreground);
+    --color-fd-secondary: var(--puzzle-color-surface-sunken);
+    --color-fd-secondary-foreground: var(--puzzle-color-text);
+    --color-fd-accent: var(--puzzle-color-surface-sunken);
+    --color-fd-accent-foreground: var(--puzzle-color-text);
+    --color-fd-ring: var(--puzzle-color-ring);
+    --font-sans: var(--puzzle-font-family-body);
 }

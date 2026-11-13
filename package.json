@@ -4,6 +4,7 @@
   "scripts": {
     "site": "bun run --filter '@puzzle-ui/site' dev",
     "dev": "bun run --filter '@puzzle-ui/playground' dev",
+    "fonts:download": "bun run --filter '@puzzle-ui/site' fonts:download",
     "schema:generate": "bun run --filter '@puzzle-ui/seo' schema:generate",
     "schema:check": "bun run --filter '@puzzle-ui/seo' schema:check",
     "build": "bun run schema:check && bun run --filter './packages/*' build",

@@ -3,7 +3,7 @@ title: Theme Provider
 description: The Theme component injects design token CSS variables, loads fonts, and applies Puzzle's global styles.
 ---
 
-The `Theme` component is the entry point of the theme system. It resolves tokens into CSS custom properties, renders font stylesheet links, and provides theme context to Puzzle components.
+The `Theme` component is the entry point of the theme system. It resolves tokens into CSS custom properties, renders font stylesheet links, preloads local fonts when configured, and provides theme context to Puzzle components.
 
 ## Import
 
@@ -21,6 +21,9 @@ import { Theme } from "@puzzle-ui/theme";
 | `tokens`       | `ThemeTokenOverrides`                   | —          | Deep-partial overrides of the default [design tokens](/docs/theme/tokens).                                    |
 | `colorTheme`   | `ColorThemes`                           | —          | One of the built-in [color themes](/docs/theme/colors#built-in-color-themes).                                 |
 | `fonts`        | `Partial<Record<FontRole, FontConfig>>` | —          | Google Fonts for the `heading`, `body`, and `accent` roles. See [Typography & Fonts](/docs/theme/typography). |
+| `fontSource`   | `"google" \| "local"`                   | `"google"` | Determines whether fonts are loaded from Google Fonts or a local generated stylesheet.                        |
+| `fontBasePath` | `string`                                | `"/fonts"` | Public URL directory containing the generated local font files and stylesheet.                                |
+| `fontPreload`  | `FontRole \| false`                     | `"body"`   | Selects which local font to preload. Set to `false` to disable preloading.                                    |
 | `components`   | `ThemeComponents`                       | —          | Global link and image [component overrides](/docs/theme/components).                                          |
 | `nonce`        | `string`                                | —          | CSP nonce applied to the injected `<style>` elements.                                                         |
 
@@ -76,6 +79,51 @@ When `fonts` are provided, `Theme` renders preconnect links for Google Fonts plu
   <App />
 </Theme>
 ```
+
+### Local fonts and preloading
+
+For local fonts, Puzzle can automatically preload one font file. The default is the `body` role.
+
+```tsx
+<Theme
+  fonts={{
+    heading: { family: "Sora" },
+    body: { family: "Inter" },
+  }}
+  fontSource="local"
+>
+  <App />
+</Theme>
+```
+
+This generates a preload link for the normal Latin variant of Inter. The preload uses the same URL as the corresponding `@font-face` declaration, allowing the browser to reuse the downloaded resource.
+
+Choose another role when necessary:
+
+```tsx
+<Theme
+  fonts={{
+    heading: { family: "Sora" },
+    body: { family: "Inter" },
+  }}
+  fontSource="local"
+  fontPreload="heading"
+>
+  <App />
+</Theme>
+```
+
+Disable preloading when the selected font is not needed immediately or when the generated font files do not contain a Latin subset:
+
+```tsx
+<Theme fonts={fonts} fontSource="local" fontPreload={false}>
+  <App />
+</Theme>
+```
+
+Only one font is preloaded per `Theme` instance. Preloading too many fonts can compete with other critical resources and negatively affect page performance.
+
+The `fontPreload` property only applies to local fonts. Google Fonts loading is unchanged.
 
 ## Content Security Policy
 
