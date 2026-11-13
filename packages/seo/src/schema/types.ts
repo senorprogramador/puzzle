@@ -4,6 +4,12 @@ export type SchemaDefinitionSource = "generated" | "custom";
 
 export type SchemaPropertyType = string | string[];
 
+export interface SchemaEnumerationValue {
+  name: string;
+  type: string;
+  description?: string;
+}
+
 export interface SchemaPropertyDefinition {
   name: string;
   type: SchemaPropertyType;
@@ -24,6 +30,7 @@ export interface SchemaDefinition<T extends SeoNode = SeoNode> {
   description?: string;
   properties?: readonly SchemaPropertyDefinition[];
   parentTypes?: readonly string[];
+  enumerationValues?: readonly SchemaEnumerationValue[];
   nodeType?: string;
   namespace?: string;
   create?: (input: JsonObject) => T;

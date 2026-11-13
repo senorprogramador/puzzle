@@ -1,6 +1,7 @@
 export type {
   SchemaDefinitionSource,
   SchemaPropertyType,
+  SchemaEnumerationValue,
   SchemaPropertyDefinition,
   SchemaDefinition,
   SchemaExtension,

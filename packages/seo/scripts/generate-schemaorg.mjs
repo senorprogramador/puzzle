@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const SCRIPT_DIRECTORY = dirname(fileURLToPath(import.meta.url));
 const PACKAGE_DIRECTORY = resolve(SCRIPT_DIRECTORY, "..");
@@ -13,31 +13,24 @@ const SOURCE_DIRECTORY = resolve(SCRIPT_DIRECTORY, "schemaorg");
 const SOURCE_FILE = resolve(SOURCE_DIRECTORY, "source.jsonld");
 
 const GENERATED_DIRECTORY = resolve(PACKAGE_DIRECTORY, "src/schema/generated");
-
 const GENERATED_FILE = resolve(GENERATED_DIRECTORY, "schemaorg.ts");
-
 const MANIFEST_FILE = resolve(GENERATED_DIRECTORY, "manifest.json");
 
 const SCHEMA_PREFIX = "https://schema.org/";
+const CHECK_MODE = process.argv.includes("--check");
 
-const DEFAULT_PREFIXES = {
-  schema: "https://schema.org/",
+const PREFIXES = {
+  schema: SCHEMA_PREFIX,
   rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
   rdfs: "http://www.w3.org/2000/01/rdf-schema#",
   owl: "http://www.w3.org/2002/07/owl#",
   xsd: "http://www.w3.org/2001/XMLSchema#",
 };
 
-const RDF_CLASS = `${DEFAULT_PREFIXES.rdfs}Class`;
-const OWL_CLASS = `${DEFAULT_PREFIXES.owl}Class`;
-const RDF_PROPERTY = `${DEFAULT_PREFIXES.rdf}Property`;
-
-const CHECK_MODE = process.argv.includes("--check");
-
-const normalizeUri = (value) =>
-  typeof value === "string"
-    ? value.replace(/^http:\/\/schema\.org\//, SCHEMA_PREFIX)
-    : value;
+const RDF_CLASS = `${PREFIXES.rdfs}Class`;
+const OWL_CLASS = `${PREFIXES.owl}Class`;
+const RDF_PROPERTY = `${PREFIXES.rdf}Property`;
+const SCHEMA_ENUMERATION = `${SCHEMA_PREFIX}Enumeration`;
 
 const toArray = (value) => {
   if (value === undefined || value === null) {
@@ -45,6 +38,20 @@ const toArray = (value) => {
   }
 
   return Array.isArray(value) ? value : [value];
+};
+
+const unique = (values) => [...new Set(values.filter(Boolean))];
+
+const compareStrings = (a, b) => a.localeCompare(b, "en");
+
+const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+
+const normalizeUri = (value) => {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  return value.replace(/^http:\/\/schema\.org\//, SCHEMA_PREFIX);
 };
 
 const getLocalName = (uri) => {
@@ -62,69 +69,12 @@ const getLocalName = (uri) => {
   return normalized.slice(separator + 1);
 };
 
-const unique = (values) => [...new Set(values.filter(Boolean))];
-
-const compareStrings = (a, b) => a.localeCompare(b, "en");
-
-const sha256 = (value) => createHash("sha256").update(value).digest("hex");
-
-const readJson = async (path) => {
-  const content = await readFile(path, "utf8");
-
-  return JSON.parse(content);
-};
-
-const fetchSource = async () => {
-  if (!CHECK_MODE) {
-    try {
-      const cached = await readFile(SOURCE_FILE, "utf8");
-
-      return {
-        content: cached,
-        downloaded: false,
-      };
-    } catch {
-      // Download the pinned release when no cache exists.
-    }
-  }
-
-  console.log(`Downloading Schema.org ${SCHEMA_VERSION}...`);
-
-  const response = await fetch(SOURCE_URL);
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to download Schema.org: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const content = await response.text();
-
-  try {
-    JSON.parse(content);
-  } catch {
-    throw new Error("Downloaded Schema.org source is not valid JSON.");
-  }
-
-  if (!CHECK_MODE) {
-    await mkdir(SOURCE_DIRECTORY, { recursive: true });
-    await writeFile(SOURCE_FILE, content, "utf8");
-  }
-
-  return {
-    content,
-    downloaded: true,
-  };
-};
-
 const createContextResolver = (document) => {
-  const prefixes = new Map(Object.entries(DEFAULT_PREFIXES));
-
+  const prefixes = new Map(Object.entries(PREFIXES));
   const terms = new Map();
+  const contexts = [];
 
   let vocabulary = "";
-
-  const contexts = [];
 
   const collectContexts = (context) => {
     if (Array.isArray(context)) {
@@ -135,26 +85,21 @@ const createContextResolver = (document) => {
       return;
     }
 
-    if (!context || typeof context !== "object") {
-      return;
+    if (context && typeof context === "object") {
+      contexts.push(context);
     }
-
-    contexts.push(context);
   };
 
   collectContexts(document["@context"]);
 
-  const resolveDefinition = (value) => {
-    if (typeof value !== "string") {
+  const expandDefinition = (value) => {
+    if (typeof value !== "string" || value.startsWith("@")) {
       return value;
     }
 
-    if (value.startsWith("@")) {
-      return value;
-    }
+    const separator = value.indexOf(":");
 
-    if (/^[a-z][a-z0-9+.-]*:/i.test(value)) {
-      const separator = value.indexOf(":");
+    if (separator !== -1) {
       const prefix = value.slice(0, separator);
       const suffix = value.slice(separator + 1);
 
@@ -162,19 +107,15 @@ const createContextResolver = (document) => {
         return `${prefixes.get(prefix)}${suffix}`;
       }
 
-      return value;
+      return normalizeUri(value);
     }
 
-    if (vocabulary) {
-      return `${vocabulary}${value}`;
-    }
-
-    return value;
+    return vocabulary ? `${vocabulary}${value}` : value;
   };
 
   for (const context of contexts) {
     if (typeof context["@vocab"] === "string") {
-      vocabulary = resolveDefinition(context["@vocab"]);
+      vocabulary = expandDefinition(context["@vocab"]);
     }
 
     for (const [key, definition] of Object.entries(context)) {
@@ -196,13 +137,11 @@ const createContextResolver = (document) => {
         continue;
       }
 
-      if (definition["@prefix"] === true) {
-        const id = definition["@id"];
-
-        if (typeof id === "string") {
-          prefixes.set(key, resolveDefinition(id));
-        }
-
+      if (
+        definition["@prefix"] === true &&
+        typeof definition["@id"] === "string"
+      ) {
+        prefixes.set(key, expandDefinition(definition["@id"]));
         continue;
       }
 
@@ -213,19 +152,15 @@ const createContextResolver = (document) => {
   }
 
   const expand = (value) => {
-    if (typeof value !== "string") {
-      return value;
-    }
-
-    if (value.startsWith("@")) {
+    if (typeof value !== "string" || value.startsWith("@")) {
       return value;
     }
 
     if (terms.has(value)) {
-      return normalizeUri(resolveDefinition(terms.get(value)));
+      return normalizeUri(expandDefinition(terms.get(value)));
     }
 
-    return normalizeUri(resolveDefinition(value));
+    return normalizeUri(expandDefinition(value));
   };
 
   const expandKey = (key) => {
@@ -243,10 +178,10 @@ const createContextResolver = (document) => {
 };
 
 const getValues = (node, resolver, property) => {
-  const expandedProperty = resolver.expandKey(property);
+  const expectedKey = resolver.expandKey(property);
 
   for (const [key, value] of Object.entries(node)) {
-    if (resolver.expandKey(key) === expandedProperty) {
+    if (resolver.expandKey(key) === expectedKey) {
       return toArray(value);
     }
   }
@@ -295,16 +230,12 @@ const getDescription = (node, resolver) =>
     ...getValues(node, resolver, "schema:description"),
   ]);
 
-const getLabel = (node, resolver) =>
-  getText([
-    ...getValues(node, resolver, "rdfs:label"),
-    ...getValues(node, resolver, "schema:name"),
-  ]);
-
 const getNodeId = (node, resolver) => {
-  const values = getValues(node, resolver, "@id");
+  if (typeof node["@id"] === "string") {
+    return normalizeUri(resolver.expand(node["@id"]));
+  }
 
-  return getIds(values, resolver)[0];
+  return getIds(getValues(node, resolver, "@id"), resolver)[0];
 };
 
 const getNodeTypes = (node, resolver) =>
@@ -324,6 +255,7 @@ const createSchemaDefinitions = (document) => {
 
   const classes = new Map();
   const properties = [];
+  const nodesById = new Map();
 
   for (const node of graph) {
     if (!node || typeof node !== "object") {
@@ -338,6 +270,11 @@ const createSchemaDefinitions = (document) => {
 
     const nodeTypes = getNodeTypes(node, resolver);
 
+    nodesById.set(id, {
+      node,
+      nodeTypes,
+    });
+
     if (nodeTypes.includes(RDF_CLASS) || nodeTypes.includes(OWL_CLASS)) {
       classes.set(id, node);
     }
@@ -350,40 +287,87 @@ const createSchemaDefinitions = (document) => {
     }
   }
 
-  const propertiesByDomain = new Map();
+  const parentsByClass = new Map();
 
-  for (const { id, node } of properties) {
-    const domains = getIds(
-      getValues(node, resolver, "schema:domainIncludes"),
+  for (const [id, node] of classes) {
+    const parents = getIds(
+      getValues(node, resolver, "rdfs:subClassOf"),
       resolver,
     );
 
-    const expectedTypes = getIds(
+    parentsByClass.set(id, parents);
+  }
+
+  const isEnumerationClass = (type, visited = new Set()) => {
+    if (type === SCHEMA_ENUMERATION) {
+      return true;
+    }
+
+    if (visited.has(type)) {
+      return false;
+    }
+
+    visited.add(type);
+
+    for (const parent of parentsByClass.get(type) ?? []) {
+      if (isEnumerationClass(parent, visited)) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const propertiesByDomain = new Map();
+
+  for (const { id, node } of properties) {
+    const domainTypes = getIds(
+      getValues(node, resolver, "schema:domainIncludes"),
+      resolver,
+    ).sort(compareStrings);
+
+    const rangeTypes = getIds(
       getValues(node, resolver, "schema:rangeIncludes"),
       resolver,
-    )
-      .map(getLocalName)
-      .sort(compareStrings);
+    ).sort(compareStrings);
+
+    const inverseOf = getIds(
+      getValues(node, resolver, "schema:inverseOf"),
+      resolver,
+    )[0];
+
+    const supersededBy = getIds(
+      getValues(node, resolver, "schema:supersededBy"),
+      resolver,
+    )[0];
+
+    const description = getDescription(node, resolver);
 
     const property = {
       name: getLocalName(id),
       type:
-        expectedTypes.length === 1
-          ? expectedTypes[0]
-          : expectedTypes.length > 1
-            ? expectedTypes
-            : "Thing",
-      ...(getDescription(node, resolver)
-        ? { description: getDescription(node, resolver) }
+        rangeTypes.length === 1
+          ? rangeTypes[0]
+          : rangeTypes.length > 1
+            ? rangeTypes
+            : `${SCHEMA_PREFIX}Thing`,
+      ...(description ? { description } : {}),
+      ...(rangeTypes.length > 0
+        ? {
+            expectedTypes: rangeTypes,
+            rangeTypes,
+          }
         : {}),
-      ...(expectedTypes.length > 0 ? { expectedTypes } : {}),
+      ...(domainTypes.length > 0 ? { domainTypes } : {}),
+      ...(inverseOf ? { inverseOf } : {}),
+      ...(supersededBy ? { supersededBy } : {}),
     };
 
-    for (const domain of domains) {
-      const existing = propertiesByDomain.get(domain) ?? [];
+    for (const domainType of domainTypes) {
+      const existing = propertiesByDomain.get(domainType) ?? [];
 
       existing.push(property);
-      propertiesByDomain.set(domain, existing);
+      propertiesByDomain.set(domainType, existing);
     }
   }
 
@@ -396,12 +380,8 @@ const createSchemaDefinitions = (document) => {
       continue;
     }
 
-    const parentTypes = getIds(
-      getValues(node, resolver, "rdfs:subClassOf"),
-      resolver,
-    )
-      .map(getLocalName)
-      .filter(Boolean)
+    const parentTypes = (parentsByClass.get(id) ?? [])
+      .slice()
       .sort(compareStrings);
 
     const nodeProperties = (propertiesByDomain.get(id) ?? [])
@@ -410,6 +390,36 @@ const createSchemaDefinitions = (document) => {
 
     const description = getDescription(node, resolver);
 
+    const enumerationValues = [];
+
+    if (isEnumerationClass(id)) {
+      for (const [valueId, value] of nodesById) {
+        if (valueId === id || classes.has(valueId)) {
+          continue;
+        }
+
+        if (!value.nodeTypes.includes(id)) {
+          continue;
+        }
+
+        const valueName = getLocalName(valueId);
+
+        if (!valueName) {
+          continue;
+        }
+
+        const valueDescription = getDescription(value.node, resolver);
+
+        enumerationValues.push({
+          name: valueName,
+          type: valueId,
+          ...(valueDescription ? { description: valueDescription } : {}),
+        });
+      }
+
+      enumerationValues.sort((a, b) => compareStrings(a.name, b.name));
+    }
+
     definitions.push({
       name,
       type: id,
@@ -417,12 +427,28 @@ const createSchemaDefinitions = (document) => {
       ...(description ? { description } : {}),
       ...(parentTypes.length > 0 ? { parentTypes } : {}),
       ...(nodeProperties.length > 0 ? { properties: nodeProperties } : {}),
+      ...(enumerationValues.length > 0 ? { enumerationValues } : {}),
     });
   }
 
   definitions.sort((a, b) => compareStrings(a.name, b.name));
 
-  return definitions;
+  const knownTypes = new Set(classes.keys());
+
+  const unknownParentTypes = unique(
+    definitions.flatMap((definition) =>
+      (definition.parentTypes ?? []).filter(
+        (parent) => parent.startsWith(SCHEMA_PREFIX) && !knownTypes.has(parent),
+      ),
+    ),
+  ).sort(compareStrings);
+
+  return {
+    definitions,
+    diagnostics: {
+      unknownParentTypes,
+    },
+  };
 };
 
 const createGeneratedSource = (definitions, sourceHash) => {
@@ -440,17 +466,20 @@ const createGeneratedSource = (definitions, sourceHash) => {
     `export const SCHEMAORG_VERSION = "${SCHEMA_VERSION}";`,
     `export const SCHEMAORG_SOURCE_HASH = "${sourceHash}";`,
     "",
-    "export const generatedSchemaDefinitions = ",
+    "export const generatedSchemaDefinitions =",
     `${serialized} satisfies readonly SchemaDefinition[];`,
     "",
   ].join("\n");
 };
 
-const createManifest = (sourceHash, definitions) => {
-  const types = definitions.length;
-
-  const properties = definitions.reduce(
+const createManifest = (sourceHash, definitions, diagnostics) => {
+  const generatedProperties = definitions.reduce(
     (total, definition) => total + (definition.properties?.length ?? 0),
+    0,
+  );
+
+  const generatedEnumerationValues = definitions.reduce(
+    (total, definition) => total + (definition.enumerationValues?.length ?? 0),
     0,
   );
 
@@ -460,12 +489,47 @@ const createManifest = (sourceHash, definitions) => {
       version: SCHEMA_VERSION,
       sourceUrl: SOURCE_URL,
       sourceSha256: sourceHash,
-      generatedTypes: types,
-      generatedProperties: properties,
+      generatedTypes: definitions.length,
+      generatedProperties,
+      generatedEnumerationValues,
+      diagnostics,
     },
     null,
     2,
   )}\n`;
+};
+
+const fetchSource = async () => {
+  // Prefer the pinned local source. This keeps generation and checks
+  // reproducible and allows CI checks to run without network access.
+  try {
+    return await readFile(SOURCE_FILE, "utf8");
+  } catch {
+    console.log(`Downloading Schema.org ${SCHEMA_VERSION}...`);
+
+    const response = await fetch(SOURCE_URL);
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to download Schema.org: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const content = await response.text();
+
+    try {
+      JSON.parse(content);
+    } catch {
+      throw new Error("Downloaded Schema.org source is not valid JSON.");
+    }
+
+    if (!CHECK_MODE) {
+      await mkdir(SOURCE_DIRECTORY, { recursive: true });
+      await writeFile(SOURCE_FILE, content, "utf8");
+    }
+
+    return content;
+  }
 };
 
 const compareFile = async (path, expected) => {
@@ -494,11 +558,11 @@ const main = async () => {
     `${CHECK_MODE ? "Checking" : "Generating"} Schema.org ${SCHEMA_VERSION}...`,
   );
 
-  const { content } = await fetchSource();
+  const content = await fetchSource();
   const document = JSON.parse(content);
-
   const sourceHash = sha256(content);
-  const definitions = createSchemaDefinitions(document);
+
+  const { definitions, diagnostics } = createSchemaDefinitions(document);
 
   if (definitions.length === 0) {
     throw new Error(
@@ -508,7 +572,7 @@ const main = async () => {
 
   const generatedSource = createGeneratedSource(definitions, sourceHash);
 
-  const manifest = createManifest(sourceHash, definitions);
+  const manifest = createManifest(sourceHash, definitions, diagnostics);
 
   if (CHECK_MODE) {
     const sourceMatches = await compareFile(GENERATED_FILE, generatedSource);
@@ -528,21 +592,46 @@ const main = async () => {
       `Schema.org ${SCHEMA_VERSION} is up to date (${definitions.length} types).`,
     );
 
+    if (diagnostics.unknownParentTypes.length > 0) {
+      console.warn(
+        `Unknown Schema.org parent types: ${diagnostics.unknownParentTypes.length}`,
+      );
+    }
+
     return;
   }
 
   await writeGeneratedFile(GENERATED_FILE, generatedSource);
-
   await writeGeneratedFile(MANIFEST_FILE, manifest);
 
   console.log(`Generated ${definitions.length} Schema.org types.`);
+  console.log(
+    `Generated ${manifest ? JSON.parse(manifest).generatedEnumerationValues : 0} enumeration values.`,
+  );
+
+  if (diagnostics.unknownParentTypes.length > 0) {
+    console.warn(
+      `Unknown Schema.org parent types: ${diagnostics.unknownParentTypes.length}`,
+    );
+
+    for (const type of diagnostics.unknownParentTypes) {
+      console.warn(`  - ${type}`);
+    }
+  }
 
   console.log(`Source: ${SOURCE_FILE}`);
   console.log(`Definitions: ${GENERATED_FILE}`);
   console.log(`Manifest: ${MANIFEST_FILE}`);
 };
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+export { createSchemaDefinitions };
+
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href
+) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

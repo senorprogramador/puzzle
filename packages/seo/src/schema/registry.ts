@@ -1,5 +1,6 @@
 import type {
   SchemaDefinition,
+  SchemaEnumerationValue,
   SchemaPropertyDefinition,
   SchemaRegistry,
   SchemaRegistryConflict,
@@ -13,8 +14,17 @@ const normalizeType = (type: string): string => {
     throw new Error("Schema type cannot be empty.");
   }
 
-  return value.replace(/^http:\/\/schema\.org\//, "https://schema.org/");
+  return /^[A-Za-z][A-Za-z0-9]*$/.test(value)
+    ? `https://schema.org/${value}`
+    : value.replace(/^http:\/\/schema\.org\//, "https://schema.org/");
 };
+
+const normalizeEnumerationValue = (
+  value: SchemaEnumerationValue,
+): SchemaEnumerationValue => ({
+  ...value,
+  type: normalizeType(value.type),
+});
 
 const normalizeDefinition = (
   definition: SchemaDefinition,
@@ -22,11 +32,23 @@ const normalizeDefinition = (
   ...definition,
   type: normalizeType(definition.type),
   parentTypes: definition.parentTypes?.map(normalizeType),
+  enumerationValues: definition.enumerationValues?.map(
+    normalizeEnumerationValue,
+  ),
   properties: definition.properties?.map((property) => ({
     ...property,
     expectedTypes: property.expectedTypes?.map(normalizeType),
     rangeTypes: property.rangeTypes?.map(normalizeType),
     domainTypes: property.domainTypes?.map(normalizeType),
+    inverseOf: property.inverseOf
+      ? normalizeType(property.inverseOf)
+      : undefined,
+    supersededBy: property.supersededBy
+      ? normalizeType(property.supersededBy)
+      : undefined,
+    type: Array.isArray(property.type)
+      ? property.type.map(normalizeType)
+      : normalizeType(property.type),
   })),
 });
 
@@ -56,16 +78,14 @@ export const createSchemaRegistry = (
   for (const definition of custom) {
     const existing = definitions.get(definition.type);
 
-    if (existing) {
-      if (!options.allowGeneratedOverrides) {
-        conflicts.push({
-          type: definition.type,
-          code: "duplicate-type",
-          message: `Custom schema type conflicts with generated type: ${definition.type}`,
-        });
+    if (existing && !options.allowGeneratedOverrides) {
+      conflicts.push({
+        type: definition.type,
+        code: "duplicate-type",
+        message: `Custom schema type conflicts with generated type: ${definition.type}`,
+      });
 
-        continue;
-      }
+      continue;
     }
 
     definitions.set(definition.type, definition);
@@ -117,13 +137,36 @@ export const createSchemaRegistry = (
         continue;
       }
 
-      properties.set(property.name, property);
+      properties.set(property.name, {
+        ...property,
+        type: Array.isArray(property.type)
+          ? property.type.map(normalizeType)
+          : normalizeType(property.type),
+        expectedTypes: property.expectedTypes?.map(normalizeType),
+        rangeTypes: property.rangeTypes?.map(normalizeType),
+        domainTypes: property.domainTypes?.map(normalizeType),
+      });
     }
 
     definitions.set(type, {
       ...existing,
       properties: [...properties.values()],
     });
+  }
+
+  // Report parent references that cannot be resolved by this registry.
+  for (const definition of definitions.values()) {
+    for (const parentType of definition.parentTypes ?? []) {
+      if (definitions.has(parentType)) {
+        continue;
+      }
+
+      conflicts.push({
+        type: definition.type,
+        code: "unknown-parent",
+        message: `Unknown parent type ${parentType} referenced by ${definition.type}.`,
+      });
+    }
   }
 
   const get = (type: string) => definitions.get(normalizeType(type));

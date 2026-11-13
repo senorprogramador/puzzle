@@ -49,6 +49,47 @@ describe("Schema Registry", () => {
     expect(registry.get("http://schema.org/Product")?.name).toBe("Product");
   });
 
+  it("normalizes short names in definitions, parents, and extensions", () => {
+    const registry = createSchemaRegistry({
+      generated: [
+        { name: "Thing", type: "Thing", source: "generated" },
+        {
+          name: "Product",
+          type: "Product",
+          source: "generated",
+          parentTypes: ["Thing"],
+        },
+      ],
+      extensions: [
+        {
+          type: "Product",
+          properties: [{ name: "name", type: "Text" }],
+        },
+      ],
+    });
+
+    expect(registry.get("https://schema.org/Product")?.type).toBe(
+      "https://schema.org/Product",
+    );
+    expect(registry.getProperty("Product", "name")?.type).toBe(
+      "https://schema.org/Text",
+    );
+    expect(registry.isTypeOf("Product", "Thing")).toBe(true);
+    expect(registry.getConflicts()).toEqual([]);
+  });
+
+  it("preserves custom namespace identifiers", () => {
+    const registry = createSchemaRegistry({
+      custom: [
+        { name: "Product", type: "custom:Product", source: "custom" },
+      ],
+    });
+
+    expect(registry.get("custom:Product")?.type).toBe("custom:Product");
+    expect(registry.has("Product")).toBe(false);
+    expect(() => registry.get(" ")).toThrow("Schema type cannot be empty");
+  });
+
   it("returns inherited properties", () => {
     const registry = createSchemaRegistry({ generated });
 
