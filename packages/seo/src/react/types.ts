@@ -14,6 +14,10 @@ import type { SeoPageMetadata, ResolvedSeoMetadata } from "../metadata/types";
 import type { SchemaRegistry, SchemaValidationOptions } from "../schema/types";
 
 import type { SchemaOrgPropertyNames } from "../schema/generated";
+import type {
+  SeoValidationOptions,
+  SeoValidationReport,
+} from "../validation/types";
 
 export type SchemaComponentType = keyof SchemaOrgPropertyNames;
 
@@ -68,7 +72,23 @@ export interface SeoProviderProps {
   nonce?: string;
   graphOptions?: SeoGraphBuilderOptions;
   schemaRegistry?: SchemaRegistry;
-  validation?: SchemaValidationOptions | false;
+
+  /**
+   * Controls validation of the complete SEO output.
+   *
+   * false disables validation.
+   *
+   * Legacy SchemaValidationOptions are still supported.
+   */
+  validation?: SeoValidationOptions | SchemaValidationOptions | false;
+
+  /**
+   * Receives validation diagnostics after rendering.
+   *
+   * In warn mode the JSON-LD output is still rendered.
+   * In strict mode invalid output throws before rendering.
+   */
+  onValidation?: (report: SeoValidationReport) => void;
 }
 
 export interface SeoContextValue {

@@ -441,6 +441,10 @@ describe("Schema Components", () => {
             SeoProvider,
             {
               config,
+              // Legacy `strict` enables full strict mode, so metadata must be valid too.
+              metadata: {
+                description: "UI library",
+              },
               validation: {
                 strict: true,
               },

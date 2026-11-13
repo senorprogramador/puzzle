@@ -40,9 +40,6 @@ const getTypes = (node: SeoNode): string[] => {
   );
 };
 
-const getProperty = (node: SeoNode, property: string): unknown =>
-  node[property];
-
 const hasValue = (value: unknown): boolean => {
   if (value === undefined || value === null) {
     return false;
@@ -194,7 +191,8 @@ const validateGraph = (
 
     const result = validateSchemaNode(node, registry, {
       strict: options.mode === "strict",
-      allowUnknownProperties: options.mode !== "strict",
+      allowUnknownProperties:
+        options.allowUnknownProperties ?? options.mode !== "strict",
       validateRequiredProperties: options.validateRequiredProperties ?? false,
     });
 
@@ -460,60 +458,108 @@ const validateSemanticNode = (
 interface RichResultRule {
   type: string;
   required: readonly string[];
+  recommended?: readonly string[];
+  requireAny?: readonly string[];
+  docsUrl: string;
 }
 
 const richResultRules: Record<SeoRichResultProfile, RichResultRule> = {
   article: {
     type: "Article",
-    required: ["headline", "image", "datePublished"],
+    required: [],
+    recommended: [
+      "headline",
+      "image",
+      "datePublished",
+      "dateModified",
+      "author",
+    ],
+    docsUrl: `${GOOGLE_DOCS}/article`,
   },
 
   product: {
     type: "Product",
     required: ["name"],
+    requireAny: ["offers", "aggregateRating", "review"],
+    recommended: ["image", "description"],
+    docsUrl: `${GOOGLE_DOCS}/product`,
   },
 
   breadcrumb: {
     type: "BreadcrumbList",
     required: ["itemListElement"],
+    docsUrl: `${GOOGLE_DOCS}/breadcrumb`,
   },
 
   event: {
     type: "Event",
     required: ["name", "startDate", "location"],
+    docsUrl: `${GOOGLE_DOCS}/event`,
   },
 
   recipe: {
     type: "Recipe",
-    required: ["name", "image", "recipeIngredient", "recipeInstructions"],
+    required: ["name", "image"],
+    recommended: [
+      "author",
+      "description",
+      "prepTime",
+      "cookTime",
+      "recipeYield",
+      "nutrition",
+    ],
+    docsUrl: `${GOOGLE_DOCS}/recipe`,
   },
 
   "job-posting": {
     type: "JobPosting",
-    required: ["title", "description", "datePosted", "hiringOrganization"],
+    required: [
+      "title",
+      "description",
+      "datePosted",
+      "hiringOrganization",
+      "jobLocation",
+    ],
+    recommended: ["validThrough", "employmentType", "baseSalary"],
+    docsUrl: `${GOOGLE_DOCS}/job-posting`,
   },
 
   "local-business": {
     type: "LocalBusiness",
     required: ["name", "address"],
+    recommended: ["telephone", "url", "image", "openingHoursSpecification"],
+    docsUrl: `${GOOGLE_DOCS}/local-business`,
   },
 
   "software-application": {
     type: "SoftwareApplication",
-    required: ["name", "offers", "applicationCategory"],
+    required: ["name", "offers"],
+    requireAny: ["aggregateRating", "review"],
+    recommended: ["applicationCategory", "operatingSystem"],
+    docsUrl: `${GOOGLE_DOCS}/software-app`,
   },
 };
+
+const getLocalTypeName = (type: string): string =>
+  type.split(/[\/#]/).at(-1) ?? type;
 
 const profileMatches = (
   node: SeoNode,
   profile: SeoRichResultProfile,
 ): boolean => {
-  const types = getTypes(node);
-
   const expected = richResultRules[profile].type;
 
-  return types.some((type) => (type.split("/").pop() ?? type) === expected);
+  return getTypes(node).some((type) => getLocalTypeName(type) === expected);
 };
+
+const getNestedObjects = (value: unknown): Record<string, unknown>[] => {
+  const values = Array.isArray(value) ? value : [value];
+
+  return values.filter(isObject);
+};
+
+const hasNestedValue = (value: unknown, property: string): boolean =>
+  getNestedObjects(value).some((item) => hasValue(item[property]));
 
 const validateRichResults = (
   nodes: readonly SeoNode[],
@@ -524,58 +570,195 @@ const validateRichResults = (
   for (const profile of profiles) {
     const rule = richResultRules[profile];
 
-    const matchingNodes = nodes.filter((node) => profileMatches(node, profile));
+    nodes.forEach((node, nodeIndex) => {
+      if (!profileMatches(node, profile)) {
+        return;
+      }
 
-    if (matchingNodes.length === 0) {
-      continue;
-    }
-
-    matchingNodes.forEach((node, index) => {
       const nodeId = typeof node["@id"] === "string" ? node["@id"] : undefined;
+
+      const path = `@graph[${nodeIndex}]`;
+
+      const add = (
+        code: string,
+        message: string,
+        property?: string,
+        severity: SeoValidationIssue["severity"] = "warning",
+        suggestion?: string,
+      ) => {
+        issues.push(
+          createIssue("rich-results", code, message, severity, {
+            nodeId,
+            property,
+            path: property ? `${path}.${property}` : path,
+            suggestion,
+            docsUrl: rule.docsUrl,
+          }),
+        );
+      };
+
+      // Required properties
 
       for (const property of rule.required) {
         if (hasValue(node[property])) {
           continue;
         }
 
-        issues.push(
-          createIssue(
-            "rich-results",
-            `rich-results-missing-${property}`,
-            `${rule.type} is missing the recommended Rich Results property "${property}".`,
-            "warning",
-            {
-              nodeId,
-              property,
-              path: `@graph[${index}].${property}`,
-              suggestion: `Add the ${property} property to improve eligibility for ${profile} rich results.`,
-              docsUrl: GOOGLE_DOCS,
-            },
-          ),
+        add(
+          `rich-results-missing-${property}`,
+          `${rule.type} is missing the required Rich Results property "${property}".`,
+          property,
+          "warning",
+          `Add the ${property} property to meet the ${profile} structured data requirements.`,
         );
       }
 
-      if (profile === "product") {
-        const hasOffer =
-          hasValue(node.offers) ||
-          hasValue(node.aggregateRating) ||
-          hasValue(node.review);
+      // Recommended properties
 
-        if (!hasOffer) {
-          issues.push(
-            createIssue(
-              "rich-results",
-              "product-missing-rich-result-data",
-              "Product should provide offers, aggregateRating or review data.",
-              "warning",
-              {
-                nodeId,
-                path: `@graph[${index}]`,
-                suggestion:
-                  "Add valid offer information, aggregate ratings or reviews.",
-                docsUrl: GOOGLE_DOCS,
-              },
-            ),
+      for (const property of rule.recommended ?? []) {
+        if (hasValue(node[property])) {
+          continue;
+        }
+
+        add(
+          `rich-results-recommended-${property}`,
+          `${rule.type} should provide the recommended property "${property}".`,
+          property,
+          "info",
+          `Consider adding ${property} to provide more complete structured data.`,
+        );
+      }
+
+      // At least one of a group of alternative properties
+
+      if (
+        rule.requireAny &&
+        !rule.requireAny.some((property) => hasValue(node[property]))
+      ) {
+        add(
+          "rich-results-missing-alternative",
+          `${rule.type} must provide at least one of: ${rule.requireAny.join(", ")}.`,
+          undefined,
+          "warning",
+          `Provide at least one of: ${rule.requireAny.join(", ")}.`,
+        );
+      }
+
+      // Product-specific checks
+
+      if (profile === "product" && hasValue(node.offers)) {
+        if (!hasNestedValue(node.offers, "price")) {
+          add(
+            "rich-results-product-offer-missing-price",
+            "Product offers should include a price.",
+            "offers",
+            "warning",
+            "Add a price to each Offer object.",
+          );
+        }
+      }
+
+      // Breadcrumb-specific checks
+
+      if (profile === "breadcrumb") {
+        const elements = node.itemListElement;
+
+        if (Array.isArray(elements) && elements.length < 2) {
+          add(
+            "rich-results-breadcrumb-minimum-items",
+            "BreadcrumbList must contain at least two ListItem entries.",
+            "itemListElement",
+            "warning",
+            "Provide at least two breadcrumb items.",
+          );
+        }
+      }
+
+      // Event-specific checks
+
+      if (profile === "event" && isObject(node.location)) {
+        if (!hasValue(node.location.name)) {
+          add(
+            "rich-results-event-missing-location-name",
+            "Event location should include a name.",
+            "location.name",
+            "warning",
+            "Provide the name of the physical event venue.",
+          );
+        }
+
+        if (!hasValue(node.location.address)) {
+          add(
+            "rich-results-event-missing-address",
+            "Event location should include a detailed address.",
+            "location.address",
+            "warning",
+            "Provide the venue's PostalAddress.",
+          );
+        }
+      }
+
+      // LocalBusiness-specific checks
+
+      if (profile === "local-business" && hasValue(node.address)) {
+        if (!isObject(node.address)) {
+          add(
+            "rich-results-business-invalid-address",
+            "LocalBusiness address should be a PostalAddress object.",
+            "address",
+            "warning",
+            "Provide an address object with the relevant PostalAddress fields.",
+          );
+        }
+      }
+
+      // SoftwareApplication-specific checks
+
+      if (profile === "software-application" && hasValue(node.offers)) {
+        if (!hasNestedValue(node.offers, "price")) {
+          add(
+            "rich-results-software-missing-price",
+            "SoftwareApplication offers must include a price.",
+            "offers.price",
+            "warning",
+            "Provide an Offer object with a price. Use 0 for a free application.",
+          );
+        }
+      }
+
+      // JobPosting-specific checks
+
+      if (profile === "job-posting") {
+        if (
+          isObject(node.hiringOrganization) &&
+          !hasValue(node.hiringOrganization.name)
+        ) {
+          add(
+            "rich-results-job-missing-employer-name",
+            "JobPosting hiringOrganization should include a name.",
+            "hiringOrganization.name",
+            "warning",
+            "Provide the employer's organization name.",
+          );
+        }
+
+        const locations = getNestedObjects(node.jobLocation);
+
+        const hasCountry = locations.some((location) => {
+          if (!isObject(location.address)) {
+            return false;
+          }
+
+          return hasValue(location.address.addressCountry);
+        });
+
+        if (locations.length > 0 && !hasCountry) {
+          add(
+            "rich-results-job-missing-country",
+            "JobPosting jobLocation address should include addressCountry.",
+            "jobLocation.address.addressCountry",
+            "warning",
+            "Provide the country code or country name in the job location address.",
           );
         }
       }

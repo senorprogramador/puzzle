@@ -19,6 +19,11 @@ const normalizeType = (type: string): string => {
     : value.replace(/^http:\/\/schema\.org\//, "https://schema.org/");
 };
 
+const isRdfVocabularyType = (type: string): boolean =>
+  /^https?:\/\/www\.w3\.org\/(1999\/02\/22-rdf-syntax-ns|2000\/01\/rdf-schema)#/.test(
+    type,
+  );
+
 /**
  * Recursively freezes registry-owned objects and arrays.
  *
@@ -234,9 +239,11 @@ export const createSchemaRegistry = (
   }
 
   // Report parent references that cannot be resolved by this registry.
+  // RDF/RDFS meta-classes (e.g. DataType → rdfs:Class) are vocabulary
+  // structure, not Schema.org types, so they are never registered.
   for (const definition of definitions.values()) {
     for (const parentType of definition.parentTypes ?? []) {
-      if (definitions.has(parentType)) {
+      if (definitions.has(parentType) || isRdfVocabularyType(parentType)) {
         continue;
       }
 

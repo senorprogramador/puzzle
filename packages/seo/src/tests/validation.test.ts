@@ -283,11 +283,11 @@ describe("validateSeo", () => {
     expect(report.issues).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          code: "rich-results-missing-image",
+          code: "rich-results-recommended-image",
           source: "rich-results",
         }),
         expect.objectContaining({
-          code: "rich-results-missing-datePublished",
+          code: "rich-results-recommended-datePublished",
           source: "rich-results",
         }),
       ]),
@@ -447,5 +447,246 @@ describe("validateSeo", () => {
 
     expect(report.valid).toBe(false);
     expect(report.summary.errors).toBeGreaterThan(0);
+  });
+
+  it("does not require Article properties that Google documents as recommended", () => {
+    const report = validateSeo(
+      {
+        nodes: [
+          {
+            "@type": "Article",
+            headline: "Example article",
+          },
+        ],
+      },
+      {
+        registry,
+        profiles: ["article"],
+      },
+    );
+
+    expect(report.issues).not.toContainEqual(
+      expect.objectContaining({
+        severity: "warning",
+        code: "rich-results-missing-headline",
+      }),
+    );
+
+    expect(report.issues).toContainEqual(
+      expect.objectContaining({
+        severity: "info",
+        code: "rich-results-recommended-image",
+      }),
+    );
+  });
+
+  it("requires at least two BreadcrumbList entries", () => {
+    const report = validateSeo(
+      {
+        nodes: [
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        registry,
+        profiles: ["breadcrumb"],
+      },
+    );
+
+    expect(report.issues).toContainEqual(
+      expect.objectContaining({
+        code: "rich-results-breadcrumb-minimum-items",
+      }),
+    );
+  });
+
+  it("validates the physical location of Google Events", () => {
+    const report = validateSeo(
+      {
+        nodes: [
+          {
+            "@type": "Event",
+            name: "Example event",
+            startDate: "2026-12-01T19:00:00+01:00",
+            location: {
+              "@type": "Place",
+              name: "Example venue",
+            },
+          },
+        ],
+      },
+      {
+        registry,
+        profiles: ["event"],
+      },
+    );
+
+    expect(report.issues).toContainEqual(
+      expect.objectContaining({
+        code: "rich-results-event-missing-address",
+      }),
+    );
+  });
+
+  it("requires Recipe image but not recipeInstructions", () => {
+    const report = validateSeo(
+      {
+        nodes: [
+          {
+            "@type": "Recipe",
+            name: "Example recipe",
+          },
+        ],
+      },
+      {
+        registry,
+        profiles: ["recipe"],
+      },
+    );
+
+    expect(report.issues).toContainEqual(
+      expect.objectContaining({
+        code: "rich-results-missing-image",
+      }),
+    );
+
+    expect(report.issues).not.toContainEqual(
+      expect.objectContaining({
+        code: "rich-results-missing-recipeInstructions",
+      }),
+    );
+  });
+
+  it("validates JobPosting employer and country", () => {
+    const report = validateSeo(
+      {
+        nodes: [
+          {
+            "@type": "JobPosting",
+            title: "Developer",
+            description: "A developer position.",
+            datePosted: "2026-11-01",
+            hiringOrganization: {
+              "@type": "Organization",
+              name: "Example company",
+            },
+            jobLocation: {
+              "@type": "Place",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Madrid",
+              },
+            },
+          },
+        ],
+      },
+      {
+        registry,
+        profiles: ["job-posting"],
+      },
+    );
+
+    expect(report.issues).toContainEqual(
+      expect.objectContaining({
+        code: "rich-results-job-missing-country",
+      }),
+    );
+  });
+
+  it("requires SoftwareApplication price and rating or review", () => {
+    const report = validateSeo(
+      {
+        nodes: [
+          {
+            "@type": "SoftwareApplication",
+            name: "Example app",
+            offers: {
+              "@type": "Offer",
+            },
+          },
+        ],
+      },
+      {
+        registry,
+        profiles: ["software-application"],
+      },
+    );
+
+    expect(report.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "rich-results-software-missing-price",
+        }),
+        expect.objectContaining({
+          code: "rich-results-missing-alternative",
+        }),
+      ]),
+    );
+  });
+
+  it("accepts a free SoftwareApplication with price zero and a rating", () => {
+    const report = validateSeo(
+      {
+        nodes: [
+          {
+            "@type": "SoftwareApplication",
+            name: "Example app",
+            offers: {
+              "@type": "Offer",
+              price: 0,
+            },
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: 4.8,
+              ratingCount: 100,
+            },
+          },
+        ],
+      },
+      {
+        registry,
+        profiles: ["software-application"],
+      },
+    );
+
+    expect(
+      report.issues.filter(
+        (issue) =>
+          issue.source === "rich-results" && issue.severity === "warning",
+      ),
+    ).toHaveLength(0);
+  });
+
+  it("validates LocalBusiness structured addresses", () => {
+    const report = validateSeo(
+      {
+        nodes: [
+          {
+            "@type": "LocalBusiness",
+            name: "Example business",
+            address: "Madrid",
+          },
+        ],
+      },
+      {
+        registry,
+        profiles: ["local-business"],
+      },
+    );
+
+    expect(report.issues).toContainEqual(
+      expect.objectContaining({
+        code: "rich-results-business-invalid-address",
+      }),
+    );
   });
 });

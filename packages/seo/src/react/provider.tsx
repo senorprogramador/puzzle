@@ -16,6 +16,8 @@ export const SeoProvider = ({
   config,
   metadata,
   children,
+  validation,
+  onValidation,
   ...schemaOptions
 }: SeoProviderProps) => {
   const resolvedConfig = useMemo(() => normalizeSeoConfig(config), [config]);
@@ -40,6 +42,9 @@ export const SeoProvider = ({
     },
     createElement(SeoSchemaProvider, {
       config: resolvedConfig,
+      metadata: resolvedMetadata,
+      validation,
+      onValidation,
       ...schemaOptions,
       children,
     }),

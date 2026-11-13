@@ -100,6 +100,12 @@ export interface SeoValidationOptions {
    * Base URL used for resolving local references.
    */
   baseUrl?: string;
+  /**
+   * Whether unknown Schema.org properties are accepted.
+   *
+   * Defaults to true in warn mode and false in strict mode.
+   */
+  allowUnknownProperties?: boolean;
 }
 
 export interface SeoValidationInput {

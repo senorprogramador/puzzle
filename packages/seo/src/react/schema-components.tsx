@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, createElement, Fragment, useContext } from "react";
+import {
+  createContext,
+  createElement,
+  Fragment,
+  useContext,
+  useEffect,
+} from "react";
 
 import { createSeoGraphBuilder, stringifySeoGraph } from "../core";
 
@@ -11,7 +17,7 @@ import type {
   SeoGraphBuilderOptions,
 } from "../core";
 
-import { createDefaultSchemaRegistry, validateSchemaNode } from "../schema";
+import { createDefaultSchemaRegistry } from "../schema";
 
 import type { SchemaRegistry, SchemaValidationOptions } from "../schema";
 
@@ -26,16 +32,23 @@ import type {
   SeoJsonLdProps,
   SeoProviderProps,
 } from "./types";
+import type { ResolvedSeoMetadata } from "../metadata/types";
+import type {
+  SeoValidationOptions,
+  SeoValidationReport,
+} from "../validation/types";
+import { validateSeo } from "../validation/validate";
 
 interface SchemaCollector {
   config: SeoConfig;
   builder: SeoGraphBuilder;
   registry: SchemaRegistry;
-  validation: SchemaValidationOptions | false;
+  metadata?: ResolvedSeoMetadata;
+  validation: SeoValidationOptions | false;
+  onValidation?: (report: SeoValidationReport) => void;
   nonce?: string;
   scriptId: string;
 }
-
 const defaultRegistry = createDefaultSchemaRegistry();
 
 const SchemaContext = createContext<SchemaCollector | null>(null);
@@ -52,30 +65,6 @@ const useSchemaCollector = (): SchemaCollector => {
   return collector;
 };
 
-const validateGraph = (
-  graph: SeoGraph,
-  registry: SchemaRegistry,
-  options: SchemaValidationOptions | false,
-): void => {
-  if (options === false) {
-    return;
-  }
-
-  const issues = graph["@graph"].flatMap(
-    (node) => validateSchemaNode(node, registry, options).issues,
-  );
-
-  if (options.strict && issues.some((issue) => issue.severity === "error")) {
-    const messages = issues
-      .filter((issue) => issue.severity === "error")
-      .map((issue) => issue.message);
-
-    throw new Error(
-      `Puzzle SEO schema validation failed:\n${messages.join("\n")}`,
-    );
-  }
-};
-
 interface SchemaGraphOutputProps {
   collector: SchemaCollector;
 }
@@ -85,6 +74,27 @@ const SchemaGraphOutput = ({ collector }: SchemaGraphOutputProps) => {
   const graphIssues = collector.builder.getIssues();
 
   const graphErrors = graphIssues.filter((issue) => issue.severity === "error");
+
+  const report =
+    collector.validation !== false && graph["@graph"].length > 0
+      ? validateSeo(
+          {
+            graph,
+            metadata: collector.metadata,
+          },
+          {
+            ...collector.validation,
+            registry: collector.validation.registry ?? collector.registry,
+            baseUrl: collector.validation.baseUrl ?? collector.config.siteUrl,
+          },
+        )
+      : undefined;
+
+  useEffect(() => {
+    if (report && collector.onValidation) {
+      collector.onValidation(report);
+    }
+  }, [report, collector.onValidation]);
 
   if (graphErrors.length > 0) {
     throw new Error(
@@ -98,7 +108,22 @@ const SchemaGraphOutput = ({ collector }: SchemaGraphOutputProps) => {
     return null;
   }
 
-  validateGraph(graph, collector.registry, collector.validation);
+  if (report?.mode === "strict" && !report.valid) {
+    const errors = report.issues.filter((issue) => issue.severity === "error");
+    const messages = errors.map(
+      (issue) => `[${issue.source}:${issue.code}] ${issue.message}`,
+    );
+    // Keep the established message when only schema rules failed.
+    const scope =
+      errors.length > 0 &&
+      errors.every(
+        (issue) => issue.source === "schema" || issue.source === "registry",
+      )
+        ? "schema validation"
+        : "validation";
+
+    throw new Error(`Puzzle SEO ${scope} failed:\n${messages.join("\n")}`);
+  }
 
   const json = stringifySeoGraph(graph, {
     pretty: false,
@@ -118,6 +143,43 @@ const SchemaGraphOutput = ({ collector }: SchemaGraphOutputProps) => {
 };
 
 /**
+ * Legacy options are identified by `strict`, the only property that
+ * SeoValidationOptions does not share; `mode` always wins when present.
+ */
+const isLegacyValidation = (
+  validation: SeoValidationOptions | SchemaValidationOptions,
+): validation is SchemaValidationOptions =>
+  "strict" in validation && !("mode" in validation);
+
+const normalizeValidation = (
+  validation: SeoValidationOptions | SchemaValidationOptions | false,
+): SeoValidationOptions | false => {
+  if (validation === false) {
+    return false;
+  }
+
+  if (!isLegacyValidation(validation)) {
+    return validation;
+  }
+
+  const { strict, ...options } = validation;
+
+  return {
+    ...options,
+    mode: strict ? "strict" : "warn",
+  };
+};
+
+/**
+ * Props for the internal schema provider. The public SeoProvider resolves
+ * page metadata before passing it on, so it arrives here already resolved.
+ */
+export interface SchemaProviderProps
+  extends Omit<SeoProviderProps, "metadata"> {
+  metadata?: ResolvedSeoMetadata;
+}
+
+/**
  * Central SEO provider.
  *
  * Creates an isolated graph builder for every render.
@@ -132,18 +194,27 @@ export const SeoProvider = ({
   nonce,
   graphOptions,
   schemaRegistry,
+  metadata,
   validation = {},
-}: SeoProviderProps) => {
+  onValidation,
+}: SchemaProviderProps) => {
   const options: SeoGraphBuilderOptions = {
     ...graphOptions,
     baseUrl: graphOptions?.baseUrl ?? config.siteUrl,
   };
 
+  const normalizedValidation = normalizeValidation(validation);
+
   const collector: SchemaCollector = {
     config,
     builder: createSeoGraphBuilder(options),
-    registry: schemaRegistry ?? defaultRegistry,
-    validation,
+    registry:
+      normalizedValidation !== false
+        ? (normalizedValidation.registry ?? schemaRegistry ?? defaultRegistry)
+        : (schemaRegistry ?? defaultRegistry),
+    metadata,
+    validation: normalizedValidation,
+    onValidation,
     nonce,
     scriptId,
   };

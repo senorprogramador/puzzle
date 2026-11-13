@@ -213,6 +213,22 @@ describe("Schema Registry", () => {
     expect(registry.getConflicts()[0]?.code).toBe("unknown-parent");
   });
 
+  it("does not report RDF vocabulary parents as unknown", () => {
+    const registry = createSchemaRegistry({
+      generated: [
+        {
+          name: "DataType",
+          type: "https://schema.org/DataType",
+          source: "generated",
+          parentTypes: ["http://www.w3.org/2000/01/rdf-schema#Class"],
+        },
+      ],
+    });
+
+    expect(registry.getConflicts()).toHaveLength(0);
+    expect(createDefaultSchemaRegistry().getConflicts()).toHaveLength(0);
+  });
+
   it("keeps generated and custom collections separate", () => {
     const registry = createSchemaRegistry({
       generated,

@@ -12,6 +12,7 @@ export default defineConfig({
     "src/sitemap/index.ts",
     "src/robots/index.ts",
     "src/testing/index.ts",
+    "src/validation/index.ts",
   ],
   unbundle: true,
   format: ["esm", "cjs"],
