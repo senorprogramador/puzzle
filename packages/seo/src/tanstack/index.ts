@@ -11,7 +11,16 @@ export type TanStackSeoRouteHandler = (
 ) => Promise<Response>;
 
 export interface TanStackSeoRoutes {
+  /**
+   * Mount on a dynamic root route, e.g. /$seoFile.
+   *
+   * Handles the sitemap index and every generated sitemap file.
+   */
   sitemapGET: TanStackSeoRouteHandler;
+
+  /**
+   * Mount on the static /robots.txt route.
+   */
   robotsGET: TanStackSeoRouteHandler;
 }
 

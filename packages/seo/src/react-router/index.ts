@@ -13,7 +13,16 @@ export type ReactRouterSeoLoader = (
 ) => Promise<Response>;
 
 export interface ReactRouterSeoRoutes {
+  /**
+   * Mount on a dynamic root resource route, e.g. /:seoFile.
+   *
+   * Handles the sitemap index and every generated sitemap file.
+   */
   sitemapLoader: ReactRouterSeoLoader;
+
+  /**
+   * Mount on the static /robots.txt resource route.
+   */
   robotsLoader: ReactRouterSeoLoader;
 }
 

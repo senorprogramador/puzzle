@@ -20,7 +20,7 @@ import { Select } from "@puzzle-ui/ui";
 
 Provide a visible `label` and an array of options with `value` and plain-text `label`. `placeholder` is shown until a value is selected. Disabled options remain visible but cannot be chosen.
 
-<Preview fit="device" hideDevices={true} code={`\
+<Preview height={320} align="start" hideDevices={true} code={`\
 const options = [
   { value: "apple", label: "Apple" },
   { value: "pear", label: "Pear" },
@@ -45,7 +45,8 @@ const options = [
 `multiple` changes the value to an array and keeps the popup open after selection by default. `maxSelected` limits the number of selected options. `clearable` adds a clear action; customize its accessible name with `clearLabel`.
 
 <Preview
-  fit="device"
+  height={320}
+  align="start"
   hideDevices={true}
   code={`\
 <Select
@@ -81,7 +82,8 @@ Clearing returns `undefined` in single mode and `[]` in multiple mode. Set `clos
 `size` supports `sm`, `md`, and `lg`. `fullWidth` fills the available width. Both accept responsive objects with `mobile`, `tablet`, and `desktop` keys.
 
 <Preview
-  fit="device"
+  height={540}
+  align="start"
   code={`\
 <Stack>
   <Select label="Small" size="sm" options={options} defaultValue="apple" />
@@ -133,7 +135,8 @@ Clearing returns `undefined` in single mode and `[]` in multiple mode. Set `clos
 `renderValue` receives one selected option or `undefined` in single mode, and an array in multiple mode.
 
 <Preview
-  fit="device"
+  height={400}
+  align="start"
   hideDevices={true}
   code={`\
 <Select
@@ -202,18 +205,23 @@ Custom option rendering replaces the default description display. Include `optio
 
 Pair `value` with `onChange`. In single mode the callback receives `T | undefined`; in multiple mode it receives `T[]`. Passing `value={undefined}` represents a controlled empty selection. Use `defaultValue` only for uncontrolled selection.
 
-<Preview fit="device" hideDevices={true} code={`\
+<Preview
+  height={320}
+  align="start"
+  hideDevices={true}
+  code={`\
 const [fruit, setFruit] = useState<string | undefined>("apple");
-
 return (
-
   <Stack>
     <Select label="Favorite fruit" options={options} value={fruit} onChange={setFruit} />
     <span role="status">Selected: {fruit ?? "none"}</span>
   </Stack>
 );
-`}>
-  <Section><ControlledSelectExample /></Section>
+`}
+>
+  <Section>
+    <ControlledSelectExample />
+  </Section>
 </Preview>
 
 ## Popup placement and empty options
@@ -221,7 +229,7 @@ return (
 Control popup visibility with `open` and `onOpenChange`, or set its initial visibility with `defaultOpen`. Placement may fall back when space is limited. `menuMaxHeight` constrains the scrollable list; `matchTriggerWidth={false}` allows a narrower menu.
 
 <Preview
-  fit="device"
+  height={500}
   code={`\
 <Stack>
   <Select
@@ -264,7 +272,8 @@ Control popup visibility with `open` and `onOpenChange`, or set its initial visi
 `required` participates in native validation when `name` enables the hidden native select. `error` displays a message and marks the control invalid; `error={true}` uses "Invalid value". `disabled` prevents interaction.
 
 <Preview
-  fit="device"
+  height={320}
+  align="start"
   hideDevices={true}
   code={`\
 <Stack>
@@ -299,7 +308,8 @@ Select combines `aria-invalid` with its own `error`, and `data-invalid` matches 
 For object values, use `isOptionEqualToValue` to compare stable identifiers instead of object identity. Supply `serializeValue` with a unique string for native form submission. `name` enables a visually hidden native select; `form` associates it with a form elsewhere in the document.
 
 <Preview
-  fit="device"
+  height={240}
+  align="start"
   hideDevices={true}
   code={`\
 <Select
