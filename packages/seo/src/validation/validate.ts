@@ -540,16 +540,14 @@ const richResultRules: Record<SeoRichResultProfile, RichResultRule> = {
   },
 };
 
-const getLocalTypeName = (type: string): string =>
-  type.split(/[\/#]/).at(-1) ?? type;
-
 const profileMatches = (
   node: SeoNode,
   profile: SeoRichResultProfile,
+  registry: SchemaRegistry,
 ): boolean => {
   const expected = richResultRules[profile].type;
 
-  return getTypes(node).some((type) => getLocalTypeName(type) === expected);
+  return getTypes(node).some((type) => registry.isTypeOf(type, expected));
 };
 
 const getNestedObjects = (value: unknown): Record<string, unknown>[] => {
@@ -564,6 +562,7 @@ const hasNestedValue = (value: unknown, property: string): boolean =>
 const validateRichResults = (
   nodes: readonly SeoNode[],
   profiles: readonly SeoRichResultProfile[],
+  registry: SchemaRegistry,
 ): SeoValidationIssue[] => {
   const issues: SeoValidationIssue[] = [];
 
@@ -571,7 +570,7 @@ const validateRichResults = (
     const rule = richResultRules[profile];
 
     nodes.forEach((node, nodeIndex) => {
-      if (!profileMatches(node, profile)) {
+      if (!profileMatches(node, profile, registry)) {
         return;
       }
 
@@ -1173,7 +1172,9 @@ export const validateSeo = (
       });
 
       if (options.profiles?.length) {
-        issues.push(...validateRichResults(getNodes(graph), options.profiles));
+        issues.push(
+          ...validateRichResults(getNodes(graph), options.profiles, registry),
+        );
       }
     }
   }

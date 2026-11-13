@@ -187,3 +187,36 @@ describe("Badge layout (browser)", () => {
     )).toThrow("Badge anchorOffset values must be finite numbers.");
   });
 });
+
+describe("Badge shape (browser)", () => {
+  it.each([
+    ["1", 16],
+    ["7", 20],
+    ["A", 32],
+    [5, 48],
+  ] as const)("renders single-character content %s as a circle at size %i", (content, size) => {
+    render(
+      <Theme theme="light">
+        <Badge content={content} size={size} />
+      </Theme>,
+    );
+
+    const indicator = screen.getByText(String(content));
+    const { width, height } = indicator.getBoundingClientRect();
+    expect(indicator).toHaveClass("puzzle-badge-indicator--single");
+    expect(Math.abs(width - height)).toBeLessThan(0.5);
+  });
+
+  it("keeps multi-character content as a pill", () => {
+    render(
+      <Theme theme="light">
+        <Badge content="99+" />
+      </Theme>,
+    );
+
+    const indicator = screen.getByText("99+");
+    const { width, height } = indicator.getBoundingClientRect();
+    expect(indicator).not.toHaveClass("puzzle-badge-indicator--single");
+    expect(width).toBeGreaterThan(height);
+  });
+});

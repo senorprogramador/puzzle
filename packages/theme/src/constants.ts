@@ -179,7 +179,7 @@ export const DEFAULT_TOKENS: ThemeTokens = {
     8: "0 25px 50px -12px rgb(0 0 0 / 0.20)",
     12: "0 35px 60px -15px rgb(0 0 0 / 0.22)",
     16: "0 45px 80px -20px rgb(0 0 0 / 0.25)",
-    24: "0 60px 100px -25px rgb(0 0 0 / 0.30)",
+    24: "0 60px 100px -20px rgb(0 0 0 / 0.40), 0 24px 40px -12px rgb(0 0 0 / 0.25)",
   },
   motion: {
     fast: "120ms",

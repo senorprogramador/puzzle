@@ -76,7 +76,7 @@ const SchemaGraphOutput = ({ collector }: SchemaGraphOutputProps) => {
   const graphErrors = graphIssues.filter((issue) => issue.severity === "error");
 
   const report =
-    collector.validation !== false && graph["@graph"].length > 0
+    collector.validation !== false
       ? validateSeo(
           {
             graph,
@@ -104,15 +104,13 @@ const SchemaGraphOutput = ({ collector }: SchemaGraphOutputProps) => {
     );
   }
 
-  if (graph["@graph"].length === 0) {
-    return null;
-  }
-
   if (report?.mode === "strict" && !report.valid) {
     const errors = report.issues.filter((issue) => issue.severity === "error");
+
     const messages = errors.map(
       (issue) => `[${issue.source}:${issue.code}] ${issue.message}`,
     );
+
     // Keep the established message when only schema rules failed.
     const scope =
       errors.length > 0 &&
@@ -123,6 +121,12 @@ const SchemaGraphOutput = ({ collector }: SchemaGraphOutputProps) => {
         : "validation";
 
     throw new Error(`Puzzle SEO ${scope} failed:\n${messages.join("\n")}`);
+  }
+
+  // Metadata-only validation is supported. An empty graph simply means
+  // that there is no JSON-LD script to render.
+  if (graph["@graph"].length === 0) {
+    return null;
   }
 
   const json = stringifySeoGraph(graph, {
@@ -174,8 +178,10 @@ const normalizeValidation = (
  * Props for the internal schema provider. The public SeoProvider resolves
  * page metadata before passing it on, so it arrives here already resolved.
  */
-export interface SchemaProviderProps
-  extends Omit<SeoProviderProps, "metadata"> {
+export interface SchemaProviderProps extends Omit<
+  SeoProviderProps,
+  "metadata"
+> {
   metadata?: ResolvedSeoMetadata;
 }
 

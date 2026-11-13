@@ -50,6 +50,13 @@ const Badge = ({
   const isHex = isHexColor(color);
   const isDark = isHex ? isDarkColor(color) : false;
 
+  const textContent =
+    typeof content === "string" || typeof content === "number"
+      ? String(content).trim()
+      : null;
+  const isSingleCharacter =
+    textContent != null && Array.from(textContent).length === 1;
+
   const classes = cn(
     "puzzle-badge",
     children != null && [
@@ -66,7 +73,10 @@ const Badge = ({
     <div className={classes}>
       {children}
       <span
-        className="puzzle-badge-indicator"
+        className={cn(
+          "puzzle-badge-indicator",
+          isSingleCharacter && "puzzle-badge-indicator--single",
+        )}
         style={{
           fontSize: `clamp(0.7rem, calc(${resolvedSize}px - 1em), 4rem)`,
           minHeight: `${resolvedSize}px`,

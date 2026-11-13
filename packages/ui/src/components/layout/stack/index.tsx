@@ -63,7 +63,7 @@ const Stack = ({
   direction = "col",
   alignH,
   alignV,
-  wrap = "nowrap",
+  wrap = "wrap",
   gap = "md",
   divider,
   reverse = false,

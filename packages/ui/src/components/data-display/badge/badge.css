@@ -22,6 +22,11 @@
     vertical-align: middle;
 }
 
+.puzzle-badge > .puzzle-badge-indicator--single {
+    padding-inline: var(--puzzle-space-1);
+    aspect-ratio: 1;
+}
+
 .puzzle-badge-primary > .puzzle-badge-indicator {
     background-color: var(--puzzle-color-primary);
     color: var(--puzzle-color-primary-foreground);
