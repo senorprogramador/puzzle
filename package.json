@@ -12,7 +12,8 @@
     "benchmark:auth": "bun run build && node scripts/benchmark-auth.mjs",
     "storybook": "bun run --filter './apps/playground' storybook",
     "release": "node scripts/release.mjs",
-    "release:dry-run": "node scripts/release.mjs --dry-run"
+    "release:dry-run": "node scripts/release.mjs --dry-run",
+    "test:release": "node --test scripts/release.test.mjs"
   },
   "workspaces": [
     "apps/playground",

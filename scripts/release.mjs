@@ -105,8 +105,6 @@ const bumpVersion = (version, type) => {
   return `${major}.${minor}.${patch + 1}`;
 };
 
-const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
 const validateReleasePackageCoverage = () => {
   const directories = readdirSync(join(root, "packages"), {
     withFileTypes: true,
@@ -125,37 +123,6 @@ const validateReleasePackageCoverage = () => {
   if (missing.length > 0) {
     fail(`Release order contains missing packages: ${missing.join(", ")}.`);
   }
-};
-
-const updateLockfile = (manifests, currentVersion, version) => {
-  const lock = readFileSync(lockfile, "utf8");
-
-  const workspacesEnd = lock.indexOf('\n  "packages": {');
-
-  if (workspacesEnd === -1) {
-    fail("Could not find the packages section in bun.lock.");
-  }
-
-  let workspaces = lock.slice(0, workspacesEnd);
-
-  for (const { dir, manifest } of manifests) {
-    const entry = new RegExp(
-      `("${escapeRegExp(relative(root, dir))}": \\{\\s*"name": "${escapeRegExp(manifest.name)}",\\s*"version": ")${escapeRegExp(currentVersion)}"`,
-    );
-
-    if (!entry.test(workspaces)) {
-      fail(`Could not find ${manifest.name}@${currentVersion} in bun.lock.`);
-    }
-
-    workspaces = workspaces
-      .replace(entry, `$1${version}"`)
-      .replaceAll(
-        `"${manifest.name}": "^${currentVersion}"`,
-        `"${manifest.name}": "^${version}"`,
-      );
-  }
-
-  writeFileSync(lockfile, workspaces + lock.slice(workspacesEnd));
 };
 
 const askReleaseType = async () => {
@@ -281,7 +248,7 @@ const main = async () => {
       writeManifest(manifestPath, manifest);
     }
 
-    updateLockfile(manifests, currentVersion, version);
+    runOrFail("Updating bun.lock", "bun", ["install", "--lockfile-only"]);
 
     runOrFail("Verifying bun.lock", "bun", ["install", "--frozen-lockfile"]);
 

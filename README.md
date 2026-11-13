@@ -315,6 +315,11 @@ npm run release
 
 The release script requires a clean Git working tree. It updates package versions and workspace dependency ranges, refreshes the lockfile, validates types, runs tests, builds packages, publishes them, commits the release, creates a tag, and pushes the release.
 
+After changing versions, it regenerates `bun.lock` using `bun install --lockfile-only`
+before verifying it with `bun install --frozen-lockfile`. Dry runs and pre-publish
+failures restore the original package manifests and lockfile.
+Run the isolated release workflow tests with `bun run test:release`.
+
 The release script publishes only the packages listed above. Other packages in the repository are not included in its current release sequence.
 
 ## License
