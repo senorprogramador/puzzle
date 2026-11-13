@@ -79,6 +79,7 @@ export interface SeoContextValue {
 
 export interface SeoMetadataProps {
   metadata: SeoPageMetadata;
+  children?: ReactNode;
 }
 
 export interface SeoJsonLdProps {

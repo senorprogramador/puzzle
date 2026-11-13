@@ -5,13 +5,21 @@ const DEFAULT_LOCALE = "en";
 const DEFAULT_TRAILING_SLASH = "never";
 
 const normalizeLocale = (locale: string): SeoLocale => {
-  const normalized = Intl.getCanonicalLocales(locale)[0];
-
-  if (!normalized) {
-    throw new Error(`Invalid SEO locale: "${locale}".`);
+  if (!locale.trim()) {
+    throw new Error("SEO locale must not be empty.");
   }
 
-  return normalized as SeoLocale;
+  try {
+    const normalized = Intl.getCanonicalLocales(locale)[0];
+
+    if (!normalized) {
+      throw new Error(`Invalid SEO locale: "${locale}".`);
+    }
+
+    return normalized as SeoLocale;
+  } catch {
+    throw new Error(`Invalid SEO locale: "${locale}".`);
+  }
 };
 
 const normalizeSiteUrl = (value: string): SeoUrl => {
@@ -33,10 +41,8 @@ const normalizeSiteUrl = (value: string): SeoUrl => {
     throw new Error("SEO siteUrl must not contain credentials.");
   }
 
-  url.hash = "";
-  url.search = "";
-
-  return url.toString().replace(/\/+$/, "") as SeoUrl;
+  // Paths, queries and fragments are dropped: page URLs resolve against the origin.
+  return url.origin as SeoUrl;
 };
 
 const normalizeLocales = (
@@ -47,7 +53,10 @@ const normalizeLocales = (
   supportedLocales: SeoLocale[];
 } => {
   const normalizedDefault = normalizeLocale(defaultLocale);
-  const locales = (supportedLocales ?? [defaultLocale]).map(normalizeLocale);
+
+  const locales = (
+    supportedLocales?.length ? supportedLocales : [defaultLocale]
+  ).map(normalizeLocale);
 
   if (!locales.includes(normalizedDefault)) {
     locales.unshift(normalizedDefault);
@@ -69,6 +78,7 @@ export const normalizeSeoConfig = (config: SeoConfig): SeoResolvedConfig => {
   }
 
   const siteUrl = normalizeSiteUrl(config.siteUrl);
+
   const locales = normalizeLocales(
     config.defaultLocale ?? DEFAULT_LOCALE,
     config.supportedLocales,
@@ -86,9 +96,9 @@ export const normalizeSeoConfig = (config: SeoConfig): SeoResolvedConfig => {
     );
   }
 
-  if (config.identity?.url) {
-    normalizeSiteUrl(config.identity.url);
-  }
+  const identityUrl = config.identity?.url
+    ? normalizeSiteUrl(config.identity.url)
+    : siteUrl;
 
   return {
     ...config,
@@ -108,9 +118,7 @@ export const normalizeSeoConfig = (config: SeoConfig): SeoResolvedConfig => {
     identity: config.identity
       ? {
           ...config.identity,
-          url: config.identity.url
-            ? normalizeSiteUrl(config.identity.url)
-            : siteUrl,
+          url: identityUrl,
           sameAs: config.identity.sameAs
             ? [...config.identity.sameAs]
             : undefined,
@@ -134,7 +142,7 @@ export const normalizeSeoPath = (
   }
 
   if (trailingSlash === "always") {
-    return pathname.replace(/\/+$/, "") + "/";
+    return `${pathname.replace(/\/+$/, "")}/`;
   }
 
   if (trailingSlash === "never") {
@@ -160,9 +168,9 @@ export const resolveSeoUrl = (
     throw new Error(`SEO URL must use HTTP or HTTPS: "${value}".`);
   }
 
-  const isSiteUrl = url.origin === new URL(config.siteUrl).origin;
+  const siteOrigin = new URL(config.siteUrl).origin;
 
-  if (isSiteUrl) {
+  if (url.origin === siteOrigin) {
     url.pathname = normalizeSeoPath(url.pathname, config.trailingSlash);
   }
 

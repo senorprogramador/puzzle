@@ -4,7 +4,9 @@ import { createContext, useContext } from "react";
 
 import type { SeoResolvedConfig } from "../context/types";
 
-import type { ResolvedSeoMetadata } from "../metadata/types";
+import { resolveSeoMetadata } from "../metadata";
+
+import type { ResolvedSeoMetadata, SeoPageMetadata } from "../metadata/types";
 
 export interface SeoReactContextValue {
   config: SeoResolvedConfig;
@@ -27,6 +29,20 @@ export const useSeoConfig = (): SeoResolvedConfig => {
   return useSeoReactContext().config;
 };
 
-export const useSeoMetadata = (): ResolvedSeoMetadata | undefined => {
-  return useSeoReactContext().metadata;
+/**
+ * Returns the metadata from the closest SEO context.
+ *
+ * Passing metadata explicitly resolves it against the current config.
+ * This is useful when a route component owns its metadata object.
+ */
+export const useSeoMetadata = (
+  metadata?: SeoPageMetadata,
+): ResolvedSeoMetadata | undefined => {
+  const context = useSeoReactContext();
+
+  if (metadata) {
+    return resolveSeoMetadata(metadata, context.config);
+  }
+
+  return context.metadata;
 };

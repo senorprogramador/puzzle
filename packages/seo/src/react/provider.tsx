@@ -21,7 +21,7 @@ export const SeoProvider = ({
   const resolvedConfig = useMemo(() => normalizeSeoConfig(config), [config]);
 
   const resolvedMetadata = useMemo(
-    () => (metadata ? resolveSeoMetadata(metadata, resolvedConfig) : undefined),
+    () => resolveSeoMetadata(metadata ?? {}, resolvedConfig),
     [metadata, resolvedConfig],
   );
 
