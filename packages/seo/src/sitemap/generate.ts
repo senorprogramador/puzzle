@@ -178,6 +178,11 @@ export const generateSitemap = (
       allowExternalUrls: options.allowExternalUrls,
     });
 
+  // The empty document represents the fixed XML header and footer.
+  const emptyDocumentBytes = sitemapByteLength(createXml([]));
+
+  let currentBytes = emptyDocumentBytes;
+
   const flush = () => {
     if (current.length === 0) {
       return;
@@ -200,12 +205,14 @@ export const generateSitemap = (
     });
 
     current = [];
+    currentBytes = emptyDocumentBytes;
   };
 
   for (const entry of entries) {
     const singleXml = createXml([entry]);
+    const singleBytes = sitemapByteLength(singleXml);
 
-    if (sitemapByteLength(singleXml) > maxBytes) {
+    if (singleBytes > maxBytes) {
       issues.push({
         code: "ENTRY_TOO_LARGE",
         message: `Sitemap entry exceeds the configured byte limit: ${entry.url}.`,
@@ -215,16 +222,19 @@ export const generateSitemap = (
       continue;
     }
 
-    const candidate = [...current, entry];
+    // This includes the entry fragment and its namespace overhead.
+    // Counting namespace overhead per entry is intentionally conservative.
+    const entryBytes = singleBytes - emptyDocumentBytes;
 
-    const exceedsCount = candidate.length > maxEntries;
-    const exceedsBytes = sitemapByteLength(createXml(candidate)) > maxBytes;
+    const exceedsCount = current.length + 1 > maxEntries;
+    const exceedsBytes = currentBytes + entryBytes > maxBytes;
 
     if (current.length > 0 && (exceedsCount || exceedsBytes)) {
       flush();
     }
 
     current.push(entry);
+    currentBytes += entryBytes;
   }
 
   flush();
