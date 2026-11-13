@@ -29,7 +29,7 @@ export type * from "./server";
 export type * from "./sitemap";
 export type * from "./robots";
 export type * from "./urls";
-export type * from "./testing";
+export * from "./testing";
 
 export * from "./sitemap";
 export * from "./robots";

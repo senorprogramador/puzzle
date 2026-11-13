@@ -6,10 +6,16 @@ import { dirname, resolve } from "node:path";
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 
+const repositoryRoot = resolve(packageRoot, "../..");
+
 const readManifest = async () => {
   const content = await readFile(resolve(packageRoot, "package.json"), "utf8");
 
   return JSON.parse(content);
+};
+
+const exists = async (path) => {
+  await assert.doesNotReject(readFile(path));
 };
 
 test("package has the correct identity", async () => {
@@ -18,6 +24,19 @@ test("package has the correct identity", async () => {
   assert.equal(manifest.name, "@puzzle-ui/seo");
   assert.equal(manifest.type, "module");
   assert.equal(manifest.license, "MIT");
+  assert.equal(manifest.private, undefined);
+});
+
+test("package contains publication metadata", async () => {
+  const manifest = await readManifest();
+
+  assert.equal(manifest.publishConfig.access, "public");
+
+  assert.equal(manifest.publishConfig.registry, "https://registry.npmjs.org/");
+
+  assert.equal(manifest.sideEffects, false);
+
+  assert.ok(manifest.description && manifest.description.length > 10);
 });
 
 test("package supports ESM and CommonJS", async () => {
@@ -25,6 +44,7 @@ test("package supports ESM and CommonJS", async () => {
 
   assert.ok(manifest.main.endsWith(".cjs"));
   assert.ok(manifest.module.endsWith(".js"));
+  assert.ok(manifest.types.endsWith(".d.ts"));
 
   assert.ok(manifest.exports["."].import);
   assert.ok(manifest.exports["."].require);
@@ -43,9 +63,9 @@ test("all public subpaths have explicit exports", async () => {
     "./server",
     "./sitemap",
     "./robots",
-    "./urls",
     "./testing",
     "./validation",
+    "./urls",
     "./next",
     "./tanstack",
     "./react-router",
@@ -67,10 +87,18 @@ test("all exports expose ESM, CJS and declarations", async () => {
   }
 });
 
-test("React supports the declared peer dependency versions", async () => {
+test("React supports the declared optional peer dependency", async () => {
   const manifest = await readManifest();
 
   assert.equal(manifest.peerDependencies.react, "^19.0.0");
+
+  assert.equal(manifest.peerDependenciesMeta.react.optional, true);
+});
+
+test("package has no unnecessary runtime dependencies", async () => {
+  const manifest = await readManifest();
+
+  assert.equal(Object.keys(manifest.dependencies ?? {}).length, 0);
 });
 
 test("published files are restricted to dist", async () => {
@@ -79,21 +107,61 @@ test("published files are restricted to dist", async () => {
   assert.deepEqual(manifest.files, ["dist"]);
 });
 
+test("package documentation and license exist", async () => {
+  await exists(resolve(packageRoot, "README.md"));
+  await exists(resolve(repositoryRoot, "LICENSE"));
+  await exists(resolve(packageRoot, "CHANGELOG.md"));
+  await exists(resolve(packageRoot, "TESTING.md"));
+});
+
+test("testing utilities are exposed through the public API", async () => {
+  const manifest = await readManifest();
+
+  const testingExport = manifest.exports["./testing"];
+
+  assert.ok(testingExport);
+
+  const source = await readFile(
+    resolve(packageRoot, "src/testing/index.ts"),
+    "utf8",
+  );
+
+  for (const name of [
+    "inspectSeoGraph",
+    "formatSeoDiagnostics",
+    "createSeoTestFixture",
+    "runSeoTest",
+    "assertSeoTest",
+  ]) {
+    assert.ok(source.includes(name), `Missing testing export: ${name}`);
+  }
+});
+
 test("build output exists for every public entrypoint", async () => {
   const manifest = await readManifest();
 
   for (const [name, entry] of Object.entries(manifest.exports)) {
     const esmPath = resolve(packageRoot, entry.import.default);
+
     const cjsPath = resolve(packageRoot, entry.require.default);
 
-    await assert.doesNotReject(
-      readFile(esmPath),
-      `Missing ESM build for ${name}`,
+    const esmTypes = resolve(packageRoot, entry.import.types);
+
+    const cjsTypes = resolve(packageRoot, entry.require.types);
+
+    await exists(esmPath);
+    await exists(cjsPath);
+    await exists(esmTypes);
+    await exists(cjsTypes);
+
+    assert.ok(
+      esmPath.startsWith(resolve(packageRoot, "dist")),
+      `${name}: ESM must resolve inside dist`,
     );
 
-    await assert.doesNotReject(
-      readFile(cjsPath),
-      `Missing CJS build for ${name}`,
+    assert.ok(
+      cjsPath.startsWith(resolve(packageRoot, "dist")),
+      `${name}: CJS must resolve inside dist`,
     );
   }
 });

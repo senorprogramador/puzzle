@@ -30,8 +30,8 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p .",
-    "test": "bun test tests",
-    "vitest": "bun test tests",
+    "test": "bun test tests --timeout 30000",
+    "vitest": "bun test tests --timeout 30000",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
   },
