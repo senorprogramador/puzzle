@@ -276,6 +276,120 @@ https://example.com/#organization
 Use stable identifiers for entities that should be referenced by
 other nodes, such as organizations, websites, authors and pages.
 
+## Metadata
+
+Puzzle SEO provides a framework-independent metadata resolver
+and React integration for page-level SEO metadata.
+
+### Configuration
+
+```ts
+import { SeoProvider } from "@puzzle-ui/seo";
+
+const config = {
+  siteUrl: "https://example.com",
+
+  defaultLocale: "en",
+  supportedLocales: ["en", "nl", "de"],
+
+  title: {
+    default: "Example",
+    template: "%s | Example",
+  },
+
+  identity: {
+    name: "Example",
+    description: "Example website",
+  },
+};
+```
+
+### Page metadata
+
+```tsx
+import { SeoMetadata, SeoHead } from "@puzzle-ui/seo";
+
+const Page = () => (
+  <SeoMetadata
+    metadata={{
+      title: "About",
+      description: "About our company",
+      canonical: "https://example.com/about",
+      locale: "en",
+
+      openGraph: {
+        type: "website",
+        images: [
+          {
+            url: "/images/social.png",
+            width: 1200,
+            height: 630,
+            alt: "Example",
+          },
+        ],
+      },
+
+      twitter: {
+        card: "summary_large_image",
+        site: "@example",
+      },
+
+      robots: {
+        index: true,
+        follow: true,
+      },
+    }}
+  />
+);
+```
+
+### Metadata output
+
+Use `SeoMetadata` to establish a page-level metadata scope
+and render its metadata.
+
+Alternatively, provide metadata through SeoProvider and
+render it using SeoHead.
+
+Use one metadata output strategy per document.
+
+### Supported metadata
+
+- Title and title templates.
+- Description and site defaults.
+- Canonical URLs.
+- Robots directives.
+- Open Graph metadata and images.
+- Twitter/X cards and images.
+- Hreflang alternate URLs.
+- Article publication and modification dates.
+- Keywords and author.
+
+### Metadata resolution
+
+Metadata is resolved using the following priority:
+
+1. Explicit page metadata.
+2. Configured metadata defaults.
+3. Site-level defaults.
+4. Identity defaults, where applicable.
+
+Page locales are validated against supportedLocales.
+A regional variant such as `nl-NL` is accepted when its
+base language (`nl`) is supported. Locale casing is
+normalized, so `NL-nl` resolves to `nl-NL`.
+
+URLs are normalized and restricted to HTTP(S).
+URLs containing credentials are rejected.
+
+Canonical URLs are never inferred from siteUrl alone.
+A canonical must be explicitly configured or supplied
+by the page. `og:url` is required by Open Graph, so it
+falls back to the canonical URL and then to the site root.
+
+Metadata resolution is framework-independent and can
+be used by server-side integrations.
+
 ### Available Schema.org components
 
 The React integration provides the following components:
@@ -570,12 +684,11 @@ The central JSON-LD script supports a Content Security Policy nonce.
 
 ````tsx
 <SeoProvider
-config={config}
-nonce={requestNonce}
-
+  config={config}
+  nonce={requestNonce}
 >   <LDOrganization name="Example" />
-> </SeoProvider>
-> ```
+</SeoProvider>
+```
 
 The nonce is applied to the single central script element.
 

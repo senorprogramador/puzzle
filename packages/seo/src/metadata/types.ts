@@ -39,6 +39,7 @@ export interface SeoTwitterMetadata {
   title?: string;
   description?: string;
   images?: string[];
+  imageAlt?: string;
   site?: string;
   creator?: string;
 }
@@ -77,15 +78,20 @@ export interface SeoPageMetadata {
   openGraph?: SeoOpenGraphMetadata;
   twitter?: SeoTwitterMetadata;
   alternates?: SeoHreflangMetadata;
+
   keywords?: string[];
   author?: string;
+
   publishedTime?: string;
   modifiedTime?: string;
 }
 
 export interface ResolvedSeoMetadata extends SeoPageMetadata {
   title: string;
-  canonical: SeoUrl;
+  canonical?: SeoUrl;
   locale: SeoLocale;
+  description?: string;
   alternates?: SeoHreflangMetadata;
+  openGraph: SeoOpenGraphMetadata;
+  twitter: SeoTwitterMetadata;
 }
