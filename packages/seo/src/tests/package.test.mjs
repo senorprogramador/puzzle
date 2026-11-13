@@ -45,6 +45,10 @@ test("all public subpaths have explicit exports", async () => {
     "./robots",
     "./urls",
     "./testing",
+    "./validation",
+    "./next",
+    "./tanstack",
+    "./react-router",
   ];
 
   for (const entry of expected) {
@@ -79,12 +83,8 @@ test("build output exists for every public entrypoint", async () => {
   const manifest = await readManifest();
 
   for (const [name, entry] of Object.entries(manifest.exports)) {
-    const esm = name === "." ? entry.import.default : entry.import.default;
-
-    const cjs = entry.require.default;
-
-    const esmPath = resolve(packageRoot, esm);
-    const cjsPath = resolve(packageRoot, cjs);
+    const esmPath = resolve(packageRoot, entry.import.default);
+    const cjsPath = resolve(packageRoot, entry.require.default);
 
     await assert.doesNotReject(
       readFile(esmPath),

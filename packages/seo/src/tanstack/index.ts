@@ -1,0 +1,27 @@
+import { createSeoRouteHandlers } from "../server";
+
+import type { SeoRouteOptions } from "../server";
+
+export interface TanStackServerRouteContext {
+  request: Request;
+}
+
+export type TanStackSeoRouteHandler = (
+  context: TanStackServerRouteContext,
+) => Promise<Response>;
+
+export interface TanStackSeoRoutes {
+  sitemapGET: TanStackSeoRouteHandler;
+  robotsGET: TanStackSeoRouteHandler;
+}
+
+export const createTanStackSeoRoutes = (
+  options: SeoRouteOptions,
+): TanStackSeoRoutes => {
+  const handlers = createSeoRouteHandlers(options);
+
+  return {
+    sitemapGET: ({ request }) => handlers.sitemap(request),
+    robotsGET: ({ request }) => handlers.robots(request),
+  };
+};

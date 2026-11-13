@@ -9,6 +9,9 @@ import type {
 
 const DEFAULT_CACHE_CONTROL = "public, max-age=3600, s-maxage=3600";
 
+const XML_CONTENT_TYPE = "application/xml; charset=utf-8";
+const TEXT_CONTENT_TYPE = "text/plain; charset=utf-8";
+
 const createTextResponse = (
   body: string,
   options: {
@@ -28,8 +31,54 @@ const createTextResponse = (
   body,
 });
 
+const createNotFoundResponse = (): SeoTextResponse =>
+  createTextResponse("Not found.", {
+    contentType: TEXT_CONTENT_TYPE,
+    status: 404,
+    cacheControl: "no-store",
+  });
+
+const createErrorResponse = (
+  error: unknown,
+  fallback: string,
+): SeoTextResponse =>
+  createTextResponse(error instanceof Error ? error.message : fallback, {
+    contentType: TEXT_CONTENT_TYPE,
+    status: 500,
+    cacheControl: "no-store",
+  });
+
+const getRequestPathname = (request?: Request): string | undefined => {
+  if (!request) {
+    return undefined;
+  }
+
+  try {
+    return new URL(request.url).pathname;
+  } catch {
+    return "";
+  }
+};
+
+const normalizeRoutePath = (path: string): string => {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+
+  return normalized.replace(/\/+/g, "/");
+};
+
+const getSitemapIndexPath = (options: SeoSitemapHandlerOptions): string => {
+  if (options.path) {
+    return normalizeRoutePath(options.path);
+  }
+
+  return normalizeRoutePath(`/${options.sitemap.filename ?? "sitemap"}.xml`);
+};
+
+const getSitemapFilePath = (filename: string): string =>
+  normalizeRoutePath(`/${filename}`);
+
 export const createSitemapHandler = (options: SeoSitemapHandlerOptions) => {
-  return (): SeoTextResponse => {
+  return (request?: Request): SeoTextResponse => {
     try {
       const result = generateSitemap(options.sitemap);
 
@@ -37,11 +86,29 @@ export const createSitemapHandler = (options: SeoSitemapHandlerOptions) => {
         return createTextResponse(
           result.issues.map((issue) => issue.message).join("\n"),
           {
-            contentType: "text/plain; charset=utf-8",
+            contentType: TEXT_CONTENT_TYPE,
             status: 500,
             cacheControl: "no-store",
           },
         );
+      }
+
+      const requestedPath = getRequestPathname(request);
+      const indexPath = getSitemapIndexPath(options);
+
+      if (requestedPath && requestedPath !== indexPath) {
+        const requestedFile = result.files.find(
+          (file) => getSitemapFilePath(file.filename) === requestedPath,
+        );
+
+        if (!requestedFile) {
+          return createNotFoundResponse();
+        }
+
+        return createTextResponse(requestedFile.xml, {
+          contentType: XML_CONTENT_TYPE,
+          cacheControl: options.cacheControl,
+        });
       }
 
       const body =
@@ -53,40 +120,44 @@ export const createSitemapHandler = (options: SeoSitemapHandlerOptions) => {
         ].join("");
 
       return createTextResponse(body, {
-        contentType: "application/xml; charset=utf-8",
+        contentType: XML_CONTENT_TYPE,
         cacheControl: options.cacheControl,
       });
     } catch (error) {
-      return createTextResponse(
-        error instanceof Error ? error.message : "Sitemap generation failed.",
-        {
-          contentType: "text/plain; charset=utf-8",
-          status: 500,
-          cacheControl: "no-store",
-        },
-      );
+      return createErrorResponse(error, "Sitemap generation failed.");
     }
   };
 };
 
 export const createRobotsHandler = (options: SeoRobotsHandlerOptions) => {
-  return (): SeoTextResponse => {
-    const result = generateRobotsTxt(options.robots);
+  return (request?: Request): SeoTextResponse => {
+    const requestedPath = getRequestPathname(request);
+    const robotsPath = normalizeRoutePath(options.path ?? "/robots.txt");
 
-    if (result.issues.length > 0) {
-      return createTextResponse(
-        result.issues.map((issue) => issue.message).join("\n"),
-        {
-          contentType: "text/plain; charset=utf-8",
-          status: 500,
-          cacheControl: "no-store",
-        },
-      );
+    if (requestedPath && requestedPath !== robotsPath) {
+      return createNotFoundResponse();
     }
 
-    return createTextResponse(result.content, {
-      contentType: "text/plain; charset=utf-8",
-      cacheControl: options.cacheControl,
-    });
+    try {
+      const result = generateRobotsTxt(options.robots);
+
+      if (result.issues.length > 0) {
+        return createTextResponse(
+          result.issues.map((issue) => issue.message).join("\n"),
+          {
+            contentType: TEXT_CONTENT_TYPE,
+            status: 500,
+            cacheControl: "no-store",
+          },
+        );
+      }
+
+      return createTextResponse(result.content, {
+        contentType: TEXT_CONTENT_TYPE,
+        cacheControl: options.cacheControl,
+      });
+    } catch (error) {
+      return createErrorResponse(error, "Robots.txt generation failed.");
+    }
   };
 };

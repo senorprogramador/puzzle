@@ -98,7 +98,7 @@
         "default": "./dist/robots/index.js"
       },
       "require": {
-        "types": "./dist/robots/index.cjs",
+        "types": "./dist/robots/index.d.cts",
         "default": "./dist/robots/index.cjs"
       }
     },
@@ -108,7 +108,7 @@
         "default": "./dist/testing/index.js"
       },
       "require": {
-        "types": "./dist/testing/index.cjs",
+        "types": "./dist/testing/index.d.cts",
         "default": "./dist/testing/index.cjs"
       }
     },
@@ -130,6 +130,36 @@
       "require": {
         "types": "./dist/urls/index.d.cts",
         "default": "./dist/urls/index.cjs"
+      }
+    },
+    "./next": {
+      "import": {
+        "types": "./dist/next/index.d.ts",
+        "default": "./dist/next/index.js"
+      },
+      "require": {
+        "types": "./dist/next/index.d.cts",
+        "default": "./dist/next/index.cjs"
+      }
+    },
+    "./tanstack": {
+      "import": {
+        "types": "./dist/tanstack/index.d.ts",
+        "default": "./dist/tanstack/index.js"
+      },
+      "require": {
+        "types": "./dist/tanstack/index.d.cts",
+        "default": "./dist/tanstack/index.cjs"
+      }
+    },
+    "./react-router": {
+      "import": {
+        "types": "./dist/react-router/index.d.ts",
+        "default": "./dist/react-router/index.js"
+      },
+      "require": {
+        "types": "./dist/react-router/index.d.cts",
+        "default": "./dist/react-router/index.cjs"
       }
     }
   },
