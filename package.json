@@ -4,7 +4,9 @@
   "scripts": {
     "site": "bun run --filter '@puzzle-ui/site' dev",
     "dev": "bun run --filter '@puzzle-ui/playground' dev",
-    "build": "bun run --filter './packages/*' build",
+    "schema:generate": "bun run --filter '@puzzle-ui/seo' schema:generate",
+    "schema:check": "bun run --filter '@puzzle-ui/seo' schema:check",
+    "build": "bun run schema:check && bun run --filter './packages/*' build",
     "typecheck": "bun run --filter './packages/*' --filter './apps/site' typecheck",
     "test:all": "bun run build && bun run --filter './packages/*' vitest && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser && bun run --filter '@puzzle-ui/pieces' test:browser",
     "benchmark:auth": "bun run build && node scripts/benchmark-auth.mjs",

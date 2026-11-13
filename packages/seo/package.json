@@ -98,7 +98,7 @@
         "default": "./dist/robots/index.js"
       },
       "require": {
-        "types": "./dist/robots/index.d.cts",
+        "types": "./dist/robots/index.cjs",
         "default": "./dist/robots/index.cjs"
       }
     },
@@ -108,7 +108,7 @@
         "default": "./dist/testing/index.js"
       },
       "require": {
-        "types": "./dist/testing/index.d.cts",
+        "types": "./dist/testing/index.cjs",
         "default": "./dist/testing/index.cjs"
       }
     }
@@ -118,7 +118,9 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "tsdown",
+    "schema:generate": "node scripts/generate-schemaorg.mjs",
+    "schema:check": "node scripts/generate-schemaorg.mjs --check",
+    "build": "bun run schema:check && tsdown",
     "typecheck": "tsc --noEmit -p .",
     "typecheck:test": "tsc --noEmit -p tsconfig.test.json",
     "vitest": "bun run test:integration && bun run test:schema",
@@ -128,7 +130,7 @@
     "test:package": "bun run build && node --test src/tests/package.test.mjs",
     "test:schema": "bun run typecheck:test",
     "clean": "rm -rf dist",
-    "prepack": "tsdown"
+    "prepack": "bun run schema:check && tsdown"
   },
   "peerDependencies": {
     "react": "^19.0.0"
@@ -141,6 +143,7 @@
   "devDependencies": {
     "@types/react": "^19.0.0",
     "tsdown": "^0.23.1",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2",
+    "vitest": "latest"
   }
 }
