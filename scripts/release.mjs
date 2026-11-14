@@ -241,6 +241,21 @@ const restoreReleaseFiles = (files) => {
   ]);
 };
 
+// Copilot may wrap the JSON in a Markdown fence or surround it with prose.
+const parseChangelogJson = (output) => {
+  const text = output.trim();
+  const fenced = text.match(/```(?:json)?\s*\n([\s\S]*?)\n?```/i);
+  const body = fenced ? fenced[1].trim() : text;
+  try {
+    return JSON.parse(body);
+  } catch (error) {
+    const start = body.indexOf("[");
+    const end = body.lastIndexOf("]");
+    if (start === -1 || end <= start) throw error;
+    return JSON.parse(body.slice(start, end + 1));
+  }
+};
+
 const updateChangelogs = (manifests, version, baseline, originals) => {
   const range = `${baseline}..HEAD`;
   const changed = run("git", ["diff", "--name-status", range], { capture: true });
@@ -261,7 +276,7 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
     "Exclude version/dependency bumps, lockfile churn, and changelog-only edits.",
     "Include existing Unreleased notes in the new release without duplicating them.",
     "Use an empty changes array if a package has no substantive changes.",
-    "Return ONLY JSON: an array with exactly one object per package,",
+    "Return ONLY raw JSON (no Markdown code fences or prose): an array with exactly one object per package,",
     '{"package":"@puzzle-ui/core","changes":["Added ...","Fixed ..."]}.',
     "Each change must be a nonempty single-line Markdown bullet body (no bullet prefix).",
     `Packages: ${JSON.stringify(manifests.map(({ manifest, dir }) => ({
@@ -299,7 +314,7 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
 
   let notes;
   try {
-    notes = JSON.parse(result.stdout);
+    notes = parseChangelogJson(result.stdout);
   } catch (error) {
     fail(`Copilot did not return valid changelog JSON: ${error.message}`);
   }
