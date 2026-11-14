@@ -2,6 +2,11 @@
   "name": "@puzzle-ui/session",
   "version": "0.5.0",
   "description": "Secure, database-independent session management for Puzzle Auth.",
+  "homepage": "https://puzzle-ui.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
   "license": "MIT",
   "publishConfig": {
     "access": "public",

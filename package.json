@@ -1,6 +1,11 @@
 {
   "name": "puzzle-ui",
   "private": true,
+  "homepage": "https://puzzle-ui.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
   "scripts": {
     "site": "bun run --filter '@puzzle-ui/site' dev",
     "dev": "bun run --filter '@puzzle-ui/playground' dev",
@@ -9,7 +14,7 @@
     "schema:check": "bun run --filter '@puzzle-ui/seo' schema:check",
     "build": "bun run schema:check && bun run --filter './packages/*' build",
     "typecheck": "bun run --filter './packages/*' --filter './apps/site' typecheck",
-    "test:all": "bun run build && bun run --filter './packages/*' vitest && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser && bun run --filter '@puzzle-ui/pieces' test:browser",
+    "test:all": "bun run build && bun run --filter '!@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser && bun run --filter '@puzzle-ui/pieces' test:browser && bun run --filter '@puzzle-ui/storage-mongodb' vitest",
     "benchmark:auth": "bun run build && node scripts/benchmark-auth.mjs",
     "benchmark:seo": "bun run build && bun run packages/seo/scripts/benchmark.ts",
     "storybook": "bun run --filter './apps/playground' storybook",

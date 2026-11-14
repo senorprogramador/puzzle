@@ -3,6 +3,11 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "homepage": "https://puzzle-ui.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
   "scripts": {
     "dev": "bun run fonts:download && vite dev",
     "build": "bun run fonts:download && vite build",

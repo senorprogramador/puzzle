@@ -2,6 +2,11 @@
   "name": "@puzzle-ui/storage",
   "version": "0.5.0",
   "description": "Vendor-neutral storage contracts for Puzzle Auth.",
+  "homepage": "https://puzzle-ui.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
   "license": "MIT",
   "publishConfig": {
     "access": "public",

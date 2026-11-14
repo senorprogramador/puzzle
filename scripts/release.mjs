@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
-import { readFileSync, writeFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { fileURLToPath } from "node:url";
@@ -70,6 +70,7 @@ const run = (command, args, { cwd = root, capture = false } = {}) => {
   return {
     ok: result.status === 0,
     stdout: result.stdout?.trim() ?? "",
+    stderr: result.stderr?.trim() ?? "",
   };
 };
 
@@ -163,17 +164,133 @@ const ensureNpmAuthentication = () => {
 const restoreReleaseFiles = (files) => {
   log("Restoring version changes");
 
-  run("git", ["restore", "--", ...files]);
+  runOrFail("Restoring release files", "git", [
+    "restore", "--staged", "--worktree", "--", ...files,
+  ]);
+};
+
+const updateChangelogs = (manifests, version, baseline, originals) => {
+  const range = `${baseline}..HEAD`;
+  const changed = run("git", ["diff", "--name-status", range], { capture: true });
+  const commits = run("git", ["log", "--format=%h %s", range], { capture: true });
+
+  if (!changed.ok || !commits.ok) {
+    fail(`Could not inspect changes since ${baseline}.`);
+  }
+
+  const date = new Date().toISOString().slice(0, 10);
+  const prompt = [
+    `Prepare changelog notes for Puzzle ${version}, released on ${date}.`,
+    `The last release is ${baseline}; review git diff ${range} and git log ${range}.`,
+    "Read every changed file that still exists, and inspect the diff for deleted files.",
+    "Read each package's existing CHANGELOG.md if present, including Unreleased notes.",
+    "Do not modify files or run commands other than git diff and git log.",
+    "Summarize meaningful user-facing changes per package, including relevant shared changes.",
+    "Exclude version/dependency bumps, lockfile churn, and changelog-only edits.",
+    "Include existing Unreleased notes in the new release without duplicating them.",
+    "Use an empty changes array if a package has no substantive changes.",
+    "Return ONLY JSON: an array with exactly one object per package,",
+    '{"package":"@puzzle-ui/core","changes":["Added ...","Fixed ..."]}.',
+    "Each change must be a nonempty single-line Markdown bullet body (no bullet prefix).",
+    `Packages: ${JSON.stringify(manifests.map(({ manifest, dir }) => ({
+      package: manifest.name,
+      directory: relative(root, dir),
+    })))}`,
+    `Changed files:\n${changed.stdout || "(none)"}`,
+    `Commits:\n${commits.stdout || "(none)"}`,
+  ].join("\n");
+
+  log(`Generating package changelogs with Copilot since ${baseline}`);
+
+  const result = run("copilot", [
+    "--prompt", prompt,
+    "--silent",
+    "--no-ask-user",
+    "--available-tools", "bash,view,grep,glob",
+    "--allow-tool", "read",
+    "--allow-tool", "shell(git diff)",
+    "--allow-tool", "shell(git log)",
+    "--deny-tool", "write",
+  ], { capture: true });
+
+  if (!result.ok) {
+    fail(`Copilot changelog generation failed.${result.stderr ? `\n${result.stderr}` : ""}`);
+  }
+
+  let notes;
+  try {
+    notes = JSON.parse(result.stdout);
+  } catch (error) {
+    fail(`Copilot did not return valid changelog JSON: ${error.message}`);
+  }
+
+  const expected = new Set(manifests.map(({ manifest }) => manifest.name));
+  const byPackage = new Map();
+  if (!Array.isArray(notes)) {
+    fail("Copilot changelog output must be an array.");
+  }
+  for (const entry of notes) {
+    if (
+      !entry || !expected.has(entry.package) || byPackage.has(entry.package) ||
+      !Array.isArray(entry.changes) ||
+      entry.changes.some((change) =>
+        typeof change !== "string" || !change.trim() || /[\r\n]/.test(change))
+    ) {
+      fail("Copilot returned invalid or duplicate package changelog notes.");
+    }
+    byPackage.set(entry.package, entry.changes);
+  }
+  if (byPackage.size !== expected.size) {
+    fail("Copilot changelog output is missing packages.");
+  }
+
+  for (const { dir, manifest } of manifests) {
+    const path = join(dir, "CHANGELOG.md");
+    const original = existsSync(path) ? readFileSync(path, "utf8") : null;
+    originals.set(path, original);
+    const content = original ?? `# Changelog\n\nAll notable changes to \`${manifest.name}\` are documented in this file.\n`;
+    const headings = [...content.matchAll(/^## (.+)$/gm)];
+    if (headings.some((heading) => heading[1].split(" - ")[0] === version)) {
+      fail(`${manifest.name} already has a changelog entry for ${version}.`);
+    }
+    const first = headings[0];
+    const intro = first ? content.slice(0, first.index) : content;
+    const unreleased = first && /^Unreleased$/i.test(first[1]);
+    const history = first
+      ? content.slice(unreleased ? (headings[1]?.index ?? content.length) : first.index)
+      : "";
+    const changes = byPackage.get(manifest.name);
+    if (
+      unreleased && changes.length === 0 &&
+      content.slice(first.index + first[0].length, headings[1]?.index).trim()
+    ) {
+      fail(`Copilot omitted Unreleased notes for ${manifest.name}.`);
+    }
+    const bullets = changes.length
+      ? changes.map((change) => `- ${change.trim()}`).join("\n")
+      : "- No changes; version bumped in lockstep.";
+    writeFileSync(path, `${intro.trimEnd()}\n\n## ${version} - ${date}\n\n${bullets}\n${history ? `\n${history}` : ""}`);
+  }
+};
+
+const restoreChangelogs = (originals) => {
+  for (const [path, content] of originals) {
+    if (content === null && existsSync(path)) {
+      unlinkSync(path);
+    } else if (content !== null) {
+      writeFileSync(path, content);
+    }
+  }
 };
 
 const main = async () => {
   log(dryRun ? "Starting release (dry run)" : "Starting release");
 
-  if (
-    run("git", ["status", "--porcelain"], {
-      capture: true,
-    }).stdout
-  ) {
+  const status = run("git", ["status", "--porcelain"], { capture: true });
+  if (!status.ok) {
+    fail(`Could not check the git working tree.${status.stderr ? `\n${status.stderr}` : ""}`);
+  }
+  if (status.stdout) {
     fail(
       "The git working tree is not clean. Commit or stash your changes before releasing.",
     );
@@ -222,6 +339,13 @@ const main = async () => {
     fail(`Git tag ${tag} already exists.`);
   }
 
+  const baseline = `v${currentVersion}`;
+  if (!run("git", ["merge-base", "--is-ancestor", `refs/tags/${baseline}`, "HEAD"], {
+    capture: true,
+  }).ok) {
+    fail(`Last release tag ${baseline} must exist and be an ancestor of HEAD. Fetch release tags before releasing.`);
+  }
+
   const releaseFiles = [
     ...manifests.map(({ manifestPath }) => relative(root, manifestPath)),
     relative(root, lockfile),
@@ -230,6 +354,8 @@ const main = async () => {
   const names = new Set(manifests.map(({ manifest }) => manifest.name));
 
   const published = [];
+  const changelogOriginals = new Map();
+  let releaseCommitted = false;
 
   try {
     log(`Updating packages from ${currentVersion} to ${version}`);
@@ -299,8 +425,38 @@ const main = async () => {
         { cwd: dir },
       );
     }
+
+    updateChangelogs(manifests, version, baseline, changelogOriginals);
+
+    if (!dryRun) {
+      log(`Committing and pushing ${tag} before publishing`);
+      runOrFail("Staging release changes", "git", ["add", "--all"]);
+      runOrFail("Committing release", "git", [
+        "commit", "-m", `Release ${tag}`,
+        "-m", "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
+      ]);
+      releaseCommitted = true;
+      runOrFail("Pushing release commit", "git", ["push"]);
+    }
   } catch (error) {
-    restoreReleaseFiles(releaseFiles);
+    if (releaseCommitted) {
+      console.error(`\nRelease ${tag} was committed. Files were left in place; resolve the push failure before publishing.`);
+    } else {
+      const trackedChangelogs = [...changelogOriginals]
+        .filter(([, content]) => content !== null)
+        .map(([path]) => relative(root, path));
+      restoreReleaseFiles([...releaseFiles, ...trackedChangelogs]);
+      const newChangelogs = [...changelogOriginals]
+        .filter(([, content]) => content === null)
+        .map(([path]) => relative(root, path));
+      // Newly created changelogs may have been staged before a failed commit.
+      if (!dryRun && newChangelogs.length > 0) {
+        runOrFail("Unstaging changelogs", "git", [
+          "reset", "HEAD", "--", ...newChangelogs,
+        ]);
+      }
+      restoreChangelogs(changelogOriginals);
+    }
     throw error;
   }
 
@@ -325,12 +481,13 @@ const main = async () => {
       published.push(manifest.name);
     }
   } catch (error) {
-    if (published.length > 0 && !dryRun) {
+    if (!dryRun) {
       console.error(
-        `\nAlready published: ${published.join(", ")}. Version changes were left in place.`,
+        `\nRelease ${tag} was committed and pushed. Already published: ${published.join(", ") || "(none)"}. Files were left in place; inspect npm before recovering the release.`,
       );
     } else {
       restoreReleaseFiles(releaseFiles);
+      restoreChangelogs(changelogOriginals);
     }
 
     throw error;
@@ -338,6 +495,7 @@ const main = async () => {
 
   if (dryRun) {
     restoreReleaseFiles(releaseFiles);
+    restoreChangelogs(changelogOriginals);
 
     log(
       `Dry run for ${tag} succeeded. No packages were published and no commit or tag was created.`,
@@ -346,11 +504,7 @@ const main = async () => {
     return;
   }
 
-  log(`Committing and tagging ${tag}`);
-
-  runOrFail("Staging release changes", "git", ["add", "--", ...releaseFiles]);
-
-  runOrFail("Committing release", "git", ["commit", "-m", `Release ${tag}`]);
+  log(`Tagging ${tag}`);
 
   runOrFail("Creating tag", "git", ["tag", "-a", tag, "-m", `Release ${tag}`]);
 

@@ -22,6 +22,7 @@ Required development tooling:
 - Bun 1.4.4.
 - Node.js 22 or 24 for the validated CI matrix.
 - npm CLI.
+- GitHub Copilot CLI (`copilot`), installed and authenticated for non-interactive use.
 - Docker with Docker Compose.
 - Chromium through Playwright.
 
@@ -182,6 +183,7 @@ The release order is:
 11. storage-mongodb
 12. auth
 13. fullstack
+14. seo
 
 The script checks package coverage, version consistency, typechecks, tests,
 builds and npm package contents.
@@ -193,6 +195,16 @@ Perform a dry run first:
 Inspect the output and confirm that every package is included.
 
 A dry run must not publish packages, create commits or create Git tags.
+It does run Copilot changelog generation and restores all version, lockfile and
+changelog changes afterwards. Copilot usage may consume premium requests.
+
+After validation, Copilot reads the files changed since the current version's
+release tag (`v<current-version>`) and returns release notes for every package.
+Fetch that tag before releasing; it must be an ancestor of HEAD.
+The script prepends a dated version entry to each package's `CHANGELOG.md`,
+incorporates any Unreleased notes, and preserves previous release history.
+Packages without substantive changes receive a lockstep version-bump note.
+Invalid or incomplete Copilot output stops the release before publishing.
 
 ## 7. Publishing
 
@@ -214,9 +226,18 @@ Select one of:
 - minor
 - major
 
-The release procedure publishes packages in dependency order.
+After building, testing and validating package contents, the release procedure
+generates changelogs, stages all changes, commits the release and pushes the
+commit. Only then does it publish packages in dependency order.
+After every package is published, it creates and pushes the release tag.
 
-It then commits and tags the release and pushes the commit and tag.
+Failures before the commit restore version, lockfile and changelog changes.
+If the commit has already been created, it is preserved on failure.
+A failed push prevents npm publishing; resolve it before publishing manually.
+A failed npm publish leaves the pushed release commit intact. Inspect the
+registry, publish only missing packages at that version, then create and push
+the release tag after all packages are published. Do not rerun the version-bump
+script to recover an incomplete release.
 
 Do not interrupt a release after one or more packages have been published.
 
@@ -240,6 +261,7 @@ Verify each package on npm:
 - @puzzle-ui/storage-mongodb
 - @puzzle-ui/auth
 - @puzzle-ui/fullstack
+- @puzzle-ui/seo
 
 Verify:
 

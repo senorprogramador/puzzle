@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://puzzle-ui.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

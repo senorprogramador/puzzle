@@ -2,6 +2,11 @@
   "name": "@puzzle-ui/hooks",
   "version": "0.5.0",
   "description": "Reusable React hooks for Puzzle",
+  "homepage": "https://puzzle-ui.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
   "license": "MIT",
   "publishConfig": {
     "access": "public",
