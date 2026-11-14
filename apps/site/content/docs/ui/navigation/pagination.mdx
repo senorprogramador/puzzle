@@ -5,6 +5,9 @@ description: Navigate between pages of a larger collection.
 
 Pagination provides page-number and previous/next controls for content split across multiple pages. It supports both button-based state updates and URL-based links.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -97,3 +100,16 @@ Other native `nav` attributes are supported.
 - Pagination renders a labeled navigation landmark containing a list of controls.
 - The current page is identified with `aria-current="page"` and cannot be selected again.
 - Previous and next controls are disabled at the ends of the page range. Use descriptive custom labels when the defaults do not fit your language or context.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Accordion](/docs/ui/navigation/accordion)
+- [Carousel](/docs/ui/navigation/carousel)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

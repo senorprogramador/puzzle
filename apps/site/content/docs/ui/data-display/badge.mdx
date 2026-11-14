@@ -5,7 +5,12 @@ description: Badges attach a small count, label, or status indicator to another 
 
 Use the Badge component to annotate an element, such as an avatar or icon, with a count or status. Badge wraps its children and positions the indicator on a corner.
 
-Without children, Badge renders as an inline label. `anchorOrigin` and
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
+Without children, Badge renders as an inline label with a `span` root, so it
+can be used inside paragraphs. With children, it retains a `div` wrapper and
+must be placed outside paragraphs. `anchorOrigin` and
 `anchorOverlap` and `anchorOffset` apply only when the badge wraps an element. Text stays on one
 line, and the indicator grows to fit its content with padding.
 
@@ -191,3 +196,16 @@ Role colors use the `--puzzle-color-<role>` and `--puzzle-color-<role>-foregroun
 ## Accessibility
 
 Badge does not add any ARIA semantics. Screen readers read `content` as plain text next to the child, so for status dots or ambiguous counts, convey the meaning in the child's accessible name (for example `aria-label="Inbox, 4 unread"`).
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Alert](/docs/ui/data-display/alert)
+- [Avatar](/docs/ui/data-display/avatar)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

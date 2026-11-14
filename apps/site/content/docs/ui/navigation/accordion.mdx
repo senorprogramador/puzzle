@@ -3,6 +3,9 @@ title: Accordion
 description: Show and hide related sections of content.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import {
   ControlledAccordionExample,
   shippingItems,
@@ -175,3 +178,16 @@ Other native div attributes are forwarded to the root, except `children` and `on
 ## Accessibility
 
 Triggers are native buttons inside headings, with `aria-expanded` and `aria-controls`. Use Tab to move between enabled triggers and Enter or Space to toggle them. Keep headings concise and use the panel for longer content.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Carousel](/docs/ui/navigation/carousel)
+- [Link](/docs/ui/navigation/link)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

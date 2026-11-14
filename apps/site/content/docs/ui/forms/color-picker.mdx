@@ -5,6 +5,9 @@ description: Choose a color with an interactive picker, text input, or preset sw
 
 ColorPicker provides a trigger and popup for choosing a color. Users can adjust saturation and brightness, set hue and opacity, enter a CSS color value, or choose from preset swatches.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -132,3 +135,12 @@ Other native button attributes, including `id`, `name`, and `aria-*`, are forwar
 - Preset swatches are buttons with accessible names and pressed states. Give swatches a descriptive `label` when the raw color value is not meaningful.
 - The saturation/brightness area supports arrow keys; hold Shift to adjust in larger increments. Hue and opacity use native range inputs and support their standard keyboard controls.
 - Use Escape to close the popup; clicking outside also closes it.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

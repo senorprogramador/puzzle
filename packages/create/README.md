@@ -26,7 +26,8 @@ When Auth is enabled, the CLI adds client auth components and, for Next.js and T
 
 See the [Create documentation](https://puzzle-ui.com/docs/create) for framework-specific generated files, Tailwind setup, and Auth requirements.
 
-Puzzle is under active development and is not yet ready for production use. Review and test generated applications before using them in production.
+Review generated applications against your deployment, security, and
+accessibility requirements before release.
 
 ## Package details
 

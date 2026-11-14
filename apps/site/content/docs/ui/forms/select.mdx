@@ -3,6 +3,9 @@ title: Select
 description: Choose one or more options from a popup list.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import {
   ControlledSelectExample,
   fruitOptions,
@@ -419,3 +422,12 @@ Other supported button attributes, including `id`, `aria-label`, `aria-labelledb
 ## Accessibility
 
 Prefer a visible `label`; when omitted, provide `aria-label` or `aria-labelledby`. The combobox keeps DOM focus while its popup is open and exposes the highlighted option with `aria-activedescendant`. It supports arrow-key navigation, Home/End, typeahead, and Enter/Space to open or select. Escape closes the list. Keep custom option content non-interactive.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

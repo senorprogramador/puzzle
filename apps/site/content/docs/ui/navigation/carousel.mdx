@@ -3,6 +3,9 @@ title: Carousel
 description: Browse a collection of items with carousel navigation.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import {
   ControlledCarouselExample,
   carouselItems,
@@ -246,3 +249,12 @@ For custom controls within the controller, `useCarouselContext<T>()` exposes `it
 ## Accessibility
 
 Give each carousel a descriptive `ariaLabel`. Navigation elements must be real buttons with accessible names and forward their received props. They are disabled at the collection boundaries. Provide buttons rather than relying on pointer dragging alone.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Accordion](/docs/ui/navigation/accordion)
+- [Link](/docs/ui/navigation/link)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

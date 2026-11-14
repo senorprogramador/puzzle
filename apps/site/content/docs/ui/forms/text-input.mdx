@@ -3,6 +3,9 @@ title: Text Input
 description: Enter text, email addresses, phone numbers, or passwords.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -54,3 +57,16 @@ import { TextInput } from "@puzzle-ui/ui";
 | `className`             | `string`                                     | -             | Class on the outer span.                       |
 
 Other native input attributes and `ref` apply to the input. Prefix content is decorative and hidden from assistive technology; keep essential units or instructions in the label/description. Always provide a label.
+
+## Accessibility and keyboard behavior
+
+Use semantic content and provide accessible names for interactive controls. Native controls retain browser keyboard behavior; any custom interaction should be verified with a keyboard and assistive technology in your application. This API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

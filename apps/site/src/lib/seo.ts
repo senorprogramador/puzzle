@@ -23,7 +23,7 @@ export const PUBLISHER = {
 };
 
 export const SITE_DESCRIPTION =
-  "A thoughtfully crafted React UI framework. Build accessible, consistent and beautiful interfaces with Puzzle UI.";
+  "Puzzle is a TypeScript-first React design system and developer ecosystem for UI components, theme tokens, hooks, icons, page sections, SEO, authentication, and project scaffolding.";
 
 const SITE_ORIGIN = new URL(SITE_URL).origin;
 
@@ -31,7 +31,7 @@ const SOCIAL_IMAGE = {
   url: `${SITE_URL}/puzzle_social.png`,
   width: 1200,
   height: 675,
-  alt: "Puzzle UI — React UI framework",
+  alt: "Puzzle UI — TypeScript-first React design system",
   type: "image/png",
 };
 

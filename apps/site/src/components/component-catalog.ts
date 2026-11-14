@@ -245,6 +245,12 @@ export const components = [
     description: "Constrain content width with consistent page gutters.",
   },
   {
+    name: "Grid",
+    href: "/docs/ui/layout/grid",
+    icon: "lucide:layout-grid",
+    description: "Arrange responsive columns and rows with optional item spans.",
+  },
+  {
     name: "Page Layout",
     href: "/docs/ui/layout/page-layout",
     icon: "lucide:layout-dashboard",

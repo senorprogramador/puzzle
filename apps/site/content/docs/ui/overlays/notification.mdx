@@ -3,6 +3,9 @@ title: Notification
 description: Announce transient feedback with optional actions and persistent errors.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { NotificationExample } from "../../../../src/components/doc-examples";
 
 ## Import
@@ -95,3 +98,16 @@ notification.dismiss(id);
 | `NotificationViewport` | `notifications: NotificationItem[]`, `position: NotificationPosition`, `label: string`, `onDismiss: (id: string) => void` | Positioned accessible region rendering a list.         |
 
 `NotificationItem` is `NotificationOptions` with required `id`, `severity`, and `closable`. Error messages use assertive alerts; other severities use polite status announcements. Timers pause on hover, focus, window blur, and document hiding. Use persistent messages for actions users must not miss; do not make a short-lived notification the only place an important error appears.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Command](/docs/ui/overlays/command)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

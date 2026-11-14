@@ -3,6 +3,9 @@ title: File Upload
 description: Select, validate, and upload files with a keyboard-accessible dropzone.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import {
   FileUploadProgressExample,
   FileUploadSelectionExample,
@@ -303,3 +306,12 @@ Other supported div attributes are forwarded to the outer wrapper. `children` an
 The dropzone is keyboard focusable and uses button semantics. Enter and Space open the native picker; disabled dropzones are skipped by Tab. Removal and retry controls have filename-specific accessible names.
 
 The selected-file list announces additions and removals politely. Rejection messages use an alert, upload errors and completion use status messages, and progress bars have file-specific labels. Drag feedback is supplementary: users can always choose files with the keyboard instead.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

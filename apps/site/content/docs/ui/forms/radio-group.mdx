@@ -3,6 +3,9 @@ title: Radio Group
 description: Choose one option from a labelled group.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -88,3 +91,16 @@ Render `Radio` inside `RadioGroup`; every option needs a unique `value`. `name` 
 | `disabled`          | `boolean`   | `false`  | Disables this option.       |
 
 Group props extend native fieldset attributes. Radio forwards supported input props and refs; `className`/`style` target its label. Arrow keys select enabled options; Home/End reach the boundaries.
+
+## Accessibility and keyboard behavior
+
+Use semantic content and provide accessible names for interactive controls. Native controls retain browser keyboard behavior; any custom interaction should be verified with a keyboard and assistive technology in your application. This API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

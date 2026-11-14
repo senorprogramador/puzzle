@@ -5,6 +5,9 @@ description: Responsive images with loading states, fallbacks, and framework ima
 
 The Image component provides a consistent way to display images with responsive sizing, loading placeholders, and fallback content. It renders a native HTML `<img>` by default and can also use an image component configured for your framework.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -241,3 +244,16 @@ type ImageSourceData = {
 - Use `alt=""` when an image is decorative so assistive technology can ignore it.
 - If `fallback` communicates image content, the component exposes it as an image with the provided `alt` text.
 - Native image attributes and event handlers are forwarded to the rendered image element.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Alert](/docs/ui/data-display/alert)
+- [Avatar](/docs/ui/data-display/avatar)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

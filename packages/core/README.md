@@ -4,9 +4,8 @@ Framework-independent utilities shared by all Puzzle packages.
 
 **Documentation:** [https://puzzle-ui.com/docs/getting-started](https://puzzle-ui.com/docs/getting-started)
 
-> [!WARNING]
-> **Puzzle is not ready for production use.** APIs and package exports may
-> change without notice. Use it for experimentation and evaluation.
+See the [package documentation](https://puzzle-ui.com/docs/getting-started)
+for API and compatibility details.
 
 `@puzzle-ui/core` contains the small, dependency-free helpers that
 [`@puzzle-ui/ui`](https://puzzle-ui.com/docs/ui),

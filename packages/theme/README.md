@@ -4,10 +4,8 @@ Design tokens, color themes, typography, fonts, and theme scoping for Puzzle.
 
 **Documentation:** [https://puzzle-ui.com/docs/theme](https://puzzle-ui.com/docs/theme)
 
-> [!WARNING]
-> **Puzzle is not ready for production use.** APIs, tokens, and package
-> exports may change without notice. Use it for experimentation and
-> evaluation.
+See the [theme documentation](https://puzzle-ui.com/docs/theme) for API
+maturity and compatibility details.
 
 `@puzzle-ui/theme` is the source of truth for Puzzle's visual design. Its
 `Theme` provider turns a typed token object into CSS custom properties

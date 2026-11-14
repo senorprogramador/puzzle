@@ -3,6 +3,9 @@ title: Stepper
 description: Show progress through a sequence of steps.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { ControlledStepperExample } from "../../../../src/components/doc-examples";
 
 Stepper shows progress through a sequence. It does not render panels or validate a form: your application owns the content and the rules for advancing.
@@ -198,3 +201,12 @@ Other native ordered-list attributes are forwarded to the root.
 Clickable steps use roving focus: arrow keys move focus (in either orientation), Home and End move to the first and last selectable step, and Enter or Space activates the focused step. With the default `linear` behavior, steps ahead of the active step cannot be selected.
 
 The active list item exposes `aria-current="step"`. Give the ordered list a descriptive `aria-label` when there are multiple progress indicators.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

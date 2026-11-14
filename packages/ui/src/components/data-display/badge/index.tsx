@@ -69,8 +69,10 @@ const Badge = ({
     className,
   );
 
+  const Component = children == null ? "span" : "div";
+
   return (
-    <div className={classes}>
+    <Component className={classes}>
       {children}
       <span
         className={cn(
@@ -94,7 +96,7 @@ const Badge = ({
       >
         {content}
       </span>
-    </div>
+    </Component>
   );
 };
 

@@ -3,6 +3,9 @@ title: Label
 description: Associate visible text with a form control.
 ---
 
+<Badge content="Experimental" color="info" /> **API maturity: Experimental.** This API is not yet sufficiently validated; expect change. This label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -48,3 +51,16 @@ Match `htmlFor` to a control's `id`. Indicators are visual cues: configure `requ
 | `optional` | `boolean`   | `false`  | Adds optional text.                |
 
 Standard native label attributes, `className`, and `style` are supported.
+
+## Accessibility and keyboard behavior
+
+Use semantic content and provide accessible names for interactive controls. Native controls retain browser keyboard behavior; any custom interaction should be verified with a keyboard and assistive technology in your application. This API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

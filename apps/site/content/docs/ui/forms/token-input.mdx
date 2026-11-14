@@ -5,6 +5,9 @@ description: Enter verification codes and short tokens using individual characte
 
 TokenInput displays a short token as a row of native inputs. It supports numeric and alphanumeric values, automatic focus advancement, pasting, masking, and native form submission.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -173,3 +176,12 @@ Other supported native `div` attributes, including `className`, `style`, and `da
 - `id` and `ref` target the first input, allowing external labels and programmatic focus.
 - Keep error messages visible and explain how to recover, such as requesting a new verification code.
 - Prefer short token lengths. Long rows may exceed narrow containers; choose a length and size appropriate to the available space.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

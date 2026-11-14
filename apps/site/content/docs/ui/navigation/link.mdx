@@ -3,6 +3,9 @@ title: Link
 description: Theme-styled links with optional router integration.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -42,3 +45,16 @@ Use Link for navigation and Button for actions. New-tab links automatically incl
 | `target`, `rel`  | `string`                  | -        | Native link attributes with new-tab protection. |
 
 Native anchor attributes and refs are forwarded. The theme can configure a link component and its destination prop; the core UI remains router-independent. Use `aria-current="page"` for the current route.
+
+## Accessibility and keyboard behavior
+
+Use semantic content and provide accessible names for interactive controls. Native controls retain browser keyboard behavior; any custom interaction should be verified with a keyboard and assistive technology in your application. This API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Accordion](/docs/ui/navigation/accordion)
+- [Carousel](/docs/ui/navigation/carousel)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

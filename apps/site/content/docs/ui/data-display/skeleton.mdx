@@ -5,6 +5,9 @@ description: Skeletons are placeholders that hint at the shape of content while 
 
 Use the Skeleton component to reserve space for content that is still loading. It renders a muted block with a subtle shimmer, reducing layout shift and making loading states feel smoother.
 
+<Badge content="Experimental" color="info" /> **API maturity: Experimental.** This API is not yet sufficiently validated; expect change. This label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -131,3 +134,16 @@ Skeleton renders an empty `<span>` with `aria-hidden="true"`, so it is ignored b
 ### Reduced motion
 
 When the user prefers reduced motion, the shimmer animation is disabled and only the static placeholder is shown.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Alert](/docs/ui/data-display/alert)
+- [Avatar](/docs/ui/data-display/avatar)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

@@ -5,6 +5,8 @@ description: Render Iconify icons as React SVG components and style them with CS
 
 <code>@puzzle-ui/icons</code> provides a React `Icon` component backed by Iconify. Pass an Iconify-prefixed icon name such as `lucide:house`; the package does not export each icon as a separate React component.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** The `Icon` API is functional and tested but may evolve; this label does not guarantee production readiness.
+
 ## Install
 
 <PackageManagerTabs>
@@ -106,6 +108,9 @@ Icon(props: IconProps): import("react").JSX.Element
 ## SSR and production notes
 
 The component can be included in server-rendered React applications, but Iconify may load requested icon data asynchronously in the browser. Ensure the icon set is available under your network and Content Security Policy rules, or use a controlled asset strategy appropriate to your deployment. `showLoader` provides a visual loading indicator; it is not a substitute for an accessible status message when loading state matters to users.
+
+For theme-aware colors, see [Design tokens](/docs/theme/tokens). For labeled
+actions that contain decorative icons, use the [Button component](/docs/ui/actions/button).
 
 ## Exports
 

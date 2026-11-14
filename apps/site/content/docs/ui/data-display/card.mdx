@@ -5,6 +5,9 @@ description: Cards group related content and actions into a single, self-contain
 
 Use the Card component to present a unit of related content, such as a summary, a product, or a settings group. Compose it from the Card parts to get consistent spacing and structure.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -247,3 +250,12 @@ The component exports `CardProps`, `CardPartProps`, `CardVariant`, `CardSize`, a
 - `CardTitle` renders an `<h3>`. Use `as` to pick the level that fits the page's heading hierarchy.
 - For a clickable card, render the card as `a` or `button` with `as` rather than adding a click handler to a `div`. Avoid nesting other interactive controls inside it.
 - The card has no implicit role. Add `role`, `aria-labelledby`, or similar only when the card represents a meaningful landmark or group.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Alert](/docs/ui/data-display/alert)
+- [Avatar](/docs/ui/data-display/avatar)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

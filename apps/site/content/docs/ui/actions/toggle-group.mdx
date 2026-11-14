@@ -5,6 +5,9 @@ description: Toggle groups let users select one or more options from a related s
 
 Use the ToggleGroup component to present a set of related toggle buttons. Choose single selection for mutually exclusive options or multiple selection when users can choose several.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -257,3 +260,12 @@ Moving focus does not change the selection. Selection changes when an item is ac
 ### Disabled state
 
 Disabled items cannot be activated and are skipped during keyboard navigation. Disabling the group disables every item.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Button Group](/docs/ui/actions/button-group)
+- [Button](/docs/ui/actions/button)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

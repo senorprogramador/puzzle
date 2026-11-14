@@ -3,6 +3,9 @@ title: Dropdown Menu
 description: An accessible, keyboard-navigable menu of actions anchored to a trigger.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { DropdownMenuExample } from "../../../../src/components/doc-examples";
 
 DropdownMenu displays a set of actions in a popout attached to a trigger. Its compound components support grouped actions, checkable options, and mutually exclusive choices.
@@ -113,3 +116,12 @@ Checkbox items can also use `defaultChecked` when uncontrolled. Radio groups acc
 | `DropdownMenu.RadioItem`    | `value`, `closeOnSelect`, `disabled`, `textValue`, `onSelect`                                        | Choice within a radio group; closes on selection by default.                                                                                                             |
 
 Items also accept standard button attributes, and groups, labels, separators, and content accept standard div attributes. Item `onSelect` receives the triggering mouse event. Each item supports `textValue` for keyboard typeahead when its text content is unsuitable.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Command](/docs/ui/overlays/command)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

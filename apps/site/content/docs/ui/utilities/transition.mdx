@@ -3,6 +3,9 @@ title: Transition
 description: Animate mounting and unmounting with reusable CSS transition templates.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { TransitionExample } from "../../../../src/components/doc-examples";
 
 ## Import
@@ -48,3 +51,16 @@ const [visible, setVisible] = useState(true);
 | `className`                                  | `string`                                                                                           | `""`             | Animated element classes.                       |
 
 Remaining native props target the wrapper or cloned child. Built-in styles respect reduced-motion preferences. Custom transitions should do the same. Hidden content should not contain reachable interactive controls; consider unmounting rather than keeping such content mounted.
+
+## Accessibility and keyboard behavior
+
+Use semantic content and provide accessible names for interactive controls. Native controls retain browser keyboard behavior; any custom interaction should be verified with a keyboard and assistive technology in your application. This API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Preview](/docs/ui/utilities/preview)
+- [Scroll Lock](/docs/ui/utilities/scroll-lock)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

@@ -5,6 +5,9 @@ description: Paper is a basic surface that lifts content off the page with a con
 
 Use the Paper component as a neutral surface when you need an elevated container without the structure of a Card.
 
+<Badge content="Experimental" color="info" /> **API maturity: Experimental.** This API is not yet sufficiently validated; expect change. This label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -91,3 +94,16 @@ The component exports `PaperProps<C extends ElementType>`. The generic follows t
 ## Accessibility
 
 Paper is purely presentational and adds no role or semantics. Choose a semantic element with `as` when the surface represents a landmark, and provide an accessible name where needed.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Alert](/docs/ui/data-display/alert)
+- [Avatar](/docs/ui/data-display/avatar)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

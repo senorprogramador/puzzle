@@ -3,6 +3,9 @@ title: Popout
 description: Low-level anchored positioning for custom floating content.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -55,3 +58,16 @@ Popout positions content and handles opening/dismissal without imposing menu, to
 | `className`, `contentClassName`        | `string`                                 | -          | Floating wrapper/content classes.                |
 
 Supply appropriate accessible relationships for custom interactive content. Hover-only opening must not be the only way to reach essential information. Do not use a disabled element as the only trigger.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Command](/docs/ui/overlays/command)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

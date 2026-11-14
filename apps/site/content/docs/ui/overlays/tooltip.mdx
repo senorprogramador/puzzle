@@ -3,6 +3,9 @@ title: Tooltip
 description: Short, non-interactive supplementary information for a trigger.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { ControlledTooltipExample } from "../../../../src/components/doc-examples";
 
 Tooltip provides a short hint on hover or keyboard focus. Use a focusable trigger that forwards its ref and event handlers, such as a native button or Puzzle `Button`.
@@ -143,4 +146,13 @@ return (
 
 The popup has `role="tooltip"` and is linked to its trigger with `aria-describedby`; an existing description relationship is preserved. Keep a meaningful accessible name on the trigger itself, and do not put essential information only in a tooltip.
 
-Tooltip content must not be interactive: keyboard users cannot reach it because it closes when focus leaves the trigger. Use [Popover](/docs/components/ui/overlays/popover) for links, buttons, form controls, or a close button.
+Tooltip content must not be interactive: keyboard users cannot reach it because it closes when focus leaves the trigger. Use [Popover](/docs/ui/overlays/popover) for links, buttons, form controls, or a close button.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Command](/docs/ui/overlays/command)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

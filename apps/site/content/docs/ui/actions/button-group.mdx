@@ -5,6 +5,9 @@ description: Button groups organize related actions into a single, coherent cont
 
 Use the ButtonGroup component to visually group related buttons. It arranges its children together without changing their individual behavior or appearance.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -176,3 +179,12 @@ The group does not add custom keyboard behavior. Each child control retains its 
 ### Disabled state
 
 `disabled` sets `aria-disabled` on the group but does not prevent interaction with its children. Apply each child control's disabled state as needed.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Button](/docs/ui/actions/button)
+- [Toggle Group](/docs/ui/actions/toggle-group)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

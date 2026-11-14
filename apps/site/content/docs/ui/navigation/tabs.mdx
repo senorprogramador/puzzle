@@ -3,6 +3,9 @@ title: Tabs
 description: Switch between related panels of content.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { ControlledTabsExample } from "../../../../src/components/doc-examples";
 
 Organize related content into panels, with a single selected tab at a time. Compose `Tabs` with direct `Tabs.Tab` children, each with a unique `id`.
@@ -198,3 +201,12 @@ Other native div attributes are forwarded to the root, except `onChange`.
 ## Accessibility
 
 Tabs use automatic activation: arrow-key focus changes the selected panel. Horizontal tabs use Left/Right; vertical tabs use Up/Down. Home and End move to the first and last enabled tab. Tab buttons expose `aria-selected` and `aria-controls`, and each panel is labelled by its trigger.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Accordion](/docs/ui/navigation/accordion)
+- [Carousel](/docs/ui/navigation/carousel)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

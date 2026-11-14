@@ -5,6 +5,9 @@ description: Preview content in an isolated frame sized to its content or device
 
 Use `Preview` to display a component in an isolated iframe, with optional source code and device-size controls.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -136,3 +139,12 @@ At 1024px and wider all three are shown. This does not change the selected devic
 ## Accessibility
 
 Each instance generates its own tab, panel, and iframe-root IDs, so multiple previews can share a page. Preview/Code tabs support arrow-key activation. Device buttons use arrow keys to move focus and Enter or Space to select. Copy feedback is announced through a live region.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Scroll Lock](/docs/ui/utilities/scroll-lock)
+- [Transition](/docs/ui/utilities/transition)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

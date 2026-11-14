@@ -20,6 +20,7 @@ import {
   Stack,
   Text,
   Heading,
+  Grid,
 } from "@puzzle-ui/ui";
 import "./home.css";
 import { Header } from "@/components/layout/header";
@@ -40,9 +41,9 @@ const features = [
   },
   {
     number: "02",
-    title: "Accessibility first",
+    title: "Accessibility informed",
     description:
-      "Keyboard navigation, focus management, semantic markup and screen reader support are part of the foundation.",
+      "Semantic markup, keyboard navigation, focus management, and screen reader behavior are considered in the component design.",
   },
   {
     number: "03",
@@ -52,7 +53,50 @@ const features = [
   },
 ];
 
-const codeExample = `import { Button, Card, Heading, Text } from "@puzzle/ui";
+const ecosystem = [
+  {
+    name: "UI components",
+    href: "/docs/ui",
+    description: "Composable React components with typed props and examples.",
+  },
+  {
+    name: "Theme and design tokens",
+    href: "/docs/theme",
+    description: "Theme provider, semantic tokens, colors, and typography.",
+  },
+  {
+    name: "React hooks",
+    href: "/docs/hooks",
+    description: "Keyboard shortcuts and roving-focus utilities.",
+  },
+  {
+    name: "Icons",
+    href: "/docs/icons",
+    description: "Iconify-backed React SVG icons and styling guidance.",
+  },
+  {
+    name: "Pieces",
+    href: "/docs/pieces/components/hero",
+    description: "Composed hero sections built from shared UI primitives.",
+  },
+  {
+    name: "SEO",
+    href: "/docs/seo",
+    description: "Metadata, structured data, sitemaps, and robots utilities.",
+  },
+  {
+    name: "Authentication",
+    href: "/docs/fullstack",
+    description: "Authentication client, server, and framework integrations.",
+  },
+  {
+    name: "Project scaffolding",
+    href: "/docs/create",
+    description: "Generate a React application configured for Puzzle.",
+  },
+] as const;
+
+const codeExample = `import { Button, Card, Heading, Text } from "@puzzle-ui/ui";
 
 export function Welcome() {
   return (
@@ -220,7 +264,7 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
       <div className="home-preview__footer">
         <span>
           <span className="home-preview__status" />
-          All components ready
+          Interactive example
         </span>
         <span>Built with Puzzle</span>
       </div>
@@ -287,15 +331,16 @@ const Home = () => {
                 >
                   <Stack direction="col" alignV="center" alignH="start">
                     <Heading level="headline1" as="h1">
-                      Interfaces,
+                      A TypeScript-first
                       <br />
-                      <span>beautifully</span> composed.
+                      <span>React design system.</span>
                     </Heading>
 
                     <Text className="home-hero__description">
-                      A thoughtfully crafted React UI framework for developers
-                      who care about the details. Build accessible, consistent
-                      and beautiful interfaces without getting in your way.
+                      Compose typed UI components with shared theme tokens,
+                      hooks, icons, page sections, and developer tools. Puzzle
+                      brings a design system and a growing React ecosystem
+                      together.
                     </Text>
                   </Stack>
                   <Stack
@@ -325,7 +370,7 @@ const Home = () => {
                     </span>
                     <span>
                       <span className="home-hero__check">✓</span>
-                      Accessibility focused
+                      Accessibility informed
                     </span>
                     <span>
                       <span className="home-hero__check">✓</span>
@@ -351,8 +396,8 @@ const Home = () => {
                   <div className="home-hero__floating home-hero__floating--bottom">
                     <span className="home-floating-check">✓</span>
                     <div>
-                      <strong>Accessible by default</strong>
-                      <span>Built for everyone.</span>
+                      <strong>Accessibility in focus</strong>
+                      <span>Semantics, labels, focus, and keyboard use.</span>
                     </div>
                   </div>
                 </div>
@@ -371,7 +416,9 @@ const Home = () => {
                 <span className="home-strip__line" />
                 <span>ENDLESS POSSIBILITIES</span>
                 <span className="home-strip__line" />
-                <span>BUILT FOR: REACT | NEXT.JS | TANSTACK START</span>
+                <span>
+                  REACT DESIGN SYSTEM | SHARED TOKENS | DEVELOPER TOOLS
+                </span>
               </Stack>
             </Section>
 
@@ -517,6 +564,38 @@ const Home = () => {
               </Stack>
             </Section>
 
+            <Section id="ecosystem" className="home-below-fold">
+              <Stack direction="col" alignH="center" gap="xl">
+                <Stack direction="col" alignH="start" alignV="center">
+                  <Badge color="secondary" content="The Puzzle ecosystem" />
+                  <Heading level="headline1" as="h2">
+                    More than components.
+                  </Heading>
+                  <Text className="home-hero__description">
+                    Start with the UI package and add the parts your React
+                    application needs. Capabilities and framework integrations
+                    are documented by package.
+                  </Text>
+                </Stack>
+
+                <Grid columns={{ mobile: 1, tablet: 2, desktop: 2 }}>
+                  {ecosystem.map((item) => (
+                    <Card as="a" interactive href={item.href} key={item.href}>
+                      <CardHeader>
+                        <CardTitle>{item.name}</CardTitle>
+                        <CardDescription>{item.description}</CardDescription>
+                      </CardHeader>
+                    </Card>
+                  ))}
+                </Grid>
+
+                <Text className="home-hero__description">
+                  Component API maturity and package-specific compatibility
+                  notes are documented with each package.
+                </Text>
+              </Stack>
+            </Section>
+
             <Section className="home-developer home-below-fold" id="developers">
               <Stack
                 className="home-developer__layout"
@@ -655,7 +734,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "A thoughtfully crafted React UI framework. Build accessible, consistent and beautiful interfaces with Puzzle UI.",
+          "Puzzle is a TypeScript-first React design system and developer ecosystem for UI components, theme tokens, hooks, icons, page sections, SEO, authentication, and project scaffolding.",
       },
       {
         property: "og:url",

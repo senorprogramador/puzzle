@@ -40,7 +40,7 @@ The package exports `AuthError` and specialized subclasses with stable `code` va
 
 Core and lifecycle operations write auth audit events to the configured collection. MFA operations also record security-relevant factor and challenge events. Use those records for appropriate audit and incident-response workflows, while applying retention and access control for your environment. Do not treat audit records as application tracing spans or add credential contents to telemetry.
 
-For application-wide telemetry guidance, see [Observability](/docs/observability). For server handlers, cookie and CSRF integration, and framework adapters, see [`@puzzle-ui/fullstack`](/docs/fullstack) and the [developer authentication guide](/docs/developer/authentication).
+For server handlers, cookie and CSRF integration, and framework adapters, see [`@puzzle-ui/fullstack`](/docs/fullstack) and the [developer authentication guide](/docs/developer/authentication).
 
 ## Scope
 

@@ -3,6 +3,9 @@ title: Portal
 description: Render content into a document target without changing React ownership.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { PortalExample } from "../../../../src/components/doc-examples";
 
 ## Import
@@ -48,3 +51,16 @@ Without a target ID, or if it is not found, Portal uses `document.body`. It rend
 | `children` | `ReactNode` | -        | Optional content already inside the target. |
 
 Native div attributes and refs are supported. React context and event propagation follow the React tree; DOM layout and reading order follow the target location. Portal does not add dialog semantics, focus management, or scroll locking.
+
+## Accessibility and keyboard behavior
+
+Use semantic content and provide accessible names for interactive controls. Native controls retain browser keyboard behavior; any custom interaction should be verified with a keyboard and assistive technology in your application. This API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Command](/docs/ui/overlays/command)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

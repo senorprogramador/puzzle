@@ -3,6 +3,9 @@ title: Command
 description: Searchable, keyboard-navigable command lists and command palettes.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import {
   CommandDialogExample,
   CommandExample,
@@ -127,3 +130,12 @@ Use `loading` and `loadingMessage` while searching asynchronously. `emptyMessage
 | `onSelect`    | `() => void` | Optional item-specific selection callback.           |
 
 When selected, an item's `onSelect` runs before the component's `onSelect`. `CommandDialog` then requests that the dialog close.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Context Menu](/docs/ui/overlays/context-menu)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

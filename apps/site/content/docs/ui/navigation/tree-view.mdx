@@ -3,6 +3,9 @@ title: Tree View
 description: Navigate and select items in a keyboard-accessible hierarchy.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -101,3 +104,12 @@ Each item needs a stable unique ID. Supply `textValue` for rich labels so typeah
 Items require `id` and `label`; optional fields are `href`, `textValue`, `icon`, `endAdornment`, `children`, `hasChildren`, `disabled`, `selectable`, and `data`. Disabled branches can still expand. Clicking anywhere on a group row (a branch without `href`) toggles it; linked branches navigate and expand via their arrow. Set `expandOnItemClick={false}` to select groups on click instead. Rendering state contains `expanded`, `selected`, `focused`, `loading`, `disabled`, and `hasChildren`.
 
 Arrow keys move through the hierarchy; Home/End reach boundaries, Enter activates, and Space selects. Re-collapse and re-expand a failed lazy branch to retry. Keep nested buttons and links out of custom row content.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Accordion](/docs/ui/navigation/accordion)
+- [Carousel](/docs/ui/navigation/carousel)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

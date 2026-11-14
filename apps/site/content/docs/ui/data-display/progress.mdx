@@ -5,6 +5,9 @@ description: Progress indicators show that work is underway, either as a bar or 
 
 Puzzle provides two progress indicators: LinearProgress for a horizontal bar and CircularProgress for a spinner. Both are determinate when given a `value` and indeterminate when `value` is omitted.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -162,3 +165,16 @@ Both indicators default to `--puzzle-color-primary`, so they follow light, dark,
 - Always provide an accessible name with `aria-label` or `aria-labelledby`.
 - CircularProgress sets `aria-label="Loading..."` by default; override it with a more specific label, such as the task being performed.
 - For long-running or important operations, also announce completion in a live region so assistive technology users know when work finishes.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Alert](/docs/ui/data-display/alert)
+- [Avatar](/docs/ui/data-display/avatar)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

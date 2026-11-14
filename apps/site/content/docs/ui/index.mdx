@@ -7,6 +7,12 @@ description: Browse all Puzzle UI component documentation, grouped by purpose.
 interfaces with consistent theme tokens, layout, and interaction patterns.
 Use this index to find a component's examples, props, and accessibility guidance.
 
+Most documented component APIs are **Beta**. Paper, Skeleton, Label, Background,
+Breadcrumbs, Sidebar, and Backdrop are **Experimental** because their current
+validation evidence is limited. These labels describe API maturity, not
+production readiness. Review each component's documented accessibility and
+framework limitations when integrating it.
+
 ## Getting started
 
 Follow the [Getting Started guide](/docs/getting-started) for installation and
@@ -90,6 +96,7 @@ Structure pages, arrange content, and manage scrolling or resizable regions.
 - [Breadcrumbs](/docs/ui/layout/breadcrumbs)
 - [Collapsable Sidebar](/docs/ui/layout/collapsable-sidebar)
 - [Container](/docs/ui/layout/container)
+- [Grid](/docs/ui/layout/grid)
 - [Page Layout](/docs/ui/layout/page-layout)
 - [Resizable Panels](/docs/ui/layout/resizable-panels)
 - [Scroll Area](/docs/ui/layout/scroll-area)
@@ -147,3 +154,9 @@ Components consume shared CSS custom properties rather than defining a separate
 theme system. See [Theme](/docs/theme) for an overview,
 [Design Tokens](/docs/theme/tokens) for customization, and
 [Colors](/docs/theme/colors) for light, dark, and scoped color schemes.
+
+The UI package targets React 19 and React DOM 19 and does not require a router.
+Framework-specific and server-rendering compatibility are not guaranteed.
+Explore [React hooks](/docs/hooks), [icons](/docs/icons), and
+[composed page sections](/docs/pieces/components/hero) elsewhere in the Puzzle
+ecosystem.

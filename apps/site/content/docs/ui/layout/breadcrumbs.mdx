@@ -3,6 +3,9 @@ title: Breadcrumbs
 description: Show a page's position in a navigation hierarchy.
 ---
 
+<Badge content="Experimental" color="info" /> **API maturity: Experimental.** This API is not yet sufficiently validated; expect change. This label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -42,3 +45,16 @@ Provide linked ancestors followed by a current-page item without `href`. The las
 | `aria-label` | `string`                                           | `"Breadcrumbs"` | Navigation landmark name.                    |
 
 Each item has `label: ReactNode` and optional `leadingIcon: ReactNode`; ancestor items require `href: string`. Native nav attributes are forwarded. Use concise labels and keep the path meaningful on narrow screens.
+
+## Accessibility and keyboard behavior
+
+Use semantic content and provide accessible names for interactive controls. Native controls retain browser keyboard behavior; any custom interaction should be verified with a keyboard and assistive technology in your application. This API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [App Bar](/docs/ui/layout/app-bar)
+- [Aspect Ratio](/docs/ui/layout/aspect-ratio)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

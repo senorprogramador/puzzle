@@ -3,6 +3,9 @@ title: Resizable Panels
 description: Split an area into panels that users resize with a pointer or keyboard.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { ControlledResizablePanelsExample } from "../../../../src/components/doc-examples";
 
 ## Import
@@ -212,3 +215,12 @@ The handle's hit area uses `--puzzle-resizable-panels-handle-size`, which defaul
 ```
 
 The divider line uses the theme's border colors and shows the focus ring color while dragging. The state is reflected in `data-orientation`, `data-disabled`, and `data-resizing` attributes.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [App Bar](/docs/ui/layout/app-bar)
+- [Aspect Ratio](/docs/ui/layout/aspect-ratio)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

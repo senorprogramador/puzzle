@@ -3,6 +3,9 @@ title: Number Input
 description: Enter bounded numeric values with increment controls.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -59,3 +62,12 @@ Use `initialValue` for uncontrolled input, or `value` and `onChange` for control
 | `decrementLabel`, `incrementLabel` | `string`                  | `"Decrease value"`, `"Increase value"` | Accessible control labels.                         |
 
 Native input attributes such as `name`, `disabled`, `readOnly`, and `aria-describedby` are supported. Arrow keys increment/decrement; PageUp/PageDown apply `largeStep`. Use a visible label.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

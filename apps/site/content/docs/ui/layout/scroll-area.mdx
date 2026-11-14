@@ -5,6 +5,9 @@ description: Create accessible, theme-aware scrollable regions with native brows
 
 Scroll Area provides a constrained viewport for overflowing content. It keeps browser-native scrolling and keyboard behavior while applying Puzzle's scrollbar styling.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -139,3 +142,12 @@ A Scroll Area needs a constrained dimension to overflow:
 The scrollbar thumb uses `--puzzle-color-border` and follows the active light, dark, or scoped theme.
 
 Scrollbar rendering and visibility remain subject to the browser and operating-system settings.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [App Bar](/docs/ui/layout/app-bar)
+- [Aspect Ratio](/docs/ui/layout/aspect-ratio)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

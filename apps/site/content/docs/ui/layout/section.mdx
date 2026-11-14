@@ -3,6 +3,9 @@ title: Section
 description: Theme-aware page sections with consistent content spacing.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -54,3 +57,16 @@ Use `fullWidth` to leave content unconstrained without container gutters, or
 | `className` | `string`                                                                 | -           | Root class.                        |
 
 `compactTop`, `compactBottom`, and `divider` are internal coordination props set by `SectionStack`; prefer composing sections rather than setting them manually. Section does not forward arbitrary native DOM attributes.
+
+## Accessibility and keyboard behavior
+
+Use semantic content and provide accessible names for interactive controls. Native controls retain browser keyboard behavior; any custom interaction should be verified with a keyboard and assistive technology in your application. This API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [App Bar](/docs/ui/layout/app-bar)
+- [Aspect Ratio](/docs/ui/layout/aspect-ratio)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

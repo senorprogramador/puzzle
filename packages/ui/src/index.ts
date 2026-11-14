@@ -310,6 +310,19 @@ export {
 export { Container, type ContainerProps } from "./components/layout/container";
 
 export {
+  Grid,
+  GridItem,
+  type GridProps,
+  type GridItemProps,
+  type GridGap,
+  type GridAlignment,
+  type GridTracks,
+  type GridSpan,
+  type GridLine,
+  type GridAutoFlow,
+} from "./components/layout/grid";
+
+export {
   PageLayout,
   type PageLayoutProps,
   type SidebarPlacement,

@@ -3,6 +3,9 @@ title: Backdrop
 description: A dismissible background layer for custom overlays.
 ---
 
+<Badge content="Experimental" color="info" /> **API maturity: Experimental.** This API is not yet sufficiently validated; expect change. This label does not guarantee production readiness.
+
+
 import { BackdropExample } from "../../../../src/components/doc-examples";
 
 ## Import
@@ -46,3 +49,16 @@ const [open, setOpen] = useState(false);
 | `children`        | `ReactNode`   | -       | Overlay content.                                |
 
 Native props are forwarded. Only the top overlay handles dismissal. For custom modal content, provide an accessible dialog name/role and mark its content root with `data-overlay-content`; Backdrop itself does not provide dialog semantics. It does not create a portal.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Command](/docs/ui/overlays/command)
+- [Context Menu](/docs/ui/overlays/context-menu)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

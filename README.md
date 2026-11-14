@@ -1,27 +1,20 @@
 # Puzzle
 
-**Puzzle is an early-stage React UI library and application toolkit.**
+**Puzzle is a TypeScript-first React design system and developer ecosystem.**
 
-It provides reusable UI components, design tokens, theme utilities, composed interface sections, and tools for building React applications.
+It brings together UI components, theme tokens, hooks, icons, composed page
+sections, SEO utilities, authentication integrations, and project scaffolding.
 
-> [!WARNING]
-> **Puzzle is not ready for production use.**
->
-> The project is under active development. APIs, component props, package exports, styling, and package boundaries may change without notice. Components may be incomplete, and testing, accessibility, documentation, and framework compatibility are not guaranteed. Use Puzzle for experimentation and evaluation only, not for production applications.
+## Ecosystem capabilities
 
-## Project status
+Puzzle brings together reusable React UI components, shared design tokens,
+composed UI sections, authentication and session infrastructure, framework
+integrations, project scaffolding, and developer tooling. Component API
+maturity and package-specific compatibility notes are documented with each
+package.
 
-Puzzle is a work in progress. Its current focus includes:
-
-- Reusable React UI components.
-- Shared design tokens and theme utilities.
-- Composed UI sections and larger building blocks.
-- Authentication and session infrastructure.
-- Framework integrations.
-- A project generator and developer tooling.
-- Documentation and component previews.
-
-Do not assume that every package or API is stable.
+The [component API stability audit](docs/api-stability-audit.md) records the
+current UI and Pieces component classifications and their evidence.
 
 ## Packages
 

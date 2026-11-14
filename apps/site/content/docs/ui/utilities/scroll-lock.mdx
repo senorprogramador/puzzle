@@ -3,6 +3,9 @@ title: Scroll Lock
 description: Lock document scrolling while preserving existing body styles.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { ScrollLockExample } from "../../../../src/components/doc-examples";
 
 ## Import
@@ -40,3 +43,16 @@ const [enabled, setEnabled] = useState(false);
 | `enabled` | `boolean` | `true`  | Lock the document containing the component. |
 
 ScrollLock renders a hidden marker, not a content wrapper. Multiple locks are coordinated per document; scrolling is restored only after the final lock releases. Existing inline styles and scroll position are preserved, with scrollbar compensation and iOS handling. It does not trap focus or create modal semantics; `Dialog` and modal `Backdrop` already include it.
+
+## Accessibility and keyboard behavior
+
+Use semantic content and provide accessible names for interactive controls. Native controls retain browser keyboard behavior; any custom interaction should be verified with a keyboard and assistive technology in your application. This API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Preview](/docs/ui/utilities/preview)
+- [Transition](/docs/ui/utilities/transition)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

@@ -3,6 +3,9 @@ title: Form Field
 description: Connect a label, description, and validation message to a control.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -56,3 +59,16 @@ Pass one control as the direct child. Form Field supplies its ID, required/disab
 | `controlId`                        | `string`               | Existing child ID or generated | Actual control ID.                                   |
 
 Native div attributes apply to the root. Custom controls must forward the supplied accessibility attributes to their actual form element.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

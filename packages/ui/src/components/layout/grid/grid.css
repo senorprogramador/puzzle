@@ -1,0 +1,63 @@
+.puzzle-grid {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: var(--puzzle-grid-columns-mobile);
+    grid-template-rows: var(--puzzle-grid-rows-mobile);
+    row-gap: var(--puzzle-grid-row-gap-mobile);
+    column-gap: var(--puzzle-grid-column-gap-mobile);
+    justify-items: var(--puzzle-grid-align-h-mobile);
+    align-items: var(--puzzle-grid-align-v-mobile);
+    grid-auto-flow: var(--puzzle-grid-auto-flow-mobile);
+}
+
+.puzzle-grid > * {
+    min-width: 0;
+}
+
+.puzzle-grid-item {
+    grid-column: var(--puzzle-grid-item-column-start-mobile) / var(--puzzle-grid-item-column-end-mobile);
+    grid-row-end: var(--puzzle-grid-item-row-span-mobile);
+    grid-row-start: var(--puzzle-grid-item-row-start-mobile);
+    justify-self: var(--puzzle-grid-item-align-h-mobile);
+    align-self: var(--puzzle-grid-item-align-v-mobile);
+}
+
+@media (min-width: 768px) {
+    .puzzle-grid {
+        grid-template-columns: var(--puzzle-grid-columns-tablet);
+        grid-template-rows: var(--puzzle-grid-rows-tablet);
+        row-gap: var(--puzzle-grid-row-gap-tablet);
+        column-gap: var(--puzzle-grid-column-gap-tablet);
+        justify-items: var(--puzzle-grid-align-h-tablet);
+        align-items: var(--puzzle-grid-align-v-tablet);
+        grid-auto-flow: var(--puzzle-grid-auto-flow-tablet);
+    }
+
+    .puzzle-grid-item {
+        grid-column: var(--puzzle-grid-item-column-start-tablet) / var(--puzzle-grid-item-column-end-tablet);
+        grid-row-end: var(--puzzle-grid-item-row-span-tablet);
+        grid-row-start: var(--puzzle-grid-item-row-start-tablet);
+        justify-self: var(--puzzle-grid-item-align-h-tablet);
+        align-self: var(--puzzle-grid-item-align-v-tablet);
+    }
+}
+
+@media (min-width: 1024px) {
+    .puzzle-grid {
+        grid-template-columns: var(--puzzle-grid-columns-desktop);
+        grid-template-rows: var(--puzzle-grid-rows-desktop);
+        row-gap: var(--puzzle-grid-row-gap-desktop);
+        column-gap: var(--puzzle-grid-column-gap-desktop);
+        justify-items: var(--puzzle-grid-align-h-desktop);
+        align-items: var(--puzzle-grid-align-v-desktop);
+        grid-auto-flow: var(--puzzle-grid-auto-flow-desktop);
+    }
+
+    .puzzle-grid-item {
+        grid-column: var(--puzzle-grid-item-column-start-desktop) / var(--puzzle-grid-item-column-end-desktop);
+        grid-row-end: var(--puzzle-grid-item-row-span-desktop);
+        grid-row-start: var(--puzzle-grid-item-row-start-desktop);
+        justify-self: var(--puzzle-grid-item-align-h-desktop);
+        align-self: var(--puzzle-grid-item-align-v-desktop);
+    }
+}

@@ -3,6 +3,9 @@ title: Popover
 description: A non-modal dialog anchored to a trigger, for interactive content.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { ControlledPopoverExample } from "../../../../src/components/doc-examples";
 
 Popover opens on click and contains an interactive, non-modal dialog. Use a focusable trigger that forwards its ref and event handlers, such as Puzzle `Button`.
@@ -156,4 +159,17 @@ return (
 
 The dialog has `role="dialog"`. The trigger exposes `aria-haspopup="dialog"`, `aria-expanded`, and, while open, `aria-controls`.
 
-Use [Tooltip](/docs/components/ui/overlays/tooltip) for short, non-interactive hints.
+Use [Tooltip](/docs/ui/overlays/tooltip) for short, non-interactive hints.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Command](/docs/ui/overlays/command)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

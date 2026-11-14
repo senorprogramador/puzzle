@@ -3,6 +3,9 @@ title: App Bar
 description: Responsive application branding and navigation.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -53,3 +56,16 @@ The app bar adapts its navigation to a mobile drawer. Resize the preview to see 
 | `className`                   | `string`                                                                   | -                   | Root styling hook.                                    |
 
 Use descriptive destinations and label icon-only actions. Place sticky bars in `PageLayout.Header` to scope their measured layout offset to that page. Make the header region itself sticky (`position: sticky; top: 0`) when it wraps the bar, so the wrapper does not limit its sticky travel.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Aspect Ratio](/docs/ui/layout/aspect-ratio)
+- [Background](/docs/ui/layout/background)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

@@ -7,6 +7,9 @@ Use `TextEditor` to edit a serializable `TextDocument`, `TextEditorToolbar` to
 provide formatting controls, and `TextRenderer` to display the saved document
 without editing controls.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -109,3 +112,12 @@ variants. Inline marks include bold, italic, underline, and strike.
 The formatting toolbar uses labeled buttons, pressed states, and arrow-key
 navigation. Keep it inside the editor's `toolbar` prop and provide an
 `ariaLabel` when multiple formatting toolbars need distinct names.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Text](/docs/ui/typography/text)
+- [Card](/docs/ui/data-display/card)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

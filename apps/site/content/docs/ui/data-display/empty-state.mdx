@@ -5,6 +5,9 @@ description: Help people understand when a collection has no content and what to
 
 Use an empty state when a list, search, or other content area has nothing to show. Explain why it is empty when that is useful, and offer a relevant next step when one is available.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -106,3 +109,16 @@ All parts accept `children`. `EmptyState` and each part also accept the native a
 - Keep the title concise and ensure its `h3` level fits the surrounding heading hierarchy.
 - Use a clear description and an actionable control when a useful next step exists; do not rely on an icon or color alone to explain the empty state.
 - Leave decorative media unnamed so it stays hidden from assistive technology. Label media only when it adds information not already present in the text.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Alert](/docs/ui/data-display/alert)
+- [Avatar](/docs/ui/data-display/avatar)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

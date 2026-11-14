@@ -237,6 +237,11 @@ const layout: TreeViewItem = {
       href: `${folder}/layout/container`,
     },
     {
+      id: "ui-grid",
+      label: "Grid",
+      href: `${folder}/layout/grid`,
+    },
+    {
       id: "ui-page-layout",
       label: "Page Layout",
       href: `${folder}/layout/page-layout`,

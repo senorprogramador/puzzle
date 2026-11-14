@@ -41,7 +41,7 @@ const buildLlmsTxt = (): string => {
 
     "",
 
-    "Puzzle UI is an open-source React UI component library built around reusable components, TypeScript-first APIs, accessibility and shared design tokens.",
+    "Puzzle is an open-source, TypeScript-first React design system and developer ecosystem with UI components, theme tokens, hooks, icons, composed page sections, SEO utilities, authentication integrations, and project scaffolding.",
 
     "",
 
@@ -61,9 +61,9 @@ const buildLlmsTxt = (): string => {
 
     "",
 
-    "## Project status",
+    "## API maturity and compatibility",
 
-    "The documentation currently states that Puzzle UI is under active development and is not ready for production use. APIs, props, exports, styling, accessibility and framework compatibility may change.",
+    "Component API maturity and package-specific compatibility notes are documented in the relevant package guides.",
 
     "",
   ].join("\n");

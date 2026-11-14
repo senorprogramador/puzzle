@@ -3,11 +3,13 @@ title: Heroes
 description: Responsive hero sections and layouts for websites, applications and landing pages.
 ---
 
-# Heroes
-
 Heroes are introductory sections that establish the visual identity of a page.
 
 Puzzle Pieces provides a flexible Hero component and a collection of specialized presets. All presets share the same underlying implementation, making them easy to customize without maintaining separate layouts.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** The Hero API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+The generic Hero component and all presets listed here are Beta. Their maturity describes API stability, not production readiness.
 
 ## Installation
 
@@ -26,28 +28,28 @@ import {
 
 ## Components
 
-| Component            | Description                      |
-| -------------------- | -------------------------------- |
-| Hero                 | Generic hero component           |
-| SplitHero            | Text and media side by side      |
-| CenteredHero         | Centered introduction            |
-| FullScreenHero       | Full viewport introduction       |
-| VideoHero            | Background video                 |
-| ImageHero            | Background image with overlay    |
-| MinimalHero          | Minimal introduction             |
-| EditorialHero        | Editorial layout                 |
-| AgencyHero           | Agency and consultancy websites  |
-| ProductHero          | Product introductions            |
-| SaaSHero             | SaaS product websites            |
-| StoreHero            | Online stores and collections    |
-| RestaurantHero       | Restaurants and hospitality      |
-| AccommodationHero    | Hotels and holiday accommodation |
-| PrintShopHero        | Printing businesses              |
-| DashboardWelcomeHero | Dashboard introductions          |
-| AppHero              | Web application introductions    |
-| CampaignHero         | Campaign landing pages           |
-| ComingSoonHero       | Pre-launch pages                 |
-| SearchHero           | Search-oriented websites         |
+| Component            | Description                      | API maturity |
+| -------------------- | -------------------------------- | ------------ |
+| Hero                 | Generic hero component           | <Badge content="Beta" color="info" /> |
+| SplitHero            | Text and media side by side      | <Badge content="Beta" color="info" /> |
+| CenteredHero         | Centered introduction            | <Badge content="Beta" color="info" /> |
+| FullScreenHero       | Full viewport introduction       | <Badge content="Beta" color="info" /> |
+| VideoHero            | Background video                 | <Badge content="Beta" color="info" /> |
+| ImageHero            | Background image with overlay    | <Badge content="Beta" color="info" /> |
+| MinimalHero          | Minimal introduction             | <Badge content="Beta" color="info" /> |
+| EditorialHero        | Editorial layout                 | <Badge content="Beta" color="info" /> |
+| AgencyHero           | Agency and consultancy websites  | <Badge content="Beta" color="info" /> |
+| ProductHero          | Product introductions            | <Badge content="Beta" color="info" /> |
+| SaaSHero             | SaaS product websites            | <Badge content="Beta" color="info" /> |
+| StoreHero            | Online stores and collections    | <Badge content="Beta" color="info" /> |
+| RestaurantHero       | Restaurants and hospitality      | <Badge content="Beta" color="info" /> |
+| AccommodationHero    | Hotels and holiday accommodation | <Badge content="Beta" color="info" /> |
+| PrintShopHero        | Printing businesses              | <Badge content="Beta" color="info" /> |
+| DashboardWelcomeHero | Dashboard introductions          | <Badge content="Beta" color="info" /> |
+| AppHero              | Web application introductions    | <Badge content="Beta" color="info" /> |
+| CampaignHero         | Campaign landing pages           | <Badge content="Beta" color="info" /> |
+| ComingSoonHero       | Pre-launch pages                 | <Badge content="Beta" color="info" /> |
+| SearchHero           | Search-oriented websites         | <Badge content="Beta" color="info" /> |
 
 ## Basic usage
 
@@ -1016,9 +1018,36 @@ Always provide meaningful alternative text for informative images.
 
 Use one primary heading per page where appropriate.
 
+Hero itself is not a focusable control and adds no keyboard interaction. Tab
+order comes from interactive descendants such as `actions` and `search`; make
+those controls accessible by name and verify their keyboard behavior in your
+application.
+
+## Compatibility
+
+The package targets React and React DOM 19. Hero does not depend on a router;
+framework-specific and server-rendering compatibility are not guaranteed and
+should be verified in the target application.
+
 ## API reference
 
 ### Hero properties
+
+`Hero` and the general presets accept `HeroProps`. `ImageHero` and `VideoHero`
+also have exported specialized types that make their media source required:
+
+```ts
+type ImageHeroProps = Omit<HeroProps, "backgroundImage"> & {
+  backgroundImage: string;
+};
+
+type VideoHeroProps = Omit<HeroProps, "backgroundVideo"> & {
+  backgroundVideo: HeroVideoSource;
+};
+```
+
+The other presets use `HeroProps`; the package does not export separate named
+props types for each preset.
 
 | Property         | Type              | Default |
 | ---------------- | ----------------- | ------- |
@@ -1103,3 +1132,7 @@ type HeroVideoSource = {
   poster?: string;
 };
 ```
+
+Related packages: [UI components](/docs/ui),
+[theme tokens](/docs/theme/tokens), and
+[Getting Started](/docs/getting-started).

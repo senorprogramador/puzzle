@@ -5,6 +5,9 @@ description: An accessible contextual menu opened at the pointer or through keyb
 
 A Context Menu displays actions related to a specific area or element. It opens at the pointer location on right-click, and also supports keyboard activation and touch long-press.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -171,3 +174,12 @@ const [open, setOpen] = useState(false);
 | `ContextMenu.RadioItem `    | `value `, `disabled `, `onSelect `                                   | Option within a radio group.                                          |
 
 Items accept standard button attributes. Content, groups, labels, and separators accept standard div attributes.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Command](/docs/ui/overlays/command)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

@@ -3,6 +3,9 @@ title: Autocomplete
 description: Search options, select multiple values, or accept custom text.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { AutocompleteExample } from "../../../../src/components/doc-examples";
 
 ## Import
@@ -161,3 +164,12 @@ const [value, setValue] = useState<string | undefined>();
 | `className`, `inputClassName`, `popoverClassName`, `menuClassName`, `optionClassName` | `string`                                 | -                                            | Scoped styling hooks.                        |
 
 Options support `id`, `value`, `label`, `description`, `group`, and `disabled`. Standard input attributes and refs are supported. Arrow keys navigate, Enter selects, and Escape closes. Custom renderers must not nest interactive controls inside options.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Color Picker](/docs/ui/forms/color-picker)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

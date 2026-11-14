@@ -5,6 +5,9 @@ description: Maintain consistent proportions for images, videos, and other conte
 
 The AspectRatio component maintains a consistent width-to-height proportion for its content.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 It uses the native CSS aspect-ratio property, making it suitable for responsive media containers, image galleries, video embeds, and other layouts where predictable proportions are important.
 
 ## Import
@@ -360,3 +363,12 @@ When displaying images:
 - Avoid using CSS backgrounds for images that convey meaningful information.
 
 When embedding videos or iframes, provide an accessible title and ensure that the embedded content remains usable with a keyboard.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [App Bar](/docs/ui/layout/app-bar)
+- [Background](/docs/ui/layout/background)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

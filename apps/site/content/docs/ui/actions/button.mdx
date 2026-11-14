@@ -3,11 +3,16 @@ title: Button
 description: Buttons allow users to perform actions and navigate through your application.
 ---
 
-They provide clear visual feedback and communicate the importance and intent of an action.
+The Button component triggers an action or navigates to a URL while making
+the intent and importance of that action clear.
 
-The Puzzle Button component supports both native buttons and links. When a `href` is provided, the component automatically renders a Puzzle `Link` instead of a native `<button>`.
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
 
-[Read more about the Link component here](/docs/components/link).
+
+With no `href`, Button renders a native `<button>`. When `href` is provided,
+it renders a Puzzle `Link` instead.
+
+[Read more about the Link component here](/docs/ui/navigation/link).
 
 ## Import
 
@@ -429,3 +434,12 @@ Do not rely on the visual appearance of an icon to communicate its meaning to as
 ### Reduced motion
 
 The Button respects the user's reduced-motion preference. Transitions and loading animations are adjusted when `prefers-reduced-motion: reduce` is active.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Button Group](/docs/ui/actions/button-group)
+- [Toggle Group](/docs/ui/actions/toggle-group)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

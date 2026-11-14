@@ -3,6 +3,9 @@ title: Switch
 description: Toggle a setting on or off.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -50,3 +53,16 @@ Use a switch for an immediate binary setting. The label should name the setting 
 | `className`            | `string`                               | -       | Class on the wrapping label.            |
 
 Standard input attributes such as `name`, `value`, and `aria-label` are supported. The input has `role="switch"`; Space toggles it. Supply an accessible name when omitting the label.
+
+## Keyboard behavior
+
+Native controls retain browser keyboard behavior. Verify the component and its interactive content with a keyboard in your application; the API maturity label is not an accessibility certification.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

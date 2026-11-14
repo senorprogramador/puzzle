@@ -3,6 +3,9 @@ title: Date Picker
 description: Choose a single date from an accessible calendar popup.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import {
   ControlledDatePickerExample,
   DatePickerFormExample,
@@ -416,3 +419,12 @@ The trigger exposes `aria-haspopup="dialog"`, `aria-expanded`, and `aria-control
 | Tab/Shift + Tab                      | Closes the calendar and resumes tab navigation from the trigger.             |
 
 Month changes are announced politely. Provide visible explanations for unavailable dates and validation errors rather than relying only on disabled styling.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

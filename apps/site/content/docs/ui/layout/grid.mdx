@@ -1,0 +1,189 @@
+---
+title: Grid
+description: Responsive CSS Grid layouts with theme spacing, auto-fit columns, and optional item placement.
+---
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** The Grid API is
+functional and tested but may evolve; this label does not guarantee production
+readiness.
+
+`@puzzle-ui/ui` requires React and React DOM `^19.0.0`. Grid uses native CSS
+Grid without browser measurements or layout effects, so it can render on the
+server; framework integration requires React 19 support.
+
+## Import
+
+```tsx
+import { Grid, GridItem } from "@puzzle-ui/ui";
+import type { GridProps, GridItemProps } from "@puzzle-ui/ui";
+```
+
+## Responsive columns
+
+Grid uses native CSS Grid, not Flexbox. It defaults to one equal-width column,
+medium spacing, and stretched items. Like Stack, it supports `as`, theme gaps,
+and horizontal/vertical alignment. Use Stack for one-dimensional flex layouts;
+use Grid when columns and rows need to line up.
+
+Ordinary children work directly: Grid renders only its root and never wraps or
+clones children. GridItem is optional and renders only the element you select.
+There are no layout effects, resize listeners, or client-only measurements.
+
+<Preview
+  code={`\
+<Grid columns={{ mobile: 1, tablet: 2, desktop: 3 }} gap="md">
+  <Button>First</Button>
+  <Button>Second</Button>
+  <Button>Third</Button>
+</Grid>
+`}
+>
+  <Grid columns={{ mobile: 1, tablet: 2, desktop: 3 }} gap="md">
+    <Button>First</Button>
+    <Button>Second</Button>
+    <Button>Third</Button>
+  </Grid>
+</Preview>
+
+Responsive props accept a scalar or `{ mobile, tablet?, desktop? }`. Mobile is
+required in objects. Values inherit independently at larger breakpoints:
+`mobile` is the base, `tablet` starts at 768px, and `desktop` starts at 1024px.
+These are viewport breakpoints, not container queries.
+
+## Auto-fit to the available space
+
+Use `minChildWidth` to create as many columns as fit the container, without
+choosing breakpoints. Remaining space is shared equally. The minimum is clamped
+to the container width so narrow containers do not overflow just to meet it.
+`minChildWidth` takes precedence over `columns` when both are supplied.
+
+<Preview
+  code={`\
+<Grid minChildWidth="12rem" gap="sm">
+  <Button>Design</Button>
+  <Button>Develop</Button>
+  <Button>Deliver</Button>
+</Grid>
+`}
+>
+  <div style={{ width: "100vw" }}>
+    <Grid minChildWidth="12rem" gap="sm">
+      <Button>Design</Button>
+      <Button>Develop</Button>
+      <Button>Test</Button>
+      <Button>Deliver</Button>
+    </Grid>
+  </div>
+</Preview>
+
+## Spanning and placement
+
+Use GridItem only where a child needs its own placement or alignment.
+Choose a semantic element or an existing component with `as` instead of adding
+a wrapper around it.
+
+<Preview
+  code={`\
+<Grid as="section" aria-label="Overview" columns={{ mobile: 1, tablet: 3 }}>
+  <GridItem as="h3" colSpan="full">Project overview</GridItem>
+  <GridItem colSpan={{ mobile: 1, tablet: 2 }}>
+    Main content
+  </GridItem>
+  <GridItem as="aside" alignV="start">Supporting content</GridItem>
+</Grid>
+`}
+>
+  <Grid as="section" aria-label="Overview" columns={{ mobile: 1, tablet: 3 }}>
+    <GridItem as="h3" colSpan="full">
+      Project overview
+    </GridItem>
+    <GridItem colSpan={{ mobile: 1, tablet: 2 }}>Main content</GridItem>
+    <GridItem as="aside" alignV="start">
+      Supporting content
+    </GridItem>
+  </Grid>
+</Preview>
+
+`colSpan="full"` spans from line 1 to -1 of the explicit columns. Numeric spans
+must fit the available columns at each breakpoint unless you intentionally want
+implicit tracks. `colStart` and `rowStart` accept positive or negative CSS grid
+line numbers, or `"auto"`. An explicit `colStart` overrides the start line
+normally selected by `colSpan`, including `"full"`.
+
+For unequal tracks, named lines, areas, or advanced layouts, pass CSS track
+strings and standard styles:
+
+```tsx
+<Grid
+  columns="minmax(0, 2fr) minmax(0, 1fr)"
+  rows="auto 1fr"
+  rowGap="lg"
+  columnGap="sm"
+  style={{ gridAutoRows: "minmax(4rem, auto)", alignContent: "start" }}
+>
+  <GridItem colStart={2} rowStart={1} rowSpan={2}>
+    Sidebar
+  </GridItem>
+  <article>Main content</article>
+</Grid>
+```
+
+## Grid API
+
+All layout props below accept responsive values.
+
+| Prop                  | Type                                          | Default     | Description                                                                                                        |
+| --------------------- | --------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------ |
+| `columns`             | `number \| string`                            | `1`         | Positive integer for equal tracks, or a CSS `grid-template-columns` string.                                        |
+| `rows`                | `number \| string`                            | `"none"`    | Positive integer for equal tracks, or a CSS `grid-template-rows` string. Implicit rows size to content by default. |
+| `minChildWidth`       | `string`                                      | -           | CSS length for auto-fit columns; overrides `columns`.                                                              |
+| `gap`                 | `"0" \| "xs" \| "sm" \| "md" \| "lg" \| "xl"` | `"md"`      | Theme spacing for both axes.                                                                                       |
+| `rowGap`, `columnGap` | Same as `gap`                                 | `gap`       | Independent axis spacing. An axis override replaces `gap` for that axis at all breakpoints.                        |
+| `alignH`              | `"start" \| "center" \| "end" \| "stretch"`   | `"stretch"` | Horizontal item alignment (`justify-items`).                                                                       |
+| `alignV`              | Same as `alignH`                              | `"stretch"` | Vertical item alignment (`align-items`).                                                                           |
+| `autoFlow`            | CSS `grid-auto-flow`                          | `"row"`     | Auto-placement direction; supports `"column"`, `"dense"`, `"row dense"`, and `"column dense"`.                     |
+
+`as` defaults to `"div"` and is not responsive. Native props, event handlers,
+`className`, `style`, and React 19 `ref` are forwarded to that root, with types
+matching the selected element or component. Custom components must forward
+these props and render a layout-capable element. User styles take precedence
+over component layout styles.
+
+## GridItem API
+
+All placement and alignment props accept responsive values.
+
+| Prop                   | Type                                                  | Default  | Description                                                                 |
+| ---------------------- | ----------------------------------------------------- | -------- | --------------------------------------------------------------------------- |
+| `colSpan`              | `number \| "full"`                                    | `1`      | Positive column span, or all explicit columns.                              |
+| `rowSpan`              | `number`                                              | `1`      | Positive row span.                                                          |
+| `colStart`, `rowStart` | `number \| "auto"`                                    | `"auto"` | Non-zero integer grid line. Full-column spans start at 1 unless overridden. |
+| `alignH`               | `"auto" \| "start" \| "center" \| "end" \| "stretch"` | `"auto"` | Per-item horizontal alignment (`justify-self`).                             |
+| `alignV`               | Same as `alignH`                                      | `"auto"` | Per-item vertical alignment (`align-self`).                                 |
+
+GridItem also accepts `as` (default `"div"`) and native props, styles, classes,
+and refs matching that element. It must be a direct grid child for placement
+to apply. Custom CSS placement is also available on ordinary children through
+`style={{ gridColumn: "1 / -1" }}`.
+
+Numeric counts and spans must be positive integers; start lines must be non-zero
+integers. Invalid numbers throw a `RangeError`, including in responsive values.
+CSS strings are passed to the browser unchanged and must be valid CSS.
+
+## Accessibility
+
+Grid adds no ARIA role or keyboard interaction. A visual CSS grid is not an ARIA
+`grid` widget. Use semantic content such as `as="ul"` with `GridItem as="li"`,
+and preserve meaningful reading and focus order.
+
+Explicit placement and dense auto-flow can change visual order without changing
+DOM or keyboard order; avoid them when that would make content confusing.
+`start` and `end` follow the document's writing direction, including RTL.
+Long content can overflow its cell; choose wrapping or scrolling on that content
+when necessary. Grid does not hide overflow.
+
+## Related documentation
+
+- [Stack](/docs/ui/layout/stack)
+- [Container](/docs/ui/layout/container)
+- [Theme design tokens](/docs/theme/tokens)

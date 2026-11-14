@@ -5,6 +5,9 @@ description: Pair an input with leading or trailing text and actions.
 
 InputGroup visually combines an input with add-ons, such as a URL prefix, unit, or action button. It is composed around existing input components and does not change their value or form behavior.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -75,3 +78,12 @@ Both components accept `children`. Add-ons forward custom attributes such as `da
 - Give the input an accessible label, for example with `aria-label` or a surrounding `FormField`.
 - Use text add-ons for useful units or context; keep essential instructions in the input's label or description.
 - Interactive elements inside add-ons remain keyboard-operable. Visual positioning does not alter their DOM or focus order.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Autocomplete](/docs/ui/forms/autocomplete)
+- [Checkbox](/docs/ui/forms/checkbox)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

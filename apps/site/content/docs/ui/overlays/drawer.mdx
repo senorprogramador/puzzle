@@ -3,6 +3,9 @@ title: Drawer
 description: A resizable modal panel attached to a viewport edge.
 ---
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 import { DrawerExample } from "../../../../src/components/doc-examples";
 
 ## Import
@@ -51,3 +54,12 @@ const [open, setOpen] = useState(false);
 | `children`        | `ReactNode`                              | -          | Drawer content.                           |
 
 Supported div attributes and classes are forwarded to content. Drawer provides a modal backdrop, focus management, and scroll locking, but does not portal itself. Wrap it in `Portal` if ancestors would clip or constrain it. Backdrop clicks request closing; include an explicit close action.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Backdrop](/docs/ui/overlays/backdrop)
+- [Command](/docs/ui/overlays/command)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

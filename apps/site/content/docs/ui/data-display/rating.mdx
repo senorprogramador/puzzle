@@ -5,6 +5,9 @@ description: Display and collect star-based ratings with keyboard and pointer su
 
 Use the Rating component to display a score or let users select one. It supports controlled and uncontrolled values, half-star precision, and a read-only display mode.
 
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+
+
 ## Import
 
 ```tsx
@@ -142,3 +145,12 @@ Arrow keys change the value using the configured precision; Home and End move to
 Read-only ratings are exposed as images with an accessible name that includes the current score.
 
 Star icons are decorative and hidden from assistive technology.
+
+**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+
+## Related documentation
+
+- [Alert](/docs/ui/data-display/alert)
+- [Avatar](/docs/ui/data-display/avatar)
+- [Theme design tokens](/docs/theme/tokens)
+- [UI component index](/docs/ui)

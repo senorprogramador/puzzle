@@ -35,7 +35,7 @@ import {
 import { TanStackLink } from "../components/navigation/link/link";
 
 const rootSeoHead = createSeoHead({
-  title: "Accessible React UI Components",
+  title: "TypeScript-First React Design System",
   description: SITE_DESCRIPTION,
   locale: "en-US",
   author: SITE_NAME,
@@ -153,12 +153,12 @@ function SitePageStructuredData() {
   return (
     <LDWebPage
       id={`${SITE_URL}/#webpage`}
-      name="Accessible React UI Components"
+      name="TypeScript-First React Design System"
       description={SITE_DESCRIPTION}
       url={HOME_URL}
       inLanguage="en-US"
       about={{
-        "@id": `${SITE_URL}/#organization`,
+        "@id": `${SITE_URL}/#software`,
       }}
       isPartOf={{
         "@id": `${SITE_URL}/#website`,
@@ -228,7 +228,7 @@ function RootDocument({
               description={SITE_DESCRIPTION}
               inLanguage="en-US"
               publisher={{
-                "@id": `${SITE_URL}/#organization`,
+                "@id": "https://senorprogramador.com/#organization",
               }}
             />
 
