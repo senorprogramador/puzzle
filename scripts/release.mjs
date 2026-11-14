@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { createInterface } from "node:readline/promises";
@@ -56,7 +56,7 @@ const fail = (message) => {
   throw new ReleaseError(message);
 };
 
-const run = (command, args, { cwd = root, capture = false } = {}) => {
+const run = (command, args, { cwd = root, capture = false, allowMissing = false } = {}) => {
   const result = spawnSync(command, args, {
     cwd,
     encoding: "utf8",
@@ -64,6 +64,9 @@ const run = (command, args, { cwd = root, capture = false } = {}) => {
   });
 
   if (result.error) {
+    if (allowMissing && result.error.code === "ENOENT") {
+      return { ok: false, missing: true, stdout: "", stderr: result.error.message };
+    }
     fail(`Could not run "${command}": ${result.error.message}`);
   }
 
@@ -151,11 +154,69 @@ const askReleaseType = async () => {
   }
 };
 
-const ensureNpmAuthentication = () => {
+const runNpmWithBrowserPrompt = (args, cwd = root) => new Promise((resolve, reject) => {
+  const command = `npm ${args.join(" ")}`;
+  const terminalArgs = process.platform === "darwin"
+    ? ["-q", "/dev/null", "npm", ...args]
+    : process.platform === "linux"
+      ? ["-q", "-e", "-c", command, "/dev/null"]
+      : null;
+
+  if (!terminalArgs) {
+    reject(new ReleaseError("Automatic npm browser confirmation requires macOS or Linux."));
+    return;
+  }
+
+  // macOS script requires a pipe or terminal, not Node's stdin socket.
+  const child = spawn("bash", ["-c", 'script "$@" < <(cat)', "bash", ...terminalArgs], {
+    cwd,
+    stdio: ["pipe", "pipe", "inherit"],
+  });
+  let output = "";
+  let inputError;
+  const wasPaused = process.stdin.isPaused();
+  process.stdin.pipe(child.stdin, { end: false });
+  child.stdin.on("error", (error) => {
+    // npm may exit while terminal input is still being forwarded.
+    if (error.code !== "EPIPE") {
+      inputError = error;
+    }
+  });
+  child.stdout.on("data", (chunk) => {
+    process.stdout.write(chunk);
+    output += chunk.toString();
+    const prompt = /Press ENTER to open in the browser[^\r\n]*/i.exec(output);
+    if (prompt) {
+      child.stdin.write("\n");
+      output = output.slice(prompt.index + prompt[0].length);
+    }
+    output = output.slice(-1024);
+  });
+  const cleanup = () => {
+    process.stdin.unpipe(child.stdin);
+    if (wasPaused) {
+      process.stdin.pause();
+    }
+  };
+  child.on("error", (error) => {
+    cleanup();
+    reject(new ReleaseError(`Could not run npm in a terminal: ${error.message}`));
+  });
+  child.on("close", (code) => {
+    cleanup();
+    if (inputError) {
+      reject(new ReleaseError(`Could not forward npm terminal input: ${inputError.message}`));
+    } else {
+      resolve({ ok: code === 0 });
+    }
+  });
+});
+
+const ensureNpmAuthentication = async () => {
   while (!run("npm", ["whoami"], { capture: true }).ok) {
     log("npm requires authentication. Waiting for npm login...");
 
-    if (!run("npm", ["login"]).ok) {
+    if (!(await runNpmWithBrowserPrompt(["login", "--auth-type=web"])).ok) {
       fail("npm login failed.");
     }
   }
@@ -202,7 +263,7 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
 
   log(`Generating package changelogs with Copilot since ${baseline}`);
 
-  const result = run("copilot", [
+  const args = [
     "--prompt", prompt,
     "--silent",
     "--no-ask-user",
@@ -211,10 +272,17 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
     "--allow-tool", "shell(git diff)",
     "--allow-tool", "shell(git log)",
     "--deny-tool", "write",
-  ], { capture: true });
+  ];
+  let result = run("copilot", args, { capture: true, allowMissing: true });
+  if (result.missing) {
+    log("Copilot CLI is not on PATH; running @github/copilot through Bun's package cache");
+    result = run("bun", [
+      "x", "--silent", "--package", "@github/copilot", "copilot", ...args,
+    ], { capture: true });
+  }
 
   if (!result.ok) {
-    fail(`Copilot changelog generation failed.${result.stderr ? `\n${result.stderr}` : ""}`);
+    fail(`Copilot changelog generation failed.${result.stderr ? `\n${result.stderr}` : ""}\nAuthenticate first with "bun x --package @github/copilot copilot login".`);
   }
 
   let notes;
@@ -462,7 +530,7 @@ const main = async () => {
 
   try {
     if (!dryRun) {
-      ensureNpmAuthentication();
+      await ensureNpmAuthentication();
     }
 
     log("Publishing packages");
@@ -476,7 +544,11 @@ const main = async () => {
         ...(dryRun ? ["--dry-run"] : []),
       ];
 
-      runOrFail(`Publishing ${manifest.name}`, "npm", args, { cwd: dir });
+      if (dryRun) {
+        runOrFail(`Publishing ${manifest.name}`, "npm", args, { cwd: dir });
+      } else if (!(await runNpmWithBrowserPrompt(args, dir)).ok) {
+        fail(`Publishing ${manifest.name} failed.`);
+      }
 
       published.push(manifest.name);
     }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { chmod, copyFile, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, readFile, readdir, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -50,13 +50,19 @@ const createFixture = async (directory) => {
 
   const commandShim = `#!${process.execPath}
 import assert from "node:assert/strict";
-import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { spawnSync } from "node:child_process";
 const command = basename(process.argv[1]);
 const args = process.argv.slice(2);
 appendFileSync(join(process.env.FIXTURE_ROOT, "commands.jsonl"), JSON.stringify({ command, args, cwd: process.cwd() }) + "\\n");
-if (command === "git") {
+if (command === "script") {
+  const result = process.env.REAL_SCRIPT
+    ? spawnSync(process.env.REAL_SCRIPT, args, { stdio: "inherit" })
+    : spawnSync("npm", process.platform === "darwin" ? args.slice(3) : args[3].split(" ").slice(1), { stdio: "inherit" });
+  if (result.error) throw result.error;
+  process.exit(result.status ?? 1);
+} else if (command === "git") {
   if (process.env.REAL_GIT) {
     if (args[0] === process.env.FAIL_STEP) process.exit(1);
     const result = spawnSync(process.env.REAL_GIT, args, { stdio: "inherit" });
@@ -94,8 +100,30 @@ if (command === "git") {
   process.exit(result.status ?? 1);
 } else if (command === "npm") {
   if (process.env.DRY_RUN === "true") assert.ok(args.includes("--dry-run"), "Never publish during a dry run");
+  const authenticated = join(process.env.FIXTURE_ROOT, "npm-authenticated");
+  if (args[0] === "whoami" && process.env.NPM_LOGIN === "true" && !existsSync(authenticated)) process.exit(1);
   if (args[0] === process.env.FAIL_STEP) process.exit(1);
-} else if (command === "copilot") {
+  if (args[0] === "login" || (args[0] === "publish" && process.env.NPM_LOGIN === "true")) {
+    if (args[0] === "login") assert.ok(args.includes("--auth-type=web"));
+    process.stdout.write("Press ENTER to open ");
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    process.stdout.write("in the browser...");
+    const { createInterface } = await import("node:readline/promises");
+    const prompt = createInterface({ input: process.stdin, output: process.stdout });
+    const answer = await prompt.question("");
+    assert.equal(answer, "");
+    prompt.close();
+    writeFileSync(authenticated, "authenticated");
+    process.stdin.pause();
+  }
+} else if (command === "copilot" || (command === "bun" && args[0] === "x")) {
+  if (command === "bun") {
+    assert.deepEqual(args.slice(0, 5), ["x", "--silent", "--package", "@github/copilot", "copilot"]);
+    if (process.env.FAIL_STEP === "copilot-runner") {
+      console.error("Copilot authentication required");
+      process.exit(1);
+    }
+  }
   assert.ok(args.includes("--no-ask-user"));
   assert.ok(args.includes("read"));
   assert.ok(args.includes("bash,view,grep,glob"));
@@ -125,7 +153,7 @@ if (command === "git") {
   assert.equal(args[0], "run");
 }
 `;
-  for (const command of ["bun", "git", "npm", "copilot"]) {
+  for (const command of ["bun", "git", "npm", "copilot", "script"]) {
     const path = join(directory, "bin", command);
     await writeFile(path, commandShim);
     await chmod(path, 0o755);
@@ -133,6 +161,86 @@ if (command === "git") {
   await writeFile(join(directory, "bin/package.json"), '{"type":"module"}');
   return originals;
 };
+
+for (const failure of [undefined, "copilot-runner"]) {
+  test(`release without Copilot on PATH ${failure ? "reports runner failures and restores files" : "uses Bun's package runner"}`, async () => {
+    const directory = await mkdtemp(join(tmpdir(), "puzzle-release-runner-test-"));
+    try {
+      const originals = await createFixture(directory);
+      await rm(join(directory, "bin/copilot"));
+      const result = run(process.execPath, ["scripts/release.mjs", "--dry-run"], {
+        cwd: directory,
+        input: "minor\n",
+        env: {
+          ...process.env,
+          PATH: join(directory, "bin"),
+          REAL_BUN: bun,
+          FIXTURE_ROOT: directory,
+          FAIL_INSTALL: "",
+          FAIL_STEP: failure ?? "",
+          DRY_RUN: "true",
+        },
+      });
+      assert.equal(result.status, failure ? 1 : 0, result.stdout + result.stderr);
+      const commands = (await readFile(join(directory, "commands.jsonl"), "utf8"))
+        .trim().split("\n").map((line) => JSON.parse(line));
+      assert.equal(commands.filter(({ command, args }) => command === "bun" && args[0] === "x").length, 1);
+      assert.equal(commands.some(({ command }) => command === "copilot"), false);
+      if (failure) {
+        assert.match(result.stderr, /Copilot authentication required/);
+        assert.match(result.stderr, /Authenticate first/);
+        assert.equal(commands.some(({ command, args }) => command === "npm" && args[0] === "publish"), false);
+      }
+      for (const [path, content] of Object.entries(originals)) {
+        assert.equal(await readFile(join(directory, path), "utf8"), content, path);
+      }
+      assert.equal((await readdir(join(directory, "packages/ui"))).includes("CHANGELOG.md"), false);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+}
+
+for (const failure of [undefined, "login"]) {
+  test(`release automatically confirms npm browser prompts ${failure ? "and stops on login failure" : "for login and publishing"}`, async () => {
+    const directory = await mkdtemp(join(tmpdir(), "puzzle-release-npm-test-"));
+    try {
+      await createFixture(directory);
+      const result = run(process.execPath, ["scripts/release.mjs"], {
+        cwd: directory,
+        input: "minor\n",
+        timeout: 60000,
+        env: {
+          ...process.env,
+          PATH: `${join(directory, "bin")}:${process.env.PATH}`,
+          REAL_BUN: bun,
+          REAL_SCRIPT: process.platform === "darwin" || process.platform === "linux" ? "/usr/bin/script" : "",
+          FIXTURE_ROOT: directory,
+          FAIL_INSTALL: "",
+          FAIL_STEP: failure ?? "",
+          DRY_RUN: "false",
+          NPM_LOGIN: "true",
+        },
+      });
+      assert.equal(result.status, failure ? 1 : 0, result.stdout + result.stderr);
+      const commands = (await readFile(join(directory, "commands.jsonl"), "utf8"))
+        .trim().split("\n").map((line) => JSON.parse(line));
+      assert.equal(commands.filter(({ command, args }) => command === "npm" && args[0] === "login").length, 1);
+      const publishes = commands.filter(({ command, args }) => command === "npm" && args[0] === "publish");
+      assert.equal(publishes.length, failure ? 0 : 14);
+      for (const publish of publishes) {
+        assert.ok(publish.cwd.startsWith(join(await realpath(directory), "packages") + "/"));
+      }
+      if (failure) {
+        assert.match(result.stderr, /npm login failed/);
+      } else {
+        assert.equal(await readFile(join(directory, "npm-authenticated"), "utf8"), "authenticated");
+      }
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+}
 
 for (const failure of [undefined, "--lockfile-only", "--frozen-lockfile"]) {
   test(`release ${failure ? `restores files after ${failure} failure` : "refreshes and verifies the lockfile before a dry run"}`, async () => {
@@ -161,6 +269,7 @@ for (const failure of [undefined, "--lockfile-only", "--frozen-lockfile"]) {
       ]);
       assert.equal(commands.some(({ command }) => command === "npm"), !failure);
       assert.equal(commands.some(({ command }) => command === "copilot"), !failure);
+      assert.equal(commands.some(({ command, args }) => command === "bun" && args[0] === "x"), false);
       for (const [path, content] of Object.entries(originals)) {
         assert.equal(await readFile(join(directory, path), "utf8"), content, path);
       }
@@ -199,6 +308,7 @@ for (const failure of [
       const index = (command, action) => commands.findIndex((entry) =>
         entry.command === command && (!action || entry.args[0] === action));
       const committed = [undefined, "push", "publish", "tag"].includes(failure);
+      assert.equal(commands.some(({ command, args }) => command === "bun" && args[0] === "x"), false);
       if (committed) {
         const core = await readFile(join(directory, "packages/core/CHANGELOG.md"), "utf8");
         assert.match(core, /## 0\.5\.0 - \d{4}-\d{2}-\d{2}\n\n- Added a helper\./);

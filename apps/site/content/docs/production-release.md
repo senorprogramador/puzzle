@@ -22,9 +22,16 @@ Required development tooling:
 - Bun 1.4.4.
 - Node.js 22 or 24 for the validated CI matrix.
 - npm CLI.
-- GitHub Copilot CLI (`copilot`), installed and authenticated for non-interactive use.
+- GitHub Copilot access, authenticated for non-interactive CLI use.
 - Docker with Docker Compose.
 - Chromium through Playwright.
+
+If `copilot` is not on PATH, the release script runs it through
+`bun x --package @github/copilot copilot`, downloading it into Bun's shared
+package cache when needed without changing workspace dependencies.
+Authenticate before releasing:
+
+    bun x --package @github/copilot copilot login
 
 ## 2. Required CI checks
 
@@ -230,6 +237,11 @@ After building, testing and validating package contents, the release procedure
 generates changelogs, stages all changes, commits the release and pushes the
 commit. Only then does it publish packages in dependency order.
 After every package is published, it creates and pushes the release tag.
+
+On macOS and Linux, npm login and publishing use Bash and the system `script`
+utility so the release automatically answers "Press ENTER to open in the browser".
+Complete authentication in the browser yourself; OTP and other prompts remain
+manual. npm login uses web authentication.
 
 Failures before the commit restore version, lockfile and changelog changes.
 If the commit has already been created, it is preserved on failure.
