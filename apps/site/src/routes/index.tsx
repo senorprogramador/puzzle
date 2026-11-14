@@ -29,6 +29,7 @@ import {
   componentPanels,
   randomComponentsOfLength,
 } from "@/components/component-catalog";
+import { Schema } from "@puzzle-ui/seo";
 
 const features = [
   {
@@ -248,6 +249,21 @@ const Home = () => {
   const [theme, setTheme] = useState<ThemeMode>("dark");
   return (
     <Theme theme={theme} scope="local">
+      <Schema
+        type="SoftwareSourceCode"
+        id="https://puzzle-ui.com/#software"
+        properties={{
+          name: "Puzzle UI",
+          url: "https://puzzle-ui.com/",
+          codeRepository: "https://github.com/senorprogramador/puzzle",
+          author: {
+            "@id": "https://senorprogramador.com/#person",
+          },
+          publisher: {
+            "@id": "https://senorprogramador.com/#organization",
+          },
+        }}
+      />
       <PageLayout>
         <PageLayout.Header className="puzzle-site-header">
           <Header />

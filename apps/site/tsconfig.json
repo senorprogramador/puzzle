@@ -66,6 +66,12 @@
       ],
       "@puzzle-ui/icons/*": [
         "../../packages/icons/src/*"
+      ],
+      "@puzzle-ui/seo": [
+        "../../packages/seo/src/index.ts"
+      ],
+      "@puzzle-ui/seo/*": [
+        "../../packages/seo/src/*"
       ]
     }
   }
