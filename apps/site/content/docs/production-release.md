@@ -33,6 +33,13 @@ Authenticate before releasing:
 
     bun x --package @github/copilot copilot login
 
+If changelog generation reports missing credentials, the release script starts
+Copilot login and retries generation once after you authorize it in the browser.
+It does not rerun the builds or tests. Login failures or a failed retry stop the
+release before committing or publishing. Existing GitHub CLI authentication
+(`gh auth login`) or `COPILOT_GITHUB_TOKEN`, `GH_TOKEN`, or `GITHUB_TOKEN`
+environment variables can also provide credentials. Never commit tokens.
+
 ## 2. Required CI checks
 
 The GitHub Actions workflow must pass on both Node versions:

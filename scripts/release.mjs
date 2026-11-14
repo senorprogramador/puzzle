@@ -83,6 +83,17 @@ const runOrFail = (description, command, args, options) => {
   }
 };
 
+const runCopilot = (args, { capture = false } = {}) => {
+  const result = run("copilot", args, { capture, allowMissing: true });
+  if (!result.missing) {
+    return result;
+  }
+  log("Copilot CLI is not on PATH; running @github/copilot through Bun's package cache");
+  return run("bun", [
+    "x", "--silent", "--package", "@github/copilot", "copilot", ...args,
+  ], { capture });
+};
+
 const readManifest = (path) => JSON.parse(readFileSync(path, "utf8"));
 
 const writeManifest = (path, manifest) => {
@@ -273,12 +284,13 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
     "--allow-tool", "shell(git log)",
     "--deny-tool", "write",
   ];
-  let result = run("copilot", args, { capture: true, allowMissing: true });
-  if (result.missing) {
-    log("Copilot CLI is not on PATH; running @github/copilot through Bun's package cache");
-    result = run("bun", [
-      "x", "--silent", "--package", "@github/copilot", "copilot", ...args,
-    ], { capture: true });
+  let result = runCopilot(args, { capture: true });
+  if (!result.ok && /No authentication information found/i.test(result.stderr)) {
+    log("Copilot requires GitHub authentication. Complete the login in your browser...");
+    if (!runCopilot(["login"]).ok) {
+      fail("Copilot login failed. Run \"bun x --package @github/copilot copilot login\" before retrying the release.");
+    }
+    result = runCopilot(args, { capture: true });
   }
 
   if (!result.ok) {

@@ -124,6 +124,17 @@ if (command === "script") {
       process.exit(1);
     }
   }
+  const copilotAuthenticated = join(process.env.FIXTURE_ROOT, "copilot-authenticated");
+  if (args.includes("login")) {
+    if (process.env.FAIL_STEP === "copilot-login") process.exit(1);
+    writeFileSync(copilotAuthenticated, "authenticated");
+    process.exit(0);
+  }
+  if (process.env.COPILOT_LOGIN === "true" &&
+      (!existsSync(copilotAuthenticated) || process.env.FAIL_STEP === "copilot-auth-retry")) {
+    console.error("Error: No authentication information found.");
+    process.exit(1);
+  }
   assert.ok(args.includes("--no-ask-user"));
   assert.ok(args.includes("read"));
   assert.ok(args.includes("bash,view,grep,glob"));
@@ -161,6 +172,49 @@ if (command === "script") {
   await writeFile(join(directory, "bin/package.json"), '{"type":"module"}');
   return originals;
 };
+
+for (const missing of [false, true]) {
+  for (const failure of [undefined, "copilot-login", "copilot-auth-retry"]) {
+    test(`release logs into Copilot ${missing ? "through Bun" : "on PATH"}${failure ? ` and stops after ${failure}` : " and retries changelog generation"}`, async () => {
+      const directory = await mkdtemp(join(tmpdir(), "puzzle-release-auth-test-"));
+      try {
+        const originals = await createFixture(directory);
+        if (missing) await rm(join(directory, "bin/copilot"));
+        const result = run(process.execPath, ["scripts/release.mjs", "--dry-run"], {
+          cwd: directory,
+          input: "minor\n",
+          env: {
+            ...process.env,
+            PATH: join(directory, "bin"),
+            REAL_BUN: bun,
+            FIXTURE_ROOT: directory,
+            FAIL_INSTALL: "",
+            FAIL_STEP: failure ?? "",
+            DRY_RUN: "true",
+            COPILOT_LOGIN: "true",
+          },
+        });
+        assert.equal(result.status, failure ? 1 : 0, result.stdout + result.stderr);
+        const commands = (await readFile(join(directory, "commands.jsonl"), "utf8"))
+          .trim().split("\n").map((line) => JSON.parse(line));
+        const copilotCommands = commands.filter(({ command, args }) =>
+          command === "copilot" || (command === "bun" && args[0] === "x"));
+        assert.equal(copilotCommands.filter(({ args }) => args.includes("login")).length, 1);
+        assert.equal(copilotCommands.filter(({ args }) => args.includes("--prompt")).length,
+          failure === "copilot-login" ? 1 : 2);
+        assert.equal(commands.some(({ command, args }) => command === "npm" && args[0] === "publish"), !failure);
+        for (const [path, content] of Object.entries(originals)) {
+          assert.equal(await readFile(join(directory, path), "utf8"), content, path);
+        }
+        assert.equal((await readdir(join(directory, "packages/ui"))).includes("CHANGELOG.md"), false);
+        if (failure === "copilot-login") assert.match(result.stderr, /Copilot login failed/);
+        if (failure === "copilot-auth-retry") assert.match(result.stderr, /No authentication information found/);
+      } finally {
+        await rm(directory, { recursive: true, force: true });
+      }
+    });
+  }
+}
 
 for (const failure of [undefined, "copilot-runner"]) {
   test(`release without Copilot on PATH ${failure ? "reports runner failures and restores files" : "uses Bun's package runner"}`, async () => {
