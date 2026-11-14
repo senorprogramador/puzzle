@@ -1,0 +1,86 @@
+---
+title: TanStack Start adapter
+description: Connect Puzzle Fullstack auth routes to TanStack Start server handlers using Web Request and Response APIs.
+---
+
+The `@puzzle-ui/fullstack/auth/tanstack` entry point provides either a single request dispatcher or the underlying pathname-to-method route map. It keeps auth logic independent from TanStack Start; your server route passes its incoming Web `Request` to the dispatcher.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/fullstack react react-dom @tanstack/react-start
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/fullstack react react-dom @tanstack/react-start
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/fullstack react react-dom @tanstack/react-start
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/fullstack react react-dom @tanstack/react-start
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+`@tanstack/react-start` is an optional peer. React and React DOM 19 are required peers.
+
+## Quick start
+
+Create the server instance once, then call the handler from the TanStack Start server route that owns the configured base path. The default base path is `/api/auth`.
+
+```ts
+import { createTanStackAuthHandler } from "@puzzle-ui/fullstack/auth/tanstack";
+import { authServer } from "./auth";
+
+export const handleAuthRequest = createTanStackAuthHandler({
+  auth: authServer,
+});
+
+// In the framework route's GET/POST callback:
+export const handleRequest = (request: Request) => handleAuthRequest(request);
+```
+
+This generic callback illustrates the adapter boundary: wire `handleAuthRequest` to your TanStack Start server route API and pass its incoming `Request`. The exact route-file declaration depends on your application's TanStack Start setup. Create `authServer` using the [server handler configuration](/docs/fullstack/server).
+
+## Options and route map
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `auth` | `AuthServer` | — | Server instance returned by `createAuthServer`. |
+| `basePath` | `string` | `"/api/auth"` | Prefix used to build the route map. |
+
+`createTanStackAuthHandler(options)` returns `(request: Request) => Promise<Response>`. `createTanStackAuthRouteHandlers(options)` returns the path map when the application needs to register each route explicitly. The dispatcher handles `GET` and `POST`, responds `404` to unknown paths, and responds `405` with an `Allow` header when a route does not support the method.
+
+| Export | Description |
+| --- | --- |
+| `createTanStackAuthRouteHandlers` | Create the underlying pathname-to-method handler map. |
+| `createTanStackAuthHandler` | Create a single Request dispatcher. |
+| `TanStackAuthIntegrationOptions` | `{ auth: AuthServer; basePath?: string }`. |
+
+## Production notes
+
+Keep the auth server and its manager dependencies in server-only modules. The adapter does not configure storage, session cookies, CSRF protection, or auth policy. See [Auth](/docs/auth), [Storage](/docs/storage), and the [authentication guide](/docs/developer/authentication).
+
+## Exports
+
+Runtime exports: `createTanStackAuthRouteHandlers`, `createTanStackAuthHandler`.
+
+Type exports: `TanStackAuthIntegrationOptions`.
+
+For Next.js, see the [Next.js adapter](/docs/fullstack/next); for the shared server route definitions, see [Server handlers](/docs/fullstack/server).

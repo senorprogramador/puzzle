@@ -1,0 +1,112 @@
+---
+title: Icons
+description: Render Iconify icons as React SVG components and style them with CSS, currentColor, or Puzzle theme tokens.
+---
+
+<code>@puzzle-ui/icons</code> provides a React `Icon` component backed by Iconify. Pass an Iconify-prefixed icon name such as `lucide:house`; the package does not export each icon as a separate React component.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/icons react@^19 react-dom@^19
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/icons react@^19 react-dom@^19
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/icons react@^19 react-dom@^19
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/icons react@^19 react-dom@^19
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React and React DOM `^19.0.0` are peer dependencies. If they are already installed in your app, you do not need to add them again.
+
+## Quick start
+
+```tsx
+import { Icon } from "@puzzle-ui/icons";
+
+export function HomeLink() {
+  return (
+    <a href="/" aria-label="Home">
+      <Icon name="lucide:house" aria-hidden="true" />
+    </a>
+  );
+}
+```
+
+<Icon name="lucide:house" size={32} aria-hidden="true" />
+
+Icon names use Iconify's `prefix:name` format. `Icon` passes the name to Iconify at runtime; it is not a statically imported named icon. Iconify may request icon data over the network, so account for network availability and your Content Security Policy.
+
+## Sizing and color
+
+By default, the SVG uses `1em` for its width and height, so it follows the surrounding text size. Set `size` to a number of pixels, or use the standard SVG `width`, `height`, and `style` props for other dimensions. When `size` is supplied it takes precedence over width and height.
+
+With no explicit `color`, the icon inherits the surrounding CSS text color (`currentColor`). You can set `color` directly or apply it through a parent or `style`. Use a semantic theme token to keep the icon aligned with the active Puzzle theme:
+
+```tsx
+<Icon
+  name="lucide:heart"
+  size={24}
+  color="var(--puzzle-color-primary)"
+  aria-hidden="true"
+/>
+```
+
+The token resolves through the active `Theme` and adapts to its color scheme. Icons whose SVG paths specify their own fixed colors may not inherit `currentColor`. You do not need a Puzzle theme provider to use the icon package; CSS variables are simply a convenient option when your application already uses `@puzzle-ui/theme`.
+
+## Accessibility
+
+Treat icons as decorative when adjacent text already conveys the same meaning. Hide decorative SVGs from assistive technology with `aria-hidden="true"`:
+
+```tsx
+<button type="button" aria-label="Search">
+  <Icon name="lucide:search" aria-hidden="true" />
+</button>
+```
+
+When an icon itself communicates information, give it an accessible name, for example with `role="img"` and `aria-label`. For icon-only controls, label the button or link rather than relying on a decorative icon to name its parent. The component forwards SVG attributes, including ARIA attributes, to the rendered SVG.
+
+## API
+
+```ts
+Icon(props: IconProps): import("react").JSX.Element
+```
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `name` | `string` | Required | Iconify icon identifier in `prefix:name` form. |
+| `size` | `number` | `undefined` | Width and height in pixels. Overrides `width` and `height`. |
+| `color` | `string` | Inherited `currentColor` | CSS color applied to the icon. Accepts CSS values such as `var(--puzzle-color-primary)`. |
+| `showLoader` | `boolean` | `false` | Renders an animated loading indicator in place of the icon. Animation is disabled for users who prefer reduced motion. |
+| SVG attributes | `ComponentProps<"svg">` except `mode`, `onLoad`, and `rotate` | — | Standard SVG properties such as `width`, `height`, `className`, `style`, `role`, and `aria-*` are forwarded. |
+
+`IconProps` is exported as a type. The package root `@puzzle-ui/icons` is the only public entry point; generated icon-set files are not package subpaths.
+
+## SSR and production notes
+
+The component can be included in server-rendered React applications, but Iconify may load requested icon data asynchronously in the browser. Ensure the icon set is available under your network and Content Security Policy rules, or use a controlled asset strategy appropriate to your deployment. `showLoader` provides a visual loading indicator; it is not a substitute for an accessible status message when loading state matters to users.
+
+## Exports
+
+The package root exports `Icon` and the `IconProps` type. It supports ESM, CommonJS, and TypeScript declarations. Individual icon collection files under the source tree are not public exports.

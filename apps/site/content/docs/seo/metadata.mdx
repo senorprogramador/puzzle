@@ -1,0 +1,116 @@
+---
+title: Metadata and URLs
+description: Configure site defaults and resolve page metadata and SEO URLs.
+---
+
+<code>@puzzle-ui/seo</code> resolves page metadata independently of React, including canonical URLs, social cards, robots directives, and language alternates.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React 19 is a peer dependency. Framework adapters do not require a framework package at runtime.
+
+## Quick start
+
+```ts
+import { normalizeSeoConfig } from "@puzzle-ui/seo/context";
+import { resolveSeoMetadata, resolveSeoRobots } from "@puzzle-ui/seo/metadata";
+
+const config = normalizeSeoConfig({
+  siteUrl: "https://example.com",
+  defaultLocale: "en",
+  supportedLocales: ["en", "nl"],
+  title: { default: "Example", template: "%s | Example" },
+  identity: { name: "Example" },
+});
+
+const page = resolveSeoMetadata({
+  title: "About",
+  description: "About Example",
+  canonical: "/about",
+  openGraph: { images: [{ url: "/social.png", alt: "Example" }] },
+  robots: { index: true, follow: true },
+}, config);
+const robots = resolveSeoRobots(page, config);
+```
+
+`title.template` must include `%s`. Page title, description and canonical override configured defaults; title and description can also fall back to identity. A canonical is not inferred automatically. Open Graph URL falls back to canonical and then the site URL. Open Graph title and description fall back to the resolved values; Twitter images fall back to Open Graph images. The default Open Graph type is `website`, and the default Twitter card is `summary_large_image`.
+
+## Configuration
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `siteUrl` | `string` | required | Absolute HTTP(S) site URL. |
+| `defaultLocale` | `string` | `en` | Default page locale. |
+| `supportedLocales` | `string[]` | default locale | Supported locales; regional variants of a supported base language are accepted. |
+| `trailingSlash` | `"always" \| "never" \| "preserve"` | `"never"` | Same-origin URL path policy. |
+| `title` | `SeoTitleConfig` | separator `" \| "` | Default title and optional `%s` template. |
+| `defaults` | `SeoDefaultMetadata` | `{}` | Default title, description, canonical and robots string. |
+| `metadata` | `SeoMetadata` | `{}` | Site-level title, description, canonical and robots string. |
+| `identity` | `SeoSiteIdentity` | — | Name and optional URL, logo, description and social links. |
+| `debug` | `boolean` | — | Optional application debug flag. |
+
+## Page metadata
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title`, `description` | `string` | site defaults | Page text. |
+| `canonical` | `string` | configured canonical or none | Explicit canonical URL. |
+| `locale` | `string` | default locale | Supported locale, normalized for casing. |
+| `robots` | `SeoRobotsMetadata` | configured robots or none | Index/follow and preview directives. |
+| `openGraph` | `SeoOpenGraphMetadata` | resolved from page and site | Social title, description, type, URL, locale, site name and image objects. |
+| `twitter` | `SeoTwitterMetadata` | resolved from page and Open Graph | Card, text, image URLs, image alt, site and creator. |
+| `alternates` | `SeoHreflangMetadata` | — | `{ alternates: [{ locale, url }] }` language links. |
+| `keywords`, `author` | `string[]`, `string` | — | Page keywords and author. |
+| `publishedTime`, `modifiedTime` | `string` | — | Article timestamps. |
+
+## URL helpers and safety
+
+```ts
+import { normalizeSeoUrl, isSameSeoOrigin } from "@puzzle-ui/seo/urls";
+
+const url = normalizeSeoUrl("/guide/", {
+  baseUrl: "https://example.com",
+  trailingSlash: "never",
+  allowExternal: false,
+});
+const sameOrigin = isSameSeoOrigin(url, "https://example.com");
+```
+
+`normalizeSeoUrl` accepts HTTP(S) only and rejects credentials unless explicitly allowed. Its fallback base is `https://example.com`; supply your real base for relative URLs. Set `allowExternal: false` to enforce the base origin (external URLs are otherwise allowed). Metadata URL resolution also rejects credentials. Validate untrusted input and select an appropriate same-origin policy for your application.
+
+## Exports
+
+- `@puzzle-ui/seo/context`: `normalizeSeoConfig`, `normalizeSeoPath`, `resolveSeoUrl` and configuration types.
+- `@puzzle-ui/seo/metadata`: `resolveSeoMetadata`, `resolveSeoRobots` and metadata types.
+- `@puzzle-ui/seo/urls`: `normalizeSeoPath`, `normalizeSeoUrl`, `normalizeSeoOrigin`, `isSameSeoOrigin`, `isValidSeoUrl`, `resolveSeoUrls` and URL option/result types.

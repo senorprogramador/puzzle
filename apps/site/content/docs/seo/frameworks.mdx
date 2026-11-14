@@ -1,0 +1,108 @@
+---
+title: Framework Adapters
+description: Serve sitemap and robots routes with Fetch handlers and framework adapters.
+---
+
+<code>@puzzle-ui/seo</code> provides framework-independent server handlers and small adapters for Next.js, TanStack Start, and React Router.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React 19 is a peer dependency. Framework adapters do not require a framework package at runtime.
+
+## Quick start
+
+```ts
+import { createSeoRouteHandlers } from "@puzzle-ui/seo/server";
+
+const handlers = createSeoRouteHandlers({
+  sitemap: {
+    sitemap: { baseUrl: "https://example.com", entries: [{ url: "/" }] },
+    cacheControl: "public, max-age=3600",
+  },
+  robots: {
+    robots: { rules: [{ userAgent: "*", allow: ["/"] }], sitemap: "https://example.com/sitemap.xml" },
+    cacheControl: "public, max-age=3600",
+  },
+});
+// Mount handlers.sitemap and handlers.robots where your server receives Request objects.
+```
+
+Both handlers return `Promise<Response>`. The sitemap handler serves the configured index path and generated sitemap filenames; it serves the single file at the index path when no index is needed. The robots handler serves the configured robots path. Unknown paths return 404; generation issues return 500 with `no-store`. Configure your platform to route generated filenames as well as the index.
+
+## Handler options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `sitemap.sitemap` | `SitemapGenerationOptions` | required | Sitemap generation input. |
+| `sitemap.path` | `string` | `/{filename}.xml` | Public index path; filename defaults to `sitemap`. |
+| `sitemap.cacheControl` | `string` | `"public, max-age=3600, s-maxage=3600"` | Response cache policy. |
+| `robots.robots` | `RobotsOptions` | required | robots.txt generation input. |
+| `robots.path` | `string` | `/robots.txt` | Public robots path. |
+| `robots.cacheControl` | `string` | `"public, max-age=3600, s-maxage=3600"` | Response cache policy. |
+
+`createSitemapHandler` and `createRobotsHandler` return text response objects instead of Fetch responses. Their optional `Request` lets them select the requested path. Review generation errors and cache settings before exposing routes in production.
+
+## Framework adapters
+
+Each adapter accepts the same route options as `createSeoRouteHandlers`. Create the options in a shared server module, then mount the returned functions in the framework's route files:
+
+```ts
+import { createNextSeoRoutes } from "@puzzle-ui/seo/next";
+import { createTanStackSeoRoutes } from "@puzzle-ui/seo/tanstack";
+import { createReactRouterSeoRoutes } from "@puzzle-ui/seo/react-router";
+
+const options = {
+  sitemap: { sitemap: { baseUrl: "https://example.com", entries: [{ url: "/" }] } },
+  robots: { robots: { rules: [{ userAgent: "*", allow: ["/"] }] } },
+};
+
+const next = createNextSeoRoutes(options);
+const tanstack = createTanStackSeoRoutes(options);
+const reactRouter = createReactRouterSeoRoutes(options);
+```
+
+| Framework | Sitemap mount | Robots mount |
+| --- | --- | --- |
+| Next.js | Export `next.sitemapGET` as `GET` from a dynamic root route such as `app/[seoFile]/route.ts`. | Export `next.robotsGET` as `GET` from `app/robots.txt/route.ts`. |
+| TanStack Start | Mount `tanstack.sitemapGET` as the GET server handler for a dynamic root route such as `/$seoFile`. It receives `{ request }`. | Mount `tanstack.robotsGET` on `/robots.txt`. |
+| React Router | Export `reactRouter.sitemapLoader` as `loader` from a dynamic root resource route such as `/:seoFile`. | Export `reactRouter.robotsLoader` as `loader` from the `/robots.txt` resource route. |
+
+Framework routing conventions and route priority remain the application's responsibility. Ensure the static robots route wins over the dynamic sitemap route and that custom `path` settings match the routes you mount.
+
+## Exports
+
+- `@puzzle-ui/seo/server`: `createSitemapHandler`, `createRobotsHandler`, `createSeoRouteHandlers` and server types.
+- `@puzzle-ui/seo/next`: `createNextSeoRoutes` and `NextSeoRoutes`.
+- `@puzzle-ui/seo/tanstack`: `createTanStackSeoRoutes` and the TanStack route types.
+- `@puzzle-ui/seo/react-router`: `createReactRouterSeoRoutes` and the React Router loader types.

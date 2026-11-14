@@ -25,36 +25,36 @@ Do not assume that every package or API is stable.
 
 ## Packages
 
-Puzzle is organized as a Bun workspace monorepo.
+Puzzle is organized as a Bun workspace monorepo. Full documentation is available at [puzzle-ui.com](https://puzzle-ui.com/docs/getting-started).
 
 ### UI and design system
 
-| Package                        | Purpose                                                                                 |
-| ------------------------------ | --------------------------------------------------------------------------------------- |
-| <code>@puzzle-ui/core</code>   | Framework-independent utilities                                                         |
-| <code>@puzzle-ui/hooks</code>  | Reusable React hooks                                                                    |
-| <code>@puzzle-ui/icons</code>  | Icon components and utilities                                                           |
-| <code>@puzzle-ui/theme</code>  | Theme provider, design tokens, colors, and typography                                   |
-| <code>@puzzle-ui/ui</code>     | Reusable React UI components                                                            |
-| <code>@puzzle-ui/pieces</code> | Composed UI sections and larger building blocks                                         |
-| <code>@puzzle-ui/seo</code>    | Framework-independent SEO, metadata, Schema.org contracts, sitemap and robots utilities |
+| Package                        | Purpose                                                                                 | Documentation                                             |
+| ------------------------------ | --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| <code>@puzzle-ui/core</code>   | Framework-independent utilities                                                         | [Docs](https://puzzle-ui.com/docs/getting-started)        |
+| <code>@puzzle-ui/hooks</code>  | Reusable React hooks                                                                    | [Docs](https://puzzle-ui.com/docs/hooks)                  |
+| <code>@puzzle-ui/icons</code>  | Icon components and utilities                                                           | [Docs](https://puzzle-ui.com/docs/icons)                  |
+| <code>@puzzle-ui/theme</code>  | Theme provider, design tokens, colors, and typography                                   | [Docs](https://puzzle-ui.com/docs/theme)                  |
+| <code>@puzzle-ui/ui</code>     | Reusable React UI components                                                            | [Docs](https://puzzle-ui.com/docs/ui)                     |
+| <code>@puzzle-ui/pieces</code> | Composed UI sections and larger building blocks                                         | [Docs](https://puzzle-ui.com/docs/pieces/components/hero) |
+| <code>@puzzle-ui/seo</code>    | Framework-independent SEO, metadata, Schema.org contracts, sitemap and robots utilities | [Docs](https://puzzle-ui.com/docs/seo)                    |
 
 ### Developer tooling
 
-| Package                        | Purpose                                 |
-| ------------------------------ | --------------------------------------- |
-| <code>@puzzle-ui/create</code> | Interactive React application generator |
+| Package                        | Purpose                                 | Documentation                             |
+| ------------------------------ | --------------------------------------- | ----------------------------------------- |
+| <code>@puzzle-ui/create</code> | Interactive React application generator | [Docs](https://puzzle-ui.com/docs/create) |
 
 ### Authentication and storage
 
-| Package                                 | Purpose                                                   |
-| --------------------------------------- | --------------------------------------------------------- |
-| <code>@puzzle-ui/auth</code>            | Framework-independent authentication core                 |
-| <code>@puzzle-ui/fullstack</code>       | Authentication client, server, and framework integrations |
-| <code>@puzzle-ui/session</code>         | Session management                                        |
-| <code>@puzzle-ui/storage</code>         | Storage contracts                                         |
-| <code>@puzzle-ui/storage-d1</code>      | Cloudflare D1 storage adapter                             |
-| <code>@puzzle-ui/storage-mongodb</code> | MongoDB storage adapter                                   |
+| Package                                 | Purpose                                                   | Documentation                                |
+| --------------------------------------- | --------------------------------------------------------- | -------------------------------------------- |
+| <code>@puzzle-ui/auth</code>            | Framework-independent authentication core                 | [Docs](https://puzzle-ui.com/docs/auth)      |
+| <code>@puzzle-ui/fullstack</code>       | Authentication client, server, and framework integrations | [Docs](https://puzzle-ui.com/docs/fullstack) |
+| <code>@puzzle-ui/session</code>         | Session management                                        | [Docs](https://puzzle-ui.com/docs/auth)      |
+| <code>@puzzle-ui/storage</code>         | Storage contracts                                         | [Docs](https://puzzle-ui.com/docs/storage)   |
+| <code>@puzzle-ui/storage-d1</code>      | Cloudflare D1 storage adapter                             | [Docs](https://puzzle-ui.com/docs/storage)   |
+| <code>@puzzle-ui/storage-mongodb</code> | MongoDB storage adapter                                   | [Docs](https://puzzle-ui.com/docs/storage)   |
 
 ### Applications
 

@@ -1,0 +1,98 @@
+---
+title: Validation
+description: Validate graphs, metadata, Schema.org definitions, and rich-result profiles.
+---
+
+<code>@puzzle-ui/seo</code> reports graph, schema, semantic, metadata, registry, rich-result, and custom validation diagnostics.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React 19 is a peer dependency. Framework adapters do not require a framework package at runtime.
+
+## Quick start
+
+```ts
+import { buildSeoGraph } from "@puzzle-ui/seo/core";
+import { validateSeo } from "@puzzle-ui/seo/validation";
+
+const graph = buildSeoGraph([
+  { "@type": "Organization", name: "Example", url: "https://example.com" },
+], { baseUrl: "https://example.com" });
+
+const report = validateSeo({ graph, metadata: { title: "Welcome to Example", description: "Discover the Example website and its services.", canonical: "https://example.com/" } }, {
+  mode: "strict",
+  baseUrl: "https://example.com",
+});
+if (!report.valid) console.error(report.issues);
+```
+
+A report contains `valid`, `mode`, `issues`, and `summary` counts. Each issue includes a severity, source, code and message, and may include a path, suggestion or documentation URL. Warnings are promoted to errors in strict mode. Validation is guidance, not a guarantee of search engine eligibility or indexing.
+
+## Options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mode` | `"off" \| "warn" \| "strict"` | `"warn"` | Disable checks, report issues, or promote warnings to errors. |
+| `registry` | `SchemaRegistry` | generated default registry | Definitions used for schema validation. |
+| `profiles` | `SeoRichResultProfile[]` | — | Additional rich-result checks. |
+| `validators` | `SeoCustomValidator[]` | — | Custom validators returning issues. |
+| `validateRequiredProperties` | `boolean` | `false` | Check required schema properties. |
+| `allowExternalReferences` | `boolean` | `true` | Permit external graph references. |
+| `baseUrl` | `string` | — | Resolve local references against this URL. |
+| `allowUnknownProperties` | `boolean` | `true` in warn, `false` in strict | Permit unrecognized Schema.org properties. |
+
+Profiles are `article`, `product`, `breadcrumb`, `event`, `recipe`, `job-posting`, `local-business`, and `software-application`. Choose profiles appropriate for the actual content rather than marking up content that is absent from the page.
+
+## React validation
+
+```tsx
+import { LDOrganization, SeoProvider } from "@puzzle-ui/seo/react";
+
+const App = () => (
+  <SeoProvider
+    config={{ siteUrl: "https://example.com" }}
+    metadata={{ title: "Welcome to Example", description: "Discover the Example website and its services.", canonical: "/" }}
+    validation={{ mode: "strict" }}
+    onValidation={(report) => console.log(report.summary)}
+  >
+    <LDOrganization name="Example" />
+  </SeoProvider>
+);
+```
+
+Warn mode keeps rendering even when the validation report is invalid; strict mode throws before output when its report is invalid. The callback runs in a React effect, not during server rendering, so validate explicitly on the server if you need diagnostics there. `validation={false}` disables the complete validation report, not independent graph-builder errors. Legacy `validation={{ strict: true }}` remains supported; prefer `mode` for new code.
+
+## Exports
+
+`@puzzle-ui/seo/validation` exports `validateSeo`, `validateSeoMetadata`, `validateSeoNode`, and validation option, input, report, issue and profile types. The root also exports these functions; its `SeoValidationIssue` type is the core graph issue, while `SeoValidationReportIssue` aliases the richer validation issue type.

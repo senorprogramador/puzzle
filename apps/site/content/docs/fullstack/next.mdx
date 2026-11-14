@@ -1,0 +1,91 @@
+---
+title: Next.js adapter
+description: Mount Puzzle Fullstack authentication handlers in Next.js App Router route handlers.
+---
+
+The `@puzzle-ui/fullstack/auth/next` entry point dispatches the server route map through Next.js-compatible `GET` and `POST` functions. It uses standard Web `Request` and `Response` objects, so the auth server itself remains framework-independent.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/fullstack react react-dom next
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/fullstack react react-dom next
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/fullstack react react-dom next
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/fullstack react react-dom next
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+The package supports Next.js 15 and 16 as an optional peer. React and React DOM 19 are required peers.
+
+## Quick start
+
+Create the route file for the same base path you configure in the client. The default is `/api/auth`.
+
+```ts
+// app/api/auth/[...auth]/route.ts
+import { createNextAuthHandler } from "@puzzle-ui/fullstack/auth/next";
+import { authServer } from "@/server/auth";
+
+const handlers = createNextAuthHandler({ auth: authServer });
+
+export const GET = handlers.GET;
+export const POST = handlers.POST;
+```
+
+`authServer` is created once from the server-side managers; see [Server handlers](/docs/fullstack/server). In the client, point `AuthProvider` or `createAuthClient` at the matching path if you change the default:
+
+```tsx
+<AuthProvider options={{ basePath: "/api/auth" }}>{children}</AuthProvider>
+```
+
+## Adapter options and behavior
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `auth` | `AuthServer` | — | Server instance returned by `createAuthServer`. |
+| `basePath` | `string` | `"/api/auth"` | Prefix used to build the route map. |
+
+`createNextAuthRouteHandlers(options)` returns the route map if you prefer to register individual paths. `createNextAuthHandler(options)` returns `{ GET, POST }`; both methods share a dispatcher. Unmatched paths return `404`, unsupported methods return `405` with an `Allow` header, and responses are not cacheable.
+
+| Export | Description |
+| --- | --- |
+| `createNextAuthRouteHandlers` | Create the underlying pathname-to-method handler map. |
+| `createNextAuthHandler` | Create Next-compatible `GET` and `POST` dispatcher functions. |
+| `NextAuthIntegrationOptions` | `{ auth: AuthServer; basePath?: string }`. |
+| `NextAuthRouteHandler` | `(request: Request) => Promise<Response>`. |
+| `NextAuthHandlerSet` | Object with `GET` and `POST` route handlers. |
+
+## Production notes
+
+Keep the server instance and its manager dependencies in a server-only module. Do not import this adapter into client components. Configure cookies, CSRF checks, trusted proxy handling, and auth storage in the server layer; the adapter only routes requests. See [Auth](/docs/auth), [Storage](/docs/storage), and the [authentication guide](/docs/developer/authentication).
+
+## Exports
+
+Runtime exports: `createNextAuthRouteHandlers`, `createNextAuthHandler`.
+
+Type exports: `NextAuthIntegrationOptions`, `NextAuthRouteHandler`, `NextAuthHandlerSet`.
+
+For the framework-independent route map, see [Server handlers](/docs/fullstack/server).

@@ -1,0 +1,93 @@
+---
+title: Structured Data
+description: Build deterministic Schema.org graphs and serialize safe JSON-LD.
+---
+
+<code>@puzzle-ui/seo</code> builds Schema.org nodes into a JSON-LD graph, resolves references and merges nodes sharing an ID.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React 19 is a peer dependency. Framework adapters do not require a framework package at runtime.
+
+## Quick start
+
+```ts
+import { createSeoGraphBuilder, serializeSeoGraph } from "@puzzle-ui/seo/core";
+
+const builder = createSeoGraphBuilder({ baseUrl: "https://example.com" });
+builder.add({ "@type": "Organization", "@id": "#org", name: "Example" });
+builder.add({
+  "@type": "WebPage",
+  name: "Home",
+  publisher: { "@id": "#org" },
+});
+const graph = builder.build();
+const result = serializeSeoGraph(graph, { scriptSafe: true });
+if (result.errors.length) console.error(result.errors);
+const jsonLd = result.value;
+```
+
+Nested nodes are extracted and referenced by ID. Explicit IDs override generated IDs. A builder has isolated state; `addMany`, `build`, and `getIssues` support incremental construction and inspection. The default conflict strategy is deterministic; `first`, `last` and `error` are also available. Check issues when merging data from different sources.
+
+## Graph options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `baseUrl` | `string` | — | Base for resolving IDs and references. |
+| `locale` | `string` | — | Locale available to graph normalization. |
+| `context` | `string \| object` | Schema.org context | JSON-LD context. |
+| `rootIds` | `string[]` | — | Graph root IDs. |
+| `conflictStrategy` | `"deterministic" \| "first" \| "last" \| "error"` | `"deterministic"` | Policy for conflicting scalar values. |
+| `strictReferences` | `boolean` | `false` | Report unresolved local references as errors. |
+
+`serializeSeoGraph` returns `{ value, errors }`; `stringifySeoGraph` returns a string. Serialization is deterministic and script-safe by default. Keep script-safe escaping enabled when embedding JSON-LD in HTML; never concatenate unescaped user input into a script tag.
+
+## Schema registry
+
+```ts
+import { createDefaultSchemaRegistry, validateSchemaNode } from "@puzzle-ui/seo/schema";
+
+const registry = createDefaultSchemaRegistry();
+const issues = validateSchemaNode(
+  { "@type": "Organization", name: "Example" },
+  registry,
+);
+```
+
+The generated registry includes Schema.org definitions and inherited properties. `createSchemaRegistry` accepts generated and custom definitions, extensions, and an `allowGeneratedOverrides` option; inspect `registry.getConflicts()` when composing definitions. React schema components are documented in [React Integration](/docs/seo/react); complete reports and rich-result profiles are covered in [Validation](/docs/seo/validation).
+
+## Exports
+
+- `@puzzle-ui/seo/core`: `normalizeSeoId`, `createSeoNode`, `mergeSeoNodes`, `createSeoGraphBuilder`, `buildSeoGraph`, `resolveSeoReferences`, `validateSeoGraph`, `serializeSeoGraph`, `stringifySeoGraph` and graph types.
+- `@puzzle-ui/seo/schema`: `createSchemaRegistry`, `createDefaultSchemaRegistry`, `validateSchemaNode`, `SCHEMAORG_VERSION`, `SCHEMAORG_SOURCE_HASH`, `generatedSchemaDefinitions` and registry types.

@@ -1,82 +1,79 @@
-# Getting Started
+# @puzzle-ui/theme
 
-Install Puzzle in your React app, build your first interface, and customize the theme.
+Design tokens, color themes, typography, fonts, and theme scoping for Puzzle.
 
-> \[!WARNING\] **Puzzle is not ready for production use.**
+**Documentation:** [https://puzzle-ui.com/docs/theme](https://puzzle-ui.com/docs/theme)
+
+> [!WARNING]
+> **Puzzle is not ready for production use.** APIs, tokens, and package
+> exports may change without notice. Use it for experimentation and
+> evaluation.
+
+`@puzzle-ui/theme` is the source of truth for Puzzle's visual design. Its
+`Theme` provider turns a typed token object into CSS custom properties
+(`--puzzle-*`), loads configured fonts, resolves light, dark, and system color
+schemes, and can scope a theme to the whole document or a single subtree.
+All [`@puzzle-ui/ui`](https://puzzle-ui.com/docs/ui) components consume these
+variables, so a single provider styles your application.
+
+## Install
+
+```bash
+npm install @puzzle-ui/theme
+# or
+bun add @puzzle-ui/theme
+# or
+pnpm add @puzzle-ui/theme
+# or
+yarn add @puzzle-ui/theme
+```
+
+React and React DOM 19 are peer dependencies.
+
+## Usage
+
+Wrap your application once at the root:
+
+```tsx
+import { Theme } from "@puzzle-ui/theme";
+
+export const App = () => (
+  <Theme>
+    <YourApp />
+  </Theme>
+);
+```
+
+Customize the color scheme, color theme, fonts, and tokens:
+
+```tsx
+<Theme
+  theme="system"
+  colorTheme="cobalt-sky"
+  fonts={{
+    heading: { family: "Sora" },
+    body: { family: "Inter" },
+  }}
+  tokens={{
+    radius: { md: "0.5rem" },
+  }}
 >
-> This project is under active development. APIs, component props,
-> package exports, styling, and internal implementation may change
-> without notice. Components may be incomplete, and testing,
-> accessibility, documentation, and framework compatibility are not yet
-> guaranteed. Use it for experimentation and evaluation only---not for
-> production applications.
-
-Puzzle is a TypeScript and React UI component library built around reusable components and shared design tokens. Its components are composable and router-independent, with styling supplied by `"@puzzle-ui/theme`. The framework is setup to be compatible with `Next.js`, `Tanstack Start` and `react-router`.
-
-**Puzzle is under active development and is not ready for production use.** APIs, props, exports, and styling may change without notice. Accessibility and framework compatibility are still being tested. Use the project for experimentation and evaluation.
-
-## Prerequisites
-
-- A package manager: npm, Bun, pnpm, or Yarn.
-- An existing React application with a bundler that supports CSS imports, such as Vite.
-- Familiarity with React and TypeScript. The UI and theme packages require React and React DOM 19 or later within the supported React 19 range.
-
-## Set up a new project
-
-Simple run our @puzzle-ui/create project template to get started.
-
-npm:
-
-```bash
-npx @puzzle-ui/create
+  <YourApp />
+</Theme>
 ```
 
-bun:
+## Features
 
-```bash
-bunx @puzzle-ui/create
-```
+| Area                 | Description                                                                                       | Docs                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Theme provider       | Injects token CSS variables, loads fonts, and applies global styles at root or local scope.       | [Theme Provider](https://puzzle-ui.com/docs/theme/theme-provider)   |
+| Design tokens        | Typed token groups for spacing, radius, shadows, elevation, borders, layout, motion, and z-index. | [Design Tokens](https://puzzle-ui.com/docs/theme/tokens)            |
+| Colors               | Semantic color roles, light/dark color schemes, and built-in color themes.                        | [Colors](https://puzzle-ui.com/docs/theme/colors)                   |
+| Typography and fonts | Named typography roles, fluid font sizes, Google Fonts, and self-hosted fonts.                    | [Typography and Fonts](https://puzzle-ui.com/docs/theme/typography) |
+| Breakpoints          | Shared responsive breakpoints for JavaScript and CSS.                                             | [Breakpoints](https://puzzle-ui.com/docs/theme/breakpoints)         |
+| Component overrides  | Global link and image components for router and framework integration.                            | [Component Overrides](https://puzzle-ui.com/docs/theme/components)  |
 
-Puzzle can set up a new project for you with the following framework options:
-
-- Basic React app
-- Tanstack start
-- Next.js
-
-Furthermore you can choose to install tailwindcss or not.
-It directly installs all dependencies and sets up the project for you.
-
-## Set up in an existing project:
-
-Install the UI library and theme package in your application's directory. Choose your package manager below:
-
-npm:
-
-```bash
-npm install @puzzle-ui/ui --save
-```
-
-bun:
-
-```bash
-bun add @puzzle-ui/create
-```
-
-pnpm:
-
-```bash
-pnpm add @puzzle-ui/ui
-```
-
-yarn:
-
-```bash
-yarn add @puzzle-ui/ui
-```
-
-These commands install published packages; they do not clone the repository or build its workspaces. Puzzle does not require Bun in your application. React and React DOM are peer dependencies and should already be installed in your app.
-
-## Download fonts with the theme CLI
+## Self-host fonts with the theme CLI
 
 The `@puzzle-ui/theme` package includes the `puzzle-theme` executable.
 It requires Node.js 20.19 or later.
@@ -131,23 +128,7 @@ The generated stylesheet and preload link use the same font URL, avoiding
 duplicate downloads. Preloading only applies to local fonts and only one
 font is preloaded per Theme instance.
 
-## Your first interface
+## Related packages
 
-Import components from `"@puzzle-ui/ui` and wrap your application in `Theme` from `"@puzzle-ui/theme`:
-
-```tsx
-import { Theme } from "@puzzle-ui/theme";
-import { Button } from "@puzzle-ui/ui";
-
-export const App = () => (
-  <Theme>
-    <main>
-      <h1>Hello, Puzzle</h1>
-      <p>Build your interface with reusable components and shared tokens.</p>
-      <Button onClick={() => window.alert("Welcome to Puzzle!")}>
-        Get started
-      </Button>
-    </main>
-  </Theme>
-);
-```
+- [`@puzzle-ui/ui`](https://puzzle-ui.com/docs/ui) — components styled by this theme.
+- [`@puzzle-ui/core`](https://www.npmjs.com/package/@puzzle-ui/core) — shared utilities such as `cn` and responsive helpers.

@@ -595,6 +595,55 @@ describe("TreeView", () => {
     );
   });
 
+  it("toggles a group when anywhere on its row is clicked", async () => {
+    const user = userEvent.setup();
+    const onSelectionChange = vi.fn();
+
+    render(
+      <TreeView
+        items={items}
+        aria-label="Project files"
+        onSelectionChange={onSelectionChange}
+      />,
+    );
+
+    const source = getTreeItem("src");
+    const label = source.querySelector<HTMLElement>(".puzzle-tree__label")!;
+
+    await user.click(label);
+
+    expect(source).toHaveAttribute("aria-expanded", "true");
+    expect(source).toHaveFocus();
+
+    await user.click(label);
+
+    expect(source).toHaveAttribute("aria-expanded", "false");
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+
+  it("selects a group on row click when expandOnItemClick is false", async () => {
+    const user = userEvent.setup();
+
+    render(
+      <TreeView
+        items={items}
+        aria-label="Project files"
+        expandOnItemClick={false}
+      />,
+    );
+
+    const source = getTreeItem("src");
+
+    await user.click(source.querySelector<HTMLElement>(".puzzle-tree__label")!);
+
+    expect(source).toHaveAttribute("aria-expanded", "false");
+    expect(source).toHaveAttribute("aria-selected", "true");
+
+    await user.click(getToggle(source));
+
+    expect(source).toHaveAttribute("aria-expanded", "true");
+  });
+
   it("expands a linked branch when its toggle is clicked without navigating", async () => {
     const user = userEvent.setup();
 

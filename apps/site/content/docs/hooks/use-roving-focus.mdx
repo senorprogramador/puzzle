@@ -1,0 +1,96 @@
+---
+title: Roving Focus
+description: Manage a single tab stop and keyboard navigation for a composite group of focusable items.
+---
+
+`useRovingFocus` manages the active item in a group so that only one enabled item is in the tab order at a time. It provides ref, focus, and keyboard handlers for implementing accessible menus, tabs, toolbars, and similar composite widgets.
+
+## Quick start
+
+```tsx
+import { useRovingFocus, type RovingFocusItem } from "@puzzle-ui/hooks";
+
+const items: RovingFocusItem[] = [
+  { id: "overview" },
+  { id: "activity" },
+  { id: "settings", disabled: true },
+];
+
+function ProjectToolbar() {
+  const {
+    getItemRef,
+    getItemTabIndex,
+    onItemFocus,
+    onItemKeyDown,
+  } = useRovingFocus<HTMLButtonElement>({
+    items,
+    orientation: "horizontal",
+  });
+
+  return (
+    <div role="toolbar" aria-label="Project actions">
+      {items.map((item) => (
+        <button
+          key={item.id}
+          ref={getItemRef(item.id)}
+          disabled={item.disabled}
+          tabIndex={getItemTabIndex(item.id, item.disabled)}
+          onFocus={() => onItemFocus(item.id)}
+          onKeyDown={(event) => onItemKeyDown(event, item.id)}
+        >
+          {item.id}
+        </button>
+      ))}
+    </div>
+  );
+}
+```
+
+The hook only manages focus navigation; provide the appropriate widget roles, selection behavior, and activation logic for your component. Item IDs must be unique and stable across renders.
+
+## API
+
+```ts
+useRovingFocus<T extends HTMLElement>(
+  options: UseRovingFocusOptions,
+): UseRovingFocusReturn<T>
+```
+
+### Options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `readonly RovingFocusItem[]` | Required | Current group items. Each item has a unique `id` and may have `disabled: true`. |
+| `orientation` | `"horizontal"`, `"vertical"`, or `"both"` | `"horizontal"` | Which arrow keys move focus. Home and End work in every orientation. |
+| `dir` | `"ltr"` or `"rtl"` | `"ltr"` | Reverses horizontal arrow-key direction in RTL. |
+| `loop` | `boolean` | `true` | Whether moving past either end wraps to the other end. |
+| `initialActiveId` | `string` | First enabled item's ID | Initial active item when it exists and is enabled. Otherwise the first enabled item is selected. |
+
+### Return value
+
+| Member | Type | Description |
+| --- | --- | --- |
+| `activeId` | `string` or `undefined` | Active enabled item ID; undefined when no items are enabled. |
+| `getItemRef(id)` | `RefCallback<T>` | Ref callback that registers the item's element for programmatic focus. |
+| `getItemTabIndex(id, disabled?)` | `0` or `-1` | Returns 0 for the active enabled item and -1 for other or disabled items. |
+| `focusItem(id)` | `(id: string) => void` | Sets the active item and focuses its mounted element if it is enabled. |
+| `onItemFocus(id)` | `(id: string) => void` | Updates the active item when an enabled item receives focus. |
+| `onItemKeyDown(event, id)` | `(event: React.KeyboardEvent<T>, id: string) => void` | Handles Home, End, and orientation-appropriate arrow keys. It leaves already-prevented events untouched. |
+
+`RovingFocusItem`, `RovingFocusOrientation`, `UseRovingFocusOptions`, and `UseRovingFocusReturn` are also exported types.
+
+## Keyboard behavior
+
+- Horizontal groups use Left and Right; RTL reverses their direction.
+- Vertical groups use Up and Down. `both` enables both pairs.
+- Home moves to the first enabled item; End moves to the last.
+- Disabled items are skipped. With looping enabled, navigation wraps; otherwise it stops at the group boundary.
+- The hook calls `preventDefault()` only when it handles a supported key and focuses a valid next item.
+
+## SSR and client components
+
+This hook is marked with React's `"use client"` directive and uses state, effects, and element refs. In server/client framework setups, call it in a client component. Its initial active ID is derived from the supplied item list and `initialActiveId`; provide consistent initial items on the server and client to avoid hydration mismatches. Focus changes require mounted DOM elements.
+
+## Exports
+
+Import `useRovingFocus` and its public types from `@puzzle-ui/hooks`. The package does not expose a separate subpath for this hook.

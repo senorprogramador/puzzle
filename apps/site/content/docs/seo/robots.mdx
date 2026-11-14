@@ -1,0 +1,70 @@
+---
+title: Robots
+description: Validate and generate robots.txt crawler rules.
+---
+
+<code>@puzzle-ui/seo</code> generates robots.txt rules and reports invalid directives before publication.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React 19 is a peer dependency. Framework adapters do not require a framework package at runtime.
+
+## Quick start
+
+```ts
+import { generateRobotsTxt } from "@puzzle-ui/seo/robots";
+
+const result = generateRobotsTxt({
+  rules: [{ userAgent: "*", allow: ["/"], disallow: ["/admin/"] }],
+  sitemap: "https://example.com/sitemap.xml",
+});
+if (result.issues.length) throw new Error(result.issues.map((issue) => issue.message).join("\n"));
+const text = result.content;
+```
+
+## Options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `rules` | `RobotsRule[]` | required | Groups of crawler rules. |
+| `sitemap` | `string \| string[]` | — | Sitemap URL or URLs. |
+| `host` | `string` | — | Optional host directive. |
+
+Each `RobotsRule` requires `userAgent` as a string or string array and optionally accepts `allow`, `disallow` (arrays of paths), and numeric `crawlDelay`. `validateRobotsOptions` reports issues; `serializeRobotsTxt` returns text; `generateRobotsTxt` returns both text and issues. The [server handlers](/docs/seo/frameworks) turn invalid generation into a 500 response.
+
+Robots rules are crawler instructions, not access control. Protect private resources with authentication and authorization. Page-level robots meta directives are separate; see [Metadata and URLs](/docs/seo/metadata).
+
+## Exports
+
+`@puzzle-ui/seo/robots` exports `validateRobotsOptions`, `serializeRobotsTxt`, `generateRobotsTxt` and the `RobotsDirective`, `RobotsRule`, `RobotsOptions`, `RobotsPolicy`, `RobotsResult`, and `RobotsValidationIssue` types.

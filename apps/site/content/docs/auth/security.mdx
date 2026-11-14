@@ -1,0 +1,47 @@
+---
+title: Auth Security
+description: Review storage, token, password, MFA, WebAuthn, and deployment requirements before exposing @puzzle-ui/auth endpoints.
+---
+
+`@puzzle-ui/auth` provides security-sensitive server-side primitives, not a complete hosted identity service. Your application must configure secure storage and providers, protect session and challenge credentials, and apply authorization checks to each protected operation.
+
+## Production checklist
+
+- Serve authentication endpoints over HTTPS and configure trusted proxy boundaries before resolving client IP addresses.
+- Put session and pending-challenge tokens only in secure, HttpOnly cookies with appropriate `SameSite`, path, lifetime, and CSRF controls. Never put tokens in local storage, session storage, logs, analytics, or browser JSON.
+- Use a maintained Argon2id password-hashing provider. The exported `PasswordHasher` interface is a contract, not a built-in password hasher.
+- Use durable shared storage with the required uniqueness, conditional-write, and atomic-batch capabilities. Do not use in-memory storage for production identities, credentials, sessions, factors, tokens, audit events, or rate limits.
+- Use a shared persistent rate limiter across server instances. Protect and consistently configure the `rateLimitKeySecret` used to derive opaque counter keys.
+- Protect TOTP secrets with `AuthSecretProtector`. `WebCryptoAuthSecretProtector` uses AES-GCM and 32-byte keys; keep keys outside source control, retain old key IDs while records require decryption, and plan key rotation.
+- Keep recovery codes hashed at rest, reveal them only at creation/regeneration, and never write them to logs or audit metadata.
+- Set exact WebAuthn origins and RP IDs for the deployed site, require HTTPS, and do not trust browser-provided credential metadata without server verification.
+- Treat `mfa-enrollment-required`, `mfa-pending`, and `mfa-enrollment-pending` as restricted states. Only `authenticated` represents normal authenticated access.
+- Return generic public responses for password-reset requests so callers cannot discover whether an email address has an account.
+
+## Storage guarantees
+
+`initializeAuthStorage` requires unique constraints and atomic batches. The lifecycle and MFA managers additionally require conditional writes and atomic batches to enforce one-time token and challenge consumption; step-up also relies on conditional consumption and atomic session rotation. A storage adapter that advertises a capability must provide its actual concurrency guarantee, not just a best-effort check.
+
+`@puzzle-ui/storage` defines the adapter and capability model. Review the [storage documentation](/docs/storage) and verify behavior against your selected database and deployment topology before launch.
+
+## Secrets and token boundaries
+
+Auth action tokens, MFA challenge tokens, recovery codes, and session tokens are bearer credentials. Their hashed or protected persistence representation does not make the cleartext token safe to expose. Return only public user/factor state to browsers, send browser challenge responses to a trusted server endpoint, and keep the cleartext credential inside the cookie/server boundary.
+
+The built-in `WebCryptoAuthSecretProtector` is for TOTP secrets specifically. It uses AES-GCM with authenticated key IDs. Its constructor accepts `{ currentKeyId, keys }`, where each key value must be a 32-byte `Uint8Array`. It does not manage a secret store, rotation schedule, backup, or key-distribution policy for you.
+
+`SimpleWebAuthnProvider` adapts `@simplewebauthn/server` to the exported `WebAuthnProvider` contract. The manager binds challenges and expected origin/RP ID; retain the exact configured origin and RP ID and use the provider's verification results server-side.
+
+## Errors and responses
+
+The package exports `AuthError` and specialized subclasses with stable `code` values, including `INVALID_INPUT`, `INVALID_CREDENTIALS`, `EMAIL_NOT_VERIFIED`, `RATE_LIMITED`, `CONFLICT`, `CONFIGURATION`, `PROVIDER`, `SESSION`, `INVALID_TOKEN`, `MFA_CHALLENGE`, and `MFA_FACTOR`. Do not expose internal provider causes, challenge existence, factor-specific verification failures, or storage details in public responses. Log sanitized operational context only.
+
+## Audit and observability
+
+Core and lifecycle operations write auth audit events to the configured collection. MFA operations also record security-relevant factor and challenge events. Use those records for appropriate audit and incident-response workflows, while applying retention and access control for your environment. Do not treat audit records as application tracing spans or add credential contents to telemetry.
+
+For application-wide telemetry guidance, see [Observability](/docs/observability). For server handlers, cookie and CSRF integration, and framework adapters, see [`@puzzle-ui/fullstack`](/docs/fullstack) and the [developer authentication guide](/docs/developer/authentication).
+
+## Scope
+
+`@puzzle-ui/auth` does not provide OAuth or external identity providers, application-specific roles and permissions, authentication pages, or UI components. Compose its managers with your application's authorization policy and use [`@puzzle-ui/fullstack`](/docs/fullstack) for HTTP and client integration.

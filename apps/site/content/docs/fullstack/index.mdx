@@ -1,0 +1,77 @@
+---
+title: Fullstack
+description: Browser clients, React authentication UI, server handlers, and framework adapters for Puzzle Auth.
+---
+
+`@puzzle-ui/fullstack` connects Puzzle authentication services to browser applications and server routes. It provides a browser-safe auth client and React components, server-side `Request`/`Response` handlers, and adapters for Next.js and TanStack Start. It complements the framework-independent `@puzzle-ui/auth` and `@puzzle-ui/session` packages rather than replacing them.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React and React DOM 19 are required peer dependencies. The `next` and `@tanstack/react-start` peers are optional; install the framework you use to enable its adapter. For server setup, your app will also use `@puzzle-ui/auth`, `@puzzle-ui/session`, and a configured storage backend. See [Auth](/docs/auth), [Storage](/docs/storage), and the [authentication implementation guide](/docs/developer/authentication) for the service and persistence layers.
+
+## Quick start
+
+Wrap the client application in `AuthProvider`. It creates a client using `/api/auth` by default and loads the authentication snapshot from the server.
+
+```tsx
+import { AuthProvider } from "@puzzle-ui/fullstack/auth/client";
+
+export const Providers = ({ children }: { children: React.ReactNode }) => (
+  <AuthProvider>{children}</AuthProvider>
+);
+```
+
+Create and configure an `AuthServer` from your server-side auth and session managers, then connect it to framework routes. The adapters and exact setup are covered in the pages below.
+
+## What the package provides
+
+| Area | Description | Documentation |
+| --- | --- | --- |
+| Client and React UI | Browser client, provider and hooks, authentication forms, MFA settings, and configurable sign-in/sign-up experience. | [Client and React](/docs/fullstack/client) |
+| Server handlers | Authentication, MFA, sessions, lifecycle, route map, readiness checks, and step-up helpers. | [Server handlers](/docs/fullstack/server) |
+| Next.js adapter | `GET` and `POST` handlers for a Next.js route handler. | [Next.js](/docs/fullstack/next) |
+| TanStack Start adapter | A Request dispatcher or explicit route map for TanStack Start. | [TanStack Start](/docs/fullstack/tanstack) |
+| Shared contracts | Serializable client snapshots, inputs, and result types shared across runtimes. | [Shared types](/docs/fullstack/shared) |
+
+## Package entry points
+
+| Import | Use |
+| --- | --- |
+| `@puzzle-ui/fullstack/auth/client` | Browser client, React provider, hooks, UI, localization helpers, and passkey browser helpers. |
+| `@puzzle-ui/fullstack/auth/server` | Server construction, route map, request/session helpers, MFA and lifecycle handlers, and readiness checks. |
+| `@puzzle-ui/fullstack/auth/shared` | Shared TypeScript data contracts only; no runtime values. |
+| `@puzzle-ui/fullstack/auth/next` | Next.js route-handler adapter. |
+| `@puzzle-ui/fullstack/auth/tanstack` | TanStack Start request-handler adapter. |
+
+There is no package-root import; use one of the exported subpaths above. Keep auth policy and storage configuration in the appropriate lower-level packages, and use Fullstack to connect them to your app. For the end-to-end app setup, continue with the [developer authentication guide](/docs/developer/authentication).

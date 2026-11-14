@@ -1,0 +1,135 @@
+---
+title: Server handlers
+description: Configure Puzzle authentication handlers, route maps, session helpers, lifecycle endpoints, readiness checks, and step-up protection.
+---
+
+The `@puzzle-ui/fullstack/auth/server` entry point adapts the managers from `@puzzle-ui/auth` and `@puzzle-ui/session` to Web `Request` and `Response` handlers. It does not create your persistence layer or auth policy; configure those services separately. See [Auth](/docs/auth), [Storage](/docs/storage), and the [authentication guide](/docs/developer/authentication).
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React and React DOM 19 are required package peers. Server-side setup also needs initialized Puzzle auth, session, and storage services; install/import the packages that own the managers you configure.
+
+## Create the server
+
+Create manager instances using their package contracts, then pass them to `createAuthServer`. The server initializes the managers once before serving a handler; if initialization fails, the request receives a no-store `503` response and initialization can be retried on a later request.
+
+```ts
+import { createAuthServer, createAuthRouteHandlers } from "@puzzle-ui/fullstack/auth/server";
+import { auth, mfa, stepUp } from "./auth-managers";
+import { sessions, cookie, csrf } from "./session";
+
+export const authServer = createAuthServer({
+  auth,
+  mfa,
+  stepUp,
+  sessions,
+  cookie,
+  csrf,
+  resolveClientIp,
+});
+
+export const authRoutes = createAuthRouteHandlers(authServer);
+```
+
+`auth`, `mfa`, `stepUp`, `sessions`, `cookie`, `csrf`, and `resolveClientIp` are required. The supplied managers own their initialization. `resolveClientIp` must use the deployment's trusted proxy configuration; do not blindly trust arbitrary `X-Forwarded-For` values.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `auth` | `AuthManager` | — | Core auth manager. |
+| `mfa` | `StorageAuthMfaManager` | — | TOTP, recovery-code, and passkey MFA manager. |
+| `stepUp` | `StorageAuthStepUpManager` | — | Recent-authentication/step-up manager. |
+| `sessions` | `SessionManager` | — | Session persistence and validation manager. |
+| `cookie` | `SessionCookieOptions` | — | Session cookie settings from `@puzzle-ui/session`. |
+| `csrf` | `CsrfOptions` | — | CSRF policy from `@puzzle-ui/session`. |
+| `resolveClientIp` | `(request: Request) => string` | — | Resolve a client IP using trusted deployment proxy settings. |
+| `passwordHasher` | `PasswordHasher` | — | Optional auth password-hashing implementation. |
+| `emailProvider` | `EmailProvider` | — | Optional email delivery provider. |
+| `rateLimitProvider` | `RateLimitProvider` | — | Optional rate-limit provider. |
+| `lifecycle` | `AuthLifecycleHandlersOptions` | — | Optional email verification and password lifecycle services and URL builders. |
+
+## Route map
+
+`createAuthRouteHandlers(server, basePath?)` returns a map from pathname to supported HTTP methods. `basePath` defaults to `/api/auth`; trailing slashes are removed. A framework can register these paths directly or use a package adapter.
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/register` | Register a user. |
+| `POST` | `/sign-in` | Password sign-in. |
+| `GET` | `/state` | Read the current public auth snapshot. |
+| `POST` | `/sign-out` | End the current session. |
+| `POST` | `/mfa/sign-in/totp`, `/mfa/sign-in/recovery-code` | Complete sign-in MFA. |
+| `POST` | `/mfa/passkey/sign-in/start`, `/mfa/passkey/sign-in/finish` | Begin or complete passkey sign-in. |
+| `POST` | `/mfa/passkey/challenge/start`, `/mfa/passkey/challenge/finish` | Begin or complete passkey MFA. |
+| `POST` | `/mfa/totp/enrollment/start`, `/mfa/totp/enrollment/finish` | Enroll a TOTP factor. |
+| `POST` | `/mfa/passkey/enrollment/start`, `/mfa/passkey/enrollment/finish` | Enroll a passkey. |
+| `POST` | `/mfa/enrollment/required/totp/start`, `/mfa/enrollment/required/totp/finish` | Complete required TOTP enrollment. |
+| `POST` | `/mfa/enrollment/required/passkey/start`, `/mfa/enrollment/required/passkey/finish` | Complete required passkey enrollment. |
+| `GET` | `/mfa/factors` | List MFA factors. |
+| `POST` | `/mfa/factors/remove` | Remove an MFA factor. |
+| `POST` | `/mfa/recovery-codes/regenerate` | Regenerate recovery codes. |
+| `POST` | `/mfa/step-up/start`, `/mfa/step-up/totp`, `/mfa/step-up/recovery-code` | Start or verify a step-up challenge. |
+| `POST` | `/mfa/step-up/passkey/start`, `/mfa/step-up/passkey/finish` | Verify step-up using a passkey. |
+| `POST` | `/email/verification/request`, `/email/verification/verify` | Request or complete email verification; only when lifecycle handlers are configured. |
+| `POST` | `/password/reset/request`, `/password/reset/finish`, `/password/change` | Request/complete reset or change a password; only when lifecycle handlers are configured. |
+
+The optional `lifecycle` configuration requires a `StorageAuthLifecycleManager`, session and CSRF settings, `resolveClientIp`, and `verificationUrl(request)` / `passwordResetUrl(request)` builders. Reset requests use a generic public response to help prevent account enumeration.
+
+## Session and step-up helpers
+
+| Export | Purpose |
+| --- | --- |
+| `getRequestSession(request, options)` | Validate the session cookie and return a `SessionRecord` or `null`. |
+| `protectAuthenticatedRequest(request, csrf)` | Enforce the configured CSRF policy for a state-changing authenticated request. |
+| `createSessionResponse` / `clearSessionResponse` | Build responses that set or clear a session cookie using supplied options. |
+| `logoutRequest` / `logoutAllRequest` | End one or all sessions for the authenticated request. |
+| `hasRecentStepUp(session, maxAgeSeconds?, now?)` | Check whether a session has recent verified step-up. |
+| `requireRecentStepUp(request, options, maxAgeSeconds?)` | Validate a session and require recent MFA; throws `AuthStepUpRequiredError` when insufficient. |
+
+Use `requireRecentStepUp` inside sensitive server actions, after the caller has established the appropriate CSRF and authorization policy.
+
+## Readiness checks
+
+`createAuthReadinessHandler({ checks })` returns a `GET`/`HEAD` handler. Each check has a unique lowercase `name` (up to 64 characters) and a synchronous or asynchronous `check` function; `false` or a thrown error marks it unavailable. The handler returns `200` with `ready` or `503` with `unavailable`, with `Cache-Control: no-store`. Avoid putting secrets or sensitive state in check names or results.
+
+## Security and production notes
+
+Configure session cookies and CSRF protection deliberately through `@puzzle-ui/session`; do not rely on defaults you have not reviewed. Only trust forwarded client-IP headers from known proxies. Keep storage credentials and service managers server-only. Protect server actions independently of client-side auth state, and require recent step-up for sensitive actions. The handlers use no-store responses for auth data and keep MFA challenge tokens in cookies rather than exposing the raw token in JSON.
+
+## Exports
+
+Runtime exports: `createAuthServer`, `createAuthRouteHandlers`, `getRequestSession`, `protectAuthenticatedRequest`, `createSessionResponse`, `clearSessionResponse`, `logoutRequest`, `logoutAllRequest`, `MFA_CHALLENGE_COOKIE_NAME`, `serializeMfaChallengeCookie`, `serializeClearedMfaChallengeCookie`, `readMfaChallengeCookie`, `createMfaPendingResponse`, `createMfaChallengeResponse`, `createAuthMfaHandlers`, `hasRecentStepUp`, `requireRecentStepUp`, `AuthStepUpRequiredError`, `createAuthLifecycleHandlers`, and `createAuthReadinessHandler`.
+
+Types include `AuthServerOptions`, `AuthServerHandlers`, `AuthServer`, `AuthHttpMethod`, `AuthRouteHandlerMap`, `AuthMfaHandlersOptions`, `AuthMfaHandlers`, `AuthMfaPendingResponse`, `AuthClientUserResponse`, `AuthLifecycleHandlersOptions`, `AuthLifecycleHandlers`, `SessionRequestOptions`, `SessionResponseOptions`, `AuthReadinessCheck`, `AuthReadinessOptions`, and `AuthReadinessResult`.
+
+For Next.js, see the [Next.js adapter](/docs/fullstack/next); for TanStack Start, see the [TanStack Start adapter](/docs/fullstack/tanstack).

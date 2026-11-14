@@ -1,0 +1,126 @@
+---
+title: Auth MFA and Step-Up
+description: Configure TOTP, WebAuthn passkeys, recovery codes, mandatory MFA enrollment, and session-bound step-up authentication with @puzzle-ui/auth.
+---
+
+`StorageAuthMfaManager` implements optional or required multi-factor authentication for `@puzzle-ui/auth`. It supports TOTP authenticator apps, WebAuthn passkeys, and single-use recovery codes. `StorageAuthStepUpManager` uses an additional verified factor to rotate an existing authenticated session after a sensitive action requires recent MFA.
+
+## Configure MFA
+
+```ts
+import {
+  SimpleWebAuthnProvider,
+  StorageAuthManager,
+  StorageAuthMfaManager,
+  WebCryptoAuthSecretProtector,
+} from "@puzzle-ui/auth";
+
+const secretProtector = new WebCryptoAuthSecretProtector({
+  currentKeyId: "totp-key-2026",
+  keys: { "totp-key-2026": encryptionKeyBytes },
+});
+
+const mfa = new StorageAuthMfaManager(
+  {
+    storage,
+    sessions,
+    passwordHasher,
+    rateLimitProvider,
+    secretProtector,
+    webAuthnProvider: new SimpleWebAuthnProvider(),
+  },
+  {
+    rateLimitKeySecret,
+    webAuthn: {
+      rpId: "example.com",
+      rpName: "Example",
+      origin: "https://example.com",
+    },
+  },
+);
+
+const auth = new StorageAuthManager(
+  { storage, passwordHasher, rateLimitProvider, sessions, mfa },
+  { rateLimitKeySecret, mfaPolicy: { required: true } },
+);
+
+await auth.initialize();
+```
+
+Use a 32-byte `Uint8Array` encryption key sourced from a secret manager, not a literal in application code. If passkeys are disabled, omit both the `webAuthn` option and `webAuthnProvider`. If enabled, configure both together and use the exact production origin and RP ID.
+
+## MFA policy and enrollment
+
+MFA is optional by default. `AuthMfaPolicy.required` requires every user to have and use an active factor; `requiredFor(user)` can require it for selected users. Existing active factors are challenged at sign-in even when MFA policy is optional. A policy that requires MFA without configuring an MFA manager fails closed.
+
+When policy requires a first factor, registration or password sign-in returns `mfa-enrollment-pending` rather than an authenticated session. Complete enrollment through `beginRequiredTotpEnrollment` and `verifyRequiredTotpEnrollment`, or `beginRequiredPasskeyEnrollment` and `finishRequiredPasskeyEnrollment`. Only successful verification completes enrollment and returns an authenticated result plus recovery codes.
+
+For an already authenticated user, factor-management methods require the session token and current password where appropriate. TOTP enrollment is a two-step process:
+
+```ts
+const pending = await mfa.beginTotpEnrollment({
+  sessionToken,
+  currentPassword,
+  ipAddress,
+  label: "Authenticator",
+});
+
+// Show pending.otpauthUrl as a QR code or display pending.secret once.
+const completed = await mfa.verifyTotpEnrollment({
+  sessionToken,
+  factorId: pending.factorId,
+  code: submittedCode,
+  ipAddress,
+});
+
+// Show completed.recoveryCodes once, then do not persist or log them.
+```
+
+The pending TOTP secret is returned so the application can display it during setup; the manager stores its protected representation. Recovery codes are returned only when generated or regenerated. Show them once and ask the user to store them safely.
+
+## MFA methods
+
+| Method | Purpose |
+| --- | --- |
+| `beginTotpEnrollment` / `verifyTotpEnrollment` | Start and confirm TOTP enrollment for an authenticated session. |
+| `beginPasskeyRegistration` / `finishPasskeyRegistration` | Start and verify a passkey registration ceremony. |
+| `listFactors(sessionToken)` | List the signed-in user's public factors. |
+| `getRecoveryCodeCount(sessionToken)` | Return the remaining unused recovery-code count. |
+| `regenerateRecoveryCodes(input)` | Require the current password, invalidate unused prior codes, and return a new set. |
+| `removeFactor(input)` | Remove a factor after current-password confirmation. |
+| `verifySignInTotp(input)` / `verifySignInRecoveryCode(input)` | Complete a password-backed MFA sign-in challenge. |
+| `beginPasskeyMfa(token, ipAddress)` / `finishPasskeyMfa(input)` | Complete password-backed MFA with a passkey. |
+| `beginPasskeySignIn(input)` / `finishPasskeySignIn(input)` | Start and complete discoverable passkey sign-in without an email/password step. |
+| `beginRequiredTotpEnrollment` / `verifyRequiredTotpEnrollment` | Enroll the first TOTP factor for a required-enrollment challenge. |
+| `beginRequiredPasskeyEnrollment` / `finishRequiredPasskeyEnrollment` | Enroll the first passkey for a required-enrollment challenge. |
+
+Passkey methods return WebAuthn options for the browser to use and accept the browser response for server-side verification. Keep challenge tokens in short-lived secure, HttpOnly cookies; do not serialize them into browser JSON or browser storage. The manager validates WebAuthn challenges, origin, RP ID, user verification, and authenticator counters.
+
+TOTP verification prevents reusing an accepted time step. MFA challenges are single-use, expire after the configured lifetime, and are limited to five failed attempts. Recovery codes are single-use and stored as hashes; regeneration invalidates unused prior codes.
+
+## Step-up authentication
+
+Initialize `StorageAuthStepUpManager` with storage, sessions, and the configured MFA manager. `beginStepUp({ sessionToken, ipAddress })` creates a challenge tied to the current session. Complete it using `verifyTotp`, `verifyRecoveryCode`, or `beginPasskey` followed by `finishPasskey`. Completion consumes the challenge, rotates the original session, and returns the replacement session token. Store that token in the same secure cookie boundary as ordinary sessions.
+
+The rotated session metadata includes `authenticationMethod`, `mfaVerifiedAt`, `stepUpVerifiedAt`, and `stepUpOfSessionId`. Your application must enforce its own maximum-age policy by validating the timestamp in trusted server code; the auth package does not authorize business operations automatically. The `AuthStepUpManagerOptions` expose `collectionName` (default `auth_mfa_step_up_challenges`) and an injectable `clock`.
+
+## MFA configuration defaults
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `rateLimitKeySecret` | `string` | Required | At least 32 characters; used to derive rate-limit keys. |
+| `usersCollection` | `string` | `auth_users` | User records. |
+| `credentialsCollection` | `string` | `auth_credentials` | Password credential records. |
+| `auditCollection` | `string` | `auth_audit_events` | Audit events. |
+| `factorsCollection` | `string` | `auth_mfa_factors` | TOTP and passkey factor records. |
+| `challengesCollection` | `string` | `auth_mfa_challenges` | Hashed, expiring MFA challenges. |
+| `recoveryCodesCollection` | `string` | `auth_recovery_codes` | Hashed, single-use recovery codes. |
+| `challengeLifetimeSeconds` | `number` | `300` | Challenge lifetime; valid range is 30–600 seconds. |
+| `recoveryCodeCount` | `number` | `10` | Codes issued at enrollment or regeneration; valid range is 5–20. |
+| `issuer` | `string` | `Puzzle Auth` | TOTP issuer label. |
+| `totp` | `Partial<AuthMfaTotpOptions>` | `{ digits: 6, periodSeconds: 30, window: 1 }` | TOTP digits, period and adjacent time-step window. Allowed ranges: 6–8 digits, 15–120 seconds, and a window from 0–2. |
+| `webAuthn` | `AuthMfaWebAuthnOptions` | Unset | Exact `rpId`, `rpName`, and browser `origin`; must be supplied with a WebAuthn provider. |
+| `requireVerifiedEmail` | `boolean` | `false` | Require verified email for MFA flows; align with the core and lifecycle managers. |
+| `clock` | `() => Date` | `() => new Date()` | Clock injection for tests. |
+
+MFA uses rate limiting as well as short-lived challenges. Verification operations default to 5 attempts per IP and, where known, user in 300 seconds; start operations default to 10 attempts per IP and, where known, user in 900 seconds. Configure a shared rate limiter in production and preserve conditional-write and atomic-batch semantics in the storage adapter.

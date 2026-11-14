@@ -1,0 +1,79 @@
+---
+title: Shared types
+description: Serializable authentication snapshots, inputs, user data, and results exposed by the shared entry point.
+---
+
+The `@puzzle-ui/fullstack/auth/shared` subpath contains data-only TypeScript contracts used across browser and server code. It has no runtime exports, so import these types when defining app boundaries or passing auth state between runtimes. The client entry point re-exports most client-facing contracts; `AuthClientLifecycleResult` is available from this shared subpath.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React and React DOM 19 are required peers by the package, including when you only consume shared types.
+
+## Import types
+
+```ts
+import type {
+  AuthClientSnapshot,
+  AuthClientStatus,
+  AuthClientUser,
+  AuthClientRegisterInput,
+  AuthClientLifecycleResult,
+} from "@puzzle-ui/fullstack/auth/shared";
+```
+
+## Contracts
+
+| Type | Description |
+| --- | --- |
+| `AuthClientStatus` | UI state: `loading`, `unauthenticated`, MFA or enrollment pending states, `step-up-pending`, or `authenticated`. |
+| `AuthClientUser` | Public user fields: `id`, `email`, nullable `name` and `image`, and `emailVerified`. |
+| `AuthClientMfaState` | Pending MFA purpose, challenge ID, expiry, and optional available factor types. |
+| `AuthClientOptions` | Browser client `basePath`, fetch `credentials`, and optional `fetcher`. |
+| `AuthClientSnapshot` | `status`, public `user` or `null`, and optional MFA state. |
+| `AuthClientSignInInput` | Email and password sign-in fields. |
+| `AuthClientRegisterInput` | Email, password, and optional nullable name. |
+| `AuthClientMfaFactor` | Factor ID, type, status, label, creation time, and last-use time. |
+| `AuthClientTotpEnrollment` | TOTP enrollment status, factor ID, secret, `otpauthUrl`, and expiry. Treat the secret as sensitive. |
+| `AuthClientEnrollmentResult` | Added factor and one-time recovery codes. Display and store recovery codes securely. |
+| `AuthClientRecoveryCodesResult` | Newly regenerated recovery codes. |
+| `AuthClientFactorList` | Active/pending factors and recovery-code count. |
+| `AuthClientLifecycleResult` | Status for verification request/completion and password reset/change results. |
+
+These are public response contracts, not proof that a user is authorized for an operation. Enforce access control on the server and avoid exposing enrollment secrets or recovery codes beyond the authenticated flow.
+
+## Exports
+
+Type-only exports: `AuthClientStatus`, `AuthClientUser`, `AuthClientMfaState`, `AuthClientOptions`, `AuthClientSnapshot`, `AuthClientSignInInput`, `AuthClientRegisterInput`, `AuthClientMfaFactor`, `AuthClientTotpEnrollment`, `AuthClientEnrollmentResult`, `AuthClientRecoveryCodesResult`, `AuthClientFactorList`, and `AuthClientLifecycleResult`.
+
+See the [client API](/docs/fullstack/client) for provider and browser usage, or the [server handlers](/docs/fullstack/server) for server-side contracts.

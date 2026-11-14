@@ -1,0 +1,168 @@
+---
+title: Client and React
+description: Use the browser authentication client, React provider and hooks, forms, MFA settings, and configurable auth experience.
+---
+
+The `@puzzle-ui/fullstack/auth/client` entry point is browser-safe. `AuthProvider` shares one client and an authentication snapshot with descendants; session credentials remain managed by the server rather than browser storage.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/fullstack react react-dom
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React and React DOM 19 are required peer dependencies. The UI is built with `@puzzle-ui/ui`; that dependency is installed with the package.
+
+## Quick start
+
+```tsx
+import { AuthProvider, useAuth, useSession, useUser } from "@puzzle-ui/fullstack/auth/client";
+
+export const Providers = ({ children }: { children: React.ReactNode }) => (
+  <AuthProvider options={{ basePath: "/api/auth" }} locale="en">
+    {children}
+  </AuthProvider>
+);
+
+export const Account = () => {
+  const session = useSession();
+  const user = useUser();
+  const { signOut } = useAuth();
+
+  if (session.isLoading) return <p>Loading…</p>;
+  if (!user) return <p>Signed out</p>;
+
+  return <button onClick={() => void signOut()}>Sign out {user.email}</button>;
+};
+```
+
+`useAuth` must be called below `AuthProvider`; it exposes the client, snapshot, messages, state flags, refresh, and auth/lifecycle actions. `useSession` returns the status, optional MFA state, and loading/authenticated flags. `useUser` returns the current public user or `null`.
+
+## Client options and provider props
+
+`createAuthClient` accepts `AuthClientOptions`. Its default base path is `/api/auth`, and its default fetch credentials mode is `same-origin`.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `basePath` | `string` | `"/api/auth"` | Absolute same-origin URL path prefix for the server endpoints. Query strings, fragments, and protocol-relative paths are rejected. |
+| `credentials` | `"same-origin" \| "include"` | `"same-origin"` | Fetch credentials mode for auth requests. |
+| `fetcher` | `typeof fetch` | `fetch` | Fetch implementation used to call the server. |
+
+`AuthProvider` accepts these props:
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `children` | `ReactNode` | — | Descendant UI that can access auth context. |
+| `client` | `AuthClient` | Created from `options` | Supply an existing client instead of letting the provider create one. |
+| `options` | `AuthClientOptions` | — | Options for the provider-created client. |
+| `initialSnapshot` | `AuthClientSnapshot` | — | Initial public snapshot, useful when the server already loaded auth state. |
+| `locale` | `string` | `"en"` | Locale identifier used to resolve messages. English is the built-in fallback. |
+| `messages` | `AuthMessageOverrides` | — | Partial per-message overrides. |
+| `onAuthStateChange` | `(snapshot: AuthClientSnapshot) => void` | — | Called when the provider observes an updated snapshot. |
+
+## React components
+
+All components below are exported from the client entry point and require an `AuthProvider` ancestor.
+
+| Component | Purpose | Notable props |
+| --- | --- | --- |
+| `SignInForm` | Email/password sign-in form. | `className`, `redirectTo`, `onSuccess`, `onForgotPassword`, `onSignUp` |
+| `SignUpForm` | Registration form. | `className`, `redirectTo`, `onSuccess`, `onSignIn` |
+| `MfaChallengeForm` | Handles the pending MFA challenge. | `className`, `redirectTo`, `onSuccess` |
+| `AuthScreen` | Selects sign-in or sign-up UI and supports custom children. | `mode` (`"sign-in"` or `"sign-up"`), `children`, `className`, callbacks, `redirectTo` |
+| `MfaSettings` | Manage the signed-in user's MFA factors and recovery codes. | `className` |
+
+`redirectTo` values are restricted to safe, same-origin paths. If no redirect is supplied, use the callbacks or render your own navigation.
+
+## Configurable auth experience
+
+`AuthExperience` combines branded sign-in/sign-up UI and custom registration fields. Use `onSubmit` when the app must persist additional field values itself; custom fields are not added to the auth user model automatically.
+
+```tsx
+import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";
+
+export const Register = () => (
+  <AuthExperience
+    mode="sign-up"
+    config={{
+      branding: { title: "Create your account" },
+      redirects: { afterSignUp: "/dashboard" },
+      fields: [
+        {
+          name: "company",
+          label: "Company",
+          type: "text",
+          required: true,
+          validate: (value) => (value ? null : "Enter your company."),
+        },
+      ],
+    }}
+    onSubmit={async ({ registration, fields, signUp }) => {
+      const snapshot = await signUp(registration);
+      await saveCompany(registration.email, fields.company);
+      return snapshot;
+    }}
+  />
+);
+```
+
+| Configuration | Type | Description |
+| --- | --- | --- |
+| `mode` | `"sign-in" \| "sign-up"` | Form mode; defaults to `"sign-in"`. |
+| `branding` | `AuthExperienceBranding` | Optional `logo`, `title`, and `description` React nodes. |
+| `layout` | `AuthExperienceLayout` | Optional class names, header/footer, width (`"sm"`, `"md"`, `"lg"`, `"full"`), and alignment (`"left"`, `"center"`). |
+| `redirects` | `AuthExperienceRedirects` | Optional `afterSignIn` and `afterSignUp` paths. Only safe root-relative paths are followed. |
+| `fields` | `readonly AuthCustomField[]` | Additional sign-up fields of type text, email, tel, url, number, checkbox, select, or textarea. |
+| `onSubmit` | `(input: AuthExperienceSubmitInput) => Promise<AuthClientSnapshot>` | Custom registration flow; receives standard registration values, custom field values, and the normal `signUp` action. |
+| `onSuccess`, `onSignIn`, `onSignUp`, `onForgotPassword` | `() => void` | Optional flow callbacks. |
+
+Custom field names must start with a letter, contain only letters, digits, `_` or `-`, and must not use reserved names (`name`, `email`, `password`, `confirmPassword`). `select` fields use `AuthFieldOption` entries. Validation may be synchronous or asynchronous and should return a message for invalid values.
+
+## Localization and passkeys
+
+English is built in. `getAuthLocale` selects a configured locale or falls back to English; `resolveAuthMessages` merges English defaults, locale messages, and per-message overrides. `AuthMessages` describes the complete message set and `AuthMessageOverrides` is a partial override. `AuthProvider.messages` supports per-message overrides.
+
+`isPasskeySupported` checks browser credential APIs. `startPasskeyRegistration` and `startPasskeyAuthentication` validate the server-provided WebAuthn challenge and invoke the browser ceremony. `createPasskeyBrowserHelpers` allows injecting a `PasskeyBrowserAdapter` for testing or platform-specific integration. Use these through the client methods where possible; the server must verify every assertion and registration.
+
+## Client API
+
+`AuthClient` provides `register`, `signIn`, `signOut`, and `getSnapshot`; TOTP/recovery-code/passkey challenge verification; required and optional MFA enrollment; factor listing/removal and recovery-code regeneration; step-up verification; and email/password lifecycle methods. MFA and lifecycle actions return the typed snapshots/results in [shared types](/docs/fullstack/shared). Errors from failed HTTP responses are represented by `AuthClientError`, which includes `status` and `code`.
+
+## Accessibility and security
+
+The forms use semantic form controls and Puzzle UI field components. Preserve their labels and visible validation feedback when styling them. A browser snapshot is public UI state, not authorization: protect data and actions on the server with `@puzzle-ui/auth` and `@puzzle-ui/session`. Never store session credentials in local storage or trust client-supplied identity data.
+
+## Exports
+
+Runtime exports: `AuthClientError`, `createAuthClient`, `createPasskeyBrowserHelpers`, `isPasskeySupported`, `startPasskeyRegistration`, `startPasskeyAuthentication`, `AuthProvider`, `useAuth`, `useSession`, `useUser`, `SignInForm`, `SignUpForm`, `MfaChallengeForm`, `AuthScreen`, `MfaSettings`, `AuthExperience`, `getAuthLocale`, and `resolveAuthMessages`.
+
+Type exports: `AuthClient`, `AuthClientStatus`, `AuthClientUser`, `AuthClientOptions`, `AuthClientSnapshot`, `AuthClientMfaState`, `AuthClientSignInInput`, `AuthClientRegisterInput`, `AuthClientMfaFactor`, `AuthClientTotpEnrollment`, `AuthClientEnrollmentResult`, `AuthClientRecoveryCodesResult`, `AuthClientFactorList`, `PasskeyBrowserAdapter`, `PasskeyBrowserHelpers`, `AuthProviderProps`, `AuthContextValue`, `AuthFormProps`, `SignInFormProps`, `SignUpFormProps`, `MfaChallengeFormProps`, `AuthScreenProps`, `MfaSettingsProps`, `AuthExperienceProps`, `AuthExperienceConfig`, `AuthExperienceBranding`, `AuthExperienceLayout`, `AuthExperienceRedirects`, `AuthCustomField`, `AuthFieldOption`, `AuthFieldValue`, `AuthFieldValues`, `AuthRegistrationInput`, `AuthExperienceSubmitInput`, `AuthLocale`, `AuthMessages`, and `AuthMessageOverrides`.
+
+For server wiring, continue to [Server handlers](/docs/fullstack/server) or use a [framework adapter](/docs/fullstack/next).

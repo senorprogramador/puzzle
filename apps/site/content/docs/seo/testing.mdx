@@ -1,0 +1,82 @@
+---
+title: Testing
+description: Test SEO fixtures and inspect graph validation diagnostics.
+---
+
+<code>@puzzle-ui/seo</code> includes framework-independent helpers for testing graphs and metadata in your existing test runner.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React 19 is a peer dependency. Framework adapters do not require a framework package at runtime.
+
+## Quick start
+
+```ts
+import { assertSeoTest, createSeoTestFixture } from "@puzzle-ui/seo/testing";
+
+const fixture = createSeoTestFixture({
+  config: { siteUrl: "https://example.com" },
+  nodes: [{ "@type": "Organization", name: "Example" }],
+  metadata: { title: "Welcome to Example", description: "Discover the Example website and its services.", canonical: "https://example.com/" },
+});
+assertSeoTest(fixture, { strict: true });
+```
+
+A fixture requires `config.siteUrl` and accepts `nodes` or `graph`, but not both, plus optional `metadata`. `createSeoTestFixture` builds a graph from nodes. `assertSeoTest` returns a result or throws formatted diagnostics; `runSeoTest` returns the result without throwing.
+
+## Test options and inspection
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `strict` | `boolean` | `false` | Use strict validation instead of warn mode. |
+| `validateSchema` | `boolean` | `true` | Include schema issues in the test result. |
+| `validateMetadata` | `boolean` | `true` | Include metadata validation. |
+| `validateReferences` | `boolean` | `true` | Include unresolved-reference issues. |
+
+```ts
+import { formatSeoDiagnostics, inspectSeoGraph, runSeoTest } from "@puzzle-ui/seo/testing";
+
+const result = runSeoTest(fixture);
+console.log(formatSeoDiagnostics(result.report));
+if (fixture.graph) {
+  const inspection = inspectSeoGraph(fixture.graph, { baseUrl: "https://example.com" });
+  console.log(inspection.typeCounts, inspection.unresolvedReferences);
+}
+```
+
+The result has `passed`, `errors`, `warnings`, and a filtered `report`. Inspection also includes node count, node IDs and types, properties, references and validity. Diagnostic formatting accepts `includeSuggestions`, `includePaths`, and `includeSummary`, all enabled by default. Keep checks enabled unless a test intentionally isolates a particular concern.
+
+## Exports
+
+`@puzzle-ui/seo/testing` exports `createSeoTestFixture`, `runSeoTest`, `assertSeoTest`, `inspectSeoGraph`, `formatSeoDiagnostics`, and fixture, result, inspection and formatting types.

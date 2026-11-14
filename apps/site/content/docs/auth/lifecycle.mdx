@@ -1,0 +1,71 @@
+---
+title: Auth Account Lifecycle
+description: Use @puzzle-ui/auth for email verification, password reset and change, profile updates, email changes, and account closure.
+---
+
+`StorageAuthLifecycleManager` adds account-maintenance workflows to `@puzzle-ui/auth`. It uses the same storage, session manager, password hasher, and shared rate-limit provider as the core manager, plus an `EmailProvider` for verification and reset messages.
+
+## Configure and initialize
+
+```ts
+import { StorageAuthLifecycleManager } from "@puzzle-ui/auth";
+
+const lifecycle = new StorageAuthLifecycleManager(
+  { storage, passwordHasher, emailProvider, sessions, rateLimitProvider },
+  { rateLimitKeySecret },
+);
+
+await lifecycle.initialize();
+```
+
+The `rateLimitProvider` dependency is optional; when omitted, the lifecycle manager creates a `StorageRateLimitProvider` using its configured rate-limit collection. The storage adapter must support unique constraints, conditional writes, and atomic batches.
+
+## Workflows
+
+| Method | Input | Result | Behavior |
+| --- | --- | --- | --- |
+| `sendEmailVerification(input)` | `RequestEmailVerificationInput` | `Promise<void>` | Sends a verification message for the specified `userId`; input includes `verificationUrl` and `ipAddress`. |
+| `verifyEmail(token)` | token string | `Promise<AuthUser>` | Consumes a valid email-verification token and marks the account verified. |
+| `requestPasswordReset(input)` | `RequestPasswordResetInput` | `Promise<void>` | Requests a reset using `email`, `resetUrl`, and `ipAddress`. Use a non-enumerating public response. |
+| `resetPassword(input)` | `ResetPasswordInput` | `Promise<void>` | Consumes the supplied reset token and sets `newPassword`. |
+| `changePassword(input)` | `ChangePasswordInput` | `Promise<void>` | Requires `sessionToken`, `currentPassword`, and `newPassword`. |
+| `updateProfile(input)` | `UpdateAuthProfileInput` | `Promise<AuthUser>` | Updates the signed-in user's optional `name` and/or `image`. |
+| `requestEmailChange(input)` | `RequestEmailChangeInput` | `Promise<void>` | Requires the session and current password; sends confirmation for the requested `email` using `verificationUrl` and `ipAddress`. |
+| `verifyEmailChange(token)` | token string | `Promise<AuthUser>` | Consumes the confirmation token and applies the new email. |
+| `deactivateAccount(input)` | `DeactivateAuthAccountInput` | `Promise<void>` | Deactivates the signed-in account after password confirmation. |
+| `deleteAccount(input)` | `DeleteAuthAccountInput` | `Promise<void>` | Deletes the signed-in account after password confirmation. |
+
+Lifecycle methods use the authenticated session for profile, password, email-change, deactivation, and deletion operations. Email verification and password reset use single-use action tokens. Never log the full token or include it in analytics.
+
+## `AuthLifecycleManagerOptions`
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `rateLimitKeySecret` | `string` | Required | At least 32 characters; used for opaque rate-limit identifiers. |
+| `usersCollection` | `string` | `auth_users` | User records collection. |
+| `credentialsCollection` | `string` | `auth_credentials` | Password credential collection. |
+| `actionTokensCollection` | `string` | `auth_action_tokens` | Single-use email and password action tokens. |
+| `auditCollection` | `string` | `auth_audit_events` | Lifecycle audit events. |
+| `rateLimitsCollection` | `string` | `auth_rate_limits` | Storage-backed rate-limit counters when using the default provider. |
+| `minimumPasswordLength` | `number` | `8` | Minimum new-password length. |
+| `maximumPasswordLength` | `number` | `1024` | Maximum password length, also subject to a 4096 UTF-8 byte limit. |
+| `emailVerificationTokenLifetimeSeconds` | `number` | `3600` | Email-verification token lifetime. |
+| `passwordResetTokenLifetimeSeconds` | `number` | `3600` | Password-reset token lifetime. |
+| `emailChangeTokenLifetimeSeconds` | `number` | `3600` | Email-change token lifetime. |
+| `emailTemplates` | Partial template map | See defaults below | Template identifiers passed to the email provider. |
+| `emailSubjects` | Partial subject map | See defaults below | Message subjects passed to the email provider. |
+| `rateLimits` | `AuthLifecycleRateLimitPolicies` | See defaults below | Override email and IP rules for verification, reset, and email change. |
+| `clock` | `() => Date` | `() => new Date()` | Clock injection for tests. |
+| `requireVerifiedEmail` | `boolean` | `false` | Align with the core manager's email-verification policy. |
+| `onEmailDeliveryError` | `(error: unknown) => void` | Unset | Optional callback for email delivery failures. Do not log secrets from provider errors. |
+| `onSessionRevocationError` | `(error: unknown) => void` | Unset | Optional callback for session-revocation failures during lifecycle operations. |
+
+Default template identifiers are `auth/email-verification`, `auth/password-reset`, and `auth/email-change-verification`. Default subjects are “Verify your email address”, “Reset your password”, and “Confirm your new email address”.
+
+The default rate limits for each of email verification, password reset, and email change are 3 requests per email per hour and 10 requests per IP per hour. Public reset endpoints should return the same response whether or not an account exists.
+
+## Email provider contract
+
+Implement the exported `EmailProvider.send(message)` contract. Each message contains `to`, `subject`, `template`, and a string-valued `variables` map. Provide your own delivery, templates, retries, and URL generation. Links must use an application-controlled trusted origin; do not build security-sensitive links from an untrusted `Host` header.
+
+See [`@puzzle-ui/fullstack`](/docs/fullstack) for HTTP integration. Pair this page with the [storage guide](/docs/storage) for the persistence guarantees required by single-use account action tokens.

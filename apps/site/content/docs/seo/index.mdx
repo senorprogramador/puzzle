@@ -1,0 +1,93 @@
+---
+title: SEO
+description: Build metadata, structured data, and technical SEO endpoints with @puzzle-ui/seo.
+---
+
+<code>@puzzle-ui/seo</code> combines framework-independent graph and metadata utilities with React components and server route adapters. Use it to keep page metadata, Schema.org JSON-LD, sitemaps, and robots.txt consistent across an application.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React 19 is a peer dependency. Framework adapters do not require a framework package at runtime.
+
+## Quick start
+
+```tsx
+import { LDOrganization, SeoHead, SeoProvider } from "@puzzle-ui/seo";
+
+export const App = () => (
+  <SeoProvider
+    config={{ siteUrl: "https://example.com", identity: { name: "Example" } }}
+    metadata={{ title: "Home", canonical: "/" }}
+  >
+    <SeoHead />
+    <LDOrganization name="Example" url="https://example.com" />
+    <main>Welcome</main>
+  </SeoProvider>
+);
+```
+
+The provider collects schema nodes into one script; `SeoHead` renders the active metadata. Render the application on the server when metadata and structured data must be present in the initial response.
+
+## What the package provides
+
+| Area | Description | Documentation |
+| --- | --- | --- |
+| Metadata and URLs | Configure defaults, resolve page metadata and normalize URLs. | [Metadata and URLs](/docs/seo/metadata) |
+| Structured data | Build and validate Schema.org graphs and serialize JSON-LD. | [Structured Data](/docs/seo/structured-data) |
+| React integration | Render metadata and register schema nodes with a provider. | [React Integration](/docs/seo/react) |
+| Sitemaps | Generate sitemap files and indexes. | [Sitemaps](/docs/seo/sitemaps) |
+| Robots | Generate and validate robots.txt. | [Robots](/docs/seo/robots) |
+| Validation | Inspect graph, schema, metadata and rich-result diagnostics. | [Validation](/docs/seo/validation) |
+| Server and frameworks | Serve endpoints with Fetch handlers and framework adapters. | [Framework Adapters](/docs/seo/frameworks) |
+| Testing | Assert fixtures and inspect graph diagnostics. | [Testing](/docs/seo/testing) |
+
+## Entry points
+
+| Import | Runtime exports |
+| --- | --- |
+| `@puzzle-ui/seo` | Core graph, React, validation, sitemap, robots, URL and testing exports; context, schema, metadata and server types. |
+| `@puzzle-ui/seo/core` | Graph creation, merging, reference resolution, validation and serialization. |
+| `@puzzle-ui/seo/context` | Configuration and URL resolution helpers. |
+| `@puzzle-ui/seo/schema` | Schema registry, generated definitions and node validation. |
+| `@puzzle-ui/seo/metadata` | Metadata and robots resolution. |
+| `@puzzle-ui/seo/react` | Provider, metadata and Schema.org React components and hooks. |
+| `@puzzle-ui/seo/server` | Framework-independent text and Fetch route handlers. |
+| `@puzzle-ui/seo/sitemap` | Sitemap generation and XML helpers. |
+| `@puzzle-ui/seo/robots` | robots.txt validation and generation. |
+| `@puzzle-ui/seo/testing` | Fixtures, assertions, inspection and diagnostic formatting. |
+| `@puzzle-ui/seo/validation` | Complete SEO validation. |
+| `@puzzle-ui/seo/urls` | URL normalization and origin helpers. |
+| `@puzzle-ui/seo/next`, `/tanstack`, `/react-router` | Framework-specific route adapters. |
+
+Configuration and metadata resolver functions are subpath exports, not root runtime exports. The root `SeoMetadata` and `SchemaReference` names also have corresponding type exports; see their specific subpaths when importing the data types.

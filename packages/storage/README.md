@@ -1,119 +1,56 @@
 # @puzzle-ui/storage
 
-Vendor-neutral storage contracts for Puzzle.
+Vendor-neutral storage contracts for Puzzle Auth and other packages. This package defines the typed adapter API, query language, migration protocol, and reusable adapter conformance suites; it does not bundle a database implementation.
 
-This package defines the persistence API used by Puzzle Auth and other
-packages. It does not depend on a database vendor, database SDK, framework,
-or runtime-specific implementation.
+**Documentation: [puzzle-ui.com/docs/storage](https://puzzle-ui.com/docs/storage)**
 
-## Responsibilities
+## Install
 
-- Typed collection and record contracts.
-- Query AST and cursor pagination contracts.
-- CRUD, upsert and conditional write contracts.
-- Optimistic concurrency through record revisions.
-- Capability discovery.
-- Atomic batch contract.
-- Collection schemas and index definitions.
-- Migration contracts and migration status.
-- Reusable adapter conformance requirements.
+```sh
+npm install @puzzle-ui/storage
+# or: bun add @puzzle-ui/storage
+```
 
-## Architecture
+Add a database adapter when you need an implementation: [`@puzzle-ui/storage-d1`](https://puzzle-ui.com/docs/storage#cloudflare-d1-adapter) for Cloudflare D1 or [`@puzzle-ui/storage-mongodb`](https://puzzle-ui.com/docs/storage#mongodb-adapter) for MongoDB.
 
-Database-specific implementations belong in separate packages:
+## Use
 
-- `@puzzle-ui/storage-mongodb`
-- `@puzzle-ui/storage-d1`
+Define record types by extending `StorageRecord`, then use an adapter supplied by your application:
 
-Neither adapter may leak its database SDK or query language through this
-package.
+```ts
+import type { StorageAdapter, StorageRecord } from "@puzzle-ui/storage";
 
-## Records
+type Session = StorageRecord & { userId: string; expiresAt: Date };
 
-Every persisted record has:
+const storage: StorageAdapter = getConfiguredStorage();
+await storage.registerCollection<Session>({
+  name: "sessions",
+  indexes: [{ name: "by-user", fields: ["userId"] }],
+});
 
-- `id`
-- `createdAt`
-- `updatedAt`
-- `revision`
+const session = await storage.insert<Session>("sessions", {
+  id: "session_123",
+  userId: "user_123",
+  expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+});
+```
 
-The revision is incremented by successful updates. Adapters must use it
-for optimistic concurrency when a caller supplies `expectedRevision`.
+`getConfiguredStorage` is your own adapter factory. Records have an ID, creation/update timestamps, and a revision. The query AST supports comparisons, nested boolean conditions, sorting, offset/limit, and cursor pagination. Conditional writes use expected revisions or update times; adapters advertise guarantees through capability reports. Migrations are explicit and versioned.
 
-## Atomicity
+## Entry points
 
-An adapter may advertise `atomicBatch: true` only when it guarantees
-all-or-nothing execution.
+- `@puzzle-ui/storage`: storage types, adapter and migration contracts, query validators, and storage errors.
+- `@puzzle-ui/storage/testing`: Bun conformance suites for adapter and migration implementations.
 
-If a batch fails, all changes made by that batch must be rolled back.
-Adapters without this guarantee must reject `atomicBatch` calls with
-`StorageAtomicityError`.
+The conformance kit checks core CRUD/query semantics, serialization, revisions, constraints, pagination, batch atomicity, capabilities, and migration behavior. Adapters should run it against isolated test databases before release. `bun run typecheck` also checks the conformance sources with Bun test types.
 
-Security-critical operations must fail closed when the required
-capability is unavailable.
+`StorageSchema` provides an optional type-guard shape, but the shipped D1 and MongoDB adapters do not invoke it automatically; validate untrusted records at your application boundary.
 
-## Query contract
-
-Queries use a vendor-neutral AST:
-
-- `eq`, `ne`
-- `in`, `notIn`
-- `gt`, `gte`, `lt`, `lte`
-- `exists`
-- nested `and` and `or`
-- ordering
-- offset and limit
-- cursor pagination
-
-Adapters are responsible for translating this AST into their native
-query mechanism without changing its semantics.
-
-## Schemas and indexes
-
-Collection schemas validate records at the storage boundary.
-
-Indexes can declare:
-
-- Multiple indexed fields.
-- Uniqueness.
-- TTL expiration.
-
-An adapter must report unsupported index capabilities instead of
-silently ignoring requested guarantees.
-
-## Migrations
-
-Migrations are explicit and versioned. They are never run implicitly
-during ordinary reads or writes.
-
-A migration adapter must provide durable migration status and prevent
-concurrent migration runners from applying the same migration twice.
-
-## Adapter requirements
-
-Every production adapter must pass the same conformance suite.
-
-At minimum, conformance must verify:
-
-- CRUD and upsert semantics.
-- Query operator semantics.
-- Serialization of dates and null values.
-- Conditional writes and revision conflicts.
-- Unique constraint behavior.
-- Cursor pagination.
-- Atomic batch rollback.
-- Capability reporting.
-- Migration ordering and concurrency.
-
-## Build
+## Development
 
 ```sh
 bun run build
 bun run typecheck
 ```
 
-The typecheck includes all files under `tests/conformance` and loads Bun's
-test types for their `bun:test` imports.
-
-This package contains contracts only. It does not provide a production
-database implementation or an in-memory persistence implementation.
+See the [storage guide](https://puzzle-ui.com/docs/storage) for contract details, migrations, adapter setup, and custom-adapter guidance.

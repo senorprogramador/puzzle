@@ -143,7 +143,11 @@ type TreeViewProps<TData = unknown> = Omit<
       state: TreeViewItemState,
     ) => ReactNode;
 
-    /** Clicking the label of a branch toggles it instead of selecting it. Defaults to false. */
+    /**
+     * Clicking anywhere on a group row (a branch without `href`) toggles it
+     * instead of selecting it. Linked branches always navigate. Set to false
+     * to select groups on click and expand only via the arrow. Defaults to true.
+     */
     expandOnItemClick?: boolean;
 
     /** Visual density. Defaults to md. */
@@ -206,7 +210,7 @@ const TreeView = <TData,>({
   renderItem,
   renderIcon,
   renderLabel,
-  expandOnItemClick = false,
+  expandOnItemClick = true,
   typeahead = true,
   size = "md",
   indentation,

@@ -1,0 +1,71 @@
+---
+title: Keyboard Keys
+description: Listen for selected global keyboard events with configurable callbacks and event control.
+---
+
+`useKeyboardKeys` subscribes to selected key presses and releases on `window`. It is useful for shortcuts that should work regardless of which element currently has focus.
+
+## Quick start
+
+```tsx
+import { useKeyboardKeys } from "@puzzle-ui/hooks";
+
+function SearchShortcut({ openSearch }: { openSearch: () => void }) {
+  useKeyboardKeys({
+    keys: ["k"],
+    onKeyDown: (event) => {
+      if ((event.metaKey || event.ctrlKey) && !event.repeat) {
+        openSearch();
+      }
+    },
+  });
+
+  return null;
+}
+```
+
+The hook listens during the capture phase. It normalizes key matching to lowercase and treats `Space` and `Spacebar` as aliases for the space character. The callback's `key` remains the browser's original `KeyboardEvent.key` value.
+
+## API
+
+```ts
+useKeyboardKeys(options: UseKeyboardKeysOptions): void
+```
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `keys` | `readonly string[]` | Required | Keys to match, case-insensitively. Provide `KeyboardEvent.key` values such as `"Escape"`, `"k"`, or `" "`. |
+| `onKeyDown` | `(event: UseKeyboardKeysEvent) => void` | `undefined` | Called for matching keydown events. |
+| `onKeyUp` | `(event: UseKeyboardKeysEvent) => void` | `undefined` | Called for matching keyup events. |
+| `preventDefault` | `boolean` | `false` | Calls `preventDefault()` for a matching event with a callback, when the event is cancelable. |
+| `stopPropagation` | `boolean` | `false` | Calls `stopPropagation()` for a matching event with a callback. |
+| `enabled` | `boolean` | `true` | When false, no listeners are active. |
+
+The hook returns `void`. It installs listeners only when enabled and at least one callback is provided, and cleans them up when dependencies change or the component unmounts. It clears tracked modifier state when the window blurs or the document becomes hidden.
+
+### Callback event
+
+`UseKeyboardKeysEvent` contains the following fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `key` | `string` | The original key value from the browser event. |
+| `type` | `"keydown"` or `"keyup"` | Which event triggered the callback. |
+| `shiftKey` | `boolean` | Whether Shift is pressed for this event. |
+| `ctrlKey` | `boolean` | Whether Control is pressed for this event. |
+| `metaKey` | `boolean` | Whether Meta is pressed for this event. |
+| `altKey` | `boolean` | Whether Alt is pressed for this event. |
+| `repeat` | `boolean` | Whether the browser marks this as a repeated keydown. |
+| `nativeEvent` | `KeyboardEvent` | The original browser event. |
+
+## Usage notes
+
+Because the listener is attached to `window`, it also observes matching keys while focus is in text fields and editable content. Check the target or application state in your callback when a shortcut should not run in those contexts. Modifier keys are reported on the event; include the main key in `keys` and check its modifier fields in the callback to define a chord.
+
+## SSR
+
+The hook registers `window` and `document` listeners inside `useEffect`, so those globals are not read during server rendering. In frameworks with server/client component boundaries, call it in a client component; that client component can still be server-rendered. Call it as a normal React hook, not conditionally.
+
+## Exports
+
+Import `useKeyboardKeys`, `UseKeyboardKeysOptions`, and `UseKeyboardKeysEvent` from `@puzzle-ui/hooks`. `KeyboardEventType` is an internal source type and is not exported from the package entry point.

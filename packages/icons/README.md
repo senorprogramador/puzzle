@@ -1,24 +1,19 @@
 # @puzzle-ui/icons
 
-React icon components backed by Iconify. Use named icons in your application
-or alongside Puzzle UI components.
+React `Icon` component backed by Iconify. Render an icon by passing an Iconify `prefix:name` identifier, and style it with CSS, `currentColor`, or Puzzle theme tokens. Use it when you want a consistent SVG component API without importing individual icon files.
 
-> Puzzle is under active development. APIs and framework compatibility may
-> change; use it for experimentation and evaluation rather than production.
+**Documentation: [puzzle-ui.com/docs/icons](https://puzzle-ui.com/docs/icons)**
 
-## Installation
+## Install
 
 ```sh
 npm install @puzzle-ui/icons
-# or
-bun add @puzzle-ui/icons
-# or
-pnpm add @puzzle-ui/icons
-# or
-yarn add @puzzle-ui/icons
+# or: bun add @puzzle-ui/icons
+# or: pnpm add @puzzle-ui/icons
+# or: yarn add @puzzle-ui/icons
 ```
 
-Requires React and React DOM 19 (`^19.0.0`). No theme provider is required.
+Requires React and React DOM `^19.0.0` as peer dependencies. No theme provider is required.
 
 ## Usage
 
@@ -30,29 +25,11 @@ export const HomeIcon = () => (
 );
 ```
 
-`Icon` accepts a collection-prefixed `name`, optional numeric `size` in
-pixels, optional `color`, and SVG attributes. Without an explicit color,
-it can inherit the surrounding text color.
+`Icon` accepts a required `name`, optional pixel `size`, CSS `color`, an optional `showLoader`, and standard SVG attributes. By default, it uses `1em` sizing and inherits `currentColor`. For icon-only controls, label the control and mark the icon decorative with `aria-hidden="true"`.
 
-For icon-only controls, label the control and keep its icon decorative:
+## Exports and runtime
 
-```tsx
-<button type="button" aria-label="Search">
-  <Icon name="lucide:search" aria-hidden="true" />
-</button>
-```
-
-Icon loading can make external requests to Iconify. Account for network
-availability and your Content Security Policy. Framework compatibility is
-still being evaluated.
-
-## Exports
-
-- `Icon`, `IconProps`
-
-Import from `@puzzle-ui/icons`; generated internal icon-set files are not
-exported package entry points. ESM and CommonJS builds and TypeScript
-declarations are included.
+The package root exports `Icon` and `IconProps`; it does not export each icon as a separate component or expose generated collection files as subpaths. ESM, CommonJS, and TypeScript declarations are included. Iconify may load icon data over the network, so consider network availability and your Content Security Policy. Check the relevant icon collection's license before using its artwork.
 
 ## Development
 
@@ -64,11 +41,8 @@ npm run build --workspace=@puzzle-ui/icons
 bun run vitest
 ```
 
-`prepack` rebuilds the package before packing or publishing. See the root
-[publishing guide](../../README.md#publishing-packages).
+`prepack` rebuilds the package before packing or publishing. See the root [publishing guide](../../README.md#publishing-packages).
 
 ## License
 
-Package code is MIT; see [LICENSE](../../LICENSE), also included at
-`dist/LICENSE` in published packages. Individual icon collections may carry
-their own licenses; check the collection's terms before using its artwork.
+Package code is MIT; see [LICENSE](../../LICENSE), also included at `dist/LICENSE` in published packages. Individual icon collections may carry their own licenses; check the collection's terms before use.

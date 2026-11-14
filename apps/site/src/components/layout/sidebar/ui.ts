@@ -446,16 +446,3 @@ export const ui: TreeViewItem = {
     utilities,
   ],
 } as const;
-
-export const ALL_UI_GROUP_IDS = [
-  "ui",
-  "ui-actions",
-  "ui-data-display",
-  "ui-editors",
-  "ui-forms",
-  "ui-layout",
-  "ui-navigation",
-  "ui-overlays",
-  "ui-typography",
-  "ui-utilities",
-] as const;

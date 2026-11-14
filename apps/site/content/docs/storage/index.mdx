@@ -1,0 +1,313 @@
+---
+title: Storage
+description: Vendor-neutral persistence contracts, migrations, adapter conformance testing, and database adapters for Puzzle.
+---
+
+<code>@puzzle-ui/storage</code> defines the persistence contract used by <code>@puzzle-ui/auth</code> and other Puzzle packages. It keeps application storage code independent of a database vendor; separate adapters implement the contract for Cloudflare D1 and MongoDB.
+
+Use the core package to type an adapter or build your own. Add an adapter package when you want a ready-made database implementation. For authentication wiring, see [Authentication](/docs/auth); for a broader application stack, see [Fullstack](/docs/fullstack).
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/storage
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/storage
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/storage
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/storage
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+Install <code>@puzzle-ui/storage-d1</code> or <code>@puzzle-ui/storage-mongodb</code> alongside the core package to use a built-in adapter. Each adapter declares <code>@puzzle-ui/storage</code> as a dependency.
+
+## Quick start
+
+Define a record that extends <code>StorageRecord</code>, then provide a configured adapter. This example uses the vendor-neutral interface; configure a concrete adapter as shown below.
+
+```ts
+import type { StorageAdapter, StorageRecord } from "@puzzle-ui/storage";
+
+type Session = StorageRecord & {
+  userId: string;
+  expiresAt: Date;
+};
+
+const storage: StorageAdapter = getConfiguredStorage();
+
+await storage.registerCollection<Session>({
+  name: "sessions",
+  indexes: [
+    { name: "by-user", fields: ["userId"] },
+    { name: "by-expiry", fields: ["expiresAt"], expireAfterSeconds: 0 },
+  ],
+});
+
+const session = await storage.insert<Session>("sessions", {
+  id: "session_123",
+  userId: "user_123",
+  expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+});
+
+const current = await storage.findById<Session>("sessions", session.id);
+```
+
+<code>getConfiguredStorage</code> is an application-provided factory, not an export from the package. The adapter owns storage I/O and translates the shared types into its database's representation.
+
+## Contracts
+
+### Records and collections
+
+A <code>StorageRecord</code> has a string <code>id</code>, <code>createdAt</code>, <code>updatedAt</code>, and numeric <code>revision</code>; it may also have <code>revokedAt</code>. Record-specific fields may use strings, numbers, booleans, dates, nulls, or arrays/objects that the adapter can serialize. Successful inserts default missing timestamps to the current time and a missing revision to 1. Successful updates advance the revision and refresh <code>updatedAt</code>.
+
+A collection definition gives a name and may declare a type guard and indexes. An index lists one or more fields and can request uniqueness or TTL expiration. The <code>schema</code> property is typed metadata with a <code>validate</code> type guard; the shipped D1 and MongoDB adapters currently do not call it automatically, so validate untrusted input at your application boundary.
+
+### Queries and pagination
+
+Queries use a typed, vendor-neutral AST. Each field condition uses an operator and a value; nested <code>and</code> and <code>or</code> contain more conditions.
+
+```ts
+const page = await storage.findMany<Session>("sessions", {
+  where: {
+    userId: { operator: "eq", value: "user_123" },
+    expiresAt: { operator: "gt", value: new Date() },
+  },
+  orderBy: [{ field: "createdAt", direction: "desc" }],
+  limit: 25,
+});
+```
+
+The supported comparison operators are <code>eq</code>, <code>ne</code>, <code>in</code>, <code>notIn</code>, <code>gt</code>, <code>gte</code>, <code>lt</code>, <code>lte</code>, and <code>exists</code>. Queries also support ordering, limit, and offset. Cursor pagination uses <code>findPage</code> with a positive integer <code>first</code> and an opaque <code>after</code> cursor returned from the prior page. Both built-in adapters add a stable ID tie-breaker to cursor ordering.
+
+### Conditional writes and capabilities
+
+Pass <code>expectedRevision</code> or <code>expectedUpdatedAt</code> to <code>update</code> or <code>delete</code> to make a write conditional. If a record exists but the condition no longer matches, the adapter reports a <code>StorageConflictError</code>. Use <code>getCapabilities()</code> before relying on optional behavior; capability reports include limitations where relevant.
+
+An adapter may report <code>atomicBatch</code> only when the whole batch is all-or-nothing. A failed operation must not leave partial changes. When the adapter cannot guarantee this, <code>atomicBatch</code> rejects with <code>StorageAtomicityError</code>. Security-sensitive callers should fail closed if the capability they require is unavailable.
+
+| Capability | Meaning |
+| --- | --- |
+| <code>transactions</code> | Database transactions are available to the adapter. |
+| <code>atomicBatch</code> | A multi-operation batch is all-or-nothing. |
+| <code>conditionalWrites</code> | Expected revision or update time can guard a write. |
+| <code>uniqueConstraints</code> | Unique index guarantees are supported. |
+| <code>upsert</code> | The adapter supports the shared upsert operation. |
+| <code>cursorPagination</code> | Cursor-based pages are supported. |
+| <code>migrations</code> | Durable migrations are supported. |
+| <code>ttlIndexes</code> | Index-based record expiration is supported. |
+
+## Migrations
+
+Migrations are explicit and versioned. Ordinary reads and writes never run them implicitly. A migration has a stable <code>id</code>, integer <code>version</code>, description, and asynchronous <code>up</code> function. Its context exposes one operation runner for creating or dropping a collection or index.
+
+```ts
+import type { StorageMigration } from "@puzzle-ui/storage";
+
+const initialSchema: StorageMigration = {
+  id: "2026-01-sessions",
+  version: 1,
+  description: "Create the sessions collection and user index",
+  up: async ({ execute }) => {
+    await execute({ type: "createCollection", collection: "sessions" });
+    await execute({
+      type: "createIndex",
+      collection: "sessions",
+      name: "by-user",
+      fields: ["userId"],
+    });
+  },
+};
+
+const result = await migrationAdapter.runMigrations([initialSchema], {
+  targetVersion: 1,
+});
+```
+
+Migration adapters persist each migration's status and serialize concurrent runners using a database lock. Completed migrations are skipped; failed migrations are recorded and may be retried. <code>targetVersion</code> limits which versions run, and <code>dryRun</code> reports the versions that would be applied without executing them. Migration operations are not automatically wrapped in one transaction: make each migration safe to retry, and take care with destructive drops.
+
+## Conformance testing kit
+
+The <code>@puzzle-ui/storage/testing</code> subpath exports reusable Bun test suites for adapter implementations. Give the suite a factory that creates an adapter against a clean test database and a reset function that isolates each case.
+
+```ts
+import { runStorageAdapterConformance } from "@puzzle-ui/storage/testing";
+
+runStorageAdapterConformance({
+  createAdapter: async () => makeTestAdapter(),
+  reset: async () => resetTestDatabase(),
+});
+```
+
+The suite covers capability reporting, CRUD and upsert, query and serialization behavior (including dates and nulls), cursor pagination, conditional writes and revision conflicts, uniqueness, and atomic-batch rollback. Use <code>runStorageMigrationConformance</code> with a fixture containing <code>createMigrationAdapter</code> and <code>reset</code> callbacks for migration ordering, status, failure/retry, target versions, and concurrent runners. The fixture types allow an optional <code>dispose</code> callback; manage connection and container cleanup in your own test lifecycle.
+
+## Cloudflare D1 adapter
+
+<code>@puzzle-ui/storage-d1</code> implements the shared storage and migration interfaces using a Cloudflare D1 database binding. Install it with the core package:
+
+```bash
+npm install @puzzle-ui/storage @puzzle-ui/storage-d1
+```
+
+The adapter accepts the D1 binding through its structural <code>D1DatabaseLike</code> type; it does not create or manage the Cloudflare database itself. Add a binding to <code>wrangler.toml</code> (or the equivalent <code>wrangler.jsonc</code> configuration):
+
+```toml
+[[d1_databases]]
+binding = "DB"
+database_name = "app-db"
+database_id = "<database-id>"
+```
+
+Pass <code>env.DB</code> to <code>D1StorageAdapter</code> from your Worker. The example expects a Worker environment with a D1 binding named <code>DB</code>.
+
+```ts
+import { D1StorageAdapter, D1StorageMigrationAdapter } from "@puzzle-ui/storage-d1";
+import type { D1DatabaseLike } from "@puzzle-ui/storage-d1";
+
+export default {
+  async fetch(_request: Request, env: { DB: D1DatabaseLike }) {
+    const storage = new D1StorageAdapter({ database: env.DB });
+    const migrations = new D1StorageMigrationAdapter({ database: env.DB });
+
+    await migrations.runMigrations([initialSchema]);
+    await storage.registerCollection({ name: "sessions" });
+
+    return new Response("Storage is ready");
+  },
+};
+```
+
+Use one-time deployment or startup orchestration for <code>runMigrations</code>; avoid running the migration list on every request. D1's migration adapter maintains its own prefixed migration and lock tables. These are adapter-managed migrations—not Wrangler's SQL migration directory or <code>wrangler d1 migrations</code> commands. Wrangler still manages the database binding and local/remote database lifecycle. <code>registerCollection</code> creates the prefixed table and any declared indexes if they do not exist.
+
+The default table prefix is <code>puzzle_</code>; set <code>tablePrefix</code> to change it. D1 stores record-specific fields as JSON and keeps IDs, timestamps, and revisions in columns. It supports the shared query operators, conditional writes, cursor pagination, unique indexes, migrations, and atomic batches. D1 reports transactions and atomic batches as supported through its batch API; it does not provide TTL indexes, so schedule expiration cleanup in your application or a Worker cron job. Configure a distinct prefix if multiple adapters share a database and need separate table namespaces.
+
+D1 migration options are <code>database</code>, <code>tablePrefix</code>, and <code>lockDurationMs</code> (default: 600,000 milliseconds). The adapter validates table and field identifiers used to build SQL. Avoid using dynamic or untrusted values as collection, index, or field names.
+
+## MongoDB adapter
+
+<code>@puzzle-ui/storage-mongodb</code> implements the same contracts using the official MongoDB Node.js driver. Install the package and its core contract:
+
+```bash
+npm install @puzzle-ui/storage @puzzle-ui/storage-mongodb
+```
+
+Connect a <code>MongoClient</code>, obtain a <code>Db</code>, and pass both to <code>MongoStorageAdapter</code> when you need multi-document transactions.
+
+```ts
+import { MongoClient } from "mongodb";
+import { MongoStorageAdapter, MongoStorageMigrationAdapter } from "@puzzle-ui/storage-mongodb";
+
+const client = new MongoClient(process.env.MONGODB_URI!);
+await client.connect();
+const database = client.db("app");
+
+const storage = new MongoStorageAdapter({
+  database,
+  client,
+  transactionsEnabled: true,
+});
+const migrations = new MongoStorageMigrationAdapter({ database });
+
+await migrations.runMigrations([initialSchema]);
+await storage.registerCollection({
+  name: "sessions",
+  indexes: [
+    { name: "by-user", fields: ["userId"] },
+    { name: "expire-at", fields: ["expiresAt"], expireAfterSeconds: 0 },
+  ],
+});
+```
+
+The default collection prefix is <code>puzzle_</code>. Set <code>collectionPrefix</code> to use another namespace. Collection registration creates the collection if needed, then creates the declared indexes. Index fields are ascending; <code>unique</code> requests a unique index and <code>expireAfterSeconds</code> creates a MongoDB TTL index. For TTL to remove a document, its indexed field must contain a supported BSON date. TTL deletion is asynchronous and should not be treated as an exact-time authorization check; check expiry in application logic too.
+
+MongoDB reports transactions and atomic batches as unavailable by default. To enable them, pass a <code>MongoClient</code>, set <code>transactionsEnabled: true</code>, and use a replica set or sharded deployment that supports transactions. The flag is an explicit opt-in; enabling it does not configure the server. Without both client and flag, <code>atomicBatch</code> rejects with <code>StorageAtomicityError</code>. Other capabilities include conditional writes, unique constraints, upsert, cursor pagination, migrations, and TTL indexes.
+
+The migration adapter creates prefixed migration and lock collections and an expiration index for lock cleanup. Its options are <code>database</code>, <code>collectionPrefix</code>, and <code>lockDurationMs</code> (default: 600,000 milliseconds). Close the client when your application shuts down.
+
+## Writing a custom adapter
+
+Implement <code>StorageAdapter</code> for CRUD, query, pagination, and batching. Implement <code>StorageMigrationAdapter</code> separately when migrations are supported. A production adapter should:
+
+- Preserve date, null, and query semantics across the vendor translation.
+- Increment revisions on updates and honor conditional writes.
+- Report only capabilities it can guarantee; never claim atomicity without rollback semantics.
+- Persist migration state, order by version, and prevent concurrent runners from applying the same migration twice.
+- Run the shared test suites from the <code>./testing</code> subpath against an isolated test database.
+
+The <code>StorageSchemaAdapter</code> interface describes collection and index discovery operations. The built-in adapters currently expose registration directly on <code>StorageAdapter</code>; they do not implement this separate schema adapter interface.
+
+## API reference
+
+### Storage methods
+
+| Method | Type | Default | Description |
+| --- | --- | --- | --- |
+| <code>registerCollection</code> | <code>(collection) =&gt; Promise&lt;void&gt;</code> | — | Ensure the collection and declared indexes exist. |
+| <code>findById</code> | <code>(collection, id) =&gt; Promise&lt;T &#124; null&gt;</code> | — | Read one record by ID. |
+| <code>findOne</code> | <code>(collection, query) =&gt; Promise&lt;T &#124; null&gt;</code> | — | Read the first matching record. |
+| <code>findMany</code> | <code>(collection, query?) =&gt; Promise&lt;readonly T[]&gt;</code> | Empty query | Read matching records. |
+| <code>findPage</code> | <code>(collection, query) =&gt; Promise&lt;StoragePage&lt;T&gt;&gt;</code> | — | Read a cursor page. |
+| <code>insert</code> | <code>(collection, record) =&gt; Promise&lt;T&gt;</code> | — | Insert a record. |
+| <code>upsert</code> | <code>(collection, query, record) =&gt; Promise&lt;T&gt;</code> | — | Update a match or insert when none exists. |
+| <code>update</code> | <code>(collection, id, changes, condition?) =&gt; Promise&lt;T &#124; null&gt;</code> | — | Update one record; returns null when absent. |
+| <code>updateMany</code> | <code>(collection, query, changes) =&gt; Promise&lt;number&gt;</code> | — | Update matching records and return the count. |
+| <code>delete</code> | <code>(collection, id, condition?) =&gt; Promise&lt;boolean&gt;</code> | — | Delete one record and report whether it existed. |
+| <code>deleteMany</code> | <code>(collection, query) =&gt; Promise&lt;number&gt;</code> | — | Delete matching records and return the count. |
+| <code>exists</code> | <code>(collection, query) =&gt; Promise&lt;boolean&gt;</code> | — | Check whether a match exists. |
+| <code>count</code> | <code>(collection, query?) =&gt; Promise&lt;number&gt;</code> | Empty query | Count matching records. |
+| <code>atomicBatch</code> | <code>(operations) =&gt; Promise&lt;StorageBatchResult&lt;T&gt;&gt;</code> | — | Execute insert, update, and delete operations atomically when supported. |
+| <code>getCapabilities</code> | <code>() =&gt; StorageCapabilityReport</code> | — | Inspect support and adapter limitations. |
+
+### Options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| <code>StorageAdapterOptions.requireAtomicBatch</code> | <code>boolean</code> | <code>undefined</code> | Optional shared flag; the core package does not itself enforce this value. |
+| <code>D1StorageAdapterOptions.database</code> | <code>D1DatabaseLike</code> | Required | D1 database binding. |
+| <code>D1StorageMigrationOptions.database</code> | <code>D1DatabaseLike</code> | Required | D1 database binding for migrations. |
+| <code>StorageMigrationOptions.targetVersion</code> | <code>number</code> | Latest provided version | Do not run versions above this value. |
+| <code>StorageMigrationOptions.dryRun</code> | <code>boolean</code> | <code>false</code> | Report migrations that would apply without running them. |
+| <code>D1StorageAdapterOptions.tablePrefix</code> | <code>string</code> | <code>"puzzle_"</code> | Prefix D1 collection table names. |
+| <code>D1StorageMigrationOptions.tablePrefix</code> | <code>string</code> | <code>"puzzle_"</code> | Prefix D1 migration and lock table names. |
+| <code>D1StorageMigrationOptions.lockDurationMs</code> | <code>number</code> | <code>600000</code> | Lock wait/lease duration in milliseconds. |
+| <code>MongoStorageAdapterOptions.database</code> | <code>Db</code> | Required | MongoDB database handle. |
+| <code>MongoStorageAdapterOptions.client</code> | <code>MongoClient</code> | <code>undefined</code> | Client required with <code>transactionsEnabled</code> to enable transactions. |
+| <code>MongoStorageMigrationOptions.database</code> | <code>Db</code> | Required | MongoDB database handle for migrations. |
+| <code>MongoStorageAdapterOptions.collectionPrefix</code> | <code>string</code> | <code>"puzzle_"</code> | Prefix MongoDB collection names. |
+| <code>MongoStorageAdapterOptions.transactionsEnabled</code> | <code>boolean</code> | <code>false</code> | Opt in to transactions and atomic batches when a client is provided. |
+| <code>MongoStorageMigrationOptions.collectionPrefix</code> | <code>string</code> | <code>"puzzle_"</code> | Prefix migration and lock collection names. |
+| <code>MongoStorageMigrationOptions.lockDurationMs</code> | <code>number</code> | <code>600000</code> | Lock wait/lease duration in milliseconds. |
+
+## Exports
+
+| Entry point | Public exports |
+| --- | --- |
+| <code>@puzzle-ui/storage</code> | Types: <code>StorageScalar</code>, <code>StorageRecord</code>, <code>StorageCollectionName</code>, <code>StorageField</code>, <code>StorageCollectionOptions</code>, <code>StorageCollection</code>, <code>StorageSchema</code>, <code>StorageIndex</code>, <code>StorageComparison</code>, <code>StorageWhere</code>, <code>StorageOrder</code>, <code>StorageQuery</code>, <code>StorageCursor</code>, <code>StorageCursorQuery</code>, <code>StoragePage</code>, <code>StorageCapabilities</code>, <code>StorageCapability</code>, <code>StorageCapabilityReport</code>, <code>StorageInsert</code>, <code>StorageUpdate</code>, <code>StorageCondition</code>, <code>StorageBatchOperation</code>, <code>StorageBatchResult</code>, <code>StorageAdapterOptions</code>, <code>StorageAdapter</code>, <code>StorageMigrationContext</code>, <code>StorageMigrationOperation</code>, <code>StorageMigration</code>, <code>StorageMigrationStatus</code>, <code>StorageMigrationRecord</code>, <code>StorageMigrationResult</code>, <code>StorageMigrationOptions</code>, <code>StorageMigrationAdapter</code>, <code>StorageSchemaRegistry</code>, <code>StorageIndexDefinition</code>, <code>StorageSchemaAdapter</code>. Runtime exports: <code>DEFAULT_STORAGE_CAPABILITIES</code>, <code>StorageError</code>, <code>StorageCapabilityError</code>, <code>StorageConflictError</code>, <code>StorageDuplicateError</code>, <code>StorageValidationError</code>, <code>StorageAtomicityError</code>, <code>validateQuery</code>, <code>validateWhere</code>. |
+| <code>@puzzle-ui/storage/testing</code> | <code>runStorageAdapterConformance</code>, <code>runStorageMigrationConformance</code>. |
+| <code>@puzzle-ui/storage-d1</code> | <code>D1StorageAdapter</code>, <code>D1StorageMigrationAdapter</code>, <code>D1DatabaseLike</code>, <code>D1PreparedStatementLike</code>, <code>D1ResultLike</code>, <code>D1StorageAdapterOptions</code>, <code>D1StorageMigrationOptions</code>. |
+| <code>@puzzle-ui/storage-mongodb</code> | <code>MongoStorageAdapter</code>, <code>MongoStorageMigrationAdapter</code>, <code>MongoStorageAdapterOptions</code>, <code>MongoStorageMigrationOptions</code>. |
+
+## Related packages
+
+- [Authentication](/docs/auth) uses the storage contracts for persistence.
+- [Fullstack](/docs/fullstack) brings Puzzle's application packages together.

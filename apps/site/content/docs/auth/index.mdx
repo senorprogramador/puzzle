@@ -1,0 +1,122 @@
+---
+title: Authentication
+description: The @puzzle-ui/auth package provides framework-independent account, session, MFA, and authentication lifecycle primitives for Puzzle applications.
+---
+
+`@puzzle-ui/auth` is the server-side authentication core for Puzzle. It provides storage-backed registration and sign-in, account lifecycle workflows, multi-factor authentication, passkeys, recovery codes, and step-up verification without coupling those features to a web framework.
+
+The package accepts storage, session, password-hashing, email, rate-limit, secret-protection, and WebAuthn dependencies through explicit interfaces. Your application remains responsible for creating secure HTTP endpoints, managing cookies and CSRF, and deciding what authenticated users may do.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/auth
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/auth
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/auth
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/auth
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+`@puzzle-ui/auth` depends on `@puzzle-ui/storage`, `@puzzle-ui/session`, and `@simplewebauthn/server`. You provide the storage and session implementations, password hasher, and rate-limit provider.
+
+## Quick start
+
+Create a manager with server-side dependencies, initialize it before serving requests, and keep the returned token on the server boundary so it can be set in a secure, HttpOnly cookie.
+
+```ts
+import { StorageAuthManager } from "@puzzle-ui/auth";
+
+const auth = new StorageAuthManager(
+  { storage, passwordHasher, rateLimitProvider, sessions },
+  { rateLimitKeySecret },
+);
+
+await auth.initialize();
+
+const result = await auth.register({
+  email: "person@example.com",
+  password: "a-long-unique-password",
+  ipAddress: trustedClientIp,
+});
+
+if ("status" in result) {
+  // MFA is required; complete the enrollment flow on the server.
+} else {
+  // Set result.token in a secure, HttpOnly cookie. Do not return it in JSON.
+}
+```
+
+The `StorageAuthManager` creates an authenticated session after registration unless policy requires an MFA enrollment first. A password sign-in can return an MFA challenge instead of a session. See [MFA and step-up](/docs/auth/mfa) for how to complete these flows.
+
+## What the package provides
+
+| Area | Description | Documentation |
+| --- | --- | --- |
+| Authentication manager | Registration, password sign-in, session lookup, auth-state lookup, and sign-out. | [Configuration](/docs/auth/configuration) |
+| Account lifecycle | Email verification and change, password reset and change, profile update, deactivation, and deletion. | [Account lifecycle](/docs/auth/lifecycle) |
+| MFA and passkeys | TOTP, WebAuthn passkeys, recovery codes, mandatory enrollment, and session-bound step-up. | [MFA and step-up](/docs/auth/mfa) |
+| Deployment security | Storage capabilities, token handling, encryption, rate limits, and production guidance. | [Security](/docs/auth/security) |
+
+## Authentication states
+
+`getAuthState(token)` reports the server-side state for an authentication or pending challenge token. Treat only `authenticated` as normal application access.
+
+| Status | Meaning |
+| --- | --- |
+| `unauthenticated` | No valid authenticated session or pending challenge was found. |
+| `primary-authenticated` | A staged-auth state represented in the public state type; it is not returned by the core manager. Do not treat it as full access. |
+| `mfa-pending` | Password authentication succeeded and an enrolled factor must be verified. |
+| `mfa-enrollment-pending` | Policy requires initial enrollment; no normal session is issued yet. |
+| `mfa-enrollment-required` | A valid session exists, but policy requires a factor before protected access. |
+| `authenticated` | The session is valid and satisfies the configured email-verification and MFA policy. |
+
+Challenge tokens, like session tokens, are credentials. Keep them server-side and transport them only in appropriately scoped secure, HttpOnly cookies.
+
+## Integrating packages
+
+- [`@puzzle-ui/storage`](/docs/storage) provides the adapter used to persist users, credentials, audit records, challenges, recovery codes, and rate-limit counters. Authentication requires the storage capabilities described in [Security](/docs/auth/security).
+- [`@puzzle-ui/fullstack`](/docs/fullstack) provides server handlers, browser clients, cookie and CSRF integration, and framework adapters. The [developer authentication guide](/docs/developer/authentication) covers generated application setup.
+- The [observability guide](/docs/observability) explains application telemetry. Auth also stores authentication audit events; keep credentials and secret values out of logs and telemetry.
+
+## Public exports
+
+The package currently has one public entry point, `@puzzle-ui/auth`, and no documented subpath exports.
+
+| Group | Exports |
+| --- | --- |
+| Managers | `StorageAuthManager`, `StorageAuthLifecycleManager`, `StorageAuthMfaManager`, `StorageAuthStepUpManager`, `StorageRateLimitProvider` |
+| Providers | `WebCryptoAuthSecretProtector`, `SimpleWebAuthnProvider` |
+| Storage | `AUTH_USER_COLLECTION`, `AUTH_CREDENTIAL_COLLECTION`, `AUTH_ACTION_TOKEN_COLLECTION`, `AUTH_AUDIT_COLLECTION`, `AUTH_RATE_LIMIT_COLLECTION`, `AUTH_MFA_FACTOR_COLLECTION`, `AUTH_MFA_CHALLENGE_COLLECTION`, `AUTH_RECOVERY_CODE_COLLECTION`, `AUTH_MFA_STEP_UP_COLLECTION`, `initializeAuthStorage` |
+| Errors | `AuthError`, `AuthValidationError`, `AuthInvalidCredentialsError`, `AuthEmailVerificationRequiredError`, `AuthAccountConflictError`, `AuthRateLimitError`, `AuthConfigurationError`, `AuthProviderError`, `AuthSessionError`, `AuthTokenError`, `AuthMfaChallengeError`, `AuthMfaFactorError` |
+| Email and crypto utilities | `normalizeEmail`, `normalizeDisplayName`, `generateAuthId`, `generateSecureAuthToken`, `hashAuthToken`, `createRateLimitKey`, `encodeBase32`, `decodeBase32`, `generateTotpSecret`, `generateTotpCode`, `verifyTotpCode`, `createTotpUri` |
+| Core auth types | `AuthUser`, `AuthState`, `PasswordCredentialStorageRecord`, `AuthManager`, `AuthManagerOptions`, `AuthManagerDependencies`, `StorageAuthManagerDependencies`, `AuthRateLimitRule`, `AuthRateLimitScopePolicy`, `AuthRateLimitPolicies`, `AuthSession`, `AuthResult`, `AuthRegisterResult`, `AuthSignInResult`, `AuthRegisterInput`, `AuthSignInInput`, `AuthMfaPolicy` |
+| Lifecycle and rate-limit types | `AuthActionTokenPurpose`, `AuthActionTokenStorageRecord`, `AuthAuditAction`, `AuthAuditEventStorageRecord`, `AuthRateLimitStorageRecord`, `AuthLifecycleRateLimitAction`, `AuthLifecycleRateLimitPolicy`, `AuthLifecycleRateLimitPolicies`, `AuthLifecycleManagerOptions`, `StorageAuthLifecycleManagerDependencies`, `RequestEmailVerificationInput`, `RequestPasswordResetInput`, `ResetPasswordInput`, `ChangePasswordInput`, `UpdateAuthProfileInput`, `RequestEmailChangeInput`, `DeleteAuthAccountInput`, `DeactivateAuthAccountInput`, `StorageRateLimitProviderOptions` |
+| Provider types | `PasswordHash`, `PasswordHasher`, `EmailMessage`, `EmailProvider`, `RateLimitProvider`, `ProtectedAuthSecret`, `AuthSecretProtector`, `WebAuthnOptionsJSON`, `WebAuthnRegistrationCredential`, `WebAuthnRegistrationVerification`, `WebAuthnAuthenticationVerification`, `WebAuthnProvider`, `WebCryptoAuthSecretProtectorOptions` |
+| MFA types | `AuthMfaFactorType`, `AuthMfaFactorStatus`, `AuthMfaAvailableFactor`, `AuthMfaEnrollmentFactor`, `AuthMfaFactor`, `AuthMfaFactorStorageRecord`, `AuthMfaChallengePurpose`, `AuthMfaChallengeStorageRecord`, `AuthRecoveryCodeStorageRecord`, `AuthMfaPendingResult`, `AuthMfaEnrollmentPendingResult`, `AuthMfaEnrollmentCompleted`, `AuthMfaGateway`, `AuthMfaTotpOptions`, `AuthMfaWebAuthnOptions`, `AuthMfaManagerOptions`, `StorageAuthMfaManagerDependencies`, `BeginTotpEnrollmentInput`, `TotpEnrollmentStarted`, `VerifyTotpEnrollmentInput`, `MfaEnrollmentCompleted`, `BeginRequiredMfaEnrollmentInput`, `VerifyRequiredTotpEnrollmentInput`, `FinishRequiredPasskeyEnrollmentInput`, `BeginPasskeyRegistrationInput`, `PasskeyRegistrationStarted`, `FinishPasskeyRegistrationInput`, `BeginPasskeySignInInput`, `PasskeySignInStarted`, `CompleteMfaSignInInput`, `PasskeyMfaStarted`, `PasskeyMfaCompletedInput`, `RemoveMfaFactorInput`, `RegenerateRecoveryCodesInput` |
+| Step-up and storage types | `AuthStepUpChallengeStorageRecord`, `AuthStepUpManagerOptions`, `StorageAuthStepUpManagerDependencies`, `BeginStepUpInput`, `CompleteStepUpInput`, `BeginStepUpPasskeyInput`, `FinishStepUpPasskeyInput`, `AuthStepUpPendingState`, `AuthUserStorageRecord`, `InitializeAuthStorageOptions` |
+| Error types | `AuthErrorCode` |
+
+See the [configuration](/docs/auth/configuration), [lifecycle](/docs/auth/lifecycle), and [MFA](/docs/auth/mfa) pages for option defaults and method behavior.

@@ -6,6 +6,9 @@ import {
   Fragment,
   useContext,
   useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
 } from "react";
 
 import { createSeoGraphBuilder, stringifySeoGraph } from "../core";
@@ -39,9 +42,73 @@ import type {
 } from "../validation/types";
 import { validateSeo } from "../validation/validate";
 
+/**
+ * Client-side node registry.
+ *
+ * Render-phase collection only works when every schema component renders
+ * before the output in the same pass, which holds for server rendering but
+ * not on the client (Suspense, code-split routes, navigation). On the client,
+ * components therefore register their nodes from effects and unregister on
+ * unmount, and the output subscribes to this store.
+ */
+interface SchemaStore {
+  subscribe: (listener: () => void) => () => void;
+  getSnapshot: () => number;
+  register: (nodes: readonly SeoNode[]) => () => void;
+  getNodes: () => SeoNode[];
+}
+
+const createSchemaStore = (): SchemaStore => {
+  const entries = new Map<symbol, readonly SeoNode[]>();
+  const listeners = new Set<() => void>();
+  let version = 0;
+
+  const notify = () => {
+    version += 1;
+
+    for (const listener of listeners) {
+      listener();
+    }
+  };
+
+  return {
+    subscribe(listener) {
+      listeners.add(listener);
+
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+
+    getSnapshot: () => version,
+
+    register(nodes) {
+      const key = Symbol("schema-registration");
+
+      entries.set(key, nodes);
+      notify();
+
+      return () => {
+        if (entries.delete(key)) {
+          notify();
+        }
+      };
+    },
+
+    getNodes: () => [...entries.values()].flat(),
+  };
+};
+
+// Store versions start at 0, so -1 identifies the server/hydration render.
+const SERVER_SNAPSHOT = -1;
+
+const getServerSnapshot = () => SERVER_SNAPSHOT;
+
 interface SchemaCollector {
   config: SeoConfig;
   builder: SeoGraphBuilder;
+  graphOptions: SeoGraphBuilderOptions;
+  store: SchemaStore;
   registry: SchemaRegistry;
   metadata?: ResolvedSeoMetadata;
   validation: SeoValidationOptions | false;
@@ -63,6 +130,51 @@ const useSchemaCollector = (): SchemaCollector => {
   }
 
   return collector;
+};
+
+const EMPTY_SIGNATURE = "[]";
+
+/**
+ * Returns a render-time registration function for the current component.
+ *
+ * Nodes are added to the render-phase builder for server rendering and
+ * synchronized with the client store after commit. The registration is
+ * replaced when the nodes change and removed when the component unmounts.
+ */
+const useSchemaRegistration = (collector: SchemaCollector) => {
+  const nodes: SeoNode[] = [];
+  const registration = useRef<{
+    signature: string;
+    unregister?: () => void;
+  }>({ signature: EMPTY_SIGNATURE });
+
+  useEffect(() => {
+    const signature = JSON.stringify(nodes);
+
+    if (signature === registration.current.signature) {
+      return;
+    }
+
+    registration.current.unregister?.();
+    registration.current = {
+      signature,
+      unregister:
+        nodes.length > 0 ? collector.store.register(nodes) : undefined,
+    };
+  });
+
+  useEffect(
+    () => () => {
+      registration.current.unregister?.();
+      registration.current = { signature: EMPTY_SIGNATURE };
+    },
+    [collector.store],
+  );
+
+  return (node: SeoNode) => {
+    collector.builder.add(node);
+    nodes.push(node);
+  };
 };
 
 /**
@@ -96,13 +208,37 @@ interface SchemaGraphOutputProps {
 }
 
 const SchemaGraphOutput = ({ collector }: SchemaGraphOutputProps) => {
-  const graph = collector.builder.build();
-  const graphIssues = collector.builder.getIssues();
+  const version = useSyncExternalStore(
+    collector.store.subscribe,
+    collector.store.getSnapshot,
+    getServerSnapshot,
+  );
+
+  const isServerSnapshot = version === SERVER_SNAPSHOT;
+
+  // While hydrating, client-side schema components may not have rendered
+  // yet (e.g. inside a suspended route), so the server markup is reused
+  // verbatim. The store-based graph replaces it right after hydration.
+  const hydratingScript =
+    isServerSnapshot && typeof document !== "undefined"
+      ? document.getElementById(collector.scriptId)
+      : null;
+
+  let builder = collector.builder;
+
+  if (!isServerSnapshot) {
+    builder = createSeoGraphBuilder(collector.graphOptions).addMany(
+      collector.store.getNodes(),
+    );
+  }
+
+  const graph = builder.build();
+  const graphIssues = hydratingScript ? [] : builder.getIssues();
 
   const graphErrors = graphIssues.filter((issue) => issue.severity === "error");
 
   const report =
-    collector.validation !== false
+    collector.validation !== false && !hydratingScript
       ? validateSeo(
           {
             graph,
@@ -132,6 +268,17 @@ const SchemaGraphOutput = ({ collector }: SchemaGraphOutputProps) => {
 
   if (report) {
     assertSeoValidationReport(report);
+  }
+
+  if (hydratingScript) {
+    return createElement("script", {
+      id: collector.scriptId,
+      type: "application/ld+json",
+      nonce: collector.nonce,
+      dangerouslySetInnerHTML: {
+        __html: hydratingScript.textContent ?? "",
+      },
+    });
   }
 
   // Metadata-only validation is supported. An empty graph simply means
@@ -199,7 +346,8 @@ export interface SchemaProviderProps extends Omit<
 /**
  * Central SEO provider.
  *
- * Creates an isolated graph builder for every render.
+ * Creates an isolated graph builder for every server render; in the browser
+ * the graph is rebuilt from mounted schema components.
  * All descendant schema components register into this graph.
  *
  * The final JSON-LD script is rendered after the children.
@@ -222,9 +370,13 @@ export const SeoProvider = ({
 
   const normalizedValidation = normalizeValidation(validation);
 
+  const [store] = useState(createSchemaStore);
+
   const collector: SchemaCollector = {
     config,
     builder: createSeoGraphBuilder(options),
+    graphOptions: options,
+    store,
     registry:
       normalizedValidation !== false
         ? (normalizedValidation.registry ?? schemaRegistry ?? defaultRegistry)
@@ -259,7 +411,7 @@ export const SeoProvider = ({
  * for normalization, references, deduplication and ID generation.
  */
 const registerSchema = <Type extends SchemaComponentType>(
-  collector: SchemaCollector,
+  register: (node: SeoNode) => void,
   type: Type,
   props: SchemaComponentProps<Type>,
 ): null => {
@@ -275,7 +427,7 @@ const registerSchema = <Type extends SchemaComponentType>(
     node["@id"] = id;
   }
 
-  collector.builder.add(node as SeoNode);
+  register(node as SeoNode);
 
   return null;
 };
@@ -286,7 +438,7 @@ const registerSchema = <Type extends SchemaComponentType>(
  * Supports generated Schema.org definitions and custom types.
  */
 export const Schema = ({ type, id, data, properties }: SchemaProps) => {
-  const collector = useSchemaCollector();
+  const register = useSchemaRegistration(useSchemaCollector());
 
   const node: Record<string, unknown> = {
     ...data,
@@ -298,7 +450,7 @@ export const Schema = ({ type, id, data, properties }: SchemaProps) => {
     node["@id"] = id;
   }
 
-  collector.builder.add(node as SeoNode);
+  register(node as SeoNode);
 
   return null;
 };
@@ -310,6 +462,7 @@ export const Schema = ({ type, id, data, properties }: SchemaProps) => {
  */
 export const SeoJsonLd = ({ data, id, nonce }: SeoJsonLdProps) => {
   const collector = useSchemaCollector();
+  const register = useSchemaRegistration(collector);
 
   if (nonce) {
     if (collector.nonce && collector.nonce !== nonce) {
@@ -322,7 +475,7 @@ export const SeoJsonLd = ({ data, id, nonce }: SeoJsonLdProps) => {
   }
 
   if (Array.isArray(data)) {
-    collector.builder.addMany(data);
+    data.forEach(register);
     return null;
   }
 
@@ -334,7 +487,7 @@ export const SeoJsonLd = ({ data, id, nonce }: SeoJsonLdProps) => {
     "@graph" in value &&
     Array.isArray(value["@graph"])
   ) {
-    collector.builder.addMany(value["@graph"]);
+    value["@graph"].forEach(register);
     return null;
   }
 
@@ -347,7 +500,7 @@ export const SeoJsonLd = ({ data, id, nonce }: SeoJsonLdProps) => {
     ...(id !== undefined ? { "@id": id } : {}),
   } as SeoNode;
 
-  collector.builder.add(node);
+  register(node);
 
   return null;
 };
@@ -366,14 +519,14 @@ export const SchemaScript = SeoJsonLd;
  * without creating additional graph builders or JSON-LD scripts.
  */
 export const SchemaGraph = (props: SchemaGraphProps) => {
-  const collector = useSchemaCollector();
+  const register = useSchemaRegistration(useSchemaCollector());
 
   if (props.graph !== undefined) {
-    collector.builder.addMany(props.graph["@graph"]);
+    props.graph["@graph"].forEach(register);
     return null;
   }
 
-  collector.builder.addMany(props.nodes);
+  props.nodes.forEach(register);
 
   return null;
 };
@@ -389,9 +542,9 @@ export const SchemaReference = ({
   id,
   type = "Thing",
 }: SchemaReferenceProps) => {
-  const collector = useSchemaCollector();
+  const register = useSchemaRegistration(useSchemaCollector());
 
-  collector.builder.add({
+  register({
     "@id": id,
     "@type": type,
   });
@@ -409,9 +562,9 @@ const createSchemaComponent = <Type extends SchemaComponentType>(
   type: Type,
 ) => {
   const Component = (props: SchemaComponentProps<Type>): null => {
-    const collector = useSchemaCollector();
+    const register = useSchemaRegistration(useSchemaCollector());
 
-    return registerSchema(collector, type, props);
+    return registerSchema(register, type, props);
   };
 
   return Component;
@@ -525,12 +678,11 @@ export const LDProfilePage = createSchemaComponent("ProfilePage");
  */
 export const useSeo = () => {
   const collector = useSchemaCollector();
+  const register = useSchemaRegistration(collector);
 
   return {
     config: collector.config,
 
-    registerNode: (node: SeoNode) => {
-      collector.builder.add(node);
-    },
+    registerNode: register,
   };
 };

@@ -2,6 +2,15 @@
 
 Secure, database-independent session management for Puzzle Auth.
 
+**Documentation:** [https://puzzle-ui.com/docs/auth](https://puzzle-ui.com/docs/auth)
+
+`@puzzle-ui/session` issues, validates, rotates, and revokes server-side
+sessions on top of any [`@puzzle-ui/storage`](https://puzzle-ui.com/docs/storage)
+adapter. [`@puzzle-ui/auth`](https://puzzle-ui.com/docs/auth) and
+[`@puzzle-ui/fullstack`](https://puzzle-ui.com/docs/fullstack) use it for
+their session handling; use it directly when you need sessions without the
+full authentication stack, such as anonymous carts or custom sign-in flows.
+
 ## Features
 
 - Cryptographically secure opaque session tokens.
@@ -29,7 +38,13 @@ Session management fails closed when these capabilities are unavailable.
 ## Installation
 
 ```sh
+npm install @puzzle-ui/session
+# or
 bun add @puzzle-ui/session
+# or
+pnpm add @puzzle-ui/session
+# or
+yarn add @puzzle-ui/session
 ```
 
 ## Initialization

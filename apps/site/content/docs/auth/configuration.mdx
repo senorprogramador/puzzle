@@ -1,0 +1,88 @@
+---
+title: Auth Configuration
+description: Configure @puzzle-ui/auth managers, storage, password hashing, sessions, and shared rate limiting.
+---
+
+`@puzzle-ui/auth` is assembled from explicit server-side dependencies instead of a framework global. Configure storage, a session manager, password hashing, and rate limiting first; add the lifecycle and MFA managers for those features.
+
+## Core manager
+
+`StorageAuthManager` depends on `StorageAdapter`, `SessionManager`, `PasswordHasher`, and `RateLimitProvider`. The optional `mfa` dependency implements `AuthMfaGateway` and is typically `StorageAuthMfaManager`.
+
+```ts
+import {
+  StorageAuthManager,
+  StorageRateLimitProvider,
+} from "@puzzle-ui/auth";
+
+const rateLimitProvider = new StorageRateLimitProvider(storage);
+
+const auth = new StorageAuthManager(
+  { storage, passwordHasher, rateLimitProvider, sessions },
+  { rateLimitKeySecret },
+);
+
+await auth.initialize();
+```
+
+Use a production-quality Argon2id implementation for `PasswordHasher`. `AuthManager` validates the stored password hash algorithm as `argon2id`; this package does not provide a password-hashing implementation. The session manager comes from `@puzzle-ui/session` and must use secure, persistent storage in production.
+
+`initialize()` registers the auth collections and initializes the optional MFA gateway before the manager can be used. Initialize related managers, including the step-up manager, before exposing their endpoints. If a storage-backed rate limiter uses a custom collection name, initialize that provider as well.
+
+## `AuthManagerOptions`
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `rateLimitKeySecret` | `string` | Required | Secret used to derive opaque rate-limit keys; must contain at least 32 characters. Keep it private and stable. |
+| `usersCollection` | `string` | `auth_users` | User collection name. |
+| `credentialsCollection` | `string` | `auth_credentials` | Password credential collection name. |
+| `auditCollection` | `string` | `auth_audit_events` | Authentication audit collection name. |
+| `minimumPasswordLength` | `number` | `8` | Minimum registration and password-change length, measured in characters. |
+| `maximumPasswordLength` | `number` | `1024` | Maximum password length; input is also capped at 4096 UTF-8 bytes. |
+| `requireVerifiedEmail` | `boolean` | `false` | Require an email-verified account to sign in or remain authenticated. Keep aligned with lifecycle and MFA manager configuration. |
+| `mfaPolicy` | `AuthMfaPolicy` | `{}` | Set `required` or an asynchronous/synchronous `requiredFor(user)` predicate. Existing active factors are challenged at sign-in even if policy is optional. |
+| `rateLimits` | Partial registration/sign-in policies | See defaults below | Override email and IP rate limits independently for registration and sign-in. |
+| `clock` | `() => Date` | `() => new Date()` | Clock injection for deterministic tests and controlled environments. |
+
+Default rate limits use fixed windows:
+
+| Action | Scope | Limit | Window |
+| --- | --- | ---: | ---: |
+| Registration | Email | 5 | 3600 seconds |
+| Registration | IP | 10 | 3600 seconds |
+| Sign-in | Email | 10 | 900 seconds |
+| Sign-in | IP | 30 | 900 seconds |
+
+## Manager methods
+
+| Method | Input | Result | Description |
+| --- | --- | --- | --- |
+| `initialize()` | — | `Promise<void>` | Registers storage and prepares the configured managers. Call before requests. |
+| `register(input)` | `AuthRegisterInput` | `Promise<AuthRegisterResult>` | Creates an account and either an authenticated session or an MFA enrollment challenge. |
+| `signIn(input)` | `AuthSignInInput` | `Promise<AuthSignInResult>` | Verifies a password and returns an authenticated session, MFA challenge, or required-enrollment challenge. |
+| `getCurrentUser(token)` | session token | `Promise<AuthUser \| null>` | Returns a user only when the session and current authentication policy are valid. |
+| `getAuthState(token)` | session or pending token | `Promise<AuthState>` | Resolves authenticated, unauthenticated, and pending MFA states. |
+| `signOut(token)` | session token | `Promise<void>` | Revokes one session. |
+| `signOutEverywhere(userId)` | user ID | `Promise<void>` | Revokes all user sessions and pending MFA challenges. |
+
+`AuthRegisterInput` includes `email`, `password`, required `ipAddress`, optional `name`, and optional `sessionMetadata`. `AuthSignInInput` includes `email`, `password`, required `ipAddress`, and optional `sessionMetadata`. Obtain the client IP only through a trusted proxy/application configuration, not an arbitrary client header.
+
+The `AuthResult` token is server-only. Put it in a secure, HttpOnly cookie through your HTTP integration and do not expose it in browser JSON. For framework handlers and cookie/CSRF configuration, see [`@puzzle-ui/fullstack`](/docs/fullstack) and the [developer authentication guide](/docs/developer/authentication).
+
+## Storage-backed rate limiting
+
+`StorageRateLimitProvider` implements the exported `RateLimitProvider` interface using the auth rate-limit collection and conditional storage updates.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `collectionName` | `string` | `auth_rate_limits` | Collection for rate-limit counters. |
+| `clock` | `() => Date` | `() => new Date()` | Clock used for window boundaries. |
+| `maximumRetries` | `number` | `12` | Maximum storage-conflict retries; must be a positive integer. |
+
+Its constructor requires storage with unique constraints and conditional writes. The `consume({ key, limit, windowSeconds })` method returns `allowed`, `remaining`, and `resetAt`. Use a shared persistent provider across application instances; process-local counters do not coordinate distributed deployments.
+
+## Storage and sessions
+
+`initializeAuthStorage(storage, options?)` registers the default auth collections and optional overrides. Base auth storage requires unique constraints and atomic batches. Lifecycle, MFA, step-up, and the storage-backed rate limiter also require conditional writes where they enforce single-use tokens, atomic transitions, or counters. Confirm the adapter's capabilities in [`@puzzle-ui/storage`](/docs/storage) before deploying.
+
+Do not use the auth package's internal collection records as application-level authorization policy. Auth returns the public `AuthUser` shape; application roles, permissions, and resource access checks belong to your application.

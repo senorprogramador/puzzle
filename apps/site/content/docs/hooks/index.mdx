@@ -1,0 +1,73 @@
+---
+title: Hooks
+description: Reusable React hooks for keyboard shortcuts and accessible roving focus.
+---
+
+<code>@puzzle-ui/hooks</code> provides small, composable hooks for keyboard interactions and composite widgets. Its hooks manage browser listeners and focus state while leaving markup and visual styling to your application.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/hooks
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/hooks
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/hooks
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/hooks
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React `^19.0.0` is a peer dependency and should already be installed in your application.
+
+## Quick start
+
+Import the hooks you need from the package root. `useKeyboardKeys` listens for selected keyboard keys; `useRovingFocus` coordinates arrow-key navigation and tab stops among related elements.
+
+```tsx
+import { useKeyboardKeys } from "@puzzle-ui/hooks";
+
+function EscapeShortcut() {
+  useKeyboardKeys({
+    keys: ["Escape"],
+    onKeyDown: () => console.log("Escape pressed"),
+  });
+
+  return null;
+}
+```
+
+## Hooks
+
+| Hook | Purpose | Reference |
+| --- | --- | --- |
+| `useKeyboardKeys` | Subscribe to selected `keydown` and `keyup` events on `window`. | [Keyboard Keys](/docs/hooks/use-keyboard-keys) |
+| `useRovingFocus` | Implement roving tab stops and arrow-key navigation for a group of focusable items. | [Roving Focus](/docs/hooks/use-roving-focus) |
+
+## Exports
+
+The package root, `@puzzle-ui/hooks`, exports `useKeyboardKeys`, `useRovingFocus`, and their public option, event, item, orientation, and return types. There are no documented subpath exports.
+
+## SSR and production notes
+
+These are React hooks and must be called at the top level of a React component or custom hook. `useKeyboardKeys` attaches browser listeners in an effect, so it does not access `window` or `document` during server rendering. In frameworks that distinguish server and client modules, call either hook from a client component; `useRovingFocus` carries a client directive. Keep the rendered item order and initial active item consistent between server and client for predictable hydration.

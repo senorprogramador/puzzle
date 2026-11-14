@@ -1,4 +1,11 @@
-import { Component, act, type ReactNode } from "react";
+import {
+  Component,
+  Suspense,
+  act,
+  lazy,
+  useState,
+  type ReactNode,
+} from "react";
 
 import { createRoot, hydrateRoot, type Root } from "react-dom/client";
 
@@ -6,7 +13,7 @@ import { renderToString } from "react-dom/server";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { SeoProvider, SeoHead, LDOrganization } from "../react";
+import { SeoProvider, SeoHead, LDOrganization, LDWebPage } from "../react";
 
 import { generateRobotsTxt, generateSitemap } from "../index";
 
@@ -256,6 +263,85 @@ describe("SEO JSON-LD in the browser", () => {
     expect(parseJsonLd(container)["@graph"]).toContainEqual(
       expect.objectContaining({ name: "Hydrated" }),
     );
+  });
+
+  it("hydrates when schema components in a suspended subtree render after the output", async () => {
+    const LazyPage = () => (
+      <LDWebPage id="https://example.com/lazy#webpage" name="Lazy page" />
+    );
+
+    let resolveLazy!: () => void;
+    const DeferredPage = lazy(
+      () =>
+        new Promise<{ default: typeof LazyPage }>((resolve) => {
+          resolveLazy = () => resolve({ default: LazyPage });
+        }),
+    );
+
+    const tree = (page: ReactNode) => (
+      <SeoProvider config={config}>
+        <LDOrganization name="Root" url="https://example.com" />
+        <Suspense fallback={null}>{page}</Suspense>
+      </SeoProvider>
+    );
+
+    const container = document.createElement("div");
+    container.innerHTML = renderToString(tree(<LazyPage />));
+    document.body.append(container);
+
+    const serverScript = container.querySelector("script");
+    const serverJson = serverScript?.textContent;
+    const consoleError = vi.spyOn(console, "error");
+
+    await act(async () => {
+      roots.push(hydrateRoot(container, tree(<DeferredPage />)));
+    });
+
+    // The route chunk resolves after the root (and its output) hydrated.
+    await act(async () => {
+      resolveLazy();
+    });
+
+    expect(consoleError).not.toHaveBeenCalled();
+    expect(container.querySelector("script")).toBe(serverScript);
+    expect(container.querySelector("script")?.textContent).toBe(serverJson);
+    expect(parseJsonLd(container)["@graph"]).toContainEqual(
+      expect.objectContaining({ name: "Lazy page" }),
+    );
+  });
+
+  it("updates the graph when schema components change without a provider render", async () => {
+    let navigate!: (page: "home" | "about") => void;
+
+    const Routes = () => {
+      const [page, setPage] = useState<"home" | "about">("home");
+      navigate = setPage;
+
+      return page === "home" ? (
+        <LDWebPage id="https://example.com/#webpage" name="Home" />
+      ) : (
+        <LDWebPage id="https://example.com/about#webpage" name="About" />
+      );
+    };
+
+    await mount(
+      <SeoProvider config={config}>
+        <LDOrganization name="Root" url="https://example.com" />
+        <Routes />
+      </SeoProvider>,
+    );
+
+    const names = () =>
+      parseJsonLd(document.body)["@graph"].map((node) => node.name);
+
+    expect(names()).toEqual(expect.arrayContaining(["Root", "Home"]));
+
+    await act(async () => {
+      navigate("about");
+    });
+
+    expect(names()).toEqual(expect.arrayContaining(["Root", "About"]));
+    expect(names()).not.toContain("Home");
   });
 });
 

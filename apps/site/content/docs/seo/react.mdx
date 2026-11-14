@@ -1,0 +1,102 @@
+---
+title: React Integration
+description: Render page metadata and collect Schema.org nodes with React.
+---
+
+<code>@puzzle-ui/seo</code> provides a React provider, metadata output, and typed Schema.org components. Schema components must be descendants of the provider.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React 19 is a peer dependency. Framework adapters do not require a framework package at runtime.
+
+## Quick start
+
+```tsx
+import { LDOrganization, LDWebPage, SeoMetadata, SeoProvider } from "@puzzle-ui/seo/react";
+
+export const Page = () => (
+  <SeoProvider config={{ siteUrl: "https://example.com" }}>
+    <SeoMetadata metadata={{ title: "Home", canonical: "/" }} />
+    <LDOrganization id="#org" name="Example" url="https://example.com" />
+    <LDWebPage name="Home" publisher={{ "@id": "#org" }} />
+    <main>Welcome</main>
+  </SeoProvider>
+);
+```
+
+The provider collects nodes in a graph and emits one JSON-LD script after its children, or no script when the graph is empty. During server rendering, nodes are collected as components render. In the browser, schema components register after mount and unregister on unmount, so the script stays in sync with code-split routes, Suspense boundaries, and client-side navigation. Hydration reuses the server-rendered script. Use server rendering if crawlers need the initial HTML. Supply a request-specific CSP nonce when required by your policy.
+
+## Provider props
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `config` | `SeoConfig` | required | Site configuration. |
+| `children` | `ReactNode` | required | Content and schema nodes. |
+| `metadata` | `SeoPageMetadata` | — | Metadata for the provider scope. |
+| `scriptId` | `string` | `"puzzle-seo-jsonld"` | JSON-LD script ID. |
+| `nonce` | `string` | — | CSP nonce for the script. |
+| `graphOptions` | `SeoGraphBuilderOptions` | site URL as base | Graph options. |
+| `schemaRegistry` | `SchemaRegistry` | default registry | Custom schema registry. |
+| `validation` | `SeoValidationOptions \| SchemaValidationOptions \| false` | warn mode | Validation options; `false` disables validation. |
+| `onValidation` | `(report: SeoValidationReport) => void` | — | Receives a report in a React effect after rendering. |
+
+## Metadata scopes
+
+`SeoMetadata` resolves and renders the provided `metadata` and makes it available to descendants. Alternatively, pass `metadata` to `SeoProvider` and render `SeoHead` inside it. Use one metadata output strategy per document to avoid duplicate tags. `useSeoConfig` and `useSeoMetadata` read the current metadata context; `useSeo` exposes the graph collector's configuration and `registerNode`. Call `registerNode` during render, not from event handlers or effects; nodes registered in a render replace those from the component's previous render and are removed when it unmounts.
+
+## Schema components
+
+Named components accept typed Schema.org properties, an optional `id`, and `data` for additional values. `Schema` accepts `type`, `id`, `data` and `properties` for generic or custom types. `SchemaGraph` accepts either `nodes` or `graph`; `SeoJsonLd` and its alias `SchemaScript` accept `data` as a node, node array or graph. `SchemaReference` registers a minimal node with `id` and an optional `type` (default `Thing`); it merges with matching nodes. An `id` passed to `SeoJsonLd` overrides the ID of a single node. A `nonce` passed there must not conflict with the provider nonce.
+
+```tsx
+import { Schema, SchemaGraph } from "@puzzle-ui/seo/react";
+
+const ExtraData = () => (
+  <>
+    <Schema type="Organization" id="#org" properties={{ name: "Example" }} />
+    <SchemaGraph nodes={[{ "@type": "WebPage", name: "About" }]} />
+  </>
+);
+```
+
+Render `ExtraData` under `SeoProvider`. Validation and graph errors are separate: strict report failures throw, while graph builder errors can throw regardless of report mode. See [Validation](/docs/seo/validation).
+
+## Exports
+
+`@puzzle-ui/seo/react` exports `SeoProvider`, `SeoMetadata`, `SeoHead`, `useSeoConfig`, `useSeoMetadata`, `useSeo`, `SeoJsonLd`, `Schema`, `SchemaReference`, `SchemaGraph`, `SchemaScript`, their public prop types, and these named components:
+
+- `LDOrganization`, `LDPerson`, `LDWebSite` (`LDWebsite`), `LDWebPage`, `LDArticle`, `LDBlogPosting`.
+- `LDBreadcrumbList` (`LDBreadcrumbs`), `LDProduct`, `LDOffer`, `LDAggregateRating`, `LDReview`, `LDLocalBusiness`, `LDService`.
+- `LDImageObject`, `LDVideoObject`, `LDEvent`, `LDRecipe`, `LDCourse`, `LDJobPosting`, `LDPlace`, `LDPostalAddress`, `LDContactPoint`.
+- `LDSearchAction`, `LDItemList`, `LDSoftwareApplication`, `LDHowTo`, `LDFaqPage` (`LDFAQPage`), `LDCollectionPage`, `LDProfilePage`.

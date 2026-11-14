@@ -1,0 +1,78 @@
+---
+title: Sitemaps
+description: Generate sitemap XML, split files, and publish sitemap indexes.
+---
+
+<code>@puzzle-ui/seo</code> generates sitemap XML from URL entries and can split large collections into multiple files.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/seo react
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+React 19 is a peer dependency. Framework adapters do not require a framework package at runtime.
+
+## Quick start
+
+```ts
+import { generateSitemap } from "@puzzle-ui/seo/sitemap";
+
+const result = generateSitemap({
+  baseUrl: "https://example.com",
+  entries: [
+    { url: "/", changeFrequency: "weekly" },
+    { url: "/about", lastModified: "2026-01-01" },
+  ],
+});
+if (result.issues.length) throw new Error(result.issues.map((issue) => issue.message).join("\n"));
+// Publish result.indexXml when present, and every result.files entry at its URL.
+```
+
+`serializeSitemap` produces one `{ xml, entries, issues }` result. `generateSitemap` returns `{ files, indexXml, indexUrl, totalEntries, issues }`; the index is present only when multiple files are generated. Files use names such as `sitemap-1.xml`. See [Framework Adapters](/docs/seo/frameworks) for handlers that publish the index and individual files.
+
+## Options
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `baseUrl` | `string` | required | Site origin for relative URLs. |
+| `entries` | `SitemapEntry[]` | required | Pages to include. |
+| `includeLastModified` | `boolean` | `true` | Control last-modified serialization. |
+| `allowExternalUrls` | `boolean` | `false` | Allow external page and alternate URLs. |
+| `maxEntries` | `number` | `50000` | Maximum entries per generated file. |
+| `maxBytes` | `number` | `52428800` | Maximum bytes per generated file, from 1024 to 50 MiB. |
+| `filename` | `string` | `"sitemap"` | Base for generated file and index names. |
+| `validateAlternates` | `boolean` | `false` | Enable alternate relationship validation. |
+
+A `SitemapEntry` accepts `url`, `lastModified`, `changeFrequency`, `priority`, `images`, `videos`, and locale `alternates`. Entries marked `indexable: false`, with a non-200 `statusCode`, or with `redirectTo` are excluded. URLs are normalized, deduplicated and sorted. Check `issues`: invalid input is not a substitute for application-level URL or publication policy. External images are supported even when external page URLs are disabled.
+
+## Exports
+
+`@puzzle-ui/seo/sitemap` exports `serializeSitemap`, `generateSitemap`, `validateSitemapEntries`, `createSitemapXml`, `serializeSitemapEntry`, `escapeXml`, `formatSitemapDate`, `sitemapByteLength` and sitemap types.

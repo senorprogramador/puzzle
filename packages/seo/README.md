@@ -1,6 +1,40 @@
 # @puzzle-ui/seo
 
-Framework-independent SEO toolkit for Puzzle.
+Framework-independent SEO toolkit for Puzzle. Use it to generate metadata,
+Schema.org JSON-LD, sitemaps and robots.txt for React applications and server routes.
+
+**Documentation: [https://puzzle-ui.com/docs/seo](https://puzzle-ui.com/docs/seo)**
+
+## Install
+
+```sh
+npm install @puzzle-ui/seo react
+```
+
+React 19 is a peer dependency. For Bun, pnpm or Yarn, use the equivalent add command.
+
+## Quick start
+
+```tsx
+import { LDOrganization, SeoHead, SeoProvider } from "@puzzle-ui/seo";
+
+export const App = () => (
+  <SeoProvider
+    config={{ siteUrl: "https://example.com", identity: { name: "Example" } }}
+    metadata={{ title: "Home", canonical: "/" }}
+  >
+    <SeoHead />
+    <LDOrganization name="Example" url="https://example.com" />
+    <main>Welcome</main>
+  </SeoProvider>
+);
+```
+
+The root exports graph, React, validation, sitemap, robots, URL and testing
+utilities. The `core`, `context`, `schema`, `metadata`, `react`, `server`,
+`sitemap`, `robots`, `testing`, `validation`, `urls`, `next`, `tanstack` and
+`react-router` subpaths expose focused APIs. Import configuration, metadata
+resolver, schema registry and server handler functions from their subpaths.
 
 The package provides:
 
@@ -638,55 +672,43 @@ const CustomStructuredData = () => {
 };
 ```
 
-The hook must be used inside SeoProvider.
+The hook must be used inside SeoProvider. Call `registerNode` during render,
+not from event handlers or effects: the nodes registered in a render replace
+those from the component's previous render and are removed when it unmounts.
 
 ### Validation
 
-Schema validation is enabled by default.
-
-Strict validation rejects unknown Schema.org types and properties.
-
-````tsx
-<SeoProvider
-config={config}
-validation={{
-    strict: true,
-  }}
-
->   <LDOrganization name="Example" />
-> </SeoProvider>
-> ```
-
-Disable validation when integrating custom or non-standard
-Schema.org definitions:
+Validation runs in warn mode by default. Strict mode promotes warnings to
+errors and rejects invalid output. Graph builder errors may still throw when
+report validation is disabled. See the [validation guide](https://puzzle-ui.com/docs/seo/validation)
+for profiles, custom rules and diagnostics.
 
 ```tsx
 <SeoProvider
-config={config}
-validation={false}
-
-> <Schema
-
-    type="CustomType"
-    data={{
-      name: "Example",
-    }}
-
-/>
+  config={config}
+  metadata={{ title: "Welcome to Example", description: "Discover the Example website and its services.", canonical: "/" }}
+  validation={{ mode: "strict" }}
+>
+  <LDOrganization name="Example" />
 </SeoProvider>
-````
+```
 
-A custom registry can be supplied through schemaRegistry.
+Disable report validation when needed, or supply a custom registry through
+`schemaRegistry`:
+
+```tsx
+<SeoProvider config={config} validation={false}>
+  <Schema type="CustomType" data={{ name: "Example" }} />
+</SeoProvider>
+```
 
 ### CSP nonce
 
 The central JSON-LD script supports a Content Security Policy nonce.
 
-````tsx
-<SeoProvider
-  config={config}
-  nonce={requestNonce}
->   <LDOrganization name="Example" />
+```tsx
+<SeoProvider config={config} nonce={requestNonce}>
+  <LDOrganization name="Example" />
 </SeoProvider>
 ```
 
@@ -734,7 +756,7 @@ Run the following commands from the package directory:
 ```sh
 bun run schema:generate
 bun run schema:check
-````
+```
 
 The check command verifies that the committed generated definitions
 match the pinned Schema.org source data.

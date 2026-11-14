@@ -91,13 +91,13 @@ Each item needs a stable unique ID. Supply `textValue` for rich labels so typeah
 | `onItemActivate`                          | `(item) => void`                           | -                           | Enter activation.                      |
 | `getItemActive`                           | `(item) => boolean`                        | -                           | Current-route predicate.               |
 | `renderItem`, `renderIcon`, `renderLabel` | `(item, state) => ReactNode`               | Built-in renderer           | Non-interactive custom content.        |
-| `expandOnItemClick`                       | `boolean`                                  | `false`                     | Toggle branches on label click.        |
+| `expandOnItemClick`                       | `boolean`                                  | `true`                      | Toggle groups on row click.            |
 | `size`                                    | `"sm" \| "md"`                             | `"md"`                      | Density.                               |
 | `indentation`                             | `string \| number`                         | Theme spacing               | Hierarchy indentation.                 |
 | `typeahead`                               | `boolean`                                  | `true`                      | Character-based navigation.            |
 | `loadingLabel`, `loadErrorLabel`          | `string`                                   | Built-in messages           | Loading/error feedback.                |
 | `itemClassName`                           | `string`                                   | -                           | Class on each item.                    |
 
-Items require `id` and `label`; optional fields are `href`, `textValue`, `icon`, `endAdornment`, `children`, `hasChildren`, `disabled`, `selectable`, and `data`. Disabled branches can still expand. Rendering state contains `expanded`, `selected`, `focused`, `loading`, `disabled`, and `hasChildren`.
+Items require `id` and `label`; optional fields are `href`, `textValue`, `icon`, `endAdornment`, `children`, `hasChildren`, `disabled`, `selectable`, and `data`. Disabled branches can still expand. Clicking anywhere on a group row (a branch without `href`) toggles it; linked branches navigate and expand via their arrow. Set `expandOnItemClick={false}` to select groups on click instead. Rendering state contains `expanded`, `selected`, `focused`, `loading`, `disabled`, and `hasChildren`.
 
 Arrow keys move through the hierarchy; Home/End reach boundaries, Enter activates, and Space selects. Re-collapse and re-expand a failed lazy branch to retry. Keep nested buttons and links out of custom row content.
