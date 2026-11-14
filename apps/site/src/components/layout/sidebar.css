@@ -1,0 +1,64 @@
+.puzzle-site-sidebar__toggle {
+    justify-content: space-between;
+}
+
+.puzzle-site-sidebar__chevron {
+    transition: transform var(--puzzle-duration-normal, 300ms) var(--puzzle-easing-out, ease-out);
+}
+
+.puzzle-site-sidebar__toggle[aria-expanded="true"] .puzzle-site-sidebar__chevron {
+    transform: rotate(180deg);
+}
+
+/* Direct grid child of the accordion transition; lets the 0fr track collapse. */
+.puzzle-site-sidebar__panel-inner {
+    min-height: 0;
+}
+
+/* Mobile: full-width, collapsible menu above the page content. */
+@media (max-width: 767.98px) {
+    .puzzle-page-layout.puzzle-site-docs-layout {
+        --puzzle-page-sidebar-left-order: -1;
+    }
+
+    .puzzle-sidebar.puzzle-site-sidebar {
+        position: static;
+        gap: 0;
+
+        width: 100%;
+        height: auto;
+        max-height: none;
+
+        overflow: visible;
+        padding-block: var(--puzzle-space-2, 0.5rem);
+        border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    }
+
+    .puzzle-site-sidebar__panel-inner {
+        overflow: hidden;
+    }
+
+    .puzzle-site-sidebar__panel-inner > * {
+        padding-block: var(--puzzle-space-2, 0.5rem);
+    }
+}
+
+/* Wider screens: the menu is always expanded and the toggle is hidden. */
+@media (min-width: 768px) {
+    .puzzle-site-sidebar__toggle {
+        display: none;
+    }
+
+    .puzzle-site-sidebar .puzzle-site-sidebar__panel {
+        display: block;
+        overflow: visible;
+        opacity: 1;
+        transition: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-site-sidebar__chevron {
+        transition: none;
+    }
+}

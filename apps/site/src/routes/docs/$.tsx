@@ -266,7 +266,7 @@ function Page() {
   const data = useFumadocsLoader(Route.useLoaderData());
 
   return (
-    <PageLayout>
+    <PageLayout className="puzzle-site-docs-layout">
       <PageLayout.Header className="puzzle-site-header">
         <Header />
       </PageLayout.Header>
