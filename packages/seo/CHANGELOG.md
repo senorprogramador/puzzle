@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/seo` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.6.0 - 2026-11-14
+
+- No changes; version bumped in lockstep.
+
 ## 0.5.1 - 2026-11-14
 
 - Keep React schema component JSON-LD graphs synchronized with client-side registrations, including components rendered after Suspense and changes made without a `SeoProvider` rerender.

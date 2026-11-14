@@ -77,10 +77,10 @@
     },
     "packages/auth": {
       "name": "@puzzle-ui/auth",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
-        "@puzzle-ui/session": "^0.5.1",
-        "@puzzle-ui/storage": "^0.5.1",
+        "@puzzle-ui/session": "^0.6.0",
+        "@puzzle-ui/storage": "^0.6.0",
         "@simplewebauthn/server": "^14.1.0",
       },
       "devDependencies": {
@@ -90,7 +90,7 @@
     },
     "packages/core": {
       "name": "@puzzle-ui/core",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "devDependencies": {
         "tsdown": "^0.23.1",
         "tsup": "latest",
@@ -100,7 +100,7 @@
     },
     "packages/create": {
       "name": "@puzzle-ui/create",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "bin": {
         "create-puzzle": "./dist/index.js",
       },
@@ -116,11 +116,11 @@
     },
     "packages/fullstack": {
       "name": "@puzzle-ui/fullstack",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
-        "@puzzle-ui/auth": "^0.5.1",
-        "@puzzle-ui/session": "^0.5.1",
-        "@puzzle-ui/ui": "^0.5.1",
+        "@puzzle-ui/auth": "^0.6.0",
+        "@puzzle-ui/session": "^0.6.0",
+        "@puzzle-ui/ui": "^0.6.0",
         "@simplewebauthn/browser": "^14.0.0",
       },
       "devDependencies": {
@@ -148,9 +148,9 @@
     },
     "packages/hooks": {
       "name": "@puzzle-ui/hooks",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
-        "@puzzle-ui/core": "^0.5.1",
+        "@puzzle-ui/core": "^0.6.0",
       },
       "devDependencies": {
         "@types/react": "^19.0.0",
@@ -164,11 +164,11 @@
     },
     "packages/icons": {
       "name": "@puzzle-ui/icons",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
         "@iconify/react": "^6.0.3",
         "@iconify/utils": "^3.1.7",
-        "@puzzle-ui/core": "^0.5.1",
+        "@puzzle-ui/core": "^0.6.0",
       },
       "devDependencies": {
         "@types/react": "^19.0.0",
@@ -184,13 +184,13 @@
     },
     "packages/pieces": {
       "name": "@puzzle-ui/pieces",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
-        "@puzzle-ui/core": "^0.5.1",
-        "@puzzle-ui/hooks": "^0.5.1",
-        "@puzzle-ui/icons": "^0.5.1",
-        "@puzzle-ui/theme": "^0.5.1",
-        "@puzzle-ui/ui": "^0.5.1",
+        "@puzzle-ui/core": "^0.6.0",
+        "@puzzle-ui/hooks": "^0.6.0",
+        "@puzzle-ui/icons": "^0.6.0",
+        "@puzzle-ui/theme": "^0.6.0",
+        "@puzzle-ui/ui": "^0.6.0",
       },
       "devDependencies": {
         "@testing-library/jest-dom": "^7.0.1",
@@ -214,7 +214,7 @@
     },
     "packages/seo": {
       "name": "@puzzle-ui/seo",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "devDependencies": {
         "@types/node": "^26.6.6",
         "@types/react": "^19.0.0",
@@ -235,9 +235,9 @@
     },
     "packages/session": {
       "name": "@puzzle-ui/session",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
-        "@puzzle-ui/storage": "^0.5.1",
+        "@puzzle-ui/storage": "^0.6.0",
       },
       "devDependencies": {
         "tsdown": "^0.23.1",
@@ -246,7 +246,7 @@
     },
     "packages/storage": {
       "name": "@puzzle-ui/storage",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "devDependencies": {
         "@types/bun": "^1.4.4",
         "bun": "^1.4.4",
@@ -256,9 +256,9 @@
     },
     "packages/storage-d1": {
       "name": "@puzzle-ui/storage-d1",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
-        "@puzzle-ui/storage": "^0.5.1",
+        "@puzzle-ui/storage": "^0.6.0",
       },
       "devDependencies": {
         "@types/bun": "^1.4.4",
@@ -271,9 +271,9 @@
     },
     "packages/storage-mongodb": {
       "name": "@puzzle-ui/storage-mongodb",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
-        "@puzzle-ui/storage": "^0.5.1",
+        "@puzzle-ui/storage": "^0.6.0",
         "mongodb": "^7.8.0",
       },
       "devDependencies": {
@@ -286,12 +286,12 @@
     },
     "packages/theme": {
       "name": "@puzzle-ui/theme",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "bin": {
         "puzzle-theme": "./dist/cli.js",
       },
       "dependencies": {
-        "@puzzle-ui/core": "^0.5.1",
+        "@puzzle-ui/core": "^0.6.0",
       },
       "devDependencies": {
         "@tsdown/css": "^0.23.1",
@@ -309,12 +309,12 @@
     },
     "packages/ui": {
       "name": "@puzzle-ui/ui",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "dependencies": {
-        "@puzzle-ui/core": "^0.5.1",
-        "@puzzle-ui/hooks": "^0.5.1",
-        "@puzzle-ui/icons": "^0.5.1",
-        "@puzzle-ui/theme": "^0.5.1",
+        "@puzzle-ui/core": "^0.6.0",
+        "@puzzle-ui/hooks": "^0.6.0",
+        "@puzzle-ui/icons": "^0.6.0",
+        "@puzzle-ui/theme": "^0.6.0",
       },
       "devDependencies": {
         "@testing-library/jest-dom": "^7.0.1",

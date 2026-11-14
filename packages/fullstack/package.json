@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/fullstack",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "First-party Puzzle Auth client, server and framework integration entry points.",
   "homepage": "https://puzzle-ui.com",
   "repository": {
@@ -93,9 +93,9 @@
     "vitest": "latest"
   },
   "dependencies": {
-    "@puzzle-ui/ui": "^0.5.1",
-    "@puzzle-ui/auth": "^0.5.1",
-    "@puzzle-ui/session": "^0.5.1",
+    "@puzzle-ui/ui": "^0.6.0",
+    "@puzzle-ui/auth": "^0.6.0",
+    "@puzzle-ui/session": "^0.6.0",
     "@simplewebauthn/browser": "^14.0.0"
   },
   "peerDependencies": {

@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.6.0 - 2026-11-14
+
+- Added the `Grid` and `GridItem` layout components. They support responsive (mobile, tablet and desktop) columns, rows, gaps, alignment, auto-flow, auto-fit `minChildWidth`, item spans and placement, polymorphic `as` roots, and native props and refs.
+- Fixed `Badge` so a standalone badge, one with no children, renders as a `span` instead of a `div`. This keeps it valid inside paragraphs and avoids hydration errors. Badges wrapping children still render a `div`.
+
 ## 0.5.1 - 2026-11-14
 
 - `TreeView` now expands branch rows when clicked by default; linked branches continue to navigate. Set `expandOnItemClick={false}` to select groups on click and expand them only with the arrow.

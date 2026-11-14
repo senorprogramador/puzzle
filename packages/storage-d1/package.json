@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/storage-d1",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Cloudflare D1 storage adapter foundation for Puzzle Auth.",
   "homepage": "https://puzzle-ui.com",
   "repository": {
@@ -49,6 +49,6 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@puzzle-ui/storage": "^0.5.1"
+    "@puzzle-ui/storage": "^0.6.0"
   }
 }

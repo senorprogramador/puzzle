@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/storage",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Vendor-neutral storage contracts for Puzzle Auth.",
   "homepage": "https://puzzle-ui.com",
   "repository": {
