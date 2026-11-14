@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/storage-mongodb",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "MongoDB storage adapter foundation for Puzzle Auth.",
   "license": "MIT",
   "publishConfig": {
@@ -43,7 +43,7 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@puzzle-ui/storage": "^0.4.0",
+    "@puzzle-ui/storage": "^0.5.0",
     "mongodb": "^7.8.0"
   }
 }

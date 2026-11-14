@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/pieces",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "UI pieces for Puzzle",
   "license": "MIT",
   "publishConfig": {
@@ -42,11 +42,11 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.4.0",
-    "@puzzle-ui/hooks": "^0.4.0",
-    "@puzzle-ui/icons": "^0.4.0",
-    "@puzzle-ui/theme": "^0.4.0",
-    "@puzzle-ui/ui": "^0.4.0"
+    "@puzzle-ui/core": "^0.5.0",
+    "@puzzle-ui/hooks": "^0.5.0",
+    "@puzzle-ui/icons": "^0.5.0",
+    "@puzzle-ui/theme": "^0.5.0",
+    "@puzzle-ui/ui": "^0.5.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",
