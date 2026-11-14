@@ -3,9 +3,7 @@
 All notable changes to `@puzzle-ui/session` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
-## Unreleased
-
-### Changed
+## 0.5.1 - 2026-11-14
 
 - Expanded package documentation with direct-use scenarios, documentation links, and npm, pnpm, and yarn installation instructions.
 

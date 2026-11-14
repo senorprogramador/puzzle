@@ -3,11 +3,10 @@
 All notable changes to `@puzzle-ui/seo` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
-## Unreleased
-
-### Fixed
+## 0.5.1 - 2026-11-14
 
 - Keep React schema component JSON-LD graphs synchronized with client-side registrations, including components rendered after Suspense and changes made without a `SeoProvider` rerender.
+- `useSeo().registerNode` must now be called during render; nodes registered in a render replace those from the component's previous render and are removed on unmount.
 
 ## 0.5.0 - 2026-11-14
 

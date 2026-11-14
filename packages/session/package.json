@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/session",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Secure, database-independent session management for Puzzle Auth.",
   "homepage": "https://puzzle-ui.com",
   "repository": {
@@ -45,6 +45,6 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@puzzle-ui/storage": "^0.5.0"
+    "@puzzle-ui/storage": "^0.5.1"
   }
 }

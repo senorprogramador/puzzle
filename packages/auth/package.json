@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/auth",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Framework-independent authentication core for Puzzle.",
   "homepage": "https://puzzle-ui.com",
   "repository": {
@@ -45,8 +45,8 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@puzzle-ui/storage": "^0.5.0",
-    "@puzzle-ui/session": "^0.5.0",
+    "@puzzle-ui/storage": "^0.5.1",
+    "@puzzle-ui/session": "^0.5.1",
     "@simplewebauthn/server": "^14.1.0"
   }
 }

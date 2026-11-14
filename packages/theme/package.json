@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/theme",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Theme components for Puzzle",
   "homepage": "https://puzzle-ui.com",
   "repository": {
@@ -69,7 +69,7 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.5.0"
+    "@puzzle-ui/core": "^0.5.1"
   },
   "peerDependencies": {
     "react": "^19.0.0",

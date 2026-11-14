@@ -3,9 +3,7 @@
 All notable changes to `@puzzle-ui/auth` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
-## Unreleased
-
-### Changed
+## 0.5.1 - 2026-11-14
 
 - Reworked package documentation with installation, minimal setup, feature overview, and security guidance.
 

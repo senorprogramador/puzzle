@@ -3,9 +3,7 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
-## Unreleased
-
-### Changed
+## 0.5.1 - 2026-11-14
 
 - `TreeView` now expands branch rows when clicked by default; linked branches continue to navigate. Set `expandOnItemClick={false}` to select groups on click and expand them only with the arrow.
 
