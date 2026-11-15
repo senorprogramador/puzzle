@@ -7,6 +7,9 @@ description: Configure @puzzle-ui/auth managers, storage, password hashing, sess
 
 ## Core manager
 
+For complete dependency configuration, password hashing, persistence and HTTP
+wiring, follow the [Auth tutorial](/docs/tutorials/auth#configuration).
+
 `StorageAuthManager` depends on `StorageAdapter`, `SessionManager`, `PasswordHasher`, and `RateLimitProvider`. The optional `mfa` dependency implements `AuthMfaGateway` and is typically `StorageAuthMfaManager`.
 
 ```ts

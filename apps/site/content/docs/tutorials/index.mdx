@@ -1,0 +1,83 @@
+---
+title: Practical Puzzle Tutorials
+description: Build a searchable publication, a persistent notebook, and a protected MFA-enabled application using verified Puzzle APIs.
+---
+
+Follow these task-oriented guides alongside the API references. Each guide
+includes configuration, complete TypeScript files, verification instructions,
+and deployment boundaries rather than another list of API methods.
+
+## Choose a workflow
+
+| Tutorial | What you will build | Prerequisites |
+| --- | --- | --- |
+| [SEO: a searchable publication](/docs/tutorials/seo) | Server-rendered home, article listing, and dynamic article pages with social metadata, a connected JSON-LD graph, and framework endpoints. | React 19; Bun for the standalone example. |
+| [Storage: a persistent notebook](/docs/tutorials/storage) | A database-neutral notebook with MongoDB persistence, conditional CRUD, a D1 alternative, and custom-adapter integration. | A MongoDB replica set; Cloudflare only for the D1 alternative. |
+| [Auth: registration to a protected dashboard](/docs/tutorials/auth) | Password registration/login, required TOTP enrollment, recovery-code challenges, policy-aware route protection, session rotation, and logout. | The Storage connection module; Bun; HTTPS. |
+
+For the combined application, follow **Storage, then Auth**. SEO is independent;
+use its private-page guidance for authenticated routes.
+
+## API maturity
+
+The [package readiness audit](https://github.com/senorprogramador/puzzle/blob/main/docs/api-stability-audit.md)
+records the source/export checks, executed tests, and limitations behind these labels.
+
+- **Stable:** validated API with an explicit backward-compatibility commitment.
+  Button, ButtonGroup and ToggleGroup (including Item) are Stable. The Auth
+  tutorial uses the Stable Button API.
+- **Beta:** implemented and tested, but may evolve. Storage adapters,
+  Auth/Session/Fullstack, and SEO utilities/components/adapters used here
+  remain Beta; other UI primitives retain their component-specific labels.
+- **Experimental:** insufficient validation evidence for the public surface.
+  These tutorials do not require Experimental APIs. Existing Experimental UI
+  components elsewhere in the reference retain that classification.
+
+No tutorial claims that a Beta API is Stable or that passing tests establishes
+production readiness. Review the [Auth security requirements](/docs/auth/security)
+before deploying authentication.
+
+## How to follow the examples
+
+Code-block titles are application-relative file paths. Keep the indicated
+directory layout so relative imports work. Framework alternatives are alternatives,
+not extra metadata writers to install alongside the standalone server.
+
+The examples target TypeScript with strict checking and React 19. Bun is an
+explicit runtime choice for the standalone servers and Argon2id implementation,
+not a requirement of the Puzzle library contracts. Existing Next.js or TanStack
+applications can reuse the server modules through the adapters shown in the guides.
+
+The repository's `test:tutorials` check extracts the named TypeScript blocks,
+checks imports against built package export maps, and typechecks them together.
+It also runs the pure SEO rendering assertions and notebook behavior checks.
+Real database conformance and framework/deployment checks are distinguished
+from those example checks in each tutorial.
+
+From a repository checkout, build packages first and run the example check:
+
+```bash
+bun run build
+bun run --filter '@puzzle-ui/site' test:tutorials
+bun run --filter '@puzzle-ui/site' build
+bun run --filter '@puzzle-ui/site' test:hydration
+```
+
+Set `TUTORIAL_MONGODB_URI` to a **disposable** transaction-capable MongoDB fixture
+to include the notebook and Auth flows. Set `TUTORIAL_SITE_URL` to a running
+local documentation build to also check rendered routes, metadata, JSON-LD,
+sitemap and `llms.txt`. These checks copy built package output into a temporary
+consumer project, so workspace source aliases cannot hide packaging mistakes.
+They remove that project afterward and never install additional dependencies.
+The hydration check uses the existing Playwright Chromium installation and
+starts/stops its own production server on an ephemeral local port. It checks
+fresh loads, client navigation, history and reloads for hydration errors,
+duplicate metadata/JSON-LD and stale route entities.
+
+## API references
+
+- SEO: [overview](/docs/seo), [metadata](/docs/seo/metadata),
+  [structured data](/docs/seo/structured-data), [frameworks](/docs/seo/frameworks).
+- Auth: [configuration](/docs/auth/configuration), [MFA](/docs/auth/mfa),
+  [Fullstack server](/docs/fullstack/server), [client](/docs/fullstack/client).
+- Storage: [contracts, adapters, and conformance testing](/docs/storage).

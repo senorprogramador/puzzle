@@ -1,11 +1,70 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { createRef } from "react";
 
 import { ButtonGroup } from "./index";
 import { Button } from "../button";
 
 describe("ButtonGroup", () => {
+  it("preserves child refs and individual disabled states when the group is re-enabled", () => {
+    const ref = createRef<HTMLButtonElement>();
+    const { rerender } = render(
+      <ButtonGroup disabled><Button ref={ref}>Save</Button><Button disabled>Unavailable</Button></ButtonGroup>,
+    );
+    const button = screen.getByRole("button", { name: "Save" });
+    expect(ref.current).toBe(button);
+    expect(button).toBeDisabled();
+
+    rerender(<ButtonGroup><Button ref={ref}>Save</Button><Button disabled>Unavailable</Button></ButtonGroup>);
+
+    expect(ref.current).toBe(button);
+    expect(button).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: "Unavailable" })).toBeDisabled();
+    expect(screen.getByRole("group")).not.toHaveAttribute("aria-disabled");
+  });
+
+  it("preserves polymorphic refs, explicit roles, labels and styles alongside spacing", () => {
+    const ref = createRef<HTMLElement>();
+    render(
+      <>
+        <h2 id="editing">Editing actions</h2>
+        <ButtonGroup as="section" ref={ref} role="toolbar" aria-labelledby="editing"
+          style={{ margin: "2px" }} spacing="var(--puzzle-space-2)">
+          <Button>Save</Button>
+        </ButtonGroup>
+      </>,
+    );
+    const group = screen.getByRole("toolbar", { name: "Editing actions" });
+
+    expect(ref.current).toBe(group);
+    expect(group.tagName).toBe("SECTION");
+    expect(group.style.margin).toBe("2px");
+    expect(group.style.getPropertyValue("--puzzle-button-group-gap")).toBe("var(--puzzle-space-2)");
+  });
+
+  it("prevents disabled native and link actions from calling their handlers", async () => {
+    const user = userEvent.setup();
+    const onClick = vi.fn();
+    render(
+      <ButtonGroup disabled>
+        <Button onClick={onClick}>Save</Button>
+        <Button href="#cancel" onClick={onClick}>Cancel</Button>
+      </ButtonGroup>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    await user.click(screen.getByRole("link", { name: "Cancel" }));
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("retains non-element children when disabled", () => {
+    render(<ButtonGroup disabled aria-label="Actions">Available actions:{null}{false}<Button>Save</Button></ButtonGroup>);
+
+    expect(screen.getByRole("group", { name: "Actions" })).toHaveTextContent("Available actions:Save");
+    expect(screen.getByRole("button", { name: "Save" })).toBeDisabled();
+  });
+
   it("renders children", () => {
     render(
       <ButtonGroup>

@@ -270,8 +270,9 @@ Follow the repository conventions in <code>AGENTS.md</code>.
 
 Until Puzzle reaches a more stable stage:
 
-- Public APIs may change.
-- Breaking changes may be introduced.
+- APIs not marked Stable may change, including breaking changes.
+- The Stable action APIs (Button, ButtonGroup, and ToggleGroup including Item)
+  are intended to remain backward-compatible within a major version.
 - Documentation may lag behind implementation.
 - Tests and examples may not cover every use case.
 

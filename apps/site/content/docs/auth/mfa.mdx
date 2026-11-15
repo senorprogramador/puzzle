@@ -7,6 +7,11 @@ description: Configure TOTP, WebAuthn passkeys, recovery codes, mandatory MFA en
 
 ## Configure MFA
 
+For a complete required-enrollment flow that keeps provisioning secrets out of
+JSON and React state, follow the [Auth tutorial](/docs/tutorials/auth).
+Its non-hydrated server HTML flow is intentionally different from the bundled
+client enrollment/settings UI.
+
 ```ts
 import {
   SimpleWebAuthnProvider,

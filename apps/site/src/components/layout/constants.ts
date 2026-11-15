@@ -11,6 +11,7 @@ import { seo } from "./sidebar/seo";
 import { auth } from "./sidebar/auth";
 import { fullstack } from "./sidebar/fullstack";
 import { storage } from "./sidebar/storage";
+import { tutorials } from "./sidebar/tutorials";
 
 const items: TreeViewItem[] = [
   {
@@ -19,6 +20,7 @@ const items: TreeViewItem[] = [
     href: "/docs/getting-started",
   },
   developer,
+  tutorials,
   theme,
   pieces,
   ui,

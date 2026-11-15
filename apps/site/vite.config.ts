@@ -1,4 +1,5 @@
-import { createLogger, defineConfig } from "vite";
+import { createRequire } from "node:module";
+import { createLogger, defineConfig, type Plugin } from "vite";
 import { nitro } from "nitro/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
@@ -6,6 +7,18 @@ import tailwindcss from "@tailwindcss/vite";
 import { fumadocsMdx } from "fumadocs-mdx/vite";
 
 const logger = createLogger();
+const routerEntry = createRequire(import.meta.url).resolve("@tanstack/react-router");
+
+const routerCoreResolution: Plugin = {
+  name: "puzzle:router-core-resolution",
+  enforce: "pre",
+  resolveId(source, _importer, options) {
+    if (source === "@tanstack/router-core" || source.startsWith("@tanstack/router-core/")) {
+      // Use React Router's core dependency for both SSR transport and hydration.
+      return this.resolve(source, routerEntry, { ...options, skipSelf: true });
+    }
+  },
+};
 
 const DAY = 60 * 60 * 24;
 const YEAR = DAY * 365;
@@ -65,6 +78,7 @@ export default defineConfig({
     cssMinify: "esbuild",
   },
   plugins: [
+    routerCoreResolution,
     tanstackStart(),
     nitro({
       routeRules: Object.fromEntries([

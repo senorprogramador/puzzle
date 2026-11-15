@@ -15,6 +15,8 @@
     "fonts:download": "bun ../../packages/theme/src/cli.ts fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
     "test:seo": "bun test src/lib/seo.test.ts",
     "test:catalog": "bun test src/components/component-catalog.test.ts",
+    "test:tutorials": "bun scripts/validate-tutorials.ts",
+    "test:hydration": "bun scripts/validate-hydration.ts",
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
@@ -28,6 +30,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-router": "^1.170.41",
     "@tanstack/react-start": "^1.168.60",
+    "@tanstack/router-core": "1.171.39",
     "@types/mdx": "^2.0.14",
     "fumadocs-core": "^16.17.10",
     "fumadocs-mdx": "^15.4.10",

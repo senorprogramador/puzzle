@@ -1,0 +1,888 @@
+---
+title: Build a Protected Dashboard with Puzzle Auth
+description: Build registration, password login, server-rendered TOTP enrollment, recovery challenges, protected routes, session refresh, and logout with Puzzle Fullstack.
+---
+
+## What you will build
+
+A Fieldnotes account flow: register, enroll a TOTP authenticator, save recovery
+codes, open a protected dashboard, sign out, then sign back in with password
+and TOTP or a recovery code. A separate profile collection stores a company
+field without modifying Auth's public user model.
+
+**API maturity: Beta** for Auth, Session, Storage and the Fullstack client/server/
+framework APIs below. The UI Button used below is **Stable**; the other UI
+primitives and Theme are Beta. No Experimental API is required. Review the
+[maturity policy](/docs/tutorials#api-maturity),
+[Auth configuration](/docs/auth/configuration), and
+[security reference](/docs/auth/security).
+
+## Prerequisites
+
+- Bun with its Argon2id password API and Web Crypto support; TypeScript.
+- React/React DOM 19 and Puzzle's [Theme setup](/docs/getting-started).
+- The `storage/database.ts` module from the
+  [Storage tutorial](/docs/tutorials/storage#configuration).
+- A transaction-capable MongoDB deployment and server-only connection URI.
+- A trusted HTTPS origin. For the standalone local server use
+  `https://localhost:3443` with a trusted localhost certificate/key.
+
+The MFA cookie is always `Secure` and `HttpOnly`, including during development.
+Plain HTTP is not a supported shortcut for this flow. Other runtimes can
+provide a conforming `PasswordHasher`; the package does not supply one.
+
+## Installation
+
+```bash
+bun add @puzzle-ui/auth @puzzle-ui/session @puzzle-ui/storage @puzzle-ui/storage-mongodb mongodb @puzzle-ui/fullstack @puzzle-ui/theme @puzzle-ui/ui react react-dom
+```
+
+In an existing application, reuse its installed peers. There is deliberately
+no root `@puzzle-ui/fullstack` import: use its `/auth/client`, `/auth/server`,
+`/auth/next`, or `/auth/tanstack` public entry points.
+
+## Configuration
+
+### Configure the server dependencies
+
+This module accepts the database-neutral storage contract. Database connection
+details stay in the Storage module; cookie/HTTP integration stays in Fullstack.
+No database SDK, server manager, or encryption key is imported by the browser.
+
+```ts title="auth/services.ts"
+import {
+  StorageAuthManager,
+  StorageAuthMfaManager,
+  StorageAuthStepUpManager,
+  StorageRateLimitProvider,
+  WebCryptoAuthSecretProtector,
+  type PasswordHasher,
+} from "@puzzle-ui/auth";
+import { createAuthServer } from "@puzzle-ui/fullstack/auth/server";
+import { createSessionCookieOptions, StorageSessionManager } from "@puzzle-ui/session";
+import type { StorageAdapter } from "@puzzle-ui/storage";
+
+export type ServiceOptions = {
+  storage: StorageAdapter;
+  origin: string;
+  rateLimitKeySecret: string;
+  encryptionKey: Uint8Array;
+  resolveClientIp: (request: Request) => string;
+};
+
+export const createServices = async (options: ServiceOptions) => {
+  if (new URL(options.origin).protocol !== "https:" ||
+      new URL(options.origin).origin !== options.origin) {
+    throw new Error("Configure an exact HTTPS origin without a trailing slash.");
+  }
+  const { storage, rateLimitKeySecret, resolveClientIp } = options;
+  const passwordHasher: PasswordHasher = {
+    async hash(password) {
+      return {
+        hash: await Bun.password.hash(password, {
+          algorithm: "argon2id", memoryCost: 65536, timeCost: 3,
+        }),
+        algorithm: "argon2id",
+        parameters: { memoryCost: 65536, timeCost: 3 },
+      };
+    },
+    verify: (password, stored) => Bun.password.verify(password, stored.hash, "argon2id"),
+  };
+  const sessions = new StorageSessionManager(storage, {
+    lifetime: { idleTimeoutSeconds: 1800, absoluteLifetimeSeconds: 86400 },
+  });
+  const rateLimitProvider = new StorageRateLimitProvider(storage);
+  const secretProtector = new WebCryptoAuthSecretProtector({
+    currentKeyId: "primary",
+    keys: { primary: options.encryptionKey },
+  });
+  const mfa = new StorageAuthMfaManager({
+    storage, sessions, passwordHasher, rateLimitProvider, secretProtector,
+  }, { rateLimitKeySecret, issuer: "Fieldnotes" });
+  const auth = new StorageAuthManager({
+    storage, sessions, passwordHasher, rateLimitProvider, mfa,
+  }, {
+    rateLimitKeySecret,
+    minimumPasswordLength: 12,
+    mfaPolicy: { required: true },
+  });
+  const stepUp = new StorageAuthStepUpManager({ storage, sessions, mfa });
+  const cookie = createSessionCookieOptions({ production: true });
+  const csrf = { allowedOrigins: [options.origin] };
+  const authServer = createAuthServer({
+    auth, mfa, stepUp, sessions, cookie, csrf, resolveClientIp,
+  });
+  await sessions.initialize();
+  await rateLimitProvider.initialize();
+  await authServer.initialize();
+  return { auth, mfa, sessions, cookie, csrf, authServer, resolveClientIp, storage };
+};
+
+export type Services = Awaited<ReturnType<typeof createServices>>;
+```
+
+Tune Argon2id cost using production measurements; do not substitute a fast hash.
+Use two independent server secrets: a stable rate-limit key secret of at least
+32 characters and a 32-byte encryption key from a secret manager. Keep the
+encryption key/key ID available across restarts and plan key rotation; generating
+a new key on startup makes existing TOTP factors unreadable.
+
+Optional MFA uses `mfaPolicy: {}`. `required: true` requires all users to enroll;
+`requiredFor(user)` can additionally require selected users. Existing active
+factors are challenged even when policy is optional. The complete app below
+uses required enrollment from the start.
+
+## Step-by-step implementation
+
+### 1. Extend application data, not the Auth user contract
+
+`AuthUser` is not generic and registration does not persist arbitrary fields.
+Keep company/role/preferences in an application collection. Never accept a user
+ID or authorization role from the browser as proof of identity.
+
+```ts title="auth/profile.ts"
+import {
+  StorageValidationError,
+  type StorageAdapter,
+  type StorageRecord,
+} from "@puzzle-ui/storage";
+
+export type Profile = StorageRecord & { company: string };
+
+export const initializeProfiles = (storage: StorageAdapter) =>
+  storage.registerCollection<Profile>({ name: "profiles" });
+
+export const saveCompany = async (
+  storage: StorageAdapter,
+  authenticatedUserId: string,
+  company: unknown,
+) => {
+  if (typeof company !== "string" || !company.trim() || company.trim().length > 120) {
+    throw new StorageValidationError("Enter a company of 1 to 120 characters.");
+  }
+  const existing = await storage.findById<Profile>("profiles", authenticatedUserId);
+  if (existing) {
+    return storage.update<Profile>("profiles", authenticatedUserId, {
+      company: company.trim(),
+    }, { expectedRevision: existing.revision });
+  }
+  return storage.insert<Profile>("profiles", {
+    id: authenticatedUserId, company: company.trim(),
+  });
+};
+```
+
+Auth and Session managers own user/credential/session/challenge collections,
+hashed bearer tokens, TOTP protection, and atomic state transitions. Application
+code should not manually insert those records. The generic adapter knows
+nothing about an authenticated user or MFA policy.
+
+### 2. Keep the credential boundary on the server
+
+Registration calls `auth.register`; login calls `auth.signIn` through Fullstack.
+A required-enrollment result has **no normal session**. Its challenge credential
+is delivered only in the short-lived `__Host-puzzle.mfa` cookie, never the public
+snapshot. A public `challengeId` is an identifier, not that bearer token.
+
+The bundled TOTP start handlers return the provisioning secret/URI in JSON,
+and bundled enrollment/settings components retain it in React state. Those
+are public Beta APIs, but do **not** satisfy this tutorial's stricter boundary.
+Here, allowlist only the HTTP endpoints the app uses and implement enrollment
+as server-rendered HTML with no hydration, scripts, analytics, or secret-bearing
+JSON. Recovery codes get the same one-time display treatment.
+
+A TOTP setup necessarily reveals a shared secret to the enrolling user and
+authenticator. Here it appears only in the cookie-bound enrollment response's
+HTML, not in client application state, JSON, URLs, logs, or persistent browser
+storage. The pending factor remains encrypted at rest.
+
+### 3. Enforce every protected route and mutation on the server
+
+The complete handler below checks `auth.getCurrentUser(token)` rather than
+trusting a client snapshot or only `sessions.validate`. The latter establishes
+session validity but not current account/email/MFA policy.
+
+Only state-changing POSTs start or complete enrollment. Every custom mutation
+checks the exact allowed origin with Puzzle's CSRF helper. Keep normal
+application authorization/resource ownership checks in addition to this
+authentication boundary.
+
+```tsx title="auth/application.tsx"
+import type { ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { AuthError, AuthMfaChallengeError } from "@puzzle-ui/auth";
+import {
+  createAuthRouteHandlers,
+  createSessionResponse,
+  readMfaChallengeCookie,
+  serializeClearedMfaChallengeCookie,
+} from "@puzzle-ui/fullstack/auth/server";
+import {
+  protectStateChangingRequest,
+  readSessionCookie,
+  serializeClearedSessionCookie,
+  SessionSecurityError,
+} from "@puzzle-ui/session";
+import {
+  StorageConflictError, StorageDuplicateError, StorageValidationError,
+} from "@puzzle-ui/storage";
+import { initializeProfiles, saveCompany, type Profile } from "./profile";
+import type { Services } from "./services";
+
+const page = (content: ReactNode) => "<!doctype html>" + renderToStaticMarkup(
+  <html lang="en"><head><meta charSet="utf-8" /><title>Fieldnotes account</title></head>
+    <body><main>{content}</main></body></html>,
+);
+const secureHtml = (response: Response) => {
+  response.headers.set("Content-Type", "text/html; charset=utf-8");
+  response.headers.set("Cache-Control", "no-store");
+  response.headers.set("Pragma", "no-cache");
+  response.headers.set("Referrer-Policy", "no-referrer");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  response.headers.set("Content-Security-Policy",
+    "default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+  return response;
+};
+const html = (content: ReactNode, status = 200) =>
+  secureHtml(new Response(page(content), { status }));
+const field = (form: FormData, key: string, maximum = 160) => {
+  const value = form.get(key);
+  if (typeof value !== "string" || !value.trim() || value.length > maximum) {
+    throw new StorageValidationError(`Invalid ${key}.`);
+  }
+  return value.trim();
+};
+
+export const createApplication = async (services: Services) => {
+  await initializeProfiles(services.storage);
+  const routes = createAuthRouteHandlers(services.authServer);
+  const allowed = new Set([
+    "/api/auth/register", "/api/auth/sign-in", "/api/auth/state", "/api/auth/sign-out",
+    "/api/auth/mfa/sign-in/totp", "/api/auth/mfa/sign-in/recovery-code",
+  ]);
+  const tokenFor = (request: Request) =>
+    readSessionCookie(request.headers.get("cookie"), services.cookie.name);
+  const currentUser = async (request: Request) => {
+    const token = tokenFor(request);
+    return token ? services.auth.getCurrentUser(token) : null;
+  };
+  const enrollmentToken = async (request: Request) => {
+    const token = readMfaChallengeCookie(request.headers.get("cookie"));
+    if (!token || tokenFor(request) ||
+        (await services.auth.getAuthState(token)).status !== "mfa-enrollment-pending") {
+      throw new AuthMfaChallengeError();
+    }
+    return token;
+  };
+  const fetch = async (request: Request): Promise<Response> => {
+    const { pathname } = new URL(request.url);
+    try {
+      if (pathname.startsWith("/api/auth/")) {
+        if (!allowed.has(pathname)) return html(<p>Endpoint not enabled.</p>, 404);
+        const route = routes[pathname];
+        const handler = request.method === "GET" ? route?.GET :
+          request.method === "POST" ? route?.POST : undefined;
+        if (!handler) return new Response(null, { status: 405 });
+        return handler(request);
+      }
+      if (pathname === "/enroll" && request.method === "GET") {
+        await enrollmentToken(request);
+        return html(<>
+          <h1>Set up your authenticator</h1>
+          <p>Enrollment is required before dashboard access.</p>
+          <form method="post" action="/enroll/start">
+            <button type="submit">Show a new setup key</button>
+          </form>
+        </>);
+      }
+      if (pathname === "/enroll/start" && request.method === "POST") {
+        protectStateChangingRequest(request, services.csrf);
+        const challengeToken = await enrollmentToken(request);
+        const enrollment = await services.mfa.beginRequiredTotpEnrollment({
+          challengeToken, ipAddress: services.resolveClientIp(request),
+        });
+        return html(<>
+          <h1>Add Fieldnotes to your authenticator</h1>
+          <p>Enter this setup key manually. Do not share it.</p>
+          <code>{enrollment.secret}</code>
+          <p>Use a time-based code: six digits, changing every 30 seconds.</p>
+          <form method="post" action="/enroll/verify">
+            <input type="hidden" name="factorId" value={enrollment.factorId} />
+            <label htmlFor="totp">Authenticator code</label>
+            <input id="totp" name="code" inputMode="numeric" autoComplete="one-time-code" required />
+            <button type="submit">Verify and finish enrollment</button>
+          </form>
+        </>);
+      }
+      if (pathname === "/enroll/verify" && request.method === "POST") {
+        protectStateChangingRequest(request, services.csrf);
+        const challengeToken = await enrollmentToken(request);
+        const form = await request.formData();
+        const completed = await services.mfa.verifyRequiredTotpEnrollment({
+          challengeToken,
+          factorId: field(form, "factorId"),
+          code: field(form, "code", 8),
+          ipAddress: services.resolveClientIp(request),
+        });
+        const response = secureHtml(createSessionResponse(page(<>
+          <h1>Save your recovery codes now</h1>
+          <p>Each code works once. Store these securely outside this browser.</p>
+          <ul>{completed.recoveryCodes.map((code) => <li key={code}><code>{code}</code></li>)}</ul>
+          <a href="/dashboard">I saved my codes; open dashboard</a>
+        </>), completed.auth.token, services, completed.auth.session.expiresAt));
+        response.headers.append("Set-Cookie", serializeClearedMfaChallengeCookie());
+        return response;
+      }
+      if (pathname === "/dashboard" && request.method === "GET") {
+        const user = await currentUser(request);
+        if (!user) return html(<p>Sign in and complete MFA at <a href="/account">Account</a>.</p>, 401);
+        const profile = await services.storage.findById<Profile>("profiles", user.id);
+        return html(<>
+          <h1>Your Fieldnotes dashboard</h1><p>Signed in as {user.email}</p>
+          <form action="/profile" method="post">
+            <label htmlFor="company">Company</label>
+            <input id="company" name="company" defaultValue={profile?.company ?? ""} maxLength={120} required />
+            <button type="submit">Save profile</button>
+          </form>
+          <form action="/session/refresh" method="post"><button>Refresh session</button></form>
+          <form action="/logout" method="post"><button>Sign out</button></form>
+        </>);
+      }
+      if (pathname === "/api/me" && request.method === "GET") {
+        const user = await currentUser(request);
+        if (!user) return new Response(null, { status: 401, headers: { "Cache-Control": "no-store" } });
+        return Response.json({ id: user.id, email: user.email }, {
+          headers: { "Cache-Control": "no-store" },
+        });
+      }
+      if (pathname === "/profile" && request.method === "POST") {
+        protectStateChangingRequest(request, services.csrf);
+        const user = await currentUser(request);
+        if (!user) return html(<p>Authentication required.</p>, 401);
+        await saveCompany(services.storage, user.id, field(await request.formData(), "company", 120));
+        return html(<p>Profile saved. <a href="/dashboard">Return to dashboard</a>.</p>);
+      }
+      if (pathname === "/session/refresh" && request.method === "POST") {
+        protectStateChangingRequest(request, services.csrf);
+        const token = tokenFor(request);
+        const user = await currentUser(request);
+        const session = token ? await services.sessions.validate(token, { touch: false }) : null;
+        if (!user || !session || session.userId !== user.id) return html(<p>Sign in again.</p>, 401);
+        const rotated = await services.sessions.rotate({ sessionId: session.id });
+        return secureHtml(createSessionResponse(
+          page(<p>Session refreshed. <a href="/dashboard">Return to dashboard</a>.</p>),
+          rotated.token, services, rotated.session.expiresAt,
+        ));
+      }
+      if (pathname === "/logout" && request.method === "POST") {
+        protectStateChangingRequest(request, services.csrf);
+        const token = tokenFor(request);
+        if (token) await services.auth.signOut(token);
+        const response = html(<p>Signed out. <a href="/account">Sign in</a>.</p>);
+        response.headers.append("Set-Cookie", serializeClearedSessionCookie(services.cookie));
+        response.headers.append("Set-Cookie", serializeClearedMfaChallengeCookie());
+        return response;
+      }
+      if (["/enroll", "/enroll/start", "/enroll/verify", "/dashboard", "/api/me",
+           "/profile", "/session/refresh", "/logout"].includes(pathname)) {
+        return html(<p>Method not allowed.</p>, 405);
+      }
+      return html(<p>Not found.</p>, 404);
+    } catch (error) {
+      if (error instanceof SessionSecurityError) return html(<p>Request origin rejected.</p>, 403);
+      if (error instanceof StorageValidationError) return html(<p>{error.message}</p>, 400);
+      if (error instanceof StorageConflictError || error instanceof StorageDuplicateError) {
+        return html(<p>The record changed. Reload and retry.</p>, 409);
+      }
+      if (error instanceof AuthError) {
+        if (error.code === "PROVIDER" || error.code === "CONFIGURATION") {
+          console.error("Fieldnotes authentication service unavailable", { code: error.code });
+          return html(<p>Authentication temporarily unavailable.</p>, 503);
+        }
+        const status = error.code === "RATE_LIMITED" ? 429 :
+          error.code === "MFA_CHALLENGE" || error.code === "SESSION" ||
+          error.code === "INVALID_CREDENTIALS" ? 401 : 400;
+        return html(<p>{error.message} <a href="/account">Return to account</a>.</p>, status);
+      }
+      console.error("Fieldnotes request failed", {
+        errorType: error instanceof Error ? error.name : "UnknownError",
+      });
+      return html(<p>Temporarily unavailable. Please retry.</p>, 500);
+    }
+  };
+  return { fetch };
+};
+```
+
+The hidden factor ID is not a credential; the cookie is still required and
+validated on the server. No secret or challenge token is in the verification
+form. Only successful code verification and committed enrollment create a
+normal session. Expired/consumed challenges and reused codes do not grant access.
+
+### 4. Build the client UX without making it an authorization boundary
+
+Mount `AuthProvider` inside the normal Puzzle `Theme`. The screen explicitly
+handles restricted enrollment states before rendering any bundled enrollment
+UI. The custom password form below also avoids advertising a passkey enrollment
+flow that this application has not enabled.
+
+```tsx title="auth/client.tsx"
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { createRoot } from "react-dom/client";
+import { Theme } from "@puzzle-ui/theme";
+import { Alert, Button, FormField, TextInput } from "@puzzle-ui/ui";
+import {
+  AuthClientError, AuthProvider, MfaChallengeForm, SignUpForm, useAuth,
+} from "@puzzle-ui/fullstack/auth/client";
+
+const PasswordSignIn = () => {
+  const { signIn } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    setBusy(true);
+    setError(null);
+    try {
+      await signIn({
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
+      });
+    } catch (cause) {
+      setError(cause instanceof AuthClientError && cause.code === "RATE_LIMITED"
+        ? "Too many attempts. Wait before retrying."
+        : cause instanceof Error ? cause.message : "Sign-in failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return <form onSubmit={submit}>
+    <h1>Sign in to Fieldnotes</h1>
+    {error && <Alert severity="error">{error}</Alert>}
+    <FormField label="Email" controlId="email" required>
+      <TextInput id="email" name="email" type="email" autoComplete="email" required />
+    </FormField>
+    <FormField label="Password" controlId="password" required>
+      <TextInput id="password" name="password" type="password" autoComplete="current-password" required />
+    </FormField>
+    <Button type="submit" loading={busy}>Sign in</Button>
+  </form>;
+};
+
+const Account = () => {
+  const { snapshot, signOut } = useAuth();
+  const [register, setRegister] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const logout = async () => {
+    try { await signOut(); }
+    catch { setError("Sign-out failed. Please retry."); }
+  };
+  if (snapshot.status === "loading") return <p role="status">Loading account...</p>;
+  if (snapshot.status === "mfa-enrollment-pending") {
+    return <p><a href="/enroll">Continue to secure authenticator enrollment</a></p>;
+  }
+  if (snapshot.status === "mfa-enrollment-required") {
+    return <><p>Policy changed. Sign out and sign in to start required enrollment.</p>
+      {error && <Alert severity="error">{error}</Alert>}
+      <Button onClick={logout}>Sign out</Button></>;
+  }
+  if (snapshot.status === "mfa-pending") {
+    return <MfaChallengeForm redirectTo="/dashboard" />;
+  }
+  if (snapshot.status === "authenticated") {
+    return <p><a href="/dashboard">Open your protected dashboard</a></p>;
+  }
+  return <>
+    {register ? <SignUpForm /> : <PasswordSignIn />}
+    <Button variant="ghost" onClick={() => setRegister(!register)}>
+      {register ? "Already registered? Sign in" : "Create an account"}
+    </Button>
+  </>;
+};
+
+const root = document.getElementById("root");
+if (!root) throw new Error("Missing account root.");
+createRoot(root).render(
+  <Theme theme="system">
+    <AuthProvider options={{ basePath: "/api/auth" }} locale="en"
+      messages={{ signUp: "Create your Fieldnotes account", invalidCredentials: "Check your email and password." }}>
+      <Account />
+    </AuthProvider>
+  </Theme>,
+);
+```
+
+Both custom and bundled forms still call the real server endpoints: browser
+validation is UX, while Auth enforces password length, normalization, rate
+limits and credential verification. Never call storage directly from a form.
+For a branded form use [AuthExperience](/docs/fullstack/client#configurable-auth-experience);
+its custom fields are not automatically persisted. Save company after the
+user is fully authenticated using the server-validated profile form above,
+not by trusting a registration callback's email address as identity.
+
+`AuthProvider.messages` provides typed message overrides; English is the built-in
+fallback. Supply translations for your application text too. Do not assume a
+locale string loads a translation bundle or translates arbitrary server errors.
+`AuthClientError` exposes `status` and `code`; use these to choose public copy
+without logging credentials or displaying raw database errors.
+
+## Complete working example
+
+Keep the `auth/` and `storage/` directories as shown above. Build the account
+client into `public/`; that directory contains public assets only.
+
+```bash
+bun build ./auth/client.tsx --target browser --outdir ./public
+```
+
+```tsx title="auth/server.tsx"
+import { connectStorage } from "../storage/database";
+import { createServices } from "./services";
+import { createApplication } from "./application";
+
+const required = (name: string) => {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing server configuration: ${name}`);
+  return value;
+};
+
+if (import.meta.main) {
+  const connection = await connectStorage(required("MONGODB_URI"));
+  const keyHex = required("AUTH_ENCRYPTION_KEY_HEX");
+  if (!/^[a-f0-9]{64}$/i.test(keyHex)) throw new Error("The encryption key must encode exactly 32 bytes.");
+  const encryptionKey = Uint8Array.from(Buffer.from(keyHex, "hex"));
+  let server: Bun.Server<undefined>;
+  const services = await createServices({
+    storage: connection.storage,
+    origin: "https://localhost:3443",
+    encryptionKey,
+    rateLimitKeySecret: required("AUTH_RATE_LIMIT_SECRET"),
+    resolveClientIp: (request) => {
+      const peer = server.requestIP(request);
+      if (!peer) throw new Error("Trusted peer IP is unavailable.");
+      return peer.address;
+    },
+  });
+  const app = await createApplication(services);
+  server = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 3443,
+    maxRequestBodySize: 16384,
+    tls: { cert: Bun.file(required("TLS_CERT_FILE")), key: Bun.file(required("TLS_KEY_FILE")) },
+    async fetch(request) {
+      const path = new URL(request.url).pathname;
+      if (request.method === "GET" && (path === "/client.js" || path === "/client.css")) {
+        const file = Bun.file(`public${path}`);
+        if (!await file.exists()) return new Response("Asset missing; build the client.", { status: 404 });
+        return new Response(file);
+      }
+      if (request.method === "GET" && path === "/account") {
+        return new Response(`<!doctype html><html lang="en"><head>
+          <meta charset="utf-8"><title>Fieldnotes account</title>
+          <link rel="stylesheet" href="/client.css"></head><body>
+          <div id="root"></div><script type="module" src="/client.js"></script></body></html>`, {
+          headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store",
+            "X-Robots-Tag": "noindex, nofollow", "Referrer-Policy": "no-referrer" },
+        });
+      }
+      return app.fetch(request);
+    },
+  });
+  const shutdown = async () => {
+    await server.stop();
+    await connection.close();
+  };
+  process.once("SIGINT", () => { void shutdown(); });
+  process.once("SIGTERM", () => { void shutdown(); });
+}
+```
+
+Set `MONGODB_URI`, `AUTH_RATE_LIMIT_SECRET`, `AUTH_ENCRYPTION_KEY_HEX`,
+`TLS_CERT_FILE`, and `TLS_KEY_FILE` in the server environment. Generate the
+two auth secrets independently with your secret-management tool; never copy
+example credentials into source. Start with `bun run auth/server.tsx` and open
+`https://localhost:3443/account`.
+
+The standalone server takes the IP from Bun's socket peer. If you deploy behind
+a reverse proxy, replace that resolver with a deployment-verified forwarded-IP
+policy; do not blindly trust `X-Forwarded-For`. Change the origin and TLS
+termination together, keeping CSRF and Secure cookies intact.
+
+### Existing framework applications
+
+For Next App Router, `createNextAuthHandler({ auth: services.authServer })`
+from `@puzzle-ui/fullstack/auth/next` supplies `GET` and `POST` for
+`app/api/auth/[...puzzle]/route.ts`. For TanStack Start,
+`createTanStackAuthHandler({ auth: services.authServer })` from
+`@puzzle-ui/fullstack/auth/tanstack` supplies the dispatcher for a server
+catch-all under `/api/auth`.
+
+Those dispatchers expose the complete standard route map. **Do not mount them
+unfiltered for this stricter tutorial.** Apply the same pathname allowlist
+before dispatch, and mount the custom HTML routes as server handlers calling
+the application above. The framework adapters do not replace the storage
+adapter or secret management. See [Next](/docs/fullstack/next) and
+[TanStack](/docs/fullstack/tanstack) for the actual mount signatures.
+
+For SSR, pass only an explicit public `AuthClientSnapshot` as `initialSnapshot`
+if preloading the client. Never serialize managers, cookies, tokens, raw
+`AuthResult`, or database records. Do not cache user-specific responses across
+requests. This complete example intentionally uses a client-rendered account
+shell and a non-hydrated protected dashboard/enrollment flow.
+
+## Testing and verification
+
+The tutorial check typechecks the named files and builds the browser entry.
+With `TUTORIAL_MONGODB_URI` set to a disposable replica set, it also executes
+Request/Response integration assertions. These cover registration, restricted pre-enrollment access, rejected
+cross-origin enrollment, server-only provisioning, successful enrollment,
+password/TOTP sign-in, session rotation/revocation, and logout. It is not a
+real-browser authenticator or a deployed Next/TanStack application test.
+
+Manually verify the complete HTTPS flow too:
+
+1. Register with a new email and a password of at least 12 characters.
+   The JSON snapshot should be `mfa-enrollment-pending`, with no token/secret,
+   and `/dashboard` and `/api/me` must return 401.
+2. Follow the enrollment link and POST to show a key. Confirm the response is
+   no-store HTML with no scripts. Enter the key in an authenticator app.
+3. Submit its code. Only now should the session cookie be set and the MFA
+   cookie cleared. Save the one-time recovery codes outside the browser.
+4. Open the dashboard and save a company. Inspect persistence in the separate
+   profile collection; the public Auth user shape remains unchanged.
+5. POST refresh. The old session token must stop working. Client `refresh()`
+   only reloads a public snapshot; it is **not** a token refresh API.
+6. Sign out, then sign in. The password alone must yield `mfa-pending`.
+   Test TOTP and, on a separate sign-in attempt, one saved recovery code.
+   Reusing that recovery code must fail.
+7. Test a wrong code, expired challenge, missing cookie, cross-origin POST,
+   stale/revoked session, and direct navigation while signed out. No dashboard
+   access should be granted by changing client state.
+
+The following is a **server-side test harness**, not browser application code.
+Its in-memory cookie jar simulates the browser's HttpOnly cookie transport;
+provisioning credentials stay inside the test process and are never logged.
+Run it only against a disposable database using `TUTORIAL_MONGODB_URI`.
+
+```ts title="auth/verify.ts"
+import assert from "node:assert/strict";
+import {
+  AUTH_MFA_CHALLENGE_COLLECTION,
+  generateTotpCode,
+  type AuthMfaChallengeStorageRecord,
+} from "@puzzle-ui/auth";
+import type { AuthClientSnapshot } from "@puzzle-ui/fullstack/auth/shared";
+import { SESSION_COLLECTION, type SessionStorageRecord } from "@puzzle-ui/session";
+import { connectStorage } from "../storage/database";
+import { createServices } from "./services";
+import { createApplication } from "./application";
+
+const uri = process.env.TUTORIAL_MONGODB_URI;
+if (!uri) throw new Error("Set TUTORIAL_MONGODB_URI to a disposable replica set.");
+const connection = await connectStorage(uri, `fieldnotes_auth_${crypto.randomUUID().replaceAll("-", "")}`);
+const origin = "https://localhost:3443";
+const password = crypto.randomUUID() + crypto.randomUUID();
+const email = `${crypto.randomUUID()}@example.com`;
+const jar = new Map<string, string>();
+
+try {
+  const services = await createServices({
+    storage: connection.storage, origin,
+    rateLimitKeySecret: crypto.randomUUID() + crypto.randomUUID(),
+    encryptionKey: crypto.getRandomValues(new Uint8Array(32)),
+    resolveClientIp: () => "127.0.0.1",
+  });
+  const app = await createApplication(services);
+  const send = async (path: string, method = "GET", body?: string,
+    contentType = "application/json", requestOrigin = origin) => {
+    const response = await app.fetch(new Request(origin + path, {
+      method,
+      headers: {
+        cookie: [...jar].map(([key, value]) => `${key}=${value}`).join("; "),
+        origin: requestOrigin, "Content-Type": contentType,
+      },
+      ...(body === undefined ? {} : { body }),
+    }));
+    for (const cookie of response.headers.getSetCookie()) {
+      assert.match(cookie, /HttpOnly/i);
+      assert.match(cookie, /Secure/i);
+      const pair = cookie.split(";")[0]!;
+      const separator = pair.indexOf("=");
+      const name = pair.slice(0, separator);
+      if (/Max-Age=0(?:;|$)/i.test(cookie)) jar.delete(name);
+      else jar.set(name, pair.slice(separator + 1));
+    }
+    return response;
+  };
+  const post = (path: string, fields: Record<string, string>) =>
+    send(path, "POST", new URLSearchParams(fields).toString(),
+      "application/x-www-form-urlencoded");
+  const signIn = () => send("/api/auth/sign-in", "POST", JSON.stringify({ email, password }));
+
+  const registration = await send("/api/auth/register", "POST", JSON.stringify({ email, password }));
+  assert.equal(registration.status, 200);
+  const registrationText = await registration.text();
+  assert.equal(JSON.parse(registrationText).status, "mfa-enrollment-pending");
+  assert.ok(!registrationText.includes("challengeToken") && !registrationText.includes('"secret"'));
+  assert.ok(jar.has("__Host-puzzle.mfa"));
+  assert.ok(!registrationText.includes(jar.get("__Host-puzzle.mfa")!));
+  assert.ok(!jar.has(services.cookie.name!));
+  assert.equal((await send("/dashboard")).status, 401);
+  assert.equal((await send("/api/me")).status, 401);
+  assert.equal((await send("/enroll/start")).status, 405);
+  assert.equal((await send("/enroll/start", "POST", "", "text/plain", "https://attacker.example")).status, 403);
+  for (const endpoint of [
+    "/api/auth/mfa/enrollment/required/totp/start",
+    "/api/auth/mfa/enrollment/required/totp/finish",
+    "/api/auth/mfa/totp/enrollment/start",
+    "/api/auth/mfa/totp/enrollment/finish",
+    "/api/auth/mfa/recovery-codes/regenerate",
+  ]) {
+    assert.equal((await send(endpoint, "POST", "{}")).status, 404);
+  }
+  assert.equal((await post("/enroll/verify", { factorId: "missing", code: "000000" })).status, 401);
+
+  const started = await post("/enroll/start", {});
+  assert.equal(started.status, 200);
+  assert.equal(started.headers.get("Cache-Control"), "no-store");
+  assert.match(started.headers.get("Content-Type")!, /text\/html/);
+  assert.match(started.headers.get("Content-Security-Policy")!, /default-src 'none'/);
+  const markup = await started.text();
+  assert.ok(!markup.includes("<script") && !markup.includes(jar.get("__Host-puzzle.mfa")!));
+  const secret = markup.match(/<code>([A-Z2-7]+)<\/code>/)?.[1];
+  const factorId = markup.match(/name="factorId" value="([^"]+)"/)?.[1];
+  assert.ok(secret && factorId);
+  const code = await generateTotpCode(secret, Date.now(), { digits: 6, periodSeconds: 30 });
+  const enrolled = await post("/enroll/verify", { factorId, code });
+  assert.equal(enrolled.status, 200);
+  const recoveryHtml = await enrolled.text();
+  const recoveryCode = [...recoveryHtml.matchAll(/<li><code>([^<]+)<\/code><\/li>/g)][0]?.[1];
+  assert.ok(recoveryCode);
+  assert.ok(!jar.has("__Host-puzzle.mfa"));
+  assert.ok(jar.has(services.cookie.name!));
+  assert.equal((await send("/dashboard")).status, 200);
+  assert.equal((await post("/profile", { company: "Fieldnotes Studio" })).status, 200);
+  assert.ok((await (await send("/dashboard")).text()).includes("Fieldnotes Studio"));
+
+  const oldToken = jar.get(services.cookie.name!)!;
+  assert.equal((await post("/session/refresh", {})).status, 200);
+  assert.equal(await services.auth.getCurrentUser(oldToken), null);
+  assert.notEqual(jar.get(services.cookie.name!), oldToken);
+  assert.equal((await post("/logout", {})).status, 200);
+  assert.equal((await send("/dashboard")).status, 401);
+
+  const login = await signIn();
+  assert.equal(login.status, 200);
+  const pending: AuthClientSnapshot = await (await send("/api/auth/state")).json();
+  assert.equal(pending.status, "mfa-pending");
+  assert.equal((await send("/dashboard")).status, 401);
+  const nextCode = await generateTotpCode(secret, Date.now() + 30000, { digits: 6, periodSeconds: 30 });
+  const verified = await send("/api/auth/mfa/sign-in/totp", "POST", JSON.stringify({ code: nextCode }));
+  assert.equal(verified.status, 200);
+  assert.equal((await send("/api/me")).status, 200);
+  const activeToken = jar.get(services.cookie.name!)!;
+  const activeSession = await services.sessions.validate(activeToken, { touch: false });
+  assert.ok(activeSession);
+  await services.storage.update<SessionStorageRecord>(SESSION_COLLECTION, activeSession.id, {
+    expiresAt: new Date(0),
+  });
+  assert.equal((await send("/dashboard")).status, 401);
+  await post("/logout", {});
+
+  await signIn();
+  assert.equal((await send("/api/auth/mfa/sign-in/recovery-code", "POST",
+    JSON.stringify({ code: recoveryCode }))).status, 200);
+  await post("/logout", {});
+  assert.equal((await signIn()).status, 200);
+  const repeatLogin: AuthClientSnapshot = await (await send("/api/auth/state")).json();
+  assert.equal((await send("/api/auth/mfa/sign-in/recovery-code", "POST",
+    JSON.stringify({ code: recoveryCode }))).status, 401);
+  assert.ok(repeatLogin.mfa);
+  await services.storage.update<AuthMfaChallengeStorageRecord>(
+    AUTH_MFA_CHALLENGE_COLLECTION, repeatLogin.mfa.challengeId, { expiresAt: new Date(0) },
+  );
+  assert.equal((await send("/api/auth/mfa/sign-in/totp", "POST",
+    JSON.stringify({ code: nextCode }))).status, 401);
+  assert.equal((await send("/dashboard")).status, 401);
+  console.log("Auth enrollment, cookie boundaries, policy enforcement, MFA, expiration, rotation, and logout verified.");
+} finally {
+  await connection.close();
+}
+```
+
+Sessions are created by successful Auth flows, not a browser call to
+`sessions.create`. Server `sessions.validate` touches idle activity according
+to its interval. Touching activity does not itself renew the browser cookie.
+The explicit refresh route uses `sessions.rotate`, sets a replacement cookie
+and revokes the old session. Rotation creates a new record with a new creation
+time and lifetime; the configured absolute lifetime caps each record, not the
+total age of a login across rotations. Rotation is not fresh credential
+verification. Add a separate trusted server-side login-age policy if your
+application requires forced reauthentication across rotations.
+Expired sessions/cookies require a new sign-in, not resurrection from a client
+snapshot. Server-side administrative revocation can use `sessions.revoke(id)`;
+`auth.signOutEverywhere(user.id)` also revokes pending MFA challenges and must
+only be called with a server-authorized user ID.
+
+### Passkeys, optional enrollment, and recovery
+
+The core additionally supports `beginTotpEnrollment` /
+`verifyTotpEnrollment` for authenticated optional enrollment, with current
+password confirmation at the start. Adapt the same server-HTML display
+boundary if you add that flow; do not enable the stock secret-returning routes
+accidentally. A user with required MFA but an older unenrolled session must
+sign out/sign in to obtain this example's restricted enrollment challenge.
+
+WebAuthn support is implemented, not an external OAuth provider. Add
+`SimpleWebAuthnProvider` to the MFA dependencies and configure both
+`webAuthn: { rpId, rpName, origin }` and the provider together, using the exact
+origin and RP ID. Core methods include required/optional passkey enrollment,
+password-backed passkey challenges, and discoverable passkey sign-in.
+The [MFA reference](/docs/auth/mfa) lists the paired methods.
+
+Browser helpers from `/auth/client` can handle the ceremony, but the server
+must verify the assertion/registration, origin, RP ID, user verification and
+counters. Public WebAuthn **options/challenge bytes** are not the server's
+bearer **challenge token**: only the latter authenticates the pending flow and
+must stay in its HttpOnly cookie. For this application's boundary, also handle
+recovery-code issuance on a no-store HTML completion page rather than returning
+codes in JSON. Passkey UX is an extension, not silently enabled by this example.
+
+Recovery-code sign-in uses the existing pending cookie plus the user-entered
+code. Codes are single-use hashes at rest; regeneration invalidates unused
+older codes and requires the current password. If every factor/code is lost,
+there is no documented automatic account-recovery bypass: design an explicit
+verified recovery/support policy. Do not turn off MFA on an email-only claim.
+
+## Common mistakes and troubleshooting
+
+- **Pending auth treated as signed in:** only policy-aware `authenticated`
+  grants dashboard access. Enrollment challenges cannot call protected APIs.
+- **MFA cookie missing:** use HTTPS and preserve all `Set-Cookie` headers.
+  Do not disable Secure or move challenge tokens into JSON/localStorage.
+- **Factor becomes unreadable after restart:** restore the configured
+  encryption key and key ID. Keep old keys available during rotation.
+- **TOTP rejected:** check clock synchronization, six-digit/30-second app
+  settings, expiry and replay protection. Wait for a new code after enrollment
+  before using TOTP again at sign-in.
+- **403 on POST:** verify exact origin/port and trusted proxy deployment;
+  do not set `allowMissingOrigin` just to bypass the failure.
+- **Custom field missing:** the stock registration DTO has no company/role
+  field. Persist it through a separately authorized, validated server route.
+- **Unexpected passkey or lifecycle UI:** this minimal route allowlist only
+  enables password, TOTP and recovery sign-in. Do not expose UI for unconfigured
+  email/reset/passkey endpoints. Add each complete flow deliberately.
+
+## Next steps
+
+- Add [account lifecycle delivery](/docs/auth/lifecycle) with a real email provider
+  before requiring verified email; keep that policy aligned across managers.
+- Require recent server-enforced [step-up](/docs/auth/mfa#step-up-authentication)
+  for destructive actions; it rotates the session and is not only a UI prompt.
+- Apply resource-level authorization to the [notebook](/docs/tutorials/storage).
+- Keep private routes noindex and out of the public
+  [SEO publication sitemap](/docs/tutorials/seo).

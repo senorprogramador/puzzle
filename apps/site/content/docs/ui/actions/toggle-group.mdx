@@ -5,7 +5,7 @@ description: Toggle groups let users select one or more options from a related s
 
 Use the ToggleGroup component to present a set of related toggle buttons. Choose single selection for mutually exclusive options or multiple selection when users can choose several.
 
-<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented public API, including `ToggleGroup.Item`, is covered by component and browser tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
 
 
 ## Import
@@ -196,6 +196,11 @@ Use `spacing` to set the gap between items. Numbers are interpreted as pixels; s
 
 Set `disabled` on the group to disable all items, or set it on an individual item to disable only that option. Disabled items are skipped during keyboard navigation.
 
+Items with `loading`, `aria-disabled={true}`, or `aria-disabled="true"` follow
+the same disabled behavior: they cannot be activated and are excluded from
+the tab order and arrow-key navigation. Disabling an item does not clear an
+existing selection.
+
 ```tsx
 <ToggleGroup defaultValue="read" aria-label="Permission">
   <ToggleGroup.Item value="read">Read</ToggleGroup.Item>
@@ -236,6 +241,8 @@ The group also accepts standard `<div>` props, including `aria-*` and `data-*` a
 | ----------- | ----------- | ------- | --------------------------------------------------- |
 | `value`     | `string`    | —       | Unique value identifying the item within its group. |
 | `disabled`  | `boolean`   | `false` | Disables this item.                                 |
+| `loading` | `boolean` | `false` | Shows the Button spinner and disables this item. |
+| `aria-disabled` | `boolean \| "true" \| "false"` | — | Disables activation and keyboard navigation when true. |
 | `children`  | `ReactNode` | —       | Item label or content.                              |
 | `className` | `string`    | —       | Additional CSS class names.                         |
 

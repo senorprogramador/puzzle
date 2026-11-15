@@ -1,0 +1,478 @@
+---
+title: Build a Searchable Publication with Puzzle SEO
+description: Implement complete server-rendered publication pages with canonical URLs, dynamic social cards, connected JSON-LD, and framework SEO endpoints.
+---
+
+## What you will build
+
+A Fieldnotes publication with `/`, `/articles`, and `/articles/packing-light`.
+Each response contains metadata and a single connected JSON-LD graph before
+JavaScript runs. The dynamic article uses its own description and image.
+
+**API maturity: Beta** for all Puzzle APIs below. See the
+[maturity policy](/docs/tutorials#api-maturity).
+This tutorial complements the [metadata](/docs/seo/metadata),
+[React](/docs/seo/react), and [structured-data](/docs/seo/structured-data)
+references.
+
+## Prerequisites
+
+- A TypeScript application and React/React DOM 19.
+- Bun for the runnable standalone server. The library itself is runtime-neutral.
+- A production origin and publicly reachable social images.
+
+The example uses `https://fieldnotes.example` as the publication's identity.
+Replace it with your origin before deployment; local previews deliberately
+retain production canonical URLs.
+
+## Installation
+
+```bash
+bun add @puzzle-ui/seo react react-dom
+```
+
+In an existing framework application, keep its existing React 19 installation.
+No framework package is needed by Puzzle's endpoint adapter functions.
+
+## Configuration
+
+Create the shared site configuration. Do not give every page a homepage
+canonical by setting it as a global fallback.
+
+```ts title="seo/config.ts"
+import type { SeoConfig } from "@puzzle-ui/seo";
+
+export const origin = "https://fieldnotes.example";
+
+export const config: SeoConfig = {
+  siteUrl: origin,
+  defaultLocale: "en-US",
+  supportedLocales: ["en"],
+  trailingSlash: "never",
+  identity: {
+    name: "Fieldnotes",
+    url: `${origin}/`,
+    description: "Practical field guides for curious travelers.",
+  },
+  title: { default: "Fieldnotes", template: "%s | Fieldnotes" },
+  defaults: {
+    description: "Practical field guides for curious travelers.",
+    robots: "index, follow",
+  },
+};
+```
+
+Page values override configured defaults. The title fallback order is
+`config.metadata.title`, `defaults.title`, `title.default`, then
+`identity.name`; the template applies to an explicit page title, not a fallback.
+Descriptions similarly prefer page metadata, configured metadata, defaults,
+then identity description.
+
+`SeoProvider.metadata` resolves one page against that configuration.
+`SeoMetadata` is an alternative metadata **renderer**, not a passive merge
+layer: it also resolves against config, not parent page metadata. Do not put
+`SeoHead` inside it or render both for the same document. Nested providers are
+not a metadata inheritance system.
+
+## Step-by-step implementation
+
+### 1. Load content and derive metadata from the same record
+
+Use the loaded record, not an untrusted URL slug, as the source for visible
+content, canonical URL, social copy, and structured data.
+
+```tsx title="seo/publication.tsx"
+import {
+  LDArticle,
+  LDBreadcrumbList,
+  LDOrganization,
+  LDWebPage,
+  LDWebSite,
+  Schema,
+  SeoHead,
+  SeoJsonLd,
+  SeoProvider,
+  type SeoPageMetadata,
+} from "@puzzle-ui/seo";
+import { renderToString } from "react-dom/server";
+import { config, origin } from "./config";
+
+export const articles = [
+  {
+    slug: "packing-light",
+    title: "Packing light for a week outdoors",
+    description: "A tested packing checklist for a seven-day walking trip.",
+    image: "https://images.unsplash.com/photo-1551632811-561732d1e306",
+    published: "2026-10-12T09:00:00Z",
+    body: "Choose reusable layers, carry only essential equipment, and plan water stops.",
+  },
+];
+
+export const paths = ["/", "/articles", ...articles.map((a) => `/articles/${a.slug}`)];
+
+export const renderPage = (pathname: string): string | null => {
+  const article = articles.find((a) => pathname === `/articles/${a.slug}`);
+  if (pathname !== "/" && pathname !== "/articles" && !article) return null;
+
+  const title = article?.title ?? (pathname === "/" ? "Fieldnotes" : "Field guides");
+  const description = article?.description ?? config.defaults?.description;
+  const url = `${origin}${pathname}`;
+  const image = article?.image ??
+    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b";
+  const webpageId = `${url}#webpage`;
+  const metadata: SeoPageMetadata = {
+    ...(pathname === "/" ? {} : { title }),
+    description,
+    canonical: pathname,
+    robots: { index: true, follow: true, maxImagePreview: "large" },
+    openGraph: {
+      type: article ? "article" : "website",
+      images: [{ url: image, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: [image],
+      imageAlt: title,
+    },
+    ...(article ? { publishedTime: article.published } : {}),
+  };
+
+  return "<!doctype html>" + renderToString(
+    <html lang="en">
+      <head><meta charSet="utf-8" /></head>
+      <body>
+        <SeoProvider config={config} metadata={metadata}>
+          <SeoHead />
+          <LDOrganization
+            id={`${origin}/#organization`}
+            name="Fieldnotes"
+            url={`${origin}/`}
+          />
+          <LDWebSite
+            id={`${origin}/#website`}
+            name="Fieldnotes"
+            url={`${origin}/`}
+            publisher={{ "@id": `${origin}/#organization` }}
+          />
+          <LDWebPage
+            id={webpageId}
+            name={title}
+            description={description}
+            url={url}
+            isPartOf={{ "@id": `${origin}/#website` }}
+            breadcrumb={{ "@id": `${url}#breadcrumbs` }}
+            {...(article ? { mainEntity: { "@id": `${url}#article` } } : {})}
+          />
+          <LDBreadcrumbList
+            id={`${url}#breadcrumbs`}
+            itemListElement={[
+              { "@type": "ListItem", position: 1, name: "Home", item: `${origin}/` },
+              ...(pathname === "/" ? [] : [
+                { "@type": "ListItem", position: 2, name: "Field guides", item: `${origin}/articles` },
+              ]),
+              ...(article ? [
+                { "@type": "ListItem", position: 3, name: article.title, item: url },
+              ] : []),
+            ]}
+          />
+          {pathname === "/articles" && (
+            <>
+              <Schema type="CollectionPage" id={webpageId} data={{
+                mainEntity: { "@id": `${url}#list` },
+              }} />
+              <SeoJsonLd data={{
+                "@type": "ItemList",
+                "@id": `${url}#list`,
+                itemListElement: articles.map((a, index) => ({
+                  "@type": "ListItem",
+                  position: index + 1,
+                  name: a.title,
+                  url: `${origin}/articles/${a.slug}`,
+                })),
+              }} />
+            </>
+          )}
+          {article && (
+            <LDArticle
+              id={`${url}#article`}
+              headline={article.title}
+              description={article.description}
+              image={article.image}
+              datePublished={article.published}
+              author={{ "@id": `${origin}/#organization` }}
+              publisher={{ "@id": `${origin}/#organization` }}
+              mainEntityOfPage={{ "@id": webpageId }}
+            />
+          )}
+          <main>
+            <nav aria-label="Main"><a href="/">Home</a>{" "}<a href="/articles">Field guides</a></nav>
+            <h1>{title}</h1>
+            {article ? <article><p>{article.body}</p></article> : (
+              <>
+                <p>{description}</p>
+                <ul>{articles.map((a) => (
+                  <li key={a.slug}><a href={`/articles/${a.slug}`}>{a.title}</a></li>
+                ))}</ul>
+              </>
+            )}
+          </main>
+        </SeoProvider>
+      </body>
+    </html>,
+  );
+};
+```
+
+Replace the in-memory array with your repository/CMS loader; await it before
+calling the renderer. Return a real 404 for missing records. The same canonical
+excludes query strings such as campaign tracking parameters because it is
+derived from the matched route, not `request.url`.
+
+Open Graph title/description default to resolved page metadata, URL defaults
+to canonical, and site name defaults to identity. Twitter/X title/description
+follow the resolved page; explicitly supplying both image lists makes their
+relationship clear. The package does not generate image files or verify that
+remote images are accessible. Use your own durable image URLs in production.
+
+For private/search-preview pages, use `robots: { index: false, follow: false }`
+and an appropriate HTTP/cache policy. Robots metadata is not access control.
+
+### 2. Compose one graph rather than several scripts
+
+`SeoProvider` owns graph output. `SeoJsonLd` registers raw nodes; despite its
+name it does not add a competing script inside a provider. `Schema` registers
+a generic Schema.org node; named components such as `LDArticle` supply the type.
+
+The listing deliberately registers `WebPage` and `CollectionPage` under the
+same ID: they describe the same entity, and the graph combines their types.
+Different entities have distinct stable absolute IDs. Relationships use
+`{ "@id": ... }`, not repeated embedded organizations. `SchemaReference` is
+also available for reference registration, but does not replace defining the
+referenced entity with useful properties.
+
+Use one owner for each entity's values. Do not rely on conflict resolution to
+choose between two different names or publishers. Do not mount another
+provider in each card, manually stringify a second graph, or retain JSON-LD
+from the previous route.
+
+### 3. Add product or FAQ data only when it describes visible content
+
+This independent page demonstrates the supported `LDProduct` and `LDFAQPage`
+components. Offers are nested entities rather than dangling references.
+FAQ schema does not imply eligibility for a search-engine rich result.
+
+```tsx title="seo/product.tsx"
+import { LDFAQPage, LDProduct, SeoHead, SeoProvider } from "@puzzle-ui/seo";
+import { config, origin } from "./config";
+
+export const ProductPage = () => (
+  <SeoProvider config={config} metadata={{
+    title: "Field notebook",
+    description: "A pocket notebook for walking trips.",
+    canonical: "/shop/notebook",
+  }}>
+    <SeoHead />
+    <LDProduct
+      id={`${origin}/shop/notebook#product`}
+      name="Field notebook"
+      description="A pocket notebook for walking trips."
+      offers={{
+        "@type": "Offer",
+        url: `${origin}/shop/notebook`,
+        price: "12.00",
+        priceCurrency: "EUR",
+        availability: "https://schema.org/InStock",
+      }}
+    />
+    <LDFAQPage id={`${origin}/shop/notebook#faq`} mainEntity={[{
+      "@type": "Question",
+      name: "Is the paper recyclable?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes, the paper is recyclable." },
+    }]} />
+    <main>
+      <h1>Field notebook</h1>
+      <p>A pocket notebook for walking trips. EUR 12.00. In stock.</p>
+      <h2>Is the paper recyclable?</h2>
+      <p>Yes, the paper is recyclable.</p>
+    </main>
+  </SeoProvider>
+);
+```
+
+## Complete working example
+
+Save the files above and add the endpoints/server below. The product page is
+an optional independent component, not a route in this publication.
+
+```ts title="seo/framework-routes.ts"
+import { createNextSeoRoutes } from "@puzzle-ui/seo/next";
+import { createReactRouterSeoRoutes } from "@puzzle-ui/seo/react-router";
+import { createSeoRouteHandlers, type SeoRouteOptions } from "@puzzle-ui/seo/server";
+import { createTanStackSeoRoutes } from "@puzzle-ui/seo/tanstack";
+import { origin } from "./config";
+import { paths } from "./publication";
+
+const options: SeoRouteOptions = {
+  sitemap: { sitemap: { baseUrl: origin, entries: paths.map((url) => ({ url })) } },
+  robots: { robots: {
+    rules: [{ userAgent: "*", allow: ["/"] }],
+    sitemap: `${origin}/sitemap.xml`,
+  } },
+};
+
+export const endpoints = createSeoRouteHandlers(options);
+export const next = createNextSeoRoutes(options);
+export const tanstack = createTanStackSeoRoutes(options);
+export const reactRouter = createReactRouterSeoRoutes(options);
+```
+
+```tsx title="seo/server.tsx"
+import { endpoints } from "./framework-routes";
+import { renderPage } from "./publication";
+
+export const fetchPublication = async (request: Request): Promise<Response> => {
+  const { pathname } = new URL(request.url);
+  if (request.method !== "GET") return new Response(null, { status: 405 });
+  if (pathname === "/robots.txt") return endpoints.robots(request);
+  if (pathname.startsWith("/sitemap")) return endpoints.sitemap(request);
+  const html = renderPage(pathname);
+  return new Response(html ?? "Not found", {
+    status: html ? 200 : 404,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      ...(html ? {} : { "X-Robots-Tag": "noindex, nofollow" }),
+    },
+  });
+};
+
+if (import.meta.main) {
+  Bun.serve({ port: 3001, fetch: fetchPublication });
+}
+```
+
+Run `bun run seo/server.tsx`, then visit `http://localhost:3001/articles/packing-light`.
+No client JavaScript is required for this publication.
+
+### Framework alternatives
+
+The explicitly supported frameworks are Next.js, TanStack Start, and React
+Router. Their Puzzle adapters own **sitemap/robots routes**, not framework
+metadata APIs. Use the same `options` above; do not mount the standalone server too.
+
+| Framework | Sitemap resource | Robots resource |
+| --- | --- | --- |
+| Next.js App Router | In `app/[seoFile]/route.ts`, import `next` from your shared module and export `const GET = next.sitemapGET`. | In `app/robots.txt/route.ts`, export `const GET = next.robotsGET`. |
+| TanStack Start | Register `/$seoFile` with `server.handlers.GET: tanstack.sitemapGET`. The handler receives `{ request }`. | Register `/robots.txt` with `server.handlers.GET: tanstack.robotsGET`. |
+| React Router framework mode | In the `:seoFile` resource route module, export `const loader = reactRouter.sitemapLoader`. | In the `robots.txt` resource route module, export `const loader = reactRouter.robotsLoader`. |
+
+Register resource routes using your framework's route configuration/generator,
+not as React page components. The dynamic sitemap resource also serves split
+sitemap files if the dataset grows. Ensure the static robots route wins.
+These mount signatures match the [framework reference](/docs/seo/frameworks).
+
+For page metadata in all three frameworks, the portable option is one
+`SeoProvider`/`SeoHead` tree rendered with route data available on the server.
+In Next App Router, place the provider and SEO components in a client boundary
+that still participates in initial server rendering; do not disable SSR.
+Alternatively use Next `generateMetadata`, TanStack `head`, or React Router
+`meta` as the **only metadata writer**, mapping
+`resolveSeoMetadata` from `@puzzle-ui/seo/metadata` with
+`normalizeSeoConfig` from `@puzzle-ui/seo/context`. There is no Puzzle
+`generateMetadata` adapter. Keep the graph provider but omit `SeoHead` in that mode.
+
+Do not pass a pre-rendered complete `<html>` string into a framework page:
+extract the route-data/component composition from `renderPage` and let the
+framework own the document. Resolve loader data before rendering schema nodes.
+The collector outputs after its children; late streaming/Suspense descendants
+are not a reliable way to populate initial-response JSON-LD.
+
+For hydration, use identical server/client data and stable IDs, one provider
+per document, and the same CSP nonce if configured. The provider preserves the
+server script during hydration and updates registrations on client navigation.
+Inspect both initial HTML and the post-navigation DOM; never suppress hydration
+warnings to hide duplicate writers.
+
+## Testing and verification
+
+```ts title="seo/verify.ts"
+import assert from "node:assert/strict";
+import type { SeoGraph } from "@puzzle-ui/seo";
+import { paths, renderPage } from "./publication";
+import { origin } from "./config";
+import { endpoints, next, tanstack, reactRouter } from "./framework-routes";
+
+for (const path of paths) {
+  const html = renderPage(path);
+  assert.ok(html);
+  assert.equal((html.match(/<title>/g) ?? []).length, 1);
+  assert.equal((html.match(/rel="canonical"/g) ?? []).length, 1);
+  assert.equal((html.match(/type="application\/ld\+json"/g) ?? []).length, 1);
+  assert.ok(html.includes(`href="${origin}${path}"`));
+  const match = html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/);
+  assert.ok(match?.[1]);
+  const graph: SeoGraph = JSON.parse(match[1]);
+  assert.equal(graph["@context"], "https://schema.org");
+  assert.ok(graph["@graph"].length >= 4);
+  const ids = graph["@graph"].map((node) => node["@id"]);
+  assert.equal(new Set(ids).size, ids.length);
+}
+assert.equal(renderPage("/articles/missing"), null);
+const sitemapRequest = new Request(`${origin}/sitemap.xml`);
+const sitemaps = await Promise.all([
+  endpoints.sitemap(sitemapRequest),
+  next.sitemapGET(sitemapRequest),
+  tanstack.sitemapGET({ request: sitemapRequest }),
+  reactRouter.sitemapLoader({ request: sitemapRequest, params: {}, context: undefined }),
+]);
+for (const response of sitemaps) {
+  assert.equal(response.status, 200);
+  const xml = await response.text();
+  for (const path of paths) assert.ok(xml.includes(`${origin}${path}`));
+}
+const robotsRequest = new Request(`${origin}/robots.txt`);
+for (const response of await Promise.all([
+  endpoints.robots(robotsRequest),
+  next.robotsGET(robotsRequest),
+  tanstack.robotsGET({ request: robotsRequest }),
+  reactRouter.robotsLoader({ request: robotsRequest, params: {}, context: undefined }),
+])) {
+  assert.equal(response.status, 200);
+  assert.ok((await response.text()).includes(`${origin}/sitemap.xml`));
+}
+console.log("Publication metadata and graph assertions passed.");
+```
+
+Run `bun run seo/verify.ts`. Expected output is
+`Publication metadata and graph assertions passed.`
+These pure render assertions are executed by the repository tutorial check;
+they are not a deployed crawler or framework hydration test.
+
+Also fetch initial responses with `curl`, inspect the article's `og:image`,
+description, robots and Twitter tags, and parse the script as JSON.
+`/sitemap.xml` should include all three page URLs; `/robots.txt` should name it.
+Use Schema.org's validator and the applicable search-engine rich-result test
+against deployed URLs. Validation does not guarantee indexing or rich results.
+See [SEO testing](/docs/seo/testing) and [validation](/docs/seo/validation).
+
+## Common mistakes and troubleshooting
+
+- **Every page canonicalizes to home:** remove the global canonical; derive it
+  from the loaded route. Check redirects and trailing-slash policy too.
+- **Wrong social image:** images are page-level inputs, not an inherited social
+  configuration object. Supply fallback images in your application mapping.
+- **Duplicate metadata:** remove either native framework metadata output or
+  `SeoHead`/`SeoMetadata`. React keys are not a document-wide deduplication API.
+- **Empty/incomplete graph in source:** move data loading before the render;
+  do not rely on effects or late suspended server children.
+- **Warnings despite valid JSON:** distinguish Schema.org validity from
+  rich-result recommendations. Provide truthful visible content; do not invent
+  ratings, prices, or publication dates to silence diagnostics.
+
+## Next steps
+
+- Replace the article array and sample image URLs with production content.
+- Add [sitemap pagination](/docs/seo/sitemaps), a CSP nonce, and
+  [robots policy](/docs/seo/robots) appropriate to your deployment.
+- Use [Storage](/docs/tutorials/storage) for content persistence.
+- Add [Auth](/docs/tutorials/auth) for a private editorial dashboard; enforce
+  authentication server-side and exclude private pages from the public sitemap.

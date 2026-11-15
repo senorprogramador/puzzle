@@ -5,7 +5,7 @@ description: Button groups organize related actions into a single, coherent cont
 
 Use the ButtonGroup component to visually group related buttons. It arranges its children together without changing their individual behavior or appearance.
 
-<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented public API is covered by component and browser tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
 
 
 ## Import
@@ -138,8 +138,8 @@ Use `disabled` to disable the whole group: the group gets `aria-disabled="true"`
 
 ```tsx
 <ButtonGroup disabled aria-label="Unavailable actions">
-  <Button disabled>Save</Button>
-  <Button disabled>Publish</Button>
+  <Button>Save</Button>
+  <Button>Publish</Button>
 </ButtonGroup>
 ```
 
@@ -153,7 +153,7 @@ Use `disabled` to disable the whole group: the group gets `aria-disabled="true"`
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | Visual direction of the group.                                                             |
 | `attached`    | `boolean`                    | `false`        | Removes the gap and visually joins adjacent children.                                      |
 | `fullWidth`   | `boolean`                    | `false`        | Makes the group fill its container and lets its children flex to fill the available space. |
-| `disabled`    | `boolean`                    | `false`        | Marks the group with `aria-disabled`; does not disable children.                           |
+| `disabled`    | `boolean`                    | `false`        | Marks the group with `aria-disabled` and disables its direct child controls.               |
 | `spacing`     | `number \| string`           | —              | Gap between children. Numbers are interpreted as pixels; strings are passed as CSS values. |
 | `className`   | `string`                     | —              | Additional CSS class names.                                                                |
 | `children`    | `ReactNode`                  | —              | Content displayed inside the group.                                                        |
@@ -178,7 +178,10 @@ The group does not add custom keyboard behavior. Each child control retains its 
 
 ### Disabled state
 
-`disabled` sets `aria-disabled` on the group but does not prevent interaction with its children. Apply each child control's disabled state as needed.
+`disabled` sets `aria-disabled` on the group and passes `disabled` to every
+direct child. Use Button children directly, including Button links. Custom
+child components must forward `disabled` to their underlying control; the group
+does not traverse fragments or arbitrary wrappers.
 
 **Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
 

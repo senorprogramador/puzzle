@@ -1,0 +1,356 @@
+---
+title: Build a Persistent Notebook with Puzzle Storage
+description: Implement typed MongoDB-backed notebook CRUD, optimistic concurrency, a Cloudflare D1 alternative, and Auth persistence integration.
+---
+
+## What you will build
+
+A notebook repository with create/read/update/delete, pagination, a sequential
+welcome-note upsert, and conflict handling. The same repository works with
+MongoDB, Cloudflare D1, or a conforming custom adapter.
+
+**API maturity: Beta** for Storage contracts, the testing kit, and both shipped
+adapters. No Stable or Experimental API is required. See the
+[maturity policy](/docs/tutorials#api-maturity) and
+[Storage API reference](/docs/storage).
+
+Storage is **record/database persistence**, not file upload, object storage, an
+ORM relation layer, or an authentication manager. The core package exports
+contracts, errors, and query validation; it does not create a database connection
+or provide an in-memory production adapter.
+
+## Prerequisites
+
+- TypeScript and Bun for the runnable CLI example.
+- A MongoDB replica set or sharded deployment with transaction support, plus
+  its server-only connection URI. Use a disposable development database.
+- For the alternative: a Cloudflare Worker project with Wrangler and a D1 binding.
+
+MongoDB transactions are not needed for a single note update, but configuring
+them now allows this connection to support the [Auth tutorial](/docs/tutorials/auth).
+
+## Installation
+
+```bash
+bun add @puzzle-ui/storage @puzzle-ui/storage-mongodb mongodb
+```
+
+`mongodb` is explicit because application code imports `MongoClient` directly.
+No React dependency is needed by Storage.
+
+## Configuration
+
+```ts title="storage/database.ts"
+import { MongoClient } from "mongodb";
+import { MongoStorageAdapter } from "@puzzle-ui/storage-mongodb";
+
+export const connectStorage = async (uri: string, databaseName = "fieldnotes") => {
+  if (!uri.trim()) throw new Error("A server-only MongoDB URI is required.");
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const storage = new MongoStorageAdapter({
+      database: client.db(databaseName),
+      client,
+      transactionsEnabled: true,
+    });
+    return { storage, close: () => client.close() };
+  } catch (error) {
+    await client.close();
+    throw error;
+  }
+};
+```
+
+Keep the URI in server environment/secret configuration, never a public-prefixed
+environment variable. `transactionsEnabled` reports an explicit opt-in; it
+does not convert a standalone MongoDB server into a replica set. Auth fails
+closed without unique constraints, conditional writes, and atomic batches.
+
+Use a server process/module singleton per deployment instance, sharing the
+driver's connection pool. Do not reconnect per SSR component or close the
+pool after every request. Close it during process shutdown, or at the end of
+the short-lived CLI below.
+
+## Step-by-step implementation
+
+### 1. Define and validate a record at the application boundary
+
+IDs are application-supplied strings, not necessarily MongoDB ObjectIds.
+Storage fills missing `createdAt`, `updatedAt`, and `revision` on insert;
+updates refresh the timestamp and increment the revision.
+
+Collection `schema.validate` is metadata: the shipped adapters do **not** call
+it automatically. Validate untrusted input before a write. Types do not
+validate incoming JSON.
+
+```ts title="storage/notebook.ts"
+import {
+  StorageValidationError,
+  type StorageAdapter,
+  type StorageCursor,
+  type StorageRecord,
+} from "@puzzle-ui/storage";
+
+export type Note = StorageRecord & {
+  ownerId: string;
+  title: string;
+  archived: boolean;
+  publishedAt: Date | null;
+};
+
+export const noteTitle = (value: unknown): string => {
+  if (typeof value !== "string" || !value.trim() || value.trim().length > 160) {
+    throw new StorageValidationError("Enter a title of 1 to 160 characters.");
+  }
+  return value.trim();
+};
+
+export const createNotebook = (storage: StorageAdapter) => ({
+  initialize: () => storage.registerCollection<Note>({
+    name: "notes",
+    indexes: [{ name: "notes_owner", fields: ["ownerId"] }],
+  }),
+  create: (ownerId: string, title: unknown) =>
+    storage.insert<Note>("notes", {
+      id: crypto.randomUUID(),
+      ownerId,
+      title: noteTitle(title),
+      archived: false,
+      publishedAt: null,
+    }),
+  get: (ownerId: string, id: string) =>
+    storage.findOne<Note>("notes", { where: {
+      id: { operator: "eq", value: id },
+      ownerId: { operator: "eq", value: ownerId },
+    } }),
+  list: (ownerId: string, after?: StorageCursor) =>
+    storage.findPage<Note>("notes", {
+      where: { ownerId: { operator: "eq", value: ownerId } },
+      orderBy: [{ field: "createdAt", direction: "desc" }],
+      first: 20,
+      ...(after ? { after } : {}),
+    }),
+  rename: async (ownerId: string, id: string, title: unknown, revision: number) => {
+    const existing = await storage.findById<Note>("notes", id);
+    if (!existing || existing.ownerId !== ownerId) return null;
+    return storage.update<Note>("notes", id, { title: noteTitle(title) }, {
+      expectedRevision: revision,
+    });
+  },
+  remove: async (ownerId: string, id: string, revision: number) => {
+    const existing = await storage.findById<Note>("notes", id);
+    if (!existing || existing.ownerId !== ownerId) return false;
+    return storage.delete<Note>("notes", id, { expectedRevision: revision });
+  },
+  upsertWelcome: (ownerId: string) =>
+    storage.upsert<Note>("notes", {
+      where: { id: { operator: "eq", value: `welcome-${ownerId}` } },
+    }, {
+      id: `welcome-${ownerId}`,
+      ownerId,
+      title: "Welcome to your notebook",
+      archived: false,
+      publishedAt: null,
+    }),
+});
+```
+
+The owner ID must come from trusted authentication, not a request body. This
+repository never changes note ownership; the revision condition protects the
+read/authorize/write sequence from concurrent mutation. If your application
+introduces ownership transfers, preserve that invariant or use an appropriate
+atomic authorization design.
+
+`get`/`rename` return `null` for missing or inaccessible notes, and `remove`
+returns `false`. A found record with a stale revision throws
+`StorageConflictError` rather than reporting success. Map these outcomes to
+404 and 409 at the HTTP boundary; do not silently overwrite another editor's work.
+
+### 2. Understand upsert and deletion semantics
+
+Both adapters implement upsert as a lookup followed by update or insert.
+It is **not** an atomic database-native upsert. Use `upsertWelcome` only in a
+controlled sequential setup task. Concurrent creators can hit
+`StorageDuplicateError`; reload and resolve that conflict rather than treating
+it as an atomic counter or a once-only security operation.
+
+Deletion is physical, not a soft-delete flag: `delete` returns whether a record
+was deleted; repeating it returns `false`. `deleteMany` returns a count.
+Setting `revokedAt` is a separate application convention, not a universal
+automatic query filter or cascading deletion mechanism.
+
+Dates round-trip as `Date`, explicit `null` is preserved, and the adapters
+serialize arrays/objects. Query/order/index fields use the supported scalar
+contract; do not assume arbitrary vendor-specific JSON queries or joins.
+
+### 3. Use Cloudflare D1 instead
+
+Install `@puzzle-ui/storage-d1` and `@puzzle-ui/storage` in an existing Worker
+project. Create a database with `wrangler d1 create fieldnotes`, then put the
+returned database ID in the project's `d1_databases` binding named `DB`.
+Keep Wrangler's generated configuration and runtime types for that project.
+
+```ts title="storage/worker.ts"
+import { D1StorageAdapter, type D1DatabaseLike } from "@puzzle-ui/storage-d1";
+import { createNotebook } from "./notebook";
+
+export default {
+  async fetch(request: Request, env: { DB: D1DatabaseLike }): Promise<Response> {
+    if (new URL(request.url).pathname !== "/health/storage") {
+      return new Response("Not found", { status: 404 });
+    }
+    if (request.method !== "GET") return new Response(null, { status: 405 });
+    const storage = new D1StorageAdapter({ database: env.DB });
+    const notebook = createNotebook(storage);
+    await notebook.initialize();
+    await storage.count("notes");
+    return new Response("Storage ready", { headers: { "Cache-Control": "no-store" } });
+  },
+};
+```
+
+Set this as the Worker's entry point; run `wrangler dev` and request
+`/health/storage`. Expected body: `Storage ready`. Storage failures propagate
+to the Worker error boundary instead of becoming successful readiness responses.
+This intentionally exposes no note data and creates no account.
+
+`registerCollection` creates missing tables/indexes idempotently; it is not a
+versioned migration. For schema changes use `D1StorageMigrationAdapter` (or
+`MongoStorageMigrationAdapter`) in deployment/startup orchestration, not a
+migration runner on every request. See [migrations](/docs/storage#migrations).
+
+D1 defaults to the `puzzle_` table prefix and provides atomic batches, not
+interactive transaction callbacks. It has no TTL-index support: schedule
+cleanup explicitly, and always enforce expiration in domain logic.
+MongoDB uses the same default collection prefix and can create asynchronous
+TTL indexes; TTL cleanup is never exact-time authorization.
+
+These are the only two shipped database adapters. Storage has no Next.js or
+TanStack-specific adapter: call it from those frameworks' **server** handlers,
+loaders, or server functions. Bind D1 through the deployment request environment;
+do not put a request-scoped binding in shared cross-request user state.
+
+### 4. Integrate a custom adapter
+
+The notebook already accepts `StorageAdapter`, so a conforming implementation
+needs no repository changes. Implement every required method and honestly
+report capabilities. The separate migration/schema interfaces are not
+automatically implemented by satisfying `StorageAdapter`.
+
+This test registration helper accepts your adapter factory; call it in a Bun
+test file with a disposable database fixture and an isolated reset function.
+Do not replace atomic rollback with sequential writes.
+
+```ts title="storage/custom-adapter.ts"
+import type { StorageAdapter } from "@puzzle-ui/storage";
+import { runStorageAdapterConformance } from "@puzzle-ui/storage/testing";
+
+export const checkCustomAdapter = (
+  createAdapter: () => Promise<StorageAdapter>,
+  reset: () => Promise<void>,
+) => {
+  runStorageAdapterConformance({ createAdapter, reset });
+};
+```
+
+The [conformance reference](/docs/storage#conformance-testing-kit) covers the
+fixture lifecycle and the separate migration suite. A factory in this example
+is an application callback, not an invented Puzzle connection API.
+
+## Complete working example
+
+Save the connection and notebook modules, then run this CLI against a disposable
+database. It is the smallest complete lifecycle without a web framework.
+
+```ts title="storage/main.ts"
+import assert from "node:assert/strict";
+import { StorageConflictError } from "@puzzle-ui/storage";
+import { connectStorage } from "./database";
+import { createNotebook } from "./notebook";
+
+const uri = process.env.MONGODB_URI;
+if (!uri) throw new Error("Set MONGODB_URI to a development replica-set database.");
+const connection = await connectStorage(uri, "fieldnotes_tutorial");
+
+try {
+  const notebook = createNotebook(connection.storage);
+  await notebook.initialize();
+  const note = await notebook.create("tutorial-user", "First field note");
+  assert.equal((await notebook.get("tutorial-user", note.id))?.title, note.title);
+  assert.equal(await notebook.get("another-user", note.id), null);
+  const renamed = await notebook.rename("tutorial-user", note.id, "Revised field note", note.revision);
+  assert.ok(renamed);
+  assert.equal(renamed.revision, note.revision + 1);
+  await assert.rejects(
+    () => notebook.rename("tutorial-user", note.id, "Stale edit", note.revision),
+    StorageConflictError,
+  );
+  assert.ok((await notebook.list("tutorial-user")).items.some((item) => item.id === note.id));
+  const welcome = await notebook.upsertWelcome("tutorial-user");
+  assert.equal((await notebook.upsertWelcome("tutorial-user")).id, welcome.id);
+  assert.equal(await notebook.remove("tutorial-user", note.id, renamed.revision), true);
+  assert.equal(await notebook.remove("tutorial-user", note.id, renamed.revision), false);
+  await connection.storage.delete("notes", welcome.id);
+  console.log("Notebook CRUD, ownership, revision conflict, upsert, and deletion verified.");
+} finally {
+  await connection.close();
+}
+```
+
+Set `MONGODB_URI` in your shell/secret environment, then run
+`bun run storage/main.ts`. Do not paste credentials into source or commit `.env`.
+The fixed `tutorial-user` is a CLI fixture, not an HTTP authorization strategy.
+
+## Testing and verification
+
+Expected CLI output:
+`Notebook CRUD, ownership, revision conflict, upsert, and deletion verified.`
+The script asserts the required behavior rather than only checking that a write
+did not throw. Use a unique database per concurrent test run.
+
+The repository tutorial check typechecks these files. With
+`TUTORIAL_MONGODB_URI` set to an isolated replica-set fixture, it also executes
+this CLI with that URI as `MONGODB_URI`. The package checks additionally
+exercise D1 through Miniflare and MongoDB through the official replica-set
+conformance suite. The Worker deployment itself is not executed by those checks.
+
+For a custom adapter, run the conformance suite against a real test backend,
+including failed-batch rollback, date/null serialization, uniqueness and stale
+revision rejection. A TypeScript `implements` clause cannot establish atomicity.
+
+## Common mistakes and troubleshooting
+
+- **Auth reports missing atomicity:** MongoDB needs both `client` and
+  `transactionsEnabled: true`, plus an actually transaction-capable server.
+- **Input is stored despite a schema guard:** call validation explicitly at
+  the boundary; collection schema metadata is not an enforced validator.
+- **Lost edits:** send the revision loaded by the editor and handle conflict
+  with reload/merge UI; do not fetch a fresh revision just to overwrite.
+- **Browser bundle contains database code:** keep this entire module tree in
+  server entry points. Send explicit public DTOs, not raw records or adapters,
+  to React/client components. SSR is not permission to serialize the connection.
+- **Unexpected deletion/expiration:** physical deletion has no cascade; TTL
+  is asynchronous on MongoDB and unavailable on D1. Domain managers check expiry.
+
+## Next steps
+
+### Persist Auth data without turning Storage into Auth
+
+Continue with [registration through MFA and logout](/docs/tutorials/auth).
+It imports `connectStorage` from this tutorial and supplies the same adapter to
+`StorageSessionManager`, `StorageAuthManager`, `StorageAuthMfaManager`,
+`StorageAuthStepUpManager`, and `StorageRateLimitProvider`.
+
+Those managers register and own collections for users, password credentials,
+sessions, factors, hashed challenges, recovery-code hashes, rate limits and
+audit records. They use unique constraints, conditional writes and atomic
+batches to enforce domain transitions. Storage does not hash passwords,
+encrypt TOTP secrets, mint sessions, authorize users, or decide MFA policy.
+Do not manually insert auth records as a shortcut.
+
+Add application fields in a separate profile collection keyed by the
+policy-validated user ID, as shown in the Auth tutorial. Do not expect
+`AuthUser` to become a generic type or arbitrary registration fields to persist.
+For public content instead, combine the notebook repository pattern with the
+[SEO publication](/docs/tutorials/seo).

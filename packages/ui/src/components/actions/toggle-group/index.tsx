@@ -52,18 +52,19 @@ const useToggleGroupContext = () => {
   return context;
 };
 
-const ToggleGroupItem = ({
-  value,
-  disabled = false,
-  onClick,
-  onFocus,
-  onKeyDown,
-  children,
-  ...buttonProps
-}: ToggleGroupItemProps) => {
+const isItemDisabled = (
+  item: Pick<ToggleGroupItemProps, "disabled" | "loading" | "aria-disabled">,
+) =>
+  item.disabled === true ||
+  item.loading === true ||
+  item["aria-disabled"] === true ||
+  item["aria-disabled"] === "true";
+
+const ToggleGroupItem = (props: ToggleGroupItemProps) => {
+  const { value, onClick, onFocus, onKeyDown, children, ...buttonProps } = props;
   const context = useToggleGroupContext();
 
-  const isDisabled = context.disabled || disabled;
+  const isDisabled = context.disabled || isItemDisabled(props);
   const isSelected = context.selectedValues.includes(value);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -225,7 +226,7 @@ const ToggleGroupRoot = (props: ToggleGroupProps): ReactElement => {
 
   const rovingItems = groupItems.map((item) => ({
     id: item.props.value,
-    disabled: disabled || item.props.disabled,
+    disabled: disabled || isItemDisabled(item.props),
   }));
 
   const rovingFocus = useRovingFocus<HTMLButtonElement>({

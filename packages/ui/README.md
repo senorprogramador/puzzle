@@ -5,6 +5,11 @@ Composable, token-driven React components for building React interfaces with Puz
 **Documentation:** [https://puzzle-ui.com/docs/ui](https://puzzle-ui.com/docs/ui)
 
 Component API maturity is listed on each component's documentation page.
+[Button](https://puzzle-ui.com/docs/ui/actions/button),
+[Button Group](https://puzzle-ui.com/docs/ui/actions/button-group), and
+[Toggle Group](https://puzzle-ui.com/docs/ui/actions/toggle-group), including
+`ToggleGroup.Item`, have Stable public APIs with component/browser coverage
+and backward-compatibility intent within a major version.
 Paper, Skeleton, Label, Background, Breadcrumbs, Sidebar, and Backdrop are
 Experimental because their current validation evidence is limited. Review
 documented accessibility and framework details when integrating components.

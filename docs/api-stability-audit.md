@@ -12,9 +12,10 @@ page are documentation pages, not additional components.
 The public API below is taken from the package entry points and component
 exports, not inferred from examples. Validation evidence is based on
 component-local test files and the public package peer dependencies. The site
-package declares React and React DOM 19 as peers. The project READMEs explicitly
-warn that APIs can change without notice; no component-level backward
-compatibility commitment or deprecation policy was found.
+package declares React and React DOM 19 as peers. The project READMEs warn
+that APIs not marked Stable may change. Button, ButtonGroup and ToggleGroup
+(including Item) now have a scoped, documented backward-compatibility intent
+within a major version, supported by component and browser coverage.
 
 No `@deprecated` annotations or deprecated component exports were found in the
 audited component APIs.
@@ -40,9 +41,9 @@ The test count is the number of test files in the component source directory
 
 | Component | Current public API | Status | Evidence and outstanding issues |
 |---|---|---|---|
-| Button | `Button`, `ButtonProps`, `ButtonVariant`, `ButtonSize` | Beta | 2 local test files. React 19 peer; project does not promise backward compatibility. |
-| Button Group | `ButtonGroup`, `ButtonGroupProps` | Beta | 2 local test files. React 19 peer; project does not promise backward compatibility. |
-| Toggle Group | `ToggleGroup`, `ToggleGroupProps`, `ToggleGroupSingleProps`, `ToggleGroupMultipleProps`, `ToggleGroupItemProps`, `ToggleGroupSize`, `ToggleGroupOrientation` | Beta | 1 local test file. Compound selection API is more complex than the shared examples; no compatibility promise. |
+| Button | `Button`, `ButtonProps`, `ButtonVariant`, `ButtonSize` | Stable | 3 local test files covering the internal ButtonContent helper, variants/sizes, native and link behavior, refs, forms, loading/disabled states, keyboard focus and themed hover. Scoped backward-compatibility intent documented. |
+| Button Group | `ButtonGroup`, `ButtonGroupProps` | Stable | 2 local test files covering direct-child disabling, refs, polymorphism, props/styles, tab order, attached layout, both orientations and RTL. Scoped backward-compatibility intent documented. |
+| Toggle Group | `ToggleGroup`, `ToggleGroupProps`, `ToggleGroupSingleProps`, `ToggleGroupMultipleProps`, `ToggleGroupItemProps`, `ToggleGroupSize`, `ToggleGroupOrientation` | Stable | 2 local test files covering controlled/uncontrolled single/multiple selection, required behavior, disabled/loading/ARIA-disabled states, event composition, keyboard/RTL focus and light/dark attached layout. Includes ToggleGroup.Item; scoped backward-compatibility intent documented. |
 | Alert | `Alert`, `AlertProps`, `AlertSeverity`, `AlertVariant` | Beta | 3 local test files. React 19 peer; project does not promise backward compatibility. |
 | Avatar | `Avatar`, `AvatarProps`, `AvatarShape` | Beta | 1 local test file. React 19 peer; project does not promise backward compatibility. |
 | Badge | `Badge`, `BadgeProps`, `BadgeColor`, `AnchorOrigin`, `AnchorOffset`, `AnchorOverlap` | Beta | 2 local test files. React 19 peer; project does not promise backward compatibility. |
@@ -198,9 +199,11 @@ their component names and usage.
 
 ## Findings and follow-up
 
-- **Stable: 0; Beta: 128; Experimental: 8 (136 components total).** Stable is
-  not assigned because the repository explicitly allows public APIs to change
-  without notice and no component-level compatibility guarantee was found.
+- **Stable: 3; Beta: 125; Experimental: 8 (136 components total).** Button,
+  ButtonGroup and ToggleGroup (including Item, not counted separately) are
+  Stable after all 146 action tests across 7 files passed in jsdom and Chromium.
+  Their documentation and package READMEs state scoped backward-compatibility
+  intent. Other component classifications are unchanged.
 - **Experimental components needing validation:** Paper, Skeleton, Label,
   Background, Breadcrumbs, Sidebar, Backdrop, and GoogleFont. These have no
   component-local test file in the source tree; add focused
@@ -253,3 +256,109 @@ their component names and usage.
   Local font assets and fixed/intrinsic layout dimensions reduce avoidable
   loading shifts, but CLS/LCP/INP have not been measured. Run field or lab
   measurement against a deployed build before making performance claims.
+
+## Tutorial API readiness — 2026-11-15
+
+The final tutorial pass additionally checked the public package export maps,
+exported contracts, and their implementations for the following workflows.
+These classifications extend the component inventory above; they do not
+introduce a backward-compatibility commitment.
+
+| Public surface | Classification | Verified workflow and evidence |
+|---|---|---|
+| `@puzzle-ui/seo` and its documented subpaths | Beta | Configuration/metadata resolution, React metadata and graph collection, serialization, validation, and Next.js/TanStack/React Router endpoint adapters. 36 integration tests, 391 unit tests, 12 browser tests, schema type tests, and package typecheck passed. |
+| `@puzzle-ui/auth` | Beta | Storage-backed registration/sign-in, policy-aware user lookup, revocation, required enrollment, TOTP/recovery challenges, passkey provider and step-up contracts. All 81 existing package tests and package typecheck passed. |
+| `@puzzle-ui/session` | Beta | Persistent session creation, validation/touch, rotation/revocation, cookie and CSRF helpers. All 78 existing tests and package typecheck passed. |
+| `@puzzle-ui/fullstack/auth/{client,server,shared,next,tanstack}` | Beta | Browser/public snapshot boundary, forms, HTTP route dispatch, cookie transport, and server initialization. All 79 Node tests, 15 browser tests, and package typecheck passed. |
+| `@puzzle-ui/storage` and `/testing` | Beta | Collection/query/CRUD/concurrency/capability contracts and public conformance kit. Both package tests and typecheck passed; behavior is additionally exercised by both adapter conformance suites. |
+| `@puzzle-ui/storage-d1` | Beta | D1 configuration, CRUD, date serialization, conditional writes, uniqueness, atomic rollback, cursor pagination and migrations. All 45 tests (including package test) and package typecheck passed against Miniflare. |
+| `@puzzle-ui/storage-mongodb` | Beta | MongoDB configuration and the same persistence/concurrency contracts. All 46 conformance tests and package typecheck passed against the package's Docker replica-set fixture. |
+
+`bun run build` passed before these tests. Executing the tutorial package-export
+check then found that the declared `/testing` entry was missing from Storage's
+build. The build now includes that entry and bundles its conformance helpers
+inside `dist`; a regression test checks every declared runtime/declaration
+target. Storage's two package tests and all 45 D1 tests passed after this fix.
+None of these surfaces is **Stable**:
+the repository still has no explicit backward-compatibility commitment.
+**Experimental** means insufficient validation evidence, not an alternative
+word for Beta; no Experimental API is needed by these tutorials. Existing
+Experimental component classifications remain unchanged.
+
+### Boundaries and unsupported assumptions
+
+- Storage is a record persistence contract, not file/object storage or a
+  database connection factory. Its shipped adapters are D1 and MongoDB only.
+  Collection `schema.validate` is metadata, not automatic runtime validation.
+  Upsert is a read followed by a write, not a concurrency-safe atomic upsert.
+  MongoDB Auth requires a transaction-capable deployment, `client`, and
+  `transactionsEnabled: true`; D1 uses atomic batches, not interactive
+  transactions.
+- Auth's public user is fixed, not a generic extensible user type. Application
+  profile fields belong in a separate collection keyed by the authenticated
+  user ID. Raw storage records are not public auth snapshots.
+- Auth core does not implement password hashing, framework routes, cookies,
+  application authorization, or trusted proxy resolution. Fullstack supplies
+  HTTP adapters, not these deployment-specific decisions. Session validation
+  is not a replacement for policy-aware `auth.getCurrentUser`.
+- Session rotation creates a new record with a new creation time/lifetime and
+  revokes the old record. The absolute lifetime is per record, not a global
+  login-age cap across rotations; rotation is not fresh credential verification.
+  Touching server-side idle activity does not itself renew the browser cookie.
+- Fullstack's TOTP start handlers return the provisioning secret/URI in JSON,
+  and its bundled enrollment/settings UI holds that data in React state.
+  Those APIs cannot satisfy a stricter no-secrets-in-JSON/client-state
+  tutorial boundary without customization. The authentication tutorial uses
+  core enrollment methods on the server, no-store non-hydrated HTML for
+  one-time provisioning/recovery display, and blocks the corresponding stock
+  secret-returning routes. Provisioning necessarily discloses the shared
+  secret to the enrolling user/authenticator, never to logs or browser storage.
+- SEO framework adapters generate sitemap/robots endpoints, not Next metadata,
+  TanStack head descriptors, or React Router meta functions. Metadata output
+  and graph output each need a single owner. `SeoMetadata` renders metadata
+  itself and resolves against config, not by deep-merging parent page metadata.
+  Provider collection must not rely on late suspended SSR descendants.
+
+These are API/design limitations to explain, not missing exports to invent.
+Database deployment and third-party framework application smoke tests remain
+consumer deployment checks, distinct from the executed repository suites.
+
+### Tutorial execution and hydration verification
+
+The tutorial validator checks 17 named TypeScript files using only public
+exports from a temporary consumer installation of the built packages. It
+executes publication SSR/graph assertions and all three framework endpoint
+adapter shapes, builds the browser auth entry, and can execute notebook CRUD
+and cookie-bound Auth enrollment/sign-in/recovery/rotation/expiration/logout
+against a disposable MongoDB replica set. The database examples were executed
+during this documentation pass, not just inferred from types.
+
+Built-site HTTP checks confirm all four tutorial routes, unique metadata,
+one initial-response JSON-LD graph containing WebPage/TechArticle/breadcrumbs,
+and automatic sitemap and `llms.txt` inclusion. Browser cross-link navigation
+from SEO to Storage to Auth also resolves.
+
+Browser verification initially found a production hydration mismatch
+(React error 418), reproduced on existing and new documentation routes.
+The server and browser resolved different copies of `@tanstack/router-core`
+with incompatible SSR match-ID serialization. The client discarded the
+transported route state and rebuilt the document, duplicating head metadata
+and JSON-LD.
+
+The site's Vite resolver now resolves router-core and its subpaths relative
+to React Router's own dependency, preserving environment-specific resolution
+while keeping the server and client protocol consistent. The site also declares
+the matching router-core dependency explicitly so editor types use the same
+router contract instead of an incompatible stale local copy. No package upgrades,
+hydration-warning suppression, document-tree changes, or post-mount duplicate
+removal are required.
+
+`bun run --filter '@puzzle-ui/site' test:hydration` runs Chromium against a
+local production build on an ephemeral port. The regression reproduces the
+original failure without the resolver fix and checks initial HTML, hydration,
+client navigation, back/forward history and cached reloads. It requires one
+title, description, canonical, Open Graph/Twitter title and JSON-LD graph,
+correct current-page canonical/graph IDs, no stale route graph, and no browser
+hydration errors. Coverage includes the homepage, Getting Started, the tutorial
+index and each package tutorial. This is a site integration check, not a
+third-party framework deployment claim.

@@ -15,6 +15,121 @@ const renderSingleGroup = (props: Partial<ToggleGroupSingleProps> = {}) =>
   );
 
 describe("ToggleGroup", () => {
+  it.each([
+    { loading: true },
+    { "aria-disabled": true },
+    { "aria-disabled": "true" },
+  ] as const)("keeps a noninteractive selected item out of the tab order: %j", async (itemProps) => {
+    const user = userEvent.setup();
+    render(
+      <ToggleGroup defaultValue="bold">
+        <ToggleGroup.Item value="bold" {...itemProps}>Bold</ToggleGroup.Item>
+        <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
+      </ToggleGroup>,
+    );
+    const bold = screen.getByRole("button", { name: "Bold" });
+    expect(bold).toBeDisabled();
+    expect(bold).toHaveAttribute("data-disabled", "true");
+    expect(bold).toHaveAttribute("tabindex", "-1");
+    expect(bold).toHaveAttribute("aria-pressed", "true");
+    await user.tab();
+    expect(screen.getByRole("button", { name: "Italic" })).toHaveFocus();
+  });
+
+  it("reports controlled multiple changes without mutating values until the parent updates", async () => {
+    const user = userEvent.setup();
+    const value = ["bold"];
+    const onValueChange = vi.fn();
+    const items = <><ToggleGroup.Item value="bold">Bold</ToggleGroup.Item><ToggleGroup.Item value="italic">Italic</ToggleGroup.Item></>;
+    const { rerender } = render(
+      <ToggleGroup type="multiple" value={value} onValueChange={onValueChange}>{items}</ToggleGroup>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Italic" }));
+    expect(onValueChange).toHaveBeenCalledWith(["bold", "italic"]);
+    expect(value).toEqual(["bold"]);
+    expect(screen.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "false");
+
+    rerender(<ToggleGroup type="multiple" value={["bold", "italic"]} onValueChange={onValueChange}>{items}</ToggleGroup>);
+    expect(screen.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("allows a parent to clear a controlled single selection", () => {
+    const { rerender } = renderSingleGroup({ value: "italic" });
+    rerender(
+      <ToggleGroup value={null} aria-label="Text formatting">
+        <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+        <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
+      </ToggleGroup>,
+    );
+
+    expect(screen.queryAllByRole("button", { pressed: true })).toHaveLength(0);
+  });
+
+  it("does not invent an initial selection when required", async () => {
+    const user = userEvent.setup();
+    renderSingleGroup({ required: true });
+
+    expect(screen.queryAllByRole("button", { pressed: true })).toHaveLength(0);
+    await user.click(screen.getByRole("button", { name: "Italic" }));
+    expect(screen.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("composes focus handlers without selecting the newly focused item", async () => {
+    const user = userEvent.setup();
+    const onFocus = vi.fn();
+    const onValueChange = vi.fn();
+    render(
+      <ToggleGroup defaultValue="bold" onValueChange={onValueChange}>
+        <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+        <ToggleGroup.Item value="italic" onFocus={onFocus}>Italic</ToggleGroup.Item>
+      </ToggleGroup>,
+    );
+    await user.tab();
+    await user.keyboard("{ArrowRight}");
+
+    expect(onFocus).toHaveBeenCalledOnce();
+    expect(screen.getByRole("button", { name: "Italic" })).toHaveFocus();
+    expect(screen.getByRole("button", { name: "Bold" })).toHaveAttribute("aria-pressed", "true");
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it("lets an item prevent the roving keyboard handler", async () => {
+    const user = userEvent.setup();
+    const onKeyDown = vi.fn((event: React.KeyboardEvent) => event.preventDefault());
+    render(
+      <ToggleGroup defaultValue="bold">
+        <ToggleGroup.Item value="bold" onKeyDown={onKeyDown}>Bold</ToggleGroup.Item>
+        <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
+      </ToggleGroup>,
+    );
+    await user.tab();
+    await user.keyboard("{ArrowRight}");
+
+    expect(onKeyDown).toHaveBeenCalledOnce();
+    expect(screen.getByRole("button", { name: "Bold" })).toHaveFocus();
+  });
+
+  it("does not submit its surrounding form on keyboard activation", async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn((event: React.FormEvent) => event.preventDefault());
+    render(
+      <form onSubmit={onSubmit}><ToggleGroup>
+        <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+      </ToggleGroup></form>,
+    );
+    await user.tab();
+    await user.keyboard("{Enter}");
+
+    expect(screen.getByRole("button", { name: "Bold" })).toHaveAttribute("aria-pressed", "true");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("requires items to have a group context", () => {
+    expect(() => render(<ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>))
+      .toThrow("ToggleGroup.Item must be rendered inside a ToggleGroup.");
+  });
+
   it("applies the group size to every item", () => {
     render(
       <ToggleGroup size="lg">

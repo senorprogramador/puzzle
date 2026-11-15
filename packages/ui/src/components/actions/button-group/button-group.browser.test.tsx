@@ -1,11 +1,41 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import type { CSSProperties } from "react";
 import { afterEach, describe, expect, it } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { Button } from "../button";
 import { ButtonGroup } from "./index";
 
 afterEach(cleanup);
+
+it("keeps every enabled action in the normal tab order", async () => {
+  render(
+    <><button>Before</button><ButtonGroup aria-label="Actions">
+      <Button>First</Button><Button disabled>Disabled</Button>
+      <Button href="#second">Second</Button>
+    </ButtonGroup><button>After</button></>,
+  );
+  screen.getByRole("button", { name: "Before" }).focus();
+
+  await userEvent.keyboard("{Tab}");
+  expect(screen.getByRole("button", { name: "First" })).toHaveFocus();
+  await userEvent.keyboard("{Tab}");
+  expect(screen.getByRole("link", { name: "Second" })).toHaveFocus();
+  await userEvent.keyboard("{Tab}");
+  expect(screen.getByRole("button", { name: "After" })).toHaveFocus();
+});
+
+it("removes all grouped actions from keyboard navigation when disabled", async () => {
+  render(
+    <><button>Before</button><ButtonGroup disabled>
+      <Button>First</Button><Button href="#second">Second</Button>
+    </ButtonGroup><button>After</button></>,
+  );
+  screen.getByRole("button", { name: "Before" }).focus();
+  await userEvent.keyboard("{Tab}");
+
+  expect(screen.getByRole("button", { name: "After" })).toHaveFocus();
+});
 
 describe("ButtonGroup attached corners", () => {
   for (const orientation of ["horizontal", "vertical"] as const) {
