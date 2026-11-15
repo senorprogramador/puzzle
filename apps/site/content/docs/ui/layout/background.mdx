@@ -9,39 +9,66 @@ description: Theme-aware decorative background patterns.
 ## Import
 
 ```tsx
-import { Background } from "@puzzle-ui/ui";
+import { AspectRatio, Background, Heading, Stack } from "@puzzle-ui/ui";
 ```
 
 ## Patterns
 
 Use backgrounds behind real content rather than as the only way to communicate meaning.
+`Background` takes its size from its content or container. Here, `AspectRatio`
+reserves a full-width square (`ratio={1}`). Keep foreground containers
+transparent so they do not cover the decorative pattern.
 
 <Preview
   hideDevices={true}
   code={`\
-<Stack>
-  <Background pattern="grid"><Section><Heading level="headline3">Grid</Heading></Section></Background>
-  <Background pattern="dots" fade="bottom"><Section><Heading level="headline3">Dots</Heading></Section></Background>
-  <Background pattern="mesh"><Section><Heading level="headline3">Mesh</Heading></Section></Background>
+<Stack style={{ width: "100%" }}>
+  <AspectRatio ratio={1}>
+    <Background pattern="grid">
+      <Stack alignH="center" alignV="center" style={{ height: "100%" }}>
+        <Heading level="headline3">Grid</Heading>
+      </Stack>
+    </Background>
+  </AspectRatio>
+  <AspectRatio ratio={1}>
+    <Background pattern="dots" fade="bottom">
+      <Stack alignH="center" alignV="center" style={{ height: "100%" }}>
+        <Heading level="headline3">Dots</Heading>
+      </Stack>
+    </Background>
+  </AspectRatio>
+  <AspectRatio ratio={1}>
+    <Background pattern="mesh">
+      <Stack alignH="center" alignV="center" style={{ height: "100%" }}>
+        <Heading level="headline3">Mesh</Heading>
+      </Stack>
+    </Background>
+  </AspectRatio>
 </Stack>
 `}
 >
-  <Stack>
-    <Background pattern="grid">
-      <Section>
-        <Heading level="headline3">Grid</Heading>
-      </Section>
-    </Background>
-    <Background pattern="dots" fade="bottom">
-      <Section>
-        <Heading level="headline3">Dots</Heading>
-      </Section>
-    </Background>
-    <Background pattern="mesh">
-      <Section>
-        <Heading level="headline3">Mesh</Heading>
-      </Section>
-    </Background>
+  <Stack style={{ width: "100%" }}>
+    <AspectRatio ratio={1}>
+      <Background pattern="grid">
+        <Stack alignH="center" alignV="center" style={{ height: "100%" }}>
+          <Heading level="headline3">Grid</Heading>
+        </Stack>
+      </Background>
+    </AspectRatio>
+    <AspectRatio ratio={1}>
+      <Background pattern="dots" fade="bottom">
+        <Stack alignH="center" alignV="center" style={{ height: "100%" }}>
+          <Heading level="headline3">Dots</Heading>
+        </Stack>
+      </Background>
+    </AspectRatio>
+    <AspectRatio ratio={1}>
+      <Background pattern="mesh">
+        <Stack alignH="center" alignV="center" style={{ height: "100%" }}>
+          <Heading level="headline3">Mesh</Heading>
+        </Stack>
+      </Background>
+    </AspectRatio>
   </Stack>
 </Preview>
 
