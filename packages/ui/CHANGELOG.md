@@ -3,6 +3,14 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.6.2 - 2026-11-15
+
+- Added link support to TextEditor: a toolbar Link popover to apply, edit and remove links, link rendering in the editor and TextRenderer, and a new exported `TextLink` type for inline `link` data.
+- Added safe link handling to TextEditor: only http, https, mailto and tel URLs are accepted, and links are preserved when parsing pasted HTML and Markdown.
+- Added a `searchPlaceholder` prop and a search icon to the DataTable search field.
+- Improved TextEditor list behavior: pressing Enter on an empty list item exits the list, list items get proper indentation, and the bullet and ordered list toolbar icons are no longer swapped.
+- Fixed TextEditor losing its selection when focusing the editor or interacting with toolbar controls.
+
 ## 0.6.1 - 2026-11-15
 
 - Added `DataTable`, a paginated data table with column sizing, local sorting (controlled or default), local search, custom loading and empty content, error handling and a max height, plus exported `DataTable` types.

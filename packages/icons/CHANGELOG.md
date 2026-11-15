@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/icons` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.6.2 - 2026-11-15
+
+- No changes; version bumped in lockstep.
+
 ## 0.6.1 - 2026-11-15
 
 - No changes; version bumped in lockstep.

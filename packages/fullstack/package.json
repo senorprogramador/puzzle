@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/fullstack",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Browser auth client, React UI, server handlers, and Next.js and TanStack Start adapters for Puzzle Auth.",
   "homepage": "https://puzzle-ui.com/docs/fullstack",
   "keywords": [
@@ -101,9 +101,9 @@
     "vitest": "latest"
   },
   "dependencies": {
-    "@puzzle-ui/ui": "^0.6.1",
-    "@puzzle-ui/auth": "^0.6.1",
-    "@puzzle-ui/session": "^0.6.1",
+    "@puzzle-ui/ui": "^0.6.2",
+    "@puzzle-ui/auth": "^0.6.2",
+    "@puzzle-ui/session": "^0.6.2",
     "@simplewebauthn/browser": "^14.0.0"
   },
   "peerDependencies": {
