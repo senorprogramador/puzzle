@@ -339,6 +339,20 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
     fail("Copilot changelog output is missing packages.");
   }
 
+  const rootPath = join(root, "CHANGELOG.md");
+  const rootOriginal = existsSync(rootPath) ? readFileSync(rootPath, "utf8") : null;
+  const rootContent = rootOriginal ?? "# Changelog\n\nAll notable changes to Puzzle packages are documented in this file.\n";
+  const rootHeadings = [...rootContent.matchAll(/^## (.+)$/gm)];
+  if (rootHeadings.some((heading) => heading[1].split(" - ")[0].replace(/^\[|\]$/g, "") === version)) {
+    fail(`Root changelog already has an entry for ${version}.`);
+  }
+  const firstRelease = rootHeadings.find((heading) => !/^\[?Unreleased\]?$/i.test(heading[1]));
+  const rootIntro = firstRelease ? rootContent.slice(0, firstRelease.index) : rootContent;
+  const rootHistory = firstRelease ? rootContent.slice(firstRelease.index) : "";
+  const formatChanges = (changes) => changes.length
+    ? changes.map((change) => `- ${change.trim()}`).join("\n")
+    : "- No changes; version bumped in lockstep.";
+
   for (const { dir, manifest } of manifests) {
     const path = join(dir, "CHANGELOG.md");
     const original = existsSync(path) ? readFileSync(path, "utf8") : null;
@@ -361,11 +375,16 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
     ) {
       fail(`Copilot omitted Unreleased notes for ${manifest.name}.`);
     }
-    const bullets = changes.length
-      ? changes.map((change) => `- ${change.trim()}`).join("\n")
-      : "- No changes; version bumped in lockstep.";
+    const bullets = formatChanges(changes);
     writeFileSync(path, `${intro.trimEnd()}\n\n## ${version} - ${date}\n\n${bullets}\n${history ? `\n${history}` : ""}`);
   }
+
+  const packageNotes = manifests
+    .filter(({ manifest }) => byPackage.get(manifest.name).length > 0)
+    .map(({ manifest }) => `### \`${manifest.name}\`\n\n${formatChanges(byPackage.get(manifest.name))}`)
+    .join("\n\n");
+  originals.set(rootPath, rootOriginal);
+  writeFileSync(rootPath, `${rootIntro.trimEnd()}\n\n## ${version} - ${date}\n${packageNotes ? `\n${packageNotes}\n` : ""}${rootHistory ? `\n${rootHistory}` : ""}`);
 };
 
 const restoreChangelogs = (originals) => {

@@ -96,6 +96,12 @@ export {
   type ImagePlaceholder,
 } from "./components/data-display/image";
 
+export {
+  ImageBox,
+  type ImageBoxImage,
+  type ImageBoxProps,
+} from "./components/data-display/image-box";
+
 export { Paper, type PaperProps } from "./components/data-display/paper";
 
 export type { ProgressProps } from "./components/data-display/progress/types";

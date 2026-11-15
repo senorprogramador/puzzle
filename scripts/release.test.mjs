@@ -46,6 +46,8 @@ const createFixture = async (directory) => {
   originals["bun.lock"] = await readFile(join(directory, "bun.lock"), "utf8");
   originals["packages/core/CHANGELOG.md"] = "# Changelog\n\nCore history.\n\n## Unreleased\n\n- Added a helper.\n\n## 0.4.0 - 2026-11-09\n\n- Previous changes.\n";
   await writeFile(join(directory, "packages/core/CHANGELOG.md"), originals["packages/core/CHANGELOG.md"]);
+  originals["CHANGELOG.md"] = "# Changelog\n\nRoot history.\n\n## [Unreleased]\n\n### Added\n\n- A monorepo change.\n\n## 0.4.0 - 2026-11-09\n\n- Previous root changes.\n";
+  await writeFile(join(directory, "CHANGELOG.md"), originals["CHANGELOG.md"]);
   await writeFile(join(directory, "originals.json"), JSON.stringify(originals));
 
   const commandShim = `#!${process.execPath}
@@ -152,7 +154,9 @@ if (command === "script") {
   const packages = JSON.parse(packageLine.slice("Packages: ".length));
   const notes = packages.map(({ package: name }) => ({
     package: name,
-    changes: name === "@puzzle-ui/core" ? ["Added a helper."] : [],
+    changes: process.env.ALL_EMPTY === "true" ? [] :
+      name === "@puzzle-ui/core" ? ["Added a helper."] :
+      name === "@puzzle-ui/theme" ? ["Updated the theme."] : [],
   }));
   if (process.env.FAIL_STEP === "missing-package") notes.pop();
   if (process.env.FAIL_STEP === "duplicate-package") notes.push(notes[0]);
@@ -172,6 +176,94 @@ if (command === "script") {
   await writeFile(join(directory, "bin/package.json"), '{"type":"module"}');
   return originals;
 };
+
+test("root changelog includes changed package release entries only", async () => {
+  const rootChangelog = await readFile(join(root, "CHANGELOG.md"), "utf8");
+  const rootHeadings = [...rootChangelog.matchAll(/^## (\d+\.\d+\.\d+) - (\d{4}-\d{2}-\d{2})$/gm)];
+  for (const entry of await readdir(join(root, "packages"), { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const dir = join(root, "packages", entry.name);
+    const { name } = JSON.parse(await readFile(join(dir, "package.json"), "utf8"));
+    const content = await readFile(join(dir, "CHANGELOG.md"), "utf8");
+    const headings = [...content.matchAll(/^## (\d+\.\d+\.\d+) - (\d{4}-\d{2}-\d{2})$/gm)];
+    for (const [index, heading] of headings.entries()) {
+      const releaseIndex = rootHeadings.findIndex((rootHeading) =>
+        rootHeading[1] === heading[1] && rootHeading[2] === heading[2]);
+      assert.notEqual(releaseIndex, -1, `${name}@${heading[1]} missing from root changelog`);
+      const release = rootChangelog.slice(rootHeadings[releaseIndex].index, rootHeadings[releaseIndex + 1]?.index);
+      const sections = [...release.matchAll(/^### `([^`]+)`$/gm)];
+      const sectionIndex = sections.findIndex((section) => section[1] === name);
+      const expected = content.slice(heading.index + heading[0].length, headings[index + 1]?.index).trim().replace(/^### /gm, "#### ");
+      if (expected === "- No changes; version bumped in lockstep.") {
+        assert.equal(sectionIndex, -1, `${name}@${heading[1]} should be omitted`);
+        continue;
+      }
+      assert.notEqual(sectionIndex, -1, `${name}@${heading[1]} missing package section`);
+      const actual = release.slice(sections[sectionIndex].index + sections[sectionIndex][0].length, sections[sectionIndex + 1]?.index).trim();
+      assert.equal(actual, expected, `${name}@${heading[1]} differs from its package changelog`);
+    }
+  }
+});
+
+test("release retains a root version heading when no packages have changes", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "puzzle-release-empty-test-"));
+  try {
+    await createFixture(directory);
+    await writeFile(join(directory, "packages/core/CHANGELOG.md"), "# Changelog\n\n## 0.4.0 - 2026-11-09\n\n- Previous changes.\n");
+    const result = run(process.execPath, ["scripts/release.mjs"], {
+      cwd: directory,
+      input: "minor\n",
+      env: {
+        ...process.env,
+        PATH: `${join(directory, "bin")}:${process.env.PATH}`,
+        REAL_BUN: bun,
+        FIXTURE_ROOT: directory,
+        FAIL_INSTALL: "",
+        FAIL_STEP: "",
+        DRY_RUN: "false",
+        ALL_EMPTY: "true",
+      },
+    });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    const rootChangelog = await readFile(join(directory, "CHANGELOG.md"), "utf8");
+    assert.match(rootChangelog, /## 0\.5\.0 - \d{4}-\d{2}-\d{2}\n\n## 0\.4\.0/);
+    assert.doesNotMatch(rootChangelog, /### `@puzzle-ui\//);
+    assert.match(await readFile(join(directory, "packages/core/CHANGELOG.md"), "utf8"),
+      /## 0\.5\.0 - \d{4}-\d{2}-\d{2}\n\n- No changes; version bumped in lockstep\./);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+for (const dryRun of [false, true]) {
+  test(`release ${dryRun ? "removes a newly created root changelog after a dry run" : "creates a missing root changelog"}`, async () => {
+    const directory = await mkdtemp(join(tmpdir(), "puzzle-release-root-test-"));
+    try {
+      await createFixture(directory);
+      await rm(join(directory, "CHANGELOG.md"));
+      const result = run(process.execPath, ["scripts/release.mjs", ...(dryRun ? ["--dry-run"] : [])], {
+        cwd: directory,
+        input: "minor\n",
+        env: {
+          ...process.env,
+          PATH: `${join(directory, "bin")}:${process.env.PATH}`,
+          REAL_BUN: bun,
+          FIXTURE_ROOT: directory,
+          FAIL_INSTALL: "",
+          DRY_RUN: String(dryRun),
+        },
+      });
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      if (dryRun) {
+        assert.equal((await readdir(directory)).includes("CHANGELOG.md"), false);
+      } else {
+        assert.match(await readFile(join(directory, "CHANGELOG.md"), "utf8"), /### `@puzzle-ui\/core`\n\n- Added a helper\./);
+      }
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+}
 
 for (const missing of [false, true]) {
   for (const failure of [undefined, "copilot-login", "copilot-auth-retry"]) {
@@ -337,12 +429,17 @@ for (const failure of [undefined, "--lockfile-only", "--frozen-lockfile"]) {
 for (const failure of [
   undefined, "baseline", "copilot", "invalid-json", "missing-package",
   "duplicate-package", "commit", "push", "publish", "tag",
-  "omitted-unreleased", "multiline-note",
+  "omitted-unreleased", "multiline-note", "duplicate-root",
 ]) {
-  test(`release ${failure ? `stops safely after ${failure} failure` : "pushes package changelogs before publishing and tags afterwards"}`, async () => {
+  test(`release ${failure ? `stops safely after ${failure} failure` : "pushes all changelogs before publishing and tags afterwards"}`, async () => {
     const directory = await mkdtemp(join(tmpdir(), "puzzle-release-test-"));
     try {
       const originals = await createFixture(directory);
+      if (failure === "duplicate-root") {
+        originals["CHANGELOG.md"] += "\n## [0.5.0] - 2026-11-10\n\n- Existing release.\n";
+        await writeFile(join(directory, "CHANGELOG.md"), originals["CHANGELOG.md"]);
+        await writeFile(join(directory, "originals.json"), JSON.stringify(originals));
+      }
       const result = run(process.execPath, ["scripts/release.mjs"], {
         cwd: directory,
         input: "minor\n",
@@ -370,6 +467,13 @@ for (const failure of [
         assert.match(core, /## 0\.4\.0 - 2026-11-09\n\n- Previous changes\./);
         assert.match(await readFile(join(directory, "packages/ui/CHANGELOG.md"), "utf8"),
           /- No changes; version bumped in lockstep\./);
+        const rootChangelog = await readFile(join(directory, "CHANGELOG.md"), "utf8");
+        assert.match(rootChangelog, /## \[Unreleased\]\n\n### Added\n\n- A monorepo change\.\n\n## 0\.5\.0 - \d{4}-\d{2}-\d{2}/);
+        assert.match(rootChangelog, /### `@puzzle-ui\/core`\n\n- Added a helper\./);
+        assert.match(rootChangelog, /### `@puzzle-ui\/theme`\n\n- Updated the theme\./);
+        assert.doesNotMatch(rootChangelog, /### `@puzzle-ui\/ui`/);
+        assert.doesNotMatch(rootChangelog, /No changes; version bumped in lockstep\./);
+        assert.match(rootChangelog, /## 0\.4\.0 - 2026-11-09\n\n- Previous root changes\./);
         assert.equal(index("git", "restore"), -1);
         assert.ok(index("copilot") > commands.findLastIndex(({ command }) => command === "bun"));
         assert.ok(commands.some(({ command, args }) => command === "bun" && args[1] === "test"));
@@ -382,6 +486,7 @@ for (const failure of [
           assert.equal(await readFile(join(directory, path), "utf8"), content, path);
         }
         assert.equal((await readdir(join(directory, "packages/ui"))).includes("CHANGELOG.md"), false);
+        if (failure === "duplicate-root") assert.match(result.stderr, /Root changelog already has an entry/);
       }
       if (!failure || ["publish", "tag"].includes(failure)) {
         assert.ok(index("git", "push") < index("npm", "publish"));
@@ -455,6 +560,7 @@ for (const failure of [undefined, "commit", "push"]) {
       } else {
         assert.notEqual(gitRun("rev-parse", "HEAD"), initialHead);
         assert.match(gitRun("show", "HEAD:packages/ui/CHANGELOG.md"), /No changes; version bumped in lockstep/);
+        assert.match(gitRun("show", "HEAD:CHANGELOG.md"), /### `@puzzle-ui\/core`\n\n- Added a helper\./);
         if (!failure) {
           assert.equal(gitRun("rev-parse", "HEAD"), gitRun("--git-dir=remote.git", "rev-parse", "v0.5.0^{}"));
         }

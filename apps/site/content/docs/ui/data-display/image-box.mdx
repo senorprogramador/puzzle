@@ -1,0 +1,364 @@
+---
+title: Image Box
+description: Arrange image collections into a responsive collage, with a balanced half-width split for five or more photos.
+---
+
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** API
+stability is `stable`; the documented public API is covered by component and
+browser tests and is intended to remain backward-compatible within a major
+version. This is an API commitment, not a guarantee of production readiness in
+every application.
+
+import {
+  ImageBoxGalleryExample,
+  ImageBoxInteractionExample,
+} from "../../../../src/components/doc-examples";
+
+ImageBox presents related photographs in a cohesive collage and chooses its layout from the number of images. Use it for a property listing, product detail, or portfolio preview. Use [Image](/docs/ui/data-display/image) for a single image with loading controls, or a dedicated image gallery when visitors need browsing controls such as a carousel, thumbnails, or zoom.
+
+## Import
+
+```tsx
+import { ImageBox, type ImageBoxImage } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Provide an image source and meaningful alternative text for each photo. The main image is loaded eagerly; supporting images are lazy-loaded.
+
+```tsx
+const photos: ImageBoxImage[] = [
+  {
+    src: "/stay/living-room.jpg",
+    alt: "Living room with a view of the garden",
+  },
+  { src: "/stay/bedroom.jpg", alt: "Bedroom with a king-size bed" },
+  { src: "/stay/kitchen.jpg", alt: "Kitchen with a marble island" },
+  { src: "/stay/bathroom.jpg", alt: "Bathroom with a walk-in shower" },
+  { src: "/stay/terrace.jpg", alt: "Private terrace with outdoor seating" },
+  { src: "/stay/dining-room.jpg", alt: "Dining table beside a large window" },
+  { src: "/stay/reading-nook.jpg", alt: "Reading chair beside a floor lamp" },
+  { src: "/stay/garden.jpg", alt: "Garden surrounding the accommodation" },
+  { src: "/stay/pool.jpg", alt: "Swimming pool with sun loungers" },
+  { src: "/stay/exterior.jpg", alt: "Exterior of the accommodation at sunset" },
+];
+
+<ImageBox images={photos} />;
+```
+
+The sample collection below is used for the live layout previews.
+
+## Automatic layouts
+
+ImageBox uses the whole collection to select a layout and never renders more than five image elements.
+
+### One image
+
+The single image fills the available box.
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox images={photos.slice(0, 1)} />
+`}
+>
+  <ImageBoxGalleryExample count={1} />
+</Preview>
+
+### Two images
+
+Two images use equal-width columns.
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox images={photos.slice(0, 2)} />
+`}
+>
+  <ImageBoxGalleryExample count={2} offset={1} />
+</Preview>
+
+### Three images
+
+The first image occupies two-thirds of the content width. Two supporting images stack in one column.
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox images={photos.slice(0, 3)} />
+`}
+>
+  <ImageBoxGalleryExample count={3} offset={2} />
+</Preview>
+
+### Four images
+
+Three supporting images divide the main image's height into equal rows.
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox images={photos.slice(0, 4)} />
+`}
+>
+  <ImageBoxGalleryExample count={4} offset={3} />
+</Preview>
+
+### Five images
+
+The main image and supporting grid each take half of the content width, excluding the gap. Four supporting images form a two-by-two grid beside the main image.
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox images={photos.slice(0, 5)} />
+`}
+>
+  <ImageBoxGalleryExample count={5} offset={4} />
+</Preview>
+
+### Six images
+
+The fifth visible image stays in the collage and carries the `+1` overflow indicator.
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox images={photos.slice(0, 6)} />
+`}
+>
+  <ImageBoxGalleryExample count={6} offset={1} />
+</Preview>
+
+### Ten images
+
+Only the first five photos are rendered; the remaining five are summarized on the fifth image.
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox images={photos.slice(0, 10)} />
+`}
+>
+  <ImageBoxGalleryExample count={10} offset={5} />
+</Preview>
+
+### Large collection
+
+Collections of any size retain the same five-image layout. For example, 25 images show `+20`.
+
+<Preview padding={0} code={`\
+const allPhotos = Array.from(
+  { length: 25 },
+  (_, index) => photos[index % photos.length]!,
+);
+
+<ImageBox images={allPhotos} />
+`}>
+  <ImageBoxGalleryExample count={25} offset={2} />
+</Preview>
+
+## Geometry and spacing
+
+For three or four images, the main image takes two-thirds of the content width and the supporting column takes one-third, excluding the gap. For five or more images, the main and supporting columns each take half of the content width, excluding the gap. In every collage layout, both columns share one fixed-height grid row. Supporting tracks use equal fractional rows (or a two-by-two grid), so their combined height including gaps exactly matches the main image.
+
+The single `gap` value applies in both directions. The default uses the Puzzle spacing token and is slightly reduced at tablet widths. `aspectRatio` controls the collage's width-to-height ratio; every image uses `object-fit: cover` to fill its cell without changing the grid geometry.
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox images={photos.slice(0, 5)} gap="1rem" aspectRatio={1.6} />
+`}
+>
+  <ImageBoxGalleryExample count={5} aspectRatio={1.6} gap="1rem" offset={3} />
+</Preview>
+
+## Overflow and view-all action
+
+The fifth photo remains visible under the overlay. The visible counter reports the number of additional photos (`total - 5`). Add `onViewAll` to make the overlay a native button and open your own gallery. On mobile, a compact count button appears on the main photo for collections of three or more.
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox images={photos.slice(0, 10)} onViewAll={openGallery} />
+`}
+>
+  <ImageBoxInteractionExample />
+</Preview>
+
+## Responsive behavior
+
+At desktop (1024px and wider) and tablet (640–1023px), the collage layout stays intact. Below 640px, collections of three or more show the main image across the full width and expose the total count. Supply `onViewAll` to make that count an action to the complete gallery; one- and two-image layouts remain unchanged.
+
+<Preview
+  padding={0}
+  defaultDevice="desktop"
+  fit="device"
+
+code={`\
+
+<ImageBox images={photos.slice(0, 8)} onViewAll={openGallery} />
+`}
+>
+  <ImageBoxGalleryExample count={8} offset={2} />
+</Preview>
+
+<Preview
+  padding={0}
+  defaultDevice="tablet"
+  fit="device"
+
+code={`\
+
+<ImageBox images={photos.slice(0, 8)} onViewAll={openGallery} />
+`}
+>
+  <ImageBoxGalleryExample count={8} offset={1} />
+</Preview>
+
+<Preview
+  padding={0}
+  defaultDevice="mobile"
+  fit="device"
+
+code={`\
+
+<ImageBox images={photos.slice(0, 8)} onViewAll={openGallery} />
+`}
+>
+  <ImageBoxGalleryExample count={8} offset={4} />
+</Preview>
+
+## Interactions
+
+When `onImageClick` is provided, each visible photo is a native button. The callback receives the original image object and its zero-based index. `onViewAll` is called only by the view-all overlay; it does not trigger `onImageClick`. Without callbacks, photos and counters do not pretend to be interactive.
+
+```tsx
+<ImageBox
+  images={photos}
+  onImageClick={(image, index) => openGalleryAt(index, image)}
+  onViewAll={() => openGallery(0)}
+/>
+```
+
+<Preview
+  padding={0}
+  code={`\
+<ImageBox
+  images={photos}
+  onImageClick={(image, index) => openGalleryAt(index, image)}
+  onViewAll={() => openGallery(0)}
+/>
+`}
+>
+  <ImageBoxInteractionExample />
+</Preview>
+
+## Advanced examples
+
+### Accommodation
+
+```tsx
+<ImageBox
+  images={stay.photos}
+  aspectRatio={2}
+  onViewAll={() => setGalleryOpen(true)}
+/>
+```
+
+<Preview padding={0}>
+  <ImageBoxGalleryExample count={7} offset={2} />
+</Preview>
+
+### Product detail
+
+```tsx
+<ImageBox
+  images={product.photos}
+  aspectRatio={1.8}
+  gap="var(--puzzle-space-2)"
+  onImageClick={(image, index) => selectProductImage(index, image)}
+/>
+```
+
+<Preview padding={0}>
+  <ImageBoxGalleryExample
+    count={5}
+    aspectRatio={1.8}
+    gap="var(--puzzle-space-2)"
+  />
+</Preview>
+
+### Portfolio
+
+```tsx
+<ImageBox images={project.images} radius="var(--puzzle-radius-xl)" />
+```
+
+<Preview padding={0}>
+  <ImageBoxGalleryExample
+    count={4}
+    radius="var(--puzzle-radius-xl)"
+    offset={5}
+  />
+</Preview>
+
+### Custom ratio and spacing
+
+```tsx
+<ImageBox images={article.photos} aspectRatio={1.5} gap={12} radius={16} />
+```
+
+<Preview padding={0}>
+  <ImageBoxGalleryExample
+    count={6}
+    aspectRatio={1.5}
+    gap={12}
+    radius={16}
+    offset={3}
+  />
+</Preview>
+
+### Gallery callbacks
+
+```tsx
+<ImageBox
+  images={portfolio.photos}
+  onImageClick={(image, index) => openLightbox({ image, index })}
+  onViewAll={() => openLightbox({ image: portfolio.photos[0], index: 0 })}
+/>
+```
+
+<Preview padding={0} defaultDevice="desktop">
+  <ImageBoxInteractionExample />
+</Preview>
+
+## API reference
+
+### `ImageBoxImage`
+
+| Property | Type     | Required | Description                                                                             |
+| -------- | -------- | -------- | --------------------------------------------------------------------------------------- |
+| `src`    | `string` | Yes      | Image URL. An empty value renders the image fallback.                                   |
+| `alt`    | `string` | Yes      | Alternative text describing the image; use an empty string only for decorative imagery. |
+| `title`  | `string` | No       | Optional native image title.                                                            |
+
+### `ImageBoxProps`
+
+| Property       | Type                                            | Default              | Required | Description                                                                                                      |
+| -------------- | ----------------------------------------------- | -------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| `images`       | `ImageBoxImage[]`                               | —                    | Yes      | Images to arrange. Empty arrays render nothing; only five images are rendered at most.                           |
+| `aspectRatio`  | `number`                                        | `2`                  | No       | Positive width-to-height ratio of the collage.                                                                   |
+| `gap`          | `number \| string`                              | Puzzle spacing token | No       | Shared horizontal and vertical gap. Numbers are interpreted as CSS pixels; strings may be CSS lengths or tokens. |
+| `radius`       | `number \| string`                              | Large radius token   | No       | Outer corner radius. Numbers are interpreted as CSS pixels.                                                      |
+| `className`    | `string`                                        | —                    | No       | Class added to the collage container.                                                                            |
+| `onImageClick` | `(image: ImageBoxImage, index: number) => void` | —                    | No       | Makes each visible image a button and receives that image and its zero-based index.                              |
+| `onViewAll`    | `() => void`                                    | —                    | No       | Makes the overflow/mobile count overlay a button that opens the complete collection.                             |
+
+## Accessibility
+
+Write meaningful `alt` text for every image. The collage is exposed as a labeled group announcing the collection's total photo count. Interactive photos and view-all controls use native buttons, so Tab, Enter, and Space work without custom keyboard handlers; visible focus styling follows Puzzle's focus-ring token. The view-all name includes the total number of photos. On mobile, the count control is sized for touch. The component also supports forced-colors mode and avoids non-essential animation.
+
+## Theming and styling
+
+ImageBox uses Puzzle spacing, radius, typography, surface, and focus-ring tokens and follows the active light or dark theme. Use `gap`, `radius`, and `aspectRatio` for the supported layout controls, or add `className` to customize the outer wrapper. The underlying [Image](/docs/ui/data-display/image) component handles image loading and presents a neutral fallback for unavailable sources. Set a theme or scoped theme around ImageBox as usual; it does not introduce its own theme configuration.
