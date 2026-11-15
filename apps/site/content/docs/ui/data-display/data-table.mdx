@@ -12,6 +12,8 @@ export const members = [
 
 Use `DataTable` to render structured data in an accessible table. Provide the total item count, column headers, a range-based loader, and a function that maps each item to its cells.
 
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented public API is covered by tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
+
 ## Import
 
 ```tsx
@@ -82,7 +84,7 @@ To control the sort from a parent, provide `sort` (including `null` to enable so
 
 ### Searchable rows
 
-Set `searchable` and provide `getSearchValue` to add a search field. Return the text fields that should be matched for each item.
+Set `searchable` and provide `getSearchValue` to add a search field with a search icon. Return the text fields that should be matched for each item. Optionally set `searchPlaceholder` to provide a hint.
 
 <Preview
   hideDevices={true}
@@ -93,6 +95,7 @@ Set `searchable` and provide `getSearchValue` to add a search field. Return the 
       requestItems={async (start, end) => members.slice(start, end)}
       renderCell={(member) => [member.name, member.role, member.team]}
       searchable
+      searchPlaceholder="Search members"
       getSearchValue={(member) =>
         \`\${member.name} \${member.role} \${member.team}\`
       }
@@ -105,6 +108,7 @@ Set `searchable` and provide `getSearchValue` to add a search field. Return the 
     requestItems={async (start, end) => members.slice(start, end)}
     renderCell={(member) => [member.name, member.role, member.team]}
     searchable
+    searchPlaceholder="Search members"
     getSearchValue={(member) =>
       `${member.name} ${member.role} ${member.team}`
     }
@@ -212,6 +216,7 @@ For paginated data, pass `initialItems` for the first range and keep `requestIte
 | `getSortValue` | `(item: T, columnIndex: number) => string \| number \| null` | — | Value used to sort an item by a column. Sorting applies to loaded items only. |
 | `onSortChange` | `(sort: DataTableSortState \| null) => void` | — | Called when the user changes the sort. |
 | `searchable` | `boolean` | `false` | Shows a search field. Requires `getSearchValue`. |
+| `searchPlaceholder` | `string` | — | Optional placeholder for the search field. |
 | `getSearchValue` | `(item: T) => string` | — | Text used to search an item. Search applies to loaded items only. |
 | `noContent` | `ReactNode` | `"No items found."` | Content shown when there are no matching items. |
 | `loadingContent` | `ReactNode` | `"Loading…"` | Content shown while items are loading. |

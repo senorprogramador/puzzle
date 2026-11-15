@@ -14,3 +14,36 @@
     min-height: 1.5rem;
     background-color: var(--puzzle-color-border, #e5e0d6);
 }
+
+.text-editor-toolbar__link-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.text-editor-toolbar__link-label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.text-editor-toolbar__link-input {
+    min-width: 14rem;
+    max-width: 100%;
+    padding: var(--puzzle-space-2, 0.5rem);
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border, #e5e0d6);
+    border-radius: var(--puzzle-radius-lg, 0.75rem);
+    background: var(--puzzle-color-surface, #ffffff);
+    color: var(--puzzle-color-text, #171717);
+    font: inherit;
+}
+
+.text-editor-toolbar__link-input:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring, #2563eb);
+    outline-offset: 2px;
+}
+
+.text-editor-toolbar__link-error {
+    flex-basis: 100%;
+}

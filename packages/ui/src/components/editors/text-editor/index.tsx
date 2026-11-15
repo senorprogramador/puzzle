@@ -10,15 +10,18 @@ import {
 import type { TextEditorHandle } from "./editor";
 import { Stack } from "../../layout/stack";
 import { Editor } from "./editor";
+import { createTextSelection } from "./text-document";
 import type {
   TextBlockVariant,
   TextDocument,
   TextMark,
+  TextSelection,
 } from "./text-editor.types";
 
 type TextEditorContextType = Partial<TextEditorHandle> & {
   activeMarks: TextMark[];
   activeVariant: TextBlockVariant | null;
+  selection: TextSelection;
 };
 
 const TextEditorContext = createContext<TextEditorContextType | null>(null);
@@ -48,6 +51,7 @@ const TextEditor = ({
 }: TextEditorProps) => {
   const editorHandleRef = useRef<TextEditorHandle>(null);
   const [activeMarks, setActiveMarks] = useState<TextMark[]>([]);
+  const [selection, setSelection] = useState<TextSelection>(createTextSelection);
   const [activeVariant, setActiveVariant] = useState<TextBlockVariant | null>(
     "body1",
   );
@@ -59,6 +63,7 @@ const TextEditor = ({
           ...editorHandleRef.current,
           activeMarks,
           activeVariant,
+          selection,
         }}
       >
         {toolbar}
@@ -68,6 +73,7 @@ const TextEditor = ({
         value={value}
         defaultValue={defaultValue}
         onChange={onChange}
+        onSelectionChange={setSelection}
         onActiveMarksChange={setActiveMarks}
         onActiveTextVariantChange={setActiveVariant}
       />

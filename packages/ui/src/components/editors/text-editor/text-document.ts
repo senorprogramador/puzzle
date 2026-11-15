@@ -2,6 +2,7 @@ import type {
   TextBlock,
   TextDocument,
   TextInline,
+  TextLink,
   TextMark,
   TextPoint,
   TextSelection,
@@ -21,6 +22,24 @@ const HEADING_VARIANTS = new Set<TextBlockVariant>([
 ]);
 
 const MARK_ORDER: TextMark[] = ["bold", "italic", "underline", "strike"];
+
+export const normalizeLinkHref = (href: string): string | null => {
+  const normalized = href.trim();
+  if (!normalized || /[\u0000-\u001f\u007f]/.test(normalized)) return null;
+
+  const scheme = normalized.match(/^([a-z][a-z\d+.-]*):/i)?.[1]?.toLowerCase();
+  if (scheme && !["http", "https", "mailto", "tel"].includes(scheme)) {
+    return null;
+  }
+
+  return normalized;
+};
+
+const normalizeLink = (link?: TextLink): TextLink | undefined => {
+  if (!link || typeof link.href !== "string") return undefined;
+  const href = normalizeLinkHref(link.href);
+  return href ? { href } : undefined;
+};
 
 export const isHeadingVariant = (variant: TextBlockVariant): boolean =>
   HEADING_VARIANTS.has(variant);
@@ -74,6 +93,20 @@ const sameMarks = (left: TextMark[] = [], right: TextMark[] = []): boolean => {
   return a.length === b.length && a.every((mark, index) => mark === b[index]);
 };
 
+const sameLink = (left?: TextLink, right?: TextLink): boolean =>
+  left?.href === right?.href;
+
+const copyInlineAttributes = (
+  inline: TextInline,
+  marks = inline.marks,
+  link: TextLink | null | undefined = normalizeLink(inline.link),
+): Pick<TextInline, "marks" | "link"> => {
+  return {
+    ...(marks?.length ? { marks: [...marks] } : {}),
+    ...(link ? { link: { ...link } } : {}),
+  };
+};
+
 export const normalizeInlines = (inlines: TextInline[]): TextInline[] => {
   const result: TextInline[] = [];
 
@@ -81,9 +114,14 @@ export const normalizeInlines = (inlines: TextInline[]): TextInline[] => {
     if (!inline.text) continue;
 
     const marks = normalizeMarks(inline.marks);
+    const link = normalizeLink(inline.link);
     const previous = result[result.length - 1];
 
-    if (previous && sameMarks(previous.marks, marks)) {
+    if (
+      previous &&
+      sameMarks(previous.marks, marks) &&
+      sameLink(previous.link, link)
+    ) {
       previous.text += inline.text;
       continue;
     }
@@ -91,6 +129,7 @@ export const normalizeInlines = (inlines: TextInline[]): TextInline[] => {
     result.push({
       text: inline.text,
       ...(marks.length ? { marks } : {}),
+      ...(link ? { link } : {}),
     });
   }
 
@@ -133,7 +172,8 @@ export const normalizeTextDocument = (input: TextDocument): TextDocument => {
             const marks = Array.isArray(inline.marks)
               ? inline.marks.filter(isTextMark)
               : [];
-            return [{ text: inline.text, marks }];
+            const link = normalizeLink(inline.link);
+            return [{ text: inline.text, marks, ...(link ? { link } : {}) }];
           }),
         );
 
@@ -206,7 +246,7 @@ const sliceInlines = (
     if (overlapStart < overlapEnd) {
       result.push({
         text: inline.text.slice(overlapStart - start, overlapEnd - start),
-        ...(inline.marks?.length ? { marks: [...inline.marks] } : {}),
+        ...copyInlineAttributes(inline),
       });
     }
 
@@ -235,7 +275,7 @@ const transformInlineRange = (
     if (end <= from || start >= to) {
       result.push({
         ...inline,
-        ...(inline.marks ? { marks: [...inline.marks] } : {}),
+        ...copyInlineAttributes(inline),
       });
     } else {
       const leftLength = Math.max(0, from - start);
@@ -245,7 +285,7 @@ const transformInlineRange = (
       if (leftLength > 0) {
         result.push({
           text: inline.text.slice(0, leftLength),
-          ...(marks.length ? { marks: [...marks] } : {}),
+          ...copyInlineAttributes(inline, marks),
         });
       }
 
@@ -253,14 +293,14 @@ const transformInlineRange = (
       if (middleEnd > leftLength) {
         result.push({
           text: inline.text.slice(leftLength, middleEnd),
-          marks: transform([...marks]),
+          ...copyInlineAttributes(inline, transform([...marks])),
         });
       }
 
       if (rightStart < inline.text.length) {
         result.push({
           text: inline.text.slice(Math.max(0, rightStart)),
-          ...(marks.length ? { marks: [...marks] } : {}),
+          ...copyInlineAttributes(inline, marks),
         });
       }
     }
@@ -312,6 +352,193 @@ export const applyMark = (
         else next.delete(mark);
         return MARK_ORDER.filter((item) => next.has(item));
       }),
+    };
+  });
+
+  return { document: { type: "doc", content }, selection };
+};
+
+const getLinkRangeAtOffset = (
+  inlines: TextInline[],
+  offset: number,
+): { from: number; to: number; href: string } | null => {
+  let position = 0;
+  let matchIndex = -1;
+
+  for (let index = 0; index < inlines.length; index += 1) {
+    const inline = inlines[index]!;
+    const end = position + inline.text.length;
+    if (
+      inline.link &&
+      ((offset > position && offset <= end) ||
+        (offset === position && offset < end))
+    ) {
+      matchIndex = index;
+      break;
+    }
+    position = end;
+  }
+
+  if (matchIndex < 0) return null;
+
+  const href = inlines[matchIndex]!.link!.href;
+  let firstIndex = matchIndex;
+  let lastIndex = matchIndex;
+  while (firstIndex > 0 && inlines[firstIndex - 1]!.link?.href === href) {
+    firstIndex -= 1;
+  }
+  while (
+    lastIndex < inlines.length - 1 &&
+    inlines[lastIndex + 1]!.link?.href === href
+  ) {
+    lastIndex += 1;
+  }
+
+  const from = inlines
+    .slice(0, firstIndex)
+    .reduce((length, inline) => length + inline.text.length, 0);
+  const to =
+    from +
+    inlines
+      .slice(firstIndex, lastIndex + 1)
+      .reduce((length, inline) => length + inline.text.length, 0);
+  return { from, to, href };
+};
+
+const transformInlineLinkRange = (
+  inlines: TextInline[],
+  from: number,
+  to: number,
+  href: string | null,
+): TextInline[] => {
+  const result: TextInline[] = [];
+  let position = 0;
+
+  for (const inline of inlines) {
+    const start = position;
+    const end = start + inline.text.length;
+    if (end <= from || start >= to) {
+      result.push({ text: inline.text, ...copyInlineAttributes(inline) });
+    } else {
+      const leftLength = Math.max(0, from - start);
+      const rightStart = Math.max(0, to - start);
+      if (leftLength > 0) {
+        result.push({
+          text: inline.text.slice(0, leftLength),
+          ...copyInlineAttributes(inline),
+        });
+      }
+      const middleEnd = Math.min(inline.text.length, to - start);
+      if (middleEnd > leftLength) {
+        result.push({
+          text: inline.text.slice(leftLength, middleEnd),
+          ...copyInlineAttributes(
+            inline,
+            undefined,
+            href ? { href } : null,
+          ),
+        });
+      }
+      if (rightStart < inline.text.length) {
+        result.push({
+          text: inline.text.slice(Math.max(0, rightStart)),
+          ...copyInlineAttributes(inline),
+        });
+      }
+    }
+    position = end;
+  }
+
+  return normalizeInlines(result);
+};
+
+export const getTextLink = (
+  document: TextDocument,
+  selection: TextSelection,
+): string | null => {
+  if (isCollapsedSelection(selection)) {
+    const block = document.content[selection.focus.block];
+    return block
+      ? getLinkRangeAtOffset(block.children, selection.focus.offset)?.href ?? null
+      : null;
+  }
+
+  const { start, end } = getOrderedSelection(selection);
+  let href: string | null = null;
+  let foundText = false;
+
+  for (
+    let blockIndex = start.block;
+    blockIndex <= end.block;
+    blockIndex += 1
+  ) {
+    const block = document.content[blockIndex];
+    if (!block) continue;
+    const from = blockIndex === start.block ? start.offset : 0;
+    const to = blockIndex === end.block ? end.offset : getBlockLength(block);
+    let position = 0;
+
+    for (const inline of block.children) {
+      const inlineStart = position;
+      const inlineEnd = inlineStart + inline.text.length;
+      position = inlineEnd;
+      if (inlineEnd <= from || inlineStart >= to) continue;
+      const inlineHref = inline.link?.href;
+      if (!inlineHref || (href !== null && href !== inlineHref)) return null;
+      href = inlineHref;
+      foundText = true;
+    }
+  }
+
+  return foundText ? href : null;
+};
+
+export const setTextLink = (
+  document: TextDocument,
+  selection: TextSelection,
+  href: string | null,
+): TextTransaction => {
+  const normalizedHref =
+    href === null ? null : normalizeLinkHref(href);
+  if (href !== null && normalizedHref === null) return { document, selection };
+
+  if (isCollapsedSelection(selection)) {
+    const block = document.content[selection.focus.block];
+    const range = block
+      ? getLinkRangeAtOffset(block.children, selection.focus.offset)
+      : null;
+    if (!range) return { document, selection };
+
+    return {
+      document: {
+        type: "doc",
+        content: document.content.map((item, index) =>
+          index === selection.focus.block
+            ? {
+                ...item,
+                children: transformInlineLinkRange(
+                  item.children,
+                  range.from,
+                  range.to,
+                  normalizedHref,
+                ),
+              }
+            : item,
+        ),
+      },
+      selection,
+    };
+  }
+
+  const { start, end } = getOrderedSelection(selection);
+  const content = document.content.map((block, index) => {
+    if (index < start.block || index > end.block) return block;
+    const from = index === start.block ? start.offset : 0;
+    const to = index === end.block ? end.offset : getBlockLength(block);
+    if (to <= from) return block;
+    return {
+      ...block,
+      children: transformInlineLinkRange(block.children, from, to, normalizedHref),
     };
   });
 

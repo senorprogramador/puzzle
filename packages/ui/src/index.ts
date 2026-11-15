@@ -139,6 +139,7 @@ export {
 } from "./components/editors/text-editor/text-renderer";
 export type {
   TextMark,
+  TextLink,
   TextInline,
   TextBlockType,
   TextAlign,

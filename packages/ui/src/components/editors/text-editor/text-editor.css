@@ -132,6 +132,12 @@
     text-decoration-thickness: from-font;
 }
 
+.puzzle-text-editor a,
+.puzzle-text-renderer a {
+    color: var(--puzzle-color-primary, #2563eb);
+    text-decoration: underline;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .puzzle-text-editor {
         scroll-behavior: auto;
@@ -156,6 +162,10 @@
     width: 1.5em;
     margin-inline-start: -1.5em;
     padding-inline-start: 0.25em;
+}
+
+.puzzle-text-editor__block[data-puzzle-list-type] {
+    padding-inline-start: 1.5em;
 }
 
 .puzzle-text-editor__block[data-puzzle-list-type="ordered"] {

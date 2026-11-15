@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { cn } from "@puzzle-ui/core";
+import { Link } from "../../navigation/link";
 import "./text-editor.css";
 import type { TextBlock, TextDocument, TextMark } from "./text-editor.types";
+import { normalizeLinkHref } from "./text-document";
 
 export type TextRendererProps = { document: TextDocument; className?: string };
 
@@ -19,6 +21,11 @@ const renderInline = (block: TextBlock, blockIndex: number): ReactNode[] =>
       ? [part]
       : [<br key={`break-${blockIndex}-${inlineIndex}-${partIndex}`} />, part]);
     for (const mark of [...(inline.marks ?? [])].reverse()) node = MARK_COMPONENTS[mark](node);
+    const href =
+      typeof inline.link?.href === "string"
+        ? normalizeLinkHref(inline.link.href)
+        : null;
+    if (href) node = <Link href={href}>{node}</Link>;
     return <span key={`${blockIndex}-${inlineIndex}`}>{node}</span>;
   });
 

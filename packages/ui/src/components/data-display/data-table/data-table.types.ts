@@ -33,6 +33,8 @@ type DataTableProps<T> = Omit<
     columnIndex: number,
   ) => string | number | null;
   searchable?: boolean;
+  /** Placeholder shown in the search field when searching is enabled. */
+  searchPlaceholder?: string;
   /** Search is local to the items currently loaded by the table. */
   getSearchValue?: (item: T) => string;
   initialItems?: T[];

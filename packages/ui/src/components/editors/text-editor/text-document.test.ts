@@ -5,11 +5,13 @@ import {
   createTextSelection,
   getBlockText,
   insertDocumentAtSelection,
+  normalizeTextDocument,
   setTextVariant,
   setTextAlign,
   setListType,
+  setTextLink,
 } from "./text-document";
-import { parseHtmlToDocument } from "./text-parser";
+import { parseHtmlToDocument, parseMarkdownToDocument } from "./text-parser";
 import type { TextDocument } from "./text-editor.types";
 
 describe("text HTML parsing", () => {
@@ -38,6 +40,39 @@ describe("text HTML parsing", () => {
       headingLevel: 2,
       children: [{ text: "Title" }],
     });
+  });
+
+  it("parses safe links and discards unsafe link URLs", () => {
+    expect(
+      parseHtmlToDocument(
+        '<p><a href="https://example.com">Safe</a> <a href="javascript:alert(1)">Unsafe</a></p>',
+      ).content[0]!.children,
+    ).toEqual([
+      { text: "Safe", link: { href: "https://example.com" } },
+      { text: " Unsafe" },
+    ]);
+
+    expect(
+      normalizeTextDocument({
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            variant: "body1",
+            children: [{ text: "Unsafe", link: { href: "data:text/html,x" } }],
+          },
+        ],
+      }).content[0]!.children,
+    ).toEqual([{ text: "Unsafe" }]);
+  });
+
+  it("parses Markdown links into link nodes", () => {
+    expect(
+      parseMarkdownToDocument("[Puzzle](https://example.com)")
+        .content[0]!.children,
+    ).toEqual([
+      { text: "Puzzle", link: { href: "https://example.com" } },
+    ]);
   });
 
   it.each(["h5", "h6"])("parses semantic %s headings", (tag) => {
@@ -69,6 +104,61 @@ describe("text document operations", () => {
     ]);
 
     expect(applyMark(bold, selection, "bold").document).toEqual(document);
+  });
+
+  it("applies and removes a link without losing marks", () => {
+    const document: TextDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          variant: "body1",
+          children: [{ text: "Hello", marks: ["bold"] }],
+        },
+      ],
+    };
+    const selection = {
+      anchor: { block: 0, offset: 1 },
+      focus: { block: 0, offset: 4 },
+    };
+
+    const linked = setTextLink(document, selection, "https://example.com");
+    expect(linked.document.content[0]!.children).toEqual([
+      { text: "H", marks: ["bold"] },
+      {
+        text: "ell",
+        marks: ["bold"],
+        link: { href: "https://example.com" },
+      },
+      { text: "o", marks: ["bold"] },
+    ]);
+
+    expect(setTextLink(linked.document, selection, null).document).toEqual(
+      document,
+    );
+  });
+
+  it("edits or removes the whole link when the caret is inside it", () => {
+    const document: TextDocument = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          variant: "body1",
+          children: [
+            { text: "Hello", link: { href: "https://old.example" } },
+          ],
+        },
+      ],
+    };
+    const caret = createTextSelection(0, 2);
+
+    expect(
+      setTextLink(document, caret, "https://new.example").document.content[0]!
+        .children,
+    ).toEqual([{ text: "Hello", link: { href: "https://new.example" } }]);
+    expect(setTextLink(document, caret, null).document.content[0]!.children)
+      .toEqual([{ text: "Hello" }]);
   });
 
   it("changes the selected block to a theme heading role", () => {

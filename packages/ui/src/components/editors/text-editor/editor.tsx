@@ -19,7 +19,11 @@ import {
   insertDocumentAtSelection,
   insertTextAtSelection,
   isCollapsedSelection,
+  getBlockText,
+  getTextLink,
   normalizeTextDocument,
+  normalizeLinkHref,
+  setTextLink,
   setTextVariant,
   setTextAlign,
   setListType,
@@ -53,6 +57,8 @@ type TextEditorHandle = {
   isTextAlignActive: (align: TextAlign) => boolean;
   setListType: (listType: TextListType | null) => void;
   isListTypeActive: (listType: TextListType) => boolean;
+  getActiveLink: () => string | null;
+  setLink: (href: string | null) => boolean;
   insertText: (text: string) => void;
   replaceSelection: (document: TextDocument) => void;
   undo: () => void;
@@ -394,6 +400,13 @@ const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
           node = wrapper;
         }
 
+        if (inline.link) {
+          const anchor = ownerDocument.createElement("a");
+          anchor.href = inline.link.href;
+          anchor.appendChild(node);
+          node = anchor;
+        }
+
         inlineElement.appendChild(node);
         blockElement.appendChild(inlineElement);
       }
@@ -554,9 +567,12 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
     const focus = useCallback(() => {
       const root = editableRef.current;
       if (!root) return;
+      const selection = selectionRef.current;
+      // Focusing the editor can synchronously report a collapsed DOM selection.
       root.focus({ preventScroll: true });
-      restoreSelection(selectionRef.current);
-    }, [restoreSelection]);
+      updateSelection(selection);
+      restoreSelection(selection);
+    }, [restoreSelection, updateSelection]);
 
     const clearTypingGroup = useCallback(() => {
       historyRef.current.lastInputAt = 0;
@@ -743,6 +759,33 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       return getListType(documentRef.current, selectionRef.current, listType);
     }, []);
 
+    const getActiveLink = useCallback(
+      (): string | null =>
+        getTextLink(documentRef.current, selectionRef.current),
+      [],
+    );
+
+    const changeLink = useCallback(
+      (href: string | null): boolean => {
+        const normalizedHref =
+          href === null ? null : normalizeLinkHref(href);
+        if (href !== null && normalizedHref === null) return false;
+
+        focus();
+        const document = documentRef.current;
+        const selection = selectionRef.current;
+        const existingHref = getTextLink(document, selection);
+        const transaction = setTextLink(document, selection, normalizedHref);
+        if (documentsEqual(document, transaction.document)) {
+          return normalizedHref !== null && existingHref === normalizedHref;
+        }
+
+        commitTransaction(transaction);
+        return true;
+      },
+      [commitTransaction, focus],
+    );
+
     const replaceSelection = useCallback(
       (insertedDocument: TextDocument) => {
         focus();
@@ -790,6 +833,8 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         isTextAlignActive,
         setListType: changeListType,
         isListTypeActive,
+        getActiveLink,
+        setLink: changeLink,
         insertText,
         replaceSelection,
         undo,
@@ -801,9 +846,11 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         changeAlign,
         changeListType,
         changeVariant,
+        changeLink,
         focus,
         isTextAlignActive,
         getActiveMarks,
+        getActiveLink,
         getActiveTextVariant,
         insertText,
         isActive,
@@ -870,6 +917,9 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       const onSelectionChangeInDocument = () => {
         const root = editableRef.current;
         if (!root) return;
+        const activeElement = root.ownerDocument.activeElement;
+        // Selection changes in toolbar controls must not replace the editor range.
+        if (activeElement !== root.ownerDocument.body && !root.contains(activeElement)) return;
         const next = selectionFromDom(root);
         if (!next) return;
         const current = selectionRef.current;
@@ -902,10 +952,23 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       const handleBeforeInput = (event: InputEvent) => {
         const inputType = event.inputType ?? "";
         inputTypeRef.current = inputType;
-        selectionBeforeInputRef.current =
+        const selection =
           selectionFromDom(root) ?? selectionRef.current;
+        selectionBeforeInputRef.current = selection;
 
-        if (inputType === "historyUndo") {
+        const block = documentRef.current.content[selection.focus.block];
+        if (
+          !readOnly &&
+          inputType === "insertParagraph" &&
+          block?.listType &&
+          !getBlockText(block)
+        ) {
+          event.preventDefault();
+          updateSelection(selection);
+          commitTransaction(
+            setListType(documentRef.current, selection, null),
+          );
+        } else if (inputType === "historyUndo") {
           event.preventDefault();
           undo();
         } else if (inputType === "historyRedo") {
@@ -916,7 +979,7 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
 
       root.addEventListener("beforeinput", handleBeforeInput);
       return () => root.removeEventListener("beforeinput", handleBeforeInput);
-    }, [redo, undo]);
+    }, [commitTransaction, readOnly, redo, undo, updateSelection]);
 
     const handleInput = (event: FormEvent<HTMLDivElement>) => {
       const root = event.currentTarget;
@@ -1068,6 +1131,11 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         onKeyUp={handleKeyUp}
         onMouseUp={handleMouseUp}
         onFocus={handleKeyUp}
+        onClick={(event) => {
+          if (event.target instanceof Element && event.target.closest("a")) {
+            event.preventDefault();
+          }
+        }}
       />
     );
   },

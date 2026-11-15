@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "@puzzle-ui/core";
+import { Icon } from "@puzzle-ui/icons";
 import { Pagination } from "../../navigation/pagination";
 import { TextInput } from "../../forms/input";
 import {
@@ -62,6 +63,7 @@ const DataTable = <T,>({
   onSortChange,
   getSortValue,
   searchable = false,
+  searchPlaceholder,
   getSearchValue,
   initialItems,
   noContent = "No items found.",
@@ -386,6 +388,8 @@ const DataTable = <T,>({
                   <TextInput
                     className="puzzle-data-table__search"
                     aria-label="Search table"
+                    placeholder={searchPlaceholder}
+                    suffix={<Icon name="oui:search" aria-hidden="true" />}
                     value={search}
                     onChange={(event) => handleSearchChange(event.target.value)}
                   />

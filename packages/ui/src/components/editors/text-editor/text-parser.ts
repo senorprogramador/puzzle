@@ -1,4 +1,10 @@
-import { createTextDocument, isHeadingVariant, normalizeInlines, normalizeTextDocument } from "./text-document";
+import {
+  createTextDocument,
+  isHeadingVariant,
+  normalizeInlines,
+  normalizeLinkHref,
+  normalizeTextDocument,
+} from "./text-document";
 import type {
   TextAlign,
   TextBlock,
@@ -44,20 +50,30 @@ const HEADING_LEVELS: Record<string, TextHeadingLevel> = {
   h6: 6,
 };
 
-const appendText = (target: TextInline[], text: string, marks: TextMark[]) => {
+const appendText = (
+  target: TextInline[],
+  text: string,
+  marks: TextMark[],
+  href?: string,
+) => {
   if (!text) return;
-  target.push({ text, ...(marks.length ? { marks: [...marks] } : {}) });
+  target.push({
+    text,
+    ...(marks.length ? { marks: [...marks] } : {}),
+    ...(href ? { link: { href } } : {}),
+  });
 };
 
 const readInlineNodes = (
   nodes: NodeListOf<ChildNode> | ChildNode[],
   inheritedMarks: TextMark[] = [],
+  inheritedLink?: string,
 ): TextInline[] => {
   const result: TextInline[] = [];
 
   for (const node of Array.from(nodes)) {
     if (node.nodeType === Node.TEXT_NODE) {
-      appendText(result, node.textContent ?? "", inheritedMarks);
+      appendText(result, node.textContent ?? "", inheritedMarks, inheritedLink);
       continue;
     }
 
@@ -67,7 +83,7 @@ const readInlineNodes = (
 
     if (tag === "br") {
       if (!node.hasAttribute("data-puzzle-placeholder")) {
-        appendText(result, "\n", inheritedMarks);
+        appendText(result, "\n", inheritedMarks, inheritedLink);
       }
       continue;
     }
@@ -85,10 +101,16 @@ const readInlineNodes = (
     const nextMarks = mark
       ? Array.from(new Set([...inheritedMarks, mark]))
       : inheritedMarks;
+    const nextLink =
+      tag === "a"
+        ? normalizeLinkHref(node.getAttribute("href") ?? "") ?? undefined
+        : inheritedLink;
 
     // Unsupported elements are transparent: keep their readable children but
     // deliberately discard their styling, attributes and behavior.
-    result.push(...readInlineNodes(Array.from(node.childNodes), nextMarks));
+    result.push(
+      ...readInlineNodes(Array.from(node.childNodes), nextMarks, nextLink),
+    );
   }
 
   return normalizeInlines(result);
@@ -261,29 +283,35 @@ export const parseHtmlToDocument = (html: string): TextDocument => {
 };
 
 const parseInlineMarkdown = (input: string): TextInline[] => {
-  const pattern = /!\[([^\]]*)\]\([^)]+\)|\[([^\]]+)\]\([^)]+\)|\*\*(.+?)\*\*|__(.+?)__|~~(.+?)~~|\*(.+?)\*|_(.+?)_|`([^`]+)`/g;
+  const pattern =
+    /!\[(?<imageAlt>[^\]]*)\]\([^)]+\)|\[(?<linkText>[^\]]+)\]\((?<linkHref>[^)]+)\)|\*\*(?<boldA>.+?)\*\*|__(?<boldB>.+?)__|~~(?<strike>.+?)~~|\*(?<italicA>.+?)\*|_(?<italicB>.+?)_|`(?<code>[^`]+)`/g;
   const result: TextInline[] = [];
   let previousIndex = 0;
   let match: RegExpExecArray | null;
 
   while ((match = pattern.exec(input)) !== null) {
     appendText(result, input.slice(previousIndex, match.index), []);
+    const groups = match.groups!;
 
-    if (match[1] !== undefined) {
+    if (groups.imageAlt !== undefined) {
       // Images are not supported nodes; preserve their useful alt text.
-      appendText(result, match[1], []);
-    } else if (match[2] !== undefined) {
-      // Links are not supported nodes; preserve the link label only.
-      appendText(result, match[2], []);
-    } else if (match[3] !== undefined || match[4] !== undefined) {
-      appendText(result, match[3] ?? match[4] ?? "", ["bold"]);
-    } else if (match[5] !== undefined) {
-      appendText(result, match[5], ["strike"]);
-    } else if (match[6] !== undefined || match[7] !== undefined) {
-      appendText(result, match[6] ?? match[7] ?? "", ["italic"]);
-    } else if (match[8] !== undefined) {
+      appendText(result, groups.imageAlt, []);
+    } else if (groups.linkText !== undefined) {
+      appendText(
+        result,
+        groups.linkText,
+        [],
+        normalizeLinkHref(groups.linkHref!) ?? undefined,
+      );
+    } else if (groups.boldA !== undefined || groups.boldB !== undefined) {
+      appendText(result, groups.boldA ?? groups.boldB ?? "", ["bold"]);
+    } else if (groups.strike !== undefined) {
+      appendText(result, groups.strike, ["strike"]);
+    } else if (groups.italicA !== undefined || groups.italicB !== undefined) {
+      appendText(result, groups.italicA ?? groups.italicB ?? "", ["italic"]);
+    } else if (groups.code !== undefined) {
       // Inline code is not supported; preserve its contents as regular text.
-      appendText(result, match[8], []);
+      appendText(result, groups.code, []);
     }
 
     previousIndex = pattern.lastIndex;

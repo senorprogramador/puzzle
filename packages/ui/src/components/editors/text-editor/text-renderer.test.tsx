@@ -109,6 +109,27 @@ describe("TextRenderer", () => {
     expect(container.querySelector("strong em, em strong")).toBeTruthy();
   });
 
+  it("renders links as safe semantic anchors", () => {
+    const { container } = render(
+      <TextRenderer
+        document={doc({
+          type: "paragraph",
+          variant: "body1",
+          children: [
+            { text: "Safe", link: { href: "https://example.com" } },
+            { text: " unsafe", link: { href: "javascript:alert(1)" } },
+          ],
+        })}
+      />,
+    );
+
+    expect(container.querySelector('a[href="https://example.com"]')).toHaveTextContent(
+      "Safe",
+    );
+    expect(container.querySelectorAll("a")).toHaveLength(1);
+    expect(container).toHaveTextContent("Safe unsafe");
+  });
+
   it("turns newlines into line breaks and keeps empty blocks open", () => {
     const { container } = render(
       <TextRenderer

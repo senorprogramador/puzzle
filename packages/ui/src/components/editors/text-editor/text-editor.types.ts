@@ -2,9 +2,14 @@ import type { TypographyStyle } from "@puzzle-ui/theme";
 
 type TextMark = "bold" | "italic" | "underline" | "strike";
 
+type TextLink = {
+  href: string;
+};
+
 type TextInline = {
   text: string;
   marks?: TextMark[];
+  link?: TextLink;
 };
 
 type TextBlockType = "paragraph" | "heading" | "listItem";
@@ -50,6 +55,7 @@ type TextBlockVariant = TypographyStyle;
 
 export type {
   TextMark,
+  TextLink,
   TextInline,
   TextBlockType,
   TextAlign,

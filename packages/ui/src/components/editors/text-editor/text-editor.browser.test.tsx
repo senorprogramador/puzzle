@@ -64,6 +64,37 @@ describe("TextEditor (browser)", () => {
     );
   });
 
+  it("exits a list when Enter is pressed in an empty list item", async () => {
+    let latestDocument: TextDocument | undefined;
+    render(
+      <TextEditor
+        defaultValue={{
+          type: "doc",
+          content: [
+            {
+              type: "listItem",
+              variant: "body1",
+              listType: "bullet",
+              children: [],
+            },
+          ],
+        }}
+        onChange={(document) => {
+          latestDocument = document;
+        }}
+      />,
+    );
+
+    const editor = screen.getByRole("textbox", { name: "Text editor" });
+    await userEvent.click(editor);
+    await userEvent.keyboard("{Enter}");
+
+    await waitFor(() => {
+      expect(latestDocument?.content[0]?.type).toBe("paragraph");
+      expect(latestDocument?.content[0]?.listType).toBeUndefined();
+    });
+  });
+
   it("preserves selected formatting and supports toolbar history actions", async () => {
     let latestDocument: TextDocument | undefined;
     render(
@@ -101,5 +132,82 @@ describe("TextEditor (browser)", () => {
     await waitFor(() =>
       expect(latestDocument?.content[0]?.children[0]?.marks).toEqual(["bold"]),
     );
+  });
+
+  it("applies a link to the selected text after interacting with the popover", async () => {
+    let latestDocument: TextDocument | undefined;
+    render(
+      <TextEditor
+        toolbar={<TextEditorToolbar />}
+        defaultValue={createTextDocument("Hello world")}
+        onChange={(document) => {
+          latestDocument = document;
+        }}
+      />,
+    );
+
+    const editor = screen.getByRole("textbox", { name: "Text editor" });
+    const linkButton = screen.getByRole("button", { name: "Link" });
+    expect(linkButton).toBeDisabled();
+    await userEvent.click(editor);
+    const text = editor.querySelector("span")!.firstChild!;
+    const range = editor.ownerDocument.createRange();
+    range.setStart(text, 6);
+    range.setEnd(text, 11);
+    const selection = editor.ownerDocument.defaultView!.getSelection()!;
+    selection.removeAllRanges();
+    selection.addRange(range);
+    editor.ownerDocument.dispatchEvent(new Event("selectionchange"));
+    await waitFor(() => expect(linkButton).toBeEnabled());
+
+    await userEvent.click(linkButton);
+    const dialog = await screen.findByRole("dialog", { name: "Link settings" });
+    const input = screen.getByRole("textbox", { name: "Link URL" });
+    const applyButton = screen.getByRole("button", { name: "Apply link" });
+    expect(dialog).toContainElement(input);
+    expect(applyButton).toHaveClass("puzzle-button--primary");
+    const inputRect = input.getBoundingClientRect();
+    const buttonRect = applyButton.getBoundingClientRect();
+    expect(buttonRect.left).toBeGreaterThanOrEqual(inputRect.right);
+    expect(buttonRect.bottom).toBeCloseTo(inputRect.bottom, 0);
+    await userEvent.type(input, "https://example.com");
+    await userEvent.click(applyButton);
+
+    await waitFor(() =>
+      expect(latestDocument?.content[0]?.children).toEqual([
+        { text: "Hello " },
+        { text: "world", link: { href: "https://example.com" } },
+      ]),
+    );
+    expect(screen.queryByRole("dialog", { name: "Link settings" })).not.toBeInTheDocument();
+    expect(window.getSelection()?.toString()).toBe("world");
+    selection.collapse(editor.querySelector("a")!.firstChild!, 2);
+    editor.ownerDocument.dispatchEvent(new Event("selectionchange"));
+    await waitFor(() => expect(linkButton).toBeDisabled());
+  });
+
+  it("returns focus and selection to the editor when cancelling a link", async () => {
+    render(
+      <TextEditor
+        toolbar={<TextEditorToolbar />}
+        defaultValue={createTextDocument("Hello")}
+      />,
+    );
+    const editor = screen.getByRole("textbox", { name: "Text editor" });
+    await userEvent.click(editor);
+    const text = editor.querySelector("span")!.firstChild!;
+    const range = editor.ownerDocument.createRange();
+    range.selectNodeContents(text);
+    const selection = editor.ownerDocument.defaultView!.getSelection()!;
+    selection.removeAllRanges();
+    selection.addRange(range);
+    editor.ownerDocument.dispatchEvent(new Event("selectionchange"));
+    const linkButton = screen.getByRole("button", { name: "Link" });
+    await waitFor(() => expect(linkButton).toBeEnabled());
+
+    await userEvent.click(linkButton);
+    await userEvent.click(await screen.findByRole("button", { name: "Cancel" }));
+    expect(editor).toHaveFocus();
+    expect(window.getSelection()?.toString()).toBe("Hello");
   });
 });

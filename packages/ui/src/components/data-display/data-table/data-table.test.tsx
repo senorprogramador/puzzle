@@ -314,6 +314,38 @@ describe("DataTable", () => {
     expect(screen.getByText("No items found.")).toBeInTheDocument();
   });
 
+  it("renders a decorative search icon and optional placeholder without forwarding it to the root", () => {
+    const { container, rerender } = render(
+      <DataTable
+        numberOfItems={0}
+        header={headers}
+        renderCell={renderPerson}
+        requestItems={vi.fn()}
+        searchable
+        getSearchValue={getPersonSearchValue}
+        searchPlaceholder="Search people"
+      />,
+    );
+
+    const input = screen.getByRole("textbox", { name: "Search table" });
+    expect(input).toHaveAttribute("placeholder", "Search people");
+    const suffix = input.parentElement?.querySelector(".puzzle-input__suffix");
+    expect(suffix?.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
+    expect(container.firstElementChild).not.toHaveAttribute("searchPlaceholder");
+
+    rerender(
+      <DataTable
+        numberOfItems={0}
+        header={headers}
+        renderCell={renderPerson}
+        requestItems={vi.fn()}
+        searchable
+        getSearchValue={getPersonSearchValue}
+      />,
+    );
+    expect(screen.getByRole("textbox", { name: "Search table" })).not.toHaveAttribute("placeholder");
+  });
+
   it("shows loading, reports errors, and retries failed requests", async () => {
     const user = userEvent.setup();
     const requestError = new Error("Network unavailable");
