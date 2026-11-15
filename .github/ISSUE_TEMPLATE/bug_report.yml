@@ -1,0 +1,86 @@
+name: Bug report
+description: Report a reproducible problem in a Puzzle UI package or tool.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: Search existing issues first. Do not include secrets or report security vulnerabilities here; see [SECURITY.md](https://github.com/senorprogramador/puzzle/blob/main/SECURITY.md) for private reporting guidance.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is going wrong?
+      placeholder: A short description of the problem.
+    validations:
+      required: true
+  - type: input
+    id: package
+    attributes:
+      label: Package
+      description: Which package is affected? If unsure, enter "unknown".
+      placeholder: "@puzzle-ui/ui"
+    validations:
+      required: false
+  - type: input
+    id: package-version
+    attributes:
+      label: Package version
+      description: Include the affected package version if known.
+      placeholder: "0.6.0"
+    validations:
+      required: false
+  - type: input
+    id: framework
+    attributes:
+      label: Framework
+      description: Framework and version, if relevant.
+      placeholder: "React 19"
+    validations:
+      required: false
+  - type: input
+    id: runtime-browser
+    attributes:
+      label: Runtime or browser
+      description: Include a version if known.
+      placeholder: "Node.js 22, Chrome"
+    validations:
+      required: false
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Steps or a minimal code example that reproduce the problem.
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: false
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: false
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: false
+  - type: input
+    id: reproduction-url
+    attributes:
+      label: Minimal reproduction URL
+      description: Link to a minimal reproduction, if available.
+      placeholder: "https://..."
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add relevant logs or details. Remove secrets and personal data.
+    validations:
+      required: false

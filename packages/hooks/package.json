@@ -2,7 +2,8 @@
   "name": "@puzzle-ui/hooks",
   "version": "0.6.0",
   "description": "Keyboard shortcut and roving-focus hooks for React applications",
-  "homepage": "https://puzzle-ui.com",
+  "homepage": "https://puzzle-ui.com/docs/hooks",
+  "keywords": ["puzzle-ui", "react", "typescript", "react-hooks", "keyboard-shortcuts", "roving-focus"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"

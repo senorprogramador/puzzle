@@ -2,182 +2,53 @@
 
 ## Supported versions
 
-Puzzle is currently in the 0.x release series.
-
-Security fixes should target the current development branch and the latest
-published package versions.
-
-The authentication-related packages must be treated as one coordinated
-security surface:
-
-- @puzzle-ui/storage
-- @puzzle-ui/storage-d1
-- @puzzle-ui/storage-mongodb
-- @puzzle-ui/session
-- @puzzle-ui/auth
-- @puzzle-ui/fullstack
+Puzzle packages are currently in the 0.x release series. A formal supported
+version and maintenance policy has not been established. When reporting an
+issue, identify the affected package and version; the maintainer will assess
+the report against the current code and published packages.
 
 ## Reporting a vulnerability
 
-Do not publish security vulnerabilities as public GitHub issues.
+Do not disclose exploitable vulnerabilities in public issues, discussions, or
+pull requests.
 
-Use GitHub's private vulnerability reporting or contact the repository
-maintainer privately.
+Use [GitHub's private vulnerability reporting page](https://github.com/senorprogramador/puzzle/security/advisories/new)
+if private reporting is available for this repository. Its availability could
+not be verified from the public repository settings. If the reporting form is
+unavailable, use a private contact method listed on the
+[maintainer's GitHub profile](https://github.com/senorprogramador), if one is
+available. No dedicated security email address is published in this
+repository. Do not include vulnerability details in a public request for
+contact information.
 
-Please include:
+Please include, when known:
 
-- A description of the vulnerability.
-- The affected package and version.
-- The affected runtime and framework.
-- Reproduction instructions.
-- A proof of concept where possible.
-- The potential impact.
-- Suggested remediation, if known.
+- The affected Puzzle package and version.
+- The affected runtime, framework, and relevant configuration.
+- A description of the vulnerability and its potential impact.
+- Reproduction steps or a proof of concept that does not expose real user data
+  or credentials.
+- A suggested mitigation, if available.
 
-Do not include real user credentials, production tokens or personal data.
+Do not send real user credentials, production secrets, or personal data.
 
-## Authentication security requirements
+## Disclosure process
 
-Production deployments must follow these requirements.
+Please give the maintainer an opportunity to investigate, coordinate a fix,
+and prepare any necessary release before public disclosure. Keep details
+private while the issue is unresolved and coordinate a disclosure date with
+the maintainer. The project has not established response-time or remediation
+SLAs.
 
-### Transport security
+## Security scope
 
-- Use HTTPS for all authentication endpoints.
-- Never expose session tokens through URLs.
-- Never store session tokens in localStorage or sessionStorage.
-- Use HttpOnly cookies for session and temporary authentication tokens.
-- Use Secure cookies in production.
-- Use an appropriate SameSite policy.
-- Do not allow untrusted origins.
+Puzzle is a collection of packages, not a complete security boundary.
+Security-sensitive areas include authentication and session management in
+`@puzzle-ui/auth`, `@puzzle-ui/session`, and `@puzzle-ui/fullstack`; MFA and
+passkey flows; and the `@puzzle-ui/storage`, `@puzzle-ui/storage-d1`, and
+`@puzzle-ui/storage-mongodb` adapters.
 
-### Session security
-
-- Generate cryptographically secure opaque session tokens.
-- Store only token hashes.
-- Validate sessions against durable storage.
-- Enforce idle and absolute expiration.
-- Rotate sessions after sensitive authentication operations.
-- Revoke sessions after password changes and account security events.
-- Do not trust client-provided session metadata.
-
-### Password security
-
-- Use an Argon2id password hashing implementation.
-- Never store plaintext passwords.
-- Never log passwords or password hashes.
-- Apply shared, persistent rate limiting.
-- Use generic public responses for account recovery requests.
-- Avoid disclosing whether an email address is registered.
-
-### MFA security
-
-- Encrypt TOTP secrets at rest.
-- Store recovery codes as hashes.
-- Consume recovery codes atomically.
-- Reject expired and consumed challenges.
-- Enforce challenge attempt limits.
-- Prevent TOTP replay.
-- Require cryptographic WebAuthn verification.
-- Validate the expected WebAuthn challenge, origin and RP ID.
-- Require user verification for passkey authentication.
-
-### CSRF protection
-
-- Validate the Origin header on state-changing requests.
-- Use an explicit allowlist of origins.
-- Reject cross-site state-changing requests.
-- Do not treat a missing Origin header as trusted by default.
-- Keep CSRF validation server-side.
-
-### Storage requirements
-
-Production storage adapters must support the capabilities required by
-authentication and session management.
-
-These include:
-
-- Unique constraints.
-- Conditional writes.
-- Atomic batches.
-- Durable persistence.
-
-An in-memory storage implementation is suitable for tests and local
-development only.
-
-### Rate limiting
-
-Rate limiting must be shared across application instances.
-
-Do not use process-local counters for production authentication.
-
-Rate-limit identifiers should be opaque and must not disclose email addresses,
-IP addresses or other personal information in storage keys.
-
-### Secrets
-
-The following values must remain server-side:
-
-- Session secrets.
-- Rate-limit HMAC secrets.
-- TOTP encryption keys.
-- Database credentials.
-- Email provider credentials.
-- Application secrets.
-
-Use a proper secret manager or the deployment platform's encrypted
-environment configuration.
-
-Never commit secrets or production environment files.
-
-## Logging and observability
-
-Logs must not contain:
-
-- Session tokens.
-- MFA challenge tokens.
-- Password reset tokens.
-- Email verification tokens.
-- Passwords or password hashes.
-- TOTP secrets.
-- Recovery codes.
-- Private WebAuthn credential material.
-- Database credentials.
-
-Security events may be recorded using non-sensitive identifiers and
-sanitized metadata.
-
-## WebAuthn deployment requirements
-
-Production deployments must:
-
-- Use HTTPS.
-- Configure an exact RP ID.
-- Configure exact expected origins.
-- Use a maintained WebAuthn server implementation.
-- Keep challenges server-managed.
-- Reject unexpected origins, challenges and RP IDs.
-
-Never accept browser-provided credential information without server-side
-cryptographic verification.
-
-## Dependency and release security
-
-Every release must pass:
-
-- Workspace typechecks.
-- Package builds.
-- Package tests.
-- Browser tests.
-- Storage conformance tests.
-- Runtime compatibility checks.
-- Package publication preflight.
-
-Changes to authentication, session and storage packages require a security
-review before release.
-
-## Disclosure
-
-Coordinate disclosure with the maintainer.
-
-Do not disclose an unresolved vulnerability publicly without first allowing
-the maintainer an opportunity to investigate and prepare a fix.
+The presence of security-related features does not guarantee that an
+application is secure. Application owners remain responsible for selecting
+and configuring providers, storage, deployment settings, and other controls
+for their own threat model.

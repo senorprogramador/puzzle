@@ -1,8 +1,9 @@
 {
   "name": "@puzzle-ui/storage-mongodb",
   "version": "0.6.0",
-  "description": "MongoDB storage adapter foundation for Puzzle Auth.",
-  "homepage": "https://puzzle-ui.com",
+  "description": "MongoDB adapter for the Puzzle Storage contracts.",
+  "homepage": "https://puzzle-ui.com/docs/storage",
+  "keywords": ["puzzle-ui", "mongodb", "storage-adapter", "database", "authentication"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"

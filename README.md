@@ -1,131 +1,146 @@
-# Puzzle
+<p align="center">
+  <img src="apps/site/public/favicon.svg" alt="Puzzle UI logo" width="96" />
+</p>
 
-**Puzzle is a TypeScript-first React design system and developer ecosystem.**
+<h1 align="center">Puzzle UI</h1>
 
-It brings together UI components, theme tokens, hooks, icons, composed page
-sections, SEO utilities, authentication integrations, and project scaffolding.
+<p align="center">
+  TypeScript and React packages for building interfaces, themes, and application
+  infrastructure.
+</p>
 
-## Ecosystem capabilities
+<p align="center">
+  <a href="https://puzzle-ui.com">Website</a> ·
+  <a href="https://puzzle-ui.com/docs/getting-started">Documentation</a> ·
+  <a href="https://puzzle-ui.com/docs/getting-started">Getting started</a> ·
+  <a href="https://github.com/senorprogramador/puzzle">GitHub repository</a>
+</p>
 
-Puzzle brings together reusable React UI components, shared design tokens,
-composed UI sections, authentication and session infrastructure, framework
-integrations, project scaffolding, and developer tooling. Component API
-maturity and package-specific compatibility notes are documented with each
-package.
+## Badges
 
-The [component API stability audit](docs/api-stability-audit.md) records the
-current UI and Pieces component classifications and their evidence.
+[![License](https://img.shields.io/github/license/senorprogramador/puzzle)](./LICENSE)
+[![npm version](https://img.shields.io/npm/v/%40puzzle-ui%2Fui)](https://www.npmjs.com/package/@puzzle-ui/ui)
+![TypeScript](https://img.shields.io/badge/TypeScript-first-3178C6?logo=typescript&logoColor=white)
+[![CI: build, typecheck, and tests](https://github.com/senorprogramador/puzzle/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/senorprogramador/puzzle/actions/workflows/ci.yml)
 
-## Packages
+The CI workflow builds packages, type-checks the workspace, runs package tests, and builds the documentation site. Build and test results are part of the same workflow rather than separate status checks.
 
-Puzzle is organized as a Bun workspace monorepo. Full documentation is available at [puzzle-ui.com](https://puzzle-ui.com/docs/getting-started).
+## Introduction
 
-### UI and design system
+Puzzle UI is a TypeScript-first ecosystem of independently installable React
+packages. Its UI component library and theme system provide interface
+building blocks; separate packages provide reusable hooks, icons, composed
+page sections, SEO utilities, authentication and session primitives, storage
+adapters, framework integrations, and project scaffolding.
 
-| Package                        | Purpose                                                                                 | Documentation                                             |
-| ------------------------------ | --------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| <code>@puzzle-ui/core</code>   | Framework-independent utilities                                                         | [Docs](https://puzzle-ui.com/docs/getting-started)        |
-| <code>@puzzle-ui/hooks</code>  | Reusable React hooks                                                                    | [Docs](https://puzzle-ui.com/docs/hooks)                  |
-| <code>@puzzle-ui/icons</code>  | Icon components and utilities                                                           | [Docs](https://puzzle-ui.com/docs/icons)                  |
-| <code>@puzzle-ui/theme</code>  | Theme provider, design tokens, colors, and typography                                   | [Docs](https://puzzle-ui.com/docs/theme)                  |
-| <code>@puzzle-ui/ui</code>     | Reusable React UI components                                                            | [Docs](https://puzzle-ui.com/docs/ui)                     |
-| <code>@puzzle-ui/pieces</code> | Composed UI sections and larger building blocks                                         | [Docs](https://puzzle-ui.com/docs/pieces/components/hero) |
-| <code>@puzzle-ui/seo</code>    | Framework-independent SEO, metadata, Schema.org contracts, sitemap and robots utilities | [Docs](https://puzzle-ui.com/docs/seo)                    |
+The UI library is one part of this wider application ecosystem. Puzzle is not a
+router or a general-purpose application framework, and applications do not need
+to install every package. Compatibility and API maturity are documented at the
+package or component level. The UI packages target React 19.
 
-### Developer tooling
+## Features
 
-| Package                        | Purpose                                 | Documentation                             |
-| ------------------------------ | --------------------------------------- | ----------------------------------------- |
-| <code>@puzzle-ui/create</code> | Interactive React application generator | [Docs](https://puzzle-ui.com/docs/create) |
+- **UI components** — composable React components with typed APIs.
+- **Theme system** — theme provider, design tokens, colors, and typography.
+- **Hooks and icons** — reusable React behavior and Iconify-powered icons.
+- **Page sections** — composable layouts and presets for common page sections.
+- **Accessibility** — component-specific semantics and interaction guidance;
+  behavior and coverage vary by component and consuming application.
+- **SEO** — metadata, structured data, sitemap, and robots utilities.
+- **Authentication and sessions** — authentication primitives and session
+  management, with client, server, and framework integration entry points.
+- **Storage** — storage contracts with Cloudflare D1 and MongoDB adapters.
+- **Full-stack utilities** — framework-specific integration packages for
+  authentication and SEO workflows.
+- **CLI** — an interactive generator for React, Next.js App Router, and TanStack
+  Start projects.
 
-### Authentication and storage
+These are package capabilities, not a claim that every feature or framework
+combination has the same maturity or support guarantees. Check individual
+component and package documentation for implementation and accessibility
+details.
 
-| Package                                 | Purpose                                                   | Documentation                                |
-| --------------------------------------- | --------------------------------------------------------- | -------------------------------------------- |
-| <code>@puzzle-ui/auth</code>            | Framework-independent authentication core                 | [Docs](https://puzzle-ui.com/docs/auth)      |
-| <code>@puzzle-ui/fullstack</code>       | Authentication client, server, and framework integrations | [Docs](https://puzzle-ui.com/docs/fullstack) |
-| <code>@puzzle-ui/session</code>         | Session management                                        | [Docs](https://puzzle-ui.com/docs/auth)      |
-| <code>@puzzle-ui/storage</code>         | Storage contracts                                         | [Docs](https://puzzle-ui.com/docs/storage)   |
-| <code>@puzzle-ui/storage-d1</code>      | Cloudflare D1 storage adapter                             | [Docs](https://puzzle-ui.com/docs/storage)   |
-| <code>@puzzle-ui/storage-mongodb</code> | MongoDB storage adapter                                   | [Docs](https://puzzle-ui.com/docs/storage)   |
+## Ecosystem
 
-### Applications
+The packages below are published to npm and can be installed independently.
+They are pre-1.0; check each package's documentation before adopting it.
 
-| Path                         | Purpose                            |
-| ---------------------------- | ---------------------------------- |
-| <code>apps/site</code>       | Documentation website              |
-| <code>apps/playground</code> | Storybook and component playground |
+| Package | Availability | Purpose | Install | Documentation |
+| --- | --- | --- | --- | --- |
+| [`@puzzle-ui/core`](https://www.npmjs.com/package/@puzzle-ui/core) | npm | Framework-independent shared utilities | `npm install @puzzle-ui/core` | [Getting started](https://puzzle-ui.com/docs/getting-started) |
+| [`@puzzle-ui/hooks`](https://www.npmjs.com/package/@puzzle-ui/hooks) | npm | Reusable React hooks | `npm install @puzzle-ui/hooks` | [Hooks](https://puzzle-ui.com/docs/hooks) |
+| [`@puzzle-ui/icons`](https://www.npmjs.com/package/@puzzle-ui/icons) | npm | Iconify-powered React SVG icons | `npm install @puzzle-ui/icons` | [Icons](https://puzzle-ui.com/docs/icons) |
+| [`@puzzle-ui/theme`](https://www.npmjs.com/package/@puzzle-ui/theme) | npm | Theme provider, tokens, colors, and typography | `npm install @puzzle-ui/theme` | [Theme](https://puzzle-ui.com/docs/theme) |
+| [`@puzzle-ui/ui`](https://www.npmjs.com/package/@puzzle-ui/ui) | npm | Composable React UI components | `npm install @puzzle-ui/ui` | [UI components](https://puzzle-ui.com/docs/ui) |
+| [`@puzzle-ui/pieces`](https://www.npmjs.com/package/@puzzle-ui/pieces) | npm | Composed React sections and page layouts | `npm install @puzzle-ui/pieces` | [Pieces](https://puzzle-ui.com/docs/pieces/components/hero) |
+| [`@puzzle-ui/seo`](https://www.npmjs.com/package/@puzzle-ui/seo) | npm | Metadata, structured data, sitemaps, and robots utilities | `npm install @puzzle-ui/seo` | [SEO](https://puzzle-ui.com/docs/seo) |
+| [`@puzzle-ui/auth`](https://www.npmjs.com/package/@puzzle-ui/auth) | npm | Framework-independent authentication primitives | `npm install @puzzle-ui/auth` | [Authentication](https://puzzle-ui.com/docs/auth) |
+| [`@puzzle-ui/session`](https://www.npmjs.com/package/@puzzle-ui/session) | npm | Session management for Puzzle Auth | `npm install @puzzle-ui/session` | [Authentication](https://puzzle-ui.com/docs/auth) |
+| [`@puzzle-ui/storage`](https://www.npmjs.com/package/@puzzle-ui/storage) | npm | Storage contracts for authentication and sessions | `npm install @puzzle-ui/storage` | [Storage](https://puzzle-ui.com/docs/storage) |
+| [`@puzzle-ui/storage-d1`](https://www.npmjs.com/package/@puzzle-ui/storage-d1) | npm | Cloudflare D1 storage adapter | `npm install @puzzle-ui/storage-d1` | [Storage](https://puzzle-ui.com/docs/storage) |
+| [`@puzzle-ui/storage-mongodb`](https://www.npmjs.com/package/@puzzle-ui/storage-mongodb) | npm | MongoDB storage adapter | `npm install @puzzle-ui/storage-mongodb` | [Storage](https://puzzle-ui.com/docs/storage) |
+| [`@puzzle-ui/fullstack`](https://www.npmjs.com/package/@puzzle-ui/fullstack) | npm | Auth client, server handlers, and Next.js/TanStack Start adapters | `npm install @puzzle-ui/fullstack react react-dom` | [Full-stack auth](https://puzzle-ui.com/docs/fullstack) |
+| [`@puzzle-ui/create`](https://www.npmjs.com/package/@puzzle-ui/create) | npm | Interactive React project generator | `npx @puzzle-ui/create` | [Create a project](https://puzzle-ui.com/docs/create) |
 
-## Tech stack
+The repository also contains the [documentation site](apps/site) and a
+[Storybook playground](apps/playground). See the
+[API stability audit](docs/api-stability-audit.md) for current UI and Pieces
+component maturity classifications.
 
-- React 19 and TypeScript.
-- Bun workspaces.
-- tsdown for package builds.
-- Vite and TanStack Start.
-- Fumadocs for documentation.
-- Vitest and Node's test runner.
-- Playwright for browser-level testing.
-- Docker Compose for MongoDB integration tests.
+## Installation
 
-Individual packages may use additional dependencies.
-
-## Getting started
-
-### Create a new application
-
-The easiest way to start a new application is the interactive project generator.
-
-With npm:
-
-```bash
-npx @puzzle-ui/create
-```
-
-With Bun:
-
-```bash
-bunx @puzzle-ui/create
-```
-
-With pnpm:
-
-```bash
-pnpm dlx @puzzle-ui/create
-```
-
-With Yarn 2 or later:
-
-```bash
-yarn dlx @puzzle-ui/create
-```
-
-The generator supports:
-
-- Next.js App Router.
-- TanStack Start.
-- Basic React with Vite and TypeScript.
-
-It configures the Puzzle theme and optionally installs Tailwind CSS v4.
-
-The generator requires Node.js 20.19 or later.
-
-See the [Create a Project guide](https://github.com/senorprogramador/puzzle/tree/main/apps/site/content/docs/developer) for details.
-
-### Install Puzzle manually
-
-For an existing React application, install the UI and theme packages.
+Install only the published packages your application uses. For example, add
+the component library and theme system with npm:
 
 ```bash
 npm install @puzzle-ui/ui @puzzle-ui/theme
 ```
 
-Wrap your application in the theme provider.
+For a new project, run the published generator without installing it globally:
+
+```bash
+npx @puzzle-ui/create
+```
+
+The package table above links to each npm package and its installation command.
+The generator also supports Bun, pnpm, and Yarn; see the
+[Create a Project guide](https://puzzle-ui.com/docs/create) for its
+requirements and options.
+
+## Quick start
+
+### Create a project
+
+Run the interactive generator with your package manager:
+
+```bash
+npx @puzzle-ui/create
+# or: bunx @puzzle-ui/create
+# or: pnpm dlx @puzzle-ui/create
+```
+
+The generator offers Basic React with Vite, Next.js App Router, and TanStack
+Start templates. It configures the Puzzle theme and can optionally add Tailwind
+CSS. The CLI requires Node.js 20.19 or later.
+
+See the [Create a Project guide](https://puzzle-ui.com/docs/developer/create-project)
+for the generated files and setup options.
+
+### Add UI components to an existing React app
+
+Install the UI and theme packages:
+
+```bash
+npm install @puzzle-ui/ui @puzzle-ui/theme
+```
+
+Wrap the application in `Theme`, then import components from `@puzzle-ui/ui`:
 
 ```tsx
 import { Theme } from "@puzzle-ui/theme";
 import { Button } from "@puzzle-ui/ui";
 
-const App = () => (
+export const App = () => (
   <Theme theme="system">
     <main>
       <h1>Welcome to Puzzle</h1>
@@ -133,24 +148,90 @@ const App = () => (
     </main>
   </Theme>
 );
-
-export default App;
 ```
 
-Your bundler must support CSS imports. Puzzle's component styles are imported by the components themselves.
+The bundler must support CSS imports. Puzzle components import their styles
+themselves. See [Getting started](https://puzzle-ui.com/docs/getting-started)
+for theme configuration and further examples.
 
-See the [Getting Started documentation](https://github.com/senorprogramador/puzzle/tree/main/apps/site/content/docs/getting-started.mdx).
+## Framework support
 
-## Development
+- **React 19:** UI packages declare React 19 peer dependencies.
+- **Generated templates:** `@puzzle-ui/create` offers Basic React with Vite,
+  Next.js App Router, and TanStack Start templates.
+- **SEO adapters:** `@puzzle-ui/seo` documents adapters for Next.js, TanStack
+  Start, and React Router.
+- **Authentication adapters:** `@puzzle-ui/fullstack` provides client/server
+  entry points and adapters for Next.js and TanStack Start.
 
-### Requirements
+The repository CI builds and tests packages on Node.js 22 and 24. This is not a
+framework compatibility matrix: the project does not publish blanket support
+for every browser, rendering mode, framework version, or framework/package
+combination. Check the relevant package documentation and test the target
+application. No additional framework integrations are currently marked as
+planned; see the [roadmap](./ROADMAP.md).
 
-- Git.
-- Bun 1.4.4 or a compatible newer version.
-- Node.js 20.19 or later for the project generator and related tooling.
-- Docker with Compose for MongoDB integration tests.
+## Examples
 
-### Clone the repository
+The quick start above shows a minimal themed application. The documentation
+includes interactive component examples, including [Button](https://puzzle-ui.com/docs/ui/actions/button),
+[Card](https://puzzle-ui.com/docs/ui/data-display/card), and
+[Text Input](https://puzzle-ui.com/docs/ui/forms/text-input).
+
+Run the local component playground with:
+
+```bash
+bun run dev
+```
+
+Or start Storybook with `bun run storybook`.
+
+## Documentation
+
+- [Documentation home](https://puzzle-ui.com/docs/getting-started)
+- [Getting started](https://puzzle-ui.com/docs/getting-started)
+- [UI components](https://puzzle-ui.com/docs/ui)
+- [Theme and design tokens](https://puzzle-ui.com/docs/theme)
+- [Hooks](https://puzzle-ui.com/docs/hooks)
+- [Icons](https://puzzle-ui.com/docs/icons)
+- [Page sections](https://puzzle-ui.com/docs/pieces/components/hero)
+- [SEO](https://puzzle-ui.com/docs/seo)
+- [Authentication](https://puzzle-ui.com/docs/auth)
+- [Storage](https://puzzle-ui.com/docs/storage)
+- [Full-stack integrations](https://puzzle-ui.com/docs/fullstack)
+- [Project generator](https://puzzle-ui.com/docs/create)
+- [Tutorials](https://puzzle-ui.com/docs/tutorials)
+- [API stability notes](./docs/api-stability-audit.md)
+- [Contributing guide](./CONTRIBUTING.md)
+- [Testing guide](https://puzzle-ui.com/docs/developer/testing)
+- [Security policy](./SECURITY.md)
+- [Code of Conduct](./CODE_OF_CONDUCT.md)
+- [Roadmap](./ROADMAP.md)
+- [Changelog](./CHANGELOG.md)
+
+## Project status
+
+Puzzle is under active development and its packages are currently pre-1.0.
+Unless an API is explicitly marked Stable, it may change, including in
+backward-incompatible ways. Documentation and examples may lag behind
+implementation, and tests do not cover every use case.
+
+There is no formal supported-version policy or published milestone schedule.
+Open issues and discussions are the place to follow or propose work:
+[GitHub Issues](https://github.com/senorprogramador/puzzle/issues) ·
+[GitHub Discussions](https://github.com/senorprogramador/puzzle/discussions).
+
+## Contributing
+
+Contributions, bug reports, and suggestions are welcome. For a substantial
+change, open an issue or discussion first. Bug reports are most useful when
+they include the affected package, a minimal reproduction, expected and actual
+behavior, and relevant framework and runtime versions.
+
+See the [contributor guide](./CONTRIBUTING.md) for development requirements
+and verified repository commands.
+
+To develop locally:
 
 ```bash
 git clone https://github.com/senorprogramador/puzzle.git
@@ -158,164 +239,32 @@ cd puzzle
 bun install
 ```
 
-### Run the documentation site
-
-```bash
-bun run site
-```
-
-The documentation site serves `/sitemap.xml`, generated from the homepage and
-all Fumadocs pages (including documentation indexes). URLs use the request's
-origin, so reverse proxies should preserve the public host and scheme.
-The generated XML is cached in each server process for 24 hours and sent with
-`Cache-Control: public, max-age=86400, s-maxage=86400` for browser and shared caches.
-The process cache is refreshed on expiry, an origin change, or a server restart.
-
-Run the sitemap tests with `bun run --filter @puzzle-ui/site test:sitemap`.
-
-The `/robots.txt` handler allows all crawlers and paths, advertises
-`https://puzzle-ui.com/sitemap.xml`, and sends 24-hour browser/shared cache headers.
-It returns static text without fetching or generating the sitemap.
-
-The homepage, `/docs` and its sub-pages, and all current public icons and the
-web manifest also send `Cache-Control: public, max-age=86400, s-maxage=86400`.
-These responses can be reused by browsers and shared caches for 24 hours;
-updates may remain cached until that period expires. The paths are configured
-in `apps/site/vite.config.ts`; add a rule there when adding a new public file.
-API responses are not covered by this policy.
-
-### Run the playground
-
-```bash
-bun run dev
-```
-
-### Run Storybook
-
-```bash
-bun run storybook
-```
-
-### Build packages
+Useful repository commands:
 
 ```bash
 bun run build
-```
-
-### Type check packages and documentation
-
-```bash
 bun run typecheck
+bun run test:all
+bun run --filter "@puzzle-ui/site" test:sitemap
+bun run seo:validate
+bun run --filter "@puzzle-ui/site" build
 ```
 
-### Run the repository test command
+The full test command includes browser tests and MongoDB integration tests;
+Playwright's Chromium browser and Docker Compose are required. See the
+[contributing](https://puzzle-ui.com/docs/developer/contributing) and
+[testing](https://puzzle-ui.com/docs/developer/testing) guides for package-level
+commands and repository conventions. `seo:validate` also runs a live endpoint
+smoke check against the canonical site; see the
+[SEO/GEO validation report](docs/seo-geo-validation-report.md) for a local
+production-build invocation.
 
-```bash
-bun run vitest
-```
+## Security
 
-This command builds the packages first, runs package test scripts, runs the project generator tests, and runs the UI browser tests.
-
-MongoDB integration tests require Docker with Compose. Browser tests require Playwright's Chromium browser.
-
-See the [Testing guide](https://github.com/senorprogramador/puzzle/tree/main/apps/site/content/docs/developer/testing.mdx) for package-specific commands.
-
-## Design principles
-
-### Icon loading
-
-`Icon` from `@puzzle-ui/icons` reserves its dimensions during server rendering
-and loading to avoid layout shifts. It defaults to `1em` square; use `size` for
-pixel dimensions or `width`, `height`, and `style` for custom sizing. Styles and
-accessible SVG attributes are preserved on the loading placeholder.
-
-Use `<Icon name="lucide:star" size={24} showLoader />` for an optional animated
-12-bar placeholder. It uses the current text color and respects reduced motion.
-Keep decorative icons `aria-hidden`; provide an accessible label for meaningful
-icons. The placeholder retains that same accessibility treatment without adding
-repeated loading announcements.
-
-Puzzle aims to provide interfaces that are:
-
-- **Consistent** — shared components and tokens keep visual decisions aligned.
-- **Composable** — components should fit different application layouts.
-- **Responsive** — layout primitives should adapt to different screen sizes.
-- **Accessible** — semantic HTML and appropriate accessibility behavior are core requirements.
-- **Developer-friendly** — TypeScript types, documentation, examples, and tooling should make APIs easier to understand.
-
-These are project goals, not a claim that every component currently meets them.
-
-## Compatibility
-
-Puzzle targets React 19.
-
-Compatibility with specific React frameworks, rendering modes, and build setups is still being developed and verified. Do not assume that every component works in every environment, including server-side rendering, Next.js App Router, or TanStack Start, unless that support has been tested for the specific component and release.
-
-## Contributing
-
-Contributions, bug reports, and suggestions are welcome.
-
-Before investing in a large change, open an issue or discussion so that the proposed direction can be agreed upon.
-
-When reporting a bug, include:
-
-- The package and component involved.
-- A minimal reproduction.
-- Expected behavior and actual behavior.
-- Relevant framework and runtime versions.
-
-Follow the repository conventions in <code>AGENTS.md</code>.
-
-## Versioning and releases
-
-Until Puzzle reaches a more stable stage:
-
-- APIs not marked Stable may change, including breaking changes.
-- The Stable action APIs (Button, ButtonGroup, and ToggleGroup including Item)
-  are intended to remain backward-compatible within a major version.
-- Documentation may lag behind implementation.
-- Tests and examples may not cover every use case.
-
-Pin versions or use a specific commit if you are experimenting with the project.
-
-The release script currently publishes the following packages together:
-
-- <code>@puzzle-ui/core</code>
-- <code>@puzzle-ui/theme</code>
-- <code>@puzzle-ui/hooks</code>
-- <code>@puzzle-ui/icons</code>
-- <code>@puzzle-ui/ui</code>
-- <code>@puzzle-ui/pieces</code>
-- <code>@puzzle-ui/create</code>
-- <code>@puzzle-ui/storage</code>
-- <code>@puzzle-ui/session</code>
-- <code>@puzzle-ui/storage-d1</code>
-- <code>@puzzle-ui/storage-mongodb</code>
-- <code>@puzzle-ui/auth</code>
-- <code>@puzzle-ui/fullstack</code>
-- <code>@puzzle-ui/seo</code>
-
-Run a release dry run:
-
-```bash
-npm run release:dry-run
-```
-
-Run a release:
-
-```bash
-npm run release
-```
-
-The release script requires a clean Git working tree. It updates package versions and workspace dependency ranges, refreshes the lockfile, validates types, runs tests, builds packages, publishes them, commits the release, creates a tag, and pushes the release.
-
-After changing versions, it regenerates `bun.lock` using `bun install --lockfile-only`
-before verifying it with `bun install --frozen-lockfile`. Dry runs and pre-publish
-failures restore the original package manifests and lockfile.
-Run the isolated release workflow tests with `bun run test:release`.
-
-The release script publishes only the packages listed above. Other packages in the repository are not included in its current release sequence.
+Please report security concerns privately. Read the
+[security policy](./SECURITY.md) before reporting; do not post exploitable
+vulnerability details in a public issue.
 
 ## License
 
-See the [LICENSE](./LICENSE) file for the project's current license.
+Puzzle UI is released under the [MIT License](./LICENSE).

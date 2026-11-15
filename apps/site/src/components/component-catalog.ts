@@ -50,6 +50,13 @@ export const components = [
     description: "Compose content with headers, media, actions, and footers.",
   },
   {
+    name: "Data Table",
+    href: "/docs/ui/data-display/data-table",
+    icon: "lucide:table-2",
+    description:
+      "Browse tabular data with asynchronous loading, pagination, local sorting, and search.",
+  },
+  {
     name: "Empty State",
     href: "/docs/ui/data-display/empty-state",
     icon: "lucide:inbox",

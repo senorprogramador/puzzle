@@ -52,6 +52,11 @@ const dataDisplay: TreeViewItem = {
       href: `${folder}/data-display/card`,
     },
     {
+      id: "ui-data-table",
+      label: "Data Table",
+      href: `${folder}/data-display/data-table`,
+    },
+    {
       id: "ui-empty-state",
       label: "Empty State",
       href: `${folder}/data-display/empty-state`,

@@ -1,8 +1,9 @@
 {
   "name": "@puzzle-ui/fullstack",
   "version": "0.6.0",
-  "description": "First-party Puzzle Auth client, server and framework integration entry points.",
-  "homepage": "https://puzzle-ui.com",
+  "description": "Browser auth client, React UI, server handlers, and Next.js and TanStack Start adapters for Puzzle Auth.",
+  "homepage": "https://puzzle-ui.com/docs/fullstack",
+  "keywords": ["puzzle-ui", "authentication", "react", "nextjs", "tanstack-start", "server"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"

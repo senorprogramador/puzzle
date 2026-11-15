@@ -1,0 +1,150 @@
+.puzzle-data-table {
+    min-width: 0;
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-body2, 0.875rem);
+}
+
+.puzzle-data-table__viewport {
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: clip;
+    overscroll-behavior: contain;
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+    background: var(--puzzle-color-surface, #fff);
+}
+
+.puzzle-data-table__viewport--bounded {
+    overflow-y: auto;
+}
+
+.puzzle-data-table__table {
+    width: max-content;
+    min-width: 100%;
+    border-spacing: 0;
+    border-collapse: separate;
+    table-layout: fixed;
+}
+
+.puzzle-data-table__table th,
+.puzzle-data-table__table td {
+    padding: var(--puzzle-space-3, 0.75rem);
+    border-bottom: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    text-align: start;
+    vertical-align: middle;
+}
+
+.puzzle-data-table__table th {
+    position: sticky;
+    top: 0;
+    z-index: var(--puzzle-z-index-sticky, 1);
+    background: var(--puzzle-color-surface-sunken, #f1eee6);
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+    white-space: nowrap;
+}
+
+.puzzle-data-table__table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.puzzle-data-table__table tfoot td {
+    padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+    border-top: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-bottom: 0;
+    background: var(--puzzle-color-surface, #fff);
+}
+
+.puzzle-data-table__sort {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--puzzle-space-2, 0.5rem);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+}
+
+.puzzle-data-table__sort:hover {
+    color: var(--puzzle-color-primary);
+}
+
+.puzzle-data-table__sort:focus-visible,
+.puzzle-data-table__retry:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring, currentColor);
+    outline-offset: 2px;
+}
+
+.puzzle-data-table__sort-indicator {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-caption, 0.75rem);
+}
+
+.puzzle-data-table__table th[aria-sort] .puzzle-data-table__sort-indicator {
+    color: var(--puzzle-color-primary);
+}
+
+.puzzle-data-table__search {
+    width: 100%;
+}
+
+.puzzle-data-table__search-row td {
+    padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+    background: var(--puzzle-color-surface, #fff);
+}
+
+.puzzle-data-table__search .puzzle-input__control {
+    min-width: 0;
+}
+
+.puzzle-data-table__status,
+.puzzle-data-table__empty,
+.puzzle-data-table__error {
+    display: flex;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: center;
+    gap: var(--puzzle-space-3, 0.75rem);
+    padding: var(--puzzle-space-3, 0.75rem);
+    color: var(--puzzle-color-text-muted);
+    text-align: center;
+}
+
+.puzzle-data-table__error {
+    color: var(--puzzle-color-danger, currentColor);
+}
+
+.puzzle-data-table__retry {
+    padding: var(--puzzle-space-1, 0.25rem) var(--puzzle-space-2, 0.5rem);
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+    background: var(--puzzle-color-surface, #fff);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.puzzle-data-table__retry:hover {
+    background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-data-table__table tfoot > tr > td > nav {
+    margin-inline: auto;
+}
+
+@media (forced-colors: active) {
+    .puzzle-data-table__viewport {
+        border-color: CanvasText;
+    }
+
+    .puzzle-data-table__table th {
+        border-bottom: 1px solid CanvasText;
+    }
+
+    .puzzle-data-table__sort:focus-visible,
+    .puzzle-data-table__retry:focus-visible {
+        outline-color: Highlight;
+    }
+}

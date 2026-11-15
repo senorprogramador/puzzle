@@ -77,6 +77,15 @@ export {
 } from "./components/data-display/empty-state";
 
 export {
+  DataTable,
+  type DataTableCellValue,
+  type DataTableColumnSize,
+  type DataTableProps,
+  type DataTableSortDirection,
+  type DataTableSortState,
+} from "./components/data-display/data-table";
+
+export {
   Image,
   type ImageProps,
   type ImageSource,

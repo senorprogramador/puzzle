@@ -1,8 +1,9 @@
 {
   "name": "@puzzle-ui/storage-d1",
   "version": "0.6.0",
-  "description": "Cloudflare D1 storage adapter foundation for Puzzle Auth.",
-  "homepage": "https://puzzle-ui.com",
+  "description": "Cloudflare D1 adapter for the Puzzle Storage contracts.",
+  "homepage": "https://puzzle-ui.com/docs/storage",
+  "keywords": ["puzzle-ui", "cloudflare-d1", "sqlite", "storage-adapter", "authentication"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"

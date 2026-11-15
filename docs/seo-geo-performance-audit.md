@@ -233,3 +233,28 @@ Performance scores were broadly similar with route-level outliers; the
 discoverability and metadata fixes have no demonstrated field-performance
 effect. Search rankings, AI citations and real-user Core Web Vitals have not
 been measured.
+
+## Follow-up validation — DataTable working-tree build
+
+The subsequent SEO/GEO completion work added deterministic sitemap and robots
+route tests and an external endpoint validator. The site build and typecheck
+passed. The validator passed against both production and the local production
+build:
+
+| Check | Live production | Local production build |
+|---|---:|---:|
+| Sitemap URLs | 117 | 118 |
+| Pages checked; all 200 with matching canonical and no redirects | 117 | 118 |
+| Unique titles/descriptions | 117 / 117 | 118 / 118 |
+| Documentation pages; orphan pages | 116; 0 | 117; 0 |
+| Distinct internal documentation links | 1,800 | 1,826 |
+| Robots, `llms.txt`, and `llms-full.txt` | Passed | Passed |
+
+The sole local-only sitemap URL is
+`/docs/ui/data-display/data-table`; it remains a production 404. No deployment
+was attempted. These endpoint checks do not replace Lighthouse or field
+measurements. Lighthouse was not rerun because the existing seven-route lab
+sample does not include DataTable and no performance regression has been
+established. The existing Lighthouse results remain lab-only and no CrUX or
+Search Console data was collected. Detailed endpoint methodology and
+limitations are in the [validation report](./seo-geo-validation-report.md).

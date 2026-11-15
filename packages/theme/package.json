@@ -2,7 +2,8 @@
   "name": "@puzzle-ui/theme",
   "version": "0.6.0",
   "description": "Design tokens, theme providers, and typography for Puzzle React applications",
-  "homepage": "https://puzzle-ui.com",
+  "homepage": "https://puzzle-ui.com/docs/theme",
+  "keywords": ["puzzle-ui", "react", "theme", "design-tokens", "design-system", "typography"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"

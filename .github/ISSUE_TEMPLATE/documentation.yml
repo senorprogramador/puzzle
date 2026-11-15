@@ -1,0 +1,44 @@
+name: Documentation improvement
+description: Report documentation that is missing, unclear, incomplete, or inaccurate.
+title: "[Docs]: "
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Documentation URL or file
+      description: Link to the page or name the repository file.
+      placeholder: "https://puzzle-ui.com/docs/..."
+    validations:
+      required: true
+  - type: dropdown
+    id: problem-type
+    attributes:
+      label: What is the problem?
+      options:
+        - Inaccurate
+        - Incomplete
+        - Unclear
+        - Missing
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Explain what is incorrect, missing, or difficult to understand.
+    validations:
+      required: true
+  - type: textarea
+    id: suggested-improvement
+    attributes:
+      label: Suggested improvement
+      description: Suggest a correction or the information that should be added.
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Include relevant examples or links.
+    validations:
+      required: false

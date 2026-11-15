@@ -2,7 +2,8 @@
   "name": "@puzzle-ui/icons",
   "version": "0.6.0",
   "description": "Iconify-powered React SVG icons for Puzzle applications",
-  "homepage": "https://puzzle-ui.com",
+  "homepage": "https://puzzle-ui.com/docs/icons",
+  "keywords": ["puzzle-ui", "react", "icons", "iconify", "svg"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"

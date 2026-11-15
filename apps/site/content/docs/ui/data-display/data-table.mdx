@@ -1,0 +1,242 @@
+---
+title: Data Table
+description: Display and navigate tabular data with asynchronous range loading, optional sorting, and search.
+---
+
+export const members = [
+  { name: "Alex Morgan", role: "Designer", team: "Product" },
+  { name: "Jordan Lee", role: "Engineer", team: "Platform" },
+  { name: "Sam Rivera", role: "Researcher", team: "Product" },
+  { name: "Taylor Kim", role: "Engineer", team: "Platform" },
+];
+
+Use `DataTable` to render structured data in an accessible table. Provide the total item count, column headers, a range-based loader, and a function that maps each item to its cells.
+
+## Import
+
+```tsx
+import { DataTable } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+The `requestItems` callback receives a start index and an exclusive end index. Return the items for that range; the table requests another range when the page changes.
+
+<Preview
+  hideDevices={true}
+  code={`\
+    <DataTable
+      numberOfItems={members.length}
+      header={["Name", "Role", "Team"]}
+      itemsPerPage={2}
+      requestItems={async (start, end) => members.slice(start, end)}
+      renderCell={(member) => [member.name, member.role, member.team]}
+    />
+`}
+>
+  <DataTable
+    numberOfItems={members.length}
+    header={["Name", "Role", "Team"]}
+    itemsPerPage={2}
+    requestItems={async (start, end) => members.slice(start, end)}
+    renderCell={(member) => [member.name, member.role, member.team]}
+  />
+</Preview>
+
+## Sorting and search
+
+Pass `getSortValue` and `defaultSort` to enable sorting. Pass `searchable` and `getSearchValue` to show a search field. Both operations apply only to the items currently loaded by the table. `DataTable` does not send sort or search state with range requests, so it cannot perform global sorting or filtering on server-paginated data.
+
+### Sortable columns
+
+Click a column heading to cycle through ascending, descending, and unsorted. `defaultSort` sets the initial order; `getSortValue` provides the value compared for each column.
+
+<Preview
+  hideDevices={true}
+  code={`\
+    <DataTable
+      numberOfItems={members.length}
+      header={["Name", "Role", "Team"]}
+      requestItems={async (start, end) => members.slice(start, end)}
+      renderCell={(member) => [member.name, member.role, member.team]}
+      defaultSort={{ columnIndex: 0, direction: "asc" }}
+      getSortValue={(member, columnIndex) =>
+        [member.name, member.role, member.team][columnIndex] ?? null
+      }
+    />
+`}
+>
+  <DataTable
+    numberOfItems={members.length}
+    header={["Name", "Role", "Team"]}
+    requestItems={async (start, end) => members.slice(start, end)}
+    renderCell={(member) => [member.name, member.role, member.team]}
+    defaultSort={{ columnIndex: 0, direction: "asc" }}
+    getSortValue={(member, columnIndex) =>
+      [member.name, member.role, member.team][columnIndex] ?? null
+    }
+  />
+</Preview>
+
+To control the sort from a parent, provide `sort` (including `null` to enable sorting without an active order) and update it in `onSortChange`.
+
+### Searchable rows
+
+Set `searchable` and provide `getSearchValue` to add a search field. Return the text fields that should be matched for each item.
+
+<Preview
+  hideDevices={true}
+  code={`\
+    <DataTable
+      numberOfItems={members.length}
+      header={["Name", "Role", "Team"]}
+      requestItems={async (start, end) => members.slice(start, end)}
+      renderCell={(member) => [member.name, member.role, member.team]}
+      searchable
+      getSearchValue={(member) =>
+        \`\${member.name} \${member.role} \${member.team}\`
+      }
+    />
+`}
+>
+  <DataTable
+    numberOfItems={members.length}
+    header={["Name", "Role", "Team"]}
+    requestItems={async (start, end) => members.slice(start, end)}
+    renderCell={(member) => [member.name, member.role, member.team]}
+    searchable
+    getSearchValue={(member) =>
+      `${member.name} ${member.role} ${member.team}`
+    }
+  />
+</Preview>
+
+## Column sizing and scrolling
+
+Set `columnSizes` to provide a pixel width for each column or `"auto"` for content-based sizing. Use `maxHeight` to keep a long table within a scrollable viewport; the header remains visible while scrolling.
+
+<Preview
+  hideDevices={true}
+  code={`\
+    <DataTable
+      numberOfItems={members.length}
+      header={["Name", "Role", "Team"]}
+      columnSizes={[180, 140, "auto"]}
+      requestItems={async (start, end) => members.slice(start, end)}
+      renderCell={(member) => [member.name, member.role, member.team]}
+      maxHeight="12rem"
+    />
+`}
+>
+  <DataTable
+    numberOfItems={members.length}
+    header={["Name", "Role", "Team"]}
+    columnSizes={[180, 140, "auto"]}
+    requestItems={async (start, end) => members.slice(start, end)}
+    renderCell={(member) => [member.name, member.role, member.team]}
+    maxHeight="12rem"
+  />
+</Preview>
+
+## Initial data and loading
+
+Pass `initialItems` when the first range is already available so it can render immediately. `loadingContent` replaces the loading message while later ranges are fetched.
+
+<Preview
+  hideDevices={true}
+  code={`\
+    <DataTable
+      numberOfItems={members.length}
+      header={["Name", "Role", "Team"]}
+      itemsPerPage={2}
+      initialItems={members.slice(0, 2)}
+      requestItems={async (start, end) => members.slice(start, end)}
+      renderCell={(member) => [member.name, member.role, member.team]}
+      loadingContent="Loading the next page…"
+    />
+`}
+>
+  <DataTable
+    numberOfItems={members.length}
+    header={["Name", "Role", "Team"]}
+    itemsPerPage={2}
+    initialItems={members.slice(0, 2)}
+    requestItems={async (start, end) => members.slice(start, end)}
+    renderCell={(member) => [member.name, member.role, member.team]}
+    loadingContent="Loading the next page…"
+  />
+</Preview>
+
+## Initial and empty content
+
+Set `noContent` to replace the default empty message.
+
+<Preview
+  hideDevices={true}
+  code={`\
+    <DataTable
+      numberOfItems={0}
+      header={["Name", "Role", "Team"]}
+      requestItems={async () => []}
+      renderCell={(member) => [member.name, member.role, member.team]}
+      noContent="No members match these filters."
+    />
+`}
+>
+  <DataTable
+    numberOfItems={0}
+    header={["Name", "Role", "Team"]}
+    requestItems={async () => []}
+    renderCell={(member) => [member.name, member.role, member.team]}
+    noContent="No members match these filters."
+  />
+</Preview>
+
+For paginated data, pass `initialItems` for the first range and keep `requestItems` available for subsequent pages. `loadingContent` customizes the loading message, and `onError` lets the surrounding UI respond to failed requests; the table displays a retry action by default.
+
+## API reference
+
+### DataTable props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `numberOfItems` | `number` | — | Total number of items available. |
+| `header` | `(string \| ReactNode)[]` | — | Column headings. Must contain at least one item. |
+| `requestItems` | `(start: number, end: number) => Promise<T[]>` | — | Loads the requested range; `end` is exclusive. |
+| `renderCell` | `(item: T) => DataTableCellValue[]` | — | Returns one cell value per header for an item. |
+| `columnSizes` | `(number \| "auto")[]` | — | Column widths in CSS pixels, or content-based sizing with `"auto"`. |
+| `itemsPerPage` | `number` | — | Number of items to request per page. When omitted, the table requests all items. |
+| `initialItems` | `T[]` | — | Items already loaded for the initial range. |
+| `sort` | `DataTableSortState \| null` | — | Controlled sort state; supplying it enables sorting. |
+| `defaultSort` | `DataTableSortState \| null` | — | Initial uncontrolled sort state; supplying it enables sorting. |
+| `getSortValue` | `(item: T, columnIndex: number) => string \| number \| null` | — | Value used to sort an item by a column. Sorting applies to loaded items only. |
+| `onSortChange` | `(sort: DataTableSortState \| null) => void` | — | Called when the user changes the sort. |
+| `searchable` | `boolean` | `false` | Shows a search field. Requires `getSearchValue`. |
+| `getSearchValue` | `(item: T) => string` | — | Text used to search an item. Search applies to loaded items only. |
+| `noContent` | `ReactNode` | `"No items found."` | Content shown when there are no matching items. |
+| `loadingContent` | `ReactNode` | `"Loading…"` | Content shown while items are loading. |
+| `onError` | `(error: unknown) => void` | — | Called when loading fails. The table shows an error message and a retry button. |
+| `maxHeight` | `CSSProperties["maxHeight"]` | — | Bounds the table viewport and enables vertical scrolling. |
+| `className` | `string` | — | Additional class name for the root element. |
+
+`DataTable` also accepts the standard props of a `div`.
+
+### Exported types
+
+- `DataTableProps<T>` describes the component props.
+- `DataTableCellValue` is `string`, `number`, `ReactNode`, or `null`.
+- `DataTableColumnSize` is a width in pixels or `"auto"`.
+- `DataTableSortState` contains a zero-based `columnIndex` and an `asc` or `desc` direction.
+- `DataTableSortDirection` is `"asc" | "desc"`.
+
+## Accessibility
+
+- The component uses a native HTML table with column headers and sortable header buttons.
+- Search and pagination controls have accessible names.
+- Loading state is exposed through `aria-busy`; keep custom loading and empty content understandable without relying on visual styling alone.
+- Ensure each header clearly describes its column, and return a value for every header from `renderCell`.
+
+## Related documentation
+
+- [Pagination](/docs/ui/navigation/pagination)
+- [UI component index](/docs/ui)

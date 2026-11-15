@@ -2,7 +2,8 @@
   "name": "@puzzle-ui/core",
   "version": "0.6.0",
   "description": "Framework-independent utility helpers shared by Puzzle packages",
-  "homepage": "https://puzzle-ui.com",
+  "homepage": "https://puzzle-ui.com/docs/getting-started",
+  "keywords": ["puzzle-ui", "typescript", "javascript", "utilities"],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"
