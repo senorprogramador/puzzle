@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.7.0 - 2026-11-15
+
+- Added `ImageBox`, a photo gallery component that lays out one to five images in a main-plus-supporting grid with a "+N" overflow tile, with an `aspectRatio` prop (default 2), `gap` and `radius` props, and `onImageClick` and `onViewAll` callbacks.
+- Added exported `ImageBoxProps` and `ImageBoxImage` types.
+- Added accessibility to `ImageBox`: a labelled gallery group, interactive tiles rendered as buttons only when callbacks are provided, a "View all photos" button, and eager loading for the main image with lazy loading for the rest.
+- Documented `ImageBox` and refreshed the form component docs (Autocomplete, Checkbox, ColorPicker, DatePicker, FileUpload, FormField, InputGroup, Label, NumberInput, RadioGroup, Select, Slider, Stepper, Switch, TextAreaInput, TextInput, TimePicker, TokenInput).
+
 ## 0.6.2 - 2026-11-15
 
 - Added link support to TextEditor: a toolbar Link popover to apply, edit and remove links, link rendering in the editor and TextRenderer, and a new exported `TextLink` type for inline `link` data.
