@@ -49,6 +49,17 @@ describe("TextEditorToolbar", () => {
     ).toBeInTheDocument();
   });
 
+  it("executes formatting commands through the editor context", async () => {
+    const user = userEvent.setup();
+
+    renderToolbar();
+
+    const bold = screen.getByRole("button", { name: "Bold" });
+    await user.click(bold);
+
+    expect(bold).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("moves focus using horizontal arrow keys", async () => {
     const user = userEvent.setup();
 

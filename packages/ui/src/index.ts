@@ -138,6 +138,7 @@ export type {
   TextDocument,
   TextPoint,
   TextSelection,
+  TextTransaction,
   TextBlockVariant,
 } from "./components/editors/text-editor/text-editor.types";
 

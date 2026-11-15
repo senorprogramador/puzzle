@@ -26,6 +26,27 @@ describe("text HTML parsing", () => {
       ],
     });
   });
+
+  it("preserves semantic heading levels in editable markup", () => {
+    expect(
+      parseHtmlToDocument(
+        '<p data-puzzle-variant="headline4" data-puzzle-heading-level="2">Title</p>',
+      ).content[0],
+    ).toMatchObject({
+      type: "heading",
+      variant: "headline4",
+      headingLevel: 2,
+      children: [{ text: "Title" }],
+    });
+  });
+
+  it.each(["h5", "h6"])("parses semantic %s headings", (tag) => {
+    expect(parseHtmlToDocument(`<${tag}>Title</${tag}>`).content[0]).toMatchObject({
+      type: "heading",
+      headingLevel: Number(tag.slice(1)),
+      children: [{ text: "Title" }],
+    });
+  });
 });
 
 const documentWithText = (text: string): TextDocument => ({
@@ -41,13 +62,13 @@ describe("text document operations", () => {
       focus: { block: 0, offset: 11 },
     };
 
-    const bold = applyMark(document, selection, "bold");
+    const bold = applyMark(document, selection, "bold").document;
     expect(bold.content[0]!.children).toEqual([
       { text: "Hello " },
       { text: "world", marks: ["bold"] },
     ]);
 
-    expect(applyMark(bold, selection, "bold")).toEqual(document);
+    expect(applyMark(bold, selection, "bold").document).toEqual(document);
   });
 
   it("changes the selected block to a theme heading role", () => {
@@ -55,7 +76,7 @@ describe("text document operations", () => {
       documentWithText("Title"),
       createTextSelection(0, 2),
       "headline2",
-    );
+    ).document;
 
     expect(next.content[0]!.type).toBe("heading");
     expect(next.content[0]!.variant).toBe("headline2");
@@ -135,11 +156,11 @@ describe("text document operations", () => {
       anchor: { block: 0, offset: 0 },
       focus: { block: 1, offset: 6 },
     };
-    const aligned = setTextAlign(document, selection, "center");
+    const aligned = setTextAlign(document, selection, "center").document;
     expect(aligned.content.every((block) => block.align === "center")).toBe(
       true,
     );
-    const listed = setListType(aligned, selection, "ordered");
+    const listed = setListType(aligned, selection, "ordered").document;
     expect(listed.content.map((block) => block.listType)).toEqual([
       "ordered",
       "ordered",
@@ -148,7 +169,7 @@ describe("text document operations", () => {
       "listItem",
       "listItem",
     ]);
-    const unlisted = setListType(listed, selection, "ordered");
+    const unlisted = setListType(listed, selection, "ordered").document;
     expect(unlisted.content.every((block) => !block.listType)).toBe(true);
   });
 

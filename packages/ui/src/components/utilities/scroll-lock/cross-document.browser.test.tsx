@@ -173,4 +173,46 @@ describe("cross-document behavior (browser)", () => {
     });
     expect(window.getSelection()?.toString()).toBe("");
   });
+
+  it("counts line breaks when mapping selection in a frame", async () => {
+    const selections: TextSelection[] = [];
+
+    render(
+      <InFrame>
+        <Editor
+          defaultValue={createTextDocument("Hello\nWorld")}
+          onSelectionChange={(selection) => selections.push(selection)}
+        />
+      </InFrame>,
+    );
+
+    const editable = await waitFor(() => {
+      const found = getFrame().querySelector('[contenteditable="true"]');
+
+      expect(found).not.toBeNull();
+      return found as HTMLElement;
+    });
+
+    const frameDocument = getFrame();
+    const textNodes = frameDocument.createTreeWalker(
+      editable,
+      NodeFilter.SHOW_TEXT,
+    );
+    const first = textNodes.nextNode() as Text;
+    const second = textNodes.nextNode() as Text;
+    const range = frameDocument.createRange();
+    range.setStart(first, first.length);
+    range.setEnd(second, second.length);
+
+    editable.focus();
+    frameDocument.defaultView!.getSelection()!.removeAllRanges();
+    frameDocument.defaultView!.getSelection()!.addRange(range);
+
+    await waitFor(() => {
+      const last = selections.at(-1);
+
+      expect(last?.anchor.offset).toBe(5);
+      expect(last?.focus.offset).toBe(11);
+    });
+  });
 });

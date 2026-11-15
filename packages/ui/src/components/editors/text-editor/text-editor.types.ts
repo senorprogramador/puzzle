@@ -41,6 +41,11 @@ type TextSelection = {
   focus: TextPoint;
 };
 
+type TextTransaction = {
+  document: TextDocument;
+  selection: TextSelection;
+};
+
 type TextBlockVariant = TypographyStyle;
 
 export type {
@@ -54,5 +59,6 @@ export type {
   TextDocument,
   TextPoint,
   TextSelection,
+  TextTransaction,
   TextBlockVariant,
 };

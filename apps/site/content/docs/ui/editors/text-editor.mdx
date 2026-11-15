@@ -55,8 +55,9 @@ Pass `defaultValue` for an uncontrolled editor and place the toolbar in the
   />
 </Preview>
 
-For controlled editing, pass `value` and update it with the same document object
-emitted by `onChange`.
+For controlled editing, pass `value` and update it from `onChange`. Structurally
+equal updates preserve the current selection; a changed external document starts
+at the beginning and clears the editor history.
 
 ```tsx
 const [document, setDocument] = useState<TextDocument>({
@@ -87,7 +88,7 @@ variants. Inline marks include bold, italic, underline, and strike.
 
 | Prop | Type | Description |
 | --- | --- | --- |
-| `value` | `TextDocument` | Controlled document. |
+| `value` | `TextDocument` | Controlled document. Structurally equal updates preserve selection; changed external documents reset selection and history. |
 | `defaultValue` | `TextDocument` | Initial uncontrolled document. |
 | `onChange` | `(document: TextDocument) => void` | Called when the document changes. |
 | `toolbar` | `ReactNode` | Optional toolbar rendered in the editor context. |
@@ -113,7 +114,10 @@ The formatting toolbar uses labeled buttons, pressed states, and arrow-key
 navigation. Keep it inside the editor's `toolbar` prop and provide an
 `ariaLabel` when multiple formatting toolbars need distinct names.
 
-**Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
+**Framework compatibility:** `TextEditor` is a client component and does not
+depend on a router. `TextRenderer` can render saved documents without editing
+controls. Package tests do not include full Next.js or TanStack Start
+SSR/hydration integration, so verify those integrations in the consuming app.
 
 ## Related documentation
 

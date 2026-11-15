@@ -1,3 +1,5 @@
+"use client";
+
 import {
   createContext,
   useContext,
@@ -31,7 +33,7 @@ export const useTextEditor = () => {
 
 type TextEditorProps = {
   toolbar?: ReactNode;
-  /** Controlled document. Use the same object emitted by onChange when updating it. */
+  /** Controlled document. Structurally equal updates preserve the current selection. */
   value?: TextDocument;
   /** Initial document for uncontrolled use. */
   defaultValue?: TextDocument;

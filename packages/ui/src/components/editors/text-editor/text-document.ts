@@ -8,6 +8,7 @@ import type {
   TextBlockVariant,
   TextAlign,
   TextListType,
+  TextTransaction,
 } from "./text-editor.types";
 
 const HEADING_VARIANTS = new Set<TextBlockVariant>([
@@ -275,8 +276,8 @@ export const applyMark = (
   selection: TextSelection,
   mark: TextMark,
   force?: boolean,
-): TextDocument => {
-  if (isCollapsedSelection(selection)) return document;
+): TextTransaction => {
+  if (isCollapsedSelection(selection)) return { document, selection };
 
   const { start, end } = getOrderedSelection(selection);
   const allMarked = document.content.every((block, index) => {
@@ -314,14 +315,14 @@ export const applyMark = (
     };
   });
 
-  return { type: "doc", content };
+  return { document: { type: "doc", content }, selection };
 };
 
 export const setTextVariant = (
   document: TextDocument,
   selection: TextSelection,
   variant: TextBlockVariant,
-): TextDocument => {
+): TextTransaction => {
   const { start, end } = getOrderedSelection(selection);
   const lastBlock = isCollapsedSelection(selection)
     ? start.block
@@ -330,19 +331,22 @@ export const setTextVariant = (
       : end.block;
 
   return {
-    type: "doc",
-    content: document.content.map((block, index) => {
-      if (index < start.block || index > lastBlock) return block;
-      return {
-        ...block,
-        type: block.listType
-          ? "listItem"
-          : isHeadingVariant(variant)
-            ? "heading"
-            : "paragraph",
-        variant,
-      };
-    }),
+    document: {
+      type: "doc",
+      content: document.content.map((block, index) => {
+        if (index < start.block || index > lastBlock) return block;
+        return {
+          ...block,
+          type: block.listType
+            ? "listItem"
+            : isHeadingVariant(variant)
+              ? "heading"
+              : "paragraph",
+          variant,
+        };
+      }),
+    },
+    selection,
   };
 };
 
@@ -362,7 +366,7 @@ export const insertDocumentAtSelection = (
   document: TextDocument,
   selection: TextSelection,
   insertedDocument: TextDocument,
-): { document: TextDocument; selection: TextSelection } => {
+): TextTransaction => {
   const source = normalizeTextDocument(document);
   const inserted = normalizeTextDocument(insertedDocument);
   const { start, end } = getOrderedSelection(selection);
@@ -502,7 +506,7 @@ export const insertTextAtSelection = (
   selection: TextSelection,
   text: string,
   marks: TextMark[] = [],
-): { document: TextDocument; selection: TextSelection } => {
+): TextTransaction => {
   const inserted: TextDocument = {
     type: "doc",
     content: text.split("\n").map((line) => ({
@@ -521,7 +525,7 @@ export const setTextAlign = (
   document: TextDocument,
   selection: TextSelection,
   align: TextAlign,
-): TextDocument => {
+): TextTransaction => {
   const { start, end } = getOrderedSelection(selection);
   const lastBlock = isCollapsedSelection(selection)
     ? start.block
@@ -529,11 +533,14 @@ export const setTextAlign = (
       ? end.block - 1
       : end.block;
   return {
-    type: "doc",
-    content: document.content.map((block, index) => {
-      if (index < start.block || index > lastBlock) return block;
-      return { ...block, align };
-    }),
+    document: {
+      type: "doc",
+      content: document.content.map((block, index) => {
+        if (index < start.block || index > lastBlock) return block;
+        return { ...block, align };
+      }),
+    },
+    selection,
   };
 };
 
@@ -560,7 +567,7 @@ export const setListType = (
   document: TextDocument,
   selection: TextSelection,
   listType: TextListType | null,
-): TextDocument => {
+): TextTransaction => {
   const { start, end } = getOrderedSelection(selection);
   const lastBlock = isCollapsedSelection(selection)
     ? start.block
@@ -573,18 +580,21 @@ export const setListType = (
     selected.length > 0 &&
     selected.every((block) => block.listType === listType);
   return {
-    type: "doc",
-    content: document.content.map((block, index) => {
-      if (index < start.block || index > lastBlock) return block;
-      if (remove || listType == null) {
-        const { listType: _listType, ...rest } = block;
-        return {
-          ...rest,
-          type: block.type === "listItem" ? "paragraph" : block.type,
-        };
-      }
-      return { ...block, type: "listItem", listType };
-    }),
+    document: {
+      type: "doc",
+      content: document.content.map((block, index) => {
+        if (index < start.block || index > lastBlock) return block;
+        if (remove || listType == null) {
+          const { listType: _listType, ...rest } = block;
+          return {
+            ...rest,
+            type: block.type === "listItem" ? "paragraph" : block.type,
+          };
+        }
+        return { ...block, type: "listItem", listType };
+      }),
+    },
+    selection,
   };
 };
 

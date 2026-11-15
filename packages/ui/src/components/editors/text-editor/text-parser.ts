@@ -1,5 +1,14 @@
 import { createTextDocument, isHeadingVariant, normalizeInlines, normalizeTextDocument } from "./text-document";
-import type { TextBlock, TextDocument, TextInline, TextMark, TextBlockVariant, TextAlign, TextListType } from "./text-editor.types";
+import type {
+  TextAlign,
+  TextBlock,
+  TextBlockVariant,
+  TextDocument,
+  TextHeadingLevel,
+  TextInline,
+  TextListType,
+  TextMark,
+} from "./text-editor.types";
 
 const VARIANTS = new Set<TextBlockVariant>([
   "display1", "display2", "headline1", "headline2", "headline3", "headline4",
@@ -22,6 +31,17 @@ const HEADING_VARIANTS: Record<string, TextBlockVariant> = {
   h2: "headline2",
   h3: "headline3",
   h4: "headline4",
+  h5: "headline4",
+  h6: "headline4",
+};
+
+const HEADING_LEVELS: Record<string, TextHeadingLevel> = {
+  h1: 1,
+  h2: 2,
+  h3: 3,
+  h4: 4,
+  h5: 5,
+  h6: 6,
 };
 
 const appendText = (target: TextInline[], text: string, marks: TextMark[]) => {
@@ -80,12 +100,14 @@ const createBlock = (
   forceHeading?: boolean,
   align?: TextAlign,
   listType?: TextListType,
+  headingLevel?: TextHeadingLevel,
 ): TextBlock => ({
   type: listType ? "listItem" : forceHeading || isHeadingVariant(variant) ? "heading" : "paragraph",
   variant,
   children: normalizeInlines(children),
   ...(align ? { align } : {}),
   ...(listType ? { listType } : {}),
+  ...(headingLevel ? { headingLevel } : {}),
 });
 
 const getBlockAlign = (element: Element): TextAlign | undefined => {
@@ -106,9 +128,23 @@ const getBlockVariant = (element: Element): TextBlockVariant | undefined => {
   return HEADING_VARIANTS[element.tagName.toLowerCase()];
 };
 
+const getBlockHeadingLevel = (
+  element: Element,
+): TextHeadingLevel | undefined => {
+  const provided = element.getAttribute("data-puzzle-heading-level");
+  if (provided) {
+    const level = Number(provided);
+    if (Number.isInteger(level) && level >= 1 && level <= 6) {
+      return level as TextHeadingLevel;
+    }
+  }
+
+  return HEADING_LEVELS[element.tagName.toLowerCase()];
+};
+
 const containsBlockChild = (element: Element): boolean =>
   Array.from(element.children).some((child) =>
-    ["p", "div", "h1", "h2", "h3", "h4", "ul", "ol", "li"].includes(
+    ["p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li"].includes(
       child.tagName.toLowerCase(),
     ),
   );
@@ -134,7 +170,16 @@ const readHtmlBlocks = (nodes: NodeListOf<ChildNode> | ChildNode[]): TextBlock[]
     if (!(node instanceof Element)) return;
     const tag = node.tagName.toLowerCase();
     if (["script", "style", "iframe", "object", "embed", "noscript"].includes(tag)) return;
-    const isKnownBlock = ["p", "div", "h1", "h2", "h3", "h4"].includes(tag);
+    const isKnownBlock = [
+      "p",
+      "div",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+    ].includes(tag);
 
     if (isKnownBlock && containsBlockChild(node)) {
       flushLoose();
@@ -148,7 +193,16 @@ const readHtmlBlocks = (nodes: NodeListOf<ChildNode> | ChildNode[]): TextBlock[]
       const forceHeading = Boolean(HEADING_VARIANTS[tag]);
       const dataListType = node.getAttribute("data-puzzle-list-type");
       const listType: TextListType | undefined = dataListType === "bullet" || dataListType === "ordered" ? dataListType : undefined;
-      blocks.push(createBlock(variant, readInlineNodes(Array.from(node.childNodes)), forceHeading, getBlockAlign(node), listType));
+      blocks.push(
+        createBlock(
+          variant,
+          readInlineNodes(Array.from(node.childNodes)),
+          forceHeading,
+          getBlockAlign(node),
+          listType,
+          getBlockHeadingLevel(node),
+        ),
+      );
       return;
     }
 

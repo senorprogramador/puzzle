@@ -35,6 +35,7 @@ import type {
   TextSelection,
   TextAlign,
   TextListType,
+  TextTransaction,
 } from "./text-editor.types";
 import "./text-editor.css";
 
@@ -61,7 +62,7 @@ type TextEditorHandle = {
 };
 
 type EditorProps = {
-  /** Controlled document. Use the same object emitted by onChange when updating it. */
+  /** Controlled document. Structurally equal updates preserve the current selection. */
   value?: TextDocument;
   /** Initial document for uncontrolled use. */
   defaultValue?: TextDocument;
@@ -93,12 +94,21 @@ type DomPoint = {
   offset: number;
 };
 
+type ApplyTransactionOptions = {
+  renderDom?: boolean;
+  emitChange?: boolean;
+  skipIfDocumentEqual?: boolean;
+};
+
 const isInside = (root: HTMLElement, node: Node | null): node is Node =>
   node != null && (node === root || root.contains(node));
 
+const isElementNode = (node: Node): node is Element =>
+  node.nodeType === Node.ELEMENT_NODE;
+
 const nodeTextLength = (node: Node): number => {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent?.length ?? 0;
-  if (node instanceof Element && node.tagName.toLowerCase() === "br") {
+  if (isElementNode(node) && node.tagName.toLowerCase() === "br") {
     return node.hasAttribute("data-puzzle-placeholder") ? 0 : 1;
   }
 
@@ -156,16 +166,19 @@ const pointFromDom = (
     };
   }
 
-  const markedBlock =
-    node instanceof Element
-      ? node.closest<HTMLElement>("[data-puzzle-editor-block]")
-      : node.parentElement?.closest<HTMLElement>("[data-puzzle-editor-block]");
+  const element = isElementNode(node) ? node : node.parentElement;
+  const markedBlock = element?.closest<HTMLElement>(
+    "[data-puzzle-editor-block]",
+  );
   let directChild: Node | null = node;
   while (directChild && directChild.parentNode !== root) {
     directChild = directChild.parentNode;
   }
   const blockElement =
-    markedBlock ?? (directChild instanceof HTMLElement ? directChild : null);
+    markedBlock ??
+    (directChild?.nodeType === Node.ELEMENT_NODE
+      ? (directChild as HTMLElement)
+      : null);
 
   if (!blockElement || !root.contains(blockElement)) return null;
 
@@ -228,7 +241,7 @@ const collectDomPoints = (
       return;
     }
 
-    if (node instanceof Element && node.tagName.toLowerCase() === "br") {
+    if (isElementNode(node) && node.tagName.toLowerCase() === "br") {
       if (!node.hasAttribute("data-puzzle-placeholder")) {
         points.push({ start: length, length: 1, node, kind: "break" });
         length += 1;
@@ -342,6 +355,9 @@ const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
     blockElement.className = `puzzle-text-editor__block puzzle-typography-${block.variant}`;
     blockElement.dataset.puzzleEditorBlock = "true";
     blockElement.dataset.puzzleVariant = block.variant;
+    if (block.headingLevel) {
+      blockElement.dataset.puzzleHeadingLevel = String(block.headingLevel);
+    }
     if (block.align) {
       blockElement.dataset.puzzleAlign = block.align;
       blockElement.style.textAlign = block.align;
@@ -491,19 +507,16 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
     const [documentState, setDocumentState] = useState<TextDocument>(() =>
       normalizeTextDocument(value ?? defaultValue ?? createTextDocument()),
     );
-    const [selectionState, setSelectionState] = useState<TextSelection>(() =>
-      createTextSelection(),
-    );
     const editableRef = useRef<HTMLDivElement | null>(null);
     const documentRef = useRef(documentState);
-    const selectionRef = useRef(selectionState);
+    const selectionRef = useRef(createTextSelection());
     const restoreSelectionRef = useRef<TextSelection | null>(null);
     // Contenteditable descendants are managed imperatively, never by React.
     // Skip rendering after native input because the browser has already edited
     // the DOM and rebuilding it would disrupt composition/selection.
     const renderDomOnDocumentChangeRef = useRef(true);
     const inputTypeRef = useRef("");
-    const selectionBeforeInputRef = useRef<TextSelection>(selectionState);
+    const selectionBeforeInputRef = useRef<TextSelection>(selectionRef.current);
     const pendingMarksRef = useRef<TextMark[]>([]);
     const pendingMarksOverrideRef = useRef(false);
     const historyRef = useRef<HistoryState>({
@@ -516,7 +529,6 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
     const updateSelection = useCallback(
       (nextSelection: TextSelection) => {
         selectionRef.current = nextSelection;
-        setSelectionState(nextSelection);
         onSelectionChange?.(nextSelection);
         onActiveMarksChange?.(
           getMarksForSelection(
@@ -562,31 +574,46 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       [clearTypingGroup],
     );
 
-    const emitDocument = useCallback(
-      (nextDocument: TextDocument, nextSelection = selectionRef.current) => {
-        const normalized = normalizeTextDocument(nextDocument);
-        renderDomOnDocumentChangeRef.current = true;
+    const applyTransaction = useCallback(
+      (
+        transaction: TextTransaction,
+        {
+          renderDom = true,
+          emitChange = true,
+          skipIfDocumentEqual = false,
+        }: ApplyTransactionOptions = {},
+      ): boolean => {
+        const normalized = normalizeTextDocument(transaction.document);
+        if (
+          skipIfDocumentEqual &&
+          documentsEqual(documentRef.current, normalized)
+        ) {
+          return false;
+        }
+
+        renderDomOnDocumentChangeRef.current = renderDom;
         documentRef.current = normalized;
-        restoreSelectionRef.current = nextSelection;
-        updateSelection(nextSelection);
+        restoreSelectionRef.current = transaction.selection;
+        updateSelection(transaction.selection);
         setDocumentState(normalized);
-        onChange?.(normalized);
+        if (emitChange) onChange?.(normalized);
+        return true;
       },
       [onChange, updateSelection],
     );
 
-    const commitTransform = useCallback(
-      (nextDocument: TextDocument, nextSelection = selectionRef.current) => {
-        if (documentsEqual(documentRef.current, nextDocument)) {
-          updateSelection(nextSelection);
-          restoreSelectionRef.current = nextSelection;
+    const commitTransaction = useCallback(
+      (transaction: TextTransaction) => {
+        if (documentsEqual(documentRef.current, transaction.document)) {
+          updateSelection(transaction.selection);
+          restoreSelectionRef.current = transaction.selection;
           return;
         }
 
         pushHistory(documentRef.current, selectionRef.current);
-        emitDocument(nextDocument, nextSelection);
+        applyTransaction(transaction);
       },
-      [emitDocument, pushHistory, updateSelection],
+      [applyTransaction, pushHistory, updateSelection],
     );
 
     const undo = useCallback(() => {
@@ -598,8 +625,11 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         selection: selectionRef.current,
       });
       clearTypingGroup();
-      emitDocument(previous.document, previous.selection);
-    }, [clearTypingGroup, emitDocument]);
+      applyTransaction({
+        document: previous.document,
+        selection: previous.selection,
+      });
+    }, [applyTransaction, clearTypingGroup]);
 
     const redo = useCallback(() => {
       const history = historyRef.current;
@@ -610,8 +640,8 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         selection: selectionRef.current,
       });
       clearTypingGroup();
-      emitDocument(next.document, next.selection);
-    }, [clearTypingGroup, emitDocument]);
+      applyTransaction({ document: next.document, selection: next.selection });
+    }, [applyTransaction, clearTypingGroup]);
 
     const getActiveMarks = useCallback(
       (): TextMark[] =>
@@ -664,29 +694,29 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
           return;
         }
 
-        commitTransform(applyMark(documentRef.current, selection, mark));
+        commitTransaction(applyMark(documentRef.current, selection, mark));
       },
-      [commitTransform, focus, getActiveMarks, onActiveMarksChange],
+      [commitTransaction, focus, getActiveMarks, onActiveMarksChange],
     );
 
     const changeVariant = useCallback(
       (variant: TextBlockVariant) => {
         focus();
-        commitTransform(
+        commitTransaction(
           setTextVariant(documentRef.current, selectionRef.current, variant),
         );
       },
-      [commitTransform, focus],
+      [commitTransaction, focus],
     );
 
     const changeAlign = useCallback(
       (align: TextAlign) => {
         focus();
-        commitTransform(
+        commitTransaction(
           setTextAlign(documentRef.current, selectionRef.current, align),
         );
       },
-      [commitTransform, focus],
+      [commitTransaction, focus],
     );
 
     const isTextAlignActive = useCallback((align: TextAlign): boolean => {
@@ -702,11 +732,11 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
     const changeListType = useCallback(
       (listType: TextListType | null) => {
         focus();
-        commitTransform(
+        commitTransaction(
           setListType(documentRef.current, selectionRef.current, listType),
         );
       },
-      [commitTransform, focus],
+      [commitTransaction, focus],
     );
 
     const isListTypeActive = useCallback((listType: TextListType): boolean => {
@@ -723,9 +753,9 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         );
         pendingMarksRef.current = [];
         pendingMarksOverrideRef.current = false;
-        commitTransform(result.document, result.selection);
+        commitTransaction(result);
       },
-      [commitTransform, focus],
+      [commitTransaction, focus],
     );
 
     const insertText = useCallback(
@@ -739,9 +769,9 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         );
         pendingMarksRef.current = [];
         pendingMarksOverrideRef.current = false;
-        commitTransform(result.document, result.selection);
+        commitTransaction(result);
       },
-      [commitTransform, focus],
+      [commitTransaction, focus],
     );
 
     useImperativeHandle(
@@ -787,21 +817,20 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
 
     useEffect(() => {
       if (!value || value === documentRef.current) return;
-      const normalized = normalizeTextDocument(value);
-      renderDomOnDocumentChangeRef.current = true;
-      documentRef.current = normalized;
       const selection = createTextSelection();
-      selectionRef.current = selection;
-      restoreSelectionRef.current = selection;
+      const applied = applyTransaction(
+        { document: value, selection },
+        { emitChange: false, skipIfDocumentEqual: true },
+      );
+      if (!applied) return;
+
       historyRef.current = {
         undo: [],
         redo: [],
         lastInputType: "",
         lastInputAt: 0,
       };
-      setDocumentState(normalized);
-      updateSelection(selection);
-    }, [value, updateSelection]);
+    }, [applyTransaction, value]);
 
     useLayoutEffect(() => {
       const root = editableRef.current;
@@ -866,21 +895,28 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         );
     }, [updateSelection]);
 
-    const handleBeforeInput = (event: FormEvent<HTMLDivElement>) => {
-      const nativeEvent = event.nativeEvent as InputEvent;
-      const inputType = nativeEvent.inputType ?? "";
-      inputTypeRef.current = inputType;
-      selectionBeforeInputRef.current =
-        selectionFromDom(event.currentTarget) ?? selectionRef.current;
+    useEffect(() => {
+      const root = editableRef.current;
+      if (!root) return;
 
-      if (inputType === "historyUndo") {
-        event.preventDefault();
-        undo();
-      } else if (inputType === "historyRedo") {
-        event.preventDefault();
-        redo();
-      }
-    };
+      const handleBeforeInput = (event: InputEvent) => {
+        const inputType = event.inputType ?? "";
+        inputTypeRef.current = inputType;
+        selectionBeforeInputRef.current =
+          selectionFromDom(root) ?? selectionRef.current;
+
+        if (inputType === "historyUndo") {
+          event.preventDefault();
+          undo();
+        } else if (inputType === "historyRedo") {
+          event.preventDefault();
+          redo();
+        }
+      };
+
+      root.addEventListener("beforeinput", handleBeforeInput);
+      return () => root.removeEventListener("beforeinput", handleBeforeInput);
+    }, [redo, undo]);
 
     const handleInput = (event: FormEvent<HTMLDivElement>) => {
       const root = event.currentTarget;
@@ -901,7 +937,12 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         };
         if (!isCollapsedSelection(insertedRange)) {
           for (const mark of pendingMarksRef.current) {
-            nextDocument = applyMark(nextDocument, insertedRange, mark, true);
+            nextDocument = applyMark(
+              nextDocument,
+              insertedRange,
+              mark,
+              true,
+            ).document;
           }
         }
       }
@@ -920,7 +961,6 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
           inputType === "deleteContentForward") &&
         historyRef.current.lastInputType === inputType &&
         now - historyRef.current.lastInputAt < 800;
-
       if (!canGroup) {
         historyRef.current.undo.push({
           document: previousDocument,
@@ -933,7 +973,6 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       historyRef.current.redo = [];
       historyRef.current.lastInputType = inputType;
       historyRef.current.lastInputAt = now;
-      documentRef.current = normalizeTextDocument(nextDocument);
       if (
         inputType === "insertText" ||
         inputType === "insertCompositionText" ||
@@ -942,11 +981,10 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         pendingMarksRef.current = [];
         pendingMarksOverrideRef.current = false;
       }
-      restoreSelectionRef.current = nextSelection;
-      updateSelection(nextSelection);
-      renderDomOnDocumentChangeRef.current = false;
-      setDocumentState(documentRef.current);
-      onChange?.(documentRef.current);
+      applyTransaction(
+        { document: nextDocument, selection: nextSelection },
+        { renderDom: false },
+      );
     };
 
     const handlePaste = (event: ClipboardEvent<HTMLDivElement>) => {
@@ -984,7 +1022,10 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       } else if (key === "u") {
         event.preventDefault();
         toggleMark("underline");
-      } else if (key === "x" && event.shiftKey) {
+      } else if (
+        event.shiftKey &&
+        (key === "s" || key === "x")
+      ) {
         event.preventDefault();
         toggleMark("strike");
       }
@@ -1021,7 +1062,6 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
             : undefined
         }
         spellCheck
-        onBeforeInput={handleBeforeInput}
         onInput={handleInput}
         onPaste={handlePaste}
         onKeyDown={handleKeyDown}
