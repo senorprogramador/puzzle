@@ -1,9 +1,15 @@
 {
   "name": "@puzzle-ui/pieces",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Composable React hero layouts and presets for websites and landing pages",
   "homepage": "https://puzzle-ui.com/docs/pieces/components/hero",
-  "keywords": ["puzzle-ui", "react", "hero-components", "landing-pages", "website-sections"],
+  "keywords": [
+    "puzzle-ui",
+    "react",
+    "hero-components",
+    "landing-pages",
+    "website-sections"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"
@@ -48,11 +54,11 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.6.0",
-    "@puzzle-ui/hooks": "^0.6.0",
-    "@puzzle-ui/icons": "^0.6.0",
-    "@puzzle-ui/theme": "^0.6.0",
-    "@puzzle-ui/ui": "^0.6.0"
+    "@puzzle-ui/core": "^0.6.1",
+    "@puzzle-ui/hooks": "^0.6.1",
+    "@puzzle-ui/icons": "^0.6.1",
+    "@puzzle-ui/theme": "^0.6.1",
+    "@puzzle-ui/ui": "^0.6.1"
   },
   "peerDependencies": {
     "react": "^19.0.0",

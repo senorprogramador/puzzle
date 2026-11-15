@@ -1,9 +1,17 @@
 {
   "name": "@puzzle-ui/ui",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Composable React UI components with typed APIs for Puzzle applications",
   "homepage": "https://puzzle-ui.com/docs/ui",
-  "keywords": ["puzzle-ui", "react", "typescript", "ui-components", "component-library", "design-system", "accessibility"],
+  "keywords": [
+    "puzzle-ui",
+    "react",
+    "typescript",
+    "ui-components",
+    "component-library",
+    "design-system",
+    "accessibility"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"
@@ -48,10 +56,10 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.6.0",
-    "@puzzle-ui/hooks": "^0.6.0",
-    "@puzzle-ui/icons": "^0.6.0",
-    "@puzzle-ui/theme": "^0.6.0"
+    "@puzzle-ui/core": "^0.6.1",
+    "@puzzle-ui/hooks": "^0.6.1",
+    "@puzzle-ui/icons": "^0.6.1",
+    "@puzzle-ui/theme": "^0.6.1"
   },
   "peerDependencies": {
     "react": "^19.0.0",

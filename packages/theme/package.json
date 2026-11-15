@@ -1,9 +1,16 @@
 {
   "name": "@puzzle-ui/theme",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Design tokens, theme providers, and typography for Puzzle React applications",
   "homepage": "https://puzzle-ui.com/docs/theme",
-  "keywords": ["puzzle-ui", "react", "theme", "design-tokens", "design-system", "typography"],
+  "keywords": [
+    "puzzle-ui",
+    "react",
+    "theme",
+    "design-tokens",
+    "design-system",
+    "typography"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"
@@ -70,7 +77,7 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.6.0"
+    "@puzzle-ui/core": "^0.6.1"
   },
   "peerDependencies": {
     "react": "^19.0.0",

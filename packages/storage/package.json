@@ -1,9 +1,15 @@
 {
   "name": "@puzzle-ui/storage",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Vendor-neutral storage contracts for Puzzle Auth.",
   "homepage": "https://puzzle-ui.com/docs/storage",
-  "keywords": ["puzzle-ui", "storage", "storage-adapter", "database", "authentication"],
+  "keywords": [
+    "puzzle-ui",
+    "storage",
+    "storage-adapter",
+    "database",
+    "authentication"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"

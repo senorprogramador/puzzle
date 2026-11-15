@@ -3,6 +3,18 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.6.1 - 2026-11-15
+
+- Added `DataTable`, a paginated data table with column sizing, local sorting (controlled or default), local search, custom loading and empty content, error handling and a max height, plus exported `DataTable` types.
+- Improved `TextEditor` selection handling: formatting, undo and redo now keep the selection, and structurally equal controlled `value` updates no longer reset it.
+- Added `TextEditor` support for the `Ctrl/Cmd+Shift+S` strikethrough shortcut, keeping `Ctrl/Cmd+Shift+X` as an alias.
+- Added `TextEditor` heading-level preservation, including `h5` and `h6` when parsing HTML.
+- Added exported `TextTransaction` type; the text document transform helpers (`applyMark`, `setTextVariant`, `setTextAlign`, `setListType`) now return a document and selection pair.
+- Fixed `TextEditor` selection offsets inside iframes and across line breaks, and made it `"use client"` compatible.
+- Fixed `ToggleGroup.Item` so `loading` and `aria-disabled` items are treated as disabled and skipped in roving focus.
+- Documented `Button`, `ButtonGroup` and `ToggleGroup` as Stable APIs, backed by new component and browser tests.
+- Fixed the `Background` docs preview so it renders at a consistent size.
+
 ## 0.6.0 - 2026-11-14
 
 - Added the `Grid` and `GridItem` layout components. They support responsive (mobile, tablet and desktop) columns, rows, gaps, alignment, auto-flow, auto-fit `minChildWidth`, item spans and placement, polymorphic `as` roots, and native props and refs.

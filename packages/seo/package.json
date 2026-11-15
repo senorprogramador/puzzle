@@ -1,9 +1,19 @@
 {
   "name": "@puzzle-ui/seo",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "TypeScript-first SEO toolkit for metadata, canonical URLs, sitemaps, robots.txt, Schema.org, and JSON-LD.",
   "homepage": "https://puzzle-ui.com/docs/seo",
-  "keywords": ["puzzle-ui", "seo", "typescript", "metadata", "canonical-url", "sitemap", "robots-txt", "schema.org", "json-ld"],
+  "keywords": [
+    "puzzle-ui",
+    "seo",
+    "typescript",
+    "metadata",
+    "canonical-url",
+    "sitemap",
+    "robots-txt",
+    "schema.org",
+    "json-ld"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/senorprogramador/puzzle.git"
