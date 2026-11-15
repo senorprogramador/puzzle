@@ -16,14 +16,18 @@ export const AUTHOR = {
   ],
 };
 
+export const AUTHOR_ID = `${AUTHOR.url}/#person`;
+
 export const PUBLISHER = {
   name: "Señor Programador",
   url: "https://senorprogramador.com",
   logo: "https://api.senorprogramador.com/favicon/apple-touch-icon.png",
 };
 
+export const PUBLISHER_ID = `${PUBLISHER.url}/#organization`;
+
 export const SITE_DESCRIPTION =
-  "Puzzle is a TypeScript-first React design system and developer ecosystem for UI components, theme tokens, hooks, icons, page sections, SEO, authentication, and project scaffolding.";
+  "TypeScript-first React design system and developer ecosystem for UI, themes, hooks, icons, SEO, authentication, storage, fullstack tools, and project scaffolding.";
 
 const SITE_ORIGIN = new URL(SITE_URL).origin;
 
@@ -131,7 +135,7 @@ export const createSeoHead = (metadata: SeoPageMetadata): SeoHead => {
   const pageMetadata: SeoPageMetadata = {
     ...metadata,
 
-    author: metadata.author ?? SITE_NAME,
+    author: metadata.author ?? AUTHOR.name,
 
     robots: metadata.robots ?? DEFAULT_ROBOTS,
 

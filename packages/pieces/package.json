@@ -1,7 +1,7 @@
 {
   "name": "@puzzle-ui/pieces",
   "version": "0.6.0",
-  "description": "UI pieces for Puzzle",
+  "description": "Composable React hero layouts and presets for websites and landing pages",
   "homepage": "https://puzzle-ui.com",
   "repository": {
     "type": "git",

@@ -30,6 +30,9 @@ import {
   SITE_URL,
   seoConfig,
   AUTHOR,
+  AUTHOR_ID,
+  PUBLISHER,
+  PUBLISHER_ID,
 } from "@/lib/seo";
 
 import { TanStackLink } from "../components/navigation/link/link";
@@ -38,7 +41,7 @@ const rootSeoHead = createSeoHead({
   title: "TypeScript-First React Design System",
   description: SITE_DESCRIPTION,
   locale: "en-US",
-  author: SITE_NAME,
+  author: AUTHOR.name,
 
   openGraph: {
     type: "website",
@@ -77,6 +80,12 @@ export const Route = createRootRoute({
         type: "text/plain",
         title: "AI-friendly documentation index",
         href: "/llms.txt",
+      },
+      {
+        rel: "alternate",
+        type: "text/plain",
+        title: "Full AI-readable documentation",
+        href: "/llms-full.txt",
       },
 
       {
@@ -198,25 +207,25 @@ function RootDocument({
             }}
           >
             <LDOrganization
-              id="https://senorprogramador.com/#organization"
-              name="Señor Programador"
-              url="https://senorprogramador.com"
-              logo="https://senorprogramador.com/favicon.svg"
+              id={PUBLISHER_ID}
+              name={PUBLISHER.name}
+              url={PUBLISHER.url}
+              logo={PUBLISHER.logo}
               founder={{
-                "@id": "https://senorprogramador.com/#person",
+                "@id": AUTHOR_ID,
               }}
             />
 
             <Schema
               type="Person"
-              id="https://senorprogramador.com/#person"
+              id={AUTHOR_ID}
               data={{
                 name: AUTHOR.name,
                 url: AUTHOR.url,
                 jobTitle: AUTHOR.jobTitle,
                 sameAs: AUTHOR.sameAs,
                 worksFor: {
-                  "@id": "https://senorprogramador.com/#organization",
+                  "@id": PUBLISHER_ID,
                 },
               }}
             />
@@ -228,7 +237,7 @@ function RootDocument({
               description={SITE_DESCRIPTION}
               inLanguage="en-US"
               publisher={{
-                "@id": "https://senorprogramador.com/#organization",
+                "@id": PUBLISHER_ID,
               }}
             />
 

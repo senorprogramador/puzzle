@@ -11,7 +11,14 @@ import {
   type SchemaValue,
 } from "@puzzle-ui/seo";
 
-import { HOME_URL, getCanonicalUrl, SITE_URL, createSeoHead } from "@/lib/seo";
+import {
+  AUTHOR_ID,
+  HOME_URL,
+  getCanonicalUrl,
+  PUBLISHER_ID,
+  SITE_URL,
+  createSeoHead,
+} from "@/lib/seo";
 
 import { docs, source } from "@/lib/source";
 
@@ -232,10 +239,10 @@ function Content({ path }: { path: string }) {
             "@id": `${canonical}#webpage`,
           },
           author: {
-            "@id": "https://senorprogramador.com/#person",
+            "@id": AUTHOR_ID,
           },
           publisher: {
-            "@id": "https://senorprogramador.com/#organization",
+            "@id": PUBLISHER_ID,
           },
           isPartOf: {
             "@id": `${SITE_URL}/#website`,

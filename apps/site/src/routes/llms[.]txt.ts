@@ -17,10 +17,29 @@ const escapeMarkdownLabel = (value: string): string =>
 
 const buildLlmsTxt = (): string => {
   const pages = [...source.getPages()].sort((left, right) =>
-    left.url.localeCompare(right.url),
+    left.url < right.url ? -1 : left.url > right.url ? 1 : 0,
   );
 
-  const documentation = pages.map((page) => {
+  const pagesByUrl = new Map(
+    pages.map((page) => [getCanonicalUrl(page.url), page] as const),
+  );
+
+  if (pagesByUrl.size !== pages.length) {
+    throw new Error("Documentation source contains duplicate canonical URLs.");
+  }
+
+  const getPage = (path: string) => {
+    const url = getCanonicalUrl(path);
+    const page = pagesByUrl.get(url);
+
+    if (!page) {
+      throw new Error(`Required documentation page is missing: ${url}`);
+    }
+
+    return page;
+  };
+
+  const renderPage = (page: (typeof pages)[number]) => {
     const title = escapeMarkdownLabel(cleanText(page.data.title));
 
     const description = cleanText(page.data.description);
@@ -32,7 +51,34 @@ const buildLlmsTxt = (): string => {
     }
 
     return `- [${title}](${url})`;
-  });
+  };
+
+  const startPage = getPage("/docs/getting-started");
+  const packageOverviews = [
+    "/docs/ui",
+    "/docs/theme",
+    "/docs/hooks",
+    "/docs/icons",
+    "/docs/pieces/components/hero",
+    "/docs/seo",
+    "/docs/auth",
+    "/docs/fullstack",
+    "/docs/storage",
+    "/docs/create",
+  ].map(getPage);
+  const tutorials = [
+    "/docs/tutorials/seo",
+    "/docs/tutorials/auth",
+    "/docs/tutorials/storage",
+  ].map(getPage);
+  const featuredUrls = new Set(
+    [startPage, ...packageOverviews, ...tutorials].map((page) =>
+      getCanonicalUrl(page.url),
+    ),
+  );
+  const additionalDocumentation = pages.filter(
+    (page) => !featuredUrls.has(getCanonicalUrl(page.url)),
+  );
 
   return [
     `# ${SITE_NAME}`,
@@ -41,29 +87,45 @@ const buildLlmsTxt = (): string => {
 
     "",
 
-    "Puzzle is an open-source, TypeScript-first React design system and developer ecosystem with UI components, theme tokens, hooks, icons, composed page sections, SEO utilities, authentication integrations, and project scaffolding.",
-
-    "",
-
     "## Official resources",
 
     `- Website: ${HOME_URL}`,
 
-    `- Documentation: ${getCanonicalUrl("/docs/getting-started")}`,
+    `- Full documentation for AI systems: ${getCanonicalUrl("/llms-full.txt")}`,
 
     "- Source repository: https://github.com/senorprogramador/puzzle",
 
     "",
 
-    "## Documentation",
+    "## Start here",
 
-    ...documentation,
+    renderPage(startPage),
+
+    "",
+
+    "## Package overviews",
+
+    ...packageOverviews.map(renderPage),
+
+    "",
+
+    "## Tutorials",
+
+    ...tutorials.map(renderPage),
+
+    "",
+
+    "## Additional documentation",
+
+    ...additionalDocumentation.map(renderPage),
 
     "",
 
     "## API maturity and compatibility",
 
-    "Component API maturity and package-specific compatibility notes are documented in the relevant package guides.",
+    "Button, ButtonGroup and ToggleGroup have Stable APIs. Storage adapters, Auth, Session, Fullstack and SEO surfaces described in the tutorials are Beta; other UI primitives have component-specific labels. Beta status does not guarantee production readiness.",
+
+    `See ${getCanonicalUrl("/docs/tutorials")}#api-maturity.`,
 
     "",
   ].join("\n");

@@ -1,6 +1,11 @@
 import { describe, expect, it } from "bun:test";
 
-import { createSeoHead, getCanonicalUrl, SITE_URL } from "./seo";
+import {
+  AUTHOR,
+  createSeoHead,
+  getCanonicalUrl,
+  SITE_URL,
+} from "./seo";
 
 describe("Puzzle SEO integration", () => {
   it("applies the Puzzle UI title template to documentation pages", () => {
@@ -43,6 +48,18 @@ describe("Puzzle SEO integration", () => {
     expect(head.meta).toContainEqual({
       name: "twitter:description",
       content: description,
+    });
+  });
+
+  it("uses the configured Person as the default metadata author", () => {
+    const head = createSeoHead({
+      title: "Storage",
+      description: "Persist application records.",
+    });
+
+    expect(head.meta).toContainEqual({
+      name: "author",
+      content: AUTHOR.name,
     });
   });
 

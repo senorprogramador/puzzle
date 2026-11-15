@@ -1,5 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getCanonicalUrl } from "@/lib/seo";
+import {
+  AUTHOR_ID,
+  HOME_URL,
+  PUBLISHER_ID,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+  getCanonicalUrl,
+} from "@/lib/seo";
+import { ecosystem } from "@/lib/homepage";
 import { Theme, ThemeMode } from "@puzzle-ui/theme";
 import {
   Button,
@@ -52,49 +61,6 @@ const features = [
       "TypeScript-first APIs, predictable behavior and a consistent design system make development enjoyable.",
   },
 ];
-
-const ecosystem = [
-  {
-    name: "UI components",
-    href: "/docs/ui",
-    description: "Composable React components with typed props and examples.",
-  },
-  {
-    name: "Theme and design tokens",
-    href: "/docs/theme",
-    description: "Theme provider, semantic tokens, colors, and typography.",
-  },
-  {
-    name: "React hooks",
-    href: "/docs/hooks",
-    description: "Keyboard shortcuts and roving-focus utilities.",
-  },
-  {
-    name: "Icons",
-    href: "/docs/icons",
-    description: "Iconify-backed React SVG icons and styling guidance.",
-  },
-  {
-    name: "Pieces",
-    href: "/docs/pieces/components/hero",
-    description: "Composed hero sections built from shared UI primitives.",
-  },
-  {
-    name: "SEO",
-    href: "/docs/seo",
-    description: "Metadata, structured data, sitemaps, and robots utilities.",
-  },
-  {
-    name: "Authentication",
-    href: "/docs/fullstack",
-    description: "Authentication client, server, and framework integrations.",
-  },
-  {
-    name: "Project scaffolding",
-    href: "/docs/create",
-    description: "Generate a React application configured for Puzzle.",
-  },
-] as const;
 
 const codeExample = `import { Button, Card, Heading, Text } from "@puzzle-ui/ui";
 
@@ -295,16 +261,20 @@ const Home = () => {
     <Theme theme={theme} scope="local">
       <Schema
         type="SoftwareSourceCode"
-        id="https://puzzle-ui.com/#software"
+        id={`${SITE_URL}/#software`}
         properties={{
-          name: "Puzzle UI",
-          url: "https://puzzle-ui.com/",
+          name: SITE_NAME,
+          description: SITE_DESCRIPTION,
+          url: HOME_URL,
           codeRepository: "https://github.com/senorprogramador/puzzle",
+          programmingLanguage: "TypeScript",
+          runtimePlatform: "React",
+          license: "https://opensource.org/license/mit/",
           author: {
-            "@id": "https://senorprogramador.com/#person",
+            "@id": AUTHOR_ID,
           },
           publisher: {
-            "@id": "https://senorprogramador.com/#organization",
+            "@id": PUBLISHER_ID,
           },
         }}
       />
@@ -337,10 +307,9 @@ const Home = () => {
                     </Heading>
 
                     <Text className="home-hero__description">
-                      Compose typed UI components with shared theme tokens,
-                      hooks, icons, page sections, and developer tools. Puzzle
-                      brings a design system and a growing React ecosystem
-                      together.
+                      Build accessible React interfaces with a TypeScript-first
+                      component system, or explore a broader ecosystem of
+                      developer packages designed to work together where useful.
                     </Text>
                   </Stack>
                   <Stack
@@ -572,9 +541,10 @@ const Home = () => {
                     More than components.
                   </Heading>
                   <Text className="home-hero__description">
-                    Start with the UI package and add the parts your React
-                    application needs. Capabilities and framework integrations
-                    are documented by package.
+                    Puzzle is more than a component library. Its packages can
+                    be used independently where supported and composed as your
+                    application grows, with accessibility and developer
+                    experience at the center.
                   </Text>
                 </Stack>
 
@@ -731,11 +701,6 @@ export const Route = createFileRoute("/")({
       },
     ],
     meta: [
-      {
-        name: "description",
-        content:
-          "Puzzle is a TypeScript-first React design system and developer ecosystem for UI components, theme tokens, hooks, icons, page sections, SEO, authentication, and project scaffolding.",
-      },
       {
         property: "og:url",
         content: getCanonicalUrl("/"),

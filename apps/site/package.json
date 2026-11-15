@@ -13,7 +13,7 @@
     "build": "bun run fonts:download && vite build",
     "start": "node .output/server/index.mjs",
     "fonts:download": "bun ../../packages/theme/src/cli.ts fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
-    "test:seo": "bun test src/lib/seo.test.ts",
+    "test:seo": "bun test src/lib/seo.test.ts src/lib/homepage.test.ts src/lib/mdx-to-markdown.test.ts",
     "test:catalog": "bun test src/components/component-catalog.test.ts",
     "test:tutorials": "bun scripts/validate-tutorials.ts",
     "test:hydration": "bun scripts/validate-hydration.ts",
@@ -37,6 +37,9 @@
     "fumadocs-ui": "^16.17.10",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "remark": "^15.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-mdx": "^3.1.1",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
