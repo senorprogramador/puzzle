@@ -487,8 +487,9 @@ export const handleAuthRequest = async (
 };
 `;
 
-const authConfig = `const authConfig = {
+const authConfig = (database: AuthDatabase) => `const authConfig = {
   redirects: { afterSignIn: "/dashboard", afterSignUp: "/dashboard" },
+  offerPasskeyAfterSignIn: ${database === "mongodb" || database === "d1"},
 };`;
 
 const dashboardBody = (email: string) => `<Container
@@ -581,7 +582,7 @@ import { useRouter } from "next/navigation";
 
 import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";
 
-${authConfig}
+${authConfig(database)}
 
 const SignInPage = () => {
   const router = useRouter();
@@ -605,7 +606,7 @@ import { useRouter } from "next/navigation";
 
 import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";
 
-${authConfig}
+${authConfig(database)}
 
 const SignUpPage = () => {
   const router = useRouter();
@@ -685,7 +686,7 @@ export const Route = createFileRoute("/api/auth/$")({
 
 import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";
 
-${authConfig}
+${authConfig(database)}
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -709,7 +710,7 @@ export const Route = createFileRoute("/sign-in")({
 
 import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";
 
-${authConfig}
+${authConfig(database)}
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -804,7 +805,7 @@ import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";
 
 export const meta = () => [{ title: "Sign in" }];
 
-${authConfig}
+${authConfig(database)}
 
 const SignInPage = () => {
   const navigate = useNavigate();
@@ -828,7 +829,7 @@ import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";
 
 export const meta = () => [{ title: "Create an account" }];
 
-${authConfig}
+${authConfig(database)}
 
 const SignUpPage = () => {
   const navigate = useNavigate();

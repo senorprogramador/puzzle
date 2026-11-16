@@ -9,12 +9,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PackageManager } from "./types";
 
 import { createProject } from "./create-project";
+import { prepareMongoDB } from "./auth/prepare-mongodb";
+
+vi.mock("./auth/prepare-mongodb");
 
 describe("createProject", () => {
   let cwd: string;
 
   beforeEach(async () => {
     cwd = await mkdtemp(path.join(os.tmpdir(), "puzzle-create-project-"));
+    vi.mocked(prepareMongoDB).mockResolvedValue(true);
   });
 
   afterEach(async () => {
@@ -66,6 +70,7 @@ describe("createProject", () => {
     );
 
     expect(packageJson.name).toBe("my-awesome-app");
+    expect(prepareMongoDB).not.toHaveBeenCalled();
     expect(requestInitialUser).not.toHaveBeenCalled();
     expect(main).toContain("@puzzle-ui/theme");
     expect(main).toContain(
@@ -332,8 +337,14 @@ describe("createProject", () => {
     ).toContain('"binding": "DB"');
   });
 
-  it("adds Nitro to TanStack Start projects that run on Node.js", async () => {
+  it.each([true, false])("prepares MongoDB before installation and continues only with permission (%s)", async (proceed) => {
     const projectDirectory = path.join(cwd, "node-app");
+    const requestMongoReset = vi.fn();
+    vi.mocked(prepareMongoDB).mockImplementation(async () => {
+      expect(existsSync(path.join(projectDirectory, "docker-compose.yml"))).toBe(true);
+      expect(runner).toHaveBeenCalledTimes(1);
+      return proceed;
+    });
 
     const runner = vi.fn(async () => {
       // Stand in for the TanStack Start generator on its first call.
@@ -367,11 +378,18 @@ describe("createProject", () => {
       {
         cwd,
         runner,
+        requestMongoReset,
         requestInitialUser: async () => ({ email: "owner@example.com", password: "initial user password" }),
       },
     );
 
     const options = { cwd: projectDirectory };
+    expect(prepareMongoDB).toHaveBeenCalledWith(projectDirectory, runner, requestMongoReset);
+    if (!proceed) {
+      expect(runner).toHaveBeenCalledTimes(1);
+      expect(existsSync(path.join(projectDirectory, ".env"))).toBe(true);
+      return;
+    }
     const packageJson = JSON.parse(
       await readFile(path.join(projectDirectory, "package.json"), "utf8"),
     );

@@ -54,6 +54,9 @@ export type AuthMessages = {
   readonly totpSecret: string;
   readonly verifyTotp: string;
   readonly cancel: string;
+  readonly passkeyOfferDescription?: string;
+  readonly passkeyAdded?: string;
+  readonly skip?: string;
 };
 
 /**
@@ -127,6 +130,9 @@ const englishMessages: AuthMessages = {
   totpSecret: "Authenticator secret",
   verifyTotp: "Verify authenticator",
   cancel: "Cancel",
+  passkeyOfferDescription: "Add a passkey for faster sign-in next time, or skip this step.",
+  passkeyAdded: "Passkey added",
+  skip: "Skip for now",
 };
 
 /**

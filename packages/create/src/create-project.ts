@@ -10,6 +10,7 @@ import { configureFramework } from "./frameworks/configure-framework";
 import { configureTheme } from "./theme/configure-theme";
 import { configureAuth } from "./auth/configure-auth";
 import { promptInitialUser, type InitialUser } from "./auth/initial-user";
+import { prepareMongoDB, type RequestMongoReset } from "./auth/prepare-mongodb";
 import { runCommand } from "./utils/execute";
 import { validateProjectDirectory } from "./utils/validate-project";
 
@@ -29,6 +30,7 @@ type CreateProjectContext = {
   cwd?: string;
   runner?: CommandRunner;
   requestInitialUser?: () => Promise<InitialUser | null>;
+  requestMongoReset?: RequestMongoReset;
 };
 
 const getAuthDatabase = (options: ProjectOptions) =>
@@ -126,6 +128,7 @@ const createProject = async (
     cwd = process.cwd(),
     runner = runCommand,
     requestInitialUser = promptInitialUser,
+    requestMongoReset,
   }: CreateProjectContext = {},
 ) => {
   const targetDirectory = await validateProjectDirectory(
@@ -211,6 +214,11 @@ const createProject = async (
       });
 
       finishStep("Puzzle Auth configured");
+    }
+
+    if (database === "mongodb" && !await prepareMongoDB(targetDirectory, runner, requestMongoReset)) {
+      p.cancel("Project creation cancelled. Existing MongoDB volumes were preserved.");
+      return;
     }
 
     if (options.tailwind) {

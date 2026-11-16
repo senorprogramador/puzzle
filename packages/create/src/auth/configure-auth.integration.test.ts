@@ -177,6 +177,10 @@ describe("configureAuth", () => {
       const directory = framework === "react-router" ? "app" : "src";
       const suffix = framework === "react-router" ? ".server" : "";
       const services = await read(`${directory}/lib/auth/services${suffix}.ts`);
+      const signInPath = framework === "next"
+        ? "src/app/sign-in/page.tsx"
+        : `${directory}/routes/sign-in.tsx`;
+      expect(await read(signInPath)).toContain("offerPasskeyAfterSignIn: true");
       const dashboard = await read(
         framework === "next"
           ? "src/app/dashboard/page.tsx"

@@ -8,7 +8,7 @@ import { renderToString } from "react-dom/server";
 
 import { AuthProvider } from "../src/auth/client/react";
 import { AuthExperience } from "../src/auth/client/experience";
-import type { AuthClientSnapshot } from "../src/auth/shared";
+import type { AuthClientFactorList, AuthClientSnapshot } from "../src/auth/shared";
 
 const unauthenticatedSnapshot = {
   status: "unauthenticated" as const,
@@ -43,7 +43,7 @@ const createClient = (
   resetPassword: vi.fn(async () => {}),
   changePassword: vi.fn(async () => {}),
   isPasskeySupported: vi.fn(() => false),
-  listMfaFactors: vi.fn(async () => ({
+  listMfaFactors: vi.fn(async (): Promise<AuthClientFactorList> => ({
     factors: [],
     recoveryCodeCount: 0,
   })),
@@ -69,10 +69,11 @@ const renderExperience = ({
   mode?: "sign-in" | "sign-up";
   config?: React.ComponentProps<typeof AuthExperience>["config"];
   onSubmit?: React.ComponentProps<typeof AuthExperience>["onSubmit"];
+  onSuccess?: React.ComponentProps<typeof AuthExperience>["onSuccess"];
 } = {}) =>
   render(
     <AuthProvider
-      client={client as never}
+      client={client}
       initialSnapshot={unauthenticatedSnapshot}
     >
       <AuthExperience {...props} />
@@ -84,6 +85,135 @@ afterEach(() => {
 });
 
 describe("AuthExperience browser behavior", () => {
+  const signIn = async () => {
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/Email address/), "person@example.com");
+    await user.type(screen.getByLabelText(/Password/), "correct-password");
+    await user.click(screen.getByRole("button", { name: "Continue", exact: true }));
+    return user;
+  };
+
+  it("offers passkey enrollment before completing login and allows skipping", async () => {
+    const client = createClient();
+    client.isPasskeySupported.mockReturnValue(true);
+    client.signIn.mockResolvedValue(authenticatedSnapshot);
+    const onSuccess = vi.fn();
+    renderExperience({ client, onSuccess, config: { offerPasskeyAfterSignIn: true } });
+
+    const user = await signIn();
+    expect(await screen.findByRole("heading", { name: "Add passkey" })).toBeInTheDocument();
+    expect(await screen.findByLabelText("Current password")).toHaveValue("");
+    expect(onSuccess).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Skip for now" }));
+    expect(onSuccess).toHaveBeenCalledOnce();
+    expect(client.registerPasskey).not.toHaveBeenCalled();
+  });
+
+  it("keeps recovery codes visible until the user continues after enrollment", async () => {
+    const client = createClient();
+    client.isPasskeySupported.mockReturnValue(true);
+    client.signIn.mockResolvedValue(authenticatedSnapshot);
+    client.registerPasskey.mockResolvedValue({ recoveryCodes: ["recovery-one", "recovery-two"] });
+    const onSuccess = vi.fn();
+    renderExperience({ client, onSuccess, config: { offerPasskeyAfterSignIn: true } });
+
+    const user = await signIn();
+    await user.type(await screen.findByLabelText("Current password"), "confirmed-password");
+    await user.click(screen.getByRole("button", { name: "Add passkey" }));
+    expect(client.registerPasskey).toHaveBeenCalledWith("confirmed-password");
+    expect(await screen.findByRole("heading", { name: "Passkey added" })).toBeInTheDocument();
+    expect(screen.getByText("recovery-one")).toBeInTheDocument();
+    expect(screen.getByText("recovery-two")).toBeInTheDocument();
+    expect(onSuccess).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Continue", exact: true }));
+    expect(onSuccess).toHaveBeenCalledOnce();
+  });
+
+  it("reports registration errors, clears the password and still allows skipping", async () => {
+    const client = createClient();
+    client.isPasskeySupported.mockReturnValue(true);
+    client.signIn.mockResolvedValue(authenticatedSnapshot);
+    client.registerPasskey.mockRejectedValue(new Error("Passkey registration cancelled"));
+    const onSuccess = vi.fn();
+    renderExperience({ client, onSuccess, config: { offerPasskeyAfterSignIn: true } });
+
+    const user = await signIn();
+    await user.type(await screen.findByLabelText("Current password"), "confirmed-password");
+    await user.click(screen.getByRole("button", { name: "Add passkey" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Passkey registration cancelled");
+    expect(screen.getByLabelText("Current password")).toHaveValue("");
+    expect(onSuccess).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Skip for now" }));
+    expect(onSuccess).toHaveBeenCalledOnce();
+  });
+
+  it.each([false, true])("preserves immediate login when disabled or unsupported (%s)", async (enabled) => {
+    const client = createClient();
+    client.isPasskeySupported.mockReturnValue(!enabled);
+    client.signIn.mockResolvedValue(authenticatedSnapshot);
+    const onSuccess = vi.fn();
+    renderExperience({ client, onSuccess, config: { offerPasskeyAfterSignIn: enabled } });
+    await signIn();
+    expect(onSuccess).toHaveBeenCalledOnce();
+    expect(client.listMfaFactors).not.toHaveBeenCalled();
+    expect(screen.queryByRole("heading", { name: "Add passkey" })).not.toBeInTheDocument();
+  });
+
+  it("continues immediately for users who already have an active passkey", async () => {
+    const client = createClient();
+    client.isPasskeySupported.mockReturnValue(true);
+    client.signIn.mockResolvedValue(authenticatedSnapshot);
+    client.listMfaFactors.mockResolvedValue({
+      factors: [{
+        id: "passkey-1", type: "passkey", status: "active", label: "Existing passkey",
+        createdAt: new Date().toISOString(), lastUsedAt: null,
+      }],
+      recoveryCodeCount: 5,
+    });
+    const onSuccess = vi.fn();
+    renderExperience({ client, onSuccess, config: { offerPasskeyAfterSignIn: true } });
+    await signIn();
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledOnce());
+    expect(client.registerPasskey).not.toHaveBeenCalled();
+  });
+
+  it("reports factor lookup errors rather than silently completing login", async () => {
+    const client = createClient();
+    client.isPasskeySupported.mockReturnValue(true);
+    client.signIn.mockResolvedValue(authenticatedSnapshot);
+    client.listMfaFactors.mockRejectedValue(new Error("Cannot load passkeys"));
+    const onSuccess = vi.fn();
+    renderExperience({ client, onSuccess, config: { offerPasskeyAfterSignIn: true } });
+    const user = await signIn();
+    expect(await screen.findByRole("alert")).toHaveTextContent("Cannot load passkeys");
+    expect(onSuccess).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Skip for now" }));
+    expect(onSuccess).toHaveBeenCalledOnce();
+  });
+
+  it("waits for MFA before offering a passkey", async () => {
+    const client = createClient();
+    client.isPasskeySupported.mockReturnValue(true);
+    client.signIn.mockResolvedValue({
+      status: "mfa-pending", user: null,
+      mfa: {
+        purpose: "sign-in", challengeId: "challenge-1",
+        expiresAt: new Date(Date.now() + 60_000).toISOString(),
+        availableFactors: ["totp"],
+      },
+    });
+    client.verifyMfaTotp.mockResolvedValue(authenticatedSnapshot);
+    const onSuccess = vi.fn();
+    renderExperience({ client, onSuccess, config: { offerPasskeyAfterSignIn: true } });
+    const user = await signIn();
+    expect(await screen.findByRole("heading", { name: "Verify your identity" })).toBeInTheDocument();
+    expect(client.listMfaFactors).not.toHaveBeenCalled();
+    await user.type(screen.getByLabelText(/Authentication code/), "123456");
+    await user.click(screen.getByRole("button", { name: "Verify", exact: true }));
+    expect(await screen.findByLabelText("Current password")).toBeInTheDocument();
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
   it("shows the MFA challenge after password sign-in requires a passkey", async () => {
     const user = userEvent.setup();
     const client = createClient();

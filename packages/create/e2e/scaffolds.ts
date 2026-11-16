@@ -6,6 +6,7 @@ import { chromium } from "playwright";
 
 import { createWebAuthnCredentialFixture } from "../../auth/tests/fixtures/webauthn-cryptographic-fixture.mjs";
 import { createProject } from "../src/create-project";
+import { prepareMongoDB } from "../src/auth/prepare-mongodb";
 import { fontConfigPaths } from "../src/theme/templates";
 import type { Framework } from "../src/types";
 import { HttpClient } from "./http";
@@ -238,6 +239,44 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
       });
 
       if (scaffold.framework === "tanstack" && !scaffold.tailwind) {
+        it("resets a previous scaffold database only after confirmation", async () => {
+          const shell = (script: string) => run(
+            "docker",
+            ["compose", "exec", "-T", "mongodb", "mongosh", "--quiet", "--eval", script],
+            { cwd: directory },
+          );
+          const authenticate = `
+            const application = db.getSiblingDB(process.env.MONGODB_DATABASE);
+            application.auth(process.env.MONGODB_APP_USERNAME, process.env.MONGODB_APP_PASSWORD);
+          `;
+          await shell(`${authenticate} application.setup_probe.insertOne({ _id: "old-scaffold" });`);
+          const runner = createLocalPackageRunner(inject("puzzlePackages"));
+          expect(await prepareMongoDB(directory, runner, async () => false)).toBe(false);
+          await shell(`${authenticate} if (!application.setup_probe.findOne({ _id: "old-scaffold" })) quit(1);`);
+
+          const envPath = path.join(directory, ".env");
+          const environment = await readFile(envPath, "utf8");
+          await writeFile(
+            envPath,
+            environment.replace(/^MONGODB_ROOT_PASSWORD="[^"]*"$/m, `MONGODB_ROOT_PASSWORD="${"1".repeat(64)}"`),
+          );
+          const requestReset = vi.fn(async (volumes: string[]) => {
+            expect(volumes).toEqual([
+              `${scaffold.id}_mongodb-data`,
+              `${scaffold.id}_mongodb-config`,
+            ]);
+            return true;
+          });
+          expect(await prepareMongoDB(directory, runner, requestReset)).toBe(true);
+          expect(requestReset).toHaveBeenCalledOnce();
+          await startMongo(directory);
+          await shell(`${authenticate} if (application.setup_probe.findOne({ _id: "old-scaffold" })) quit(1);`);
+          await run("node", ["scripts/create-initial-user.mjs"], {
+            cwd: directory,
+            input: JSON.stringify(initialUser),
+          });
+        });
+
         it("upgrades a userless legacy volume without losing data or resetting passwords", async () => {
           await stopMongo(directory);
           const override = path.join(directory, "docker-compose.legacy.yml");
@@ -525,10 +564,14 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
             await page.getByLabel("Email address").fill(user.email);
             await page.locator('input[name="password"]').fill(user.password);
             await page.getByRole("button", { name: "Continue", exact: true }).click();
-            await page.waitForURL("**/dashboard");
+            await page.getByRole("heading", { name: "Add passkey" }).waitFor();
+            expect(new URL(page.url()).pathname).toBe("/sign-in");
             await page.getByLabel("Current password").fill(user.password);
             await page.getByRole("button", { name: "Add passkey" }).click();
             await page.getByText("Save these codes somewhere safe.").waitFor();
+            expect(new URL(page.url()).pathname).toBe("/sign-in");
+            await page.getByRole("button", { name: "Continue", exact: true }).click();
+            await page.waitForURL("**/dashboard");
             await page.getByRole("button", { name: "Sign out" }).click();
             await page.waitForURL("**/");
             await page.goto(new URL("/sign-in", url).href);

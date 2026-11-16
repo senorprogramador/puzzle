@@ -17,6 +17,10 @@ Run the interactive generator; it prompts for a project name, framework, Tailwin
 
 Selecting MongoDB or D1 also prompts for the first application user's email, a masked password (12–1024 characters), and password confirmation. After installing dependencies, the CLI automatically initializes the local database and registers that account using Puzzle Auth's password hashing. MongoDB starts through Docker Compose; D1 uses the same local persisted database as development. Credentials go to the seed process over stdin, not command-line arguments or project files. Puzzle Auth currently has no administrator roles, so this is a normal sign-in account, not a privileged application administrator. MongoDB's database administrator credentials remain separate and randomly generated. Custom databases and Basic React do not prompt for an account.
 
+Existing project directories are never overwritten. If you remove a project directory and scaffold it again with the same Compose project name, its MongoDB volumes can still contain the previous database. Before installing dependencies, the CLI detects these volumes and asks whether to permanently delete their data and accounts and start fresh. The default is **No**: declining or cancelling stops creation and preserves the volumes, leaving the generated project files in place. Only this project's `mongodb-data` and `mongodb-config` volumes are eligible; volumes used by another service or project are refused. A normal `db:setup` never resets existing data or passwords.
+
+Generated MongoDB and D1 sign-in pages enable `AuthExperience`'s `offerPasskeyAfterSignIn` option. After a successful login, users without a passkey can add one before navigating to the dashboard, or skip the step. Enrollment requires the current password, and new recovery codes are shown before continuing. Unsupported browsers and accounts with an existing passkey continue directly; sign-up is unchanged.
+
 ```bash
 npx @puzzle-ui/create
 ```

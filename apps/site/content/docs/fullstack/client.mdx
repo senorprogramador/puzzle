@@ -146,10 +146,13 @@ export const Register = () => (
 | `layout` | `AuthExperienceLayout` | Optional class names, header/footer, width (`"sm"`, `"md"`, `"lg"`, `"full"`), and alignment (`"left"`, `"center"`). |
 | `redirects` | `AuthExperienceRedirects` | Optional `afterSignIn` and `afterSignUp` paths. Only safe root-relative paths are followed. |
 | `fields` | `readonly AuthCustomField[]` | Additional sign-up fields of type text, email, tel, url, number, checkbox, select, or textarea. |
+| `offerPasskeyAfterSignIn` | `boolean` | Defaults to `false`. After successful sign-in, offer passkey enrollment before `onSuccess` and `afterSignIn`. Unsupported browsers and users with an existing passkey continue immediately. |
 | `onSubmit` | `(input: AuthExperienceSubmitInput) => Promise<AuthClientSnapshot>` | Custom registration flow; receives standard registration values, custom field values, and the normal `signUp` action. |
 | `onSuccess`, `onSignIn`, `onSignUp`, `onForgotPassword` | `() => void` | Optional flow callbacks. |
 
 Custom field names must start with a letter, contain only letters, digits, `_` or `-`, and must not use reserved names (`name`, `email`, `password`, `confirmPassword`). `select` fields use `AuthFieldOption` entries. Validation may be synchronous or asynchronous and should return a message for invalid values.
+
+To offer a passkey after login, set `config={{ offerPasskeyAfterSignIn: true, redirects: { afterSignIn: "/dashboard" } }}`. The user can choose **Skip for now** or confirm their current password and register a browser passkey. Enrollment errors remain visible and do not prevent skipping. After registration, any new recovery codes remain visible until the user chooses **Continue**. The login password is not reused or stored. MFA challenges must complete before this optional step; sign-up is unchanged. The optional messages `passkeyOfferDescription`, `passkeyAdded`, and `skip` can be localized through `AuthProvider.messages`.
 
 ## Localization and passkeys
 

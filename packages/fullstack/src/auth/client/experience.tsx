@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useId,
   useState,
@@ -95,6 +96,7 @@ export type AuthExperienceConfig = {
   readonly layout?: AuthExperienceLayout;
   readonly redirects?: AuthExperienceRedirects;
   readonly fields?: readonly AuthCustomField[];
+  readonly offerPasskeyAfterSignIn?: boolean;
 };
 
 export type AuthExperienceProps = {
@@ -326,6 +328,92 @@ const AuthCustomFields = ({
   );
 };
 
+const PasskeyEnrollmentOffer = ({ onContinue }: {
+  readonly onContinue: () => void;
+}) => {
+  const { client, messages } = useAuth();
+  const passwordId = useId();
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [recoveryCodes, setRecoveryCodes] = useState<readonly string[] | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void client.listMfaFactors().then((result) => {
+      if (!active) return;
+      if (result.factors.some((factor) => factor.type === "passkey" && factor.status === "active")) {
+        onContinue();
+      } else {
+        setChecking(false);
+      }
+    }).catch((cause: unknown) => {
+      if (!active) return;
+      setError(cause instanceof Error ? cause.message : messages.unexpectedError);
+      setChecking(false);
+    });
+    return () => { active = false; };
+  }, [client, messages.unexpectedError, onContinue]);
+
+  const register = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const result = await client.registerPasskey(password);
+      setRecoveryCodes(result.recoveryCodes);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : messages.unexpectedError);
+    } finally {
+      setPassword("");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <section className="puzzle-auth">
+      <header className="puzzle-auth__header">
+        <Heading as="h1" level="headline2">
+          {recoveryCodes === null ? messages.addPasskey : (messages.passkeyAdded ?? messages.addPasskey)}
+        </Heading>
+        {recoveryCodes === null && <Text as="p">{messages.passkeyOfferDescription}</Text>}
+      </header>
+      {error && <Alert severity="error">{error}</Alert>}
+      {checking ? <p role="status">{messages.loading}</p> : recoveryCodes === null ? (
+        <form className="puzzle-auth__form" onSubmit={(event) => void register(event)}>
+          <FormField label={messages.currentPassword} controlId={passwordId}>
+            <TextInput
+              id={passwordId}
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.currentTarget.value)}
+              disabled={loading}
+              required
+            />
+          </FormField>
+          <Button type="submit" loading={loading} disabled={loading || !password}>
+            {messages.addPasskey}
+          </Button>
+        </form>
+      ) : recoveryCodes.length > 0 ? (
+        <div className="puzzle-auth__recovery-codes">
+          <Alert severity="warning" title={messages.recoveryCodes}>
+            {messages.saveRecoveryCodes}
+          </Alert>
+          <ul>
+            {recoveryCodes.map((code) => <li key={code}><code>{code}</code></li>)}
+          </ul>
+        </div>
+      ) : null}
+      <Button variant="outline" disabled={loading} onClick={onContinue}>
+        {recoveryCodes === null ? (messages.skip ?? messages.cancel) : messages.submit}
+      </Button>
+    </section>
+  );
+};
+
 const AuthExperience = ({
   mode = "sign-in",
   config = {},
@@ -336,12 +424,25 @@ const AuthExperience = ({
   onSignUp,
   onForgotPassword,
 }: AuthExperienceProps) => {
-  const { signUp, messages, snapshot } = useAuth();
+  const { signUp, messages, snapshot, client } = useAuth();
 
   const fields = config.fields ?? EMPTY_FIELDS;
   const branding = config.branding;
   const layout = config.layout;
   const redirects = config.redirects;
+  const [offeringPasskey, setOfferingPasskey] = useState(false);
+  const continueAfterSignIn = useCallback(() => {
+    setOfferingPasskey(false);
+    onSuccess?.();
+    redirectAfterSuccess(redirects?.afterSignIn);
+  }, [onSuccess, redirects?.afterSignIn]);
+  const handleSignInSuccess = () => {
+    if (config.offerPasskeyAfterSignIn && client.isPasskeySupported()) {
+      setOfferingPasskey(true);
+    } else {
+      continueAfterSignIn();
+    }
+  };
 
   validateFieldDefinition(fields);
 
@@ -528,15 +629,15 @@ const AuthExperience = ({
       </div>
 
       <div className={contentClassName}>
-        {snapshot.status === "mfa-pending" ? (
+        {offeringPasskey && snapshot.status === "authenticated" ? (
+          <PasskeyEnrollmentOffer onContinue={continueAfterSignIn} />
+        ) : snapshot.status === "mfa-pending" ? (
           <MfaChallengeForm
-            redirectTo={redirects?.afterSignIn}
-            onSuccess={onSuccess}
+            onSuccess={handleSignInSuccess}
           />
         ) : mode === "sign-in" ? (
           <SignInForm
-            redirectTo={redirects?.afterSignIn}
-            onSuccess={onSuccess}
+            onSuccess={handleSignInSuccess}
             onForgotPassword={onForgotPassword}
             onSignUp={onSignUp}
           />
