@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/fullstack` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.10.1 - 2026-11-16
+
+- Fixed the auth experience so sign-in pages show the MFA challenge form when a sign-in is awaiting a second factor, instead of the password form.
+
 ## 0.10.0 - 2026-11-16
 
 - No changes; version bumped in lockstep.

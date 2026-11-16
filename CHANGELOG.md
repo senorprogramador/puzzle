@@ -18,6 +18,19 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.10.1 - 2026-11-16
+
+### `@puzzle-ui/create`
+
+- Fixed MFA in scaffolded Auth projects: generated servers now configure WebAuthn passkeys (relying party and origin derived from `APP_ORIGIN`) and expose the passkey, TOTP enrollment, factor management and recovery-code endpoints.
+- Added an `MfaSettings` panel to the generated dashboard so users can enroll passkeys and TOTP, manage factors and regenerate recovery codes.
+- Fixed TanStack Start with Nitro and Auth builds by inlining dynamic imports so WebAuthn's metadata polyfill loads before its certificate dependencies.
+- Documented passkey setup and `APP_ORIGIN` requirements, and extended the end-to-end suite with passkey registration and sign-in checks, including a Chromium virtual authenticator for TanStack Start with MongoDB (requires Playwright Chromium).
+
+### `@puzzle-ui/fullstack`
+
+- Fixed the auth experience so sign-in pages show the MFA challenge form when a sign-in is awaiting a second factor, instead of the password form.
+
 ## 0.10.0 - 2026-11-16
 
 ### `@puzzle-ui/ui`

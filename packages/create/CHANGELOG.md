@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/create` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.10.1 - 2026-11-16
+
+- Fixed MFA in scaffolded Auth projects: generated servers now configure WebAuthn passkeys (relying party and origin derived from `APP_ORIGIN`) and expose the passkey, TOTP enrollment, factor management and recovery-code endpoints.
+- Added an `MfaSettings` panel to the generated dashboard so users can enroll passkeys and TOTP, manage factors and regenerate recovery codes.
+- Fixed TanStack Start with Nitro and Auth builds by inlining dynamic imports so WebAuthn's metadata polyfill loads before its certificate dependencies.
+- Documented passkey setup and `APP_ORIGIN` requirements, and extended the end-to-end suite with passkey registration and sign-in checks, including a Chromium virtual authenticator for TanStack Start with MongoDB (requires Playwright Chromium).
+
 ## 0.10.0 - 2026-11-16
 
 - Added a prompt for the first application user (email, masked password of 12–1024 characters, and confirmation) when MongoDB or D1 is selected with Auth. The CLI creates that account after install through Puzzle Auth's password hashing, and sends credentials over stdin rather than as command-line arguments or project files.
