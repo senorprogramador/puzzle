@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/fullstack` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.11.0 - 2026-11-16
+
+- Added an `offerPasskeyAfterSignIn` option to `AuthExperience`. After sign-in, users without a passkey can add one (the current password is required) and see their recovery codes, or skip the step.
+- Added optional `passkeyOfferDescription`, `passkeyAdded` and `skip` auth messages, with English defaults, for the passkey enrollment step.
+
 ## 0.10.1 - 2026-11-16
 
 - Fixed the auth experience so sign-in pages show the MFA challenge form when a sign-in is awaiting a second factor, instead of the password form.

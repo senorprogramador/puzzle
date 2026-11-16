@@ -18,6 +18,24 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.11.0 - 2026-11-16
+
+### `@puzzle-ui/ui`
+
+- Added a `barWidth` prop to `LinearProgress` and `CircularProgress` to customize bar thickness; circular progress rescales its radius and dash length to match.
+
+### `@puzzle-ui/create`
+
+- Added a MongoDB volume check before scaffolding. If volumes from an earlier project exist, it asks before deleting them, and refuses to delete volumes used by other projects or services.
+- Generated MongoDB and D1 sign-in pages now enable `offerPasskeyAfterSignIn`, so users can add a passkey after signing in.
+- Fixed React Router + D1 projects: they now install `reflect-metadata` and load it in the Worker entry before the server build, which WebAuthn needs in production.
+- Fixed the Create E2E workflow on CI by installing Chromium and its system dependencies.
+
+### `@puzzle-ui/fullstack`
+
+- Added an `offerPasskeyAfterSignIn` option to `AuthExperience`. After sign-in, users without a passkey can add one (the current password is required) and see their recovery codes, or skip the step.
+- Added optional `passkeyOfferDescription`, `passkeyAdded` and `skip` auth messages, with English defaults, for the passkey enrollment step.
+
 ## 0.10.1 - 2026-11-16
 
 ### `@puzzle-ui/create`

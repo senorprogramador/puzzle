@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/hooks",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "Keyboard shortcut and roving-focus hooks for React applications",
   "homepage": "https://puzzle-ui.com/docs/hooks",
   "keywords": [
@@ -48,7 +48,7 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.10.1"
+    "@puzzle-ui/core": "^0.11.0"
   },
   "peerDependencies": {
     "react": "^19.0.0"

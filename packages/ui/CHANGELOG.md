@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.11.0 - 2026-11-16
+
+- Added a `barWidth` prop to `LinearProgress` and `CircularProgress` to customize bar thickness; circular progress rescales its radius and dash length to match.
+
 ## 0.10.1 - 2026-11-16
 
 - No changes; version bumped in lockstep.

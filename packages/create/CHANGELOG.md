@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/create` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.11.0 - 2026-11-16
+
+- Added a MongoDB volume check before scaffolding. If volumes from an earlier project exist, it asks before deleting them, and refuses to delete volumes used by other projects or services.
+- Generated MongoDB and D1 sign-in pages now enable `offerPasskeyAfterSignIn`, so users can add a passkey after signing in.
+- Fixed React Router + D1 projects: they now install `reflect-metadata` and load it in the Worker entry before the server build, which WebAuthn needs in production.
+- Fixed the Create E2E workflow on CI by installing Chromium and its system dependencies.
+
 ## 0.10.1 - 2026-11-16
 
 - Fixed MFA in scaffolded Auth projects: generated servers now configure WebAuthn passkeys (relying party and origin derived from `APP_ORIGIN`) and expose the passkey, TOTP enrollment, factor management and recovery-code endpoints.
