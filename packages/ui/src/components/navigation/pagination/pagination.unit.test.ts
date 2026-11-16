@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getPaginationItems, normalizePage } from "./pagination.utils";
+import { getPaginationItems, getResponsivePaginationItems, normalizePage } from "./pagination.utils";
 
 describe("getPaginationItems", () => {
   it("returns an empty array when there are no pages", () => {
@@ -79,6 +79,27 @@ describe("getPaginationItems", () => {
     expect(getPaginationItems(5, 3, -1, -1)).toEqual([
       { type: "page", page: 3 },
     ]);
+  });
+});
+
+describe("responsive pagination items", () => {
+  it("preserves each layout's page and ellipsis sequence", () => {
+    for (let total = 0; total <= 30; total += 1) {
+      for (let current = 1; current <= Math.max(total, 1); current += 1) {
+        for (const boundary of [0, 1, 2]) {
+          for (const siblings of [0, 1, 2]) {
+            const items = getResponsivePaginationItems(total, current, boundary, siblings);
+            for (const [layout, expected] of [
+              ["compact", getPaginationItems(total, current, Math.min(boundary, 1), 0)],
+              ["expanded", getPaginationItems(total, current, boundary, siblings)],
+            ] as const) {
+              expect(items.filter((entry) => entry[layout]).map((entry) => entry.item))
+                .toEqual(expected);
+            }
+          }
+        }
+      }
+    }
   });
 });
 

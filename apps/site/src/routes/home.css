@@ -431,6 +431,10 @@
     font-size: 28px;
 }
 
+.home-feature-card__icon > svg {
+    vertical-align: middle;
+}
+
 .home-feature-card h3 {
     font-size: 17px;
     margin: 15px 0 10px;
@@ -473,6 +477,36 @@
 
 .home-component-panel {
     height: 100%;
+}
+
+.home-component-carousel-container {
+    width: 100%;
+    min-width: 0;
+}
+
+.home-component-fallback {
+    display: flex;
+    gap: var(--puzzle-space-4);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+.home-component-fallback > .home-component-panel {
+    flex: 0 0 100%;
+    height: auto;
+    scroll-snap-align: start;
+}
+
+@media (min-width: 768px) {
+    .home-component-fallback > .home-component-panel {
+        flex-basis: calc((100% - var(--puzzle-space-4)) / 2);
+    }
+}
+
+@media (min-width: 1024px) {
+    .home-component-fallback > .home-component-panel {
+        flex-basis: calc((100% - 2 * var(--puzzle-space-4)) / 3);
+    }
 }
 
 .home-component-card {

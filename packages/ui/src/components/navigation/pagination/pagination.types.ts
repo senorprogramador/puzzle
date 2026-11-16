@@ -40,10 +40,10 @@ type PaginationProps = Omit<
   /** Called when the selected page changes. */
   onPageChange?: (page: number) => void;
 
-  /** Number of pages displayed around the current page. */
+  /** Number of pages around the current page (zero on mobile). */
   siblingCount?: number;
 
-  /** Number of pages always displayed at both boundaries. */
+  /** Number of pages displayed at each boundary (at most one on mobile). */
   boundaryCount?: number;
 
   /** Whether first and last page controls are displayed. */

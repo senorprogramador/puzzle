@@ -3,8 +3,9 @@ title: React Carousel Component
 description: Build React image and content carousels with dragging, navigation, and pagination. Learn CarouselController, controlled selection, examples, and TypeScript props.
 ---
 
-<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
-
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is
+functional and validated but may evolve; this label does not guarantee
+production readiness.
 
 import {
   ControlledCarouselExample,
@@ -16,7 +17,7 @@ The React Carousel component displays a draggable collection of images, cards, o
 ## Import
 
 ```tsx
-import { Carousel, CarouselController } from "@puzzle-ui/ui";
+import { Carousel, CarouselController, Image } from "@puzzle-ui/ui";
 ```
 
 ## Basic usage
@@ -25,31 +26,31 @@ Supply `items` to the controller and `renderItem` to the carousel. Navigation bu
 
 <Preview hideDevices={true} code={`\
 const items = [
-  { id: "design", title: "Design", description: "Start with a clear visual language." },
-  { id: "build", title: "Build", description: "Compose reusable components." },
-  { id: "test", title: "Test", description: "Check behavior across devices." },
-  { id: "ship", title: "Ship", description: "Share your work with the world." },
+  { id: "living-room", src: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80", alt: "Warm contemporary living room with timber details" },
+  { id: "garden-room", src: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80", alt: "Bright living space opening onto a garden" },
+  { id: "bedroom", src: "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1200&q=80", alt: "Minimal bedroom with soft natural light" },
+  { id: "kitchen", src: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=80", alt: "Modern kitchen with a stone island" },
 ];
 
 <CarouselController items={items}>
   <Carousel<(typeof items)[number]>
-    ariaLabel="Project workflow"
+    ariaLabel="Interior photos"
     getItemKey={(item) => item.id}
-    renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
-    backButton={<Button variant="outline">Previous</Button>}
-    nextButton={<Button variant="outline">Next</Button>}
+    renderItem={(item) => <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />}
+    backButton={<Button variant="primary" aria-label="Previous slide"><Icon name="bx:caret-left" /></Button>}
+    nextButton={<Button variant="primary" aria-label="Next slide"><Icon name="bx:caret-right" /></Button>}
     buttonAlignment="aside"
   />
 </CarouselController>
 `}>
-  <Section>
+  <Section fullWidth>
     <CarouselController items={carouselItems}>
       <Carousel
-        ariaLabel="Project workflow"
+        ariaLabel="Interior photos"
         getItemKey={(item) => item.id}
-        renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
-        backButton={<Button variant="outline">Previous</Button>}
-        nextButton={<Button variant="outline">Next</Button>}
+        renderItem={(item) => <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />}
+        backButton={<Button variant="primary" aria-label="Previous slide"><Icon name="bx:caret-left" /></Button>}
+        nextButton={<Button variant="primary" aria-label="Next slide"><Icon name="bx:caret-right" /></Button>}
         buttonAlignment="aside"
       />
     </CarouselController>
@@ -73,28 +74,33 @@ widths remain fixed. The active panel stays aligned to its updated position.
     panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
     gap="var(--puzzle-space-4)"
     getItemKey={(item) => item.id}
-    renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
-    backButton={<Button variant="outline">Previous</Button>}
-    nextButton={<Button variant="outline">Next</Button>}
+    renderItem={(item) => <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />}
+    backButton={<Button variant="primary" aria-label="Previous slide"><Icon name="bx:caret-left" /></Button>}
+    nextButton={<Button variant="primary" aria-label="Next slide"><Icon name="bx:caret-right" /></Button>}
     buttonAlignment="aside"
   />
 </CarouselController>
 `}
 >
-  <Section>
+  <Section fullWidth>
     <CarouselController items={carouselItems}>
       <Carousel
         panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
         gap="var(--puzzle-space-4)"
         getItemKey={(item) => item.id}
         renderItem={(item) => (
-          <Card>
-            <strong>{item.title}</strong>
-            <p>{item.description}</p>
-          </Card>
+          <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />
         )}
-        backButton={<Button variant="outline">Previous</Button>}
-        nextButton={<Button variant="outline">Next</Button>}
+        backButton={
+          <Button variant="primary" aria-label="Previous slide">
+            <Icon name="bx:caret-left" />
+          </Button>
+        }
+        nextButton={
+          <Button variant="primary" aria-label="Next slide">
+            <Icon name="bx:caret-right" />
+          </Button>
+        }
         buttonAlignment="aside"
       />
     </CarouselController>
@@ -114,19 +120,19 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
     gap="var(--puzzle-space-4)"
     singlePageAlignment="center"
     getItemKey={(item) => item.id}
-    renderItem={(item) => <Card>{item.title}</Card>}
+    renderItem={(item) => <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />}
   />
 </CarouselController>
 `}
 >
-  <Section>
+  <Section fullWidth>
     <CarouselController items={carouselItems.slice(0, 2)}>
       <Carousel
         itemWidth="30%"
         gap="var(--puzzle-space-4)"
         singlePageAlignment="center"
         getItemKey={(item) => item.id}
-        renderItem={(item) => <Card>{item.title}</Card>}
+        renderItem={(item) => <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />}
       />
     </CarouselController>
   </Section>
@@ -142,7 +148,7 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
 <CarouselController items={items} defaultPanel={1}>
   <Carousel<(typeof items)[number]>
     getItemKey={(item) => item.id}
-    renderItem={(item) => <Card><p>{item.description}</p></Card>}
+    renderItem={(item) => <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />}
     backButton={<Button size="sm" aria-label="Previous slide">Back</Button>}
     nextButton={<Button size="sm" aria-label="Next slide">Next</Button>}
     buttonAlignment="over"
@@ -152,14 +158,12 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
 </CarouselController>
 `}
 >
-  <Section>
+  <Section fullWidth>
     <CarouselController items={carouselItems} defaultPanel={1}>
       <Carousel
         getItemKey={(item) => item.id}
         renderItem={(item) => (
-          <Card>
-            <p>{item.description}</p>
-          </Card>
+          <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />
         )}
         backButton={
           <Button size="sm" aria-label="Previous slide">
@@ -197,7 +201,7 @@ return (
     <CarouselController items={items} currentPanel={panel} onPanelChange={setPanel}>
       <Carousel<(typeof items)[number]>
         getItemKey={(item) => item.id}
-        renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
+        renderItem={(item) => <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />}
         backButton={<Button variant="outline">Previous</Button>}
         nextButton={<Button variant="outline">Next</Button>}
         buttonAlignment="aside"
@@ -207,7 +211,7 @@ return (
   </Stack>
 );
 `}>
-  <Section><ControlledCarouselExample /></Section>
+  <Section fullWidth><ControlledCarouselExample /></Section>
 </Preview>
 
 ## API

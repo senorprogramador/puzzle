@@ -42,6 +42,29 @@
     justify-content: center;
 }
 
+.puzzle-pagination__item--compact-only {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .puzzle-pagination {
+        --puzzle-pagination-size: 2rem;
+        --puzzle-pagination-gap: 0;
+    }
+
+    .puzzle-pagination--sm {
+        --puzzle-pagination-size: 1.875rem;
+    }
+
+    .puzzle-pagination__item--expanded-only {
+        display: none;
+    }
+
+    .puzzle-pagination__item--compact-only {
+        display: flex;
+    }
+}
+
 .puzzle-pagination__control {
     display: inline-flex;
     width: var(--puzzle-pagination-size);

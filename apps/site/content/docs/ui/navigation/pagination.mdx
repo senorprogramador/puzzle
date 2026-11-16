@@ -5,8 +5,9 @@ description: Build React pagination with page numbers, previous and next control
 
 The React Pagination component provides page-number and previous/next controls for lists, search results, or other content split across multiple pages. It supports both button-based state updates and URL-based links.
 
-<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is functional and validated but may evolve; this label does not guarantee production readiness.
-
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This API is
+functional and validated but may evolve; this label does not guarantee
+production readiness.
 
 ## Import
 
@@ -19,12 +20,12 @@ import { Pagination } from "@puzzle-ui/ui";
 Set `totalPages` to the number of pages and use `defaultPage` to choose the initial page for an uncontrolled pagination control. Page numbers start at 1.
 
 <Preview
-  hideDevices={true}
+  padding="var(--puzzle-space-4)"
   code={`\
 <Pagination totalPages={10} defaultPage={4} onPageChange={(page) => console.log(page)} />
 `}
 >
-  <Section>
+  <Section fullWidth noPadding style={{ alignItems: "center" }}>
     <Pagination totalPages={10} defaultPage={4} />
   </Section>
 </Preview>
@@ -46,7 +47,7 @@ Without `page`, `defaultPage` sets the initial page and the component updates it
 Provide `getPageHref` to render available pages as links, for example when each page has a URL. The callback receives a page number and should return its destination. Current and disabled controls are not links.
 
 <Preview
-  hideDevices={true}
+  padding="var(--puzzle-space-4)"
   code={`\
 <Pagination
   totalPages={8}
@@ -55,7 +56,7 @@ Provide `getPageHref` to render available pages as links, for example when each 
 />
 `}
 >
-  <Section>
+  <Section fullWidth noPadding style={{ alignItems: "center" }}>
     <Pagination
       totalPages={8}
       defaultPage={3}
@@ -66,7 +67,9 @@ Provide `getPageHref` to render available pages as links, for example when each 
 
 ## Visible pages and controls
 
-`boundaryCount` sets how many page numbers to keep visible at each end, and `siblingCount` sets how many page numbers appear beside the current page. Gaps of one page are shown as a page number; larger gaps use an ellipsis. When the total is small enough to fit the window, all pages are shown.
+`boundaryCount` sets how many page numbers to keep visible at each end, and `siblingCount` sets how many page numbers appear beside the current page. On mobile viewports (below 768px), the window is compact: at most one boundary page is shown at each end and no siblings are added. Explicitly smaller counts, such as `boundaryCount={0}`, are respected. On tablet and desktop, both counts are used as supplied.
+
+Gaps of one page are shown as a page number; larger gaps use an ellipsis. When the total is small enough to fit the window, all pages are shown. Use the device buttons above to compare layouts.
 
 Set `showFirstLast={false}` to hide the first- and last-page controls. Use `disabled` to disable all navigation, and `size="sm"` for a smaller control size (`md` is the default).
 
@@ -76,22 +79,22 @@ The navigation landmark is named “Pagination” by default. Override it with `
 
 ## API
 
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `totalPages` | `number` | Required | Total number of pages. |
-| `page` | `number` | - | Controlled current page; page numbers start at 1. |
-| `defaultPage` | `number` | `1` | Initial page when uncontrolled. |
-| `onPageChange` | `(page: number) => void` | - | Called when a different page is selected. |
-| `siblingCount` | `number` | `1` | Number of adjacent page numbers around the current page. |
-| `boundaryCount` | `number` | `1` | Number of page numbers shown at each end. |
-| `showFirstLast` | `boolean` | `true` | Whether to show first- and last-page controls. |
-| `disabled` | `boolean` | `false` | Disables navigation controls. |
-| `size` | `"sm" \| "md"` | `"md"` | Control size. |
-| `getPageHref` | `(page: number) => string` | - | Returns a URL to render available pages as links. |
-| `getPageAriaLabel` | `(page: number) => string` | - | Returns the accessible label for a page control. |
-| `labels` | `Partial<PaginationLabels>` | - | Accessible labels for navigation, first, previous, next, last, ellipsis, and page controls. |
-| `aria-label` | `string` | `"Pagination"` | Accessible name for the navigation landmark; `labels.navigation` is used when omitted. |
-| `className` | `string` | - | Additional class for the navigation landmark. |
+| Prop               | Type                        | Default        | Description                                                                                 |
+| ------------------ | --------------------------- | -------------- | ------------------------------------------------------------------------------------------- |
+| `totalPages`       | `number`                    | Required       | Total number of pages.                                                                      |
+| `page`             | `number`                    | -              | Controlled current page; page numbers start at 1.                                           |
+| `defaultPage`      | `number`                    | `1`            | Initial page when uncontrolled.                                                             |
+| `onPageChange`     | `(page: number) => void`    | -              | Called when a different page is selected.                                                   |
+| `siblingCount`     | `number`                    | `1`            | Number of adjacent page numbers around the current page; zero on mobile.                    |
+| `boundaryCount`    | `number`                    | `1`            | Number of page numbers shown at each end; at most one on mobile.                            |
+| `showFirstLast`    | `boolean`                   | `true`         | Whether to show first- and last-page controls.                                              |
+| `disabled`         | `boolean`                   | `false`        | Disables navigation controls.                                                               |
+| `size`             | `"sm" \| "md"`              | `"md"`         | Control size.                                                                               |
+| `getPageHref`      | `(page: number) => string`  | -              | Returns a URL to render available pages as links.                                           |
+| `getPageAriaLabel` | `(page: number) => string`  | -              | Returns the accessible label for a page control.                                            |
+| `labels`           | `Partial<PaginationLabels>` | -              | Accessible labels for navigation, first, previous, next, last, ellipsis, and page controls. |
+| `aria-label`       | `string`                    | `"Pagination"` | Accessible name for the navigation landmark; `labels.navigation` is used when omitted.      |
+| `className`        | `string`                    | -              | Additional class for the navigation landmark.                                               |
 
 Other native `nav` attributes are supported.
 

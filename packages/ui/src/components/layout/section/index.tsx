@@ -8,6 +8,7 @@ import "../container/container.css";
 export const Section = ({
   children,
   className,
+  style,
   theme = "default",
   fullWidth = false,
   noPadding = false,
@@ -28,15 +29,17 @@ export const Section = ({
     <Component
       className={cn(
         "puzzle-section",
-        !fullWidth && !constrainContent && [
-          "puzzle-container",
-          getContainerPresetClass("container"),
-        ],
+        !fullWidth &&
+          !constrainContent && [
+            "puzzle-container",
+            getContainerPresetClass("container"),
+          ],
         compactTop && "puzzle-section--compact-top",
         compactBottom && "puzzle-section--compact-bottom",
         noPadding && "puzzle-section--no-padding",
         className,
       )}
+      style={style}
       data-theme={theme}
     >
       {constrainContent ? (
@@ -49,7 +52,9 @@ export const Section = ({
         >
           {content}
         </div>
-      ) : content}
+      ) : (
+        content
+      )}
     </Component>
   );
 };

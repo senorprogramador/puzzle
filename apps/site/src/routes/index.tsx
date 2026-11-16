@@ -17,8 +17,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  Carousel,
-  CarouselController,
   Switch,
   Checkbox,
   TextInput,
@@ -33,10 +31,9 @@ import {
 } from "@puzzle-ui/ui";
 import "./home.css";
 import { Header } from "@/components/layout/header";
-import { useState } from "react";
-import { Icon } from "@puzzle-ui/icons/icon";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import {
-  componentPanels,
+  type componentPanels,
   randomComponentsOfLength,
 } from "@/components/component-catalog";
 import { Schema } from "@puzzle-ui/seo";
@@ -45,18 +42,21 @@ const features = [
   {
     number: "01",
     title: "Designed to compose",
+    icon: "hugeicons:infinity-circle",
     description:
       "Build interfaces from small, predictable building blocks. Compose complex experiences without fighting the framework.",
   },
   {
     number: "02",
     title: "Accessibility informed",
+    icon: "hugeicons:universal-access-circle",
     description:
       "Semantic markup, keyboard navigation, focus management, and screen reader behavior are considered in the component design.",
   },
   {
     number: "03",
     title: "Developer experience",
+    icon: "griddy-icons:code-circle",
     description:
       "TypeScript-first APIs, predictable behavior and a consistent design system make development enjoyable.",
   },
@@ -254,6 +254,159 @@ const PuzzleLogo = ({
   />
 );
 
+type ComponentPanels = typeof componentPanels;
+
+const FeatureCards = () => {
+  const firstIconRef = useRef<HTMLDivElement>(null);
+  const [Icon, setIcon] = useState<typeof import("@puzzle-ui/icons/icon").Icon | null>(null);
+
+  useEffect(() => {
+    const target = firstIconRef.current;
+    if (!target) return;
+
+    let active = true;
+    const load = () => {
+      void import("@puzzle-ui/icons/icon")
+        .then((module) => {
+          if (active) setIcon(() => module.Icon);
+        })
+        .catch((error: unknown) => {
+          console.error("Failed to load the home feature icons:", error);
+        });
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      load();
+      return () => { active = false; };
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        observer.disconnect();
+        load();
+      }
+    }, { rootMargin: "600px" });
+    observer.observe(target);
+    return () => {
+      active = false;
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <Stack direction={{ mobile: "col", tablet: "row" }} wrap="nowrap" gap="md">
+      {features.map((feature, index) => (
+        <Card key={feature.number}>
+          <div
+            ref={index === 0 ? firstIconRef : undefined}
+            className="home-feature-card__icon"
+          >
+            {Icon ? (
+              <Icon name={feature.icon} size={32} aria-hidden="true" />
+            ) : (
+              <svg width="32" height="32" aria-hidden="true" />
+            )}
+          </div>
+          <Heading level="headline3" as="h3">
+            {feature.title}
+          </Heading>
+          <Text>{feature.description}</Text>
+        </Card>
+      ))}
+    </Stack>
+  );
+};
+
+const DeferredComponentCarousel = ({ panels }: { panels: ComponentPanels }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const loadedRef = useRef<ComponentType<{ panels: ComponentPanels }> | null>(null);
+  const [Carousel, setCarousel] = useState<ComponentType<{ panels: ComponentPanels }> | null>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let active = true;
+    const load = () => {
+      void import("@/components/home-component-carousel")
+        .then(({ HomeComponentCarousel }) => {
+          if (!active) return;
+          loadedRef.current = HomeComponentCarousel;
+          if (!container.contains(document.activeElement)) {
+            setCarousel(() => HomeComponentCarousel);
+          }
+        })
+        .catch((error: unknown) => {
+          console.error("Failed to load the home component carousel:", error);
+        });
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      load();
+      return () => { active = false; };
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        observer.disconnect();
+        load();
+      }
+    }, { rootMargin: "600px" });
+    observer.observe(container);
+
+    return () => {
+      active = false;
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="home-component-carousel-container"
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget) && loadedRef.current) {
+          setCarousel(() => loadedRef.current);
+        }
+      }}
+    >
+      {Carousel ? (
+        <Carousel panels={panels} />
+      ) : (
+        <div className="home-component-fallback" aria-label="UI components">
+          {panels.map((panel) => (
+            <Stack
+              key={panel[0]!.href}
+              direction="col"
+              alignH="stretch"
+              gap="md"
+              className="home-component-panel"
+            >
+              {panel.map((component) => (
+                <Card
+                  as="a"
+                  interactive
+                  className="home-component-card"
+                  href={component.href}
+                  key={component.href}
+                >
+                  <span className="home-component-card__icon" aria-hidden="true">
+                    <svg />
+                  </span>
+                  <CardHeader>
+                    <CardTitle>{component.name}</CardTitle>
+                    <CardDescription>{component.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              ))}
+            </Stack>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Home = () => {
   const panels = Route.useLoaderData();
   const [theme, setTheme] = useState<ThemeMode>("dark");
@@ -406,32 +559,7 @@ const Home = () => {
                   </Text>
                 </Stack>
 
-                <Stack
-                  direction={{ mobile: "col", tablet: "row" }}
-                  wrap="nowrap"
-                  gap="md"
-                >
-                  {features.map((feature) => (
-                    <Card key={feature.number}>
-                      <div className="home-feature-card__icon">
-                        {feature.number === "01" ? (
-                          <Icon name="hugeicons:infinity-circle" size={32} />
-                        ) : feature.number === "02" ? (
-                          <Icon
-                            name="hugeicons:universal-access-circle"
-                            size={32}
-                          />
-                        ) : (
-                          <Icon name="griddy-icons:code-circle" size={32} />
-                        )}
-                      </div>
-                      <Heading level="headline3" as="h3">
-                        {feature.title}
-                      </Heading>
-                      <Text>{feature.description}</Text>
-                    </Card>
-                  ))}
-                </Stack>
+                <FeatureCards />
               </Stack>
             </Section>
 
@@ -463,73 +591,7 @@ const Home = () => {
                   </Button>
                 </Stack>
 
-                <CarouselController items={panels}>
-                  <Carousel<(typeof componentPanels)[number]>
-                    className="home-component-carousel"
-                    ariaLabel="UI components"
-                    panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
-                    gap="1rem"
-                    getItemKey={(panel) => panel[0]!.href}
-                    backButton={
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        aria-label="Previous component panels"
-                      >
-                        <Icon
-                          name="akar-icons:chevron-left"
-                          aria-hidden="true"
-                        />
-                      </Button>
-                    }
-                    nextButton={
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        aria-label="Next component panels"
-                      >
-                        <Icon
-                          name="akar-icons:chevron-right"
-                          aria-hidden="true"
-                        />
-                      </Button>
-                    }
-                    buttonAlignment="aside"
-                    renderItem={(panel) => (
-                      <Stack
-                        direction="col"
-                        alignH="stretch"
-                        gap="md"
-                        className="home-component-panel"
-                      >
-                        {panel.map((component) => (
-                          <Card
-                            as="a"
-                            interactive
-                            className="home-component-card"
-                            href={component.href}
-                            key={component.href}
-                            aria-labelledby={`component-${component.href.split("/").at(-1)}`}
-                          >
-                            <span className="home-component-card__icon">
-                              <Icon name={component.icon} aria-hidden="true" />
-                            </span>
-                            <CardHeader>
-                              <CardTitle
-                                id={`component-${component.href.split("/").at(-1)}`}
-                              >
-                                {component.name}
-                              </CardTitle>
-                              <CardDescription>
-                                {component.description}
-                              </CardDescription>
-                            </CardHeader>
-                          </Card>
-                        ))}
-                      </Stack>
-                    )}
-                  />
-                </CarouselController>
+                <DeferredComponentCarousel panels={panels} />
               </Stack>
             </Section>
 

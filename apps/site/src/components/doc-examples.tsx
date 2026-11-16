@@ -16,6 +16,7 @@ import {
   DropdownMenu,
   FileUpload,
   FormField,
+  Image,
   ImageBox,
   type ImageBoxImage,
   NotificationProvider,
@@ -126,10 +127,10 @@ export const shippingItems = [
 ];
 
 export const carouselItems = [
-  { id: "design", title: "Design", description: "Start with a clear visual language." },
-  { id: "build", title: "Build", description: "Compose reusable components." },
-  { id: "test", title: "Test", description: "Check behavior across devices." },
-  { id: "ship", title: "Ship", description: "Share your work with the world." },
+  { id: "living-room", ...imageBoxPhotos[0]! },
+  { id: "garden-room", ...imageBoxPhotos[1]! },
+  { id: "bedroom", ...imageBoxPhotos[2]! },
+  { id: "kitchen", ...imageBoxPhotos[3]! },
 ];
 
 export const fruitOptions = [
@@ -317,7 +318,9 @@ export const ControlledCarouselExample = () => {
       <CarouselController items={carouselItems} currentPanel={panel} onPanelChange={setPanel}>
         <Carousel<(typeof carouselItems)[number]>
           getItemKey={(item) => item.id}
-          renderItem={(item) => <Card><strong>{item.title}</strong><p>{item.description}</p></Card>}
+          renderItem={(item) => (
+            <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />
+          )}
           backButton={<Button variant="outline">Previous</Button>}
           nextButton={<Button variant="outline">Next</Button>}
           buttonAlignment="aside"

@@ -87,6 +87,59 @@ const getPaginationItems = (
   return items;
 };
 
+type ResponsivePaginationItem = {
+  key: string;
+  item: PaginationItem;
+  compact: boolean;
+  expanded: boolean;
+  order: number;
+};
+
+const getResponsivePaginationItems = (
+  totalPages: number,
+  currentPage: number,
+  boundaryCount: number,
+  siblingCount: number,
+): ResponsivePaginationItem[] => {
+  const entries = new Map<string, ResponsivePaginationItem>();
+
+  const addItems = (items: PaginationItem[], layout: "compact" | "expanded") => {
+    items.forEach((item, index) => {
+      const previous = items[index - 1];
+      const next = items[index + 1];
+      const order =
+        item.type === "page"
+          ? item.page
+          : previous?.type === "page" && next?.type === "page"
+            ? (previous.page + next.page) / 2
+            : 0;
+      const key =
+        item.type === "page"
+          ? `page-${item.page}`
+          : `ellipsis-${layout}-${index}`;
+      const entry = entries.get(key);
+      if (entry) {
+        entry[layout] = true;
+      } else {
+        entries.set(key, {
+          key,
+          item,
+          compact: layout === "compact",
+          expanded: layout === "expanded",
+          order,
+        });
+      }
+    });
+  };
+
+  addItems(getPaginationItems(totalPages, currentPage, boundaryCount, siblingCount), "expanded");
+  addItems(
+    getPaginationItems(totalPages, currentPage, Math.min(boundaryCount, 1), Math.min(siblingCount, 0)),
+    "compact",
+  );
+  return [...entries.values()].sort((a, b) => a.order - b.order);
+};
+
 const normalizePage = (page: number, totalPages: number) => {
   const total = normalizeCount(totalPages);
 
@@ -97,4 +150,4 @@ const normalizePage = (page: number, totalPages: number) => {
   return Math.min(Math.max(1, normalized), total);
 };
 
-export { getPaginationItems, normalizePage };
+export { getPaginationItems, getResponsivePaginationItems, normalizePage };

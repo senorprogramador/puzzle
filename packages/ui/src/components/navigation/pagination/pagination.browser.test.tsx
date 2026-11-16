@@ -1,8 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { page } from "vitest/browser";
 
 import { Pagination } from "./index";
+
+afterEach(async () => {
+  await page.viewport(1280, 800);
+});
 
 describe("Pagination browser", () => {
   it("supports keyboard navigation through native controls", async () => {
@@ -82,14 +87,47 @@ describe("Pagination browser", () => {
     expect(onPageChange).not.toHaveBeenCalled();
   });
 
-  it("keeps the pagination controls within the viewport width", () => {
-    render(<Pagination totalPages={1000} defaultPage={500} />);
-
+  it("fits compact controls and switches to the expanded window at tablet widths", async () => {
+    const user = userEvent.setup();
+    const onPageChange = vi.fn();
+    await page.viewport(320, 800);
+    render(<Pagination totalPages={1000} defaultPage={500} onPageChange={onPageChange} />);
     const navigation = screen.getByRole("navigation");
+    const list = navigation.querySelector<HTMLElement>(".puzzle-pagination__list")!;
+    const visiblePages = () =>
+      [...navigation.querySelectorAll<HTMLElement>(".puzzle-pagination__page")]
+        .filter((element) => element.getClientRects().length > 0)
+        .map((element) => element.textContent);
 
-    expect(navigation).toHaveClass("puzzle-pagination");
+    expect(visiblePages()).toEqual(["1", "500", "1000"]);
+    expect(list.scrollWidth).toBeLessThanOrEqual(320);
+    const items = [...list.children].filter((element) => element.getClientRects().length > 0);
+    const centers = items.map((element) => {
+      const rect = element.getBoundingClientRect();
+      return rect.top + rect.height / 2;
+    });
+    expect(Math.max(...centers) - Math.min(...centers)).toBeLessThan(2);
+    await user.click(screen.getByRole("button", { name: "Go to next page" }));
+    expect(onPageChange).toHaveBeenCalledWith(501);
+    expect(visiblePages()).toEqual(["1", "501", "1000"]);
 
-    expect(navigation.querySelector(".puzzle-pagination__list")).not.toBeNull();
+    await page.viewport(768, 800);
+    expect(visiblePages()).toEqual(["1", "500", "501", "502", "1000"]);
+    await page.viewport(1024, 800);
+    expect(visiblePages()).toEqual(["1", "500", "501", "502", "1000"]);
+  });
+
+  it("respects configured counts and link navigation across breakpoints", async () => {
+    await page.viewport(320, 800);
+    render(
+      <Pagination totalPages={20} defaultPage={10} boundaryCount={0} siblingCount={2}
+        getPageHref={(number) => `/items?page=${number}`} />,
+    );
+    expect(screen.getByRole("link", { name: "Go to next page" })).toHaveAttribute("href", "/items?page=11");
+    expect(screen.queryByRole("link", { name: "Go to page 9" })).toBeNull();
+    await page.viewport(768, 800);
+    expect(screen.getByRole("link", { name: "Go to page 8" })).toHaveAttribute("href", "/items?page=8");
+    expect(screen.queryByRole("link", { name: "Go to page 1" })).toBeNull();
   });
 
   it("supports link navigation", async () => {

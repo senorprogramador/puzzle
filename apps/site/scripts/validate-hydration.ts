@@ -112,6 +112,80 @@ try {
 
   assert.equal((await fetch(`${origin}/docs/getting-started`)).status, 200);
   browser = await chromium.launch();
+  const noJsContext = await browser.newContext({ javaScriptEnabled: false });
+  const noJsPage = await noJsContext.newPage();
+  await noJsPage.goto(origin);
+  assert.equal(await noJsPage.locator(".home-component-fallback a").count(), 16);
+  await noJsContext.close();
+
+  const lazyPage = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  const carouselRequests: string[] = [];
+  const iconRequests: string[] = [];
+  lazyPage.on("request", (request) => {
+    if (/\/(?:home-component-carousel|carousel)-[^/]+\.(?:js|css)(?:\?|$)/.test(request.url())) {
+      carouselRequests.push(request.url());
+    }
+    if (/\/icon-[^/]+\.js(?:\?|$)/.test(request.url())) {
+      iconRequests.push(request.url());
+    }
+  });
+  const homeResponse = await lazyPage.goto(origin);
+  const homeHtml = await homeResponse!.text();
+  assert.match(homeHtml, /home-component-fallback/, "component links are server-rendered");
+  await lazyPage.waitForLoadState("networkidle");
+  assert.deepEqual(carouselRequests, [], "carousel assets are not requested initially");
+  assert.equal(await lazyPage.locator(".home-component-fallback a").count(), 16);
+  const initialIconRequests = [...iconRequests];
+  const featureIconRequest = lazyPage.waitForRequest((request) =>
+    /\/icon-[^/]+\.js(?:\?|$)/.test(request.url()) &&
+    !initialIconRequests.includes(request.url()),
+  );
+  await lazyPage.locator(".home-feature-card__icon").first().scrollIntoViewIfNeeded();
+  await featureIconRequest;
+  await lazyPage.locator(".home-component-carousel-container").scrollIntoViewIfNeeded();
+  await lazyPage.getByRole("button", { name: "Next component panels" }).waitFor();
+  assert.ok(carouselRequests.some((url) => /home-component-carousel-.*\.js/.test(url)));
+  assert.ok(carouselRequests.some((url) => /carousel-.*\.css/.test(url)));
+  await lazyPage.getByRole("button", { name: "Next component panels" }).click();
+  await lazyPage.close();
+
+  const focusedPage = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  let releaseCarousel!: () => void;
+  const carouselGate = new Promise<void>((resolveGate) => { releaseCarousel = resolveGate; });
+  await focusedPage.route(/\/home-component-carousel-[^/]+\.js$/, async (route) => {
+    await carouselGate;
+    await route.continue();
+  });
+  await focusedPage.goto(origin);
+  const fallbackLink = focusedPage.locator(".home-component-fallback a").first();
+  await fallbackLink.focus();
+  releaseCarousel();
+  await focusedPage.waitForLoadState("networkidle");
+  assert.equal(await fallbackLink.evaluate((element) => element === document.activeElement), true);
+  assert.equal(await focusedPage.locator(".home-component-fallback a").count(), 16);
+  await fallbackLink.blur();
+  await focusedPage.getByRole("button", { name: "Next component panels" }).waitFor();
+  await focusedPage.close();
+
+  const failedPage = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  const loadErrors: string[] = [];
+  failedPage.on("console", (message) => {
+    if (message.type() === "error") loadErrors.push(message.text());
+  });
+  await failedPage.route(/\/home-component-carousel-[^/]+\.js$/, (route) => route.abort());
+  await failedPage.goto(origin);
+  await failedPage.locator(".home-component-carousel-container").scrollIntoViewIfNeeded();
+  await failedPage.waitForLoadState("networkidle");
+  assert.equal(await failedPage.locator(".home-component-fallback a").count(), 16);
+  assert.ok(loadErrors.some((message) => message.includes("Failed to load the home component carousel")));
+  await failedPage.close();
+
+  const noObserverPage = await browser.newPage({ viewport: { width: 1280, height: 720 } });
+  await noObserverPage.addInitScript(() => { Reflect.deleteProperty(window, "IntersectionObserver"); });
+  await noObserverPage.goto(origin);
+  await noObserverPage.getByRole("button", { name: "Next component panels" }).waitFor();
+  await noObserverPage.close();
+
   const page = await browser.newPage();
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));

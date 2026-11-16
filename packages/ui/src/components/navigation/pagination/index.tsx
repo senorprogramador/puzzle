@@ -10,7 +10,7 @@ import type {
   PaginationProps,
 } from "./pagination.types";
 
-import { getPaginationItems, normalizePage } from "./pagination.utils";
+import { getResponsivePaginationItems, normalizePage } from "./pagination.utils";
 
 import "./pagination.css";
 
@@ -55,7 +55,7 @@ const Pagination = ({
     ...labels,
   };
 
-  const items = getPaginationItems(
+  const items = getResponsivePaginationItems(
     totalPages,
     currentPage,
     boundaryCount,
@@ -155,12 +155,17 @@ const Pagination = ({
           )}
         </li>
 
-        {items.map((item) => {
+        {items.map(({ item, key, compact, expanded }) => {
+          const itemClass = cn(
+            "puzzle-pagination__item",
+            !compact && "puzzle-pagination__item--expanded-only",
+            !expanded && "puzzle-pagination__item--compact-only",
+          );
           if (item.type === "ellipsis") {
             return (
               <li
-                key={`ellipsis-${item.position}`}
-                className="puzzle-pagination__item"
+                key={key}
+                className={itemClass}
               >
                 <span
                   className="puzzle-pagination__ellipsis"
@@ -183,7 +188,7 @@ const Pagination = ({
           );
 
           return (
-            <li key={item.page} className="puzzle-pagination__item">
+            <li key={key} className={itemClass}>
               {getPageHref ? (
                 isCurrent ? (
                   <span

@@ -69,6 +69,12 @@ export const components = [
     description: "Display responsive images with fitting and placeholders.",
   },
   {
+    name: "Image Box",
+    href: "/docs/ui/data-display/image-box",
+    icon: "lucide:image",
+    description: "Arrange photos in a responsive image collage.",
+  },
+  {
     name: "Paper",
     href: "/docs/ui/data-display/paper",
     icon: "lucide:sticky-note",
