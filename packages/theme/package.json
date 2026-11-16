@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/theme",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Design tokens, theme providers, and typography for Puzzle React applications",
   "homepage": "https://puzzle-ui.com/docs/theme",
   "keywords": [
@@ -77,7 +77,7 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.7.0"
+    "@puzzle-ui/core": "^0.8.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

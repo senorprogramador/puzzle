@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.8.0 - 2026-11-16
+
+- Improved the package README and overlay guidelines with clearer descriptions, section headings, and a link to the overlay documentation.
+
 ## 0.7.0 - 2026-11-15
 
 - Added `ImageBox`, a photo gallery component that lays out one to five images in a main-plus-supporting grid with a "+N" overflow tile, with an `aspectRatio` prop (default 2), `gap` and `radius` props, and `onImageClick` and `onViewAll` callbacks.

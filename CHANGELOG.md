@@ -18,6 +18,38 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.8.0 - 2026-11-16
+
+### `@puzzle-ui/ui`
+
+- Improved the package README and overlay guidelines with clearer descriptions, section headings, and a link to the overlay documentation.
+
+### `@puzzle-ui/create`
+
+- Added React Router (framework mode) as a project template alongside Next.js, TanStack Start, and Basic React.
+- Added a database prompt for full-stack Puzzle Auth projects, with MongoDB, Cloudflare D1, and Custom storage options.
+- Generated Auth projects now include sign-in and sign-up pages, a protected `/dashboard` route, an API route, and server modules wired to the chosen database.
+- MongoDB projects get a `docker-compose.yml` replica set, and the next steps now include `docker compose up -d --wait`.
+- D1 projects get `wrangler.jsonc`, the Cloudflare runtime integration (OpenNext for Next.js, the Cloudflare Vite plugin for TanStack Start and React Router), and a `cf-typegen` run after install.
+- Auth projects write a `.env` with preview database settings and generated secrets for local development.
+- The generated theme now maps Puzzle `Link` (and `Image` on Next.js) to the framework's components, and the starter page links to the package docs.
+- Tailwind setup now keeps the existing layout of the Vite `plugins` array and supports React Router projects.
+- Dependency installation uses the detected package manager, including dev dependencies for Cloudflare tooling.
+
+### `@puzzle-ui/storage-d1`
+
+- Fixed storing and querying dates nested in documents, so `Date` values are encoded reliably and compared by their ISO string in filters and sorts, including for invalid dates, which now raise a validation error.
+
+### `@puzzle-ui/auth`
+
+- Added `Pbkdf2PasswordHasher`, a Web Crypto PBKDF2-HMAC-SHA256 password hasher with a secret pepper that runs on Node.js, Bun, Deno, and Cloudflare Workers, including the Workers Free plan.
+- Added `PasswordHashAlgorithm` and `PASSWORD_HASH_ALGORITHMS`, and `PasswordHash.algorithm` now accepts `pbkdf2-sha256` as well as `argon2id`.
+- Auth managers now accept hashes from any supported algorithm and report invalid hasher output with a generic password hash error.
+
+### `@puzzle-ui/fullstack`
+
+- Fixed hydration mismatches in the sign-in, MFA challenge, MFA enrollment, and MFA settings forms by detecting passkey support only after hydration.
+
 ## 0.7.0 - 2026-11-15
 
 ### `@puzzle-ui/ui`
