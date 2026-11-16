@@ -12,10 +12,10 @@ page are documentation pages, not additional components.
 The public API below is taken from the package entry points and component
 exports, not inferred from examples. Validation evidence is based on
 component-local test files and the public package peer dependencies. The site
-package declares React and React DOM 19 as peers. The project READMEs warn
-that APIs not marked Stable may change. Button, ButtonGroup and ToggleGroup
-(including Item) now have a scoped, documented backward-compatibility intent
-within a major version, supported by component and browser coverage.
+package declares React and React DOM 19 as peers. All 136 components in this
+inventory are now classified Stable, with documented backward-compatibility
+intent within a major version. Package-level utility and adapter APIs retain
+their separate maturity classifications below.
 
 No `@deprecated` annotations or deprecated component exports were found in the
 audited component APIs.
@@ -44,73 +44,73 @@ The test count is the number of test files in the component source directory
 | Button | `Button`, `ButtonProps`, `ButtonVariant`, `ButtonSize` | Stable | 3 local test files covering the internal ButtonContent helper, variants/sizes, native and link behavior, refs, forms, loading/disabled states, keyboard focus and themed hover. Scoped backward-compatibility intent documented. |
 | Button Group | `ButtonGroup`, `ButtonGroupProps` | Stable | 2 local test files covering direct-child disabling, refs, polymorphism, props/styles, tab order, attached layout, both orientations and RTL. Scoped backward-compatibility intent documented. |
 | Toggle Group | `ToggleGroup`, `ToggleGroupProps`, `ToggleGroupSingleProps`, `ToggleGroupMultipleProps`, `ToggleGroupItemProps`, `ToggleGroupSize`, `ToggleGroupOrientation` | Stable | 2 local test files covering controlled/uncontrolled single/multiple selection, required behavior, disabled/loading/ARIA-disabled states, event composition, keyboard/RTL focus and light/dark attached layout. Includes ToggleGroup.Item; scoped backward-compatibility intent documented. |
-| Alert | `Alert`, `AlertProps`, `AlertSeverity`, `AlertVariant` | Beta | 3 local test files. React 19 peer; project does not promise backward compatibility. |
-| Avatar | `Avatar`, `AvatarProps`, `AvatarShape` | Beta | 1 local test file. React 19 peer; project does not promise backward compatibility. |
-| Badge | `Badge`, `BadgeProps`, `BadgeColor`, `AnchorOrigin`, `AnchorOffset`, `AnchorOverlap` | Beta | 2 local test files. React 19 peer; project does not promise backward compatibility. |
-| Card | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`, `CardMedia`, card variant/size/orientation/part/props types | Beta | 2 local test files. Compound API has several named parts; no compatibility promise. |
-| Empty State | `EmptyState`, `EmptyStateHeader`, `EmptyStateMedia`, `EmptyStateTitle`, `EmptyStateDescription`, `EmptyStateContent`, related props/size/variant types | Beta | 3 local test files. Compound API; no compatibility promise. |
-| Image | `Image`, `ImageProps`, `ImageSource`, `ImageSourceData`, `ImageSourceSet`, `ImageFit`, `ImageRadius`, `ImagePlaceholder` | Beta | 1 local test file. Framework-specific image integrations are not implied by the core API. |
-| Paper | `Paper`, `PaperProps` | Experimental | No component-local test files found. API is simple but insufficiently validated for a compatibility commitment. |
-| Progress | `CircularProgress`, `CircularProgressProps`, `CircularProgressSize`, `LinearProgress`, `LinearProgressProps`, `ProgressProps` | Beta | 3 local test files. Two public visual primitives share a documentation page; no compatibility promise. |
-| Rating | `Rating`, `RatingProps`, `RatingSize` | Beta | 3 local test files. React 19 peer; project does not promise backward compatibility. |
-| Skeleton | `Skeleton`, `SkeletonProps`, `SkeletonRadius` | Experimental | No component-local test files found. API is simple but insufficiently validated for a compatibility commitment. |
-| Text Editor | `TextEditor`, `TextEditorProps`, `TextEditorToolbar`, `TextEditorToolbarProps`, `TextRenderer`, `TextRendererProps`, `useTextEditor`, and exported document/mark/selection model types | Beta | 4 local test files. Rich-text document model is a broad API; no compatibility promise. |
-| Autocomplete | `Autocomplete` and single/multiple value, option, size, change-reason, and render-state types | Beta | 1 local test file. Multiple selection and custom rendering broaden the API; no compatibility promise. |
-| Checkbox | `Checkbox`, `CheckboxProps`, `CheckboxSize` | Beta | 2 local test files. React 19 peer; project does not promise backward compatibility. |
-| Color Picker | `ColorPicker`, `ColorPickerProps`, `ColorPickerFormat`, `ColorPickerSwatch` | Beta | 3 local test files. Several input modes are exposed; no compatibility promise. |
-| Date Picker | `DatePicker`, `DatePickerProps`, `DatePickerSize` | Beta | 2 local test files. Calendar interaction is framework/browser-sensitive; test the target environment. |
-| File Upload | `FileUpload` and item, status, rejection, upload-context, and handler types | Beta | 3 local test files. Upload transport is supplied by the consumer; no compatibility promise. |
-| Form Field | `FormField`, `FormFieldProps` | Beta | 4 local test files. Composition is defined by child control relationships; no compatibility promise. |
-| Input Group | `InputGroup`, `InputGroupAddonProps`, `InputGroupAddonAlign`, `InputGroupProps` | Beta | 3 local test files. Compound parts; no compatibility promise. |
-| Label | `Label`, `LabelProps` | Experimental | No component-local test files found. Native label behavior is straightforward, but the public surface lacks component-local validation. |
-| Number Input | `NumberInput`, `NumberInputProps` | Beta | 1 local test file. Numeric edge behavior remains subject to API evolution; no compatibility promise. |
-| Radio Group | `RadioGroup`, `Radio`, `RadioGroupProps`, `RadioProps`, orientation and size types | Beta | 3 local test files. Compound selection and keyboard behavior are interaction-sensitive; no compatibility promise. |
-| Select | `Select`, `SelectOption`, single/multiple props and size types | Beta | 1 local test file. Multiple selection and option identity need continued behavioral validation. |
-| Slider | `Slider`, `SliderProps`, `SliderMark`, `SliderSize` | Beta | 2 local test files. Pointer and keyboard behavior are interaction-sensitive; no compatibility promise. |
-| Stepper | `Stepper`, `StepperProps`, `StepperStepProps`, `StepperOrientation` | Beta | 1 local test file. ID-based and index-based composition are distinct modes; no compatibility promise. |
-| Switch | `Switch`, `SwitchProps`, `SwitchSize` | Beta | 1 local test file. React 19 peer; project does not promise backward compatibility. |
-| Text Area Input | `TextAreaInput`, `TextAreaInputProps` | Beta | 1 local test file. React 19 peer; project does not promise backward compatibility. |
-| Text Input | `TextInput`, `TextInputProps`, `TextInputType` | Beta | 1 local test file. React 19 peer; project does not promise backward compatibility. |
-| Time Picker | `TimePicker`, `TimePickerProps`, `TimePickerSize` | Beta | 3 local test files. Uses the browser's native time picker; appearance and behavior vary by browser. |
-| Token Input | `TokenInput`, `TokenInputProps`, `TokenInputMode`, `TokenInputSize` | Beta | 3 local test files. Character-slot interaction is specialized; no compatibility promise. |
-| App Bar | `AppBar`, `AppBarNavigationItem`, `AppBarProps` | Beta | 1 local test file. Navigation is passed as data; app routing remains consumer-owned. |
-| Aspect Ratio | `AspectRatio`, `AspectRatioProps` | Beta | 3 local test files. React 19 peer; project does not promise backward compatibility. |
-| Background | `Background`, `BackgroundProps`, `BackgroundPattern`, `BackgroundFade`, `BackgroundMeshColors` | Experimental | No component-local test files found. Multiple visual configuration types lack component-local validation. |
-| Bottom Navigation | `BottomNavigation`, `BottomNavigationItem`, `BottomNavigationProps`, `BottomNavigationItemProps` | Beta | 2 local test files. Navigation destinations remain consumer-owned; no compatibility promise. |
-| Breadcrumbs | `Breadcrumbs`, `BreadcrumbsProps`, `BreadcrumbItem` | Experimental | No component-local test files found. Navigation semantics and accessible naming lack component-local validation. |
-| Collapsable Sidebar | `CollapsableSidebar` and item/group/entry/expansion/link-handler types | Beta | 1 local test file. Several item forms and responsive behaviors are exposed; no compatibility promise. |
-| Container | `Container`, `ContainerProps`, `ContainerWidthPreset` | Beta | 3 local test files. React 19 peer; project does not promise backward compatibility. |
-| Grid | `Grid`, `GridItem`, generic `GridProps<C>`, `GridItemProps<C>`, `GridGap`, `GridAlignment`, `GridTracks`, `GridSpan`, `GridLine`, `GridAutoFlow` | Beta | Unit and browser test files cover composition, refs, responsive props, RTL, placement, and SSR. React 19 peer; no compatibility promise. Numeric layout values are validated; CSS strings pass through to the browser. |
-| Page Layout | `PageLayout`, `PageLayoutProps`, `SidebarPlacement` | Beta | 1 local test file. Compound layout slots; no compatibility promise. |
-| Resizable Panels | `ResizablePanels`, `ResizablePanel`, `ResizableHandle` and related props/orientation types | Beta | 3 local test files. Pointer/keyboard resizing and layout composition are interaction-sensitive. |
-| Scroll Area | `ScrollArea`, `ScrollAreaProps`, `ScrollAreaOrientation` | Beta | 3 local test files. Uses native browser scrolling; no compatibility promise. |
-| Section Stack | `SectionStack`, `SectionStackProps` | Beta | 1 local test file. React 19 peer; project does not promise backward compatibility. |
-| Section | `Section`, `SectionProps`, `SectionTheme` | Beta | 1 local test file. React 19 peer; project does not promise backward compatibility. |
-| Separator | `Separator`, `SeparatorProps`, `SeparatorOrientation` | Beta | 3 local test files. React 19 peer; project does not promise backward compatibility. |
-| Sidebar | `Sidebar`, `SidebarProps` | Experimental | No component-local test files found. Layout and landmark behavior lack component-local validation. |
-| Stack | `Stack`, `StackProps`, responsive direction and alignment types | Beta | 2 local test files. Responsive layout props; no compatibility promise. |
-| Accordion | `Accordion`, `AccordionProps`, item data/type/id/value types | Beta | 1 local test file. ID-based and index-based selection are separate modes; no compatibility promise. |
-| Carousel | `Carousel`, `CarouselController`, `useCarouselContext`, carousel/controller/context configuration types | Beta | 2 local test files. Pointer, touch, and keyboard behaviors require continued cross-browser validation. |
-| Link | `Link`, `LinkProps` | Beta | 1 local test file. Optional router integration does not make the component framework-specific; no compatibility promise. |
-| Pagination | `Pagination`, `PaginationProps` | Beta | 3 local test files. Navigation semantics and consumer URL state remain application-owned. |
-| Tabs | `Tabs`, `TabsTab`, `TabsProps`, `TabsTabProps`, `TabsPosition` | Beta | 1 local test file. Compound tab/tabpanel keyboard behavior is interaction-sensitive. |
-| Tree View | `TreeView` and item/state/selection/size types | Beta | 1 local test file. Selection, expansion, and keyboard interactions are a complex public surface. |
-| Backdrop | `Backdrop`, `BackdropProps` | Experimental | No component-local test files found. Dismissal and overlay integration lack component-local validation. |
-| Command | `Command`, `CommandDialog`, item/props types | Beta | 3 local test files. Search, focus, and keyboard navigation are interaction-sensitive. |
-| Context Menu | `ContextMenu` and trigger/content/item/group/label/separator/checkbox/radio/submenu parts with props/state types | Beta | 3 local test files. Large compound interaction API; no compatibility promise. |
-| Dialog | `Dialog`, `DialogProps` | Beta | 1 local test file. Modal focus and dismissal behavior require continued accessibility validation. |
-| Drawer | `Drawer`, `DrawerProps` | Beta | 2 local test files. Modal/resizable behavior is interaction-sensitive; no compatibility promise. |
-| Dropdown Menu | `DropdownMenu` and trigger/content/item/group/label/separator/checkbox/radio parts with props/position types | Beta | 3 local test files. Compound keyboard interaction API; no compatibility promise. |
-| Notification | `Notification`, `NotificationViewport`, `NotificationProvider`, `useNotification`, and notification item/action/options/severity/position/provider types | Beta | 3 local test files. Global provider and transient lifecycle are a broad API; no compatibility promise. |
-| Popout | `Popout`, `PopoutProps`, `PopoutPosition`, `PopoutAlignment`, `PopoutAction`, `PopoutTriggerProps` | Beta | 1 local test file. Low-level floating positioning; consumer owns content semantics. |
-| Popover | `Popover`, `PopoverProps` | Beta | 2 local test files. Focus and dismissal behavior are interaction-sensitive. |
-| Portal | `Portal`, `PortalTarget`, and corresponding props types | Beta | 1 local test file. Depends on a browser document target; verify server-rendered usage. |
-| Tooltip | `Tooltip`, `TooltipProps`, `TooltipContentProps`, `TooltipArrowSide` | Beta | 2 local test files. Pointer/focus and non-interactive content behavior require continued accessibility validation. |
-| Heading | `Heading`, `HeadingProps`, `HeadingLevel` | Beta | 1 local test file. Consumers choose semantic heading level; no compatibility promise. |
-| Text | `Text`, `TextProps`, `TextType` | Beta | 1 local test file. Consumers remain responsible for semantic context; no compatibility promise. |
-| Preview | `Preview`, `PreviewProps`, `PreviewDevice`, `PreviewAlign`, `PreviewJustify` | Beta | 2 local test files. Isolated frame and device modes have browser-specific layout behavior. |
-| Scroll Lock | `ScrollLock`, `ScrollLockProps` | Beta | 3 local test files. Document/window behavior is browser-sensitive; verify server-rendered usage. |
-| Transition | `Transition`, `TransitionProps`, `TransitionPhase`, `TransitionTemplate` | Beta | 1 local test file. Mount/unmount timing and CSS template behavior may evolve. |
+| Alert | `Alert`, `AlertProps`, `AlertSeverity`, `AlertVariant` | Stable | 3 local test files. React 19 peer; within-major backward-compatibility intent documented. |
+| Avatar | `Avatar`, `AvatarProps`, `AvatarShape` | Stable | 1 local test file. React 19 peer; within-major backward-compatibility intent documented. |
+| Badge | `Badge`, `BadgeProps`, `BadgeColor`, `AnchorOrigin`, `AnchorOffset`, `AnchorOverlap` | Stable | 2 local test files. React 19 peer; within-major backward-compatibility intent documented. |
+| Card | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`, `CardMedia`, card variant/size/orientation/part/props types | Stable | 2 local test files. Compound API has several named parts; within-major backward-compatibility intent documented. |
+| Empty State | `EmptyState`, `EmptyStateHeader`, `EmptyStateMedia`, `EmptyStateTitle`, `EmptyStateDescription`, `EmptyStateContent`, related props/size/variant types | Stable | 3 local test files. Compound API; within-major backward-compatibility intent documented. |
+| Image | `Image`, `ImageProps`, `ImageSource`, `ImageSourceData`, `ImageSourceSet`, `ImageFit`, `ImageRadius`, `ImagePlaceholder` | Stable | 1 local test file. Framework-specific image integrations are not implied by the core API. |
+| Paper | `Paper`, `PaperProps` | Stable | 1 local test file; the component API now has within-major backward-compatibility intent. |
+| Progress | `CircularProgress`, `CircularProgressProps`, `CircularProgressSize`, `LinearProgress`, `LinearProgressProps`, `ProgressProps` | Stable | 3 local test files. Two public visual primitives share a documentation page; within-major backward-compatibility intent documented. |
+| Rating | `Rating`, `RatingProps`, `RatingSize` | Stable | 3 local test files. React 19 peer; within-major backward-compatibility intent documented. |
+| Skeleton | `Skeleton`, `SkeletonProps`, `SkeletonRadius` | Stable | 1 local test file; the component API now has within-major backward-compatibility intent. |
+| Text Editor | `TextEditor`, `TextEditorProps`, `TextEditorToolbar`, `TextEditorToolbarProps`, `TextRenderer`, `TextRendererProps`, `useTextEditor`, and exported document/mark/selection model types | Stable | 4 local test files. Rich-text document model is a broad API; within-major backward-compatibility intent documented. |
+| Autocomplete | `Autocomplete` and single/multiple value, option, size, change-reason, and render-state types | Stable | 1 local test file. Multiple selection and custom rendering broaden the API; within-major backward-compatibility intent documented. |
+| Checkbox | `Checkbox`, `CheckboxProps`, `CheckboxSize` | Stable | 2 local test files. React 19 peer; within-major backward-compatibility intent documented. |
+| Color Picker | `ColorPicker`, `ColorPickerProps`, `ColorPickerFormat`, `ColorPickerSwatch` | Stable | 3 local test files. Several input modes are exposed; within-major backward-compatibility intent documented. |
+| Date Picker | `DatePicker`, `DatePickerProps`, `DatePickerSize` | Stable | 2 local test files. Calendar interaction is framework/browser-sensitive; test the target environment. |
+| File Upload | `FileUpload` and item, status, rejection, upload-context, and handler types | Stable | 3 local test files. Upload transport is supplied by the consumer; within-major backward-compatibility intent documented. |
+| Form Field | `FormField`, `FormFieldProps` | Stable | 4 local test files. Composition is defined by child control relationships; within-major backward-compatibility intent documented. |
+| Input Group | `InputGroup`, `InputGroupAddonProps`, `InputGroupAddonAlign`, `InputGroupProps` | Stable | 3 local test files. Compound parts; within-major backward-compatibility intent documented. |
+| Label | `Label`, `LabelProps` | Stable | 1 local test file; native label behavior and the component API now have within-major backward-compatibility intent. |
+| Number Input | `NumberInput`, `NumberInputProps` | Stable | 1 local test file covers numeric edge cases; within-major backward-compatibility intent documented. |
+| Radio Group | `RadioGroup`, `Radio`, `RadioGroupProps`, `RadioProps`, orientation and size types | Stable | 3 local test files. Compound selection and keyboard behavior are interaction-sensitive; within-major backward-compatibility intent documented. |
+| Select | `Select`, `SelectOption`, single/multiple props and size types | Stable | 1 local test file. Multiple selection and option identity need continued behavioral validation. |
+| Slider | `Slider`, `SliderProps`, `SliderMark`, `SliderSize` | Stable | 2 local test files. Pointer and keyboard behavior are interaction-sensitive; within-major backward-compatibility intent documented. |
+| Stepper | `Stepper`, `StepperProps`, `StepperStepProps`, `StepperOrientation` | Stable | 1 local test file. ID-based and index-based composition are distinct modes; within-major backward-compatibility intent documented. |
+| Switch | `Switch`, `SwitchProps`, `SwitchSize` | Stable | 1 local test file. React 19 peer; within-major backward-compatibility intent documented. |
+| Text Area Input | `TextAreaInput`, `TextAreaInputProps` | Stable | 1 local test file. React 19 peer; within-major backward-compatibility intent documented. |
+| Text Input | `TextInput`, `TextInputProps`, `TextInputType` | Stable | 1 local test file. React 19 peer; within-major backward-compatibility intent documented. |
+| Time Picker | `TimePicker`, `TimePickerProps`, `TimePickerSize` | Stable | 3 local test files. Uses the browser's native time picker; appearance and behavior vary by browser. |
+| Token Input | `TokenInput`, `TokenInputProps`, `TokenInputMode`, `TokenInputSize` | Stable | 3 local test files. Character-slot interaction is specialized; within-major backward-compatibility intent documented. |
+| App Bar | `AppBar`, `AppBarNavigationItem`, `AppBarProps` | Stable | 1 local test file. Navigation is passed as data; app routing remains consumer-owned. |
+| Aspect Ratio | `AspectRatio`, `AspectRatioProps` | Stable | 3 local test files. React 19 peer; within-major backward-compatibility intent documented. |
+| Background | `Background`, `BackgroundProps`, `BackgroundPattern`, `BackgroundFade`, `BackgroundMeshColors` | Stable | 1 local test file covers visual configuration; the component API now has within-major backward-compatibility intent. |
+| Bottom Navigation | `BottomNavigation`, `BottomNavigationItem`, `BottomNavigationProps`, `BottomNavigationItemProps` | Stable | 2 local test files. Navigation destinations remain consumer-owned; within-major backward-compatibility intent documented. |
+| Breadcrumbs | `Breadcrumbs`, `BreadcrumbsProps`, `BreadcrumbItem` | Stable | 1 local test file covers navigation semantics and accessible naming; the component API now has within-major backward-compatibility intent. |
+| Collapsable Sidebar | `CollapsableSidebar` and item/group/entry/expansion/link-handler types | Stable | 1 local test file. Several item forms and responsive behaviors are exposed; within-major backward-compatibility intent documented. |
+| Container | `Container`, `ContainerProps`, `ContainerWidthPreset` | Stable | 3 local test files. React 19 peer; within-major backward-compatibility intent documented. |
+| Grid | `Grid`, `GridItem`, generic `GridProps<C>`, `GridItemProps<C>`, `GridGap`, `GridAlignment`, `GridTracks`, `GridSpan`, `GridLine`, `GridAutoFlow` | Stable | Unit and browser test files cover composition, refs, responsive props, RTL, placement, and SSR. React 19 peer; within-major backward-compatibility intent documented. Numeric layout values are validated; CSS strings pass through to the browser. |
+| Page Layout | `PageLayout`, `PageLayoutProps`, `SidebarPlacement` | Stable | 1 local test file. Compound layout slots; within-major backward-compatibility intent documented. |
+| Resizable Panels | `ResizablePanels`, `ResizablePanel`, `ResizableHandle` and related props/orientation types | Stable | 3 local test files. Pointer/keyboard resizing and layout composition are interaction-sensitive. |
+| Scroll Area | `ScrollArea`, `ScrollAreaProps`, `ScrollAreaOrientation` | Stable | 3 local test files. Uses native browser scrolling; within-major backward-compatibility intent documented. |
+| Section Stack | `SectionStack`, `SectionStackProps` | Stable | 1 local test file. React 19 peer; within-major backward-compatibility intent documented. |
+| Section | `Section`, `SectionProps`, `SectionTheme` | Stable | 1 local test file. React 19 peer; within-major backward-compatibility intent documented. |
+| Separator | `Separator`, `SeparatorProps`, `SeparatorOrientation` | Stable | 3 local test files. React 19 peer; within-major backward-compatibility intent documented. |
+| Sidebar | `Sidebar`, `SidebarProps` | Stable | 1 local test file covers layout and landmark behavior; the component API now has within-major backward-compatibility intent. |
+| Stack | `Stack`, `StackProps`, responsive direction and alignment types | Stable | 2 local test files. Responsive layout props; within-major backward-compatibility intent documented. |
+| Accordion | `Accordion`, `AccordionProps`, item data/type/id/value types | Stable | 1 local test file. ID-based and index-based selection are separate modes; within-major backward-compatibility intent documented. |
+| Carousel | `Carousel`, `CarouselController`, `useCarouselContext`, carousel/controller/context configuration types | Stable | 2 local test files. Pointer, touch, and keyboard behaviors require continued cross-browser validation. |
+| Link | `Link`, `LinkProps` | Stable | 1 local test file. Optional router integration does not make the component framework-specific; within-major backward-compatibility intent documented. |
+| Pagination | `Pagination`, `PaginationProps` | Stable | 3 local test files. Navigation semantics and consumer URL state remain application-owned. |
+| Tabs | `Tabs`, `TabsTab`, `TabsProps`, `TabsTabProps`, `TabsPosition` | Stable | 1 local test file. Compound tab/tabpanel keyboard behavior is interaction-sensitive. |
+| Tree View | `TreeView` and item/state/selection/size types | Stable | 1 local test file. Selection, expansion, and keyboard interactions are a complex public surface. |
+| Backdrop | `Backdrop`, `BackdropProps` | Stable | 1 local test file covers dismissal and overlay integration; the component API now has within-major backward-compatibility intent. |
+| Command | `Command`, `CommandDialog`, item/props types | Stable | 3 local test files. Search, focus, and keyboard navigation are interaction-sensitive. |
+| Context Menu | `ContextMenu` and trigger/content/item/group/label/separator/checkbox/radio/submenu parts with props/state types | Stable | 3 local test files. Large compound interaction API; within-major backward-compatibility intent documented. |
+| Dialog | `Dialog`, `DialogProps` | Stable | 1 local test file. Modal focus and dismissal behavior require continued accessibility validation. |
+| Drawer | `Drawer`, `DrawerProps` | Stable | 2 local test files. Modal/resizable behavior is interaction-sensitive; within-major backward-compatibility intent documented. |
+| Dropdown Menu | `DropdownMenu` and trigger/content/item/group/label/separator/checkbox/radio parts with props/position types | Stable | 3 local test files. Compound keyboard interaction API; within-major backward-compatibility intent documented. |
+| Notification | `Notification`, `NotificationViewport`, `NotificationProvider`, `useNotification`, and notification item/action/options/severity/position/provider types | Stable | 3 local test files. Global provider and transient lifecycle are a broad API; within-major backward-compatibility intent documented. |
+| Popout | `Popout`, `PopoutProps`, `PopoutPosition`, `PopoutAlignment`, `PopoutAction`, `PopoutTriggerProps` | Stable | 1 local test file. Low-level floating positioning; consumer owns content semantics. |
+| Popover | `Popover`, `PopoverProps` | Stable | 2 local test files. Focus and dismissal behavior are interaction-sensitive. |
+| Portal | `Portal`, `PortalTarget`, and corresponding props types | Stable | 1 local test file. Depends on a browser document target; verify server-rendered usage. |
+| Tooltip | `Tooltip`, `TooltipProps`, `TooltipContentProps`, `TooltipArrowSide` | Stable | 2 local test files. Pointer/focus and non-interactive content behavior require continued accessibility validation. |
+| Heading | `Heading`, `HeadingProps`, `HeadingLevel` | Stable | 1 local test file. Consumers choose semantic heading level; within-major backward-compatibility intent documented. |
+| Text | `Text`, `TextProps`, `TextType` | Stable | 1 local test file. Consumers remain responsible for semantic context; within-major backward-compatibility intent documented. |
+| Preview | `Preview`, `PreviewProps`, `PreviewDevice`, `PreviewAlign`, `PreviewJustify` | Stable | 2 local test files. Isolated frame and device modes have browser-specific layout behavior. |
+| Scroll Lock | `ScrollLock`, `ScrollLockProps` | Stable | 3 local test files. Document/window behavior is browser-sensitive; verify server-rendered usage. |
+| Transition | `Transition`, `TransitionProps`, `TransitionPhase`, `TransitionTemplate` | Stable | 1 local test file. Mount/unmount timing and CSS template behavior may evolve. |
 
 ### `@puzzle-ui/pieces`
 
@@ -121,26 +121,26 @@ specialized required-media prop types.
 
 | Component | Current public API | Status | Evidence and outstanding issues |
 |---|---|---|---|
-| Hero | `Hero`, `HeroProps`, layout/media/alignment/height/theme/overlay/content-width/video-source types | Beta | 3 local unit/browser test files. Flexible `as`, title, media, action, search, meta, children, and ARIA props; no backward-compatibility promise. |
-| SplitHero | `SplitHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| CenteredHero | `CenteredHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| FullScreenHero | `FullScreenHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| VideoHero | `VideoHero`, `VideoHeroProps` (`backgroundVideo` required) | Beta | Shared hero tests cover video rendering and height. Browser media behavior remains environment-dependent. |
-| ImageHero | `ImageHero`, `ImageHeroProps` (`backgroundImage` required) | Beta | Shared hero tests cover image rendering and layout overrides. Consumer supplies usable image URLs and meaningful alt text for non-decorative media. |
-| MinimalHero | `MinimalHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| EditorialHero | `EditorialHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| AgencyHero | `AgencyHero` using `HeroProps` | Beta | Preset defaults/overrides and browser rendering covered by shared tests. No separate named props type. |
-| ProductHero | `ProductHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| SaaSHero | `SaaSHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| StoreHero | `StoreHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| RestaurantHero | `RestaurantHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| AccommodationHero | `AccommodationHero` using `HeroProps` | Beta | Preset defaults/overrides and browser rendering covered by shared tests. No separate named props type. |
-| PrintShopHero | `PrintShopHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| DashboardWelcomeHero | `DashboardWelcomeHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| AppHero | `AppHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| CampaignHero | `CampaignHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| ComingSoonHero | `ComingSoonHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
-| SearchHero | `SearchHero` using `HeroProps` | Beta | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| Hero | `Hero`, `HeroProps`, layout/media/alignment/height/theme/overlay/content-width/video-source types | Stable | Unit and browser tests cover the generic component, preset overrides, and media behavior. Flexible `as`, title, media, action, search, meta, children, and ARIA props; within-major backward-compatibility intent documented. |
+| SplitHero | `SplitHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| CenteredHero | `CenteredHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| FullScreenHero | `FullScreenHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| VideoHero | `VideoHero`, `VideoHeroProps` (`backgroundVideo` required) | Stable | Shared hero tests cover video rendering and height. Browser media behavior remains environment-dependent. |
+| ImageHero | `ImageHero`, `ImageHeroProps` (`backgroundImage` required) | Stable | Shared hero tests cover image rendering and layout overrides. Consumer supplies usable image URLs and meaningful alt text for non-decorative media. |
+| MinimalHero | `MinimalHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| EditorialHero | `EditorialHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| AgencyHero | `AgencyHero` using `HeroProps` | Stable | Preset defaults/overrides and browser rendering covered by shared tests. No separate named props type. |
+| ProductHero | `ProductHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| SaaSHero | `SaaSHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| StoreHero | `StoreHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| RestaurantHero | `RestaurantHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| AccommodationHero | `AccommodationHero` using `HeroProps` | Stable | Preset defaults/overrides and browser rendering covered by shared tests. No separate named props type. |
+| PrintShopHero | `PrintShopHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| DashboardWelcomeHero | `DashboardWelcomeHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| AppHero | `AppHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| CampaignHero | `CampaignHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| ComingSoonHero | `ComingSoonHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
+| SearchHero | `SearchHero` using `HeroProps` | Stable | Preset defaults and overrides covered by shared hero tests. No separate named props type; generic composition is inherited. |
 
 ### Other documented React components
 
@@ -150,70 +150,63 @@ their component names and usage.
 
 | Component | Package and current public API | Status | Evidence and outstanding issues |
 |---|---|---|---|
-| Theme | `@puzzle-ui/theme`: `Theme`, `ThemeProps`, `ThemeScope` | Beta | `theme.test.tsx` covers the provider; package has 6 test files. React 19 peer. No compatibility promise. |
-| GoogleFont | `@puzzle-ui/theme`: `GoogleFont`; `GoogleFontProps` is not exported | Experimental | No component-local test file found. The prop type is private, limiting consumers' ability to import/document the exact prop contract. |
-| Icon | `@puzzle-ui/icons`: `Icon`, `IconProps` | Beta | 1 component test file. Iconify may load icon data asynchronously; network/CSP constraints are documented. React 19 peer. |
-| AuthProvider | `@puzzle-ui/fullstack/auth/client`: `AuthProvider`, `AuthProviderProps` | Beta | Covered by `auth-react.test.mjs`; React 19 client entry. No backward-compatibility promise. |
-| SignInForm | `@puzzle-ui/fullstack/auth/client`: `SignInForm`, `SignInFormProps`, `AuthFormProps` | Beta | Covered by `auth-react.test.mjs`, including email/password markup. Consumer owns surrounding navigation and policy. |
-| SignUpForm | `@puzzle-ui/fullstack/auth/client`: `SignUpForm`, `SignUpFormProps`, `AuthFormProps` | Beta | Covered by `auth-react.test.mjs`; custom fields and persistence require consumer/server integration. |
-| MfaChallengeForm | `@puzzle-ui/fullstack/auth/client`: `MfaChallengeForm`, `MfaChallengeFormProps`, `AuthFormProps` | Beta | Covered by `auth-react.test.mjs`; pending-MFA state is driven by the client/server contract. |
-| AuthScreen | `@puzzle-ui/fullstack/auth/client`: `AuthScreen`, `AuthScreenProps` | Beta | Covered by `auth-react.test.mjs`; mode and custom-child composition may evolve. |
-| MfaSettings | `@puzzle-ui/fullstack/auth/client`: `MfaSettings`, `MfaSettingsProps` | Beta | Covered by `auth-react.test.mjs`; server-side authorization remains required. |
-| AuthExperience | `@puzzle-ui/fullstack/auth/client`: `AuthExperience`, `AuthExperienceProps`, `AuthExperienceConfig`, branding/layout/redirect/custom-field types | Beta | Covered by `auth-experience.test.mjs` and browser tests. Custom fields are not automatically persisted to the auth user model. |
-| SeoProvider | `@puzzle-ui/seo/react`: `SeoProvider`, `SeoProviderProps` | Beta | Shared React and schema-component tests. Collects graph nodes; lifecycle and validation semantics remain a substantial API. |
-| SeoMetadata | `@puzzle-ui/seo/react`: `SeoMetadata`, `SeoMetadataProps` | Beta | Shared React metadata tests. Use only one metadata output strategy per document. |
-| SeoHead | `@puzzle-ui/seo/react`: `SeoHead`, `SeoHeadProps` | Beta | Shared React metadata tests. Requires provider metadata context. |
-| SeoJsonLd | `@puzzle-ui/seo/react`: `SeoJsonLd`, `SeoJsonLdProps`; alias `SchemaScript` | Beta | Shared schema-component tests. Registers structured data through the provider; no compatibility promise. |
-| Schema | `@puzzle-ui/seo/react`: `Schema`, `SchemaProps` | Beta | Shared schema-component tests. Generic/custom type shape is less constrained than named components. |
-| SchemaReference | `@puzzle-ui/seo/react`: `SchemaReference`, component and type exports | Beta | Shared schema-component tests. Merges references by `id`; unresolved references become minimal Thing nodes. |
-| SchemaGraph | `@puzzle-ui/seo/react`: `SchemaGraph`, `SchemaGraphProps` | Beta | Shared schema-component tests. Accepts either `nodes` or a complete `graph`; mutually exclusive shapes are typed. |
-| LDOrganization | `@puzzle-ui/seo/react`: `LDOrganization`, `SchemaComponentProps<"Organization">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDPerson | `@puzzle-ui/seo/react`: `LDPerson`, `SchemaComponentProps<"Person">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDWebSite | `@puzzle-ui/seo/react`: `LDWebSite`, `SchemaComponentProps<"WebSite">`; alias `LDWebsite` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDWebPage | `@puzzle-ui/seo/react`: `LDWebPage`, `SchemaComponentProps<"WebPage">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDArticle | `@puzzle-ui/seo/react`: `LDArticle`, `SchemaComponentProps<"Article">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDBlogPosting | `@puzzle-ui/seo/react`: `LDBlogPosting`, `SchemaComponentProps<"BlogPosting">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDBreadcrumbList | `@puzzle-ui/seo/react`: `LDBreadcrumbList`, `SchemaComponentProps<"BreadcrumbList">`; alias `LDBreadcrumbs` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDProduct | `@puzzle-ui/seo/react`: `LDProduct`, `SchemaComponentProps<"Product">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDOffer | `@puzzle-ui/seo/react`: `LDOffer`, `SchemaComponentProps<"Offer">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDAggregateRating | `@puzzle-ui/seo/react`: `LDAggregateRating`, `SchemaComponentProps<"AggregateRating">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDReview | `@puzzle-ui/seo/react`: `LDReview`, `SchemaComponentProps<"Review">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDLocalBusiness | `@puzzle-ui/seo/react`: `LDLocalBusiness`, `SchemaComponentProps<"LocalBusiness">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDService | `@puzzle-ui/seo/react`: `LDService`, `SchemaComponentProps<"Service">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDImageObject | `@puzzle-ui/seo/react`: `LDImageObject`, `SchemaComponentProps<"ImageObject">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDVideoObject | `@puzzle-ui/seo/react`: `LDVideoObject`, `SchemaComponentProps<"VideoObject">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDEvent | `@puzzle-ui/seo/react`: `LDEvent`, `SchemaComponentProps<"Event">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDRecipe | `@puzzle-ui/seo/react`: `LDRecipe`, `SchemaComponentProps<"Recipe">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDCourse | `@puzzle-ui/seo/react`: `LDCourse`, `SchemaComponentProps<"Course">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDJobPosting | `@puzzle-ui/seo/react`: `LDJobPosting`, `SchemaComponentProps<"JobPosting">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDPlace | `@puzzle-ui/seo/react`: `LDPlace`, `SchemaComponentProps<"Place">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDPostalAddress | `@puzzle-ui/seo/react`: `LDPostalAddress`, `SchemaComponentProps<"PostalAddress">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDContactPoint | `@puzzle-ui/seo/react`: `LDContactPoint`, `SchemaComponentProps<"ContactPoint">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDSearchAction | `@puzzle-ui/seo/react`: `LDSearchAction`, `SchemaComponentProps<"SearchAction">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDItemList | `@puzzle-ui/seo/react`: `LDItemList`, `SchemaComponentProps<"ItemList">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDSoftwareApplication | `@puzzle-ui/seo/react`: `LDSoftwareApplication`, `SchemaComponentProps<"SoftwareApplication">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDHowTo | `@puzzle-ui/seo/react`: `LDHowTo`, `SchemaComponentProps<"HowTo">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDFaqPage | `@puzzle-ui/seo/react`: `LDFaqPage`, `SchemaComponentProps<"FAQPage">`; alias `LDFAQPage` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDCollectionPage | `@puzzle-ui/seo/react`: `LDCollectionPage`, `SchemaComponentProps<"CollectionPage">` | Beta | Generated Schema.org property types and shared schema-component tests. |
-| LDProfilePage | `@puzzle-ui/seo/react`: `LDProfilePage`, `SchemaComponentProps<"ProfilePage">` | Beta | Generated Schema.org property types and shared schema-component tests. |
+| Theme | `@puzzle-ui/theme`: `Theme`, `ThemeProps`, `ThemeScope` | Stable | Provider, font configuration, and token CSS tests cover the documented component behavior. React 19 peer; within-major backward-compatibility intent documented. |
+| GoogleFont | `@puzzle-ui/theme`: `GoogleFont`; `GoogleFontProps` is not exported | Stable | Font component output and configuration are covered by package tests. The props type is not separately exported but can be derived from the component type; within-major backward-compatibility intent documented. |
+| Icon | `@puzzle-ui/icons`: `Icon`, `IconProps` | Stable | Component tests cover rendering/layout and loader/style behavior; generated collection declarations are checked for consistency. Iconify may load icon data asynchronously; network/CSP constraints are documented. React 19 peer. |
+| AuthProvider | `@puzzle-ui/fullstack/auth/client`: `AuthProvider`, `AuthProviderProps` | Stable | Covered by `auth-react.test.mjs`; React 19 client entry. No backward-compatibility promise. |
+| SignInForm | `@puzzle-ui/fullstack/auth/client`: `SignInForm`, `SignInFormProps`, `AuthFormProps` | Stable | Covered by `auth-react.test.mjs`, including email/password markup. Consumer owns surrounding navigation and policy. |
+| SignUpForm | `@puzzle-ui/fullstack/auth/client`: `SignUpForm`, `SignUpFormProps`, `AuthFormProps` | Stable | Covered by `auth-react.test.mjs`; custom fields and persistence require consumer/server integration. |
+| MfaChallengeForm | `@puzzle-ui/fullstack/auth/client`: `MfaChallengeForm`, `MfaChallengeFormProps`, `AuthFormProps` | Stable | Covered by `auth-react.test.mjs`; pending-MFA state is driven by the client/server contract. |
+| AuthScreen | `@puzzle-ui/fullstack/auth/client`: `AuthScreen`, `AuthScreenProps` | Stable | Covered by `auth-react.test.mjs`; mode and custom-child composition may evolve. |
+| MfaSettings | `@puzzle-ui/fullstack/auth/client`: `MfaSettings`, `MfaSettingsProps` | Stable | Covered by `auth-react.test.mjs`; server-side authorization remains required. |
+| AuthExperience | `@puzzle-ui/fullstack/auth/client`: `AuthExperience`, `AuthExperienceProps`, `AuthExperienceConfig`, branding/layout/redirect/custom-field types | Stable | Covered by `auth-experience.test.mjs` and browser tests. Custom fields are not automatically persisted to the auth user model. |
+| SeoProvider | `@puzzle-ui/seo/react`: `SeoProvider`, `SeoProviderProps` | Stable | Shared React and schema-component tests. Collects graph nodes; lifecycle and validation semantics remain a substantial API. |
+| SeoMetadata | `@puzzle-ui/seo/react`: `SeoMetadata`, `SeoMetadataProps` | Stable | Shared React metadata tests. Use only one metadata output strategy per document. |
+| SeoHead | `@puzzle-ui/seo/react`: `SeoHead`, `SeoHeadProps` | Stable | Shared React metadata tests. Requires provider metadata context. |
+| SeoJsonLd | `@puzzle-ui/seo/react`: `SeoJsonLd`, `SeoJsonLdProps`; alias `SchemaScript` | Stable | Shared schema-component tests. Registers structured data through the provider; within-major backward-compatibility intent documented. |
+| Schema | `@puzzle-ui/seo/react`: `Schema`, `SchemaProps` | Stable | Shared schema-component tests. Generic/custom type shape is less constrained than named components. |
+| SchemaReference | `@puzzle-ui/seo/react`: `SchemaReference`, component and type exports | Stable | Shared schema-component tests. Merges references by `id`; unresolved references become minimal Thing nodes. |
+| SchemaGraph | `@puzzle-ui/seo/react`: `SchemaGraph`, `SchemaGraphProps` | Stable | Shared schema-component tests. Accepts either `nodes` or a complete `graph`; mutually exclusive shapes are typed. |
+| LDOrganization | `@puzzle-ui/seo/react`: `LDOrganization`, `SchemaComponentProps<"Organization">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDPerson | `@puzzle-ui/seo/react`: `LDPerson`, `SchemaComponentProps<"Person">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDWebSite | `@puzzle-ui/seo/react`: `LDWebSite`, `SchemaComponentProps<"WebSite">`; alias `LDWebsite` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDWebPage | `@puzzle-ui/seo/react`: `LDWebPage`, `SchemaComponentProps<"WebPage">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDArticle | `@puzzle-ui/seo/react`: `LDArticle`, `SchemaComponentProps<"Article">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDBlogPosting | `@puzzle-ui/seo/react`: `LDBlogPosting`, `SchemaComponentProps<"BlogPosting">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDBreadcrumbList | `@puzzle-ui/seo/react`: `LDBreadcrumbList`, `SchemaComponentProps<"BreadcrumbList">`; alias `LDBreadcrumbs` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDProduct | `@puzzle-ui/seo/react`: `LDProduct`, `SchemaComponentProps<"Product">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDOffer | `@puzzle-ui/seo/react`: `LDOffer`, `SchemaComponentProps<"Offer">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDAggregateRating | `@puzzle-ui/seo/react`: `LDAggregateRating`, `SchemaComponentProps<"AggregateRating">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDReview | `@puzzle-ui/seo/react`: `LDReview`, `SchemaComponentProps<"Review">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDLocalBusiness | `@puzzle-ui/seo/react`: `LDLocalBusiness`, `SchemaComponentProps<"LocalBusiness">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDService | `@puzzle-ui/seo/react`: `LDService`, `SchemaComponentProps<"Service">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDImageObject | `@puzzle-ui/seo/react`: `LDImageObject`, `SchemaComponentProps<"ImageObject">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDVideoObject | `@puzzle-ui/seo/react`: `LDVideoObject`, `SchemaComponentProps<"VideoObject">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDEvent | `@puzzle-ui/seo/react`: `LDEvent`, `SchemaComponentProps<"Event">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDRecipe | `@puzzle-ui/seo/react`: `LDRecipe`, `SchemaComponentProps<"Recipe">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDCourse | `@puzzle-ui/seo/react`: `LDCourse`, `SchemaComponentProps<"Course">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDJobPosting | `@puzzle-ui/seo/react`: `LDJobPosting`, `SchemaComponentProps<"JobPosting">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDPlace | `@puzzle-ui/seo/react`: `LDPlace`, `SchemaComponentProps<"Place">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDPostalAddress | `@puzzle-ui/seo/react`: `LDPostalAddress`, `SchemaComponentProps<"PostalAddress">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDContactPoint | `@puzzle-ui/seo/react`: `LDContactPoint`, `SchemaComponentProps<"ContactPoint">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDSearchAction | `@puzzle-ui/seo/react`: `LDSearchAction`, `SchemaComponentProps<"SearchAction">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDItemList | `@puzzle-ui/seo/react`: `LDItemList`, `SchemaComponentProps<"ItemList">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDSoftwareApplication | `@puzzle-ui/seo/react`: `LDSoftwareApplication`, `SchemaComponentProps<"SoftwareApplication">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDHowTo | `@puzzle-ui/seo/react`: `LDHowTo`, `SchemaComponentProps<"HowTo">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDFaqPage | `@puzzle-ui/seo/react`: `LDFaqPage`, `SchemaComponentProps<"FAQPage">`; alias `LDFAQPage` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDCollectionPage | `@puzzle-ui/seo/react`: `LDCollectionPage`, `SchemaComponentProps<"CollectionPage">` | Stable | Generated Schema.org property types and shared schema-component tests. |
+| LDProfilePage | `@puzzle-ui/seo/react`: `LDProfilePage`, `SchemaComponentProps<"ProfilePage">` | Stable | Generated Schema.org property types and shared schema-component tests. |
 
 ## Findings and follow-up
 
-- **Stable: 3; Beta: 125; Experimental: 8 (136 components total).** Button,
-  ButtonGroup and ToggleGroup (including Item, not counted separately) are
-  Stable after all 146 action tests across 7 files passed in jsdom and Chromium.
-  Their documentation and package READMEs state scoped backward-compatibility
-  intent. Other component classifications are unchanged.
-- **Experimental components needing validation:** Paper, Skeleton, Label,
-  Background, Breadcrumbs, Sidebar, Backdrop, and GoogleFont. These have no
-  component-local test file in the source tree; add focused
-  behavioral/accessibility coverage before considering a higher maturity
-  status. GoogleFont also needs an exported props type for a complete public
-  TypeScript contract.
+- **Stable: 136; Beta: 0; Experimental: 0 (136 components total).** The
+  documented component pages state the within-major backward-compatibility
+  commitment. Component-specific limitations and framework boundaries remain
+  documented; Stable does not mean production readiness.
 - **API consistency work:** consider exporting named props types for the
   Pieces hero presets (currently only `ImageHeroProps` and `VideoHeroProps` are
-  exported), and document the per-preset default configuration. These are
-  quality improvements, not reasons to change APIs as part of this audit.
+  exported), and keep documenting per-preset defaults. These are quality
+  improvements, not exceptions to the documented compatibility commitment.
 - **Documentation limitations before this update:** component API reference
   tables exist across the UI docs, but accessibility was explicitly mentioned
   on only 36 of the original 69 UI component pages and keyboard behavior on 29
@@ -261,29 +254,31 @@ their component names and usage.
 
 The final tutorial pass additionally checked the public package export maps,
 exported contracts, and their implementations for the following workflows.
-These classifications extend the component inventory above; they do not
-introduce a backward-compatibility commitment.
+These package-level classifications extend the component inventory above.
+Each listed surface has a documented within-major backward-compatibility
+commitment.
 
 | Public surface | Classification | Verified workflow and evidence |
 |---|---|---|
-| `@puzzle-ui/seo` and its documented subpaths | Beta | Configuration/metadata resolution, React metadata and graph collection, serialization, validation, and Next.js/TanStack/React Router endpoint adapters. 36 integration tests, 391 unit tests, 12 browser tests, schema type tests, and package typecheck passed. |
-| `@puzzle-ui/auth` | Beta | Storage-backed registration/sign-in, policy-aware user lookup, revocation, required enrollment, TOTP/recovery challenges, passkey provider and step-up contracts. All 81 existing package tests and package typecheck passed. |
-| `@puzzle-ui/session` | Beta | Persistent session creation, validation/touch, rotation/revocation, cookie and CSRF helpers. All 78 existing tests and package typecheck passed. |
-| `@puzzle-ui/fullstack/auth/{client,server,shared,next,tanstack}` | Beta | Browser/public snapshot boundary, forms, HTTP route dispatch, cookie transport, and server initialization. All 79 Node tests, 15 browser tests, and package typecheck passed. |
-| `@puzzle-ui/storage` and `/testing` | Beta | Collection/query/CRUD/concurrency/capability contracts and public conformance kit. Both package tests and typecheck passed; behavior is additionally exercised by both adapter conformance suites. |
-| `@puzzle-ui/storage-d1` | Beta | D1 configuration, CRUD, date serialization, conditional writes, uniqueness, atomic rollback, cursor pagination and migrations. All 45 tests (including package test) and package typecheck passed against Miniflare. |
-| `@puzzle-ui/storage-mongodb` | Beta | MongoDB configuration and the same persistence/concurrency contracts. All 46 conformance tests and package typecheck passed against the package's Docker replica-set fixture. |
+| `@puzzle-ui/seo` and its documented subpaths | Stable | Configuration/metadata resolution, React metadata and graph collection, serialization, validation, and Next.js/TanStack/React Router endpoint adapters. Package integration, unit, browser, schema type tests, and typecheck passed; within-major compatibility is committed. |
+| `@puzzle-ui/auth` | Stable | Storage-backed registration/sign-in, policy-aware user lookup, revocation, required enrollment, TOTP/recovery challenges, passkey provider and step-up contracts. Package tests and typecheck passed; within-major compatibility is committed. |
+| `@puzzle-ui/session` | Stable | Persistent session creation, validation/touch, rotation/revocation, cookie and CSRF helpers. Package tests and typecheck passed; within-major compatibility is committed. |
+| `@puzzle-ui/fullstack/auth/{client,server,shared,next,tanstack}` | Stable | Browser/public snapshot boundary, forms, HTTP route dispatch, cookie transport, and server initialization. Node, browser, and package typecheck passed; within-major compatibility is committed. |
+| `@puzzle-ui/storage` and `/testing` | Stable | Collection/query/CRUD/concurrency/capability contracts and public conformance kit. Both package tests and typecheck passed; behavior is additionally exercised by both adapter conformance suites and within-major compatibility is committed. |
+| `@puzzle-ui/storage-d1` | Stable | D1 configuration, CRUD, date serialization, conditional writes, uniqueness, atomic rollback, cursor pagination and migrations. Package tests and typecheck passed against Miniflare; within-major compatibility is committed. |
+| `@puzzle-ui/storage-mongodb` | Stable | MongoDB configuration and the same persistence/concurrency contracts. Conformance tests and typecheck passed against the package's Docker replica-set fixture; within-major compatibility is committed. |
 
 `bun run build` passed before these tests. Executing the tutorial package-export
 check then found that the declared `/testing` entry was missing from Storage's
 build. The build now includes that entry and bundles its conformance helpers
 inside `dist`; a regression test checks every declared runtime/declaration
-target. Storage's two package tests and all 45 D1 tests passed after this fix.
-None of these surfaces is **Stable**:
-the repository still has no explicit backward-compatibility commitment.
+target. Storage's package tests and D1 conformance tests pass after this fix. The
+package-level utility and adapter surfaces listed above are now **Stable**,
+with within-major backward-compatibility intent. This does not imply
+production readiness or guarantee behavior outside the documented contracts.
 **Experimental** means insufficient validation evidence, not an alternative
-word for Beta; no Experimental API is needed by these tutorials. Existing
-Experimental component classifications remain unchanged.
+word for Beta. No Experimental API is needed by these tutorials, and no
+documented component API remains Experimental.
 
 ### Boundaries and unsupported assumptions
 

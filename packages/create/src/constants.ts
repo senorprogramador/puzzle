@@ -48,7 +48,7 @@ export const D1_FRAMEWORK_PACKAGES: Record<
     devDependencies: ["@cloudflare/vite-plugin@latest", "wrangler@latest"],
   },
   "react-router": {
-    dependencies: [],
+    dependencies: ["reflect-metadata@^0.2.2"],
     devDependencies: ["@cloudflare/vite-plugin@latest", "wrangler@latest"],
   },
 };

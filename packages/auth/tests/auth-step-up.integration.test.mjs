@@ -1,12 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { StorageAuthStepUpManager } from "../dist/index.js";
+import {
+  AuthMfaChallengeError,
+  StorageAuthStepUpManager,
+} from "../dist/index.js";
 
 import { MemoryStorage, FakeSessionManager } from "./fixtures/auth-harness.mjs";
 
-const createUser = () => ({
-  id: "user-1",
+const createUser = (id = "user-1") => ({
+  id,
   email: "user@example.com",
   emailVerifiedAt: new Date(),
   name: "Test User",
@@ -28,6 +31,7 @@ const toAuthSession = (session) => ({
 const createHarness = async () => {
   const storage = new MemoryStorage();
   const sessions = new FakeSessionManager();
+  let now = new Date();
 
   const current = await sessions.create({
     userId: "user-1",
@@ -41,12 +45,13 @@ const createHarness = async () => {
     status: "mfa-pending",
     challengeId: "mfa-challenge-1",
     challengeToken: "a".repeat(64),
-    expiresAt: new Date(Date.now() + 300_000),
+    expiresAt: new Date(now.getTime() + 300_000),
     availableFactors: ["totp", "passkey", "recovery-code"],
   };
 
   let verificationCalls = 0;
   let temporarySessionId = null;
+  let verifiedUserId = "user-1";
 
   const createVerifiedSession = async () => {
     verificationCalls++;
@@ -63,7 +68,7 @@ const createHarness = async () => {
     temporarySessionId = created.session.id;
 
     return {
-      user: createUser(),
+      user: createUser(verifiedUserId),
       session: toAuthSession(created.session),
       token: created.token,
     };
@@ -120,6 +125,8 @@ const createHarness = async () => {
     storage,
     sessions,
     mfa,
+  }, {
+    clock: () => new Date(now),
   });
 
   await manager.initialize();
@@ -130,6 +137,13 @@ const createHarness = async () => {
     storage,
     current,
     challenge,
+    mfa,
+    setVerifiedUserId: (userId) => {
+      verifiedUserId = userId;
+    },
+    advanceTime: (milliseconds) => {
+      now = new Date(now.getTime() + milliseconds);
+    },
     getVerificationCalls: () => verificationCalls,
     getTemporarySessionId: () => temporarySessionId,
   };
@@ -352,4 +366,104 @@ test("successful passkey step-up rotates the original session", async () => {
 
   assert.equal(activeSession.metadata.authenticationMethod, "passkey");
   assert.equal(getActiveSessions(harness.sessions, "user-1").length, 1);
+});
+
+test("expired challenges cannot be inspected or completed", async () => {
+  const harness = await createHarness();
+  const challenge = await harness.manager.beginStepUp({
+    sessionToken: harness.current.token,
+    ipAddress: "127.0.0.1",
+  });
+
+  harness.advanceTime(300_000);
+
+  assert.equal(
+    await harness.manager.getPendingAuthState(
+      challenge.challengeToken,
+      harness.current.token,
+    ),
+    null,
+  );
+  await assert.rejects(
+    () =>
+      harness.manager.verifyTotp({
+        challengeToken: challenge.challengeToken,
+        sessionToken: harness.current.token,
+        code: "123456",
+        ipAddress: "127.0.0.1",
+      }),
+    AuthMfaChallengeError,
+  );
+  assert.equal(harness.getVerificationCalls(), 0);
+});
+
+test("rejects malformed, unknown, and mismatched-action challenge tokens", async () => {
+  const harness = await createHarness();
+  const challenge = await harness.manager.beginStepUp({
+    sessionToken: harness.current.token,
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(
+    await harness.manager.getPendingAuthState("not-a-token", harness.current.token),
+    null,
+  );
+  assert.equal(
+    await harness.manager.getPendingAuthState(
+      "b".repeat(64),
+      harness.current.token,
+    ),
+    null,
+  );
+
+  harness.mfa.getPendingAuthState = async () => ({
+    status: "mfa-pending",
+    userId: "user-1",
+    challengeId: "a-different-action",
+    expiresAt: challenge.expiresAt,
+  });
+  assert.equal(
+    await harness.manager.getPendingAuthState(
+      challenge.challengeToken,
+      harness.current.token,
+    ),
+    null,
+  );
+  await assert.rejects(
+    () =>
+      harness.manager.verifyTotp({
+        challengeToken: "not-a-token",
+        sessionToken: harness.current.token,
+        code: "123456",
+        ipAddress: "127.0.0.1",
+      }),
+    AuthMfaChallengeError,
+  );
+  assert.equal(harness.getVerificationCalls(), 0);
+});
+
+test("rejects a verified MFA result for a different user and cleans it up", async () => {
+  const harness = await createHarness();
+  const challenge = await harness.manager.beginStepUp({
+    sessionToken: harness.current.token,
+    ipAddress: "127.0.0.1",
+  });
+  harness.setVerifiedUserId("another-user");
+
+  await assert.rejects(
+    () =>
+      harness.manager.verifyTotp({
+        challengeToken: challenge.challengeToken,
+        sessionToken: harness.current.token,
+        code: "123456",
+        ipAddress: "127.0.0.1",
+      }),
+    AuthMfaChallengeError,
+  );
+
+  const temporarySession = await harness.sessions.get(
+    harness.getTemporarySessionId(),
+  );
+  assert.ok(temporarySession.revokedAt instanceof Date);
+  assert.ok(await harness.sessions.validate(harness.current.token));
 });

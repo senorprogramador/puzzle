@@ -28,18 +28,19 @@ The [package readiness audit](https://github.com/senorprogramador/puzzle/blob/ma
 records the source/export checks, executed tests, and limitations behind these labels.
 
 - **Stable:** validated API with an explicit backward-compatibility commitment.
-  Button, ButtonGroup and ToggleGroup (including Item) are Stable. The Auth
-  tutorial uses the Stable Button API.
-- **Beta:** implemented and tested, but may evolve. Storage adapters,
-  Auth/Session/Fullstack, and SEO utilities/components/adapters used here
-  remain Beta; other UI primitives retain their component-specific labels.
+  All documented React component APIs across UI, Pieces, Theme, Icons,
+  Fullstack, and SEO are Stable, with compatibility intent within a major
+  version. The Auth, Session, Fullstack, SEO, Storage, D1, and MongoDB APIs
+  described in the package readiness audit are also Stable.
+- **Beta:** implemented and tested, but may evolve. No package or component
+  API currently listed in the readiness audit remains Beta.
 - **Experimental:** insufficient validation evidence for the public surface.
-  These tutorials do not require Experimental APIs. Existing Experimental UI
-  components elsewhere in the reference retain that classification.
+  These tutorials do not require Experimental APIs; no documented component
+  API currently has this classification.
 
-No tutorial claims that a Beta API is Stable or that passing tests establishes
-production readiness. Review the [Auth security requirements](/docs/auth/security)
-before deploying authentication.
+Stable classifications describe API compatibility, not production readiness.
+Review the [Auth security requirements](/docs/auth/security) before deploying
+authentication.
 
 ## How to follow the examples
 

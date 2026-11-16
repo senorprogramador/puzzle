@@ -62,6 +62,8 @@ MongoDB projects run `db:setup` and confirm that the database rejects unauthenti
 
 MongoDB and D1 variants also sign in with the account created during scaffolding in both development and production, verify that rerunning bootstrap cannot overwrite its password, exercise passwords with quotes, shell metacharacters, and Unicode, and test passkey registration and sign-in. TanStack Start with MongoDB additionally exercises passkeys in Chromium with a virtual authenticator.
 
+React Router + D1 projects load `reflect-metadata` in the Worker entry before importing the server build. Keep this import: WebAuthn's certificate dependencies require the polyfill before they are evaluated in production.
+
 Requirements: Bun, Node.js, Docker with Compose, Playwright Chromium (`bunx playwright install chromium`; on Linux, use `bunx playwright install --with-deps chromium` to also install system dependencies), and network access to npm and Google Fonts. The Create E2E workflow installs Chromium and its system dependencies before running the suite. The suite uses ports 4310–4377 and 27110–27177 on the host.
 
 | Variable | Purpose |

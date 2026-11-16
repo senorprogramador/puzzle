@@ -10,6 +10,7 @@ type LinearProgressProps = ProgressProps &
 const LinearProgress = ({
   color,
   value: rawValue,
+  barWidth,
   showTrack = true,
   className,
   style,
@@ -30,7 +31,11 @@ const LinearProgress = ({
     <div
       {...props}
       {...getProgressAriaProps(value)}
-      style={{ color: color ?? "var(--puzzle-color-primary)", ...style }}
+      style={{
+        color: color ?? "var(--puzzle-color-primary)",
+        ...(barWidth !== undefined ? { height: barWidth } : {}),
+        ...style,
+      }}
       className={classes}
     >
       <div

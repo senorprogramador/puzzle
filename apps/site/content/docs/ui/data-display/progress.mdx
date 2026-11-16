@@ -75,6 +75,27 @@ Use `color` to override the primary color with any CSS color value, and `showTra
   </div>
 </Preview>
 
+### Bar width
+
+Set `barWidth` in pixels to control the track and indicator thickness.
+
+<Preview
+  hideDevices={true}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "grid", gap: 16, width: 280 }}>
+      <LinearProgress value={60} />
+      <LinearProgress value={60} barWidth={8} />
+    </div>
+`}
+>
+  <div style={{ display: "grid", gap: 16, width: 280 }}>
+    <LinearProgress value={60} />
+    <LinearProgress value={60} barWidth={8} />
+  </div>
+</Preview>
+
 ## Circular progress
 
 ### Determinate
@@ -128,15 +149,37 @@ Use `size` (`sm`, `md`, `lg`) to scale the spinner. The default is `md`.
   </div>
 </Preview>
 
+### Bar width
+
+Set `barWidth` in pixels to change the stroke thickness.
+
+<Preview
+  hideDevices={true}
+  align="center"
+  justify="center"
+  code={`\
+    <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+      <CircularProgress value={75} />
+      <CircularProgress value={75} barWidth={8} />
+    </div>
+`}
+>
+  <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+    <CircularProgress value={75} />
+    <CircularProgress value={75} barWidth={8} />
+  </div>
+</Preview>
+
 ## API reference
 
 ### Shared props
 
-| Prop        | Type      | Default                       | Description                                                               |
-| ----------- | --------- | ----------------------------- | ------------------------------------------------------------------------- |
-| `value`     | `number`  | —                             | Progress from `0` to `100`. When omitted, the indicator is indeterminate. |
-| `color`     | `string`  | `var(--puzzle-color-primary)` | CSS color of the indicator and track.                                     |
-| `showTrack` | `boolean` | `true`                        | Shows the background track behind the indicator.                          |
+| Prop        | Type      | Default                                   | Description                                                               |
+| ----------- | --------- | ----------------------------------------- | ------------------------------------------------------------------------- |
+| `value`     | `number`  | —                                         | Progress from `0` to `100`. When omitted, the indicator is indeterminate. |
+| `color`     | `string`  | `var(--puzzle-color-primary)`             | CSS color of the indicator and track.                                     |
+| `showTrack` | `boolean` | `true`                                    | Shows the background track behind the indicator.                          |
+| `barWidth`  | `number`  | `4` (linear); size-dependent (circular)   | Thickness in pixels of the linear track or circular stroke.               |
 
 ### LinearProgress props
 

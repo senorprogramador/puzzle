@@ -58,7 +58,7 @@ workflow with npm, Bun, pnpm, and Yarn.
 
 `GoogleFont` loads a single font and sets its role variable without the rest of the theme system. Prefer `Theme` when you want the full token system.
 
-<Badge content="Experimental" color="info" /> **API maturity: Experimental.** `GoogleFont` has limited component-level validation and does not export its props type; expect the API to change. This label does not guarantee production readiness.
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented `GoogleFont` component API is covered by tests and is intended to remain backward-compatible within a major version. The props type is not separately exported; consumers can derive it from the component type. This is an API commitment, not a guarantee of production readiness.
 
 ```tsx
 import { GoogleFont } from "@puzzle-ui/theme";

@@ -24,8 +24,11 @@ const getDimension = (size: CircularProgressSize) => {
   }
 };
 
-const getHalfDimension = (size: CircularProgressSize) => {
-  return 0.5 * getDimension(size) - getStrokeWidth(size);
+const getHalfDimension = (
+  size: CircularProgressSize,
+  strokeWidth: number,
+) => {
+  return 0.5 * getDimension(size) - strokeWidth;
 };
 
 const getStrokeWidth = (size: CircularProgressSize) => {
@@ -50,14 +53,19 @@ const getCenter = (size: CircularProgressSize) => {
   }
 };
 
-const getStrokeDasharray = (size: CircularProgressSize) => {
+const getStrokeDasharray = (
+  size: CircularProgressSize,
+  strokeWidth: number,
+) => {
+  const defaultRadius = getHalfDimension(size, getStrokeWidth(size));
+  const radius = getHalfDimension(size, strokeWidth);
   switch (size) {
     case "sm":
-      return 84;
+      return (84 * radius) / defaultRadius;
     case "md":
-      return 128;
+      return (128 * radius) / defaultRadius;
     case "lg":
-      return 192;
+      return (192 * radius) / defaultRadius;
   }
 };
 
@@ -67,10 +75,14 @@ const CircularProgress = ({
   "aria-label": ariaLabel = "Loading...",
   value: rawValue,
   size = "md",
+  barWidth,
   showTrack = true,
   ...props
 }: CircularProgressProps) => {
   const value = normalizeProgressValue(rawValue);
+  const strokeWidth = barWidth ?? getStrokeWidth(size);
+  const radius = getHalfDimension(size, strokeWidth);
+  const strokeDasharray = getStrokeDasharray(size, strokeWidth);
   const classes = cn(
     "puzzle-circular-progress",
     value === undefined && "puzzle-circular-progress-indeterminate",
@@ -92,10 +104,10 @@ const CircularProgress = ({
           className="puzzle-circular-progress-track"
           cx={getCenter(size)}
           cy={getCenter(size)}
-          r={getHalfDimension(size)}
+          r={radius}
           fill="none"
           stroke="currentColor"
-          strokeWidth={getStrokeWidth(size)}
+          strokeWidth={strokeWidth}
           aria-hidden="true"
         />
       )}
@@ -103,16 +115,16 @@ const CircularProgress = ({
         className="puzzle-circular-progress-circle"
         cx={getCenter(size)}
         cy={getCenter(size)}
-        r={getHalfDimension(size)}
+        r={radius}
         fill="none"
         stroke="currentColor"
-        strokeWidth={getStrokeWidth(size)}
+        strokeWidth={strokeWidth}
         strokeLinecap="round"
-        strokeDasharray={getStrokeDasharray(size)}
+        strokeDasharray={strokeDasharray}
         style={{
           strokeDashoffset:
             value !== undefined
-              ? `${getStrokeDasharray(size) - (value / 100) * getStrokeDasharray(size)}px`
+              ? `${strokeDasharray - (value / 100) * strokeDasharray}px`
               : "32px",
         }}
       />

@@ -363,7 +363,9 @@ const openNextConfig = `import { defineCloudflareConfig } from "@opennextjs/clou
 export default defineCloudflareConfig();
 `;
 
-const reactRouterWorker = `import { createRequestHandler } from "react-router";
+const reactRouterWorker = `// Initialize WebAuthn's metadata polyfill before loading the server build.
+import "reflect-metadata";
+import { createRequestHandler } from "react-router";
 
 const requestHandler = createRequestHandler(
   () => import("virtual:react-router/server-build"),

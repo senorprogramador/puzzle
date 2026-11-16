@@ -214,6 +214,12 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
           `${environment.MONGODB_APP_USERNAME}:${environment.MONGODB_APP_PASSWORD}@`,
         );
       }
+
+      if (scaffold.framework === "react-router" && scaffold.database === "d1") {
+        expect(packageJson.dependencies?.["reflect-metadata"]).toBeDefined();
+        const worker = await readFile(path.join(directory, "workers/app.ts"), "utf8");
+        expect(worker).toContain('import "reflect-metadata";');
+      }
     });
 
     if (scaffold.database === "mongodb") {

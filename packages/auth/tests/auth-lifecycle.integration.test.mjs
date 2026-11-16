@@ -944,3 +944,104 @@ test("fails closed when physical session revocation fails after a password reset
 
   assert.equal(signedIn.user.id, registered.user.id);
 });
+
+test("rejects expired lifecycle tokens before changing account state", async () => {
+  let now = new Date();
+  const { auth, lifecycle, emailProvider, storage } =
+    await createLifecycleHarness({ clock: () => new Date(now) });
+  const registered = await registerUser(auth);
+
+  await lifecycle.requestPasswordReset({
+    email: registrationInput.email,
+    resetUrl,
+    ipAddress: registrationInput.ipAddress,
+  });
+
+  const token = extractToken(emailProvider.messages[0]);
+  now = new Date(now.getTime() + 60 * 60 * 1000);
+
+  await assert.rejects(
+    () =>
+      lifecycle.resetPassword({
+        token,
+        newPassword: "a-new-secure-password",
+      }),
+    AuthTokenError,
+  );
+  assert.ok(await storage.findById("auth_users", registered.user.id));
+});
+
+test("reports email failures after delivery and ignores callback failures", async () => {
+  const events = [];
+  let reportedError;
+  const { auth, lifecycle, storage, emailProvider } =
+    await createLifecycleHarness({
+      onEmailDeliveryError(error) {
+        events.push("callback");
+        reportedError = error;
+        throw new Error("The logging callback must not affect auth.");
+      },
+    });
+  await registerUser(auth);
+
+  const deliveryError = new Error("Email provider unavailable.");
+  emailProvider.send = async () => {
+    events.push("send");
+    throw deliveryError;
+  };
+
+  await assert.doesNotReject(() =>
+    lifecycle.requestPasswordReset({
+      email: registrationInput.email,
+      resetUrl,
+      ipAddress: registrationInput.ipAddress,
+    }),
+  );
+
+  assert.deepEqual(events, ["send", "callback"]);
+  assert.equal(reportedError, deliveryError);
+  assert.equal(
+    await storage.count("auth_action_tokens", {
+      where: {
+        purpose: { operator: "eq", value: "password-reset" },
+      },
+    }),
+    1,
+  );
+});
+
+test("reports failed physical session cleanup without restoring invalidated sessions", async () => {
+  const callbackErrors = [];
+  const { auth, lifecycle, sessions, storage } = await createLifecycleHarness({
+    onSessionRevocationError(error) {
+      callbackErrors.push(error);
+      throw new Error("The logging callback must not affect auth.");
+    },
+  });
+  const registered = await registerUser(auth);
+  sessions.failNextRevokeAll = true;
+
+  await assert.doesNotReject(() =>
+    lifecycle.changePassword({
+      sessionToken: registered.token,
+      currentPassword: registrationInput.password,
+      newPassword: "a-new-secure-password",
+    }),
+  );
+
+  assert.equal(callbackErrors.length, 1);
+  assert.match(callbackErrors[0].message, /Simulated session revocation failure/);
+  assert.ok(
+    (await storage.findById("auth_users", registered.user.id))
+      .sessionsInvalidatedAt instanceof Date,
+  );
+  assert.ok(await sessions.validate(registered.token));
+  await assert.rejects(
+    () =>
+      lifecycle.updateProfile({
+        sessionToken: registered.token,
+        name: "Must remain blocked",
+      }),
+    AuthSessionError,
+  );
+});

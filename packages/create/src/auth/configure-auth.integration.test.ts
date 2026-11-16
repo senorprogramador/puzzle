@@ -232,7 +232,12 @@ describe("configureAuth", () => {
       scripts: Record<string, string>;
     };
 
-    expect(await read("workers/app.ts")).toContain("createRequestHandler");
+    const worker = await read("workers/app.ts");
+    expect(worker).toContain("createRequestHandler");
+    expect(worker).toContain('import "reflect-metadata";');
+    expect(worker.indexOf('import "reflect-metadata";')).toBeLessThan(
+      worker.indexOf('import("virtual:react-router/server-build")'),
+    );
     expect(await read("wrangler.jsonc")).toContain('"main": "./workers/app.ts"');
     expect(packageJson.scripts.start).toBeUndefined();
     expect(packageJson.scripts.deploy).toContain("wrangler deploy");

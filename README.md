@@ -84,8 +84,8 @@ They are pre-1.0; check each package's documentation before adopting it.
 
 The repository also contains the [documentation site](apps/site) and a
 [Storybook playground](apps/playground). See the
-[API stability audit](docs/api-stability-audit.md) for current UI and Pieces
-component maturity classifications.
+[API stability audit](docs/api-stability-audit.md) for current component and
+package API maturity classifications.
 
 ## Installation
 

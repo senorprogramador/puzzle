@@ -86,6 +86,107 @@ runStorageMigrationConformance({
 });
 
 describe("D1 migration-specific conformance", () => {
+  it("orders migrations, honors target versions, and skips completed work", async () => {
+    await resetMigrationDatabase();
+
+    const adapter = new D1StorageMigrationAdapter({
+      database: migrationDatabase,
+    });
+    const executionOrder: number[] = [];
+    const migrations = [3, 1, 2].map((version) => ({
+      id: `ordered-${version}`,
+      version,
+      description: `Migration ${version}`,
+      up: async () => {
+        executionOrder.push(version);
+      },
+    }));
+
+    const first = await adapter.runMigrations(migrations, {
+      targetVersion: 2,
+    });
+    const second = await adapter.runMigrations(migrations, {
+      targetVersion: 2,
+    });
+
+    expect(executionOrder).toEqual([1, 2]);
+    expect(first.applied).toEqual([1, 2]);
+    expect(first.skipped).toEqual([3]);
+    expect(first.currentVersion).toBe(2);
+    expect(second.applied).toEqual([]);
+    expect(second.skipped).toEqual([1, 2, 3]);
+  });
+
+  it("records failed migrations and releases the migration lock", async () => {
+    await resetMigrationDatabase();
+
+    const adapter = new D1StorageMigrationAdapter({
+      database: migrationDatabase,
+    });
+
+    await expect(
+      adapter.runMigrations([
+        {
+          id: "failed-and-unlocked",
+          version: 1,
+          description: "Failure releases the lock",
+          up: async () => {
+            throw new Error("migration failed");
+          },
+        },
+      ]),
+    ).rejects.toThrow("migration failed");
+
+    expect(
+      await migrationDatabase
+        .prepare(
+          `SELECT owner, expires_at FROM "puzzle_migration_lock" WHERE id = 1`,
+        )
+        .first<{ owner: string; expires_at: number }>(),
+    ).toEqual({ owner: "", expires_at: 0 });
+
+    const status = await adapter.getMigrationStatus();
+    expect(status.migrations).toMatchObject([
+      { id: "failed-and-unlocked", status: "failed", error: "migration failed" },
+    ]);
+  });
+
+  it("serializes concurrent migration runners and applies a migration once", async () => {
+    await resetMigrationDatabase();
+
+    const adapterA = new D1StorageMigrationAdapter({
+      database: migrationDatabase,
+    });
+    const adapterB = new D1StorageMigrationAdapter({
+      database: migrationDatabase,
+    });
+    let executionCount = 0;
+
+    const migration = {
+      id: "d1-concurrent",
+      version: 1,
+      description: "Concurrent D1 migration",
+      up: async () => {
+        executionCount++;
+        await new Promise((resolve) => setTimeout(resolve, 75));
+      },
+    };
+
+    const [first, second] = await Promise.all([
+      adapterA.runMigrations([migration]),
+      adapterB.runMigrations([migration]),
+    ]);
+
+    expect(executionCount).toBe(1);
+    expect(
+      [first, second].filter(({ applied }) => applied.length === 1),
+    ).toHaveLength(1);
+    expect(
+      [first, second].filter(({ skipped }) => skipped.includes(1)),
+    ).toHaveLength(1);
+    expect([first.currentVersion, second.currentVersion]).toEqual([1, 1]);
+  });
+
   it("recovers when a previous migration lock has expired", async () => {
     await resetMigrationDatabase();
 
