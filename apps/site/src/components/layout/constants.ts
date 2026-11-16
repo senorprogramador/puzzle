@@ -19,6 +19,22 @@ const items: TreeViewItem[] = [
     label: "Getting Started",
     href: "/docs/getting-started",
   },
+  {
+    id: "project",
+    label: "Project",
+    children: [
+      {
+        id: "about",
+        label: "About Puzzle",
+        href: "/docs/about",
+      },
+      {
+        id: "architecture",
+        label: "Architecture",
+        href: "/docs/architecture",
+      },
+    ],
+  },
   developer,
   tutorials,
   theme,

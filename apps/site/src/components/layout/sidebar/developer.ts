@@ -7,6 +7,11 @@ export const developer: TreeViewItem = {
   label: "Developer Guide",
   children: [
     {
+      id: "developer-tools",
+      label: "Developer Tools",
+      href: "/docs/developer",
+    },
+    {
       id: "developer-create-project",
       label: "Create a Project",
       href: `${folder}/create-project`,

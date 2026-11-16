@@ -399,7 +399,7 @@ describe("createProject", () => {
     });
     expect(
       await readFile(path.join(projectDirectory, "vite.config.ts"), "utf8"),
-    ).toContain("nitro({ routeRules: createFontRouteRules() })");
+    ).toContain("nitro({ routeRules: createFontRouteRules(), inlineDynamicImports: true })");
   });
 
   it("does not overwrite an existing project", async () => {

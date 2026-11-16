@@ -1,0 +1,25 @@
+---
+title: About Puzzle
+description: Learn what Puzzle UI provides, how its packages fit together, and where to start with the documentation.
+---
+
+Puzzle is a TypeScript-first React design system and developer toolkit. The project brings together reusable interface components, theme tokens, composed page sections, and supporting packages for application development.
+
+## What Puzzle includes
+
+- **React interface building blocks:** [UI components](/docs/ui), [theme tokens and provider](/docs/theme), [hooks](/docs/hooks), and [icons](/docs/icons).
+- **Page sections:** the [Pieces package](/docs/pieces) currently documents Hero layouts and presets.
+- **Application capabilities:** framework-independent [authentication](/docs/auth), [fullstack auth integrations](/docs/fullstack), [storage contracts and adapters](/docs/storage), and [SEO utilities](/docs/seo).
+- **Project setup:** the [project generator](/docs/create) and [developer guides](/docs/developer) help configure and work with Puzzle projects.
+
+Use the [Getting Started guide](/docs/getting-started) to install packages and apply the theme provider. The [Architecture overview](/docs/architecture) explains how the packages are separated and how they fit together.
+
+## Project and author
+
+Puzzle is developed in the [Puzzle repository](https://github.com/senorprogramador/puzzle). The site identifies [Sjoerd van den Berg](https://senorprogramador.com) as its author and Señor Programador as its publisher.
+
+## API maturity and security boundaries
+
+Package documentation labels APIs as Stable, Beta, or Experimental according to their current validation and compatibility commitments. Many APIs remain Beta, and some UI APIs are Experimental; those labels describe API maturity, not production readiness. Check the [API maturity guide](/docs/tutorials#api-maturity) and the component or package reference before adopting an API.
+
+Puzzle authentication packages provide libraries and integration code, not a hosted identity service. Applications still need to configure secure HTTP endpoints, cookie and CSRF handling, storage and secrets, and their own authorization rules. Review the [authentication security guide](/docs/auth/security) before deployment.

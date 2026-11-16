@@ -18,6 +18,13 @@ const components: TreeViewItem = {
 
 export const pieces: TreeViewItem = {
   id: "pieces",
-  label: "Pieces",
-  children: [components],
+  label: "Page Sections",
+  children: [
+    {
+      id: "pieces-overview",
+      label: "Overview",
+      href: folder,
+    },
+    components,
+  ],
 } as const;

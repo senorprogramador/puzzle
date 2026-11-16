@@ -170,6 +170,40 @@ describe("configureAuth", () => {
     );
   });
 
+  it.each(["next", "tanstack", "react-router"] as const)(
+    "configures passkey enrollment and sign-in for %s",
+    async (framework) => {
+      await configure({ framework, database: "mongodb" });
+      const directory = framework === "react-router" ? "app" : "src";
+      const suffix = framework === "react-router" ? ".server" : "";
+      const services = await read(`${directory}/lib/auth/services${suffix}.ts`);
+      const dashboard = await read(
+        framework === "next"
+          ? "src/app/dashboard/page.tsx"
+          : `${directory}/routes/dashboard.tsx`,
+      );
+
+      expect(services).toContain("webAuthnProvider: new SimpleWebAuthnProvider()");
+      expect(services).toContain("rpId: origin.hostname");
+      for (const endpoint of [
+        "/mfa/passkey/enrollment/start",
+        "/mfa/passkey/enrollment/finish",
+        "/mfa/passkey/sign-in/start",
+        "/mfa/passkey/sign-in/finish",
+        "/mfa/passkey/challenge/start",
+        "/mfa/passkey/challenge/finish",
+        "/mfa/factors",
+        "/mfa/factors/remove",
+        "/mfa/totp/enrollment/start",
+        "/mfa/totp/enrollment/finish",
+        "/mfa/recovery-codes/regenerate",
+      ]) {
+        expect(services).toContain(`"/api/auth${endpoint}"`);
+      }
+      expect(dashboard).toContain("<MfaSettings />");
+    },
+  );
+
   it("configures React Router with MongoDB", async () => {
     await configure({ framework: "react-router", database: "mongodb" });
 

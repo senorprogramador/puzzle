@@ -1,0 +1,36 @@
+---
+title: React Page Sections
+description: Build introductory page and landing-page hero sections with the composable Hero layouts and presets in @puzzle-ui/pieces.
+---
+
+<code>@puzzle-ui/pieces</code> provides composed interface sections built on Puzzle UI. Its current documentation focuses on Hero layouts and presets for page introductions; it is not a general-purpose page builder or a library of complete website templates.
+
+## Start with a Hero
+
+Import the generic `Hero` component when you want to provide your own content and actions. The API also includes layout and visual presets such as `SplitHero`, `CenteredHero`, `ProductHero`, and `CampaignHero`.
+
+```tsx
+import { Button } from "@puzzle-ui/ui";
+import { Hero } from "@puzzle-ui/pieces";
+
+export function ProductIntroduction() {
+  return (
+    <Hero
+      eyebrow="Product"
+      title="A clear introduction to your page."
+      description="Pair a concise message with a primary next step."
+      actions={<Button href="/docs/getting-started">Get started</Button>}
+    />
+  );
+}
+```
+
+The generic component supports different layouts, content alignment, and optional media. Browse the [Hero reference](/docs/pieces/components/hero) for available layouts, presets, and examples.
+
+## Compose, do not replace
+
+Pieces supplies larger sections, while [`@puzzle-ui/ui`](/docs/ui) provides the underlying components and [`@puzzle-ui/theme`](/docs/theme) provides design tokens and theme behavior. You can use a Hero on a page and compose the rest of the interface from those building blocks.
+
+## API maturity
+
+The documented Hero component and presets are **Beta**. This describes API maturity, not production readiness. Check the [Hero API reference](/docs/pieces/components/hero) for supported props and review the [API maturity guide](/docs/tutorials#api-maturity) before relying on the API.

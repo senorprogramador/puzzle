@@ -109,7 +109,7 @@ All components below are exported from the client entry point and require an `Au
 
 ## Configurable auth experience
 
-`AuthExperience` combines branded sign-in/sign-up UI and custom registration fields. Use `onSubmit` when the app must persist additional field values itself; custom fields are not added to the auth user model automatically.
+`AuthExperience` combines branded sign-in/sign-up UI and custom registration fields. It displays the MFA challenge when sign-in requires another factor. Use `onSubmit` when the app must persist additional field values itself; custom fields are not added to the auth user model automatically.
 
 ```tsx
 import { AuthExperience } from "@puzzle-ui/fullstack/auth/client";

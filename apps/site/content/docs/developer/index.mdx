@@ -1,0 +1,28 @@
+---
+title: Developer Tools
+description: Set up Puzzle applications with the project generator, theme CLI, and practical development guides.
+---
+
+Puzzle's developer tools cover application scaffolding and project workflows. They help you get started with the packages; they do not replace framework, deployment, or security configuration.
+
+## Create a project
+
+The interactive [`@puzzle-ui/create` CLI](/docs/create) scaffolds a React application with Puzzle UI and Theme. Its prompts support Next.js, TanStack Start, React Router, or Basic React, with optional Tailwind CSS and Puzzle Auth setup.
+
+```bash
+bunx @puzzle-ui/create
+```
+
+See [Create a Project](/docs/developer/create-project) for the setup walkthrough and generated structure. The CLI requires Node.js 20.19 or later and an internet connection to fetch framework templates and dependencies.
+
+## Configure fonts
+
+The [Theme CLI](/docs/theme/cli) downloads configured font files for local serving. The project generator creates a font configuration and a download script for generated projects; review the framework-specific setup before adapting it.
+
+## Develop and verify
+
+- [Testing guide](/docs/developer/testing): run package checks and understand the repository's validation workflows.
+- [Contributing guide](/docs/developer/contributing): find package boundaries, repository prerequisites, and project conventions.
+- [Authentication setup guide](/docs/developer/authentication): connect auth services, storage, server handlers, and client UI.
+
+For package-level behavior and supported integration details, use the relevant [package references](/docs/about#what-puzzle-includes). Generated applications still need deployment-specific configuration; for authentication, follow the [security guidance](/docs/auth/security).

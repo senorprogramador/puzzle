@@ -18,6 +18,8 @@ const Header = ({}: HeaderProps) => {
       navigationItems={[
         { label: "Home", href: "/", current: true },
         { label: "Docs", href: "/docs/getting-started" },
+        { label: "About", href: "/docs/about" },
+        { label: "Architecture", href: "/docs/architecture" },
       ]}
       sticky
     />

@@ -49,14 +49,16 @@ const addCloudflarePlugin = (config: string) => {
 // Nitro builds a deployable Node.js server and caches the downloaded fonts.
 const nitroVitePlugin = "nitro({ routeRules: createFontRouteRules() })";
 
-const addNitroPlugin = (config: string) => {
+const addNitroPlugin = (config: string, auth: boolean) => {
   if (config.includes("nitro/vite")) {
     return config;
   }
 
   const withPlugin = config.replace(
     /tanstackStart\(([^)]*)\)/,
-    (match) => `${match}, ${nitroVitePlugin}`,
+    // Keep WebAuthn's metadata polyfill ahead of its certificate dependencies.
+    (match) =>
+      `${match}, ${auth ? "nitro({ routeRules: createFontRouteRules(), inlineDynamicImports: true })" : nitroVitePlugin}`,
   );
 
   return `import { nitro } from "nitro/vite";
@@ -112,7 +114,7 @@ const configureTanStack = async (
 
   const d1 = auth && database === "d1";
 
-  config = d1 ? addCloudflarePlugin(config) : addNitroPlugin(config);
+  config = d1 ? addCloudflarePlugin(config) : addNitroPlugin(config, auth);
 
   await writeFile(configPath, config, "utf8");
 

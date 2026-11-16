@@ -289,6 +289,7 @@ export const resolveClientIp = (request: Request): string => {
 `;
 
 const servicesModule = (layout: ServerLayout) => `import {
+  SimpleWebAuthnProvider,
   StorageAuthManager,
   StorageAuthMfaManager,
   StorageAuthStepUpManager,
@@ -358,8 +359,19 @@ const createServices = async () => {
     keys: { primary: hexToBytes(keyHex) },
   });
   const mfa = new StorageAuthMfaManager(
-    { storage, sessions, passwordHasher, rateLimitProvider, secretProtector },
-    { rateLimitKeySecret, issuer: origin.hostname },
+    {
+      storage, sessions, passwordHasher, rateLimitProvider, secretProtector,
+      webAuthnProvider: new SimpleWebAuthnProvider(),
+    },
+    {
+      rateLimitKeySecret,
+      issuer: origin.hostname,
+      webAuthn: {
+        rpId: origin.hostname,
+        rpName: origin.hostname,
+        origin: origin.origin,
+      },
+    },
   );
   const auth = new StorageAuthManager(
     { storage, sessions, passwordHasher, rateLimitProvider, mfa },
@@ -418,7 +430,7 @@ export const getSignedInUser = async (cookieHeader: string | null) => {
 
 /**
  * The /api/auth endpoints this app exposes. Everything else returns 404.
- * Add endpoints here when you build features such as MFA enrollment.
+ * Add endpoints here when you build additional auth features.
  */
 const enabledAuthEndpoints = new Set([
   "/api/auth/register",
@@ -427,6 +439,17 @@ const enabledAuthEndpoints = new Set([
   "/api/auth/sign-out",
   "/api/auth/mfa/sign-in/totp",
   "/api/auth/mfa/sign-in/recovery-code",
+  "/api/auth/mfa/passkey/sign-in/start",
+  "/api/auth/mfa/passkey/sign-in/finish",
+  "/api/auth/mfa/passkey/challenge/start",
+  "/api/auth/mfa/passkey/challenge/finish",
+  "/api/auth/mfa/passkey/enrollment/start",
+  "/api/auth/mfa/passkey/enrollment/finish",
+  "/api/auth/mfa/totp/enrollment/start",
+  "/api/auth/mfa/totp/enrollment/finish",
+  "/api/auth/mfa/factors",
+  "/api/auth/mfa/factors/remove",
+  "/api/auth/mfa/recovery-codes/regenerate",
 ]);
 
 const noStore = { "Cache-Control": "no-store" };
@@ -489,6 +512,7 @@ const dashboardBody = (email: string) => `<Container
       </Button>
       <SignOutButton />
     </Stack>
+    <MfaSettings />
   </Stack>
 </Container>`;
 
@@ -529,7 +553,8 @@ export const SignOutButton = () => {
 };
 `;
 
-const dashboardImports = `import { Button, Container, Heading, Stack, Text } from "@puzzle-ui/ui";`;
+const dashboardImports = `import { MfaSettings } from "@puzzle-ui/fullstack/auth/client";
+import { Button, Container, Heading, Stack, Text } from "@puzzle-ui/ui";`;
 
 const nextTemplates = (database: AuthDatabase) => {
   const layout = serverLayouts.next;

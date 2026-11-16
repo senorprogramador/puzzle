@@ -84,6 +84,32 @@ afterEach(() => {
 });
 
 describe("AuthExperience browser behavior", () => {
+  it("shows the MFA challenge after password sign-in requires a passkey", async () => {
+    const user = userEvent.setup();
+    const client = createClient();
+    client.isPasskeySupported.mockReturnValue(true);
+    client.signIn.mockResolvedValue({
+      status: "mfa-pending",
+      user: null,
+      mfa: {
+        purpose: "sign-in",
+        challengeId: "challenge-1",
+        expiresAt: new Date(Date.now() + 60_000).toISOString(),
+        availableFactors: ["passkey", "recovery-code"],
+      },
+    });
+    client.verifyMfaWithPasskey.mockResolvedValue(authenticatedSnapshot);
+
+    renderExperience({ client, mode: "sign-in" });
+    await user.type(screen.getByLabelText(/Email address/), "person@example.com");
+    await user.type(screen.getByLabelText(/Password/), "correct-password");
+    await user.click(screen.getByRole("button", { name: "Continue", exact: true }));
+
+    expect(await screen.findByRole("heading", { name: "Verify your identity" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Continue with passkey" }));
+    expect(client.verifyMfaWithPasskey).toHaveBeenCalledOnce();
+  });
+
   it("supports keyboard navigation through registration controls", async () => {
     const user = userEvent.setup();
 

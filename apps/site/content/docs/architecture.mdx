@@ -1,0 +1,51 @@
+---
+title: Puzzle Architecture
+description: Understand Puzzle's package boundaries, theme and UI relationship, and application integration layers.
+---
+
+Puzzle is developed as a Bun workspace monorepo with packages separated by responsibility. Applications can compose the packages they need; the repository also contains the documentation site and project tooling.
+
+## Package layers
+
+| Layer | Packages | Responsibility |
+| --- | --- | --- |
+| UI foundation | `@puzzle-ui/core`, [`@puzzle-ui/hooks`](/docs/hooks), [`@puzzle-ui/icons`](/docs/icons) | Shared utilities, React interaction hooks, and icon components. |
+| Design system | [`@puzzle-ui/theme`](/docs/theme), [`@puzzle-ui/ui`](/docs/ui), [`@puzzle-ui/pieces`](/docs/pieces) | Theme tokens and provider, reusable components that consume the theme CSS properties, and larger composed sections. |
+| Application services | [`@puzzle-ui/auth`](/docs/auth), `@puzzle-ui/session`, [`@puzzle-ui/storage`](/docs/storage) and storage adapters | Authentication and session contracts with pluggable persistence. |
+| Framework integration | [`@puzzle-ui/fullstack`](/docs/fullstack) | Browser auth client and React UI, server request handlers, and documented Next.js and TanStack Start adapters. |
+| Search metadata | [`@puzzle-ui/seo`](/docs/seo) | Metadata, structured data, sitemap and robots utilities, plus framework integrations. |
+| Project tooling | [`@puzzle-ui/create`](/docs/create) | Interactive application scaffolding and optional framework, theme, and authentication setup. |
+
+The [contributor guide](/docs/developer/contributing) lists the repository's package and application directories.
+
+## How the design system fits together
+
+The theme package defines tokens and provides them as CSS custom properties. UI components consume those properties instead of defining a separate theme system. A typical application wraps its interface with [`Theme`](/docs/theme/theme-provider) and composes exported components from [`@puzzle-ui/ui`](/docs/ui). The [Hero sections](/docs/pieces/components/hero) in Pieces compose larger page introductions from these UI building blocks.
+
+```tsx
+import { Theme } from "@puzzle-ui/theme";
+import { Button, Stack, Text } from "@puzzle-ui/ui";
+
+export function App() {
+  return (
+    <Theme>
+      <Stack direction="col" gap="sm">
+        <Text>Build an interface with Puzzle.</Text>
+        <Button>Continue</Button>
+      </Stack>
+    </Theme>
+  );
+}
+```
+
+## Application integration boundaries
+
+Puzzle Auth separates the authentication core from browser and framework integration. The core accepts storage, session, password-hashing, email, rate-limit, secret-protection, and WebAuthn dependencies through interfaces. Fullstack connects the server-side managers to request handlers and browser-facing React APIs; storage adapters implement persistence for supported backends.
+
+Your application remains responsible for wiring endpoints and deployment configuration, handling cookies and CSRF, supplying secrets and infrastructure, and enforcing application-specific authorization. The [Auth security guide](/docs/auth/security) describes the operational boundaries.
+
+The SEO package follows a similar separation: framework-independent metadata, graph, sitemap, and robots utilities are available alongside React components and server/framework adapters. See the [SEO overview](/docs/seo) and [framework integration guide](/docs/seo/frameworks).
+
+## Maturity
+
+API maturity is package- and component-specific. The current maturity guide marks Button, ButtonGroup, and ToggleGroup Stable; most other UI components and the Auth, Session, Fullstack, and SEO APIs used in the tutorials are Beta, while selected UI components are Experimental. These labels describe API stability and validation evidence, not production readiness. Review the relevant package documentation and [maturity policy](/docs/tutorials#api-maturity) before use.

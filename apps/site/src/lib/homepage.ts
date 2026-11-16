@@ -21,8 +21,8 @@ export const ecosystem = [
   },
   {
     name: "Pieces",
-    href: "/docs/pieces/components/hero",
-    description: "Composed hero sections built from shared UI primitives.",
+    href: "/docs/pieces",
+    description: "Composable hero sections and presets for page introductions.",
   },
   {
     name: "SEO",
@@ -51,5 +51,11 @@ export const ecosystem = [
     name: "Project scaffolding",
     href: "/docs/create",
     description: "Generate a React application configured for Puzzle.",
+  },
+  {
+    name: "Developer tools",
+    href: "/docs/developer",
+    description:
+      "Explore project setup, theme tooling, testing, and contribution guides.",
   },
 ] as const;

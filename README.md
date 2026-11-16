@@ -259,6 +259,14 @@ smoke check against the canonical site; see the
 [SEO/GEO validation report](docs/seo-geo-validation-report.md) for a local
 production-build invocation.
 
+For the current implementation inventory and follow-up process, see the
+[SEO/GEO audit](docs/seo-geo/implementation-audit.md),
+[implementation report](docs/seo-geo/implementation-report.md),
+[external authority checklist](docs/seo-geo/external-authority-checklist.md),
+and [monitoring guide](docs/seo-geo/monitoring-guide.md). The site also
+provides `/.well-known/puzzle.json` with verified public project and package
+facts when this version is deployed.
+
 ## Security
 
 Please report security concerns privately. Read the

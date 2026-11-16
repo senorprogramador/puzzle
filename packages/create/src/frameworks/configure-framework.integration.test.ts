@@ -72,7 +72,7 @@ export default defineConfig({
       'import { createFontRouteRules } from "@puzzle-ui/theme/nitro";',
     );
     expect(config).toContain(
-      "plugins: [tanstackStart(), nitro({ routeRules: createFontRouteRules() }), viteReact()]",
+      "plugins: [tanstackStart(), nitro({ routeRules: createFontRouteRules(), inlineDynamicImports: true }), viteReact()]",
     );
     expect(packageJson.scripts).toEqual({
       build: "vite build",

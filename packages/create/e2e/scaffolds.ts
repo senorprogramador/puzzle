@@ -2,7 +2,9 @@ import { access, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { afterAll, describe, expect, inject, it, vi } from "vitest";
+import { chromium } from "playwright";
 
+import { createWebAuthnCredentialFixture } from "../../auth/tests/fixtures/webauthn-cryptographic-fixture.mjs";
 import { createProject } from "../src/create-project";
 import { fontConfigPaths } from "../src/theme/templates";
 import type { Framework } from "../src/types";
@@ -341,6 +343,14 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
     }
 
     it("serves the home route and auth in development", async () => {
+      if (scaffold.framework === "tanstack" && scaffold.database === "mongodb") {
+        const envPath = path.join(directory, ".env");
+        const environment = await readFile(envPath, "utf8");
+        await writeFile(
+          envPath,
+          environment.replace(/^APP_ORIGIN="[^"]*"$/m, `APP_ORIGIN="http://localhost:${port}"`),
+        );
+      }
       server = await startDevProject(directory, port);
 
       try {
@@ -484,6 +494,110 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
     }
 
     if (runsAuth) {
+      if (scaffold.framework === "tanstack" && scaffold.database === "mongodb") {
+        it("enrolls and signs in with a browser passkey", async () => {
+          const { url } = requireServer();
+          const { APP_ORIGIN } = await readEnvironment(directory);
+          const user = {
+            email: `browser-passkey-${scaffold.id}@example.com`,
+            password: "correct horse battery staple",
+          };
+          const client = new HttpClient(url, APP_ORIGIN!);
+          const registration = await client.postJson("/api/auth/register", user);
+          expect(registration.ok, await registration.clone().text()).toBe(true);
+          const browser = await chromium.launch();
+          try {
+            const context = await browser.newContext();
+            const page = await context.newPage();
+            const cdp = await context.newCDPSession(page);
+            await cdp.send("WebAuthn.enable");
+            await cdp.send("WebAuthn.addVirtualAuthenticator", {
+              options: {
+                protocol: "ctap2",
+                transport: "internal",
+                hasResidentKey: true,
+                hasUserVerification: true,
+                isUserVerified: true,
+              },
+            });
+
+            await page.goto(new URL("/sign-in", url).href);
+            await page.getByLabel("Email address").fill(user.email);
+            await page.locator('input[name="password"]').fill(user.password);
+            await page.getByRole("button", { name: "Continue", exact: true }).click();
+            await page.waitForURL("**/dashboard");
+            await page.getByLabel("Current password").fill(user.password);
+            await page.getByRole("button", { name: "Add passkey" }).click();
+            await page.getByText("Save these codes somewhere safe.").waitFor();
+            await page.getByRole("button", { name: "Sign out" }).click();
+            await page.waitForURL("**/");
+            await page.goto(new URL("/sign-in", url).href);
+            await page.getByRole("button", { name: "Continue with passkey" }).click();
+            await page.waitForURL("**/dashboard");
+            expect(await page.getByText(user.email).count()).toBeGreaterThan(0);
+
+            await page.getByRole("button", { name: "Sign out" }).click();
+            await page.waitForURL("**/");
+            await page.goto(new URL("/sign-in", url).href);
+            await page.getByLabel("Email address").fill(user.email);
+            await page.locator('input[name="password"]').fill(user.password);
+            await page.getByRole("button", { name: "Continue", exact: true }).click();
+            await page.getByRole("heading", { name: "Verify your identity" }).waitFor();
+            await page.getByRole("button", { name: "Continue with passkey" }).click();
+            await page.waitForURL("**/dashboard");
+          } finally {
+            await browser.close();
+          }
+        });
+      }
+
+      it("registers a passkey and signs in with it", async () => {
+        const { url } = requireServer();
+        const { APP_ORIGIN } = await readEnvironment(directory);
+        const origin = APP_ORIGIN!;
+        const client = new HttpClient(url, origin);
+        const email = `passkey-${scaffold.id}@example.com`;
+        const password = "correct horse battery staple";
+
+        const register = await client.postJson("/api/auth/register", {
+          email,
+          password,
+        });
+        expect(register.ok, await register.clone().text()).toBe(true);
+
+        const start = await client.postJson("/api/auth/mfa/passkey/enrollment/start", {
+          currentPassword: password,
+        });
+        expect(start.ok, await start.clone().text()).toBe(true);
+        const { options } = await start.json() as { options: { challenge: string } };
+        const fixture = createWebAuthnCredentialFixture({
+          challenge: options.challenge,
+          origin,
+          rpId: new URL(origin).hostname,
+        });
+        const finish = await client.postJson("/api/auth/mfa/passkey/enrollment/finish", {
+          response: fixture.registrationResponse,
+        });
+        expect(finish.ok, await finish.clone().text()).toBe(true);
+        expect((await finish.json()).recoveryCodes.length).toBeGreaterThan(0);
+
+        expect((await client.postJson("/api/auth/sign-out", {})).ok).toBe(true);
+        const signInStart = await client.postJson("/api/auth/mfa/passkey/sign-in/start", {});
+        expect(signInStart.ok, await signInStart.clone().text()).toBe(true);
+        const signInOptions = await signInStart.json() as { options: { challenge: string } };
+        const signInFinish = await client.postJson("/api/auth/mfa/passkey/sign-in/finish", {
+          response: fixture.createAuthenticationResponse({
+            challenge: signInOptions.options.challenge,
+          }),
+        });
+        expect(signInFinish.ok, await signInFinish.clone().text()).toBe(true);
+        expect(await (await client.request("/api/auth/state")).json()).toMatchObject({
+          status: "authenticated",
+          user: { email },
+        });
+        expect((await client.request("/dashboard")).status).toBe(200);
+      });
+
       it("preserves the initial user's password and rejects duplicate bootstrap", async () => {
         const { url } = requireServer();
         const { APP_ORIGIN } = await readEnvironment(directory);

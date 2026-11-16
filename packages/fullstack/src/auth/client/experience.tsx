@@ -22,7 +22,7 @@ import {
 } from "@puzzle-ui/ui";
 
 import type { AuthClient, AuthClientSnapshot } from "./index";
-import { SignInForm, useAuth } from "./react";
+import { MfaChallengeForm, SignInForm, useAuth } from "./react";
 
 export type AuthFieldValue = string | boolean;
 
@@ -336,7 +336,7 @@ const AuthExperience = ({
   onSignUp,
   onForgotPassword,
 }: AuthExperienceProps) => {
-  const { signUp, messages } = useAuth();
+  const { signUp, messages, snapshot } = useAuth();
 
   const fields = config.fields ?? EMPTY_FIELDS;
   const branding = config.branding;
@@ -528,7 +528,12 @@ const AuthExperience = ({
       </div>
 
       <div className={contentClassName}>
-        {mode === "sign-in" ? (
+        {snapshot.status === "mfa-pending" ? (
+          <MfaChallengeForm
+            redirectTo={redirects?.afterSignIn}
+            onSuccess={onSuccess}
+          />
+        ) : mode === "sign-in" ? (
           <SignInForm
             redirectTo={redirects?.afterSignIn}
             onSuccess={onSuccess}

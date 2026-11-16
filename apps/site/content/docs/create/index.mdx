@@ -135,7 +135,7 @@ Full-stack projects are ready to sign up, sign in, and sign out:
 | Route | Purpose |
 | --- | --- |
 | `/sign-up`, `/sign-in` | `AuthExperience` views that navigate to `/dashboard` after authentication. |
-| `/dashboard` | A protected route. It resolves the session on the server and redirects to `/sign-in` when no user is signed in. |
+| `/dashboard` | A protected route with MFA settings. It resolves the session on the server and redirects to `/sign-in` when no user is signed in. |
 | `/api/auth/*` | The Puzzle Auth API, restricted to the endpoints the generated UI uses. |
 
 | Framework | Auth files |
@@ -146,6 +146,8 @@ Full-stack projects are ready to sign up, sign in, and sign out:
 | Basic React | `src/auth/sign-in.tsx` and `src/auth/sign-up.tsx`. Basic React has no server runtime or API route; host the authentication API separately and configure the client base path for it. |
 
 The server modules read the environment, create the storage adapter and password hasher, and build the `AuthServer` with sessions, rate limiting, MFA, and CSRF protection. Review them against the [Authentication setup guide](/docs/developer/authentication) before going to production, in particular the trusted client IP header for your host.
+
+To use a passkey, first sign in with your password and register it in the dashboard's MFA settings. Save the recovery codes shown at enrollment. Passkeys are bound to `APP_ORIGIN` and its hostname, so configure the exact deployed HTTPS origin before registering production passkeys.
 
 ## Run your application
 
