@@ -1,17 +1,20 @@
 ---
-title: Heroes
-description: Responsive hero sections and layouts for websites, applications and landing pages.
+title: React Hero Components
+description: Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.
+faq:
+  - question: Are Puzzle Pieces hero components responsive?
+    answer: Yes. Split and asymmetric layouts stack on mobile and use side-by-side columns at wider tablet and desktop widths, with spacing and typography adapted to smaller screens.
+  - question: Can I customize a hero preset?
+    answer: Yes. Every preset accepts HeroProps, and explicitly provided props override the preset defaults.
+  - question: Can a hero use a background video?
+    answer: Yes. VideoHero requires a backgroundVideo source, and Hero and the other presets also accept backgroundVideo.
 ---
 
 Heroes are introductory sections that establish the visual identity of a page.
 
-Puzzle Pieces provides a flexible Hero component and a collection of specialized presets. All presets share the same underlying implementation, making them easy to customize without maintaining separate layouts.
+Puzzle Pieces provides a flexible Hero component and responsive presets for common layouts. All presets share the same implementation and can be customized with the Hero props.
 
 <Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented Hero and preset APIs are covered by tests and are intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
-
-The generic Hero component and all presets listed here have Stable APIs, with
-within-major backward-compatibility intent. Stability describes API
-compatibility, not production readiness.
 
 ## Installation
 
@@ -21,6 +24,7 @@ Import the Hero components from Puzzle Pieces:
 import {
   Hero,
   SplitHero,
+  AsymmetricHero,
   CenteredHero,
   FullScreenHero,
   ImageHero,
@@ -30,28 +34,30 @@ import {
 
 ## Components
 
-| Component            | Description                      | API maturity |
-| -------------------- | -------------------------------- | ------------ |
-| Hero                 | Generic hero component           | <Badge content="Stable" color="primary" /> |
-| SplitHero            | Text and media side by side      | <Badge content="Stable" color="primary" /> |
-| CenteredHero         | Centered introduction            | <Badge content="Stable" color="primary" /> |
-| FullScreenHero       | Full viewport introduction       | <Badge content="Stable" color="primary" /> |
-| VideoHero            | Background video                 | <Badge content="Stable" color="primary" /> |
-| ImageHero            | Background image with overlay    | <Badge content="Stable" color="primary" /> |
-| MinimalHero          | Minimal introduction             | <Badge content="Stable" color="primary" /> |
-| EditorialHero        | Editorial layout                 | <Badge content="Stable" color="primary" /> |
-| AgencyHero           | Agency and consultancy websites  | <Badge content="Stable" color="primary" /> |
-| ProductHero          | Product introductions            | <Badge content="Stable" color="primary" /> |
-| SaaSHero             | SaaS product websites            | <Badge content="Stable" color="primary" /> |
-| StoreHero            | Online stores and collections    | <Badge content="Stable" color="primary" /> |
-| RestaurantHero       | Restaurants and hospitality      | <Badge content="Stable" color="primary" /> |
-| AccommodationHero    | Hotels and holiday accommodation | <Badge content="Stable" color="primary" /> |
-| PrintShopHero        | Printing businesses              | <Badge content="Stable" color="primary" /> |
-| DashboardWelcomeHero | Dashboard introductions          | <Badge content="Stable" color="primary" /> |
-| AppHero              | Web application introductions    | <Badge content="Stable" color="primary" /> |
-| CampaignHero         | Campaign landing pages           | <Badge content="Stable" color="primary" /> |
-| ComingSoonHero       | Pre-launch pages                 | <Badge content="Stable" color="primary" /> |
-| SearchHero           | Search-oriented websites         | <Badge content="Stable" color="primary" /> |
+| Component            | Description                              | API maturity |
+| -------------------- | ---------------------------------------- | ------------ |
+| Hero                 | Generic hero component                   | <Badge content="Stable" color="primary" /> |
+| SplitHero            | Large side-by-side content and media     | <Badge content="Stable" color="primary" /> |
+| AsymmetricHero       | Asymmetric content and media             | <Badge content="Stable" color="primary" /> |
+| CenteredHero         | Centered introduction                    | <Badge content="Stable" color="primary" /> |
+| FullScreenHero       | Full viewport background hero            | <Badge content="Stable" color="primary" /> |
+| VideoHero            | Full viewport background video           | <Badge content="Stable" color="primary" /> |
+| ImageHero            | Background image with overlay            | <Badge content="Stable" color="primary" /> |
+| MinimalHero          | Minimal introduction                     | <Badge content="Stable" color="primary" /> |
+| AgencyHero           | Dark asymmetric agency introduction      | <Badge content="Stable" color="primary" /> |
+| RestaurantHero       | Restaurant and hospitality introduction | <Badge content="Stable" color="primary" /> |
+| DashboardWelcomeHero | Dashboard introduction                   | <Badge content="Stable" color="primary" /> |
+| CampaignHero         | Campaign landing page                    | <Badge content="Stable" color="primary" /> |
+| ComingSoonHero       | Pre-launch page                          | <Badge content="Stable" color="primary" /> |
+| SearchHero           | Search-oriented introduction             | <Badge content="Stable" color="primary" /> |
+
+The former ProductHero, StoreHero, PrintShopHero and AppHero names remain
+available as aliases of SplitHero. EditorialHero and SaaSHero alias
+AsymmetricHero, and AccommodationHero aliases FullScreenHero. Use the canonical
+component for new implementations.
+
+SplitHero defaults to `height="large"`. Set `height="auto"` when the section
+should take only the height required by its content.
 
 ## Basic usage
 
@@ -89,7 +95,7 @@ Text and media are displayed in separate columns.
   layout="split"
   title="A better way to work."
   description="Bring everything together in one place."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Product preview" />}
+  media={<img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=90&w=1200&h=900&fit=crop&auto=format" alt="Product team workspace" />}
 />
 `}
 >
@@ -99,8 +105,8 @@ Text and media are displayed in separate columns.
     description="Bring everything together in one place."
     media={
       <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Product preview"
+        src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=90&w=1200&h=900&fit=crop&auto=format"
+        alt="Product team workspace"
       />
     }
   />
@@ -157,7 +163,7 @@ The media and content columns use different proportions.
 <Hero
   layout="asymmetric"
   title="Designed for ambitious teams."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Team collaborating" />}
+  media={<img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=90&w=1200&h=900&fit=crop&auto=format" alt="Team collaborating around a laptop" />}
 />
 `}
 >
@@ -166,8 +172,8 @@ The media and content columns use different proportions.
     title="Designed for ambitious teams."
     media={
       <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Team collaborating"
+        src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=90&w=1200&h=900&fit=crop&auto=format"
+        alt="Team collaborating around a laptop"
       />
     }
   />
@@ -189,7 +195,7 @@ Control where media is displayed using mediaPosition.
   layout="split"
   mediaPosition="left"
   title="Media on the left."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Example" />}
+  media={<img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=90&w=1200&h=900&fit=crop&auto=format" alt="Bright modern office" />}
 />
 `}
 >
@@ -199,8 +205,8 @@ Control where media is displayed using mediaPosition.
     title="Media on the left."
     media={
       <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Example"
+        src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=90&w=1200&h=900&fit=crop&auto=format"
+        alt="Bright modern office"
       />
     }
   />
@@ -212,7 +218,7 @@ Background media can also be supplied directly.
   code={`\
 <Hero
   mediaPosition="background"
-  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  backgroundImage="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=90&w=1920&h=1200&fit=crop&auto=format"
   title="Explore the world."
   overlay="gradient"
 />
@@ -220,7 +226,7 @@ Background media can also be supplied directly.
 >
   <Hero
     mediaPosition="background"
-    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    backgroundImage="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=90&w=1920&h=1200&fit=crop&auto=format"
     title="Explore the world."
     overlay="gradient"
   />
@@ -256,7 +262,6 @@ Hero supports four theme configurations.
 | brand    | Primary brand appearance       |
 
 <Preview
-  hideDevices={true}
   code={`\
 <Hero theme="brand" title="Your brand, your experience." />
 `}
@@ -278,10 +283,9 @@ Overlays improve text readability when using background media.
 | gradient | Directional gradient |
 
 <Preview
-  hideDevices={true}
   code={`\
 <Hero
-  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  backgroundImage="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=90&w=1920&h=1200&fit=crop&auto=format"
   overlay="gradient"
   theme="dark"
   title="Discover new places."
@@ -289,7 +293,7 @@ Overlays improve text readability when using background media.
 `}
 >
   <Hero
-    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    backgroundImage="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=90&w=1920&h=1200&fit=crop&auto=format"
     overlay="gradient"
     theme="dark"
     title="Discover new places."
@@ -305,7 +309,6 @@ Hero supports several content slots.
 A short introductory label above the heading.
 
 <Preview
-  hideDevices={true}
   code={`\
 <Hero eyebrow="Digital experiences" title="Build something remarkable." />
 `}
@@ -318,7 +321,6 @@ A short introductory label above the heading.
 Additional introductory text.
 
 <Preview
-  hideDevices={true}
   code={`\
 <Hero
   title="Everything in one place."
@@ -337,7 +339,6 @@ Additional introductory text.
 Use existing Puzzle UI components for buttons and other actions.
 
 <Preview
-  hideDevices={true}
   code={`\
 <Hero
   title="Get started."
@@ -366,7 +367,6 @@ Use existing Puzzle UI components for buttons and other actions.
 The search slot can contain any existing Puzzle form components.
 
 <Preview
-  hideDevices={true}
   code={`\
 <Hero
   layout="centered"
@@ -393,7 +393,6 @@ The search slot can contain any existing Puzzle form components.
 Use meta for supplementary information such as availability, opening hours or product details.
 
 <Preview
-  hideDevices={true}
   code={`\
 <Hero
   title="Stay somewhere special."
@@ -422,7 +421,6 @@ Use meta for supplementary information such as availability, opening hours or pr
 Additional content can be placed between the description and the action slots.
 
 <Preview
-  hideDevices={true}
   code={`\
 <Hero title="Welcome">
   <p>Additional content goes here.</p>
@@ -436,15 +434,17 @@ Additional content can be placed between the description and the action slots.
 
 ## Responsive behavior
 
-Hero automatically adapts its layout to smaller screens.
+Hero adapts to mobile and tablet widths with responsive spacing, typography, and
+media sizing. Split and asymmetric layouts stack on mobile and use side-by-side
+columns at wider tablet and desktop widths.
 
-- Split layouts become single-column layouts.
-- Asymmetric layouts become single-column layouts.
-- Media can move before content on mobile.
-- Typography uses responsive sizing.
-- Horizontal and vertical spacing adapt to available screen space.
+- Split and asymmetric layouts use one column at mobile widths.
+- At wider tablet and desktop widths, text and media render side by side.
+- Tablet media uses a consistent landscape aspect ratio.
+- Background-image heroes retain enough height for legible overlaid content.
+- reverseOnMobile controls media and content order on mobile.
 
-Use reverseOnMobile to control the order of content and media.
+Use reverseOnMobile to control the order of content and media on mobile.
 
 <Preview
   code={`\
@@ -452,7 +452,7 @@ Use reverseOnMobile to control the order of content and media.
   layout="split"
   reverseOnMobile
   title="Mobile-first experiences."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Example" />}
+  media={<img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=90&w=1200&h=900&fit=crop&auto=format" alt="Team collaborating around a laptop" />}
 />
 `}
 >
@@ -462,8 +462,8 @@ Use reverseOnMobile to control the order of content and media.
     title="Mobile-first experiences."
     media={
       <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Example"
+        src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=90&w=1200&h=900&fit=crop&auto=format"
+        alt="Team collaborating around a laptop"
       />
     }
   />
@@ -477,7 +477,7 @@ Disable reversal when the content should remain before the media.
   layout="split"
   reverseOnMobile={false}
   title="Content first."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Example" />}
+  media={<img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=90&w=1200&h=900&fit=crop&auto=format" alt="Bright modern office" />}
 />
 `}
 >
@@ -487,8 +487,8 @@ Disable reversal when the content should remain before the media.
     title="Content first."
     media={
       <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Example"
+        src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?q=90&w=1200&h=900&fit=crop&auto=format"
+        alt="Bright modern office"
       />
     }
   />
@@ -507,7 +507,7 @@ All presets inherit the properties of Hero and can be customized.
 <SplitHero
   eyebrow="Our services"
   title="Solutions built around your needs."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Services" />}
+  media={<img src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=90&w=1200&h=900&fit=crop&auto=format" alt="Sunlit creative workspace" />}
   actions={<Button>Explore services</Button>}
 />
 `}
@@ -517,8 +517,8 @@ All presets inherit the properties of Hero and can be customized.
     title="Solutions built around your needs."
     media={
       <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Services"
+        src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=90&w=1200&h=900&fit=crop&auto=format"
+        alt="Sunlit creative workspace"
       />
     }
     actions={<Button>Explore services</Button>}
@@ -548,14 +548,14 @@ All presets inherit the properties of Hero and can be customized.
 <Preview
   code={`\
 <FullScreenHero
-  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  backgroundImage="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=90&w=1920&h=1200&fit=crop&auto=format"
   title="Experience something different."
   actions={<Button>Discover more</Button>}
 />
 `}
 >
   <FullScreenHero
-    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    backgroundImage="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=90&w=1920&h=1200&fit=crop&auto=format"
     title="Experience something different."
     actions={<Button>Discover more</Button>}
   />
@@ -567,22 +567,22 @@ All presets inherit the properties of Hero and can be customized.
   code={`\
 <VideoHero
   backgroundVideo={{
-    src: "/videos/intro.mp4",
+    src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
     type: "video/mp4",
-    poster: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format",
+    poster: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=90&w=1920&h=1200&fit=crop&auto=format",
   }}
-  title="A world of possibilities."
+  title="A world in bloom."
 />
 `}
 >
   <VideoHero
     backgroundVideo={{
-      src: "/videos/intro.mp4",
+      src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
       type: "video/mp4",
       poster:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format",
+        "https://images.unsplash.com/photo-1490750967868-88aa4486c946?q=90&w=1920&h=1200&fit=crop&auto=format",
     }}
-    title="A world of possibilities."
+    title="A world in bloom."
   />
 </Preview>
 
@@ -593,14 +593,14 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 <Preview
   code={`\
 <ImageHero
-  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  backgroundImage="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=90&w=1920&h=1200&fit=crop&auto=format"
   title="Find your inspiration."
   overlay="gradient"
 />
 `}
 >
   <ImageHero
-    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    backgroundImage="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=90&w=1920&h=1200&fit=crop&auto=format"
     title="Find your inspiration."
     overlay="gradient"
   />
@@ -624,24 +624,24 @@ Background videos are muted, loop automatically and respect the user's reduced-m
   />
 </Preview>
 
-### EditorialHero
+### AsymmetricHero
 
 <Preview
   code={`\
-<EditorialHero
-  eyebrow="Travel journal"
-  title="The beauty of slowing down."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Landscape" />}
+<AsymmetricHero
+  eyebrow="Field notes"
+  title="A slower way to explore."
+  media={<img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=100&w=1200&h=900&fit=crop&auto=format" alt="Mountain landscape at sunset" />}
 />
 `}
 >
-  <EditorialHero
-    eyebrow="Travel journal"
-    title="The beauty of slowing down."
+  <AsymmetricHero
+    eyebrow="Field notes"
+    title="A slower way to explore."
     media={
       <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Landscape"
+        src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=100&w=1200&h=900&fit=crop&auto=format"
+        alt="Mountain landscape at sunset"
       />
     }
   />
@@ -655,7 +655,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
   eyebrow="Digital agency"
   title="We build products that move businesses forward."
   description="Engineering, design and strategy."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Agency workspace" />}
+  media={<img src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=90&w=1200&h=900&fit=crop&auto=format" alt="Modern agency meeting space" />}
   actions={<Button>Start a project</Button>}
 />
 `}
@@ -666,88 +666,11 @@ Background videos are muted, loop automatically and respect the user's reduced-m
     description="Engineering, design and strategy."
     media={
       <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Agency workspace"
+        src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=90&w=1200&h=900&fit=crop&auto=format"
+        alt="Modern agency meeting space"
       />
     }
     actions={<Button>Start a project</Button>}
-  />
-</Preview>
-
-### ProductHero
-
-<Preview
-  code={`\
-<ProductHero
-  eyebrow="Introducing"
-  title="Meet your new favorite product."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Product" />}
-  actions={<Button>Explore product</Button>}
-/>
-`}
->
-  <ProductHero
-    eyebrow="Introducing"
-    title="Meet your new favorite product."
-    media={
-      <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Product"
-      />
-    }
-    actions={<Button>Explore product</Button>}
-  />
-</Preview>
-
-### SaaSHero
-
-<Preview
-  code={`\
-<SaaSHero
-  eyebrow="Project management"
-  title="Work smarter together."
-  description="Everything your team needs in one place."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Dashboard preview" />}
-  actions={<Button>Start free trial</Button>}
-/>
-`}
->
-  <SaaSHero
-    eyebrow="Project management"
-    title="Work smarter together."
-    description="Everything your team needs in one place."
-    media={
-      <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Dashboard preview"
-      />
-    }
-    actions={<Button>Start free trial</Button>}
-  />
-</Preview>
-
-### StoreHero
-
-<Preview
-  code={`\
-<StoreHero
-  eyebrow="New collection"
-  title="Discover the latest collection."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Collection" />}
-  actions={<Button>Shop now</Button>}
-/>
-`}
->
-  <StoreHero
-    eyebrow="New collection"
-    title="Discover the latest collection."
-    media={
-      <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Collection"
-      />
-    }
-    actions={<Button>Shop now</Button>}
   />
 </Preview>
 
@@ -759,7 +682,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
   eyebrow="Restaurant"
   title="Good food. Great company."
   description="Seasonal ingredients and memorable evenings."
-  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  backgroundImage="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=90&w=1920&h=1200&fit=crop&auto=format"
   actions={<Button>Reserve a table</Button>}
 />
 `}
@@ -768,55 +691,8 @@ Background videos are muted, loop automatically and respect the user's reduced-m
     eyebrow="Restaurant"
     title="Good food. Great company."
     description="Seasonal ingredients and memorable evenings."
-    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    backgroundImage="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=90&w=1920&h=1200&fit=crop&auto=format"
     actions={<Button>Reserve a table</Button>}
-  />
-</Preview>
-
-### AccommodationHero
-
-<Preview
-  code={`\
-<AccommodationHero
-  eyebrow="Boutique accommodation"
-  title="Find your place in the world."
-  description="Discover beautiful places to stay."
-  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-  actions={<Button>Explore apartments</Button>}
-/>
-`}
->
-  <AccommodationHero
-    eyebrow="Boutique accommodation"
-    title="Find your place in the world."
-    description="Discover beautiful places to stay."
-    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-    actions={<Button>Explore apartments</Button>}
-  />
-</Preview>
-
-### PrintShopHero
-
-<Preview
-  code={`\
-<PrintShopHero
-  eyebrow="Professional printing"
-  title="Bring your ideas to life."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Printed materials" />}
-  actions={<Button>Explore products</Button>}
-/>
-`}
->
-  <PrintShopHero
-    eyebrow="Professional printing"
-    title="Bring your ideas to life."
-    media={
-      <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Printed materials"
-      />
-    }
-    actions={<Button>Explore products</Button>}
   />
 </Preview>
 
@@ -825,43 +701,30 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 <Preview
   code={`\
 <DashboardWelcomeHero
-  eyebrow="Dashboard"
+  eyebrow="Workspace overview"
   title="Good morning."
-  description="Here is an overview of your workspace."
+  description="Pick up where you left off and keep your projects moving."
   actions={<Button>Create project</Button>}
+  meta={
+    <>
+      <span>3 active projects</span>
+      <span>2 items need review</span>
+    </>
+  }
 />
 `}
 >
   <DashboardWelcomeHero
-    eyebrow="Dashboard"
+    eyebrow="Workspace overview"
     title="Good morning."
-    description="Here is an overview of your workspace."
+    description="Pick up where you left off and keep your projects moving."
     actions={<Button>Create project</Button>}
-  />
-</Preview>
-
-### AppHero
-
-<Preview
-  code={`\
-<AppHero
-  eyebrow="Your workspace"
-  title="Everything you need to get things done."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Application preview" />}
-  actions={<Button>Open application</Button>}
-/>
-`}
->
-  <AppHero
-    eyebrow="Your workspace"
-    title="Everything you need to get things done."
-    media={
-      <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Application preview"
-      />
+    meta={
+      <>
+        <span>3 active projects</span>
+        <span>2 items need review</span>
+      </>
     }
-    actions={<Button>Open application</Button>}
   />
 </Preview>
 
@@ -872,7 +735,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 <CampaignHero
   eyebrow="Limited offer"
   title="Something special is waiting for you."
-  backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+  backgroundImage="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=90&w=1920&h=1200&fit=crop&auto=format"
   actions={<Button>Discover offer</Button>}
 />
 `}
@@ -880,7 +743,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
   <CampaignHero
     eyebrow="Limited offer"
     title="Something special is waiting for you."
-    backgroundImage="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
+    backgroundImage="https://images.unsplash.com/photo-1607082349566-187342175e2f?q=90&w=1920&h=1200&fit=crop&auto=format"
     actions={<Button>Discover offer</Button>}
   />
 </Preview>
@@ -937,22 +800,22 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 
 All presets inherit the full Hero API.
 
-For example, an AccommodationHero can use a split layout instead of its default background layout.
+For example, a FullScreenHero can use a split layout instead of its default background layout.
 
 <Preview
   code={`\
-<AccommodationHero
+<FullScreenHero
   layout="split"
   mediaPosition="right"
   height="large"
   theme="light"
   overlay="none"
   title="A different kind of stay."
-  media={<img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format" alt="Apartment" />}
+  media={<img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=90&w=1200&h=900&fit=crop&auto=format" alt="Boutique hotel exterior" />}
 />
 `}
 >
-  <AccommodationHero
+  <FullScreenHero
     layout="split"
     mediaPosition="right"
     height="large"
@@ -961,8 +824,8 @@ For example, an AccommodationHero can use a split layout instead of its default 
     title="A different kind of stay."
     media={
       <img
-        src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=100&w=1024&h=1024&fit=crop&auto=format"
-        alt="Apartment"
+        src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=90&w=1200&h=900&fit=crop&auto=format"
+        alt="Boutique hotel exterior"
       />
     }
   />

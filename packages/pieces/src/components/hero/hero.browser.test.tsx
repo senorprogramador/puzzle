@@ -2,7 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { userEvent as browserUserEvent } from "vitest/browser";
+import { page, userEvent as browserUserEvent } from "vitest/browser";
 
 import { Hero } from "../hero";
 import {
@@ -183,6 +183,49 @@ describe("Hero browser behavior", () => {
 });
 
 describe("Hero responsive configuration", () => {
+  it.each(["split", "asymmetric"] as const)(
+    "stacks %s on mobile and uses columns on wider viewports",
+    async (layout) => {
+      render(
+        <Hero
+          testId="responsive-layout-hero"
+          layout={layout}
+          title="Responsive layout"
+          media={<img src="/image.jpg" alt="Landscape" />}
+        />,
+      );
+
+      const hero = screen.getByTestId("responsive-layout-hero");
+      const inner = hero.querySelector("[data-hero-inner]")!;
+      const media = hero.querySelector("[data-hero-media]")!;
+      const content = hero.querySelector("[data-hero-content]")!;
+
+      for (const [width, columns] of [
+        [390, 1],
+        [768, 1],
+        [800, 2],
+        [1024, 2],
+        [1280, 2],
+      ] as const) {
+        await page.viewport(width, 800);
+
+        expect(
+          getComputedStyle(inner).gridTemplateColumns.split(" "),
+        ).toHaveLength(columns);
+
+        const mediaRect = media.getBoundingClientRect();
+        const contentRect = content.getBoundingClientRect();
+
+        expect(contentRect.width).toBeGreaterThan(0);
+        if (columns === 1) {
+          expect(contentRect.top).toBeGreaterThanOrEqual(mediaRect.bottom);
+        } else {
+          expect(contentRect.right).toBeLessThanOrEqual(mediaRect.left);
+        }
+      }
+    },
+  );
+
   it("exposes the desktop layout configuration", () => {
     render(
       <Hero

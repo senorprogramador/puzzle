@@ -5,7 +5,7 @@ const SplitHero = createHeroPreset<HeroProps>({
   layout: "split",
   mediaPosition: "right",
   alignment: "start",
-  height: "auto",
+  height: "large",
   theme: "light",
   overlay: "none",
 });

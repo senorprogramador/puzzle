@@ -1,14 +1,1 @@
-import { createHeroPreset } from "./create-hero-preset";
-import type { HeroProps } from "./hero.types";
-
-const ProductHero = createHeroPreset<HeroProps>({
-  layout: "split",
-  mediaPosition: "right",
-  alignment: "start",
-  height: "large",
-  theme: "light",
-  overlay: "none",
-  contentWidth: "normal",
-});
-
-export { ProductHero };
+export { SplitHero as ProductHero } from "./split-hero";

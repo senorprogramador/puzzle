@@ -1,6 +1,7 @@
 export { Hero } from "./hero";
 
 export { SplitHero } from "./split-hero";
+export { AsymmetricHero } from "./asymmetric-hero";
 export { CenteredHero } from "./centered-hero";
 export { FullScreenHero } from "./full-screen-hero";
 export { VideoHero } from "./video-hero";
