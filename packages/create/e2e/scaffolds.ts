@@ -1,7 +1,7 @@
-import { access, readFile, rm } from "node:fs/promises";
+import { access, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { afterAll, describe, expect, inject, it } from "vitest";
+import { afterAll, describe, expect, inject, it, vi } from "vitest";
 
 import { createProject } from "../src/create-project";
 import { fontConfigPaths } from "../src/theme/templates";
@@ -19,6 +19,7 @@ import {
   buildProject,
   createLocalPackageRunner,
   readEnvironment,
+  startDevProject,
   startMongo,
   startProject,
   stopMongo,
@@ -104,6 +105,10 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
     let packageJson: PackageJson;
     let server: Server | undefined;
     let mongoStarted = false;
+    const initialUser = {
+      email: `initial-${scaffold.id}@example.com`,
+      password: "Initial 'quoted' $password\\ with unicode \u00e9",
+    };
 
     const requireServer = () => {
       if (!server) {
@@ -128,9 +133,18 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
     });
 
     it("creates and installs the project", async () => {
+      const localRunner = createLocalPackageRunner(inject("puzzlePackages"));
+
       await createProject(toProjectOptions(scaffold), {
         cwd: root,
-        runner: createLocalPackageRunner(inject("puzzlePackages")),
+        requestInitialUser: async () => initialUser,
+        runner: async (command, args, options) => {
+          if (scaffold.database === "mongodb" && args.join(" ") === "run db:setup" && !mongoStarted) {
+            await useMongoPort(directory, port + MONGO_PORT_OFFSET);
+            mongoStarted = true;
+          }
+          await localRunner(command, args, options);
+        },
       });
 
       packageJson = JSON.parse(
@@ -199,14 +213,8 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
       }
     });
 
-    it("builds and typechecks", async () => {
-      await buildProject(directory, scaffold);
-    });
-
     if (scaffold.database === "mongodb") {
       it("starts MongoDB with access control", async () => {
-        await useMongoPort(directory, port + MONGO_PORT_OFFSET);
-        mongoStarted = true;
         await startMongo(directory);
 
         await expect(
@@ -226,7 +234,178 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
           ),
         ).rejects.toThrow(/requires authentication/);
       });
+
+      if (scaffold.framework === "tanstack" && !scaffold.tailwind) {
+        it("upgrades a userless legacy volume without losing data or resetting passwords", async () => {
+          await stopMongo(directory);
+          const override = path.join(directory, "docker-compose.legacy.yml");
+
+          await writeFile(
+            override,
+            `services:
+  mongodb:
+    entrypoint: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    healthcheck:
+      disable: true
+`,
+          );
+          await run(
+            "docker",
+            [
+              "compose", "-f", "docker-compose.yml",
+              "-f", "docker-compose.legacy.yml", "up", "--detach",
+            ],
+            { cwd: directory },
+          );
+
+          const shell = (script: string) =>
+            run(
+              "docker",
+              ["compose", "exec", "-T", "mongodb", "mongosh", "--quiet", "--eval", script],
+              { cwd: directory },
+            );
+
+          await vi.waitFor(
+            () => shell("rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] })"),
+            { timeout: 30_000, interval: 1_000 },
+          );
+          await vi.waitFor(
+            () => shell(`
+              if (!db.hello().isWritablePrimary) quit(1);
+              db.getSiblingDB(process.env.MONGODB_DATABASE)
+                .setup_probe.insertOne({ _id: "preserved", value: "legacy-data" });
+            `),
+            { timeout: 30_000, interval: 1_000 },
+          );
+          await rm(override);
+          await startMongo(directory);
+          await startMongo(directory);
+
+          const checkData = () => shell(`
+            const application = db.getSiblingDB(process.env.MONGODB_DATABASE);
+            application.auth(process.env.MONGODB_APP_USERNAME, process.env.MONGODB_APP_PASSWORD);
+            if (application.setup_probe.findOne({ _id: "preserved" })?.value !== "legacy-data") quit(1);
+          `);
+
+          await checkData();
+
+          await shell(`
+            db.getSiblingDB("admin").auth(
+              process.env.MONGO_INITDB_ROOT_USERNAME,
+              process.env.MONGO_INITDB_ROOT_PASSWORD,
+            );
+            db.getSiblingDB(process.env.MONGODB_DATABASE)
+              .dropUser(process.env.MONGODB_APP_USERNAME);
+          `);
+          await expect(
+            shell('load("/opt/puzzle/mongodb/check.js")'),
+          ).rejects.toThrow("application authentication failed");
+          await startMongo(directory);
+          await checkData();
+
+          const envPath = path.join(directory, ".env");
+          const environment = await readFile(envPath, "utf8");
+
+          for (const [key, message] of [
+            ["MONGODB_APP_PASSWORD", "application authentication failed"],
+            ["MONGODB_ROOT_PASSWORD", "administrator credentials do not match"],
+          ]) {
+            try {
+              await writeFile(
+                envPath,
+                environment.replace(
+                  new RegExp(`^${key}="[^"]*"$`, "m"),
+                  `${key}="${"0".repeat(64)}"`,
+                ),
+              );
+              await expect(
+                run("bun", ["run", "db:setup"], { cwd: directory }),
+              ).rejects.toThrow(message);
+              await expect(
+                shell('load("/opt/puzzle/mongodb/check.js")'),
+              ).rejects.toThrow(/authentication failed/i);
+            } finally {
+              await writeFile(envPath, environment);
+              await startMongo(directory);
+            }
+
+            await checkData();
+          }
+
+          await run("node", ["scripts/create-initial-user.mjs"], {
+            cwd: directory,
+            input: JSON.stringify(initialUser),
+          });
+        });
+      }
     }
+
+    it("serves the home route and auth in development", async () => {
+      server = await startDevProject(directory, port);
+
+      try {
+        const home = await fetch(server.url);
+
+        expect(home.status, server.output()).toBe(200);
+        expect(await home.text()).toContain("Puzzle");
+
+        if (fullStackAuth) {
+          const { APP_ORIGIN } = await readEnvironment(directory);
+          const client = new HttpClient(server.url, APP_ORIGIN!);
+          const state = await client.request("/api/auth/state");
+
+          expect(state.status, await state.clone().text()).toBe(
+            runsAuth ? 200 : 503,
+          );
+          expect(await state.json()).toMatchObject(
+            runsAuth
+              ? { status: "unauthenticated" }
+              : { error: { code: "AUTH_NOT_CONFIGURED" } },
+          );
+
+          if (runsAuth) {
+            const initialSignIn = await client.postJson("/api/auth/sign-in", initialUser);
+
+            expect(initialSignIn.ok, await initialSignIn.clone().text()).toBe(true);
+            expect(await (await client.request("/api/auth/state")).json())
+              .toMatchObject({ status: "authenticated", user: { email: initialUser.email } });
+            expect((await client.postJson("/api/auth/sign-out", {})).ok).toBe(true);
+
+            const email = `dev-${scaffold.id}@example.com`;
+            const register = await client.postJson("/api/auth/register", {
+              email,
+              password: "correct horse battery staple",
+            });
+
+            expect(register.ok, await register.clone().text()).toBe(true);
+            expect(await (await client.request("/api/auth/state")).json())
+              .toMatchObject({ status: "authenticated", user: { email } });
+            const dashboard = await client.request("/dashboard");
+
+            expect(dashboard.status).toBe(200);
+            expect(await dashboard.text()).toContain(email);
+            expect((await client.postJson("/api/auth/sign-out", {})).ok).toBe(true);
+            expectRedirectTo(await client.request("/dashboard"), "/sign-in");
+            expect(server.output()).not.toContain("Puzzle Auth is unavailable");
+          }
+        }
+
+        if (scaffold.framework === "tanstack") {
+          const missing = await fetch(new URL("/puzzle-missing-page", server.url));
+
+          expect(missing.status).toBe(404);
+          expect(await missing.text()).toContain("Page not found");
+          expect(server.output()).not.toContain("notFoundComponent option was not configured");
+        }
+      } finally {
+        await server.stop();
+        server = undefined;
+      }
+    });
+
+    it("builds and typechecks", async () => {
+      await buildProject(directory, scaffold);
+    });
 
     it("serves the production build with local fonts", async () => {
       server = await startProject(directory, scaffold, port);
@@ -305,6 +484,29 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
     }
 
     if (runsAuth) {
+      it("preserves the initial user's password and rejects duplicate bootstrap", async () => {
+        const { url } = requireServer();
+        const { APP_ORIGIN } = await readEnvironment(directory);
+        const client = new HttpClient(url, APP_ORIGIN!);
+
+        await expect(run("node", ["scripts/create-initial-user.mjs"], {
+          cwd: directory,
+          input: JSON.stringify({ ...initialUser, password: "replacement password" }),
+        })).rejects.toThrow();
+
+        const signIn = await client.postJson("/api/auth/sign-in", initialUser);
+
+        expect(signIn.ok, await signIn.clone().text()).toBe(true);
+        expect((await client.request("/dashboard")).status).toBe(200);
+        expect((await client.postJson("/api/auth/sign-out", {})).ok).toBe(true);
+        const wrongPassword = await client.postJson("/api/auth/sign-in", {
+          ...initialUser,
+          password: "replacement password",
+        });
+
+        expect(wrongPassword.ok).toBe(false);
+      });
+
       it("signs up, keeps a session and protects the dashboard", async () => {
         const { url } = requireServer();
         const { APP_ORIGIN } = await readEnvironment(directory);

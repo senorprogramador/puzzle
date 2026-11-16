@@ -3,6 +3,7 @@ import { spawn, type ChildProcess } from "node:child_process";
 export type RunOptions = {
   cwd: string;
   env?: NodeJS.ProcessEnv;
+  input?: string;
 };
 
 const OUTPUT_LIMIT = 12_000;
@@ -33,23 +34,27 @@ const tail = (output: string) =>
 export const run = (
   command: string,
   args: string[],
-  { cwd, env }: RunOptions,
+  { cwd, env, input }: RunOptions,
 ): Promise<string> =>
   new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd,
       env: projectEnvironment(env),
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: [input === undefined ? "ignore" : "pipe", "pipe", "pipe"],
     });
     let output = "";
 
-    child.stdout.on("data", (chunk: Buffer) => {
+    child.stdout?.on("data", (chunk: Buffer) => {
       output += chunk.toString();
     });
-    child.stderr.on("data", (chunk: Buffer) => {
+    child.stderr?.on("data", (chunk: Buffer) => {
       output += chunk.toString();
     });
     child.once("error", reject);
+    if (input !== undefined) {
+      child.stdin?.on("error", reject);
+      child.stdin?.end(input);
+    }
     child.once("close", (code, signal) => {
       if (code === 0) {
         resolve(output);

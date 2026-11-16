@@ -6,12 +6,18 @@ const runCommand: CommandRunner = (command, args, options = {}) =>
   new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd ?? process.cwd(),
-      stdio: options.stdio ?? "inherit",
+      stdio: options.input === undefined
+        ? (options.stdio ?? "inherit")
+        : ["pipe", "inherit", "inherit"],
       shell: false,
       env: process.env,
     });
 
     child.once("error", reject);
+    if (options.input !== undefined) {
+      child.stdin?.on("error", reject);
+      child.stdin?.end(options.input);
+    }
 
     child.once("close", (code, signal) => {
       if (code === 0) {

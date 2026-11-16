@@ -97,7 +97,7 @@ Full-stack projects with Auth ask which database to use:
 | Cloudflare D1 | Uses <code>@puzzle-ui/storage-d1</code>, a <code>wrangler.jsonc</code> D1 binding, and the Cloudflare runtime for local development and deploys. |
 | Custom        | Leaves a placeholder storage adapter for you to implement.                                              |
 
-With MongoDB or D1, authentication works immediately after <code>dev</code> starts. See [Create](/docs/create#puzzle-auth) for the generated files and [Deployment](/docs/create/deployment) to go to production.
+With MongoDB or D1, the CLI asks for the first application user's email and a masked password with confirmation, then automatically creates that account in the local database. MongoDB requires Docker with Compose to be running; D1 uses local persisted storage, not remote Cloudflare D1. The password is hashed using Puzzle Auth and is not saved in project files. Open <code>/sign-in</code> after <code>dev</code> starts. Puzzle Auth has no administrator roles, so this is a normal application account; MongoDB database administrator credentials remain separate and randomly generated. Custom databases and Basic React do not create an initial account. See [Create](/docs/create#puzzle-auth) for the generated files and [Deployment](/docs/create/deployment) to go to production.
 
 <Callout type="warn" title="Review before production">
   The generated <code>.env</code> contains local preview values. Set real
@@ -137,7 +137,7 @@ cd my-dashboard
 bun run dev
 ```
 
-If you chose Auth with MongoDB, start the database first with <code>docker compose up -d --wait</code>.
+If you chose Auth with MongoDB, run <code>npm run db:setup</code> (or your selected package manager) before starting development. This starts the database and verifies both accounts and replica-set primary readiness. It can initialize missing users on an older local volume without deleting data or resetting existing passwords.
 
 ## Manual installation
 
@@ -189,7 +189,7 @@ Run the failed installation command manually from the generated project director
 
 ### Authentication returns HTTP 503
 
-The server could not create the <code>AuthServer</code>; the server log shows the cause. Check that the <code>.env</code> values are present and that the database is reachable. With MongoDB, run <code>docker compose up -d --wait</code>. With a custom database, return your storage adapter from the generated database module.
+The server could not create the <code>AuthServer</code>; the server log shows the cause. Check that the <code>.env</code> values are present and that the database is reachable. With MongoDB, run <code>npm run db:setup</code> (or your selected package manager). If an existing volume has different credentials, restore its original <code>.env</code> or update the user password as an administrator; exported shell variables also override Compose's <code>.env</code> values. Do not delete the volume to fix authentication. With a custom database, return your storage adapter from the generated database module.
 
 ### Tailwind styles are missing
 

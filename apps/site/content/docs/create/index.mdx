@@ -48,7 +48,7 @@ Run the generator, answer the prompts, then change into the generated directory 
 
 ## Interactive setup
 
-The CLI asks up to five questions. It has no command-line flags; setup is configured through these prompts.
+The CLI asks the following questions. It has no command-line flags; setup is configured through these prompts.
 
 | Prompt | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -57,6 +57,9 @@ The CLI asks up to five questions. It has no command-line flags; setup is config
 | Install Tailwind CSS? | Confirmation | Yes | Optionally add Tailwind CSS v4 and its framework integration. |
 | Add Puzzle Auth? | Confirmation | No | Optionally add the Puzzle Auth client and, for full-stack frameworks, server integration. |
 | Database | Selection | MongoDB | Full-stack frameworks with Auth only. Choose MongoDB, Cloudflare D1, or a custom database. |
+| First application user email | Text | None | MongoDB and D1 only. Creates the first local application sign-in account. |
+| First application user password | Masked password | None | MongoDB and D1 only. Requires 12–1024 characters and at most 4096 UTF-8 bytes. |
+| Confirm password | Masked password | None | Must match the supplied password. |
 
 Canceling a prompt cancels project creation. The CLI refuses to create a project if the target directory already exists; it does not overwrite existing files.
 
@@ -109,11 +112,13 @@ For Next.js, TanStack Start, and React Router, the CLI asks which database store
 
 | Database | Generated setup |
 | --- | --- |
-| **MongoDB** | Installs `@puzzle-ui/storage-mongodb`, the `mongodb` driver, and `@node-rs/argon2`. Adds a `docker-compose.yml` that runs a single-node MongoDB replica set (required for transactions) with access control, a keyfile, and a port bound to `127.0.0.1`. Randomly generated administrator and application passwords are written to `.env`, which `docker compose` reads; the application user can only read and write the project database. Start it with `docker compose up -d --wait` before `dev`. |
+| **MongoDB** | Installs `@puzzle-ui/storage-mongodb`, the `mongodb` driver, and `@node-rs/argon2`. Adds a `docker-compose.yml` that runs a single-node MongoDB replica set (required for transactions) with access control, a keyfile, and a port bound to `127.0.0.1`. Randomly generated administrator and application passwords are written to `.env`, which `docker compose` reads; the application user can only read and write the project database. Run `npm run db:setup` (or your selected package manager) before `dev` to start the database, initialize missing users, and verify authenticated primary readiness. |
 | **Cloudflare D1** | Installs `@puzzle-ui/storage-d1`, hashes passwords with the built-in `Pbkdf2PasswordHasher` and a generated `AUTH_PASSWORD_PEPPER_HEX`, adds `wrangler.jsonc` with a `DB` binding, and wires the Cloudflare runtime: OpenNext for Next.js, and `@cloudflare/vite-plugin` for TanStack Start and React Router. `dev` uses a local D1 database; `preview`, `deploy`, and `cf-typegen` scripts are added. |
 | **Custom** | Installs `@puzzle-ui/storage` and leaves a documented placeholder in the database module. Until it returns a storage adapter, the auth API responds with HTTP 503. |
 
 The CLI writes a `.env` file with the database settings, an `APP_ORIGIN` for CSRF checks, and freshly generated `AUTH_ENCRYPTION_KEY_HEX` and `AUTH_RATE_LIMIT_SECRET` secrets (plus `AUTH_PASSWORD_PEPPER_HEX` for D1, and database passwords for MongoDB). `.env` is added to `.gitignore`; never commit it, and set new values in your deployment environment as described in [Deployment](/docs/create/deployment).
+
+For MongoDB and D1, the CLI automatically initializes the local database and registers the first application account after installing dependencies. MongoDB requires Docker with Compose to be running. D1 uses the persisted local database used by `dev`, not your remote Cloudflare database. The password is sent through stdin to the generated seed script and stored only as an Auth password hash, never in project files or command-line arguments. Sign in at `/sign-in` when development starts. Puzzle Auth has no built-in administrator roles; this account has normal application permissions. MongoDB administrator credentials remain separate and randomly generated. Repeating bootstrap for an existing email fails rather than resetting its password.
 
 <Callout type="info" title="Deploying to Cloudflare">
   Before the first deploy, run <code>wrangler d1 create &lt;name&gt;</code> and
@@ -151,7 +156,7 @@ cd my-awesome-app
 npm run dev
 ```
 
-With Auth and MongoDB, start the database first with `docker compose up -d --wait`. Then open `/dashboard` to try the protected route.
+With Auth and MongoDB, run `npm run db:setup` before `npm run dev`, using your selected package manager. Setup can initialize an older local volume that has no users and create a missing application user when the administrator credentials match. It never resets existing passwords or deletes data. If authentication still fails, restore the original `.env` credentials or update the user password as an administrator; also check exported shell variables, which override Compose's `.env` values. Then open `/dashboard` to try the protected route.
 
 To go to production, follow [Deployment](/docs/create/deployment) for your framework and database.
 

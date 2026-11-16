@@ -23,6 +23,7 @@ export type ProjectOptions = {
 export type CommandOptions = {
   cwd?: string;
   stdio?: "inherit" | "pipe";
+  input?: string;
 };
 
 export type CommandRunner = (

@@ -26,6 +26,7 @@ describe("createProject", () => {
 
   it("creates a complete React project with Puzzle and Tailwind installed", async () => {
     const runner = vi.fn().mockResolvedValue(undefined);
+    const requestInitialUser = vi.fn();
 
     await createProject(
       {
@@ -39,6 +40,7 @@ describe("createProject", () => {
       {
         cwd,
         runner,
+        requestInitialUser,
       },
     );
 
@@ -64,6 +66,7 @@ describe("createProject", () => {
     );
 
     expect(packageJson.name).toBe("my-awesome-app");
+    expect(requestInitialUser).not.toHaveBeenCalled();
     expect(main).toContain("@puzzle-ui/theme");
     expect(main).toContain(
       '<Theme theme="system" fonts={fonts} fontSource="local">',
@@ -285,6 +288,7 @@ describe("createProject", () => {
       {
         cwd,
         runner,
+        requestInitialUser: async () => ({ email: "owner@example.com", password: "initial user password" }),
       },
     );
 
@@ -304,7 +308,12 @@ describe("createProject", () => {
       options,
     );
     expect(runner).toHaveBeenCalledWith("bun", ["run", "fonts:download"], options);
-    expect(runner).toHaveBeenLastCalledWith("bun", ["run", "cf-typegen"], options);
+    expect(runner).toHaveBeenCalledWith("bun", ["run", "cf-typegen"], options);
+    expect(runner).toHaveBeenLastCalledWith(
+      "node",
+      ["scripts/create-initial-user.mjs"],
+      { ...options, input: JSON.stringify({ email: "owner@example.com", password: "initial user password" }) },
+    );
     expect(runner).not.toHaveBeenCalledWith(
       "bun",
       expect.arrayContaining(["nitro@latest"]),
@@ -313,6 +322,10 @@ describe("createProject", () => {
 
     const env = await readFile(path.join(projectDirectory, ".env"), "utf8");
 
+    expect(env).not.toContain("initial user password");
+    expect(env).not.toContain("owner@example.com");
+    expect(await readFile(path.join(projectDirectory, "scripts/create-initial-user.mjs"), "utf8"))
+      .not.toContain("initial user password");
     expect(env).toContain('D1_DATABASE_NAME="edge-app-db"');
     expect(
       await readFile(path.join(projectDirectory, "wrangler.jsonc"), "utf8"),
@@ -354,6 +367,7 @@ describe("createProject", () => {
       {
         cwd,
         runner,
+        requestInitialUser: async () => ({ email: "owner@example.com", password: "initial user password" }),
       },
     );
 
@@ -367,10 +381,16 @@ describe("createProject", () => {
       expect.arrayContaining(["mongodb@latest", "nitro@latest"]),
       options,
     );
-    expect(runner).toHaveBeenLastCalledWith(
+    expect(runner).toHaveBeenCalledWith(
       "pnpm",
       ["run", "fonts:download"],
       options,
+    );
+    expect(runner).toHaveBeenCalledWith("pnpm", ["run", "db:setup"], options);
+    expect(runner).toHaveBeenLastCalledWith(
+      "node",
+      ["scripts/create-initial-user.mjs"],
+      { ...options, input: JSON.stringify({ email: "owner@example.com", password: "initial user password" }) },
     );
     expect(packageJson.scripts).toMatchObject({
       start: "node .output/server/index.mjs",
@@ -407,5 +427,22 @@ describe("createProject", () => {
     ).rejects.toThrow("already exists");
 
     expect(runner).not.toHaveBeenCalled();
+  });
+
+  it("cancels before scaffolding when initial user input is cancelled", async () => {
+    const runner = vi.fn();
+
+    await createProject({
+      name: "cancelled-app",
+      directory: "cancelled-app",
+      framework: "tanstack",
+      packageManager: "bun",
+      tailwind: false,
+      auth: true,
+      database: "mongodb",
+    }, { cwd, runner, requestInitialUser: async () => null });
+
+    expect(runner).not.toHaveBeenCalled();
+    expect(existsSync(path.join(cwd, "cancelled-app"))).toBe(false);
   });
 });

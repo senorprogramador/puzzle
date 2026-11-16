@@ -9,6 +9,7 @@ import { frameworkGenerators } from "./frameworks";
 import { configureFramework } from "./frameworks/configure-framework";
 import { configureTheme } from "./theme/configure-theme";
 import { configureAuth } from "./auth/configure-auth";
+import { promptInitialUser, type InitialUser } from "./auth/initial-user";
 import { runCommand } from "./utils/execute";
 import { validateProjectDirectory } from "./utils/validate-project";
 
@@ -27,6 +28,7 @@ import { installTailwind } from "./tailwind/install-tailwind";
 type CreateProjectContext = {
   cwd?: string;
   runner?: CommandRunner;
+  requestInitialUser?: () => Promise<InitialUser | null>;
 };
 
 const getAuthDatabase = (options: ProjectOptions) =>
@@ -94,7 +96,9 @@ const getNextSteps = (
 
   return [
     `cd ${relativeDirectory}`,
-    ...(database === "mongodb" ? ["docker compose up -d --wait"] : []),
+    ...(database === "mongodb"
+      ? [`${options.packageManager} run db:setup`]
+      : []),
     `${options.packageManager} run dev`,
   ];
 };
@@ -118,7 +122,11 @@ const configureProjectName = async (directory: string, projectName: string) => {
 
 const createProject = async (
   options: ProjectOptions,
-  { cwd = process.cwd(), runner = runCommand }: CreateProjectContext = {},
+  {
+    cwd = process.cwd(),
+    runner = runCommand,
+    requestInitialUser = promptInitialUser,
+  }: CreateProjectContext = {},
 ) => {
   const targetDirectory = await validateProjectDirectory(
     options.directory,
@@ -127,6 +135,15 @@ const createProject = async (
 
   const projectName = path.basename(targetDirectory);
   const projectParent = path.dirname(targetDirectory);
+  const database = getAuthDatabase(options);
+  const initialUser = database === "mongodb" || database === "d1"
+    ? await requestInitialUser()
+    : undefined;
+
+  if (initialUser === null) {
+    p.cancel("Project creation cancelled.");
+    return;
+  }
 
   const spinner = p.spinner();
   let spinnerActive = false;
@@ -162,8 +179,6 @@ const createProject = async (
     finishStep("Framework generated");
 
     startStep("Configuring framework");
-
-    const database = getAuthDatabase(options);
 
     await configureFramework(
       targetDirectory,
@@ -240,6 +255,23 @@ const createProject = async (
 
       finishStep("Cloudflare types generated");
     }
+
+    if (initialUser) {
+      if (database === "mongodb") {
+        startStep("Starting the local MongoDB database");
+        await runner(options.packageManager, ["run", "db:setup"], {
+          cwd: targetDirectory,
+        });
+        finishStep("MongoDB is ready");
+      }
+
+      startStep("Creating the first application user");
+      await runner("node", ["scripts/create-initial-user.mjs"], {
+        cwd: targetDirectory,
+        input: JSON.stringify(initialUser),
+      });
+      finishStep("Application user created");
+    }
   } catch (error) {
     if (spinnerActive) {
       spinner.error("Project creation failed");
@@ -252,7 +284,9 @@ const createProject = async (
 
   if (options.auth && isFullStackFramework(options.framework)) {
     p.log.info(
-      "Puzzle Auth settings were written to .env. Open /dashboard to try the protected route.",
+      initialUser
+        ? "Puzzle Auth settings were written to .env. Your first application account is ready in the local database. Open /sign-in to sign in."
+        : "Puzzle Auth settings were written to .env. Open /dashboard to try the protected route.",
     );
   }
 

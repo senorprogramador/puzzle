@@ -57,7 +57,7 @@ const updateGitignore = async (directory: string, entries: string[]) => {
   );
 };
 
-const updateCloudflareScripts = async (options: InfrastructureOptions & { directory: string }) => {
+const updateDatabaseScripts = async (options: InfrastructureOptions & { directory: string }) => {
   const packageJsonPath = path.join(options.directory, "package.json");
 
   const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8")) as {
@@ -65,10 +65,15 @@ const updateCloudflareScripts = async (options: InfrastructureOptions & { direct
     [key: string]: unknown;
   };
 
-  const scripts = { ...packageJson.scripts, ...getCloudflareScripts(options) };
+  const scripts = {
+    ...packageJson.scripts,
+    ...(options.database === "mongodb"
+      ? { "db:setup": "node scripts/setup-mongodb.mjs" }
+      : getCloudflareScripts(options)),
+  };
 
   // react-router-serve runs the Node.js build, which a Worker build replaces.
-  if (options.framework === "react-router") {
+  if (options.database === "d1" && options.framework === "react-router") {
     delete scripts.start;
   }
 
@@ -107,8 +112,8 @@ const configureAuth = async (
 
   await updateGitignore(directory, getGitignoreEntries(infrastructure));
 
-  if (database === "d1") {
-    await updateCloudflareScripts({ ...infrastructure, directory });
+  if (database === "d1" || database === "mongodb") {
+    await updateDatabaseScripts({ ...infrastructure, directory });
   }
 };
 

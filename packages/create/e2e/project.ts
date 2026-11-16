@@ -23,7 +23,7 @@ export const createLocalPackageRunner =
       args.some((arg) => arg.startsWith("@puzzle-ui/"));
 
     if (!installsPuzzle) {
-      await run(command, args, { cwd });
+      await run(command, args, { cwd, input: options.input });
       return;
     }
 
@@ -59,6 +59,15 @@ export const createLocalPackageRunner =
 
 const bin = (directory: string, name: string) =>
   path.join(directory, "node_modules", ".bin", name);
+
+export const startDevProject = (
+  directory: string,
+  port: number,
+): Promise<Server> =>
+  startServer("bun", ["run", "dev", "--port", String(port)], {
+    cwd: directory,
+    port,
+  });
 
 /**
  * Builds the project the way its package.json does, then typechecks it.
@@ -169,8 +178,12 @@ export const useMongoPort = async (directory: string, port: number) => {
   );
 };
 
-export const startMongo = (directory: string) =>
-  run("docker", ["compose", "up", "--detach", "--wait"], { cwd: directory });
+export const startMongo = async (directory: string) => {
+  await run("bun", ["run", "db:setup"], { cwd: directory });
+  await run("docker", ["compose", "up", "--detach", "--wait"], {
+    cwd: directory,
+  });
+};
 
 export const stopMongo = (directory: string) =>
   run("docker", ["compose", "down", "--volumes", "--remove-orphans"], {

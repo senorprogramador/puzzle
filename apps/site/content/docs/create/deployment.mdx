@@ -41,6 +41,8 @@ For the best caching, serve versioned `font-<hash>.woff2` files with `Cache-Cont
 
 ## Databases
 
+The first application account created by the CLI exists only in the local database. It is not automatically provisioned in a separate production database or remote D1. Its password is stored as an Auth password hash, not in generated configuration files. Puzzle Auth has no built-in administrator roles; this account is separate from MongoDB's database administrator.
+
 ### MongoDB
 
 Puzzle Auth uses MongoDB transactions, so production MongoDB must be a replica set or sharded cluster.
@@ -51,6 +53,7 @@ The generated setup is locked down by default:
 - `docker compose` reads the credentials from `.env`; it refuses to start when one is missing.
 - Access control is enabled. The replica set authenticates its members with a keyfile generated on first start and stored in the `mongodb-config` volume.
 - `docker/mongodb/create-app-user.js` creates the application user on first start with the `readWrite` role on `MONGODB_DATABASE` only. The application never uses the administrator account.
+- The `db:setup` package script starts the database and verifies both accounts and replica-set primary readiness. It can initialize the first administrator on an older local volume without users and create a missing application user with matching administrator credentials. Existing passwords and data are never reset.
 - The port is published on `127.0.0.1` only, so MongoDB is not reachable from other machines.
 
 #### Managed MongoDB
@@ -68,12 +71,14 @@ The `MONGODB_ROOT_*` and `MONGODB_APP_*` variables are only used by the generate
 
 To run the generated `docker-compose.yml` on your server:
 
-1. Copy `docker-compose.yml` and `docker/mongodb/create-app-user.js` to the server.
+1. Copy `docker-compose.yml` and the `docker/mongodb/` directory to the server.
 2. Create a `.env` next to them with **new** values for `MONGODB_ROOT_PASSWORD` and `MONGODB_APP_PASSWORD`, and update the password in `MONGODB_URI` to match.
 3. Restrict the file: `chmod 600 .env`.
 4. Start MongoDB with `docker compose up -d --wait`.
 
-The users are created only when the data volume is first initialised. Changing a password in `.env` afterwards does not change it in MongoDB; update it in both places, for example with `db.getSiblingDB("<database>").changeUserPassword("<user>", "<new password>")` as the administrator.
+Docker's entrypoint creates users only when the data volume is first initialised. Changing a password in `.env` afterwards does not change it in MongoDB; update it in both places, for example with `db.getSiblingDB("<database>").changeUserPassword("<user>", "<new password>")` as the administrator.
+
+For an older local volume without users, run the generated `db:setup` package script from the application directory instead of deleting the volume. If existing users have different credentials, setup refuses to reset them: restore their original `.env` values or update the passwords as an administrator. Exported shell variables override Compose's `.env` values, so check those too.
 
 Run the application on the same server so it can reach `127.0.0.1:27017`. If the application runs as another service in the same Compose project, connect to the `mongodb` service name instead of `localhost`. Never publish port `27017` to the internet. Back up the `mongodb-data` volume, for example with `mongodump`, and keep the `mongodb-config` volume with it.
 

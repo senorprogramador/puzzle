@@ -104,6 +104,8 @@ describe("configureTheme", () => {
     expect(root).toContain('link: { component: Link, hrefProp: "to" as const }');
     expect(root).toContain("components={themeComponents}");
     expect(root).toContain("<Outlet />");
+    expect(root).toContain("notFoundComponent:");
+    expect(root).toContain("Page not found");
     expect(root).toContain('import fonts from "../puzzle-fonts.json";');
     expect(root).toContain('fontSource="local"');
     expect(await read("src/puzzle-fonts.json")).toContain('"Geist"');

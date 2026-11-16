@@ -86,6 +86,7 @@ describe("configureAuth", () => {
     expect(compose).toContain(
       "MONGODB_APP_PASSWORD: ${MONGODB_APP_PASSWORD:?",
     );
+    expect(compose).toContain("/opt/puzzle/mongodb/check.js");
     expect(await read("docker/mongodb/create-app-user.js")).toContain(
       'roles: [{ role: "readWrite", db: databaseName }]',
     );
@@ -94,6 +95,35 @@ describe("configureAuth", () => {
       code: "ENOENT",
     });
   });
+
+  it.each(["next", "tanstack", "react-router"] as const)(
+    "adds data-preserving MongoDB setup for %s",
+    async (framework) => {
+      await configure({ framework, database: "mongodb", packageManager: "pnpm" });
+
+      const packageJson = JSON.parse(await read("package.json")) as {
+        scripts: Record<string, string>;
+      };
+      const directory = framework === "react-router" ? "app" : "src";
+      const module = framework === "react-router" ? "database.server" : "database";
+
+      expect(packageJson.scripts).toMatchObject({
+        dev: "dev",
+        start: "react-router-serve",
+        "db:setup": "node scripts/setup-mongodb.mjs",
+      });
+      expect(await read(".env")).toContain("pnpm run db:setup");
+      expect(await read("scripts/setup-mongodb.mjs")).toContain(
+        "PUZZLE_MONGODB_SETUP=1",
+      );
+      expect(await read("docker/mongodb/check.js")).toContain(
+        "No passwords or data were reset.",
+      );
+      expect(await read(`${directory}/lib/auth/${module}.ts`)).toContain(
+        "error instanceof MongoServerError && error.code === 18",
+      );
+    },
+  );
 
   it("configures Next.js with Cloudflare D1", async () => {
     await configure({ framework: "next", database: "d1" });

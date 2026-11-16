@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 
 import type { AuthDatabase, FullStackFramework, PackageManager } from "../types";
+import { getInitialUserTemplate } from "./initial-user-template";
 
 export type InfrastructureOptions = {
   framework: FullStackFramework;
@@ -41,7 +42,7 @@ const getMongoDatabaseName = (projectName: string) =>
 // Hex keeps generated passwords safe to embed in a connection string.
 const createDatabasePassword = () => randomBytes(32).toString("hex");
 
-const databaseEnvironment = ({ database, projectName }: InfrastructureOptions) => {
+const databaseEnvironment = ({ database, projectName, packageManager }: InfrastructureOptions) => {
   if (database === "mongodb") {
     const databaseName = getMongoDatabaseName(projectName);
     const appUsername = `${databaseName}_app`;
@@ -49,10 +50,11 @@ const databaseEnvironment = ({ database, projectName }: InfrastructureOptions) =
 
     return `
 # MongoDB. docker compose reads these values from this file. Start the
-# replica set with: docker compose up -d --wait
+# replica set with: ${packageManager} run db:setup
 # Auth uses transactions, which require a replica set.
-# Users are created when the data volume is first initialised. To change a
-# password afterwards, update the user in MongoDB as well as here.
+# Setup also creates missing users on an older local volume without users.
+# Existing passwords and data are never reset. To change a password,
+# update the user in MongoDB as well as here.
 
 # Administrator, used only by Docker for setup and health checks.
 MONGODB_ROOT_USERNAME="root"
@@ -141,15 +143,14 @@ const mongoDockerCompose = `services:
       - mongodb-data:/data/db
       - mongodb-config:/data/configdb
       - ./docker/mongodb/create-app-user.js:/docker-entrypoint-initdb.d/create-app-user.js:ro
+      - ./docker/mongodb/check.js:/opt/puzzle/mongodb/check.js:ro
     healthcheck:
       test:
-        - CMD-SHELL
-        - >-
-          mongosh --quiet
-          --username "$$MONGO_INITDB_ROOT_USERNAME"
-          --password "$$MONGO_INITDB_ROOT_PASSWORD"
-          --authenticationDatabase admin
-          --eval "try { rs.status().ok } catch (error) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] }).ok }"
+        - CMD
+        - mongosh
+        - --quiet
+        - --file
+        - /opt/puzzle/mongodb/check.js
       interval: 5s
       timeout: 10s
       retries: 12
@@ -169,6 +170,156 @@ db.getSiblingDB(databaseName).createUser({
   pwd: process.env.MONGODB_APP_PASSWORD,
   roles: [{ role: "readWrite", db: databaseName }],
 });
+`;
+
+const mongoCheck = `const setup = process.env.PUZZLE_MONGODB_SETUP === "1";
+const admin = db.getSiblingDB("admin");
+const databaseName = process.env.MONGODB_DATABASE;
+const application = db.getSiblingDB(databaseName);
+
+const fail = (message) => {
+  console.error(message);
+  quit(2);
+};
+
+const initiate = () => {
+  rs.initiate({
+    _id: "rs0",
+    members: [{ _id: 0, host: "localhost:27017" }],
+  });
+  quit(1);
+};
+
+try {
+  admin.auth(
+    process.env.MONGO_INITDB_ROOT_USERNAME,
+    process.env.MONGO_INITDB_ROOT_PASSWORD,
+  );
+} catch (error) {
+  if (error.code !== 18) {
+    throw error;
+  }
+
+  if (!setup) {
+    fail("MongoDB administrator authentication failed. Run the generated db:setup script.");
+  }
+
+  // The localhost exception permits the first administrator only when no
+  // users exist. It cannot reset credentials or replace an existing user.
+  const hello = admin.hello();
+
+  if (hello.isreplicaset && !hello.setName) {
+    initiate();
+  }
+  if (!hello.isWritablePrimary) {
+    quit(1);
+  }
+
+  try {
+    admin.createUser({
+      user: process.env.MONGO_INITDB_ROOT_USERNAME,
+      pwd: process.env.MONGO_INITDB_ROOT_PASSWORD,
+      roles: [{ role: "root", db: "admin" }],
+    });
+  } catch (error) {
+    if (error.code !== 13) {
+      throw error;
+    }
+
+    fail("MongoDB already has users, but the administrator credentials do not match. Restore the original .env credentials or ask your database administrator. No passwords or data were reset.");
+  }
+
+  admin.auth(
+    process.env.MONGO_INITDB_ROOT_USERNAME,
+    process.env.MONGO_INITDB_ROOT_PASSWORD,
+  );
+}
+
+try {
+  rs.status();
+} catch (error) {
+  if (error.code !== 94) {
+    throw error;
+  }
+  initiate();
+}
+
+if (!admin.hello().isWritablePrimary) {
+  quit(1);
+}
+
+if (setup && !application.getUser(process.env.MONGODB_APP_USERNAME)) {
+  application.createUser({
+    user: process.env.MONGODB_APP_USERNAME,
+    pwd: process.env.MONGODB_APP_PASSWORD,
+    roles: [{ role: "readWrite", db: databaseName }],
+  });
+}
+
+try {
+  application.auth(
+    process.env.MONGODB_APP_USERNAME,
+    process.env.MONGODB_APP_PASSWORD,
+  );
+} catch (error) {
+  if (error.code !== 18) {
+    throw error;
+  }
+  fail("MongoDB application authentication failed. Restore the original .env credentials or update the user password as an administrator. No passwords or data were reset.");
+}
+
+quit(0);
+`;
+
+const mongoSetup = `import { spawnSync } from "node:child_process";
+import { setTimeout } from "node:timers/promises";
+
+const compose = (args, stdio = "pipe") => {
+  const result = spawnSync("docker", ["compose", ...args], {
+    stdio,
+    encoding: "utf8",
+    timeout: 120_000,
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return result;
+};
+
+const started = compose(["up", "--detach"], "inherit");
+
+if (started.status !== 0) {
+  process.exit(started.status ?? 1);
+}
+
+const deadline = Date.now() + 120_000;
+let output = "";
+
+while (Date.now() < deadline) {
+  const result = compose([
+    "exec", "-T", "-e", "PUZZLE_MONGODB_SETUP=1", "mongodb",
+    "mongosh", "--quiet", "--file", "/opt/puzzle/mongodb/check.js",
+  ]);
+
+  if (result.status === 0) {
+    console.log("MongoDB is ready. Existing passwords and data were preserved.");
+    process.exit(0);
+  }
+
+  output = [result.stdout, result.stderr].filter(Boolean).join("\\n");
+
+  if (result.status === 2) {
+    break;
+  }
+
+  await setTimeout(2_000);
+}
+
+console.error(output);
+console.error("MongoDB setup failed. Check docker compose logs mongodb and make sure .env matches the existing database. Shell variables override Compose's .env values. No volumes were deleted.");
+process.exit(1);
 `;
 
 const wranglerConfig = ({ framework, projectName }: InfrastructureOptions) => {
@@ -277,9 +428,15 @@ const getInfrastructureFiles = (
     ".env": createEnvironmentFile(options),
   };
 
+  if (options.database === "mongodb" || options.database === "d1") {
+    files["scripts/create-initial-user.mjs"] = getInitialUserTemplate(options.database);
+  }
+
   if (options.database === "mongodb") {
     files["docker-compose.yml"] = mongoDockerCompose;
     files["docker/mongodb/create-app-user.js"] = mongoCreateAppUser;
+    files["docker/mongodb/check.js"] = mongoCheck;
+    files["scripts/setup-mongodb.mjs"] = mongoSetup;
   }
 
   if (options.database === "d1") {

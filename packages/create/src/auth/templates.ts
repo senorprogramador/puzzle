@@ -133,7 +133,7 @@ const databaseModule = (
   layout: ServerLayout,
 ) => {
   if (database === "mongodb") {
-    return `import { MongoClient } from "mongodb";
+    return `import { MongoClient, MongoServerError } from "mongodb";
 import { MongoStorageAdapter } from "@puzzle-ui/storage-mongodb";
 
 import { getEnvironmentVariable } from "./${layout.module("environment")}";
@@ -171,6 +171,14 @@ const connect = async (): Promise<Connection> => {
     return { client, storage };
   } catch (error) {
     await client.close();
+
+    if (error instanceof MongoServerError && error.code === 18) {
+      throw new Error(
+        "MongoDB authentication failed. For the generated local database, run the db:setup package script. Existing volumes keep their users and passwords: restore the matching .env credentials or update the user as an administrator. Also check for shell variables overriding .env. No data should be deleted to fix authentication.",
+        { cause: error },
+      );
+    }
+
     throw error;
   }
 };

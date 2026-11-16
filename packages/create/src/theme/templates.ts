@@ -279,6 +279,7 @@ const tanstackRootRoute = ({ auth = false }: TemplateOptions) => `import {
 } from "@tanstack/react-router";
 
 import { Theme } from "@puzzle-ui/theme";${authProviderImport(auth)}
+import { Button, Container, Heading } from "@puzzle-ui/ui";
 
 import fonts from "../puzzle-fonts.json";
 
@@ -315,6 +316,16 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
+  notFoundComponent: () => (
+    <Container
+      as="main"
+      widthPreset="content"
+      style={{ paddingBlock: "var(--puzzle-space-16)" }}
+    >
+      <Heading as="h1" level="headline1">Page not found</Heading>
+      <Button href="/">Back to home</Button>
+    </Container>
+  ),
 });
 `;
 
