@@ -1,14 +1,77 @@
 ---
 title: Build a Protected Dashboard with Puzzle Auth
-description: Build registration, password login, server-rendered TOTP enrollment, recovery challenges, protected routes, session refresh, and logout with Puzzle Fullstack.
+description: A beginner-friendly guide to accounts, passwords, sessions, authenticator-app MFA, recovery codes, and MongoDB persistence with Puzzle Auth and Bun.
 ---
 
 ## What you will build
 
-A Fieldnotes account flow: register, enroll a TOTP authenticator, save recovery
-codes, open a protected dashboard, sign out, then sign back in with password
-and TOTP or a recovery code. A separate profile collection stores a company
-field without modifying Auth's public user model.
+You will build the account system for a small app called **Fieldnotes**. By the
+end, a visitor can:
+
+1. **Register** with an email address and password.
+2. **Set up an authenticator app** (Google Authenticator, 1Password, Authy, ...)
+   and save one-time **recovery codes**.
+3. Open a **dashboard that only signed-in users can see**, and save a company
+   name to their profile.
+4. **Sign out**, and **sign back in** with password + authenticator code (or a
+   recovery code if the phone is lost).
+
+Everything — accounts, password hashes, sessions, authenticator secrets, and
+the profile — is stored in **MongoDB** through Puzzle's storage adapter.
+
+You do not need to know how authentication works to follow this guide. The
+next two sections explain every concept the code uses. If you already know the
+basics, skip to [Prerequisites](#prerequisites).
+
+Prefer a framework? After this guide, follow the
+[TanStack Start](/docs/tutorials/auth-tanstack-start) or
+[Next.js](/docs/tutorials/auth-nextjs) version. They reuse the same ideas.
+
+### Authentication in plain words
+
+| Term | What it means here |
+| --- | --- |
+| **Authentication** | Proving *who* someone is (email + password + authenticator code). |
+| **Authorization** | Deciding what that person may *do* (for example "edit only your own profile"). Puzzle Auth handles authentication; your app still decides authorization. |
+| **Password hash** | Passwords are never stored. A slow, one-way function (**Argon2id**) turns each password into a hash. At sign-in the typed password is hashed again and compared. |
+| **Session** | After a successful sign-in the server creates a session record in the database and gives the browser a random **session token**. |
+| **Cookie** | The browser stores the token in an `HttpOnly` cookie and sends it automatically with every request. `HttpOnly` means page JavaScript cannot read it, so a malicious script cannot steal it. `Secure` means it is only sent over HTTPS. |
+| **MFA (multi-factor authentication)** | Requiring a second proof besides the password. Here: a 6-digit code from an authenticator app. |
+| **TOTP** | "Time-based one-time password", the 6-digit code that changes every 30 seconds. Server and app share a **secret key** (shown once during setup) and both calculate the same code from the current time. |
+| **Recovery code** | A long one-time code the user writes down. It replaces the authenticator code once, for example after losing a phone. |
+| **Challenge** | A short-lived "half signed in" state. After the correct password, the user must still answer the MFA challenge before getting a real session. |
+| **CSRF** | Cross-site request forgery: another website tricking the browser into submitting a form to *your* site. Puzzle blocks this by checking that the request's `Origin` header matches your site. |
+| **Rate limiting** | Slowing down repeated failed attempts so attackers cannot guess passwords or codes quickly. |
+
+### How a sign-in travels through the app
+
+```text
+Browser                         Your server (Bun)                         MongoDB
+───────                         ─────────────────                         ───────
+POST /api/auth/sign-in  ──────▶ Puzzle Auth checks password hash ───────▶ auth_users, auth_credentials
+                        ◀────── "mfa-pending" + short-lived MFA cookie ─▶ auth_mfa_challenges
+POST /api/auth/mfa/...  ──────▶ Puzzle Auth checks the 6-digit code ────▶ auth_mfa_factors
+                        ◀────── session cookie (HttpOnly, Secure) ──────▶ sessions
+GET /dashboard          ──────▶ your code: auth.getCurrentUser(token) ──▶ sessions, auth_users
+                        ◀────── dashboard HTML, or 401 if not signed in
+```
+
+The browser never sees a password hash, an authenticator secret from the
+database, or a raw session record. It only holds cookies it cannot read.
+
+### Which Puzzle package does what
+
+| Package | Job in this tutorial |
+| --- | --- |
+| `@puzzle-ui/auth` | The rules: register, sign in, hash passwords, MFA, recovery codes, rate limits. |
+| `@puzzle-ui/session` | Creates, validates, rotates and revokes sessions; reads/writes cookies; CSRF checks. |
+| `@puzzle-ui/storage` | A database-neutral interface. Auth and Session only talk to this interface. |
+| `@puzzle-ui/storage-mongodb` | The MongoDB implementation of that interface (the **storage adapter**). |
+| `@puzzle-ui/fullstack` | Ready-made HTTP endpoints (`/api/auth/...`) on the server, and React hooks/forms in the browser. |
+| `@puzzle-ui/theme`, `@puzzle-ui/ui` | Styling and form components for the sign-in screen. |
+
+Because Auth only depends on the storage *interface*, you could later swap
+MongoDB for another adapter without changing any authentication code.
 
 **API maturity: Beta** for Auth, Session, Storage and the Fullstack client/server/
 framework APIs below. The UI Button used below is **Stable**; the other UI
@@ -19,35 +82,179 @@ primitives and Theme are Beta. No Experimental API is required. Review the
 
 ## Prerequisites
 
-- Bun with its Argon2id password API and Web Crypto support; TypeScript.
-- React/React DOM 19 and Puzzle's [Theme setup](/docs/getting-started).
-- The `storage/database.ts` module from the
-  [Storage tutorial](/docs/tutorials/storage#configuration).
-- A transaction-capable MongoDB deployment and server-only connection URI.
-- A trusted HTTPS origin. For the standalone local server use
-  `https://localhost:3443` with a trusted localhost certificate/key.
+You need four things on your machine. Each item says how to get it.
 
-The MFA cookie is always `Secure` and `HttpOnly`, including during development.
-Plain HTTP is not a supported shortcut for this flow. Other runtimes can
-provide a conforming `PasswordHasher`; the package does not supply one.
+- **Bun** (runtime and package manager), from [bun.sh](https://bun.sh). This
+  tutorial uses Bun's built-in Argon2id password hashing (`Bun.password`). On
+  Node.js, use the hasher from the [TanStack Start](/docs/tutorials/auth-tanstack-start#2-hash-passwords-with-argon2id)
+  guide instead.
+- **TypeScript and React 19.** Basic React knowledge is enough.
+- **A MongoDB replica set.** Puzzle Auth writes several documents in one
+  all-or-nothing **transaction** (for example "create user + create password
+  credential"), and MongoDB only supports transactions on a replica set. A
+  single-node replica set is fine for development. With Docker:
+
+  ```bash
+  docker run -d --name fieldnotes-mongo -p 27017:27017 mongo:8 --replSet rs0 --bind_ip_all
+  docker exec fieldnotes-mongo mongosh --quiet --eval "rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] })"
+  ```
+
+  Your connection string is then
+  `mongodb://localhost:27017/?directConnection=true`. A free MongoDB Atlas
+  cluster also works (Atlas is always a replica set); use its `mongodb+srv://`
+  string.
+- **Local HTTPS.** The session and MFA cookies are always `Secure`, so the
+  browser only sends them over HTTPS — even on your laptop. Plain HTTP is not a
+  supported shortcut. [mkcert](https://github.com/FiloSottile/mkcert) creates a
+  certificate your browser trusts:
+
+  ```bash
+  mkcert -install
+  mkdir -p certs
+  mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem localhost 127.0.0.1
+  ```
+
+The app will run at `https://localhost:3443`.
 
 ## Installation
 
+Create a project folder and install the packages:
+
 ```bash
+mkdir fieldnotes && cd fieldnotes
+bun init -y
 bun add @puzzle-ui/auth @puzzle-ui/session @puzzle-ui/storage @puzzle-ui/storage-mongodb mongodb @puzzle-ui/fullstack @puzzle-ui/theme @puzzle-ui/ui react react-dom
+bun add -d @types/react @types/react-dom
 ```
 
-In an existing application, reuse its installed peers. There is deliberately
-no root `@puzzle-ui/fullstack` import: use its `/auth/client`, `/auth/server`,
-`/auth/next`, or `/auth/tanstack` public entry points.
+There is deliberately no root `@puzzle-ui/fullstack` import: use its
+`/auth/client` (browser), `/auth/server` (server), `/auth/next`, or
+`/auth/tanstack` entry points. In an existing application, reuse its installed
+React version.
+
+When you are done, the project looks like this. You will create every file in
+`auth/` step by step:
+
+```text
+fieldnotes/
+├── .env                  # secrets, never committed
+├── certs/                # mkcert output, never committed
+├── public/               # built browser bundle (generated)
+└── auth/
+    ├── database.ts       # connect to MongoDB, create the storage adapter
+    ├── services.ts       # configure Auth, Session, MFA and HTTP handlers
+    ├── profile.ts        # your own app data (company name)
+    ├── application.tsx   # server routes: enrollment, dashboard, logout ...
+    ├── client.tsx        # browser UI: sign-in / register screen
+    ├── server.tsx        # starts the HTTPS server
+    └── verify.ts         # automated end-to-end check (optional)
+```
 
 ## Configuration
 
-### Configure the server dependencies
+### 1. Create your secrets
 
-This module accepts the database-neutral storage contract. Database connection
-details stay in the Storage module; cookie/HTTP integration stays in Fullstack.
-No database SDK, server manager, or encryption key is imported by the browser.
+Authentication needs a few values that must stay **on the server** and **out of
+Git**. Create a `.env` file (Bun loads it automatically) and add `.env` and
+`certs/` to `.gitignore`:
+
+```bash title=".env"
+MONGODB_URI="mongodb://localhost:27017/?directConnection=true"
+# 32 random bytes as 64 hex characters: encrypts authenticator secrets in MongoDB.
+AUTH_ENCRYPTION_KEY_HEX="paste output of: openssl rand -hex 32"
+# At least 32 random characters: keys the rate-limit counters.
+AUTH_RATE_LIMIT_SECRET="paste output of: openssl rand -base64 48"
+TLS_CERT_FILE="certs/localhost.pem"
+TLS_KEY_FILE="certs/localhost-key.pem"
+```
+
+Generate each secret separately and paste the output:
+
+```bash
+openssl rand -hex 32
+openssl rand -base64 48
+```
+
+| Variable | Why it exists | What happens if it changes or leaks |
+| --- | --- | --- |
+| `MONGODB_URI` | Where accounts and sessions are stored. | Anyone with it can read your database. |
+| `AUTH_ENCRYPTION_KEY_HEX` | Authenticator secrets are **encrypted** before they are saved, so a database dump alone does not reveal them. | If you lose or change it, existing authenticator setups can no longer be read and users must use recovery codes. Never generate it on startup. |
+| `AUTH_RATE_LIMIT_SECRET` | Rate-limit records store a keyed hash of the email/IP instead of the raw value. | Changing it resets the counters. |
+| `TLS_*` | Your local HTTPS certificate. | Use your host's certificate in production. |
+
+In production, store these in your hosting provider's secret manager instead of
+a file.
+
+### 2. Connect MongoDB and create the storage adapter
+
+The **storage adapter** is the bridge between Puzzle and your database. Auth and
+Session never call MongoDB directly; they call the adapter's generic methods
+(`insert`, `findById`, `update`, transactions, ...), and
+`MongoStorageAdapter` translates those into MongoDB operations.
+
+```ts title="auth/database.ts"
+import { MongoClient } from "mongodb";
+import { MongoStorageAdapter } from "@puzzle-ui/storage-mongodb";
+
+export const connectStorage = async (uri: string, databaseName = "fieldnotes") => {
+  if (!uri.trim()) throw new Error("A server-only MongoDB URI is required.");
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const storage = new MongoStorageAdapter({
+      database: client.db(databaseName),
+      client,
+      // Auth needs all-or-nothing writes. This requires a replica set.
+      transactionsEnabled: true,
+    });
+    return { storage, close: () => client.close() };
+  } catch (error) {
+    await client.close();
+    throw error;
+  }
+};
+```
+
+A few rules worth knowing:
+
+- **Connect once per server process** and share the returned `storage`. The
+  MongoDB driver keeps a connection pool; do not connect per request.
+- `transactionsEnabled: true` does not turn a standalone MongoDB server into a
+  replica set. If transactions are unavailable, Auth refuses to start instead
+  of silently writing half an account.
+- You never create Auth's collections or indexes yourself. When the server
+  starts, the managers call `registerCollection` on the adapter, which creates
+  the collections and the **unique indexes** (for example "one account per
+  email") that Auth relies on.
+- To share a database with another app, pass `collectionPrefix: "fieldnotes_"`
+  to `MongoStorageAdapter`; every collection name below is then prefixed.
+
+#### What ends up in MongoDB
+
+After you register and sign in once, the `fieldnotes` database contains:
+
+| Collection | Contents | Sensitive data protection |
+| --- | --- | --- |
+| `auth_users` | One document per account: email, status, timestamps. | — |
+| `auth_credentials` | The password credential for each user. | Only the Argon2id hash is stored. |
+| `auth_mfa_factors` | The user's authenticator-app setup. | The TOTP secret is encrypted with `AUTH_ENCRYPTION_KEY_HEX`. |
+| `auth_recovery_codes` | One-time recovery codes. | Stored hashed; each works once. |
+| `auth_mfa_challenges` | Pending "password OK, waiting for code" sign-ins and enrollments. | Expire after a few minutes; token stored hashed. |
+| `auth_mfa_step_up_challenges` | Re-confirmations before sensitive actions (not used yet). | Short-lived. |
+| `auth_rate_limits` | Failed-attempt counters. | Keys are keyed hashes, not raw emails/IPs. |
+| `auth_audit_events`, `auth_action_tokens` | Security events and email/reset tokens for [lifecycle flows](/docs/auth/lifecycle). | Tokens stored hashed. |
+| `sessions`, `session_data`, `session_user_locks` | Active sessions and internal session bookkeeping. | The session token itself is stored hashed. |
+| `profiles` | **Your** data: the company name (step 1 below). | Your responsibility. |
+
+Treat every `auth_*` and `session*` collection as owned by Puzzle: read them
+for debugging if you like, but never insert or edit those documents by hand.
+Put your own data in your own collections, like `profiles`.
+
+### 3. Configure the auth services
+
+This file creates all server-side objects once and connects them. It accepts the
+storage adapter as a parameter, so it does not care which database you use.
+Nothing in it is ever sent to the browser.
 
 ```ts title="auth/services.ts"
 import {
@@ -76,6 +283,7 @@ export const createServices = async (options: ServiceOptions) => {
     throw new Error("Configure an exact HTTPS origin without a trailing slash.");
   }
   const { storage, rateLimitKeySecret, resolveClientIp } = options;
+  // Turns passwords into slow Argon2id hashes, and checks them at sign-in.
   const passwordHasher: PasswordHasher = {
     async hash(password) {
       return {
@@ -88,17 +296,21 @@ export const createServices = async (options: ServiceOptions) => {
     },
     verify: (password, stored) => Bun.password.verify(password, stored.hash, "argon2id"),
   };
+  // Sessions end after 30 minutes of inactivity, or 24 hours at most.
   const sessions = new StorageSessionManager(storage, {
     lifetime: { idleTimeoutSeconds: 1800, absoluteLifetimeSeconds: 86400 },
   });
   const rateLimitProvider = new StorageRateLimitProvider(storage);
+  // Encrypts authenticator secrets before they are written to MongoDB.
   const secretProtector = new WebCryptoAuthSecretProtector({
     currentKeyId: "primary",
     keys: { primary: options.encryptionKey },
   });
+  // MFA: authenticator apps (TOTP) and recovery codes.
   const mfa = new StorageAuthMfaManager({
     storage, sessions, passwordHasher, rateLimitProvider, secretProtector,
   }, { rateLimitKeySecret, issuer: "Fieldnotes" });
+  // Accounts: register, sign in, sign out, current user.
   const auth = new StorageAuthManager({
     storage, sessions, passwordHasher, rateLimitProvider, mfa,
   }, {
@@ -106,12 +318,17 @@ export const createServices = async (options: ServiceOptions) => {
     minimumPasswordLength: 12,
     mfaPolicy: { required: true },
   });
+  // Re-confirmation before sensitive actions (required by the HTTP handlers).
   const stepUp = new StorageAuthStepUpManager({ storage, sessions, mfa });
+  // __Host-puzzle.session cookie: HttpOnly, Secure, SameSite=Lax.
   const cookie = createSessionCookieOptions({ production: true });
+  // Only POSTs coming from this exact origin are accepted (CSRF protection).
   const csrf = { allowedOrigins: [options.origin] };
+  // The ready-made /api/auth/... HTTP handlers.
   const authServer = createAuthServer({
     auth, mfa, stepUp, sessions, cookie, csrf, resolveClientIp,
   });
+  // Creates the MongoDB collections and unique indexes listed above.
   await sessions.initialize();
   await rateLimitProvider.initialize();
   await authServer.initialize();
@@ -121,24 +338,34 @@ export const createServices = async (options: ServiceOptions) => {
 export type Services = Awaited<ReturnType<typeof createServices>>;
 ```
 
-Tune Argon2id cost using production measurements; do not substitute a fast hash.
-Use two independent server secrets: a stable rate-limit key secret of at least
-32 characters and a 32-byte encryption key from a secret manager. Keep the
-encryption key/key ID available across restarts and plan key rotation; generating
-a new key on startup makes existing TOTP factors unreadable.
+What each option means for you:
 
-Optional MFA uses `mfaPolicy: {}`. `required: true` requires all users to enroll;
-`requiredFor(user)` can additionally require selected users. Existing active
-factors are challenged even when policy is optional. The complete app below
-uses required enrollment from the start.
+- **`origin`** is the exact address users type in the browser, such as
+  `https://localhost:3443` or `https://app.example.com`. CSRF protection
+  rejects form posts from anywhere else.
+- **`resolveClientIp`** tells Auth the visitor's IP address for rate limiting.
+  It is a function because the right answer depends on your hosting; see
+  [Complete working example](#complete-working-example).
+- **`minimumPasswordLength: 12`** is enforced on the server, whatever the
+  browser form says.
+- **`mfaPolicy: { required: true }`** means every user must set up an
+  authenticator before reaching the dashboard. Use `mfaPolicy: {}` to make MFA
+  optional, or `requiredFor(user)` to require it only for some users (for
+  example admins). Users who already set up MFA are always asked for it.
+- **Argon2id cost** (`memoryCost`, `timeCost`) makes each hash deliberately
+  slow, so stolen hashes are expensive to crack. Tune it with production
+  measurements; never replace it with a fast hash such as SHA-256.
 
 ## Step-by-step implementation
 
-### 1. Extend application data, not the Auth user contract
+### 1. Store your own data next to the account
 
-`AuthUser` is not generic and registration does not persist arbitrary fields.
-Keep company/role/preferences in an application collection. Never accept a user
-ID or authorization role from the browser as proof of identity.
+Puzzle's user record (`AuthUser`) intentionally only contains account fields
+such as the email address. Anything your app needs — company, role,
+preferences — goes into **your own collection**, keyed by the user's ID.
+
+The important security rule: the user ID always comes from the server-verified
+session, **never** from the browser. A browser could send any ID it likes.
 
 ```ts title="auth/profile.ts"
 import {
@@ -172,40 +399,52 @@ export const saveCompany = async (
 };
 ```
 
-Auth and Session managers own user/credential/session/challenge collections,
-hashed bearer tokens, TOTP protection, and atomic state transitions. Application
-code should not manually insert those records. The generic adapter knows
-nothing about an authenticated user or MFA policy.
+`registerCollection` creates the `profiles` collection on startup. Saving uses
+the record's `revision` so two simultaneous saves cannot silently overwrite
+each other.
 
-### 2. Keep the credential boundary on the server
+### 2. Understand which routes you need
 
-Registration calls `auth.register`; login calls `auth.signIn` through Fullstack.
-A required-enrollment result has **no normal session**. Its challenge credential
-is delivered only in the short-lived `__Host-puzzle.mfa` cookie, never the public
-snapshot. A public `challengeId` is an identifier, not that bearer token.
+Fullstack ships many ready-made endpoints under `/api/auth/`. This app only
+needs six of them, and enables only those (an **allowlist**). Fewer enabled
+endpoints means fewer things that can go wrong:
 
-The bundled TOTP start handlers return the provisioning secret/URI in JSON,
-and bundled enrollment/settings components retain it in React state. Those
-are public Beta APIs, but do **not** satisfy this tutorial's stricter boundary.
-Here, allowlist only the HTTP endpoints the app uses and implement enrollment
-as server-rendered HTML with no hydration, scripts, analytics, or secret-bearing
-JSON. Recovery codes get the same one-time display treatment.
+| Endpoint | Used for |
+| --- | --- |
+| `POST /api/auth/register` | Create an account. |
+| `POST /api/auth/sign-in` | Check email + password. |
+| `GET /api/auth/state` | Ask "am I signed in, or is MFA pending?" |
+| `POST /api/auth/sign-out` | End the session. |
+| `POST /api/auth/mfa/sign-in/totp` | Answer the MFA challenge with an authenticator code. |
+| `POST /api/auth/mfa/sign-in/recovery-code` | Answer it with a recovery code instead. |
 
-A TOTP setup necessarily reveals a shared secret to the enrolling user and
-authenticator. Here it appears only in the cookie-bound enrollment response's
-HTML, not in client application state, JSON, URLs, logs, or persistent browser
-storage. The pending factor remains encrypted at rest.
+Your own pages complete the flow:
 
-### 3. Enforce every protected route and mutation on the server
+| Page | Purpose |
+| --- | --- |
+| `GET /enroll`, `POST /enroll/start`, `POST /enroll/verify` | Show the authenticator secret once and confirm the first code. |
+| `GET /dashboard` | The protected page. |
+| `POST /profile`, `POST /session/refresh`, `POST /logout` | Dashboard actions. |
+| `GET /account` | The sign-in/register screen (React in the browser). |
 
-The complete handler below checks `auth.getCurrentUser(token)` rather than
-trusting a client snapshot or only `sessions.validate`. The latter establishes
-session validity but not current account/email/MFA policy.
+**Why enrollment is server-rendered HTML.** During authenticator setup the
+server must show the user the TOTP secret once. Fullstack's stock enrollment
+endpoints return that secret as JSON to React state. This tutorial is stricter:
+the secret only ever appears in a single no-store HTML response with no
+scripts, so it never sits in browser JavaScript, URLs, logs, or storage. The
+pending factor stays encrypted in MongoDB. Recovery codes get the same
+treatment.
 
-Only state-changing POSTs start or complete enrollment. Every custom mutation
-checks the exact allowed origin with Puzzle's CSRF helper. Keep normal
-application authorization/resource ownership checks in addition to this
-authentication boundary.
+**Why there is no session yet after registration.** With required MFA, a new
+account is not "signed in" until the authenticator is set up. Registration
+returns the status `mfa-enrollment-pending` and a short-lived
+`__Host-puzzle.mfa` cookie. That cookie only allows finishing enrollment; it
+cannot open the dashboard.
+
+### 3. Protect every page and action on the server
+
+This is the main server file. Read it top to bottom; the comments below the code
+explain the important parts.
 
 ```tsx title="auth/application.tsx"
 import type { ReactNode } from "react";
@@ -415,17 +654,44 @@ export const createApplication = async (services: Services) => {
 };
 ```
 
-The hidden factor ID is not a credential; the cookie is still required and
-validated on the server. No secret or challenge token is in the verification
-form. Only successful code verification and committed enrollment create a
-normal session. Expired/consumed challenges and reused codes do not grant access.
+The key ideas in this file:
 
-### 4. Build the client UX without making it an authorization boundary
+- **`currentUser(request)`** reads the session cookie and calls
+  `auth.getCurrentUser(token)`. It returns `null` unless the session is valid
+  *and* the account currently satisfies the MFA policy. Every protected page and
+  action calls it — never trust what the browser says about being signed in.
+  (`sessions.validate` alone only proves the session exists; it does not check
+  MFA policy or the account state.)
+- **`protectStateChangingRequest(request, services.csrf)`** is called first in
+  every `POST`. It throws (→ 403) when the request comes from another origin.
+- **`enrollmentToken(request)`** only accepts the short-lived MFA cookie while
+  the account is in the `mfa-enrollment-pending` state.
+- The hidden `factorId` field is not a secret; without the HttpOnly MFA cookie
+  it is useless. Only a correct code creates a normal session.
+- **`createSessionResponse(...)`** sets the session cookie. After enrollment
+  the MFA cookie is cleared in the same response.
+- **Session refresh** calls `sessions.rotate`: the browser gets a brand-new
+  token and the old one stops working.
+- **Errors** are mapped to safe messages and status codes. Raw database errors
+  and credentials are never shown or logged.
 
-Mount `AuthProvider` inside the normal Puzzle `Theme`. The screen explicitly
-handles restricted enrollment states before rendering any bundled enrollment
-UI. The custom password form below also avoids advertising a passkey enrollment
-flow that this application has not enabled.
+Keep your normal authorization checks too: being signed in does not mean a user
+may access *every* record.
+
+### 4. Build the sign-in screen in the browser
+
+The browser part is a normal React app. `AuthProvider` talks to the
+`/api/auth/...` endpoints and exposes the current status through `useAuth()`.
+The `Account` component simply shows the right screen for each status:
+
+| `snapshot.status` | What the user sees |
+| --- | --- |
+| `loading` | "Loading account..." |
+| `unauthenticated` | Sign-in form, or the registration form. |
+| `mfa-enrollment-pending` | A link to `/enroll` to set up the authenticator. |
+| `mfa-pending` | The MFA form: enter an authenticator or recovery code. |
+| `authenticated` | A link to the dashboard. |
+| `mfa-enrollment-required` | The MFA policy changed for an old session: sign out and in again. |
 
 ```tsx title="auth/client.tsx"
 "use client";
@@ -516,31 +782,30 @@ createRoot(root).render(
 );
 ```
 
-Both custom and bundled forms still call the real server endpoints: browser
-validation is UX, while Auth enforces password length, normalization, rate
-limits and credential verification. Never call storage directly from a form.
-For a branded form use [AuthExperience](/docs/fullstack/client#configurable-auth-experience);
-its custom fields are not automatically persisted. Save company after the
-user is fully authenticated using the server-validated profile form above,
-not by trusting a registration callback's email address as identity.
+The browser form is only for convenience. The server enforces everything that
+matters — password length, rate limits, credential checks — so never call
+storage from a form or treat `snapshot` as proof of identity.
 
-`AuthProvider.messages` provides typed message overrides; English is the built-in
-fallback. Supply translations for your application text too. Do not assume a
-locale string loads a translation bundle or translates arbitrary server errors.
-`AuthClientError` exposes `status` and `code`; use these to choose public copy
-without logging credentials or displaying raw database errors.
+- `SignUpForm` and `MfaChallengeForm` are ready-made Puzzle forms; the
+  password form is custom only so it does not advertise passkeys, which this app
+  has not enabled.
+- `AuthProvider.messages` overrides built-in English texts. Supply translations
+  for your own text too.
+- `AuthClientError` exposes `status` and `code` (for example `RATE_LIMITED`)
+  so you can show friendly messages without displaying raw server errors.
+- For a branded sign-up, see
+  [AuthExperience](/docs/fullstack/client#configurable-auth-experience). Its
+  custom fields are not saved automatically: save extra data after sign-in
+  through a server route such as `/profile`.
 
 ## Complete working example
 
-Keep the `auth/` and `storage/` directories as shown above. Build the account
-client into `public/`; that directory contains public assets only.
-
-```bash
-bun build ./auth/client.tsx --target browser --outdir ./public
-```
+The last file starts an HTTPS server. It connects MongoDB once, creates the
+services, serves the browser bundle and the `/account` page, and sends every
+other request to the application from step 3.
 
 ```tsx title="auth/server.tsx"
-import { connectStorage } from "../storage/database";
+import { connectStorage } from "./database";
 import { createServices } from "./services";
 import { createApplication } from "./application";
 
@@ -601,72 +866,82 @@ if (import.meta.main) {
 }
 ```
 
-Set `MONGODB_URI`, `AUTH_RATE_LIMIT_SECRET`, `AUTH_ENCRYPTION_KEY_HEX`,
-`TLS_CERT_FILE`, and `TLS_KEY_FILE` in the server environment. Generate the
-two auth secrets independently with your secret-management tool; never copy
-example credentials into source. Start with `bun run auth/server.tsx` and open
-`https://localhost:3443/account`.
+Build the browser bundle, then start the server:
 
-The standalone server takes the IP from Bun's socket peer. If you deploy behind
-a reverse proxy, replace that resolver with a deployment-verified forwarded-IP
-policy; do not blindly trust `X-Forwarded-For`. Change the origin and TLS
-termination together, keeping CSRF and Secure cookies intact.
+```bash
+bun build ./auth/client.tsx --target browser --outdir ./public
+bun run auth/server.tsx
+```
 
-### Existing framework applications
+Open `https://localhost:3443/account`. You should see the sign-in screen with a
+"Create an account" button.
 
-For Next App Router, `createNextAuthHandler({ auth: services.authServer })`
-from `@puzzle-ui/fullstack/auth/next` supplies `GET` and `POST` for
-`app/api/auth/[...puzzle]/route.ts`. For TanStack Start,
-`createTanStackAuthHandler({ auth: services.authServer })` from
-`@puzzle-ui/fullstack/auth/tanstack` supplies the dispatcher for a server
-catch-all under `/api/auth`.
+**About `resolveClientIp`.** Locally, the visitor's IP comes straight from the
+network connection (`server.requestIP`). In production behind a load balancer
+or CDN, every request would appear to come from the proxy, so replace the
+resolver with your platform's trusted client-IP header. Never blindly trust
+`X-Forwarded-For`: browsers can set it to anything.
 
-Those dispatchers expose the complete standard route map. **Do not mount them
-unfiltered for this stricter tutorial.** Apply the same pathname allowlist
-before dispatch, and mount the custom HTML routes as server handlers calling
-the application above. The framework adapters do not replace the storage
-adapter or secret management. See [Next](/docs/fullstack/next) and
-[TanStack](/docs/fullstack/tanstack) for the actual mount signatures.
+**Before deploying,** change `origin` to your real HTTPS address and let your
+host or proxy terminate TLS. Keep CSRF checks and `Secure` cookies enabled.
 
-For SSR, pass only an explicit public `AuthClientSnapshot` as `initialSnapshot`
-if preloading the client. Never serialize managers, cookies, tokens, raw
-`AuthResult`, or database records. Do not cache user-specific responses across
-requests. This complete example intentionally uses a client-rendered account
-shell and a non-hydrated protected dashboard/enrollment flow.
+For SSR applications, only pass a public `AuthClientSnapshot` as `initialSnapshot`
+when preloading the client. Never serialize managers, cookies, tokens, raw
+`AuthResult` values or database records, and never cache user-specific
+responses. The framework guides show this in practice:
+[TanStack Start](/docs/tutorials/auth-tanstack-start) and
+[Next.js](/docs/tutorials/auth-nextjs).
 
 ## Testing and verification
 
-The tutorial check typechecks the named files and builds the browser entry.
-With `TUTORIAL_MONGODB_URI` set to a disposable replica set, it also executes
-Request/Response integration assertions. These cover registration, restricted pre-enrollment access, rejected
-cross-origin enrollment, server-only provisioning, successful enrollment,
-password/TOTP sign-in, session rotation/revocation, and logout. It is not a
-real-browser authenticator or a deployed Next/TanStack application test.
+### Try it in the browser
 
-Manually verify the complete HTTPS flow too:
+1. **Register** with a new email and a password of at least 12 characters.
+   You are redirected to "Continue to secure authenticator enrollment". Opening
+   `/dashboard` now returns 401: the account is not fully set up.
+2. **Set up the authenticator.** Follow the link, click "Show a new setup key"
+   and type the key into your authenticator app (choose "enter a setup key").
+3. **Enter the 6-digit code.** Only now is a session cookie set. Save the
+   recovery codes somewhere safe outside the browser.
+4. **Open the dashboard** and save a company name.
+5. **Refresh session.** You stay signed in with a brand-new token.
+   (`refresh()` in the browser client only reloads the status; it does not
+   rotate tokens.)
+6. **Sign out, then sign in.** The password alone gives `mfa-pending`. Enter
+   an authenticator code. On another attempt, use a recovery code; using the
+   same recovery code twice must fail.
+7. **Try to break it:** a wrong code, an expired challenge, a deleted cookie, a
+   form post from another origin, or opening `/dashboard` while signed out. None
+   of these may grant access.
 
-1. Register with a new email and a password of at least 12 characters.
-   The JSON snapshot should be `mfa-enrollment-pending`, with no token/secret,
-   and `/dashboard` and `/api/me` must return 401.
-2. Follow the enrollment link and POST to show a key. Confirm the response is
-   no-store HTML with no scripts. Enter the key in an authenticator app.
-3. Submit its code. Only now should the session cookie be set and the MFA
-   cookie cleared. Save the one-time recovery codes outside the browser.
-4. Open the dashboard and save a company. Inspect persistence in the separate
-   profile collection; the public Auth user shape remains unchanged.
-5. POST refresh. The old session token must stop working. Client `refresh()`
-   only reloads a public snapshot; it is **not** a token refresh API.
-6. Sign out, then sign in. The password alone must yield `mfa-pending`.
-   Test TOTP and, on a separate sign-in attempt, one saved recovery code.
-   Reusing that recovery code must fail.
-7. Test a wrong code, expired challenge, missing cookie, cross-origin POST,
-   stale/revoked session, and direct navigation while signed out. No dashboard
-   access should be granted by changing client state.
+### Look inside MongoDB
 
-The following is a **server-side test harness**, not browser application code.
-Its in-memory cookie jar simulates the browser's HttpOnly cookie transport;
-provisioning credentials stay inside the test process and are never logged.
-Run it only against a disposable database using `TUTORIAL_MONGODB_URI`.
+```bash
+mongosh "mongodb://localhost:27017/fieldnotes?directConnection=true"
+```
+
+```js
+show collections
+db.auth_users.find({}, { email: 1, status: 1 })
+db.auth_credentials.findOne()   // contains an argon2id hash, never the password
+db.auth_mfa_factors.findOne()   // the TOTP secret is encrypted
+db.sessions.countDocuments()
+db.profiles.find()
+```
+
+### Run the automated check
+
+The script below drives the whole flow with plain `Request`/`Response` objects:
+registration, blocked access before enrollment, rejected cross-origin posts,
+enrollment, password + TOTP sign-in, recovery codes, session rotation, expiry
+and logout. Its in-memory cookie jar plays the role of the browser.
+
+Run it only against a **disposable** database: it creates a random database
+name on each run.
+
+```bash
+TUTORIAL_MONGODB_URI="mongodb://localhost:27017/?directConnection=true" bun run auth/verify.ts
+```
 
 ```ts title="auth/verify.ts"
 import assert from "node:assert/strict";
@@ -677,7 +952,7 @@ import {
 } from "@puzzle-ui/auth";
 import type { AuthClientSnapshot } from "@puzzle-ui/fullstack/auth/shared";
 import { SESSION_COLLECTION, type SessionStorageRecord } from "@puzzle-ui/session";
-import { connectStorage } from "../storage/database";
+import { connectStorage } from "./database";
 import { createServices } from "./services";
 import { createApplication } from "./application";
 
@@ -814,75 +1089,81 @@ try {
 }
 ```
 
-Sessions are created by successful Auth flows, not a browser call to
-`sessions.create`. Server `sessions.validate` touches idle activity according
-to its interval. Touching activity does not itself renew the browser cookie.
-The explicit refresh route uses `sessions.rotate`, sets a replacement cookie
-and revokes the old session. Rotation creates a new record with a new creation
-time and lifetime; the configured absolute lifetime caps each record, not the
-total age of a login across rotations. Rotation is not fresh credential
-verification. Add a separate trusted server-side login-age policy if your
-application requires forced reauthentication across rotations.
-Expired sessions/cookies require a new sign-in, not resurrection from a client
-snapshot. Server-side administrative revocation can use `sessions.revoke(id)`;
-`auth.signOutEverywhere(user.id)` also revokes pending MFA challenges and must
-only be called with a server-authorized user ID.
+It is a server-side test, not a real-browser or authenticator-app test.
 
-### Passkeys, optional enrollment, and recovery
+### How sessions behave over time
 
-The core additionally supports `beginTotpEnrollment` /
-`verifyTotpEnrollment` for authenticated optional enrollment, with current
-password confirmation at the start. Adapt the same server-HTML display
-boundary if you add that flow; do not enable the stock secret-returning routes
-accidentally. A user with required MFA but an older unenrolled session must
-sign out/sign in to obtain this example's restricted enrollment challenge.
+- Sessions are only created by successful Auth flows, never by a browser call.
+- Each validated request updates the session's "last active" time, so an active
+  user stays signed in up to the 24-hour absolute limit. Updating activity does
+  not renew the browser cookie.
+- The `/session/refresh` route rotates: it sets a new cookie and revokes the old
+  session. Each rotated session gets a fresh absolute lifetime, so rotation is
+  not a re-authentication. Add your own maximum login age if you need one.
+- An expired session requires a new sign-in.
+- To sign a user out remotely, call `sessions.revoke(id)`.
+  `auth.signOutEverywhere(user.id)` ends all of a user's sessions and pending
+  MFA challenges; only call it with a server-verified user ID.
 
-WebAuthn support is implemented, not an external OAuth provider. Add
-`SimpleWebAuthnProvider` to the MFA dependencies and configure both
-`webAuthn: { rpId, rpName, origin }` and the provider together, using the exact
-origin and RP ID. Core methods include required/optional passkey enrollment,
-password-backed passkey challenges, and discoverable passkey sign-in.
-The [MFA reference](/docs/auth/mfa) lists the paired methods.
+### Passkeys, optional enrollment, and lost devices
 
-Browser helpers from `/auth/client` can handle the ceremony, but the server
-must verify the assertion/registration, origin, RP ID, user verification and
-counters. Public WebAuthn **options/challenge bytes** are not the server's
-bearer **challenge token**: only the latter authenticates the pending flow and
-must stay in its HttpOnly cookie. For this application's boundary, also handle
-recovery-code issuance on a no-store HTML completion page rather than returning
-codes in JSON. Passkey UX is an extension, not silently enabled by this example.
-
-Recovery-code sign-in uses the existing pending cookie plus the user-entered
-code. Codes are single-use hashes at rest; regeneration invalidates unused
-older codes and requires the current password. If every factor/code is lost,
-there is no documented automatic account-recovery bypass: design an explicit
-verified recovery/support policy. Do not turn off MFA on an email-only claim.
+- **Optional MFA** for already signed-in users uses
+  `beginTotpEnrollment` / `verifyTotpEnrollment` (with password confirmation).
+  Reuse the server-HTML display approach from step 3; do not enable the stock
+  secret-returning routes by accident. A user whose policy changed while signed
+  in must sign out and in to get the enrollment challenge.
+- **Passkeys (WebAuthn)** are supported. Add `SimpleWebAuthnProvider` to the
+  MFA dependencies and configure `webAuthn: { rpId, rpName, origin }` with your
+  exact origin. The browser helpers from `/auth/client` run the ceremony while
+  the server verifies it. Public WebAuthn options are not the server's
+  challenge token: that token always stays in its HttpOnly cookie. See the
+  [MFA reference](/docs/auth/mfa).
+- **Lost everything?** Recovery codes are single-use and stored hashed;
+  regenerating them invalidates the old ones and requires the current password.
+  There is no automatic bypass when every factor and code is lost. Design an
+  explicit, verified support process; never turn off MFA because of an email.
 
 ## Common mistakes and troubleshooting
 
-- **Pending auth treated as signed in:** only policy-aware `authenticated`
-  grants dashboard access. Enrollment challenges cannot call protected APIs.
-- **MFA cookie missing:** use HTTPS and preserve all `Set-Cookie` headers.
-  Do not disable Secure or move challenge tokens into JSON/localStorage.
-- **Factor becomes unreadable after restart:** restore the configured
-  encryption key and key ID. Keep old keys available during rotation.
-- **TOTP rejected:** check clock synchronization, six-digit/30-second app
-  settings, expiry and replay protection. Wait for a new code after enrollment
-  before using TOTP again at sign-in.
-- **403 on POST:** verify exact origin/port and trusted proxy deployment;
-  do not set `allowMissingOrigin` just to bypass the failure.
-- **Custom field missing:** the stock registration DTO has no company/role
-  field. Persist it through a separately authorized, validated server route.
-- **Unexpected passkey or lifecycle UI:** this minimal route allowlist only
-  enables password, TOTP and recovery sign-in. Do not expose UI for unconfigured
-  email/reset/passkey endpoints. Add each complete flow deliberately.
+- **`Transaction numbers are only allowed on a replica set member or mongos`**
+  or an error about disabled transactions: MongoDB runs as a standalone server.
+  Start it with `--replSet` and run `rs.initiate()` (see
+  [Prerequisites](#prerequisites)).
+- **`Missing server configuration: ...`:** a variable from `.env` is missing.
+  Run the command from the project folder so Bun finds `.env`.
+- **The browser warns about the certificate:** run `mkcert -install` once and
+  restart the browser.
+- **Signed in, but the dashboard says 401:** the account is still
+  `mfa-pending` or `mfa-enrollment-pending`. Only a fully authenticated session
+  opens the dashboard; this is intended.
+- **MFA cookie missing:** you are using HTTP, or a proxy drops `Set-Cookie`
+  headers. Do not disable `Secure` or move challenge tokens into JSON or
+  `localStorage`.
+- **Authenticator codes stopped working after a restart:** the
+  `AUTH_ENCRYPTION_KEY_HEX` changed. Restore the original key. When rotating
+  keys, keep old keys in `keys` under their old ID.
+- **TOTP rejected:** check the phone's clock, use the default 6-digit /
+  30-second settings, and wait for a *new* code — a code cannot be used twice.
+- **403 on a form post:** the `Origin` (scheme, host and port) does not exactly
+  match `origin`. Fix the configuration; do not set `allowMissingOrigin` to
+  silence it.
+- **The company field is not saved at registration:** registration only accepts
+  email and password. Save extra fields through an authenticated server route
+  like `/profile`.
+- **Passkey or password-reset buttons appear:** this app only enables
+  password, TOTP and recovery codes. Do not show UI for endpoints you have not
+  configured.
 
 ## Next steps
 
+- Use the same setup in a framework:
+  [TanStack Start](/docs/tutorials/auth-tanstack-start) or
+  [Next.js](/docs/tutorials/auth-nextjs).
 - Add [account lifecycle delivery](/docs/auth/lifecycle) with a real email provider
   before requiring verified email; keep that policy aligned across managers.
 - Require recent server-enforced [step-up](/docs/auth/mfa#step-up-authentication)
   for destructive actions; it rotates the session and is not only a UI prompt.
-- Apply resource-level authorization to the [notebook](/docs/tutorials/storage).
+- Learn more about adapters and apply resource-level authorization in the
+  [Storage tutorial](/docs/tutorials/storage).
 - Keep private routes noindex and out of the public
   [SEO publication sitemap](/docs/tutorials/seo).

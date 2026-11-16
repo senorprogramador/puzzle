@@ -61,6 +61,65 @@ export default defineConfig({
     expect(config).toContain('"@puzzle-ui/fullstack"');
   });
 
+  it("adds the OpenNext dev bindings for Next.js on D1", async () => {
+    await configureFramework(cwd, "next", true, "d1");
+
+    const config = await readFile(path.join(cwd, "next.config.ts"), "utf8");
+
+    expect(config).toContain("@opennextjs/cloudflare");
+    expect(config).toContain("initOpenNextCloudflareForDev();");
+  });
+
+  it("adds the Cloudflare Vite plugin for TanStack Start on D1", async () => {
+    await writeFile(
+      path.join(cwd, "vite.config.ts"),
+      `import { defineConfig } from "vite";
+
+export default defineConfig({
+  plugins: [tanstackStart(), viteReact()],
+});
+`,
+      "utf8",
+    );
+
+    await configureFramework(cwd, "tanstack", true, "d1");
+
+    const config = await readFile(path.join(cwd, "vite.config.ts"), "utf8");
+
+    expect(config).toContain('from "@cloudflare/vite-plugin"');
+    expect(config).toContain(
+      'plugins: [cloudflare({ viteEnvironment: { name: "ssr" } }), tanstackStart(), viteReact()]',
+    );
+  });
+
+  it("configures React Router and removes the template's Tailwind", async () => {
+    await writeFile(
+      path.join(cwd, "package.json"),
+      JSON.stringify({
+        devDependencies: {
+          "@react-router/dev": "^7.0.0",
+          "@tailwindcss/vite": "^4.0.0",
+          tailwindcss: "^4.0.0",
+        },
+      }),
+      "utf8",
+    );
+
+    await configureFramework(cwd, "react-router", true, "d1");
+
+    const config = await readFile(path.join(cwd, "vite.config.ts"), "utf8");
+    const packageJson = JSON.parse(
+      await readFile(path.join(cwd, "package.json"), "utf8"),
+    );
+
+    expect(config).toContain("reactRouter()");
+    expect(config).toContain("cloudflare(");
+    expect(config).toContain('"@puzzle-ui/fullstack"');
+    expect(packageJson.devDependencies).toEqual({
+      "@react-router/dev": "^7.0.0",
+    });
+  });
+
   it("does not modify a basic React application", async () => {
     await configureFramework(cwd, "react", true);
 

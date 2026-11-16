@@ -1,0 +1,293 @@
+---
+title: Theme CLI
+description: Download and self-host Google Fonts with the puzzle-theme CLI, JSON configuration, subset selection, and cached build workflows.
+---
+
+The `@puzzle-ui/theme` package includes the `puzzle-theme` executable. Its
+`fonts download` command fetches configured Google Fonts, saves WOFF2 files,
+and generates a stylesheet for self-hosting. It runs during development or
+your build, not in the browser.
+
+With `fontSource="local"`, your application serves these files instead of
+requesting fonts from Google at runtime. The download step still needs network
+access to `fonts.googleapis.com` and `fonts.gstatic.com`.
+
+For a complete walkthrough, follow [Set Up a Theme with Local Fonts](/docs/tutorials/theme).
+
+## Installation and invocation
+
+Install `@puzzle-ui/theme` using the [theme installation instructions](/docs/theme#install).
+The CLI ships with that package; no separate CLI package or global installation
+is needed. The package requires Node.js 20.19 or newer when using Node.
+
+Run commands from your application's directory, where `puzzle-fonts.json` and
+the public assets directory live. In a monorepo, this is usually the application
+workspace rather than the repository root.
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm exec -- puzzle-theme fonts download
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bunx puzzle-theme fonts download
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm exec puzzle-theme fonts download
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn exec puzzle-theme fonts download
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+These commands use the executable from the installed theme package. In a
+package script, invoke `puzzle-theme` directly.
+
+## Command and options
+
+```text
+puzzle-theme fonts download [options]
+```
+
+`fonts download` is the available command. The CLI does not create your theme,
+write a configuration file, or update your React components.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `--config <path>` | `puzzle-fonts.json` | JSON file containing font roles. |
+| `--out-dir <path>` | `public/fonts` | Filesystem directory for the stylesheet and WOFF2 files. Created recursively when needed. |
+| `--subsets <names>` | `all` | Comma-separated Google Fonts subsets, such as `latin,latin-ext`. |
+| `--force` | Off | Download again even if the existing generated assets are current. |
+| `--help`, `-h` | Off | Print usage without reading configuration or downloading fonts. |
+
+Relative configuration and output paths resolve from the current working
+directory, not from the configuration file's directory. Value options also
+accept `--config=./config/fonts.json` syntax. Running without arguments prints
+help.
+
+## Configuration file
+
+Create a JSON object with at least one of the keys `heading`, `body`, or
+`accent`. These keys match the [font roles](/docs/theme/typography#font-roles)
+used by `Theme`. Do not wrap them in a `fonts` property or include theme tokens.
+
+```json title="puzzle-fonts.json"
+{
+  "heading": {
+    "family": "Sora",
+    "weightRange": [300, 700],
+    "display": "swap"
+  },
+  "body": {
+    "family": "Inter",
+    "weights": [400, 500, 700],
+    "styles": ["normal", "italic"],
+    "display": "swap"
+  },
+  "accent": {
+    "family": "JetBrains Mono",
+    "weights": [400],
+    "fallback": ["monospace"]
+  }
+}
+```
+
+| Field | Default | Purpose |
+| --- | --- | --- |
+| `family` | Required | Google Fonts family name, including spaces, such as `JetBrains Mono`. |
+| `weights` | `[400, 700]` | Non-empty array of integer weights between 1 and 1000. Choose weights supported by the family. |
+| `weightRange` | Unset | Ascending pair such as `[300, 700]` for a variable font. Takes precedence over `weights`; the family must support the requested range. |
+| `styles` | `["normal"]` | Requested styles: `normal`, `italic`, or both. |
+| `display` | `"swap"` | `font-display`: `auto`, `block`, `swap`, `fallback`, or `optional`. |
+| `fallback` | `["system-ui", "sans-serif"]` | Font-family fallbacks used by `Theme`; these are not downloaded. |
+
+Use the role keys to assign fonts; a separate `role` field is unnecessary.
+The CLI reads JSON, so comments, trailing commas, functions, and TypeScript
+exports are not supported. Use exact Google Fonts names and supported
+weights/styles; an unavailable combination can cause a Google Fonts request
+to fail.
+
+The JSON file can also supply the `fonts` prop when your application supports
+JSON imports, keeping downloads and runtime family selection in sync.
+
+## Subsets and custom paths
+
+By default, the downloader keeps all subsets returned by Google Fonts for
+each requested family. Limit this only when you know which writing systems
+your content needs. `latin-ext` is separate from `latin`; include both if
+you need both.
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm exec -- puzzle-theme fonts download --config ./config/fonts.json --out-dir public/assets/fonts --subsets latin,latin-ext --force
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bunx puzzle-theme fonts download --config ./config/fonts.json --out-dir public/assets/fonts --subsets latin,latin-ext --force
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm exec puzzle-theme fonts download --config ./config/fonts.json --out-dir public/assets/fonts --subsets latin,latin-ext --force
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn exec puzzle-theme fonts download --config ./config/fonts.json --out-dir public/assets/fonts --subsets latin,latin-ext --force
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+Every requested subset must be present in the Google Fonts response for
+every configured font, or the command fails. Subset names are lowercase,
+optionally hyphenated, such as `latin-ext`. Omitting `--subsets` or passing
+`--subsets all` keeps all returned subsets.
+
+## Generated files and runtime setup
+
+With the default output directory, the result has this shape:
+
+```text
+public/fonts/
+  puzzle-fonts.css
+  font-<url-hash>.woff2
+  puzzle-font-<family>.woff2
+```
+
+- `puzzle-fonts.css` contains generated `@font-face` declarations with relative
+  URLs to local files. Keep it alongside the generated WOFF2 files.
+- `font-<url-hash>.woff2` files contain downloaded font resources. The number
+  depends on families, weights, styles, and subsets; duplicate URLs are
+  downloaded only once per run.
+- `puzzle-font-<family>.woff2` files are stable preload copies, generated when
+  a normal Latin face is available and the selected subsets include Latin.
+  For Inter, the name is `puzzle-font-inter.woff2`. The corresponding CSS
+  declaration uses that same URL.
+
+Do not edit generated files. The CLI does not remove obsolete files from
+previous configurations.
+
+Downloading alone does not switch your application to local fonts. Pass the
+same configuration to `Theme` and enable local loading:
+
+```tsx
+import { Theme } from "@puzzle-ui/theme";
+import fonts from "./puzzle-fonts.json";
+
+const App = () => (
+  <Theme fonts={fonts} fontSource="local">
+    <YourApp />
+  </Theme>
+);
+```
+
+`Theme` links `/fonts/puzzle-fonts.css` and preloads the body font by default.
+Your framework must serve `public/fonts` at `/fonts`. There is no need to
+import the generated CSS separately when using this setup.
+
+`--out-dir` is a filesystem path; `fontBasePath` is the browser URL directory.
+For `--out-dir public/assets/fonts`, use `fontBasePath="/assets/fonts"`.
+Include any deployment base path in that URL when applicable.
+
+Set `fontPreload="heading"` to prioritize the heading font, or
+`fontPreload={false}` when no normal Latin face was generated for the selected
+role. See [local fonts and preloading](/docs/theme/theme-provider#local-fonts-and-preloading).
+
+## Caching and build integration
+
+The generated CSS includes a hash of the resolved Google Fonts stylesheet
+URLs and selected subsets. If that hash matches and all files referenced by
+the CSS exist, the CLI prints `Google Fonts are already up to date.` and
+skips network requests.
+
+Changing the family, requested weights/range, styles, display, or subsets
+invalidates the cache. Use `--force` to refresh unchanged configuration,
+for example to pick up upstream font updates. This is a presence/configuration
+check, not verification of the bytes of every existing file.
+
+Add a script to your application's existing manifest:
+
+```json title="package.json (scripts excerpt)"
+{
+  "scripts": {
+    "fonts:download": "puzzle-theme fonts download --subsets latin,latin-ext"
+  }
+}
+```
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm run fonts:download
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun run fonts:download
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm run fonts:download
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn run fonts:download
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+Run this before your development server or production build packages public
+assets. Explicitly chain it into your build or CI rather than assuming every
+package manager runs lifecycle hooks identically. Either commit the generated
+assets or regenerate them during a network-enabled build; deployed browsers
+need the generated files, not the CLI or configuration file.
+
+## Errors and troubleshooting
+
+Failures print an error and set exit code `1`. Treat a failed download as a
+failed build step rather than deploying incomplete assets.
+
+| Symptom | Check |
+| --- | --- |
+| Configuration cannot be read | Run from the application directory or pass an explicit `--config` path. |
+| JSON parsing or role error | Use valid JSON with at least one supported role and a non-empty `family`. |
+| Google Fonts HTTP error | Check network access, exact family name, and supported weight/style combinations. |
+| Missing subset error | Choose subsets available for every configured family, or omit filtering. |
+| Browser still requests Google Fonts | Set `fontSource="local"`; the default remains `"google"`. |
+| Local stylesheet or preload returns 404 | Deploy the output directory, align `fontBasePath`, and disable preloading if no normal Latin face exists. |
+| Fonts appear unchanged | Update the configuration used by both the CLI and `Theme`, rerun the download, and check browser/CDN caching. |

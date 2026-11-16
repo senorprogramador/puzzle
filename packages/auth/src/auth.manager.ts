@@ -12,6 +12,8 @@ import type {
   RateLimitProvider,
 } from "./providers/provider.types";
 
+import { PASSWORD_HASH_ALGORITHMS } from "./providers/provider.types";
+
 import type {
   AuthManager,
   AuthManagerOptions,
@@ -371,11 +373,11 @@ export class StorageAuthManager implements AuthManager {
 
       if (
         !result ||
-        result.algorithm !== "argon2id" ||
+        !PASSWORD_HASH_ALGORITHMS.includes(result.algorithm) ||
         typeof result.hash !== "string" ||
         result.hash.length === 0
       ) {
-        throw new Error("PasswordHasher returned an invalid Argon2id hash.");
+        throw new Error("PasswordHasher returned an invalid password hash.");
       }
 
       return result;

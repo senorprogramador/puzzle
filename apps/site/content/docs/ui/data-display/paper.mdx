@@ -1,9 +1,18 @@
 ---
-title: Paper
-description: Paper is a basic surface that lifts content off the page with a configurable elevation.
+title: React Paper Surface Component
+description: Add elevated surfaces to React layouts with Paper. Explore theme-based elevation, padding, and neutral containers without a card's content structure.
+faq:
+  - question: Does the React Paper component add padding?
+    answer: No. Paper has no built-in padding, so add spacing to the surface or its content to match your layout.
+  - question: When should I use Paper instead of Card?
+    answer: Use Paper for a neutral elevated surface without a predefined content structure. Use Card when you need structured header, content, and footer areas.
+  - question: Which elevation levels does Paper support?
+    answer: Paper supports elevation levels 1, 2, 3, 4, 6, 8, 12, 16, and 24. The default elevation is 1.
+  - question: How do I render Paper as a semantic element?
+    answer: Use the as prop to render an element such as section or aside. Paper adds no role on its own, so provide an accessible name when the surface represents a landmark.
 ---
 
-Use the Paper component as a neutral surface when you need an elevated container without the structure of a Card.
+Use the React Paper component as a neutral surface when you need an elevated container without the structure of a [Card](/docs/ui/data-display/card). It separates supporting content from the page using theme-based surface styling.
 
 <Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented public API is covered by tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
 

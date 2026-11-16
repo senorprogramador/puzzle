@@ -1,4 +1,5 @@
-import { mkdtemp, readFile, rm, mkdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
+import { mkdtemp, readFile, rm, mkdir, writeFile } from "node:fs/promises";
 
 import os from "node:os";
 import path from "node:path";
@@ -228,6 +229,69 @@ describe("createProject", () => {
       );
     },
   );
+
+  it("installs D1 storage and Cloudflare tooling for TanStack Start", async () => {
+    const projectDirectory = path.join(cwd, "edge-app");
+
+    const runner = vi.fn(async () => {
+      // Stand in for the TanStack Start generator on its first call.
+      if (existsSync(projectDirectory)) return;
+
+      await mkdir(path.join(projectDirectory, "src/routes"), {
+        recursive: true,
+      });
+      await writeFile(
+        path.join(projectDirectory, "package.json"),
+        JSON.stringify({ name: "generated", scripts: { dev: "vite dev" } }),
+        "utf8",
+      );
+      await writeFile(
+        path.join(projectDirectory, "vite.config.ts"),
+        "export default defineConfig({\n  plugins: [tanstackStart()],\n});\n",
+        "utf8",
+      );
+    });
+
+    await createProject(
+      {
+        name: "edge-app",
+        directory: "edge-app",
+        framework: "tanstack",
+        packageManager: "bun",
+        tailwind: false,
+        auth: true,
+        database: "d1",
+      },
+      {
+        cwd,
+        runner,
+      },
+    );
+
+    const options = { cwd: projectDirectory };
+
+    expect(runner).toHaveBeenCalledWith(
+      "bun",
+      expect.arrayContaining([
+        "@puzzle-ui/fullstack@latest",
+        "@puzzle-ui/storage-d1@latest",
+      ]),
+      options,
+    );
+    expect(runner).toHaveBeenCalledWith(
+      "bun",
+      ["add", "-D", "@cloudflare/vite-plugin@latest", "wrangler@latest"],
+      options,
+    );
+    expect(runner).toHaveBeenLastCalledWith("bun", ["run", "cf-typegen"], options);
+
+    const env = await readFile(path.join(projectDirectory, ".env"), "utf8");
+
+    expect(env).toContain('D1_DATABASE_NAME="edge-app-db"');
+    expect(
+      await readFile(path.join(projectDirectory, "wrangler.jsonc"), "utf8"),
+    ).toContain('"binding": "DB"');
+  });
 
   it("does not overwrite an existing project", async () => {
     const runner = vi.fn();

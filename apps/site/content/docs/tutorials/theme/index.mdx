@@ -1,0 +1,333 @@
+---
+title: Set Up a Theme with Local Fonts
+description: Configure a Puzzle theme, create puzzle-fonts.json, download Google Fonts with the CLI, and serve them locally in a React application.
+---
+
+## What you will build
+
+A reusable application theme with a built-in light/dark palette, customized
+tokens, Sora headings, and Inter body text. You will create `puzzle-fonts.json`,
+download the fonts with the Theme CLI, and serve them from your own application
+instead of requesting Google Fonts in the browser.
+
+The [Theme provider](/docs/theme/theme-provider) has a **Beta** API. This guide
+uses the provider, not the Experimental standalone `GoogleFont` component.
+Keep the [CLI reference](/docs/theme/cli) nearby for all options and errors.
+
+## Prerequisites
+
+- An existing TypeScript application with React and React DOM 19.
+- npm, Bun, pnpm, or Yarn. Choose one package manager throughout this guide.
+- Node.js 20.19 or newer when using the Node-based CLI.
+- A framework that serves `public/` at the site root, as Vite, Next.js, and
+  many other React frameworks do.
+- Network access to Google Fonts during the initial download.
+
+Paths below are relative to your application directory. In a monorepo, run
+the commands inside that application workspace.
+
+## Installation
+
+Install the theme package. It includes both the React provider and the
+`puzzle-theme` executable:
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/theme
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/theme
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/theme
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/theme
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+Keep your application's existing React installation. No separate font package
+or global CLI installation is required.
+
+## Configuration
+
+Create this file in a `theme/` directory at the application root. The CLI and
+React provider will read the same JSON, so changing a family in one place
+updates both configurations.
+
+```json title="theme/puzzle-fonts.json"
+{
+  "heading": {
+    "family": "Sora",
+    "weightRange": [300, 700],
+    "display": "swap",
+    "fallback": ["system-ui", "sans-serif"]
+  },
+  "body": {
+    "family": "Inter",
+    "weights": [400, 500, 700],
+    "display": "swap",
+    "fallback": ["system-ui", "sans-serif"]
+  }
+}
+```
+
+Sora's variable range covers Puzzle's default heading weights, including
+light display text. Inter includes regular body text, medium button text,
+and bold emphasis. `display: "swap"` keeps text visible while a font loads.
+The optional `accent` role is not needed here.
+
+Use valid JSON, with no comments or trailing commas. If TypeScript does not
+already allow JSON imports, enable `compilerOptions.resolveJsonModule` in
+your existing `tsconfig.json`. Keep the rest of your framework's settings.
+
+## Step-by-step implementation
+
+### 1. Download your fonts
+
+Run the CLI from your application root. Because the configuration lives in
+`theme/`, pass its path explicitly. The output path still resolves from the
+working directory, not from `theme/`.
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm exec -- puzzle-theme fonts download --config theme/puzzle-fonts.json --subsets latin,latin-ext
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bunx puzzle-theme fonts download --config theme/puzzle-fonts.json --subsets latin,latin-ext
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm exec puzzle-theme fonts download --config theme/puzzle-fonts.json --subsets latin,latin-ext
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn exec puzzle-theme fonts download --config theme/puzzle-fonts.json --subsets latin,latin-ext
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+This creates `public/fonts/puzzle-fonts.css`, hashed WOFF2 resources, and
+stable preload files including `puzzle-font-inter.woff2`. The generated CSS
+uses local relative URLs.
+
+This example keeps Latin and extended Latin characters. Omit `--subsets` to
+download all subsets returned by Google Fonts if your content needs other
+writing systems. Every selected subset must exist for every configured family.
+
+### 2. Create your application theme
+
+Import the same JSON and opt into local loading:
+
+```tsx title="theme/app-theme.tsx"
+import type { PropsWithChildren } from "react";
+import { Theme } from "@puzzle-ui/theme";
+import fonts from "./puzzle-fonts.json";
+
+export const AppTheme = ({ children }: PropsWithChildren) => (
+  <Theme
+    theme="system"
+    colorTheme="cobalt-sky"
+    fonts={fonts}
+    fontSource="local"
+    fontBasePath="/fonts"
+    tokens={{
+      radius: { md: "0.5rem" },
+    }}
+  >
+    {children}
+  </Theme>
+);
+```
+
+`theme="system"` follows the operating system's light/dark setting.
+`colorTheme` selects the palette; `tokens` adjusts specific design values.
+The default root scope applies tokens and Puzzle's global styles to the
+document.
+
+`fontSource="local"` links `/fonts/puzzle-fonts.css` rather than Google Fonts.
+The body font is preloaded by default. Keep Latin and the normal style when
+using this preload; otherwise set `fontPreload={false}`.
+
+### 3. Wrap the application once
+
+Place `AppTheme` around your application's content at its existing root.
+Use your framework's root/layout integration; do not create a second React
+root. The complete example below shows the wrapper and a small page without
+requiring `@puzzle-ui/ui`.
+
+### 4. Make downloads repeatable
+
+Merge this script into your existing `package.json`:
+
+```json title="package.json (scripts excerpt)"
+{
+  "scripts": {
+    "fonts:download": "puzzle-theme fonts download --config theme/puzzle-fonts.json --subsets latin,latin-ext"
+  }
+}
+```
+
+Run it whenever you change `puzzle-fonts.json`, and before building for deployment:
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm run fonts:download && npm run build
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun run fonts:download && bun run build
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm run fonts:download && pnpm run build
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn run fonts:download && yarn run build
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+These commands assume your application already has a `build` script. Keep
+its framework-specific implementation. Subsequent downloads skip network
+requests when configuration and referenced generated files are current.
+Append `--force` to the direct CLI command from step 1 to refresh unchanged fonts.
+
+## Complete working example
+
+With the configuration and wrapper above, your files should look like this:
+
+```text
+theme/
+  puzzle-fonts.json
+  app-theme.tsx
+  app.tsx
+public/fonts/
+  puzzle-fonts.css
+  puzzle-font-inter.woff2
+  puzzle-font-sora.woff2
+  font-<url-hash>.woff2
+```
+
+The generated directory contains multiple hashed files, not a literal
+`font-<url-hash>.woff2` filename.
+
+```tsx title="theme/app.tsx"
+import { AppTheme } from "./app-theme";
+
+export const App = () => (
+  <AppTheme>
+    <main>
+      <h1>A theme that feels like your product</h1>
+      <p>
+        Sora headings, Inter body text, and a palette that follows your system.
+      </p>
+      <button type="button">Continue</button>
+    </main>
+  </AppTheme>
+);
+```
+
+Render this `App` through your existing entry point or use `AppTheme` around
+your real routes. Puzzle UI components consume the same theme variables
+when you add them later.
+
+## Testing and verification
+
+1. Rerun the download command. It should report that fonts are already up
+   to date, unless configuration or generated files changed.
+2. Start your application's existing development server. Open
+   `/fonts/puzzle-fonts.css` directly and confirm it returns CSS, not an HTML
+   fallback page. Confirm the WOFF2 URLs referenced inside it also resolve.
+3. In browser developer tools, inspect the page's font requests. Fonts should
+   come from your application's `/fonts/` directory, with no requests to
+   `fonts.googleapis.com` or `fonts.gstatic.com` from this theme.
+4. Inspect the heading and paragraph's rendered fonts: Sora and Inter
+   respectively. Toggle your system color scheme and check that the palette
+   changes while the fonts remain the same.
+5. Build and preview the production application. Confirm the stylesheet and
+   preload URL `/fonts/puzzle-font-inter.woff2` still return successfully.
+
+The following optional server-render check verifies the wrapper's local
+stylesheet, preload, and theme mode. It does not replace checking real font
+files and rendered fonts in the browser.
+
+```tsx title="theme/verify.tsx"
+import assert from "node:assert/strict";
+import { renderToStaticMarkup } from "react-dom/server";
+import { App } from "./app";
+
+const html = renderToStaticMarkup(<App />);
+
+assert.ok(html.includes('href="/fonts/puzzle-fonts.css"'));
+assert.ok(html.includes('href="/fonts/puzzle-font-inter.woff2"'));
+assert.ok(html.includes('data-theme="system"'));
+assert.ok(!html.includes("fonts.googleapis.com"));
+assert.ok(!html.includes("fonts.gstatic.com"));
+```
+
+Commit the generated assets or ensure your build downloads them before
+packaging `public/`. An offline deployment needs these assets supplied in
+advance; local serving does not make the initial download offline.
+
+## Common mistakes and troubleshooting
+
+| Problem | Fix |
+| --- | --- |
+| The CLI cannot find configuration | Run from the application root and keep `--config theme/puzzle-fonts.json`. |
+| The CLI rejects JSON or font requests | Check JSON syntax, role names, Google Fonts family spelling, and supported weights/styles. |
+| A selected subset is missing | Use subsets supported by both fonts, or omit `--subsets` to keep all returned subsets. |
+| Google Fonts still loads remotely | Ensure the root provider has `fontSource="local"` and no other font loader requests Google Fonts. |
+| The stylesheet returns 404 | Deploy `public/fonts`; do not confuse a filesystem output directory with a public URL. |
+| Fonts live under a different URL | Match `fontBasePath` to that URL. For `public/assets/fonts`, use `"/assets/fonts"`. |
+| A preload fails after changing subsets/styles | Keep a normal Latin face for the preloaded role, choose another role, or disable `fontPreload`. |
+| TypeScript cannot import JSON | Enable `resolveJsonModule` in your application's TypeScript configuration. |
+
+## Next steps
+
+- Explore every [CLI option and caching behavior](/docs/theme/cli).
+- Choose another [color theme](/docs/theme/colors#built-in-color-themes).
+- Customize [design tokens](/docs/theme/tokens) and [typography roles](/docs/theme/typography#typography-roles).
+- Learn about [local scopes](/docs/theme/theme-provider#local-scope) and [font preloading](/docs/theme/theme-provider#local-fonts-and-preloading).

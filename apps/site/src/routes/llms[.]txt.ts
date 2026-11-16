@@ -69,6 +69,8 @@ const buildLlmsTxt = (): string => {
   const tutorials = [
     "/docs/tutorials/seo",
     "/docs/tutorials/auth",
+    "/docs/tutorials/auth-tanstack-start",
+    "/docs/tutorials/auth-nextjs",
     "/docs/tutorials/storage",
   ].map(getPage);
   const featuredUrls = new Set(

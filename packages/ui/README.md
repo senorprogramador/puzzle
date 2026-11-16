@@ -1,6 +1,8 @@
-# @puzzle-ui/ui
+# @puzzle-ui/ui — React UI component library
 
-Composable, token-driven React components for building React interfaces with Puzzle.
+Composable, token-driven React components with TypeScript APIs for building
+forms, responsive layouts, navigation, and overlays with Puzzle. Browse live
+component examples, props, and accessibility guidance in the documentation.
 
 **Documentation:** [https://puzzle-ui.com/docs/ui](https://puzzle-ui.com/docs/ui)
 

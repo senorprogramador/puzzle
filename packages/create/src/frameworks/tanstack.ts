@@ -1,27 +1,7 @@
-import type { FrameworkGenerator, PackageManager } from "../types";
+import type { FrameworkGenerator } from "../types";
 
 import { runCommand } from "../utils/execute";
-
-const getExecutor = (packageManager: PackageManager) => {
-  if (packageManager === "bun") {
-    return {
-      command: "bunx",
-      prefix: [],
-    };
-  }
-
-  if (packageManager === "pnpm" || packageManager === "yarn") {
-    return {
-      command: packageManager,
-      prefix: ["dlx"],
-    };
-  }
-
-  return {
-    command: "npx",
-    prefix: ["--yes"],
-  };
-};
+import { getPackageExecutor } from "../utils/package-executor";
 
 const createTanStackProject: FrameworkGenerator = async (
   directory,
@@ -43,7 +23,7 @@ const createTanStackProject: FrameworkGenerator = async (
     "--yes",
   ];
 
-  const executor = getExecutor(packageManager);
+  const executor = getPackageExecutor(packageManager);
 
   await runner(
     executor.command,

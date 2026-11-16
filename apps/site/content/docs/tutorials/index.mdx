@@ -1,6 +1,6 @@
 ---
 title: Practical Puzzle Tutorials
-description: Build a searchable publication, a persistent notebook, and a protected MFA-enabled application using verified Puzzle APIs.
+description: Set up a theme with local fonts, build a searchable publication, persist a notebook, and protect an MFA-enabled application using Puzzle APIs.
 ---
 
 Follow these task-oriented guides alongside the API references. Each guide
@@ -11,12 +11,16 @@ and deployment boundaries rather than another list of API methods.
 
 | Tutorial | What you will build | Prerequisites |
 | --- | --- | --- |
+| [Theme: setup and local fonts](/docs/tutorials/theme) | A customized light/dark theme, shared font configuration, and self-hosted Google Fonts downloaded with the CLI. | React 19; npm, Bun, pnpm, or Yarn. |
 | [SEO: a searchable publication](/docs/tutorials/seo) | Server-rendered home, article listing, and dynamic article pages with social metadata, a connected JSON-LD graph, and framework endpoints. | React 19; Bun for the standalone example. |
 | [Storage: a persistent notebook](/docs/tutorials/storage) | A database-neutral notebook with MongoDB persistence, conditional CRUD, a D1 alternative, and custom-adapter integration. | A MongoDB replica set; Cloudflare only for the D1 alternative. |
-| [Auth: registration to a protected dashboard](/docs/tutorials/auth) | Password registration/login, required TOTP enrollment, recovery-code challenges, policy-aware route protection, session rotation, and logout. | The Storage connection module; Bun; HTTPS. |
+| [Auth: registration to a protected dashboard](/docs/tutorials/auth) | Password registration/login, required TOTP enrollment, recovery-code challenges, policy-aware route protection, session rotation, and logout, with every record stored in MongoDB. Explains each concept for newcomers. | A MongoDB replica set; Bun; HTTPS. |
+| [Auth with TanStack Start](/docs/tutorials/auth-tanstack-start) | The same protected dashboard in a TanStack Start app: server routes, a server function guard, and MongoDB storage. | A MongoDB replica set; Node.js; HTTPS. |
+| [Auth with Next.js](/docs/tutorials/auth-nextjs) | The same protected dashboard in a Next.js App Router app: route handlers, a server component guard, and MongoDB storage. | A MongoDB replica set; Node.js; HTTPS. |
 
-For the combined application, follow **Storage, then Auth**. SEO is independent;
-use its private-page guidance for authenticated routes.
+Theme and SEO are independent. Each Auth guide sets up its own MongoDB storage
+adapter; the [Storage tutorial](/docs/tutorials/storage) goes deeper into
+adapters. Use SEO's private-page guidance for authenticated routes.
 
 ## API maturity
 
@@ -45,12 +49,16 @@ not extra metadata writers to install alongside the standalone server.
 
 The examples target TypeScript with strict checking and React 19. Bun is an
 explicit runtime choice for the standalone servers and Argon2id implementation,
-not a requirement of the Puzzle library contracts. Existing Next.js or TanStack
-applications can reuse the server modules through the adapters shown in the guides.
+not a requirement of the Puzzle library contracts. The TanStack Start and
+Next.js Auth guides run on Node.js and use `@node-rs/argon2` instead.
 
-The repository's `test:tutorials` check extracts the named TypeScript blocks,
+The repository's `test:tutorials` check extracts the named TypeScript blocks
+and their JSON configuration,
 checks imports against built package export maps, and typechecks them together.
-It also runs the pure SEO rendering assertions and notebook behavior checks.
+It also runs the Theme and SEO rendering assertions and notebook behavior checks.
+The framework Auth guides need Next.js or TanStack Start, so the check only
+validates their structure, links and file paths; verify them as complete apps
+with the end-to-end script each guide includes.
 Real database conformance and framework/deployment checks are distinguished
 from those example checks in each tutorial.
 
@@ -76,6 +84,8 @@ duplicate metadata/JSON-LD and stale route entities.
 
 ## API references
 
+- Theme: [provider](/docs/theme/theme-provider), [CLI](/docs/theme/cli),
+  [typography and fonts](/docs/theme/typography).
 - SEO: [overview](/docs/seo), [metadata](/docs/seo/metadata),
   [structured data](/docs/seo/structured-data), [frameworks](/docs/seo/frameworks).
 - Auth: [configuration](/docs/auth/configuration), [MFA](/docs/auth/mfa),

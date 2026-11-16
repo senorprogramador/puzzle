@@ -191,6 +191,8 @@ Do not use an in-memory adapter for production sessions, tokens, MFA factors, or
 
 Supply a secure password hashing implementation through the <code>PasswordHasher</code> interface.
 
+Use Argon2id where your runtime supports it. On Cloudflare Workers, use the included <code>Pbkdf2PasswordHasher</code> with a secret pepper; see [Auth configuration](/docs/auth/configuration#pbkdf2-for-cloudflare-workers).
+
 Do not store plaintext passwords. Do not replace the password hasher with a fast general-purpose hash such as SHA-256.
 
 ### Rate limiting

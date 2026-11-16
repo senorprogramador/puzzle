@@ -1,6 +1,13 @@
+export type PasswordHashAlgorithm = "argon2id" | "pbkdf2-sha256";
+
+export const PASSWORD_HASH_ALGORITHMS: readonly PasswordHashAlgorithm[] = [
+  "argon2id",
+  "pbkdf2-sha256",
+];
+
 export type PasswordHash = {
   readonly hash: string;
-  readonly algorithm: "argon2id";
+  readonly algorithm: PasswordHashAlgorithm;
   readonly parameters: Readonly<Record<string, number | string>>;
 };
 

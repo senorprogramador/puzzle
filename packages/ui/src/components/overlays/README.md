@@ -1,9 +1,13 @@
-# Overlay guidelines
+# React overlays: dialogs, drawers, popovers, and tooltips
 
-Puzzle provides several overlay components. Choose the component based on
+Puzzle provides React overlay components for modal dialogs, slide-out drawers,
+anchored popovers, and tooltips. Use this guide to choose between them based on
 interaction semantics rather than visual appearance.
 
-## Dialog
+See the [overlay component documentation](https://puzzle-ui.com/docs/ui#overlays)
+for live examples and TypeScript props.
+
+## Dialog: modal confirmations and forms
 
 Use Dialog for modal interactions that require the user's attention or input.
 
@@ -22,7 +26,7 @@ Dialogs should have:
 - Focus contained while open
 - Focus restored when closed
 
-## Drawer
+## Drawer: edge-attached modal panels
 
 Use Drawer for modal panels attached to a viewport edge.
 
@@ -35,7 +39,7 @@ Examples:
 
 Drawers must have an accessible name through `aria-label` or `aria-labelledby`.
 
-## Popover
+## Popover: interactive non-modal content
 
 Use Popover for interactive non-modal content anchored to a trigger.
 
@@ -48,7 +52,7 @@ Examples:
 
 Do not use Popover for modal workflows.
 
-## Popout
+## Popout: custom floating positioning
 
 Popout is a low-level floating positioning primitive.
 
@@ -61,7 +65,7 @@ Use it when implementing a component that needs:
 
 Prefer higher-level components when their semantics fit.
 
-## Tooltip
+## Tooltip: non-interactive hover and focus hints
 
 Use Tooltip only for short, supplementary, non-interactive information.
 

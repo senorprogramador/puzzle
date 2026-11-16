@@ -196,6 +196,7 @@ try {
 
   for (const path of [
     "/", "/docs/getting-started", "/docs/tutorials/seo", "/docs/tutorials/auth",
+    "/docs/tutorials/auth-tanstack-start", "/docs/tutorials/auth-nextjs",
     "/docs/tutorials/storage", "/docs/tutorials",
   ]) {
     const response = await page.goto(`${origin}${path}`);

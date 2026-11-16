@@ -1,17 +1,17 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, rm, writeFile } from "node:fs/promises";
 
 import path from "node:path";
 
-import type { Framework } from "../types";
+import {
+  getThemeTemplates,
+  obsoleteTemplatePaths,
+  type TemplateOptions,
+} from "./templates";
 
-import { themeTemplates } from "./templates";
-
-const configureTheme = async (
+const writeTemplates = async (
   directory: string,
-  framework: Framework,
-): Promise<void> => {
-  const templates = themeTemplates[framework];
-
+  templates: Record<string, string>,
+) => {
   await Promise.all(
     Object.entries(templates).map(async ([relativePath, content]) => {
       const filePath = path.join(directory, relativePath);
@@ -25,4 +25,20 @@ const configureTheme = async (
   );
 };
 
-export { configureTheme };
+const configureTheme = async (
+  directory: string,
+  options: TemplateOptions,
+): Promise<void> => {
+  await Promise.all(
+    (obsoleteTemplatePaths[options.framework] ?? []).map((relativePath) =>
+      rm(path.join(directory, relativePath), {
+        recursive: true,
+        force: true,
+      }),
+    ),
+  );
+
+  await writeTemplates(directory, getThemeTemplates(options));
+};
+
+export { configureTheme, writeTemplates };

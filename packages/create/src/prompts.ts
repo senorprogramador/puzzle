@@ -1,8 +1,8 @@
 import * as p from "@clack/prompts";
 
-import { FRAMEWORKS } from "./constants";
+import { AUTH_DATABASES, FRAMEWORKS, isFullStackFramework } from "./constants";
 
-import type { Framework, ProjectOptions } from "./types";
+import type { AuthDatabase, Framework, ProjectOptions } from "./types";
 
 import { toKebabCase } from "./utils/kebab-case";
 
@@ -64,6 +64,26 @@ const getProjectOptions = async (): Promise<ProjectOptions | null> => {
     return null;
   }
 
+  let database: AuthDatabase | undefined;
+
+  if (auth && isFullStackFramework(framework as Framework)) {
+    const selectedDatabase = await p.select({
+      message: "Which database should Puzzle Auth use?",
+      options: AUTH_DATABASES.map((item) => ({
+        value: item.value,
+        label: item.label,
+        hint: item.hint,
+      })),
+    });
+
+    if (p.isCancel(selectedDatabase)) {
+      p.cancel("Project creation cancelled.");
+      return null;
+    }
+
+    database = selectedDatabase as AuthDatabase;
+  }
+
   return {
     name: directory,
     directory,
@@ -71,6 +91,7 @@ const getProjectOptions = async (): Promise<ProjectOptions | null> => {
     packageManager: detectPackageManager(),
     tailwind,
     auth,
+    ...(database ? { database } : {}),
   };
 };
 

@@ -48,6 +48,8 @@ const headings = {
   h4: createHeading("h4", "headline4"),
 };
 
+export const DocsHeading2 = headings.h2;
+
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,

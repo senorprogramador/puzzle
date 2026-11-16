@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import type { Framework } from "../types";
+import { prependVitePlugin } from "../utils/vite-config";
 
 const readIfExists = async (filePath: string) => {
   try {
@@ -129,10 +130,7 @@ const configureTanStackTailwind = async (directory: string) => {
   }
 
   if (!viteConfig.includes("tailwindcss()")) {
-    viteConfig = viteConfig.replace(
-      /plugins:\s*\[/,
-      "plugins: [\n    tailwindcss(),",
-    );
+    viteConfig = prependVitePlugin(viteConfig, "tailwindcss()");
   }
 
   if (!viteConfig.includes("noExternal")) {
@@ -148,9 +146,7 @@ const configureTanStackTailwind = async (directory: string) => {
   await writeFile(viteConfigPath, viteConfig, "utf8");
 };
 
-const configureReactTailwind = async (directory: string) => {
-  const cssPath = path.join(directory, "src", "index.css");
-
+const configureViteTailwind = async (directory: string, cssPath: string) => {
   await prependCssImport(cssPath);
 
   const viteConfigPath = path.join(directory, "vite.config.ts");
@@ -162,10 +158,7 @@ const configureReactTailwind = async (directory: string) => {
   }
 
   if (!viteConfig.includes("tailwindcss()")) {
-    viteConfig = viteConfig.replace(
-      /plugins:\s*\[/,
-      "plugins: [\n    tailwindcss(),",
-    );
+    viteConfig = prependVitePlugin(viteConfig, "tailwindcss()");
   }
 
   await writeFile(viteConfigPath, viteConfig, "utf8");
@@ -182,7 +175,12 @@ const configureTailwind = async (directory: string, framework: Framework) => {
     return;
   }
 
-  await configureReactTailwind(directory);
+  if (framework === "react-router") {
+    await configureViteTailwind(directory, path.join(directory, "app", "app.css"));
+    return;
+  }
+
+  await configureViteTailwind(directory, path.join(directory, "src", "index.css"));
 };
 
 export { configureTailwind };

@@ -32,6 +32,11 @@ export const theme: TreeViewItem = {
       href: `${folder}/typography`,
     },
     {
+      id: "theme-cli",
+      label: "CLI",
+      href: `${folder}/cli`,
+    },
+    {
       id: "theme-breakpoints",
       label: "Breakpoints",
       href: `${folder}/breakpoints`,

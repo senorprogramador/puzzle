@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import {
   LDBreadcrumbList,
+  LDFaqPage,
   LDWebPage,
   Schema,
   type SchemaValue,
@@ -21,6 +22,14 @@ import {
 } from "@/lib/seo";
 
 import { docs, source } from "@/lib/source";
+
+import {
+  createFaqMainEntity,
+  FAQ_SECTION_ID,
+  FAQ_SECTION_TITLE,
+} from "@/lib/faq";
+
+import { DocsFaq } from "@/components/docs-faq";
 
 import {
   DocsBody,
@@ -205,6 +214,14 @@ function Content({ path }: { path: string }) {
 
   const breadcrumbs = getBreadcrumbItems(canonical, page.title);
 
+  const faq = sourcePage.data.faq;
+
+  const mdxComponents = useMDXComponents();
+
+  const pageToc = faq
+    ? [...toc, { title: FAQ_SECTION_TITLE, url: `#${FAQ_SECTION_ID}`, depth: 2 }]
+    : toc;
+
   return (
     <>
       <LDWebPage
@@ -256,13 +273,27 @@ function Content({ path }: { path: string }) {
         itemListElement={breadcrumbs}
       />
 
-      <DocsPage toc={toc}>
+      {faq ? (
+        <LDFaqPage
+          id={`${canonical}#${FAQ_SECTION_ID}`}
+          name={`${page.title}: ${FAQ_SECTION_TITLE}`}
+          url={canonical}
+          inLanguage="en-US"
+          isPartOf={{
+            "@id": `${canonical}#webpage`,
+          }}
+          mainEntity={createFaqMainEntity(canonical, faq)}
+        />
+      ) : null}
+
+      <DocsPage toc={pageToc}>
         <DocsTitle>{page.title}</DocsTitle>
 
         <DocsDescription>{page.description}</DocsDescription>
 
         <DocsBody>
-          <MDX components={useMDXComponents()} />
+          <MDX components={mdxComponents} />
+          {faq ? <DocsFaq faq={faq} /> : null}
         </DocsBody>
       </DocsPage>
     </>

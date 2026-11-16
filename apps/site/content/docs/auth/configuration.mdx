@@ -28,7 +28,27 @@ const auth = new StorageAuthManager(
 await auth.initialize();
 ```
 
-Use a production-quality Argon2id implementation for `PasswordHasher`. `AuthManager` validates the stored password hash algorithm as `argon2id`; this package does not provide a password-hashing implementation. The session manager comes from `@puzzle-ui/session` and must use secure, persistent storage in production.
+Use a production-quality Argon2id implementation for `PasswordHasher` where your runtime supports it, such as `@node-rs/argon2` on Node.js or `Bun.password`. `AuthManager` accepts `argon2id` and `pbkdf2-sha256` hashes. The session manager comes from `@puzzle-ui/session` and must use secure, persistent storage in production.
+
+### PBKDF2 for Cloudflare Workers
+
+Workers cannot run native Argon2, and pure JavaScript Argon2id exceeds the Free plan's CPU limit. `Pbkdf2PasswordHasher` uses the built-in WebCrypto PBKDF2-SHA256 instead. Workers cap PBKDF2 at 100,000 iterations, below the OWASP recommendation of 600,000, so the hasher requires a secret pepper: the password is keyed with HMAC-SHA256 before derivation, which makes hashes from a leaked database useless without the pepper.
+
+```ts
+import { Pbkdf2PasswordHasher } from "@puzzle-ui/auth";
+
+const passwordHasher = new Pbkdf2PasswordHasher({
+  // 32 random bytes from a Worker secret, never from the database.
+  pepper: hexToBytes(env.AUTH_PASSWORD_PEPPER_HEX),
+});
+```
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `pepper` | `Uint8Array` | Required | Secret of at least 32 bytes. Changing it makes every stored password stop verifying. |
+| `iterations` | `number` | `100000` | PBKDF2 iterations; at least 100,000. Raise it where your runtime allows; `needsRehash` reports hashes with fewer iterations. |
+
+Prefer Argon2id when your runtime supports it.
 
 `initialize()` registers the auth collections and initializes the optional MFA gateway before the manager can be used. Initialize related managers, including the step-up manager, before exposing their endpoints. If a storage-backed rate limiter uses a custom collection name, initialize that provider as well.
 

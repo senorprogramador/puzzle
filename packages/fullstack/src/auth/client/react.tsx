@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type FormEvent,
   type ReactNode,
 } from "react";
@@ -71,6 +72,7 @@ export type RequiredMfaEnrollmentProps = {
 
 const RequiredMfaEnrollment = ({ className }: RequiredMfaEnrollmentProps) => {
   const { client, snapshot, messages, refresh } = useAuth();
+  const passkeySupported = usePasskeySupport(client);
 
   const [enrollment, setEnrollment] = useState<AuthClientTotpEnrollment | null>(
     null,
@@ -208,7 +210,7 @@ const RequiredMfaEnrollment = ({ className }: RequiredMfaEnrollmentProps) => {
             {messages.addTotp}
           </Button>
 
-          {client.isPasskeySupported() && (
+          {passkeySupported && (
             <Button
               variant="outline"
               disabled={loading}
@@ -494,6 +496,17 @@ const AuthProvider = ({
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+const subscribeToPasskeySupport = () => () => {};
+
+// Passkey support is only known in the browser. The server snapshot keeps the
+// first client render identical to the server HTML, so hydration does not fail.
+const usePasskeySupport = (client: AuthClient): boolean =>
+  useSyncExternalStore(
+    subscribeToPasskeySupport,
+    () => client.isPasskeySupported(),
+    () => false,
+  );
 
 const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
@@ -885,6 +898,7 @@ const SignInForm = ({
   onSignUp,
 }: SignInFormProps) => {
   const { signIn, signInWithPasskey, messages, client } = useAuth();
+  const passkeySupported = usePasskeySupport(client);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -989,7 +1003,7 @@ const SignInForm = ({
         </Button>
       </form>
 
-      {client.isPasskeySupported() && (
+      {passkeySupported && (
         <Button
           variant="outline"
           fullWidth
@@ -1177,6 +1191,7 @@ const MfaChallengeForm = ({
     client,
     messages,
   } = useAuth();
+  const passkeySupported = usePasskeySupport(client);
 
   const [code, setCode] = useState("");
   const [recoveryMode, setRecoveryMode] = useState(false);
@@ -1286,7 +1301,7 @@ const MfaChallengeForm = ({
         )}
 
         {availableFactors?.includes("passkey") &&
-          client.isPasskeySupported() && (
+          passkeySupported && (
             <Button
               variant="outline"
               fullWidth
@@ -1387,6 +1402,7 @@ export type MfaSettingsProps = {
 
 const MfaSettings = ({ className }: MfaSettingsProps) => {
   const { client, messages } = useAuth();
+  const passkeySupported = usePasskeySupport(client);
 
   const [factors, setFactors] = useState<Awaited<
     ReturnType<AuthClient["listMfaFactors"]>
@@ -1592,7 +1608,7 @@ const MfaSettings = ({ className }: MfaSettingsProps) => {
             {messages.addTotp}
           </Button>
 
-          {client.isPasskeySupported() && (
+          {passkeySupported && (
             <Button
               variant="outline"
               disabled={loading || !password}

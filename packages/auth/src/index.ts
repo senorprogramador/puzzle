@@ -90,11 +90,19 @@ export type {
 
 export type {
   PasswordHash,
+  PasswordHashAlgorithm,
   PasswordHasher,
   EmailMessage,
   EmailProvider,
   RateLimitProvider,
 } from "./providers/provider.types";
+
+export { PASSWORD_HASH_ALGORITHMS } from "./providers/provider.types";
+
+export {
+  Pbkdf2PasswordHasher,
+  type Pbkdf2PasswordHasherOptions,
+} from "./providers/pbkdf2-password-hasher";
 
 export type {
   ProtectedAuthSecret,

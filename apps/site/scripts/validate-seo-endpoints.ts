@@ -54,6 +54,7 @@ const decodeHtml = (value: string) =>
     .replaceAll("&amp;", "&")
     .replaceAll("&quot;", '"')
     .replaceAll("&#39;", "'")
+    .replaceAll("&#x27;", "'")
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">");
 
@@ -250,6 +251,42 @@ const getPageResult = async (
         for (const relation of ["author", "publisher"]) {
           if (getReferenceIds(article[relation]).length === 0) {
             failures.push(`${canonicalUrl}: TechArticle has no ${relation} reference`);
+          }
+        }
+      }
+
+      const entityById = new Map(
+        entities.flatMap((entity) =>
+          typeof entity["@id"] === "string" ? [[entity["@id"], entity] as const] : [],
+        ),
+      );
+      const visibleText = decodeHtml(
+        html
+          .replace(/<script\b[\s\S]*?<\/script>/gi, " ")
+          .replace(/<[^>]+>/g, " "),
+      ).replace(/\s+/g, " ");
+      const isVisible = (value: unknown) =>
+        typeof value === "string" &&
+        visibleText.includes(value.replace(/\s+/g, " "));
+
+      for (const faqPage of entities.filter((entity) =>
+        getTypes(entity).includes("FAQPage"),
+      )) {
+        const questionIds = getReferenceIds(faqPage.mainEntity);
+        if (questionIds.length === 0) {
+          failures.push(`${canonicalUrl}: FAQPage has no questions`);
+        }
+
+        for (const questionId of questionIds) {
+          const question = entityById.get(questionId);
+          const answer = entityById.get(
+            getReferenceIds(question?.acceptedAnswer)[0] ?? "",
+          );
+          if (!questionId.startsWith(`${canonicalUrl}#`)) {
+            failures.push(`${canonicalUrl}: FAQ question ${questionId} is not page-scoped`);
+          }
+          if (!isVisible(question?.name) || !isVisible(answer?.text)) {
+            failures.push(`${canonicalUrl}: FAQ ${questionId} is not visible on the page`);
           }
         }
       }

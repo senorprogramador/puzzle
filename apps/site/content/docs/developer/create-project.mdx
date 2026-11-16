@@ -5,7 +5,7 @@ description: Scaffold a React application with Puzzle UI, Theme, optional Tailwi
 
 The <code>@puzzle-ui/create</code> package creates a new React application with Puzzle UI installed and configured.
 
-It supports Next.js, TanStack Start, and a basic React + Vite application.
+It supports Next.js, TanStack Start, React Router, and a basic React + Vite application.
 
 ## Requirements
 
@@ -43,7 +43,7 @@ Yarn's <code>dlx</code> command requires Yarn 2 or later. With Yarn Classic, use
 
 ## Interactive setup
 
-The generator asks for four options.
+The generator asks for up to five options.
 
 ### Project name
 
@@ -55,9 +55,10 @@ Enter a project name. The generator converts it to kebab-case and uses it for th
 | -------------- | ---------------------------------- |
 | Next.js        | Next.js App Router with TypeScript |
 | TanStack Start | Full-stack React application       |
+| React Router   | React Router in framework mode     |
 | Basic React    | React, Vite, and TypeScript        |
 
-Next.js and TanStack Start projects are generated using their official CLI tools. The Basic React template is generated directly by Puzzle.
+Next.js, TanStack Start, and React Router projects are generated using their official CLI tools. The Basic React template is generated directly by Puzzle.
 
 ### Tailwind CSS
 
@@ -75,37 +76,48 @@ When enabled, the generator installs:
 - <code>@puzzle-ui/fullstack</code>
 - <code>@puzzle-ui/session</code>
 
-For Next.js and TanStack Start, it also creates:
+For Next.js, TanStack Start, and React Router, it also creates:
 
 - An application-level <code>AuthProvider</code>.
-- A sign-in page.
-- A sign-up page.
+- Sign-in and sign-up pages.
+- A protected <code>/dashboard</code> route that redirects to sign-in without a session.
 - A framework-specific authentication API route.
-- A server-only AuthServer registration module.
-- An application bootstrap function.
+- Server-only modules that create the <code>AuthServer</code> and its database adapter.
+- A <code>.env</code> file with the database settings and generated secrets.
 
 For Basic React, it creates the AuthProvider and sign-in/sign-up components. A Basic React application has no server runtime, so its authentication API must be hosted separately.
 
-<Callout type="warn" title="Complete server configuration is required">
-  Puzzle Auth requires application-specific security dependencies. The generator
-  does not create an insecure password hasher, fake storage adapter, or
-  process-local production rate limiter. The generated API route returns HTTP
-  503 until you register a real AuthServer.
+### Database
+
+Full-stack projects with Auth ask which database to use:
+
+| Database      | Setup                                                                                                   |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| MongoDB       | Uses <code>@puzzle-ui/storage-mongodb</code> and a <code>docker-compose.yml</code> replica set for local development. |
+| Cloudflare D1 | Uses <code>@puzzle-ui/storage-d1</code>, a <code>wrangler.jsonc</code> D1 binding, and the Cloudflare runtime for local development and deploys. |
+| Custom        | Leaves a placeholder storage adapter for you to implement.                                              |
+
+With MongoDB or D1, authentication works immediately after <code>dev</code> starts. See [Create](/docs/create#puzzle-auth) for the generated files and deployment notes.
+
+<Callout type="warn" title="Review before production">
+  The generated <code>.env</code> contains local preview values. Set real
+  secrets, database settings, and <code>APP_ORIGIN</code> in your deployment
+  environment, and configure the trusted client IP header for your host.
 </Callout>
 
-See [Authentication Setup](/docs/developer/authentication) for the required server configuration.
+See [Authentication Setup](/docs/developer/authentication) for the full server configuration.
 
 ## What gets configured
 
 After framework generation, the CLI:
 
 1. Configures framework package transpilation.
-2. Adds the Puzzle theme provider.
-3. Creates a starter page using the Puzzle UI package.
+2. Adds the Puzzle theme provider and maps Puzzle <code>Link</code> (and <code>Image</code> for Next.js) to the framework's components.
+3. Creates a starter page that links to the documentation of the installed Puzzle packages.
 4. Sets the generated package name.
-5. Optionally configures and installs Tailwind CSS.
-6. Optionally creates the Puzzle Auth client and server integration files.
-7. Installs the selected Puzzle packages.
+5. Optionally creates the Puzzle Auth routes, server modules, database setup, and <code>.env</code>.
+6. Optionally configures and installs Tailwind CSS.
+7. Installs the selected Puzzle and database packages.
 
 The target directory must not already exist. The generator never overwrites an existing project.
 
@@ -124,6 +136,8 @@ Use the package manager selected during setup. For example:
 cd my-dashboard
 bun run dev
 ```
+
+If you chose Auth with MongoDB, start the database first with <code>docker compose up -d --wait</code>.
 
 ## Manual installation
 
@@ -175,9 +189,7 @@ Run the failed installation command manually from the generated project director
 
 ### Authentication returns HTTP 503
 
-The server bootstrap is intentionally incomplete. Configure the storage adapter, password hasher, rate limiter, session manager, MFA manager, step-up manager, cookies, CSRF policy, and trusted client IP resolver.
-
-Register the resulting <code>AuthServer</code> with <code>configureAuthServer</code>.
+The server could not create the <code>AuthServer</code>; the server log shows the cause. Check that the <code>.env</code> values are present and that the database is reachable. With MongoDB, run <code>docker compose up -d --wait</code>. With a custom database, return your storage adapter from the generated database module.
 
 ### Tailwind styles are missing
 

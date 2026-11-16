@@ -141,3 +141,73 @@ describe("D1 migration-specific conformance", () => {
     });
   });
 });
+
+describe("D1 date fields", () => {
+  type Window = {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    revision: number;
+    resetAt: Date;
+    history: { at: Date }[];
+  };
+
+  const COLLECTION = "date_windows";
+
+  const createAdapter = async () => {
+    await storageDatabase
+      .prepare('DROP TABLE IF EXISTS "puzzle_date_windows"')
+      .run();
+
+    const adapter = new D1StorageAdapter({
+      database: storageDatabase,
+      tablePrefix: "puzzle_",
+    });
+
+    await adapter.registerCollection<Window>({
+      name: COLLECTION,
+      indexes: [{ name: "reset", fields: ["resetAt"] }],
+    });
+
+    return adapter;
+  };
+
+  it("round-trips dates through insert, update and queries", async () => {
+    const adapter = await createAdapter();
+    const early = new Date("2026-01-01T00:00:00.000Z");
+    const late = new Date("2026-06-01T00:00:00.000Z");
+
+    await adapter.insert<Window>(COLLECTION, {
+      id: "early",
+      resetAt: early,
+      history: [{ at: early }],
+    } as unknown as Window);
+    await adapter.insert<Window>(COLLECTION, {
+      id: "late",
+      resetAt: late,
+      history: [],
+    } as unknown as Window);
+
+    const stored = await adapter.findById<Window>(COLLECTION, "early");
+    expect(stored?.resetAt).toBeInstanceOf(Date);
+    expect(stored?.resetAt.getTime()).toBe(early.getTime());
+    expect(stored?.history[0]?.at).toBeInstanceOf(Date);
+
+    const updated = await adapter.update<Window>(COLLECTION, "early", {
+      resetAt: late,
+    });
+    expect(updated?.resetAt).toBeInstanceOf(Date);
+    expect(updated?.resetAt.getTime()).toBe(late.getTime());
+
+    const matches = await adapter.findMany<Window>(COLLECTION, {
+      where: { resetAt: { operator: "lt", value: new Date("2026-07-01") } },
+      orderBy: [{ field: "resetAt", direction: "asc" }],
+    });
+    expect(matches.map((item) => item.id)).toEqual(["early", "late"]);
+
+    const exact = await adapter.findOne<Window>(COLLECTION, {
+      where: { resetAt: { operator: "eq", value: late } },
+    });
+    expect(exact?.id).toBe("early");
+  });
+});

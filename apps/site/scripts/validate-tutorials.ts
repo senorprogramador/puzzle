@@ -11,6 +11,8 @@ const docs = join(site, "content/docs");
 const work = await mkdtemp(join(site, ".tutorial-check-"));
 const routes = new Map<string, string>();
 const navigation = new Set<string>();
+const frameworkGuides = new Set(["/docs/tutorials/auth-tanstack-start", "/docs/tutorials/auth-nextjs"]);
+let frameworkExamples = 0;
 
 const visit = (nodes: typeof items) => {
   for (const item of nodes) {
@@ -73,6 +75,35 @@ try {
       }
     }
     const fences = [...content.matchAll(/^```(tsx?)\b([^\n]*)\n([\s\S]*?)^```/gm)];
+    if (frameworkGuides.has(route)) {
+      // Framework apps need Next.js/TanStack Start and native dependencies that
+      // this check does not install; they are verified as complete apps instead.
+      const names = new Set<string>();
+      for (const fence of content.matchAll(/^```json\s+title="([^"]+\.json)"\n([\s\S]*?)^```/gm)) {
+        JSON.parse(fence[2]!);
+        names.add(fence[1]!);
+      }
+      for (const fence of fences) {
+        const name = fence[2]!.match(/title="([^"]+)"/)?.[1];
+        assert.ok(name, `${route} has an unnamed TypeScript example`);
+        assert.ok(!name.startsWith("/") && !name.split("/").includes(".."),
+          `${route} example paths must be application-relative: ${name}`);
+        assert.ok(!names.has(name), `${route} has a duplicate example path ${name}`);
+        names.add(name);
+      }
+      frameworkExamples += fences.length;
+      continue;
+    }
+    for (const fence of content.matchAll(/^```json\s+title="([^"]+\.json)"\n([\s\S]*?)^```/gm)) {
+      const name = fence[1]!;
+      const target = resolve(work, name);
+      assert.ok(relative(work, target).startsWith(`${route.split("/").at(-1)}/`),
+        `Configuration path must remain in its tutorial directory: ${name}`);
+      assert.ok(!await Bun.file(target).exists(), `Duplicate configuration path ${name}`);
+      JSON.parse(fence[2]!);
+      await mkdir(dirname(target), { recursive: true });
+      await writeFile(target, fence[2]!);
+    }
     for (const fence of fences) {
       const name = fence[2]!.match(/title="([^"]+)"/)?.[1];
       assert.ok(name, `${route} has an unnamed TypeScript example`);
@@ -85,7 +116,7 @@ try {
       count++;
     }
   }
-  assert.equal(titles.size, 4, "All four tutorial pages must be checked");
+  assert.equal(titles.size, 7, "All seven tutorial pages must be checked");
 
   const dependencies = new Map<string, string>([
     ["react", site], ["react-dom", site], ["@types", site],
@@ -138,12 +169,13 @@ try {
       target: "ES2022", module: "ESNext", moduleResolution: "bundler",
       lib: ["ESNext", "DOM", "DOM.Iterable"], jsx: "react-jsx",
       strict: true, noUncheckedIndexedAccess: true, skipLibCheck: true,
-      noEmit: true, types: ["bun", "node", "react", "react-dom"],
+      noEmit: true, resolveJsonModule: true, types: ["bun", "node", "react", "react-dom"],
     },
     include: ["**/*.ts", "**/*.tsx"],
   };
   await writeFile(join(work, "tsconfig.json"), JSON.stringify(config, null, 2));
   await run([join(site, "node_modules/.bin/tsc"), "--project", join(work, "tsconfig.json")]);
+  await run([process.execPath, "run", "theme/verify.tsx"]);
   await run([process.execPath, "run", "seo/verify.ts"]);
   await run([process.execPath, "build", "./auth/client.tsx", "--target", "browser",
     "--outdir", "./public"]);
@@ -192,7 +224,8 @@ try {
     }
     console.log("Built tutorial HTTP routes, metadata, structured data, sitemap and llms.txt verified.");
   }
-  console.log(`Verified ${count} TypeScript examples, four tutorial routes, metadata, navigation, and reference links.`);
+  console.log(`Verified ${count} TypeScript examples, seven tutorial routes, metadata, navigation, and reference links.`);
+  console.log(`Checked ${frameworkExamples} framework guide examples for structure only; verify them in a TanStack Start or Next.js app.`);
 } finally {
   await rm(work, { recursive: true, force: true });
 }

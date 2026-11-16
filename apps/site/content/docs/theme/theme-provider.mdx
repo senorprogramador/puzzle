@@ -84,6 +84,12 @@ When `fonts` are provided, `Theme` renders preconnect links for Google Fonts plu
 
 ### Local fonts and preloading
 
+First generate the local assets using the [Theme CLI](/docs/theme/cli).
+The default output is `public/fonts/puzzle-fonts.css` plus WOFF2 files;
+serve this directory at `/fonts`, or set `fontBasePath` to its public URL.
+Keep the `fonts` prop synchronized with the CLI configuration. For a complete
+setup, follow the [local fonts tutorial](/docs/tutorials/theme).
+
 For local fonts, Puzzle can automatically preload one font file. The default is the `body` role.
 
 ```tsx

@@ -42,12 +42,39 @@ type CursorPayload = {
 
 const DATE_MARKER = "__puzzle_storage_date__";
 
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+  if (typeof value !== "object" || value === null) return false;
+
+  const prototype = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+};
+
+// JSON.stringify calls Date#toJSON before a replacer runs, so dates are encoded up front.
+const encodeDates = (value: unknown): unknown => {
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) {
+      throw new StorageValidationError("Cannot store an invalid date.");
+    }
+
+    return { [DATE_MARKER]: value.toISOString() };
+  }
+
+  if (Array.isArray(value)) return value.map(encodeDates);
+
+  if (isPlainObject(value)) {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, current]) => [
+        key,
+        encodeDates(current),
+      ]),
+    );
+  }
+
+  return value;
+};
+
 const serialize = (value: unknown): string =>
-  JSON.stringify(value, (_key, current: unknown) =>
-    current instanceof Date
-      ? { [DATE_MARKER]: current.toISOString() }
-      : current,
-  );
+  JSON.stringify(encodeDates(value));
 
 const deserialize = <T>(value: string): T =>
   JSON.parse(value, (_key, current: unknown) => {
@@ -102,7 +129,10 @@ const sqlField = (field: string): string => {
   if (field === "updatedAt") return "updated_at";
   if (field === "revision") return "revision";
 
-  return `json_extract(data, '${jsonPath(field)}')`;
+  const path = jsonPath(field);
+
+  // Dates are stored as marked objects; compare and index them by their ISO string.
+  return `COALESCE(json_extract(data, '${path}."${DATE_MARKER}"'), json_extract(data, '${path}'))`;
 };
 
 const sqlValue = (value: unknown): unknown =>

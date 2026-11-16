@@ -12,7 +12,13 @@ import { configureAuth } from "./auth/configure-auth";
 import { runCommand } from "./utils/execute";
 import { validateProjectDirectory } from "./utils/validate-project";
 
-import { PUZZLE_PACKAGES, PUZZLE_AUTH_PACKAGES } from "./constants";
+import {
+  AUTH_DATABASE_PACKAGES,
+  D1_FRAMEWORK_PACKAGES,
+  isFullStackFramework,
+  PUZZLE_AUTH_PACKAGES,
+  PUZZLE_PACKAGES,
+} from "./constants";
 
 import { configureTailwind } from "./tailwind/configure-tailwind";
 import { installTailwind } from "./tailwind/install-tailwind";
@@ -22,20 +28,71 @@ type CreateProjectContext = {
   runner?: CommandRunner;
 };
 
+const getAuthDatabase = (options: ProjectOptions) =>
+  options.auth && isFullStackFramework(options.framework)
+    ? (options.database ?? "custom")
+    : undefined;
+
+const getDependencies = (options: ProjectOptions) => {
+  const database = getAuthDatabase(options);
+  const cloudflare =
+    database === "d1" && isFullStackFramework(options.framework)
+      ? D1_FRAMEWORK_PACKAGES[options.framework]
+      : undefined;
+
+  return {
+    dependencies: [
+      ...PUZZLE_PACKAGES,
+      ...(options.auth ? PUZZLE_AUTH_PACKAGES : []),
+      ...(database ? AUTH_DATABASE_PACKAGES[database] : []),
+      ...(cloudflare?.dependencies ?? []),
+    ],
+    devDependencies: [...(cloudflare?.devDependencies ?? [])],
+  };
+};
+
 const installDependencies = async (
   directory: string,
-  packageManager: ProjectOptions["packageManager"],
-  auth: boolean,
+  options: ProjectOptions,
   runner: CommandRunner,
 ) => {
-  const packages = [...PUZZLE_PACKAGES, ...(auth ? PUZZLE_AUTH_PACKAGES : [])];
+  const { packageManager } = options;
+  const { dependencies, devDependencies } = getDependencies(options);
 
   const args =
-    packageManager === "npm" ? ["install", ...packages] : ["add", ...packages];
+    packageManager === "npm"
+      ? ["install", ...dependencies]
+      : ["add", ...dependencies];
 
   await runner(packageManager, args, {
     cwd: directory,
   });
+
+  if (devDependencies.length > 0) {
+    const devArgs =
+      packageManager === "npm"
+        ? ["install", "--save-dev", ...devDependencies]
+        : packageManager === "yarn"
+          ? ["add", "--dev", ...devDependencies]
+          : ["add", "-D", ...devDependencies];
+
+    await runner(packageManager, devArgs, {
+      cwd: directory,
+    });
+  }
+};
+
+const getNextSteps = (
+  options: ProjectOptions,
+  relativeDirectory: string,
+) => {
+  const database = getAuthDatabase(options);
+
+  return [
+    `cd ${relativeDirectory}`,
+    ...(database === "mongodb" ? ["docker compose up -d --wait"] : []),
+    `${options.packageManager} run dev`,
+  ];
 };
 
 const configureProjectName = async (directory: string, projectName: string) => {
@@ -102,13 +159,24 @@ const createProject = async (
 
     startStep("Configuring framework");
 
-    await configureFramework(targetDirectory, options.framework, options.auth);
+    const database = getAuthDatabase(options);
+
+    await configureFramework(
+      targetDirectory,
+      options.framework,
+      options.auth,
+      database,
+    );
 
     finishStep("Framework configured");
 
     startStep("Configuring Puzzle theme");
 
-    await configureTheme(targetDirectory, options.framework);
+    await configureTheme(targetDirectory, {
+      framework: options.framework,
+      auth: options.auth,
+      database,
+    });
     await configureProjectName(targetDirectory, projectName);
 
     finishStep("Puzzle theme configured");
@@ -116,7 +184,12 @@ const createProject = async (
     if (options.auth) {
       startStep("Configuring Puzzle Auth");
 
-      await configureAuth(targetDirectory, options.framework);
+      await configureAuth(targetDirectory, {
+        framework: options.framework,
+        database,
+        projectName,
+        packageManager: options.packageManager,
+      });
 
       finishStep("Puzzle Auth configured");
     }
@@ -142,14 +215,19 @@ const createProject = async (
 
     startStep("Installing Puzzle");
 
-    await installDependencies(
-      targetDirectory,
-      options.packageManager,
-      options.auth,
-      runner,
-    );
+    await installDependencies(targetDirectory, options, runner);
 
     finishStep(options.auth ? "Puzzle and Auth installed" : "Puzzle installed");
+
+    if (database === "d1") {
+      startStep("Generating Cloudflare types");
+
+      await runner(options.packageManager, ["run", "cf-typegen"], {
+        cwd: targetDirectory,
+      });
+
+      finishStep("Cloudflare types generated");
+    }
   } catch (error) {
     if (spinnerActive) {
       spinner.error("Project creation failed");
@@ -160,9 +238,18 @@ const createProject = async (
 
   p.log.success(`Project "${projectName}" created successfully.`);
 
-  p.outro(
-    `Next steps:\n\n  cd ${path.relative(cwd, targetDirectory) || "."}\n  ${options.packageManager} run dev`,
+  if (options.auth && isFullStackFramework(options.framework)) {
+    p.log.info(
+      "Puzzle Auth settings were written to .env. Open /dashboard to try the protected route.",
+    );
+  }
+
+  const steps = getNextSteps(
+    options,
+    path.relative(cwd, targetDirectory) || ".",
   );
+
+  p.outro(`Next steps:\n\n${steps.map((step) => `  ${step}`).join("\n")}`);
 };
 
 export { createProject, type CreateProjectContext };

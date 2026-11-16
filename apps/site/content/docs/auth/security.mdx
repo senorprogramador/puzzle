@@ -9,7 +9,7 @@ description: Review storage, token, password, MFA, WebAuthn, and deployment requ
 
 - Serve authentication endpoints over HTTPS and configure trusted proxy boundaries before resolving client IP addresses.
 - Put session and pending-challenge tokens only in secure, HttpOnly cookies with appropriate `SameSite`, path, lifetime, and CSRF controls. Never put tokens in local storage, session storage, logs, analytics, or browser JSON.
-- Use a maintained Argon2id password-hashing provider. The exported `PasswordHasher` interface is a contract, not a built-in password hasher.
+- Use a maintained Argon2id password-hashing provider. On runtimes without Argon2id, such as Cloudflare Workers, use `Pbkdf2PasswordHasher` with a secret pepper stored outside the database.
 - Use durable shared storage with the required uniqueness, conditional-write, and atomic-batch capabilities. Do not use in-memory storage for production identities, credentials, sessions, factors, tokens, audit events, or rate limits.
 - Use a shared persistent rate limiter across server instances. Protect and consistently configure the `rateLimitKeySecret` used to derive opaque counter keys.
 - Protect TOTP secrets with `AuthSecretProtector`. `WebCryptoAuthSecretProtector` uses AES-GCM and 32-byte keys; keep keys outside source control, retain old key IDs while records require decryption, and plan key rotation.

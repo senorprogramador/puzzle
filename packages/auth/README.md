@@ -10,7 +10,7 @@ Framework-independent authentication primitives for Puzzle applications. Use thi
 npm install @puzzle-ui/auth
 ```
 
-The package uses `@puzzle-ui/storage` and `@puzzle-ui/session` adapters, and includes a SimpleWebAuthn server adapter. You provide a storage adapter, a session manager, a secure Argon2id `PasswordHasher`, a shared `RateLimitProvider`, and an email provider for lifecycle workflows.
+The package uses `@puzzle-ui/storage` and `@puzzle-ui/session` adapters, and includes a SimpleWebAuthn server adapter. You provide a storage adapter, a session manager, a secure Argon2id `PasswordHasher` (or the included `Pbkdf2PasswordHasher` with a secret pepper on runtimes such as Cloudflare Workers), a shared `RateLimitProvider`, and an email provider for lifecycle workflows.
 
 ## Minimal usage
 
@@ -52,4 +52,4 @@ For storage adapter capabilities and initialization, see [`@puzzle-ui/storage`](
 
 ## Security notes
 
-Auth requires durable storage with the capabilities used by the configured managers. Production deployments should use HTTPS, secure HttpOnly cookies, shared persistent rate limiting, a maintained Argon2id password hasher, encrypted TOTP secrets, hashed recovery codes, and exact WebAuthn origin/RP ID configuration. The package does not provide OAuth, application authorization, or ready-made auth pages.
+Auth requires durable storage with the capabilities used by the configured managers. Production deployments should use HTTPS, secure HttpOnly cookies, shared persistent rate limiting, a maintained Argon2id password hasher (or a peppered `Pbkdf2PasswordHasher`), encrypted TOTP secrets, hashed recovery codes, and exact WebAuthn origin/RP ID configuration. The package does not provide OAuth, application authorization, or ready-made auth pages.

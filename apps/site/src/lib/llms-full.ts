@@ -7,6 +7,7 @@ import {
 } from "@/lib/seo";
 
 import { extractMdxToMarkdown } from "./mdx-to-markdown";
+import { formatFaqMarkdown } from "./faq";
 
 const rawPages = import.meta.glob<string>(
   ["../../content/docs/**/*.md", "../../content/docs/**/*.mdx"],
@@ -88,6 +89,7 @@ export const buildFullLlmsText = (): string => {
     const title = cleanText(page.data.title) || url;
     const description = cleanText(page.data.description);
     const markdown = extractMdxToMarkdown(content, url);
+    const faq = page.data.faq;
 
     return [
       `## ${title}`,
@@ -95,6 +97,7 @@ export const buildFullLlmsText = (): string => {
       `Source: ${url}`,
       ...(description ? ["", description] : []),
       ...(markdown ? ["", markdown] : []),
+      ...(faq ? ["", formatFaqMarkdown(faq)] : []),
     ].join("\n");
   });
 

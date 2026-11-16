@@ -660,6 +660,46 @@ describe("AuthExperience browser behavior", () => {
     container.remove();
   });
 
+  it("shows browser-only passkey sign-in after hydration without a mismatch", async () => {
+    const client = createClient(unauthenticatedSnapshot);
+    client.isPasskeySupported.mockReturnValue(true);
+    const onRecoverableError = vi.fn();
+
+    const app = (
+      <AuthProvider
+        client={client as never}
+        initialSnapshot={unauthenticatedSnapshot}
+      >
+        <AuthExperience mode="sign-in" />
+      </AuthProvider>
+    );
+
+    const markup = renderToString(app);
+    const container = document.createElement("div");
+
+    container.innerHTML = markup;
+    document.body.append(container);
+
+    expect(markup).not.toContain("Continue with passkey");
+
+    let root: ReturnType<typeof hydrateRoot> | undefined;
+
+    await act(async () => {
+      root = hydrateRoot(container, app, {
+        onRecoverableError,
+      });
+    });
+
+    expect(onRecoverableError).not.toHaveBeenCalled();
+    expect(container.textContent).toContain("Continue with passkey");
+
+    await act(async () => {
+      root?.unmount();
+    });
+
+    container.remove();
+  });
+
   it("updates the snapshot after hydration without a markup mismatch", async () => {
     const client = createClient(authenticatedSnapshot);
     const onRecoverableError = vi.fn();

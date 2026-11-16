@@ -1,0 +1,1261 @@
+---
+title: Add Puzzle Auth to Next.js
+description: Step-by-step guide to registration, sessions, authenticator-app MFA, recovery codes, and MongoDB storage with Puzzle Auth in a Next.js App Router app.
+---
+
+## What you will build
+
+You will add a complete account system to a **Next.js App Router** app called
+**Fieldnotes**. By the end, a visitor can:
+
+1. **Register** with an email address and password.
+2. **Set up an authenticator app** and save one-time **recovery codes**.
+3. Open a **dashboard that only signed-in users can see** and save a company
+   name to their profile.
+4. **Sign out** and **sign back in** with password + authenticator code, or with
+   a recovery code.
+
+Accounts, password hashes, sessions, authenticator secrets, and the profile are
+all stored in **MongoDB** through Puzzle's storage adapter.
+
+This guide assumes no prior knowledge of authentication or Puzzle. It is the
+Next.js version of the [Protected Dashboard tutorial](/docs/tutorials/auth),
+which explains the concepts in more depth. The short version is below.
+
+### The ideas in two minutes
+
+| Term | What it means here |
+| --- | --- |
+| **Password hash** | Passwords are never stored. A slow one-way function (**Argon2id**) turns them into a hash that can only be compared, not reversed. |
+| **Session** | After sign-in the server stores a session in MongoDB and gives the browser a random token in a cookie. |
+| **HttpOnly, Secure cookie** | Page JavaScript cannot read the cookie, and the browser only sends it over HTTPS. |
+| **MFA / TOTP** | A second proof besides the password: the 6-digit code from an authenticator app, which changes every 30 seconds. |
+| **Recovery code** | A one-time code the user writes down for when the phone is lost. |
+| **Challenge** | "Password OK, waiting for the code." It is a short-lived cookie that never opens the dashboard. |
+| **CSRF protection** | Rejects form posts that come from another website, by checking the `Origin` header. |
+| **Storage adapter** | Puzzle's bridge to the database. Auth talks to the adapter; the adapter talks to MongoDB. |
+
+### Where Next.js fits in
+
+Next.js runs your code on the **server** (Node.js) and in the **browser**.
+Everything security-related runs on the server:
+
+```text
+Browser (React)                 Next.js server (Node.js)                          MongoDB
+───────────────                 ────────────────────────                          ───────
+<AccountScreen> forms ────────▶ app/api/auth/[...puzzle]/route.ts (Puzzle) ──────▶ auth_*, sessions
+/enroll HTML forms ───────────▶ app/enroll/**/route.ts (your route handlers) ────▶ auth_mfa_*
+/dashboard ───────────────────▶ app/dashboard/page.tsx (server component) ───────▶ sessions, profiles
+```
+
+You use three App Router features:
+
+- **Route handlers** (`route.ts`) answer raw HTTP requests, like an API.
+  Puzzle's endpoints and your form actions use them.
+- **Server components** (the default for `page.tsx`) run only on the server. The
+  dashboard uses one to check the session before rendering.
+- **Client components** (files starting with `"use client"`) run in the browser.
+  The sign-in screen is one.
+
+| Package | Job |
+| --- | --- |
+| `@puzzle-ui/auth` | Register, sign in, password hashing interface, MFA, recovery codes, rate limits. |
+| `@puzzle-ui/session` | Sessions, cookies, and CSRF checks. |
+| `@puzzle-ui/storage`, `@puzzle-ui/storage-mongodb` | The storage interface and its MongoDB adapter. |
+| `@puzzle-ui/fullstack` | The `/api/auth/*` endpoints (`/auth/server`, `/auth/next`) and the React hooks and forms (`/auth/client`). |
+| `@puzzle-ui/theme`, `@puzzle-ui/ui` | Styling and form components. |
+
+**API maturity: Beta** for Auth, Session, Storage and Fullstack. Review the
+[maturity policy](/docs/tutorials#api-maturity) and the
+[Next.js integration reference](/docs/fullstack/next).
+
+## Prerequisites
+
+- **Node.js 22 or newer** and **Bun** (used here as the package manager; npm or
+  pnpm work too).
+- **Basic React knowledge.** No Next.js experience is needed; every file is
+  shown in full.
+- **A MongoDB replica set.** Auth saves related documents in one all-or-nothing
+  **transaction**, and MongoDB only supports transactions on a replica set. A
+  single-node replica set is enough for development:
+
+  ```bash
+  docker run -d --name fieldnotes-mongo -p 27017:27017 mongo:8 --replSet rs0 --bind_ip_all
+  docker exec fieldnotes-mongo mongosh --quiet --eval "rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] })"
+  ```
+
+  MongoDB Atlas clusters are replica sets already; use their `mongodb+srv://`
+  connection string.
+- **Local HTTPS.** Puzzle's cookies are always `Secure`, so the browser only
+  sends them over HTTPS, even on localhost. Create a trusted certificate with
+  [mkcert](https://github.com/FiloSottile/mkcert):
+
+  ```bash
+  mkcert -install
+  mkdir -p certs
+  mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem localhost 127.0.0.1
+  ```
+
+The app will run at `https://localhost:3000`.
+
+## Installation
+
+Create the project and install Next.js, Puzzle, MongoDB and an Argon2id library:
+
+```bash
+mkdir fieldnotes && cd fieldnotes
+bun init -y
+bun add next react react-dom
+bun add @puzzle-ui/auth @puzzle-ui/session @puzzle-ui/storage @puzzle-ui/storage-mongodb mongodb @puzzle-ui/fullstack @puzzle-ui/theme @puzzle-ui/ui
+bun add @node-rs/argon2
+bun add -d typescript @types/node @types/react @types/react-dom
+```
+
+Replace the `scripts` in `package.json` and make it an ES module project. The
+dev script serves HTTPS with your mkcert certificate:
+
+```json
+{
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --experimental-https --experimental-https-key certs/localhost-key.pem --experimental-https-cert certs/localhost.pem",
+    "build": "next build",
+    "start": "next start"
+  }
+}
+```
+
+No `next.config.ts` is needed. Add `.env`, `certs/`, and `.next/` to
+`.gitignore`. When you are done, the project looks like this:
+
+```text
+fieldnotes/
+├── .env                          # secrets, never committed
+├── certs/                        # mkcert output, never committed
+├── tsconfig.json
+├── scripts/verify-auth.ts        # automated end-to-end check
+└── src/
+    ├── components/
+    │   └── account-screen.tsx    # browser: sign-in / register screen
+    ├── server/                   # server-only code, never sent to the browser
+    │   ├── database.ts           # MongoDB connection + storage adapter
+    │   ├── password.ts           # Argon2id password hashing
+    │   ├── client-ip.ts          # client IP for rate limiting
+    │   ├── auth.ts               # all Puzzle services, created once
+    │   ├── profile.ts            # your own data (company name)
+    │   ├── http.ts               # HTML responses, redirects, error handling
+    │   ├── enrollment.ts         # authenticator setup pages
+    │   └── account-actions.ts    # save profile, refresh session, sign out
+    └── app/
+        ├── layout.tsx
+        ├── page.tsx              # redirects to /account
+        ├── account/page.tsx      # sign-in page
+        ├── dashboard/page.tsx    # protected page
+        ├── api/auth/[...puzzle]/route.ts   # Puzzle's /api/auth/* endpoints
+        ├── enroll/route.ts, enroll/start/route.ts, enroll/verify/route.ts
+        ├── profile/route.ts, session/refresh/route.ts, logout/route.ts
+```
+
+## Configuration
+
+### 1. Create your secrets
+
+These values must stay on the server and out of Git. Create `.env` in the
+project root; Next.js loads it into `process.env` on the server. Variables
+without the `NEXT_PUBLIC_` prefix are never sent to the browser.
+
+```bash title=".env"
+# The exact address users open. Used for the CSRF origin check.
+APP_ORIGIN="https://localhost:3000"
+MONGODB_URI="mongodb://localhost:27017/?directConnection=true"
+MONGODB_DATABASE="fieldnotes"
+# 32 random bytes as 64 hex characters: encrypts authenticator secrets in MongoDB.
+AUTH_ENCRYPTION_KEY_HEX="paste output of: openssl rand -hex 32"
+# At least 32 random characters: keys the rate-limit counters.
+AUTH_RATE_LIMIT_SECRET="paste output of: openssl rand -base64 48"
+```
+
+| Variable | Why it exists | If it changes or leaks |
+| --- | --- | --- |
+| `APP_ORIGIN` | Form posts and API calls must come from exactly this origin (scheme, host and port, no trailing slash). | A wrong value makes every post fail with 403. |
+| `MONGODB_URI`, `MONGODB_DATABASE` | Where everything is stored. | Anyone with the URI can read the database. |
+| `AUTH_ENCRYPTION_KEY_HEX` | Authenticator secrets are encrypted before they are saved. | If it is lost, existing authenticator setups stop working and users need recovery codes. Never generate it at startup. |
+| `AUTH_RATE_LIMIT_SECRET` | Rate-limit records store a keyed hash instead of raw emails and IPs. | Changing it resets the counters. |
+| `TRUSTED_CLIENT_IP_HEADER` | Production only, see [step 4](#4-tell-puzzle-who-is-calling). | Pointing it at a header clients can set lets attackers bypass rate limits. |
+
+Never prefix these with `NEXT_PUBLIC_`. In production, set them in your host's
+environment settings.
+
+### 2. Hash passwords with Argon2id
+
+Puzzle Auth does not choose a hashing library for you. You give it a
+`PasswordHasher` with two functions: `hash` (at registration) and `verify` (at
+sign-in). On Node.js, `@node-rs/argon2` is a fast native implementation that uses
+**Argon2id**, the current recommendation for password storage.
+
+```ts title="src/server/password.ts"
+import { hash, verify } from "@node-rs/argon2";
+import type { PasswordHasher } from "@puzzle-ui/auth";
+
+// @node-rs/argon2 uses Argon2id by default.
+const parameters = { memoryCost: 65536, timeCost: 3, parallelism: 1 };
+
+export const passwordHasher: PasswordHasher = {
+  async hash(password) {
+    return {
+      hash: await hash(password, parameters),
+      algorithm: "argon2id",
+      parameters,
+    };
+  },
+  verify: (password, stored) =>
+    stored.hash.startsWith("$argon2id$")
+      ? verify(stored.hash, password)
+      : Promise.resolve(false),
+};
+```
+
+`verify` refuses hashes that are not Argon2id, so a stored value from an older
+or weaker algorithm can never sign someone in by accident. Next.js keeps
+`@node-rs/argon2` and `mongodb` out of its bundles automatically and loads them
+from `node_modules` at runtime, so no configuration is needed.
+
+### 3. Connect MongoDB and create the storage adapter
+
+`MongoStorageAdapter` turns Puzzle's generic storage calls (`insert`,
+`findById`, transactions, ...) into MongoDB operations. Auth and Session never
+talk to MongoDB directly.
+
+```ts title="src/server/database.ts"
+import { MongoClient } from "mongodb";
+import { MongoStorageAdapter } from "@puzzle-ui/storage-mongodb";
+
+type Connection = { client: MongoClient; storage: MongoStorageAdapter };
+
+// Dev servers re-run modules after every edit. Keeping the connection on
+// globalThis reuses one connection pool per process instead of leaking pools.
+const cache = globalThis as typeof globalThis & {
+  fieldnotesDatabase?: Promise<Connection>;
+};
+
+const connect = async (): Promise<Connection> => {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) throw new Error("Missing server configuration: MONGODB_URI");
+  const client = new MongoClient(uri);
+  try {
+    await client.connect();
+    const storage = new MongoStorageAdapter({
+      database: client.db(process.env.MONGODB_DATABASE ?? "fieldnotes"),
+      client,
+      // Auth needs all-or-nothing writes. This requires a replica set.
+      transactionsEnabled: true,
+    });
+    return { client, storage };
+  } catch (error) {
+    await client.close();
+    throw error;
+  }
+};
+
+export const getStorage = async (): Promise<MongoStorageAdapter> => {
+  cache.fieldnotesDatabase ??= connect().catch((error: unknown) => {
+    cache.fieldnotesDatabase = undefined;
+    throw error;
+  });
+  return (await cache.fieldnotesDatabase).storage;
+};
+```
+
+- **One connection per server process.** The MongoDB driver keeps a pool of
+  connections. During development Next.js reloads modules after every edit, so
+  the connection is kept on `globalThis` instead of reconnecting each time.
+- `transactionsEnabled: true` requires a replica set. Without one, Auth refuses
+  to start instead of writing half an account.
+- You never create collections or indexes yourself: on the first request the
+  services below call `initialize()`, which registers every collection and its
+  unique indexes (for example "one account per email").
+- To share a database with another app, add `collectionPrefix: "fieldnotes_"`
+  to the adapter options.
+
+#### What ends up in MongoDB
+
+| Collection | Contents | Protection |
+| --- | --- | --- |
+| `auth_users` | One document per account (email, status). | — |
+| `auth_credentials` | The password credential. | Only the Argon2id hash. |
+| `auth_mfa_factors` | The authenticator-app setup. | Secret encrypted with `AUTH_ENCRYPTION_KEY_HEX`. |
+| `auth_recovery_codes` | One-time recovery codes. | Stored hashed. |
+| `auth_mfa_challenges`, `auth_mfa_step_up_challenges` | Pending MFA sign-ins and enrollments. | Short-lived; tokens hashed. |
+| `auth_rate_limits` | Failed-attempt counters. | Keyed hashes, not raw values. |
+| `auth_audit_events`, `auth_action_tokens` | Security events and lifecycle tokens. | Tokens hashed. |
+| `sessions`, `session_data`, `session_user_locks` | Active sessions. | Session tokens hashed. |
+| `profiles` | **Your** data: the company name. | Your responsibility. |
+
+Treat the `auth_*` and `session*` collections as owned by Puzzle: read them for
+debugging, but never edit them by hand.
+
+### 4. Tell Puzzle who is calling
+
+Rate limiting counts failed attempts per IP address, so the server needs the
+client's IP. Next.js route handlers do not expose the connecting address, and
+the common `X-Forwarded-For` header can be set by anyone. So this app only
+trusts a header you name explicitly:
+
+```ts title="src/server/client-ip.ts"
+// Used for rate limiting. Next.js route handlers do not expose the network
+// peer, and X-Forwarded-For can be sent by anyone. In production, name a header
+// that your host or proxy always overwrites, for example x-real-ip on Vercel.
+export const resolveClientIp = (request: Request): string => {
+  const header = process.env.TRUSTED_CLIENT_IP_HEADER;
+  if (!header) {
+    if (process.env.NODE_ENV !== "production") return "127.0.0.1";
+    throw new Error("Set TRUSTED_CLIENT_IP_HEADER to a header your proxy controls.");
+  }
+  const ip = request.headers.get(header)?.split(",")[0]?.trim();
+  if (!ip) throw new Error(`The trusted ${header} header is missing.`);
+  return ip;
+};
+```
+
+- **During development** every request counts as `127.0.0.1`.
+- **In production** set `TRUSTED_CLIENT_IP_HEADER` to a header your host or
+  proxy always **overwrites**. On Vercel use `x-real-ip`. Behind nginx, add
+  `proxy_set_header X-Real-IP $remote_addr;` and use `x-real-ip`.
+- If it is not set in production, auth requests fail instead of trusting a
+  value an attacker could forge.
+
+### 5. Configure the auth services
+
+This file creates every Puzzle object once, connects them, and exports two
+helpers the rest of the app uses. It only runs on the server.
+
+```ts title="src/server/auth.ts"
+import {
+  StorageAuthManager,
+  StorageAuthMfaManager,
+  StorageAuthStepUpManager,
+  StorageRateLimitProvider,
+  WebCryptoAuthSecretProtector,
+} from "@puzzle-ui/auth";
+import { createAuthServer } from "@puzzle-ui/fullstack/auth/server";
+import {
+  createSessionCookieOptions,
+  readSessionCookie,
+  StorageSessionManager,
+} from "@puzzle-ui/session";
+import { resolveClientIp } from "./client-ip";
+import { getStorage } from "./database";
+import { passwordHasher } from "./password";
+import { initializeProfiles } from "./profile";
+
+const required = (name: string) => {
+  const value = process.env[name];
+  if (!value) throw new Error(`Missing server configuration: ${name}`);
+  return value;
+};
+
+// The only /api/auth endpoints this app exposes. Everything else returns 404.
+export const enabledAuthEndpoints = new Set([
+  "/api/auth/register", "/api/auth/sign-in", "/api/auth/state", "/api/auth/sign-out",
+  "/api/auth/mfa/sign-in/totp", "/api/auth/mfa/sign-in/recovery-code",
+]);
+
+const createServices = async () => {
+  const origin = required("APP_ORIGIN");
+  if (new URL(origin).protocol !== "https:" || new URL(origin).origin !== origin) {
+    throw new Error("APP_ORIGIN must be an exact HTTPS origin without a trailing slash.");
+  }
+  const keyHex = required("AUTH_ENCRYPTION_KEY_HEX");
+  if (!/^[a-f0-9]{64}$/i.test(keyHex)) {
+    throw new Error("AUTH_ENCRYPTION_KEY_HEX must encode exactly 32 bytes.");
+  }
+  const rateLimitKeySecret = required("AUTH_RATE_LIMIT_SECRET");
+  const storage = await getStorage();
+
+  const sessions = new StorageSessionManager(storage, {
+    lifetime: { idleTimeoutSeconds: 1800, absoluteLifetimeSeconds: 86400 },
+  });
+  const rateLimitProvider = new StorageRateLimitProvider(storage);
+  const secretProtector = new WebCryptoAuthSecretProtector({
+    currentKeyId: "primary",
+    keys: { primary: Uint8Array.from(Buffer.from(keyHex, "hex")) },
+  });
+  const mfa = new StorageAuthMfaManager({
+    storage, sessions, passwordHasher, rateLimitProvider, secretProtector,
+  }, { rateLimitKeySecret, issuer: "Fieldnotes" });
+  const auth = new StorageAuthManager({
+    storage, sessions, passwordHasher, rateLimitProvider, mfa,
+  }, {
+    rateLimitKeySecret,
+    minimumPasswordLength: 12,
+    mfaPolicy: { required: true },
+  });
+  const stepUp = new StorageAuthStepUpManager({ storage, sessions, mfa });
+  const cookie = createSessionCookieOptions({ production: true });
+  const csrf = { allowedOrigins: [origin] };
+  const authServer = createAuthServer({
+    auth, mfa, stepUp, sessions, cookie, csrf, resolveClientIp,
+  });
+
+  // Creates the MongoDB collections and unique indexes on first start.
+  await sessions.initialize();
+  await rateLimitProvider.initialize();
+  await authServer.initialize();
+  await initializeProfiles(storage);
+  return { auth, mfa, sessions, cookie, csrf, authServer, storage, resolveClientIp };
+};
+
+export type Services = Awaited<ReturnType<typeof createServices>>;
+
+const cache = globalThis as typeof globalThis & {
+  fieldnotesServices?: Promise<Services>;
+};
+
+// Creates the services once per server process, on the first request.
+export const getServices = (): Promise<Services> => {
+  cache.fieldnotesServices ??= createServices().catch((error: unknown) => {
+    cache.fieldnotesServices = undefined;
+    throw error;
+  });
+  return cache.fieldnotesServices;
+};
+
+export const readSessionToken = (cookieHeader: string | null, services: Services) =>
+  readSessionCookie(cookieHeader, services.cookie.name);
+
+// The single source of truth for "who is signed in?". Returns null unless the
+// session is valid AND the account satisfies the MFA policy.
+export const getSignedInUser = async (cookieHeader: string | null) => {
+  const services = await getServices();
+  const token = readSessionToken(cookieHeader, services);
+  return token ? services.auth.getCurrentUser(token) : null;
+};
+```
+
+What each part does:
+
+- **`required()` and the checks at the top** stop the server with a clear
+  message when a secret is missing or malformed, instead of failing later in a
+  confusing way.
+- **`enabledAuthEndpoints`** is an allowlist. Puzzle can serve many
+  `/api/auth/*` endpoints (passkeys, password reset, ...); this app only exposes
+  the six it actually uses. Fewer endpoints means fewer things that can go
+  wrong.
+- **The managers.** `StorageSessionManager` stores sessions (30 minutes idle, at
+  most 24 hours). `StorageAuthManager` handles accounts, with
+  `mfaPolicy: { required: true }` so nobody reaches the dashboard without an
+  authenticator. `StorageAuthMfaManager` handles TOTP and recovery codes, and
+  `WebCryptoAuthSecretProtector` encrypts the TOTP secrets.
+- **`createSessionCookieOptions({ production: true })`** produces the
+  `__Host-puzzle.session` cookie: `HttpOnly`, `Secure`, `SameSite=Lax`, and
+  bound to your exact host.
+- **`getServices()`** creates everything on the first request and reuses it
+  afterwards. If startup fails, the next request tries again.
+- **`getSignedInUser()`** is the only function your pages need to answer "who
+  is signed in?". It returns `null` for a missing, expired or revoked session,
+  and also while MFA is still pending.
+
+### 6. Configure TypeScript and the root layout
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+```
+
+The `@/*` path lets you write `@/server/auth` instead of long relative paths.
+Next.js creates `next-env.d.ts` on the first run.
+
+```tsx title="src/app/layout.tsx"
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
+
+export const metadata: Metadata = { title: "Fieldnotes" };
+
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return <html lang="en"><body>{children}</body></html>;
+}
+```
+
+```tsx title="src/app/page.tsx"
+import { redirect } from "next/navigation";
+
+export default function Home() {
+  redirect("/account");
+}
+```
+
+## Step-by-step implementation
+
+### 1. Store your own data next to the account
+
+Puzzle owns the account; your app owns everything else. Store app data in your
+own collection, keyed by the user's ID:
+
+```ts title="src/server/profile.ts"
+import {
+  StorageValidationError,
+  type StorageAdapter,
+  type StorageRecord,
+} from "@puzzle-ui/storage";
+
+export type Profile = StorageRecord & { company: string };
+
+export const initializeProfiles = (storage: StorageAdapter) =>
+  storage.registerCollection<Profile>({ name: "profiles" });
+
+export const findProfile = (storage: StorageAdapter, userId: string) =>
+  storage.findById<Profile>("profiles", userId);
+
+export const saveCompany = async (
+  storage: StorageAdapter,
+  authenticatedUserId: string,
+  company: unknown,
+) => {
+  if (typeof company !== "string" || !company.trim() || company.trim().length > 120) {
+    throw new StorageValidationError("Enter a company of 1 to 120 characters.");
+  }
+  const existing = await findProfile(storage, authenticatedUserId);
+  if (existing) {
+    return storage.update<Profile>("profiles", authenticatedUserId, {
+      company: company.trim(),
+    }, { expectedRevision: existing.revision });
+  }
+  return storage.insert<Profile>("profiles", {
+    id: authenticatedUserId, company: company.trim(),
+  });
+};
+```
+
+`registerCollection` creates `profiles` at startup (it is called from
+`createServices`). Updates pass the current `revision`, so two simultaneous
+saves cannot silently overwrite each other.
+
+### 2. Add small HTTP helpers
+
+The enrollment and dashboard actions are plain HTML forms handled by route
+handlers. These helpers build their responses:
+
+```ts title="src/server/http.ts"
+import { AuthError } from "@puzzle-ui/auth";
+import { SessionSecurityError } from "@puzzle-ui/session";
+import {
+  StorageConflictError, StorageDuplicateError, StorageValidationError,
+} from "@puzzle-ui/storage";
+
+// Markup built with the `markup` tag. Every interpolated value is escaped,
+// so user input and secrets can never inject HTML.
+class SafeHtml {
+  constructor(readonly value: string) {}
+}
+
+const escape = (value: string) => value.replace(/[&<>"']/g, (character) =>
+  `&#${character.charCodeAt(0)};`);
+
+const render = (value: unknown): string =>
+  value instanceof SafeHtml ? value.value :
+  Array.isArray(value) ? value.map(render).join("") :
+  value === null || value === undefined || value === false ? "" : escape(String(value));
+
+export const markup = (strings: TemplateStringsArray, ...values: unknown[]) =>
+  new SafeHtml(strings.reduce((out, text, index) =>
+    out + text + (index < values.length ? render(values[index]) : ""), ""));
+
+// A static HTML page: no scripts, no hydration, nothing cached.
+export const page = (content: SafeHtml) => markup`<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Fieldnotes account</title></head>
+<body><main>${content}</main></body></html>`.value;
+
+export const secureHtml = (response: Response) => {
+  response.headers.set("Content-Type", "text/html; charset=utf-8");
+  response.headers.set("Cache-Control", "no-store");
+  response.headers.set("Pragma", "no-cache");
+  response.headers.set("Referrer-Policy", "no-referrer");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  response.headers.set("Content-Security-Policy",
+    "default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+  return response;
+};
+
+export const html = (content: SafeHtml, status = 200) =>
+  secureHtml(new Response(page(content), { status }));
+
+// "303 See Other": after a form POST, the browser loads `location` with GET.
+export const seeOther = (location: string, response = new Response(null)) => {
+  const redirect = new Response(null, { status: 303, headers: response.headers });
+  redirect.headers.set("Location", location);
+  redirect.headers.set("Cache-Control", "no-store");
+  return redirect;
+};
+
+export const field = (form: FormData, key: string, maximum = 160) => {
+  const value = form.get(key);
+  if (typeof value !== "string" || !value.trim() || value.length > maximum) {
+    throw new StorageValidationError(`Invalid ${key}.`);
+  }
+  return value.trim();
+};
+
+// Turns thrown errors into safe pages. Never shows raw database errors.
+export const withErrors = (handler: (request: Request) => Promise<Response>) =>
+  async (request: Request): Promise<Response> => {
+    try {
+      return await handler(request);
+    } catch (error) {
+      if (error instanceof SessionSecurityError) return html(markup`<p>Request origin rejected.</p>`, 403);
+      if (error instanceof StorageValidationError) return html(markup`<p>${error.message}</p>`, 400);
+      if (error instanceof StorageConflictError || error instanceof StorageDuplicateError) {
+        return html(markup`<p>The record changed. Reload and retry.</p>`, 409);
+      }
+      if (error instanceof AuthError) {
+        if (error.code === "PROVIDER" || error.code === "CONFIGURATION") {
+          console.error("Fieldnotes authentication service unavailable", { code: error.code });
+          return html(markup`<p>Authentication temporarily unavailable.</p>`, 503);
+        }
+        const status = error.code === "RATE_LIMITED" ? 429 :
+          error.code === "MFA_CHALLENGE" || error.code === "SESSION" ||
+          error.code === "INVALID_CREDENTIALS" ? 401 : 400;
+        return html(markup`<p>${error.message} <a href="/account">Return to account</a>.</p>`, status);
+      }
+      console.error("Fieldnotes request failed", {
+        errorType: error instanceof Error ? error.name : "UnknownError",
+      });
+      return html(markup`<p>Temporarily unavailable. Please retry.</p>`, 500);
+    }
+  };
+```
+
+- **`markup`** builds HTML and **escapes every value** you insert, so an email
+  address or error message can never inject HTML or scripts. (Next.js does not
+  allow `react-dom/server` in App Router code, so these pages use a template
+  tag instead of JSX.)
+- **`secureHtml`** adds headers that stop caching, block scripts, and keep the
+  pages out of search engines. This matters because these pages show secrets.
+- **`seeOther`** sends a `303` redirect after a successful form post, so
+  refreshing the page does not submit the form again. It keeps any
+  `Set-Cookie` headers.
+- **`withErrors`** turns errors into safe messages with the right status code.
+  Raw database errors are logged, never shown.
+
+### 3. Build the authenticator setup pages
+
+With required MFA, a new account is **not signed in** after registration.
+Puzzle answers with the status `mfa-enrollment-pending` and a short-lived
+`__Host-puzzle.mfa` cookie that only allows finishing the setup. These three
+pages complete it:
+
+```ts title="src/server/enrollment.ts"
+import { AuthMfaChallengeError } from "@puzzle-ui/auth";
+import {
+  createSessionResponse,
+  readMfaChallengeCookie,
+  serializeClearedMfaChallengeCookie,
+} from "@puzzle-ui/fullstack/auth/server";
+import { protectStateChangingRequest } from "@puzzle-ui/session";
+import { getServices, readSessionToken, type Services } from "./auth";
+import { field, html, markup, page, secureHtml, withErrors } from "./http";
+
+// Only accepts the short-lived MFA cookie of an account that still has to
+// set up its authenticator. It can never open the dashboard.
+const enrollmentToken = async (request: Request, services: Services) => {
+  const cookies = request.headers.get("cookie");
+  const token = readMfaChallengeCookie(cookies);
+  if (!token || readSessionToken(cookies, services) ||
+      (await services.auth.getAuthState(token)).status !== "mfa-enrollment-pending") {
+    throw new AuthMfaChallengeError();
+  }
+  return token;
+};
+
+export const showEnrollment = withErrors(async (request) => {
+  await enrollmentToken(request, await getServices());
+  return html(markup`
+    <h1>Set up your authenticator</h1>
+    <p>Enrollment is required before dashboard access.</p>
+    <form method="post" action="/enroll/start">
+      <button type="submit">Show a new setup key</button>
+    </form>`);
+});
+
+export const startEnrollment = withErrors(async (request) => {
+  const services = await getServices();
+  protectStateChangingRequest(request, services.csrf);
+  const challengeToken = await enrollmentToken(request, services);
+  const enrollment = await services.mfa.beginRequiredTotpEnrollment({
+    challengeToken, ipAddress: services.resolveClientIp(request),
+  });
+  return html(markup`
+    <h1>Add Fieldnotes to your authenticator</h1>
+    <p>Enter this setup key manually. Do not share it.</p>
+    <code>${enrollment.secret}</code>
+    <p>Use a time-based code: six digits, changing every 30 seconds.</p>
+    <form method="post" action="/enroll/verify">
+      <input type="hidden" name="factorId" value="${enrollment.factorId}">
+      <label for="totp">Authenticator code</label>
+      <input id="totp" name="code" inputmode="numeric" autocomplete="one-time-code" required>
+      <button type="submit">Verify and finish enrollment</button>
+    </form>`);
+});
+
+export const verifyEnrollment = withErrors(async (request) => {
+  const services = await getServices();
+  protectStateChangingRequest(request, services.csrf);
+  const challengeToken = await enrollmentToken(request, services);
+  const form = await request.formData();
+  const completed = await services.mfa.verifyRequiredTotpEnrollment({
+    challengeToken,
+    factorId: field(form, "factorId"),
+    code: field(form, "code", 8),
+    ipAddress: services.resolveClientIp(request),
+  });
+  // Only now does the user get a real session cookie.
+  const response = secureHtml(createSessionResponse(page(markup`
+    <h1>Save your recovery codes now</h1>
+    <p>Each code works once. Store these securely outside this browser.</p>
+    <ul>${completed.recoveryCodes.map((code) => markup`<li><code>${code}</code></li>`)}</ul>
+    <a href="/dashboard">I saved my codes; open dashboard</a>`), completed.auth.token, services, completed.auth.session.expiresAt));
+  response.headers.append("Set-Cookie", serializeClearedMfaChallengeCookie());
+  return response;
+});
+```
+
+1. `GET /enroll` checks the MFA cookie and shows a button.
+2. `POST /enroll/start` creates a new TOTP secret and shows it **once** in a
+   no-store page without scripts. The user types it into the authenticator app.
+3. `POST /enroll/verify` checks the first 6-digit code. Only now does Puzzle
+   create a real session. The page sets the session cookie, clears the MFA
+   cookie, and shows the recovery codes, also exactly once.
+
+`protectStateChangingRequest` is the CSRF check: posts from any origin other
+than `APP_ORIGIN` are rejected with 403.
+
+Why not a React page? The secret and the recovery codes should never sit in
+browser JavaScript, URLs, logs, or storage. A static HTML page is the smallest
+place to show them.
+
+Connect each handler to a URL with a **route handler**. The folder is the URL,
+and the exported name is the HTTP method:
+
+```ts title="src/app/enroll/route.ts"
+import { showEnrollment } from "@/server/enrollment";
+
+export const GET = showEnrollment;
+```
+
+```ts title="src/app/enroll/start/route.ts"
+import { startEnrollment } from "@/server/enrollment";
+
+export const POST = startEnrollment;
+```
+
+```ts title="src/app/enroll/verify/route.ts"
+import { verifyEnrollment } from "@/server/enrollment";
+
+export const POST = verifyEnrollment;
+```
+
+### 4. Add the dashboard actions
+
+```ts title="src/server/account-actions.ts"
+import {
+  createSessionResponse,
+  serializeClearedMfaChallengeCookie,
+} from "@puzzle-ui/fullstack/auth/server";
+import { protectStateChangingRequest, serializeClearedSessionCookie } from "@puzzle-ui/session";
+import { getServices, getSignedInUser, readSessionToken } from "./auth";
+import { field, html, markup, seeOther, withErrors } from "./http";
+import { saveCompany } from "./profile";
+
+export const saveProfile = withErrors(async (request) => {
+  const services = await getServices();
+  protectStateChangingRequest(request, services.csrf);
+  const user = await getSignedInUser(request.headers.get("cookie"));
+  if (!user) return html(markup`<p>Authentication required.</p>`, 401);
+  // The user ID comes from the verified session, never from the form.
+  await saveCompany(services.storage, user.id, field(await request.formData(), "company", 120));
+  return seeOther("/dashboard");
+});
+
+export const refreshSession = withErrors(async (request) => {
+  const services = await getServices();
+  protectStateChangingRequest(request, services.csrf);
+  const token = readSessionToken(request.headers.get("cookie"), services);
+  const user = await getSignedInUser(request.headers.get("cookie"));
+  const session = token ? await services.sessions.validate(token, { touch: false }) : null;
+  if (!user || !session || session.userId !== user.id) return html(markup`<p>Sign in again.</p>`, 401);
+  // New token in a new cookie; the old token stops working immediately.
+  const rotated = await services.sessions.rotate({ sessionId: session.id });
+  return seeOther("/dashboard", createSessionResponse(
+    null, rotated.token, services, rotated.session.expiresAt,
+  ));
+});
+
+export const signOut = withErrors(async (request) => {
+  const services = await getServices();
+  protectStateChangingRequest(request, services.csrf);
+  const token = readSessionToken(request.headers.get("cookie"), services);
+  if (token) await services.auth.signOut(token);
+  const response = seeOther("/account");
+  response.headers.append("Set-Cookie", serializeClearedSessionCookie(services.cookie));
+  response.headers.append("Set-Cookie", serializeClearedMfaChallengeCookie());
+  return response;
+});
+```
+
+- **`saveProfile`** takes the user ID from the verified session, **never** from
+  the form. Otherwise a user could edit someone else's profile by changing a
+  hidden field.
+- **`refreshSession`** rotates the session: the browser gets a new token and the
+  old one stops working immediately. Do this after sensitive changes.
+- **`signOut`** revokes the session in MongoDB and clears both cookies.
+
+```ts title="src/app/profile/route.ts"
+import { saveProfile } from "@/server/account-actions";
+
+export const POST = saveProfile;
+```
+
+```ts title="src/app/session/refresh/route.ts"
+import { refreshSession } from "@/server/account-actions";
+
+export const POST = refreshSession;
+```
+
+```ts title="src/app/logout/route.ts"
+import { signOut } from "@/server/account-actions";
+
+export const POST = signOut;
+```
+
+These are route handlers rather than Server Actions on purpose: they return
+exact status codes and cookies, and they are easy to test with plain HTTP.
+
+### 5. Connect Puzzle's auth endpoints
+
+One catch-all route handler (`[...puzzle]` matches the rest of the URL) serves
+all `/api/auth/*` requests. It first checks the allowlist, then hands the
+request to Puzzle's Next.js adapter:
+
+```ts title="src/app/api/auth/[...puzzle]/route.ts"
+import { createNextAuthHandler } from "@puzzle-ui/fullstack/auth/next";
+import { enabledAuthEndpoints, getServices } from "@/server/auth";
+
+const handleAuth = async (request: Request) => {
+  if (!enabledAuthEndpoints.has(new URL(request.url).pathname)) {
+    return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
+  const { authServer } = await getServices();
+  const handlers = createNextAuthHandler({ auth: authServer });
+  return request.method === "GET" ? handlers.GET(request) : handlers.POST(request);
+};
+
+export { handleAuth as GET, handleAuth as POST };
+```
+
+| Endpoint | Used for |
+| --- | --- |
+| `POST /api/auth/register` | Create an account. |
+| `POST /api/auth/sign-in` | Check email and password. |
+| `GET /api/auth/state` | "Am I signed in, or is MFA pending?" |
+| `POST /api/auth/sign-out` | End the session. |
+| `POST /api/auth/mfa/sign-in/totp` | Answer the MFA challenge with an authenticator code. |
+| `POST /api/auth/mfa/sign-in/recovery-code` | Answer it with a recovery code. |
+
+Every other path, such as the JSON enrollment endpoints, returns 404.
+
+### 6. Protect the dashboard
+
+The dashboard is a **server component**: it runs on the server for every
+request, before any HTML is sent:
+
+```tsx title="src/app/dashboard/page.tsx"
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getServices, getSignedInUser } from "@/server/auth";
+import { findProfile } from "@/server/profile";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  robots: { index: false, follow: false },
+};
+
+// A server component: this code never reaches the browser.
+export default async function DashboardPage() {
+  const user = await getSignedInUser((await headers()).get("cookie"));
+  if (!user) redirect("/account");
+  const profile = await findProfile((await getServices()).storage, user.id);
+  return (
+    <main>
+      <h1>Your Fieldnotes dashboard</h1>
+      <p>Signed in as {user.email}</p>
+      <form action="/profile" method="post">
+        <label htmlFor="company">Company</label>
+        <input id="company" name="company" defaultValue={profile?.company ?? ""} maxLength={120} required />
+        <button type="submit">Save profile</button>
+      </form>
+      <form action="/session/refresh" method="post"><button>Refresh session</button></form>
+      <form action="/logout" method="post"><button>Sign out</button></form>
+    </main>
+  );
+}
+```
+
+- `headers()` gives access to the request's cookies. Because the page reads
+  them, Next.js renders it fresh for every request instead of caching it.
+- If nobody is signed in, `redirect` sends the visitor to `/account`.
+- Only the email and company are rendered. Never pass tokens, session records,
+  or whole database documents to a client component: its props are sent to the
+  browser.
+
+Hiding a link in the UI is **not** protection, and neither is a check in
+`proxy.ts` (formerly middleware) alone. Every protected page and form action
+must check the session on the server, like this one.
+
+### 7. Build the sign-in screen
+
+The sign-in and registration screen is a client component. It talks to
+`/api/auth/*` through `AuthProvider` and `useAuth()` from
+`@puzzle-ui/fullstack/auth/client`:
+
+```tsx title="src/components/account-screen.tsx"
+"use client";
+
+import { useState, type FormEvent } from "react";
+import { Theme } from "@puzzle-ui/theme";
+import { Alert, Button, FormField, TextInput } from "@puzzle-ui/ui";
+import {
+  AuthClientError, AuthProvider, MfaChallengeForm, SignUpForm, useAuth,
+} from "@puzzle-ui/fullstack/auth/client";
+
+const PasswordSignIn = () => {
+  const { signIn } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    setBusy(true);
+    setError(null);
+    try {
+      await signIn({
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
+      });
+    } catch (cause) {
+      setError(cause instanceof AuthClientError && cause.code === "RATE_LIMITED"
+        ? "Too many attempts. Wait before retrying."
+        : cause instanceof Error ? cause.message : "Sign-in failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return <form onSubmit={submit}>
+    <h1>Sign in to Fieldnotes</h1>
+    {error && <Alert severity="error">{error}</Alert>}
+    <FormField label="Email" controlId="email" required>
+      <TextInput id="email" name="email" type="email" autoComplete="email" required />
+    </FormField>
+    <FormField label="Password" controlId="password" required>
+      <TextInput id="password" name="password" type="password" autoComplete="current-password" required />
+    </FormField>
+    <Button type="submit" loading={busy}>Sign in</Button>
+  </form>;
+};
+
+const Account = () => {
+  const { snapshot, signOut } = useAuth();
+  const [register, setRegister] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const logout = async () => {
+    try { await signOut(); }
+    catch { setError("Sign-out failed. Please retry."); }
+  };
+  if (snapshot.status === "loading") return <p role="status">Loading account...</p>;
+  if (snapshot.status === "mfa-enrollment-pending") {
+    return <p><a href="/enroll">Continue to secure authenticator enrollment</a></p>;
+  }
+  if (snapshot.status === "mfa-enrollment-required") {
+    return <><p>Policy changed. Sign out and sign in to start required enrollment.</p>
+      {error && <Alert severity="error">{error}</Alert>}
+      <Button onClick={logout}>Sign out</Button></>;
+  }
+  if (snapshot.status === "mfa-pending") {
+    return <MfaChallengeForm redirectTo="/dashboard" />;
+  }
+  if (snapshot.status === "authenticated") {
+    return <p><a href="/dashboard">Open your protected dashboard</a></p>;
+  }
+  return <>
+    {register ? <SignUpForm /> : <PasswordSignIn />}
+    <Button variant="ghost" onClick={() => setRegister(!register)}>
+      {register ? "Already registered? Sign in" : "Create an account"}
+    </Button>
+  </>;
+};
+
+export const AccountScreen = () => (
+  <Theme theme="system">
+    <AuthProvider options={{ basePath: "/api/auth" }} locale="en"
+      messages={{ signUp: "Create your Fieldnotes account", invalidCredentials: "Check your email and password." }}>
+      <Account />
+    </AuthProvider>
+  </Theme>
+);
+```
+
+The `"use client"` line at the top is required: hooks and event handlers only
+work in client components. `snapshot.status` tells the screen what to show:
+
+| Status | Meaning | Shown |
+| --- | --- | --- |
+| `loading` | Asking the server. | Loading text. |
+| `unauthenticated` | Nobody is signed in. | Sign-in or registration form. |
+| `mfa-enrollment-pending` | Registered, authenticator not set up yet. | Link to `/enroll`. |
+| `mfa-pending` | Password OK, code needed. | `MfaChallengeForm`. |
+| `mfa-enrollment-required` | MFA became required for an existing account. | Sign out and sign in again. |
+| `authenticated` | Fully signed in. | Link to the dashboard. |
+
+The client never sees tokens: it only learns the status. Add the page:
+
+```tsx title="src/app/account/page.tsx"
+import type { Metadata } from "next";
+import { AccountScreen } from "@/components/account-screen";
+
+export const metadata: Metadata = {
+  title: "Fieldnotes account",
+  robots: { index: false, follow: false },
+};
+
+export default function AccountPage() {
+  return <AccountScreen />;
+}
+```
+
+## Complete working example
+
+Every file is shown above. Start MongoDB, then run:
+
+```bash
+bun run dev
+```
+
+Open `https://localhost:3000`, which redirects to `/account`.
+
+For production:
+
+```bash
+bun run build
+bun run start
+```
+
+`next start` serves plain HTTP on `PORT` (default 3000). Put it behind HTTPS
+(your host or a reverse proxy), set every variable from `.env` in the host's
+environment with the public `APP_ORIGIN`, and set `TRUSTED_CLIENT_IP_HEADER`.
+On Vercel, HTTPS and the `x-real-ip` header are provided for you.
+
+## Testing and verification
+
+### Try it in the browser
+
+1. **Register** with a new email and a password of at least 12 characters. You
+   see "Continue to secure authenticator enrollment". Opening `/dashboard` now
+   redirects back to `/account`.
+2. **Set up the authenticator.** Click the link, then "Show a new setup key",
+   and enter the key in your authenticator app ("enter a setup key").
+3. **Enter the 6-digit code.** Save the recovery codes.
+4. **Open the dashboard** and save a company name.
+5. **Refresh session**, then **sign out**.
+6. **Sign in again.** The password alone is not enough; enter a code from the
+   app. Try a recovery code on another sign-in, and confirm the same code fails
+   the second time.
+
+### Look inside MongoDB
+
+```bash
+mongosh "mongodb://localhost:27017/fieldnotes?directConnection=true"
+```
+
+```js
+show collections
+db.auth_users.find({}, { email: 1, status: 1 })
+db.auth_credentials.findOne()   // an $argon2id$ hash, never the password
+db.auth_mfa_factors.findOne()   // the TOTP secret is encrypted
+db.profiles.find()
+```
+
+### Run the automated check
+
+This script plays the browser: it keeps a cookie jar and runs the whole flow
+against your running dev server, including the attacks that must fail. It
+calculates authenticator codes with Puzzle's `generateTotpCode`.
+
+```ts title="scripts/verify-auth.ts"
+import assert from "node:assert/strict";
+import { generateTotpCode } from "@puzzle-ui/auth";
+
+const origin = process.env.APP_ORIGIN;
+if (!origin) throw new Error("Set APP_ORIGIN, for example https://localhost:3000.");
+const email = `${crypto.randomUUID()}@example.com`;
+const password = crypto.randomUUID() + crypto.randomUUID();
+const jar = new Map<string, string>();
+const totp = { digits: 6, periodSeconds: 30 };
+
+// A tiny browser stand-in: stores cookies and sends them back.
+const send = async (path: string, init: {
+  method?: string; json?: unknown; form?: Record<string, string>;
+  origin?: string; cookies?: Map<string, string>;
+} = {}) => {
+  const headers = new Headers({ origin: init.origin ?? origin });
+  const cookies = init.cookies ?? jar;
+  headers.set("cookie", [...cookies].map(([name, value]) => `${name}=${value}`).join("; "));
+  let body: string | undefined;
+  if (init.json !== undefined) {
+    headers.set("content-type", "application/json");
+    body = JSON.stringify(init.json);
+  } else if (init.form) {
+    headers.set("content-type", "application/x-www-form-urlencoded");
+    body = new URLSearchParams(init.form).toString();
+  }
+  const response = await fetch(origin + path, {
+    method: init.method ?? (body === undefined ? "GET" : "POST"),
+    headers, body, redirect: "manual",
+  });
+  for (const cookie of response.headers.getSetCookie()) {
+    const pair = cookie.split(";")[0]!;
+    const name = pair.slice(0, pair.indexOf("="));
+    if (/Max-Age=0(?:;|$)/i.test(cookie)) jar.delete(name);
+    else jar.set(name, pair.slice(pair.indexOf("=") + 1));
+  }
+  return response;
+};
+const dashboardOpens = async (cookies?: Map<string, string>) =>
+  (await send("/dashboard", { cookies })).status === 200;
+const signIn = () => send("/api/auth/sign-in", { json: { email, password } });
+
+const registered = await send("/api/auth/register", { json: { email, password } });
+assert.equal(registered.status, 200);
+assert.equal((await registered.json()).status, "mfa-enrollment-pending");
+assert.ok(jar.has("__Host-puzzle.mfa") && !jar.has("__Host-puzzle.session"));
+assert.equal(await dashboardOpens(), false, "Dashboard must stay closed before enrollment");
+assert.equal((await send("/api/auth/mfa/totp/enrollment/start", { json: {} })).status, 404);
+assert.equal((await send("/enroll/start", { form: {}, origin: "https://attacker.example" })).status, 403);
+
+const started = await send("/enroll/start", { form: {} });
+assert.equal(started.status, 200);
+assert.equal(started.headers.get("cache-control"), "no-store");
+const setup = await started.text();
+assert.ok(!setup.includes("<script"));
+const secret = setup.match(/<code>([A-Z2-7]+)<\/code>/)?.[1];
+const factorId = setup.match(/name="factorId" value="([^"]+)"/)?.[1];
+assert.ok(secret && factorId);
+const enrolled = await send("/enroll/verify", {
+  form: { factorId, code: await generateTotpCode(secret, Date.now(), totp) },
+});
+assert.equal(enrolled.status, 200);
+const recoveryCode = (await enrolled.text()).match(/<li><code>([^<]+)<\/code><\/li>/)?.[1];
+assert.ok(recoveryCode && jar.has("__Host-puzzle.session") && !jar.has("__Host-puzzle.mfa"));
+
+assert.ok(await dashboardOpens());
+assert.equal((await send("/profile", { form: { company: "Fieldnotes Studio" } })).status, 303);
+assert.ok((await (await send("/dashboard")).text()).includes("Fieldnotes Studio"));
+
+const before = new Map(jar);
+assert.equal((await send("/session/refresh", { form: {} })).status, 303);
+assert.equal(await dashboardOpens(before), false, "The old session token must stop working");
+assert.ok(await dashboardOpens());
+assert.equal((await send("/logout", { form: {} })).status, 303);
+assert.equal(await dashboardOpens(), false);
+
+assert.equal((await signIn()).status, 200);
+assert.equal((await (await send("/api/auth/state")).json()).status, "mfa-pending");
+assert.equal(await dashboardOpens(), false, "A password alone must not open the dashboard");
+const nextCode = await generateTotpCode(secret, Date.now() + 30_000, totp);
+assert.equal((await send("/api/auth/mfa/sign-in/totp", { json: { code: nextCode } })).status, 200);
+assert.ok(await dashboardOpens());
+await send("/logout", { form: {} });
+
+await signIn();
+assert.equal((await send("/api/auth/mfa/sign-in/recovery-code", { json: { code: recoveryCode } })).status, 200);
+await send("/logout", { form: {} });
+await signIn();
+assert.equal((await send("/api/auth/mfa/sign-in/recovery-code", { json: { code: recoveryCode } })).status, 401);
+assert.equal(await dashboardOpens(), false);
+console.log("Registration, enrollment, MFA sign-in, recovery codes, rotation and logout verified.");
+```
+
+Run it while `bun run dev` is running. Point `MONGODB_DATABASE` at a disposable
+database first, because the script creates accounts:
+
+```bash
+NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem" node --env-file=.env scripts/verify-auth.ts
+```
+
+`NODE_EXTRA_CA_CERTS` makes Node.js trust your mkcert certificate. A successful
+run prints:
+
+```text
+Registration, enrollment, MFA sign-in, recovery codes, rotation and logout verified.
+```
+
+## Common mistakes and troubleshooting
+
+- **`You're importing a component that imports react-dom/server`:** App Router
+  code cannot render HTML strings with `react-dom/server`. Use the `markup` tag
+  from `src/server/http.ts`.
+- **`Transaction numbers are only allowed on a replica set member or mongos`:**
+  MongoDB runs standalone. Start it with `--replSet` and run `rs.initiate()`.
+- **`Missing server configuration: ...`:** a variable from `.env` is missing,
+  or the server was started from another folder.
+- **`APP_ORIGIN must be an exact HTTPS origin`:** remove the trailing slash and
+  use `https://`.
+- **Every form post returns 403:** the address in the browser does not match
+  `APP_ORIGIN` exactly. `https://127.0.0.1:3000` and `https://localhost:3000`
+  are different origins.
+- **Auth requests fail with 500 in production and the log mentions
+  `TRUSTED_CLIENT_IP_HEADER`:** set it as described in
+  [step 4](#4-tell-puzzle-who-is-calling).
+- **`useAuth` or `useState` errors in the account page:** the `"use client"`
+  line is missing from `account-screen.tsx`.
+- **Signed in, but `/dashboard` redirects to `/account`:** the account is still
+  `mfa-pending` or `mfa-enrollment-pending`. This is intended.
+- **Cookies are not saved:** you are using HTTP. Use `bun run dev` (it serves
+  HTTPS); the cookies are `Secure` and `__Host-` prefixed, do not weaken them.
+- **Authenticator codes stopped working after a deploy:** `AUTH_ENCRYPTION_KEY_HEX`
+  changed. Restore the original key.
+- **A secret appears in the browser bundle:** server code was imported into a
+  client component, or a variable got a `NEXT_PUBLIC_` prefix. Only import
+  `src/server/` from route handlers and server components.
+
+## Next steps
+
+- Read the [Protected Dashboard tutorial](/docs/tutorials/auth) for sessions
+  over time, passkeys, and lost-device recovery.
+- Building with TanStack Start instead? Follow
+  [Add Puzzle Auth to TanStack Start](/docs/tutorials/auth-tanstack-start).
+- Review the [Next.js integration](/docs/fullstack/next) and the
+  [Auth security reference](/docs/auth/security).
+- Require [step-up authentication](/docs/auth/mfa#step-up-authentication)
+  before destructive actions.
+- Add [account lifecycle emails](/docs/auth/lifecycle) such as verification and
+  password reset.

@@ -22,7 +22,8 @@ Pass a `fonts` map to `Theme`. Each entry is a `FontConfig`:
 | Field      | Type                                                      | Default             | Description                      |
 | ---------- | --------------------------------------------------------- | ------------------- | -------------------------------- |
 | `family`   | `GoogleFontFamily`                                        | —                   | A typed Google Font family name. |
-| `weights`  | `readonly number[]`                                       | role-based defaults | The weights to load.             |
+| `weights`  | `readonly number[]`                                       | `[400, 700]`        | The weights to load.             |
+| `weightRange` | `readonly [number, number]`                            | —                   | Variable font weight range; takes precedence over `weights`. |
 | `styles`   | `readonly ("normal" \| "italic")[]`                       | `["normal"]`        | Font styles to load.             |
 | `display`  | `"auto" \| "block" \| "swap" \| "fallback" \| "optional"` | `"swap"`            | The CSS `font-display` strategy. |
 | `fallback` | `readonly string[]`                                       | role-based defaults | Fallback font families.          |
@@ -40,6 +41,18 @@ Pass a `fonts` map to `Theme`. Each entry is a `FontConfig`:
 ```
 
 `Theme` renders the Google Fonts preconnect links and one stylesheet link per font, and builds properly quoted `font-family` values including your fallbacks.
+
+### Self-hosting fonts
+
+To serve fonts from your own application, create `puzzle-fonts.json`, run
+`puzzle-theme fonts download`, and pass the same fonts to `Theme` with
+`fontSource="local"`. Downloading fonts alone does not change the default
+Google Fonts loading mode.
+
+See the [Theme CLI reference](/docs/theme/cli) for configuration, variable
+weight ranges, subsets, caching, and all command options. The
+[theme setup tutorial](/docs/tutorials/theme) walks through the complete
+workflow with npm, Bun, pnpm, and Yarn.
 
 ### Standalone font loading
 
