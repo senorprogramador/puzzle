@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/auth",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Framework-independent authentication for accounts, MFA, passkeys, and lifecycle workflows.",
   "homepage": "https://puzzle-ui.com/docs/auth",
   "keywords": [
@@ -53,8 +53,8 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@puzzle-ui/storage": "^0.9.0",
-    "@puzzle-ui/session": "^0.9.0",
+    "@puzzle-ui/storage": "^0.10.0",
+    "@puzzle-ui/session": "^0.10.0",
     "@simplewebauthn/server": "^14.1.0"
   }
 }

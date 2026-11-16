@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/hooks` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.10.0 - 2026-11-16
+
+- No changes; version bumped in lockstep.
+
 ## 0.9.0 - 2026-11-16
 
 - No changes; version bumped in lockstep.

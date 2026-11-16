@@ -18,6 +18,23 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.10.0 - 2026-11-16
+
+### `@puzzle-ui/ui`
+
+- Added a responsive `Pagination` layout: on viewports under 768px it shows a compact page list (no sibling pages, at most one boundary page), while larger viewports keep the configured `siblingCount` and `boundaryCount`.
+- Added `style` prop support to `Section`, so inline styles are now applied to the rendered element.
+- Improved the layout and navigation component docs and examples, and added a component carousel to the site home page.
+
+### `@puzzle-ui/create`
+
+- Added a prompt for the first application user (email, masked password of 12–1024 characters, and confirmation) when MongoDB or D1 is selected with Auth. The CLI creates that account after install through Puzzle Auth's password hashing, and sends credentials over stdin rather than as command-line arguments or project files.
+- Added a `db:setup` script to generated MongoDB projects. It starts the replica set, checks both accounts and primary readiness, and initializes missing users on older local volumes without resetting existing passwords or deleting data. The next steps now say to run `db:setup` instead of `docker compose up -d --wait`.
+- Added a `Page not found` route to generated TanStack Start projects.
+- Command runner now supports passing input to a child process over stdin.
+- Docker with Compose is now documented as a requirement when selecting MongoDB with Auth.
+- Expanded the end-to-end suite to cover dev-server checks, legacy MongoDB volumes, initial-user sign-in, and passwords with special characters.
+
 ## 0.9.0 - 2026-11-16
 
 ### `@puzzle-ui/theme`

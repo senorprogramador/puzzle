@@ -3,6 +3,12 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.10.0 - 2026-11-16
+
+- Added a responsive `Pagination` layout: on viewports under 768px it shows a compact page list (no sibling pages, at most one boundary page), while larger viewports keep the configured `siblingCount` and `boundaryCount`.
+- Added `style` prop support to `Section`, so inline styles are now applied to the rendered element.
+- Improved the layout and navigation component docs and examples, and added a component carousel to the site home page.
+
 ## 0.9.0 - 2026-11-16
 
 - No changes; version bumped in lockstep.
