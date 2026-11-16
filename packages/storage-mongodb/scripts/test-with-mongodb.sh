@@ -5,6 +5,19 @@ set -Eeuo pipefail
 PACKAGE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COMPOSE_FILE="$PACKAGE_ROOT/docker-compose.yml"
 
+# Use a free host port so the tests do not collide with a local MongoDB on 27017.
+if [[ -z "${MONGODB_TEST_PORT:-}" ]]; then
+  MONGODB_TEST_PORT="$(node -e '
+    const server = require("node:net").createServer();
+    server.listen(0, "127.0.0.1", () => {
+      console.log(server.address().port);
+      server.close();
+    });
+  ')"
+fi
+
+export MONGODB_TEST_PORT
+
 compose() {
   docker compose \
     --project-directory "$PACKAGE_ROOT" \
@@ -36,7 +49,7 @@ cleanup() {
 
 trap cleanup EXIT
 
-echo "Starting MongoDB..."
+echo "Starting MongoDB on 127.0.0.1:$MONGODB_TEST_PORT..."
 
 compose up -d --wait --wait-timeout 60 mongodb
 
@@ -79,7 +92,7 @@ fi
 
 echo "MongoDB is ready."
 
-export MONGODB_TEST_URI="mongodb://127.0.0.1:27017/?replicaSet=rs0"
+export MONGODB_TEST_URI="mongodb://127.0.0.1:$MONGODB_TEST_PORT/?directConnection=true"
 export MONGODB_TEST_DATABASE="puzzle_storage_test"
 export MONGODB_TEST_TRANSACTIONS="true"
 

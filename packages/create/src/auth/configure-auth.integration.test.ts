@@ -64,13 +64,31 @@ describe("configureAuth", () => {
       'mode="sign-up"',
     );
 
-    expect(env).toContain(
-      'MONGODB_URI="mongodb://localhost:27017/?directConnection=true"',
-    );
+    const appPassword = env.match(/^MONGODB_APP_PASSWORD="([0-9a-f]{64})"$/m)?.[1];
+    const rootPassword = env.match(/^MONGODB_ROOT_PASSWORD="([0-9a-f]{64})"$/m)?.[1];
+
+    expect(appPassword).toBeDefined();
+    expect(rootPassword).toBeDefined();
+    expect(rootPassword).not.toBe(appPassword);
     expect(env).toContain('MONGODB_DATABASE="my_app"');
+    expect(env).toContain('MONGODB_APP_USERNAME="my_app_app"');
+    expect(env).toContain(
+      `MONGODB_URI="mongodb://my_app_app:${appPassword}@localhost:27017/my_app?authSource=my_app&directConnection=true"`,
+    );
     expect(env).toMatch(/AUTH_ENCRYPTION_KEY_HEX="[0-9a-f]{64}"/);
     expect(env).toContain('APP_ORIGIN="http://localhost:3000"');
     expect(compose).toContain("--replSet");
+    expect(compose).toContain("--keyFile");
+    expect(compose).toContain('"127.0.0.1:27017:27017"');
+    expect(compose).toContain(
+      "MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:?",
+    );
+    expect(compose).toContain(
+      "MONGODB_APP_PASSWORD: ${MONGODB_APP_PASSWORD:?",
+    );
+    expect(await read("docker/mongodb/create-app-user.js")).toContain(
+      'roles: [{ role: "readWrite", db: databaseName }]',
+    );
 
     await expect(read("wrangler.jsonc")).rejects.toMatchObject({
       code: "ENOENT",

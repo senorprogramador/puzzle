@@ -5,6 +5,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { fumadocsMdx } from "fumadocs-mdx/vite";
+import { createFontRouteRules } from "@puzzle-ui/theme/nitro";
 
 const logger = createLogger();
 const routerEntry = createRequire(import.meta.url).resolve("@tanstack/react-router");
@@ -23,10 +24,9 @@ const routerCoreResolution: Plugin = {
 const DAY = 60 * 60 * 24;
 const YEAR = DAY * 365;
 
-const cachedForADay = ["/", "/docs", "/docs/**", "/fonts/puzzle-fonts.css"];
+const cachedForADay = ["/", "/docs", "/docs/**"];
 
 const cachedForAYear = [
-  "/fonts/*.{woff,woff2,ttf,otf}",
   "/assets/**",
   "/apple-touch-icon.png",
   "/favicon.ico",
@@ -81,10 +81,13 @@ export default defineConfig({
     routerCoreResolution,
     tanstackStart(),
     nitro({
-      routeRules: Object.fromEntries([
-        ...cachedForADay.map((path) => [path, dayCache]),
-        ...cachedForAYear.map((path) => [path, immutableCache]),
-      ]),
+      routeRules: {
+        ...Object.fromEntries([
+          ...cachedForADay.map((path) => [path, dayCache]),
+          ...cachedForAYear.map((path) => [path, immutableCache]),
+        ]),
+        ...createFontRouteRules(),
+      },
     }),
     viteReact(),
     tailwindcss({

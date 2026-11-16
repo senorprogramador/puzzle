@@ -43,4 +43,4 @@ bun run typecheck
 bun run test
 ```
 
-The test script requires Docker and Docker Compose; it starts a MongoDB replica set for adapter tests.
+The test script requires Docker and Docker Compose; it starts a MongoDB replica set for adapter tests on a free localhost port, so an existing MongoDB on port 27017 does not conflict. Set `MONGODB_TEST_PORT` to choose the port.

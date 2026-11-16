@@ -53,6 +53,12 @@ export const D1_FRAMEWORK_PACKAGES: Record<
   },
 };
 
+/**
+ * Node.js server output for TanStack Start projects that do not deploy to
+ * Cloudflare Workers.
+ */
+export const TANSTACK_NITRO_PACKAGES = ["nitro@latest"] as const;
+
 export const FRAMEWORKS: {
   value: Framework;
   label: string;

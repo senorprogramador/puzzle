@@ -18,6 +18,7 @@ import {
   isFullStackFramework,
   PUZZLE_AUTH_PACKAGES,
   PUZZLE_PACKAGES,
+  TANSTACK_NITRO_PACKAGES,
 } from "./constants";
 
 import { configureTailwind } from "./tailwind/configure-tailwind";
@@ -46,6 +47,9 @@ const getDependencies = (options: ProjectOptions) => {
       ...(options.auth ? PUZZLE_AUTH_PACKAGES : []),
       ...(database ? AUTH_DATABASE_PACKAGES[database] : []),
       ...(cloudflare?.dependencies ?? []),
+      ...(options.framework === "tanstack" && database !== "d1"
+        ? TANSTACK_NITRO_PACKAGES
+        : []),
     ],
     devDependencies: [...(cloudflare?.devDependencies ?? [])],
   };
@@ -218,6 +222,14 @@ const createProject = async (
     await installDependencies(targetDirectory, options, runner);
 
     finishStep(options.auth ? "Puzzle and Auth installed" : "Puzzle installed");
+
+    startStep("Downloading fonts");
+
+    await runner(options.packageManager, ["run", "fonts:download"], {
+      cwd: targetDirectory,
+    });
+
+    finishStep("Fonts downloaded");
 
     if (database === "d1") {
       startStep("Generating Cloudflare types");

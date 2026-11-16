@@ -76,6 +76,7 @@ const createReactProject: FrameworkGenerator = async (
           skipLibCheck: true,
           moduleResolution: "bundler",
           allowImportingTsExtensions: true,
+          resolveJsonModule: true,
           verbatimModuleSyntax: true,
           moduleDetection: "force",
           noEmit: true,

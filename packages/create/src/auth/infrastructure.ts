@@ -35,13 +35,34 @@ const toIdentifier = (projectName: string) =>
 const getD1DatabaseName = (projectName: string) =>
   `${toIdentifier(projectName)}-db`;
 
+const getMongoDatabaseName = (projectName: string) =>
+  toIdentifier(projectName).replace(/-/g, "_");
+
+// Hex keeps generated passwords safe to embed in a connection string.
+const createDatabasePassword = () => randomBytes(32).toString("hex");
+
 const databaseEnvironment = ({ database, projectName }: InfrastructureOptions) => {
   if (database === "mongodb") {
+    const databaseName = getMongoDatabaseName(projectName);
+    const appUsername = `${databaseName}_app`;
+    const appPassword = createDatabasePassword();
+
     return `
-# MongoDB connection. Start the local replica set with: docker compose up -d
+# MongoDB. docker compose reads these values from this file. Start the
+# replica set with: docker compose up -d --wait
 # Auth uses transactions, which require a replica set.
-MONGODB_URI="mongodb://localhost:27017/?directConnection=true"
-MONGODB_DATABASE="${toIdentifier(projectName).replace(/-/g, "_")}"
+# Users are created when the data volume is first initialised. To change a
+# password afterwards, update the user in MongoDB as well as here.
+
+# Administrator, used only by Docker for setup and health checks.
+MONGODB_ROOT_USERNAME="root"
+MONGODB_ROOT_PASSWORD="${createDatabasePassword()}"
+
+# Application user with read/write access to MONGODB_DATABASE only.
+MONGODB_DATABASE="${databaseName}"
+MONGODB_APP_USERNAME="${appUsername}"
+MONGODB_APP_PASSWORD="${appPassword}"
+MONGODB_URI="mongodb://${appUsername}:${appPassword}@localhost:27017/${databaseName}?authSource=${databaseName}&directConnection=true"
 `;
   }
 
@@ -87,29 +108,67 @@ AUTH_RATE_LIMIT_SECRET="${randomBytes(48).toString("base64url")}"
 # TRUSTED_CLIENT_IP_HEADER="x-real-ip"
 ${databaseEnvironment(options)}`;
 
+// Credentials are interpolated from .env, which docker compose reads automatically.
 const mongoDockerCompose = `services:
   mongodb:
     image: mongo:8
-    # Auth needs transactions, which require a replica set.
-    command: ["--replSet", "rs0", "--bind_ip_all"]
+    restart: unless-stopped
+    # Auth needs transactions, which require a replica set. A replica set with
+    # access control needs a keyfile; one is generated on first start and kept
+    # in the mongodb-config volume.
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -euo pipefail
+        keyfile=/data/configdb/replica-set.key
+        if [ ! -s "$$keyfile" ]; then
+          head -c 756 /dev/urandom | base64 -w 0 > "$$keyfile"
+        fi
+        chown mongodb:mongodb "$$keyfile"
+        chmod 400 "$$keyfile"
+        exec docker-entrypoint.sh mongod --replSet rs0 --keyFile "$$keyfile" --bind_ip_all
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: \${MONGODB_ROOT_USERNAME:?Set MONGODB_ROOT_USERNAME in .env}
+      MONGO_INITDB_ROOT_PASSWORD: \${MONGODB_ROOT_PASSWORD:?Set MONGODB_ROOT_PASSWORD in .env}
+      MONGODB_DATABASE: \${MONGODB_DATABASE:?Set MONGODB_DATABASE in .env}
+      MONGODB_APP_USERNAME: \${MONGODB_APP_USERNAME:?Set MONGODB_APP_USERNAME in .env}
+      MONGODB_APP_PASSWORD: \${MONGODB_APP_PASSWORD:?Set MONGODB_APP_PASSWORD in .env}
+    # Only reachable from this machine. Do not publish MongoDB publicly.
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongodb-data:/data/db
+      - mongodb-config:/data/configdb
+      - ./docker/mongodb/create-app-user.js:/docker-entrypoint-initdb.d/create-app-user.js:ro
     healthcheck:
       test:
-        - CMD
-        - mongosh
-        - --quiet
-        - --eval
-        - "try { rs.status().ok } catch (error) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] }).ok }"
+        - CMD-SHELL
+        - >-
+          mongosh --quiet
+          --username "$$MONGO_INITDB_ROOT_USERNAME"
+          --password "$$MONGO_INITDB_ROOT_PASSWORD"
+          --authenticationDatabase admin
+          --eval "try { rs.status().ok } catch (error) { rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'localhost:27017' }] }).ok }"
       interval: 5s
       timeout: 10s
       retries: 12
-      start_period: 5s
+      start_period: 10s
 
 volumes:
   mongodb-data:
+  mongodb-config:
+`;
+
+const mongoCreateAppUser = `// Runs once, when the MongoDB data volume is first initialised.
+// Creates the least-privileged user the application connects with.
+const databaseName = process.env.MONGODB_DATABASE;
+
+db.getSiblingDB(databaseName).createUser({
+  user: process.env.MONGODB_APP_USERNAME,
+  pwd: process.env.MONGODB_APP_PASSWORD,
+  roles: [{ role: "readWrite", db: databaseName }],
+});
 `;
 
 const wranglerConfig = ({ framework, projectName }: InfrastructureOptions) => {
@@ -220,6 +279,7 @@ const getInfrastructureFiles = (
 
   if (options.database === "mongodb") {
     files["docker-compose.yml"] = mongoDockerCompose;
+    files["docker/mongodb/create-app-user.js"] = mongoCreateAppUser;
   }
 
   if (options.database === "d1") {

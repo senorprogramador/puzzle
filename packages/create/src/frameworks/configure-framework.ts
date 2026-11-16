@@ -46,6 +46,44 @@ const addCloudflarePlugin = (config: string) => {
   )}`;
 };
 
+// Nitro builds a deployable Node.js server and caches the downloaded fonts.
+const nitroVitePlugin = "nitro({ routeRules: createFontRouteRules() })";
+
+const addNitroPlugin = (config: string) => {
+  if (config.includes("nitro/vite")) {
+    return config;
+  }
+
+  const withPlugin = config.replace(
+    /tanstackStart\(([^)]*)\)/,
+    (match) => `${match}, ${nitroVitePlugin}`,
+  );
+
+  return `import { nitro } from "nitro/vite";
+import { createFontRouteRules } from "@puzzle-ui/theme/nitro";
+${withPlugin}`;
+};
+
+const addNodeStartScript = async (directory: string) => {
+  const packageJsonPath = path.join(directory, "package.json");
+
+  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8")) as {
+    scripts?: Record<string, string>;
+    [key: string]: unknown;
+  };
+
+  packageJson.scripts = {
+    ...packageJson.scripts,
+    start: "node .output/server/index.mjs",
+  };
+
+  await writeFile(
+    packageJsonPath,
+    `${JSON.stringify(packageJson, null, 2)}\n`,
+    "utf8",
+  );
+};
+
 const configureTanStack = async (
   directory: string,
   auth: boolean,
@@ -72,11 +110,15 @@ const configureTanStack = async (
     );
   }
 
-  if (auth && database === "d1") {
-    config = addCloudflarePlugin(config);
-  }
+  const d1 = auth && database === "d1";
+
+  config = d1 ? addCloudflarePlugin(config) : addNitroPlugin(config);
 
   await writeFile(configPath, config, "utf8");
+
+  if (!d1) {
+    await addNodeStartScript(directory);
+  }
 };
 
 const configureReactRouter = async (

@@ -1,8 +1,9 @@
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 
 import path from "node:path";
 
 import {
+  getFontDownloadScript,
   getThemeTemplates,
   obsoleteTemplatePaths,
   type TemplateOptions,
@@ -25,6 +26,52 @@ const writeTemplates = async (
   );
 };
 
+const addFontDownloadScript = async (
+  directory: string,
+  options: TemplateOptions,
+) => {
+  const packageJsonPath = path.join(directory, "package.json");
+
+  const packageJson = JSON.parse(await readFile(packageJsonPath, "utf8")) as {
+    scripts?: Record<string, string>;
+    [key: string]: unknown;
+  };
+
+  packageJson.scripts = {
+    ...packageJson.scripts,
+    "fonts:download": getFontDownloadScript(options.framework),
+  };
+
+  await writeFile(
+    packageJsonPath,
+    `${JSON.stringify(packageJson, null, 2)}\n`,
+    "utf8",
+  );
+};
+
+/**
+ * Lets TypeScript type the imported puzzle-fonts.json. The TanStack Start
+ * template's tsconfig.json contains comments, so it is edited as text.
+ */
+const enableJsonModules = async (directory: string) => {
+  const tsconfigPath = path.join(directory, "tsconfig.json");
+  const tsconfig = await readFile(tsconfigPath, "utf8").catch(() => null);
+
+  if (tsconfig === null || tsconfig.includes('"resolveJsonModule"')) {
+    return;
+  }
+
+  await writeFile(
+    tsconfigPath,
+    tsconfig.replace(
+      /("compilerOptions"\s*:\s*\{)(\s*)/,
+      (_match, start: string, whitespace: string) =>
+        `${start}${whitespace}"resolveJsonModule": true,${whitespace}`,
+    ),
+    "utf8",
+  );
+};
+
 const configureTheme = async (
   directory: string,
   options: TemplateOptions,
@@ -39,6 +86,11 @@ const configureTheme = async (
   );
 
   await writeTemplates(directory, getThemeTemplates(options));
+  await addFontDownloadScript(directory, options);
+
+  if (options.framework === "tanstack") {
+    await enableJsonModules(directory);
+  }
 };
 
 export { configureTheme, writeTemplates };

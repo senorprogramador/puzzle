@@ -208,6 +208,8 @@ import Link from "next/link";
 
 import { Theme } from "@puzzle-ui/theme";${authProviderImport(auth)}
 
+import fonts from "../puzzle-fonts.json";
+
 type ProvidersProps = {
   children: ReactNode;
 };
@@ -219,7 +221,12 @@ const themeComponents = {
 };
 
 const Providers = ({ children }: ProvidersProps) => (
-  <Theme theme="system" components={themeComponents}>
+  <Theme
+    theme="system"
+    fonts={fonts}
+    fontSource="local"
+    components={themeComponents}
+  >
 ${renderThemeChildren(auth, "{children}", 4)}
   </Theme>
 );
@@ -273,6 +280,8 @@ const tanstackRootRoute = ({ auth = false }: TemplateOptions) => `import {
 
 import { Theme } from "@puzzle-ui/theme";${authProviderImport(auth)}
 
+import fonts from "../puzzle-fonts.json";
+
 // Puzzle Link renders the TanStack Router Link, which uses a \`to\` prop.
 const themeComponents = {
   link: { component: Link, hrefProp: "to" as const },
@@ -284,7 +293,12 @@ const RootComponent = () => (
       <HeadContent />
     </head>
     <body>
-      <Theme theme="system" components={themeComponents}>
+      <Theme
+        theme="system"
+        fonts={fonts}
+        fontSource="local"
+        components={themeComponents}
+      >
 ${renderThemeChildren(auth, "<Outlet />", 8)}
       </Theme>
       <Scripts />
@@ -333,6 +347,8 @@ import { Container, Heading, Text } from "@puzzle-ui/ui";
 
 import type { Route } from "./+types/root";
 
+import fonts from "./puzzle-fonts.json";
+
 import "./app.css";
 
 // Puzzle Link renders the React Router Link, which uses a \`to\` prop.
@@ -349,7 +365,12 @@ export const Layout = ({ children }: { children: ReactNode }) => (
       <Links />
     </head>
     <body>
-      <Theme theme="system" components={themeComponents}>
+      <Theme
+        theme="system"
+        fonts={fonts}
+        fontSource="local"
+        components={themeComponents}
+      >
 ${renderThemeChildren(auth, "{children}", 8)}
       </Theme>
       <ScrollRestoration />
@@ -440,6 +461,7 @@ import ReactDOM from "react-dom/client";
 import { Theme } from "@puzzle-ui/theme";${authProviderImport(auth)}
 
 import App from "./App";
+import fonts from "./puzzle-fonts.json";
 
 import "./index.css";
 
@@ -447,7 +469,7 @@ ReactDOM.createRoot(
   document.getElementById("root")!,
 ).render(
   <React.StrictMode>
-    <Theme theme="system">
+    <Theme theme="system" fonts={fonts} fontSource="local">
 ${renderThemeChildren(auth, "<App />", 6)}
     </Theme>
   </React.StrictMode>,
@@ -461,7 +483,41 @@ ${renderHomeComponent("App", options)}
 export default App;
 `;
 
-const getThemeTemplates = (options: TemplateOptions): Record<string, string> => {
+const defaultFonts = `${JSON.stringify(
+  {
+    heading: {
+      family: "Geist",
+      weightRange: [400, 700],
+      display: "swap",
+      fallback: ["system-ui", "sans-serif"],
+    },
+    body: {
+      family: "Geist",
+      weightRange: [400, 700],
+      display: "swap",
+      fallback: ["system-ui", "sans-serif"],
+    },
+  },
+  null,
+  2,
+)}\n`;
+
+/**
+ * Font configuration file, relative to the project root, for each framework.
+ */
+const fontConfigPaths: Record<Framework, string> = {
+  next: "src/puzzle-fonts.json",
+  tanstack: "src/puzzle-fonts.json",
+  "react-router": "app/puzzle-fonts.json",
+  react: "src/puzzle-fonts.json",
+};
+
+const getFontDownloadScript = (framework: Framework) =>
+  `puzzle-theme fonts download --config ${fontConfigPaths[framework]} --subsets latin,latin-ext`;
+
+const getFrameworkTemplates = (
+  options: TemplateOptions,
+): Record<string, string> => {
   switch (options.framework) {
     case "next":
       return {
@@ -489,6 +545,11 @@ const getThemeTemplates = (options: TemplateOptions): Record<string, string> => 
   }
 };
 
+const getThemeTemplates = (options: TemplateOptions): Record<string, string> => ({
+  [fontConfigPaths[options.framework]]: defaultFonts,
+  ...getFrameworkTemplates(options),
+});
+
 /**
  * Template files replaced by the Puzzle templates and safe to remove.
  */
@@ -496,4 +557,10 @@ const obsoleteTemplatePaths: Partial<Record<Framework, string[]>> = {
   "react-router": ["app/welcome"],
 };
 
-export { getDocsLinks, getThemeTemplates, obsoleteTemplatePaths };
+export {
+  fontConfigPaths,
+  getDocsLinks,
+  getFontDownloadScript,
+  getThemeTemplates,
+  obsoleteTemplatePaths,
+};

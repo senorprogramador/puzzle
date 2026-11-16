@@ -65,11 +65,24 @@ describe("createProject", () => {
 
     expect(packageJson.name).toBe("my-awesome-app");
     expect(main).toContain("@puzzle-ui/theme");
-    expect(main).toContain('<Theme theme="system">');
+    expect(main).toContain(
+      '<Theme theme="system" fonts={fonts} fontSource="local">',
+    );
     expect(app).toContain("@puzzle-ui/ui");
     expect(css).toContain('@import "tailwindcss";');
+    expect(packageJson.scripts["fonts:download"]).toBe(
+      "puzzle-theme fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
+    );
 
-    expect(runner).toHaveBeenCalledTimes(2);
+    expect(runner).toHaveBeenCalledTimes(3);
+
+    expect(runner).toHaveBeenLastCalledWith(
+      "bun",
+      ["run", "fonts:download"],
+      {
+        cwd: projectDirectory,
+      },
+    );
 
     expect(runner).toHaveBeenCalledWith(
       "bun",
@@ -167,7 +180,7 @@ describe("createProject", () => {
 
       const projectDirectory = path.join(cwd, "auth-app");
 
-      expect(runner).toHaveBeenCalledTimes(1);
+      expect(runner).toHaveBeenCalledTimes(2);
 
       expect(runner).toHaveBeenCalledWith(
         packageManager,
@@ -214,7 +227,14 @@ describe("createProject", () => {
       );
 
       expect(css).not.toContain('@import "tailwindcss";');
-      expect(runner).toHaveBeenCalledTimes(1);
+      expect(runner).toHaveBeenCalledTimes(2);
+      expect(runner).toHaveBeenLastCalledWith(
+        packageManager,
+        ["run", "fonts:download"],
+        {
+          cwd: projectDirectory,
+        },
+      );
 
       expect(runner).toHaveBeenCalledWith(
         packageManager,
@@ -283,7 +303,13 @@ describe("createProject", () => {
       ["add", "-D", "@cloudflare/vite-plugin@latest", "wrangler@latest"],
       options,
     );
+    expect(runner).toHaveBeenCalledWith("bun", ["run", "fonts:download"], options);
     expect(runner).toHaveBeenLastCalledWith("bun", ["run", "cf-typegen"], options);
+    expect(runner).not.toHaveBeenCalledWith(
+      "bun",
+      expect.arrayContaining(["nitro@latest"]),
+      options,
+    );
 
     const env = await readFile(path.join(projectDirectory, ".env"), "utf8");
 
@@ -291,6 +317,69 @@ describe("createProject", () => {
     expect(
       await readFile(path.join(projectDirectory, "wrangler.jsonc"), "utf8"),
     ).toContain('"binding": "DB"');
+  });
+
+  it("adds Nitro to TanStack Start projects that run on Node.js", async () => {
+    const projectDirectory = path.join(cwd, "node-app");
+
+    const runner = vi.fn(async () => {
+      // Stand in for the TanStack Start generator on its first call.
+      if (existsSync(projectDirectory)) return;
+
+      await mkdir(path.join(projectDirectory, "src/routes"), {
+        recursive: true,
+      });
+      await writeFile(
+        path.join(projectDirectory, "package.json"),
+        JSON.stringify({ name: "generated", scripts: { build: "vite build" } }),
+        "utf8",
+      );
+      await writeFile(
+        path.join(projectDirectory, "vite.config.ts"),
+        "export default defineConfig({\n  plugins: [tanstackStart(), viteReact()],\n});\n",
+        "utf8",
+      );
+    });
+
+    await createProject(
+      {
+        name: "node-app",
+        directory: "node-app",
+        framework: "tanstack",
+        packageManager: "pnpm",
+        tailwind: false,
+        auth: true,
+        database: "mongodb",
+      },
+      {
+        cwd,
+        runner,
+      },
+    );
+
+    const options = { cwd: projectDirectory };
+    const packageJson = JSON.parse(
+      await readFile(path.join(projectDirectory, "package.json"), "utf8"),
+    );
+
+    expect(runner).toHaveBeenCalledWith(
+      "pnpm",
+      expect.arrayContaining(["mongodb@latest", "nitro@latest"]),
+      options,
+    );
+    expect(runner).toHaveBeenLastCalledWith(
+      "pnpm",
+      ["run", "fonts:download"],
+      options,
+    );
+    expect(packageJson.scripts).toMatchObject({
+      start: "node .output/server/index.mjs",
+      "fonts:download":
+        "puzzle-theme fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
+    });
+    expect(
+      await readFile(path.join(projectDirectory, "vite.config.ts"), "utf8"),
+    ).toContain("nitro({ routeRules: createFontRouteRules() })");
   });
 
   it("does not overwrite an existing project", async () => {

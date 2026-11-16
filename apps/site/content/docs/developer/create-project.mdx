@@ -93,11 +93,11 @@ Full-stack projects with Auth ask which database to use:
 
 | Database      | Setup                                                                                                   |
 | ------------- | ------------------------------------------------------------------------------------------------------- |
-| MongoDB       | Uses <code>@puzzle-ui/storage-mongodb</code> and a <code>docker-compose.yml</code> replica set for local development. |
+| MongoDB       | Uses <code>@puzzle-ui/storage-mongodb</code> and a <code>docker-compose.yml</code> replica set with access control. Random passwords are generated into <code>.env</code>, which Docker Compose reads. |
 | Cloudflare D1 | Uses <code>@puzzle-ui/storage-d1</code>, a <code>wrangler.jsonc</code> D1 binding, and the Cloudflare runtime for local development and deploys. |
 | Custom        | Leaves a placeholder storage adapter for you to implement.                                              |
 
-With MongoDB or D1, authentication works immediately after <code>dev</code> starts. See [Create](/docs/create#puzzle-auth) for the generated files and deployment notes.
+With MongoDB or D1, authentication works immediately after <code>dev</code> starts. See [Create](/docs/create#puzzle-auth) for the generated files and [Deployment](/docs/create/deployment) to go to production.
 
 <Callout type="warn" title="Review before production">
   The generated <code>.env</code> contains local preview values. Set real

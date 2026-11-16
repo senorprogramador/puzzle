@@ -54,6 +54,27 @@ export type DownloadGoogleFontsResult = {
   skipped: boolean;
 };
 
+/**
+ * Google Fonts serves static files from /s/<family>/<version>/<file>.woff2 and,
+ * for some responses, the same fonts from versioned font-kit URLs such as
+ * /l/font?kit=…&v=v5. Kit URLs have no extension, so they must declare WOFF2.
+ */
+const isGoogleFontFileUrl = (url: URL, format: string | undefined) => {
+  if (url.protocol !== "https:" || url.hostname !== "fonts.gstatic.com") {
+    return false;
+  }
+
+  if (url.pathname.toLowerCase().endsWith(".woff2")) {
+    return true;
+  }
+
+  return (
+    url.pathname === "/l/font" &&
+    url.searchParams.has("kit") &&
+    format?.toLowerCase() === "woff2"
+  );
+};
+
 const parseFontFaces = (css: string, family: string): ParsedFontFace[] => {
   const matches = [...css.matchAll(FONT_FACE_REGEX)];
 
@@ -92,17 +113,13 @@ const parseFontFaces = (css: string, family: string): ParsedFontFace[] => {
       );
     }
 
-    if (
-      parsedUrl.protocol !== "https:" ||
-      parsedUrl.hostname !== "fonts.gstatic.com" ||
-      !parsedUrl.pathname.toLowerCase().endsWith(".woff2")
-    ) {
+    const format = body.match(FONT_FORMAT_REGEX)?.[1];
+
+    if (!isGoogleFontFileUrl(parsedUrl, format)) {
       throw new Error(
         `Google Fonts returned an unsupported font URL: ${fontUrl}`,
       );
     }
-
-    const format = body.match(FONT_FORMAT_REGEX)?.[1];
 
     if (format && format.toLowerCase() !== "woff2") {
       throw new Error(

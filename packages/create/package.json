@@ -32,8 +32,9 @@
   },
   "scripts": {
     "build": "tsdown",
-    "typecheck": "tsc --noEmit -p .",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p e2e",
     "test": "vitest run",
+    "test:e2e": "vitest run -c vitest.e2e.config.ts",
     "test:watch": "bunx vitest run --watch --passWithNoTests",
     "prepack": "npm run build"
   },

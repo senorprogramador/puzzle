@@ -39,26 +39,45 @@ describe("configureFramework", () => {
     expect(config).toContain('"@puzzle-ui/fullstack"');
   });
 
-  it("configures TanStack Start SSR dependencies", async () => {
+  it("configures TanStack Start SSR dependencies and Nitro", async () => {
     await writeFile(
       path.join(cwd, "vite.config.ts"),
       `import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [],
+  plugins: [tanstackStart(), viteReact()],
 });
 `,
+      "utf8",
+    );
+    await writeFile(
+      path.join(cwd, "package.json"),
+      JSON.stringify({ scripts: { build: "vite build" } }),
       "utf8",
     );
 
     await configureFramework(cwd, "tanstack", true);
 
     const config = await readFile(path.join(cwd, "vite.config.ts"), "utf8");
+    const packageJson = JSON.parse(
+      await readFile(path.join(cwd, "package.json"), "utf8"),
+    );
 
     expect(config).toContain("noExternal");
     expect(config).toContain('"@puzzle-ui/ui"');
     expect(config).toContain('"@puzzle-ui/theme"');
     expect(config).toContain('"@puzzle-ui/fullstack"');
+    expect(config).toContain('import { nitro } from "nitro/vite";');
+    expect(config).toContain(
+      'import { createFontRouteRules } from "@puzzle-ui/theme/nitro";',
+    );
+    expect(config).toContain(
+      "plugins: [tanstackStart(), nitro({ routeRules: createFontRouteRules() }), viteReact()]",
+    );
+    expect(packageJson.scripts).toEqual({
+      build: "vite build",
+      start: "node .output/server/index.mjs",
+    });
   });
 
   it("adds the OpenNext dev bindings for Next.js on D1", async () => {
@@ -90,6 +109,7 @@ export default defineConfig({
     expect(config).toContain(
       'plugins: [cloudflare({ viteEnvironment: { name: "ssr" } }), tanstackStart(), viteReact()]',
     );
+    expect(config).not.toContain("nitro");
   });
 
   it("configures React Router and removes the template's Tailwind", async () => {

@@ -71,6 +71,24 @@ bun run --filter "@puzzle-ui/pieces" test:browser
 bun run --filter "@puzzle-ui/create" test
 ```
 
+### Generated project end-to-end tests
+
+The project generator has an end-to-end suite that creates every framework, Tailwind, Auth and database combination in a temporary directory. Each project is installed with Bun using the local `@puzzle-ui/*` packages, then:
+
+- builds and typechecks
+- downloads its local fonts
+- serves the production build
+
+For MongoDB and D1 projects, the suite also runs the sign-up, sign-out and sign-in flows against the running app.
+
+```bash
+bun run test:e2e
+```
+
+Docker with Compose and network access are required. The suite builds the workspace first and removes the generated projects, containers and volumes when it finishes. Set `PUZZLE_E2E_FILTER` to run specific projects, for example `PUZZLE_E2E_FILTER=tanstack-auth-d1 bun run test:e2e`. See the [create package README](https://github.com/senorprogramador/puzzle/tree/main/packages/create#end-to-end-tests) for all options.
+
+Run it when changing the generator, its templates, or packages used by generated projects.
+
 ### Fullstack authentication
 
 Run server-side and unit tests:
@@ -104,7 +122,7 @@ The MongoDB storage adapter uses a dedicated test runner.
 bun run --filter "@puzzle-ui/storage-mongodb" test
 ```
 
-Docker with Compose must be available. The test script starts its MongoDB test environment and cleans up the container and volume when it finishes.
+Docker with Compose must be available. The test script starts its MongoDB test environment on a free localhost port, so a MongoDB already running on port 27017 does not conflict (set `MONGODB_TEST_PORT` to choose the port), and cleans up the container and volume when it finishes.
 
 ## Type checking
 

@@ -6,6 +6,7 @@ export default defineConfig({
     "src/components-context.tsx",
     "src/scope-context.tsx",
     "src/cli.ts",
+    "src/nitro.ts",
   ],
   unbundle: true,
   format: ["esm", "cjs"],

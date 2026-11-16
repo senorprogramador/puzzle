@@ -126,6 +126,18 @@ The generated stylesheet and preload link use the same font URL, avoiding
 duplicate downloads. Preloading only applies to local fonts and only one
 font is preloaded per Theme instance.
 
+With a Nitro server, such as TanStack Start with `nitro/vite`, pass
+`createFontRouteRules()` from `@puzzle-ui/theme/nitro` to `routeRules`.
+Versioned font files are then cached for a year as immutable, and
+`puzzle-fonts.css` and preload fonts for a day with background revalidation:
+
+```ts
+import { nitro } from "nitro/vite";
+import { createFontRouteRules } from "@puzzle-ui/theme/nitro";
+
+nitro({ routeRules: createFontRouteRules() });
+```
+
 ## Related packages
 
 - [`@puzzle-ui/ui`](https://puzzle-ui.com/docs/ui) — components styled by this theme.

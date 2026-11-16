@@ -13,8 +13,17 @@ describe("configureTheme", () => {
   const read = (relativePath: string) =>
     readFile(path.join(cwd, relativePath), "utf8");
 
+  const readJson = async (relativePath: string) =>
+    JSON.parse(await read(relativePath)) as Record<string, unknown>;
+
   beforeEach(async () => {
     cwd = await mkdtemp(path.join(os.tmpdir(), "puzzle-theme-"));
+
+    await writeFile(
+      path.join(cwd, "package.json"),
+      JSON.stringify({ name: "app", scripts: { dev: "dev" } }),
+      "utf8",
+    );
   });
 
   afterEach(async () => {
@@ -38,6 +47,18 @@ describe("configureTheme", () => {
     expect(providers).toContain("image: Image");
     expect(providers).toContain("components={themeComponents}");
     expect(providers).not.toContain("<AuthProvider");
+    expect(providers).toContain('import fonts from "../puzzle-fonts.json";');
+    expect(providers).toContain("fonts={fonts}");
+    expect(providers).toContain('fontSource="local"');
+    expect(await readJson("src/puzzle-fonts.json")).toMatchObject({
+      heading: { family: "Geist" },
+      body: { family: "Geist" },
+    });
+    expect((await readJson("package.json")).scripts).toEqual({
+      dev: "dev",
+      "fonts:download":
+        "puzzle-theme fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
+    });
 
     expect(layout).toContain("<Providers>");
     expect(page).toContain("@puzzle-ui/ui");
@@ -63,6 +84,18 @@ describe("configureTheme", () => {
   });
 
   it("maps the TanStack Router Link in the theme", async () => {
+    await writeFile(
+      path.join(cwd, "tsconfig.json"),
+      `{
+  "compilerOptions": {
+    /* Bundler mode */
+    "moduleResolution": "bundler"
+  }
+}
+`,
+      "utf8",
+    );
+
     await configureTheme(cwd, { framework: "tanstack" });
 
     const root = await read("src/routes/__root.tsx");
@@ -71,6 +104,13 @@ describe("configureTheme", () => {
     expect(root).toContain('link: { component: Link, hrefProp: "to" as const }');
     expect(root).toContain("components={themeComponents}");
     expect(root).toContain("<Outlet />");
+    expect(root).toContain('import fonts from "../puzzle-fonts.json";');
+    expect(root).toContain('fontSource="local"');
+    expect(await read("src/puzzle-fonts.json")).toContain('"Geist"');
+    expect(await read("tsconfig.json")).toContain(`{
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    /* Bundler mode */`);
     expect(await read("src/routes/index.tsx")).toContain("@puzzle-ui/ui");
   });
 
@@ -90,6 +130,13 @@ describe("configureTheme", () => {
     expect(root).toContain('from "react-router"');
     expect(root).toContain('link: { component: Link, hrefProp: "to" as const }');
     expect(root).toContain("<AuthProvider");
+    expect(root).toContain('import fonts from "./puzzle-fonts.json";');
+    expect(root).toContain('fontSource="local"');
+    expect(await read("app/puzzle-fonts.json")).toContain('"Geist"');
+    expect((await readJson("package.json")).scripts).toMatchObject({
+      "fonts:download":
+        "puzzle-theme fonts download --config app/puzzle-fonts.json --subsets latin,latin-ext",
+    });
     expect(routes).toContain('route("dashboard", "routes/dashboard.tsx")');
     expect(routes).toContain('route("api/auth/*", "routes/api.auth.ts")');
     expect(await read("app/routes/home.tsx")).toContain("@puzzle-ui/ui");
@@ -106,7 +153,11 @@ describe("configureTheme", () => {
     const app = await read("src/App.tsx");
 
     expect(main).toContain("@puzzle-ui/theme");
-    expect(main).toContain('<Theme theme="system">');
+    expect(main).toContain('import fonts from "./puzzle-fonts.json";');
+    expect(main).toContain(
+      '<Theme theme="system" fonts={fonts} fontSource="local">',
+    );
+    expect(await read("src/puzzle-fonts.json")).toContain('"Geist"');
     expect(app).toContain("@puzzle-ui/ui");
     expect(app).toContain("https://puzzle-ui.com/docs/getting-started");
   });

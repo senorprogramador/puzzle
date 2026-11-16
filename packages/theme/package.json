@@ -63,6 +63,16 @@
         "types": "./dist/scope-context.d.cts",
         "default": "./dist/scope-context.cjs"
       }
+    },
+    "./nitro": {
+      "import": {
+        "types": "./dist/nitro.d.ts",
+        "default": "./dist/nitro.js"
+      },
+      "require": {
+        "types": "./dist/nitro.d.cts",
+        "default": "./dist/nitro.cjs"
+      }
     }
   },
   "files": [

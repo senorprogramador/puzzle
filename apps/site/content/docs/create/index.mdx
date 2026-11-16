@@ -67,13 +67,24 @@ Next.js, TanStack Start, and React Router (framework mode) projects are generate
 | Selection | Starter files and configuration |
 | --- | --- |
 | **Next.js** — Next.js App Router | `src/app/providers.tsx`, `src/app/layout.tsx`, `src/app/page.tsx`, and `next.config.ts`. The providers apply `Theme` with system color mode and map Puzzle `Link` and `Image` to `next/link` and `next/image`. |
-| **TanStack Start** — full-stack React | `src/routes/__root.tsx`, `src/routes/index.tsx`, and `vite.config.ts`. The root route applies `Theme` and maps Puzzle `Link` to the TanStack Router `Link`. |
+| **TanStack Start** — full-stack React | `src/routes/__root.tsx`, `src/routes/index.tsx`, and `vite.config.ts`. The root route applies `Theme` and maps Puzzle `Link` to the TanStack Router `Link`. Unless the project uses D1, the CLI adds [Nitro](https://nitro.build) for a deployable Node.js server, a `start` script, and font cache headers. |
 | **React Router** — framework mode | `app/root.tsx`, `app/routes.ts`, `app/routes/home.tsx`, `app/app.css`, and `vite.config.ts`. The root layout applies `Theme` and maps Puzzle `Link` to the React Router `Link`. The template's welcome screen is replaced. |
 | **Basic React** — React + Vite + TypeScript | `index.html`, `src/main.tsx`, `src/App.tsx`, `src/index.css`, `vite.config.ts`, and `tsconfig.json` with app and node configs. The entry point applies `Theme`. |
 
 Every starter home page links to the documentation of the Puzzle packages the project uses, so you can jump straight to the relevant guides. Because the framework `Link` is registered through the theme's [component mapping](/docs/theme/components), Puzzle `Link` performs client-side navigation for internal routes.
 
 The CLI updates the generated `package.json` name, configures framework package transpilation where needed, and installs `@puzzle-ui/ui` and `@puzzle-ui/theme` using the detected package manager. It detects npm, Bun, pnpm, or Yarn from the package-manager environment; if detection is unavailable, it uses npm.
+
+## Fonts
+
+Every project serves its fonts locally. The CLI writes a default `puzzle-fonts.json` that uses Geist for headings and body text, passes it to `Theme` with `fontSource="local"`, adds a `fonts:download` script, and downloads the Latin and Latin Extended subsets into `public/fonts`.
+
+| Framework | Font configuration |
+| --- | --- |
+| Next.js, TanStack Start, Basic React | `src/puzzle-fonts.json` |
+| React Router | `app/puzzle-fonts.json` |
+
+Edit the configuration to change fonts, then run `npm run fonts:download` and commit `public/fonts`. See the [Theme CLI](/docs/theme/cli) for the configuration format and [Deployment](/docs/create/deployment#fonts) for caching.
 
 ## Tailwind CSS
 
@@ -98,11 +109,11 @@ For Next.js, TanStack Start, and React Router, the CLI asks which database store
 
 | Database | Generated setup |
 | --- | --- |
-| **MongoDB** | Installs `@puzzle-ui/storage-mongodb`, the `mongodb` driver, and `@node-rs/argon2`. Adds a `docker-compose.yml` that runs a single-node MongoDB replica set (required for transactions). Start it with `docker compose up -d --wait` before `dev`. |
+| **MongoDB** | Installs `@puzzle-ui/storage-mongodb`, the `mongodb` driver, and `@node-rs/argon2`. Adds a `docker-compose.yml` that runs a single-node MongoDB replica set (required for transactions) with access control, a keyfile, and a port bound to `127.0.0.1`. Randomly generated administrator and application passwords are written to `.env`, which `docker compose` reads; the application user can only read and write the project database. Start it with `docker compose up -d --wait` before `dev`. |
 | **Cloudflare D1** | Installs `@puzzle-ui/storage-d1`, hashes passwords with the built-in `Pbkdf2PasswordHasher` and a generated `AUTH_PASSWORD_PEPPER_HEX`, adds `wrangler.jsonc` with a `DB` binding, and wires the Cloudflare runtime: OpenNext for Next.js, and `@cloudflare/vite-plugin` for TanStack Start and React Router. `dev` uses a local D1 database; `preview`, `deploy`, and `cf-typegen` scripts are added. |
 | **Custom** | Installs `@puzzle-ui/storage` and leaves a documented placeholder in the database module. Until it returns a storage adapter, the auth API responds with HTTP 503. |
 
-The CLI writes a `.env` file with the database settings as local preview values, an `APP_ORIGIN` for CSRF checks, and freshly generated `AUTH_ENCRYPTION_KEY_HEX` and `AUTH_RATE_LIMIT_SECRET` secrets (plus `AUTH_PASSWORD_PEPPER_HEX` for D1). `.env` is added to `.gitignore`; never commit it, and set real values in your deployment environment.
+The CLI writes a `.env` file with the database settings, an `APP_ORIGIN` for CSRF checks, and freshly generated `AUTH_ENCRYPTION_KEY_HEX` and `AUTH_RATE_LIMIT_SECRET` secrets (plus `AUTH_PASSWORD_PEPPER_HEX` for D1, and database passwords for MongoDB). `.env` is added to `.gitignore`; never commit it, and set new values in your deployment environment as described in [Deployment](/docs/create/deployment).
 
 <Callout type="info" title="Deploying to Cloudflare">
   Before the first deploy, run <code>wrangler d1 create &lt;name&gt;</code> and
@@ -141,6 +152,8 @@ npm run dev
 ```
 
 With Auth and MongoDB, start the database first with `docker compose up -d --wait`. Then open `/dashboard` to try the protected route.
+
+To go to production, follow [Deployment](/docs/create/deployment) for your framework and database.
 
 ## CLI package details
 

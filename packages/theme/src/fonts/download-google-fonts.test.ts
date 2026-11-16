@@ -411,4 +411,52 @@ describe("downloadGoogleFonts", () => {
       }),
     ).rejects.toThrow("unsupported font URL");
   });
+
+  it("downloads fonts served from Google Fonts kit URLs", async () => {
+    const kitUrl =
+      "https://fonts.gstatic.com/l/font?kit=gyBUhwUxId8gMGYQ&skey=70a816dcd17c8a3c&v=v5";
+    const fetcher = createFetchMock(
+      GOOGLE_CSS.replace(
+        "https://fonts.gstatic.com/s/inter/v18/example.woff2",
+        kitUrl,
+      ),
+    );
+
+    const result = await downloadGoogleFonts({
+      fonts: {
+        body: {
+          family: "Inter",
+        },
+      },
+      outputDir,
+      fetcher,
+    });
+
+    const css = await readFile(result.cssPath, "utf8");
+
+    expect(fetcher).toHaveBeenCalledWith(kitUrl);
+    expect(css).toContain('url("./puzzle-font-inter.woff2")');
+    expect(css).not.toContain("fonts.gstatic.com");
+  });
+
+  it("rejects kit URLs that do not declare a WOFF2 format", async () => {
+    const fetcher = createFetchMock(
+      GOOGLE_CSS.replace(
+        "https://fonts.gstatic.com/s/inter/v18/example.woff2) format('woff2')",
+        "https://fonts.gstatic.com/l/font?kit=gyBUhwUxId8gMGYQ&v=v5)",
+      ),
+    );
+
+    await expect(
+      downloadGoogleFonts({
+        fonts: {
+          body: {
+            family: "Inter",
+          },
+        },
+        outputDir,
+        fetcher,
+      }),
+    ).rejects.toThrow("unsupported font URL");
+  });
 });

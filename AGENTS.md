@@ -75,6 +75,7 @@ Stop reading once the required pattern is established. Do not read package-wide 
 ## 7. Validation
 
 - Run the narrowest relevant check first: targeted test, type check, lint, or build using existing scripts.
+- For changes to `packages/create` (CLI or templates) or to packages used by generated projects, run `bun run test:e2e`. It needs Docker and network access; narrow it with `PUZZLE_E2E_FILTER` when only some project shapes are affected.
 - If a check is unavailable or too expensive, say so; never claim it passed without running it.
 - Review the diff for accessibility, accidental API changes, hardcoded design values, unrelated edits, and missing exports.
 - Do not add tests that merely duplicate existing coverage; add focused tests for meaningful behavior and regressions.

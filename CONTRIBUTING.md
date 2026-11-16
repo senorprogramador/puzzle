@@ -99,6 +99,15 @@ bun run --filter "@puzzle-ui/ui" test:browser
 bun run --filter "@puzzle-ui/create" test
 ```
 
+For changes to the project generator, its templates, or packages that
+generated projects use, run the end-to-end suite. It creates, installs, builds
+and serves every project shape, and needs Docker with Compose and network
+access:
+
+```bash
+bun run test:e2e
+```
+
 For documentation changes, verify imports and links and build the site:
 
 ```bash
