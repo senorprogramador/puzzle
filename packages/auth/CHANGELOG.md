@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/auth` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.9.0 - 2026-11-16
+
+- No changes; version bumped in lockstep.
+
 ## 0.8.0 - 2026-11-16
 
 - Added `Pbkdf2PasswordHasher`, a Web Crypto PBKDF2-HMAC-SHA256 password hasher with a secret pepper that runs on Node.js, Bun, Deno, and Cloudflare Workers, including the Workers Free plan.

@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.9.0 - 2026-11-16
+
+- No changes; version bumped in lockstep.
+
 ## 0.8.0 - 2026-11-16
 
 - Improved the package README and overlay guidelines with clearer descriptions, section headings, and a link to the overlay documentation.

@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/storage-d1` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.9.0 - 2026-11-16
+
+- No changes; version bumped in lockstep.
+
 ## 0.8.0 - 2026-11-16
 
 - Fixed storing and querying dates nested in documents, so `Date` values are encoded reliably and compared by their ISO string in filters and sorts, including for invalid dates, which now raise a validation error.

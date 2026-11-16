@@ -18,6 +18,25 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.9.0 - 2026-11-16
+
+### `@puzzle-ui/theme`
+
+- Added `createFontRouteRules` in `@puzzle-ui/theme/nitro`, which creates Nitro route rules that cache versioned fonts for a year as immutable and the generated stylesheet and preload fonts for a day with background revalidation.
+- `downloadGoogleFonts` now accepts WOFF2 fonts that Google Fonts serves from `fonts.gstatic.com/l/font?kit=…` URLs, which fixes intermittent `fonts:download` failures.
+
+### `@puzzle-ui/create`
+
+- MongoDB projects now run with access control: `.env` gets randomly generated administrator and application passwords, `docker compose` reads them from `.env`, the replica set uses a generated keyfile, the application user is limited to `readWrite` on the project database, and the port is bound to `127.0.0.1`.
+- Every project now gets a default `puzzle-fonts.json`, passes it to `Theme` with `fontSource="local"`, adds a `fonts:download` script, and downloads the fonts during setup.
+- TanStack Start projects that do not use D1 now include Nitro, a `start` script, and font cache headers from `@puzzle-ui/theme/nitro`.
+- Added a deployment guide for every framework and database at https://puzzle-ui.com/docs/create/deployment.
+- Added an end-to-end suite (`bun run test:e2e`) that creates, installs, builds, serves and tests every project shape against the local packages, including the MongoDB and D1 authentication flows.
+
+### `@puzzle-ui/storage-mongodb`
+
+- The package's MongoDB test script now starts its replica set on a free localhost port (override with `MONGODB_TEST_PORT`) so it no longer conflicts with a local MongoDB on port 27017.
+
 ## 0.8.0 - 2026-11-16
 
 ### `@puzzle-ui/ui`

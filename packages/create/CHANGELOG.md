@@ -3,7 +3,7 @@
 All notable changes to `@puzzle-ui/create` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
-## Unreleased
+## 0.9.0 - 2026-11-16
 
 - MongoDB projects now run with access control: `.env` gets randomly generated administrator and application passwords, `docker compose` reads them from `.env`, the replica set uses a generated keyfile, the application user is limited to `readWrite` on the project database, and the port is bound to `127.0.0.1`.
 - Every project now gets a default `puzzle-fonts.json`, passes it to `Theme` with `fontSource="local"`, adds a `fonts:download` script, and downloads the fonts during setup.
