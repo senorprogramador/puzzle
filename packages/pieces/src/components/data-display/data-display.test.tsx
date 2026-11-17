@@ -1,9 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import {
   ActivityTimeline,
   EmptyStatePanel,
+  EmptyStateSection,
   MetricComparison,
   ProgressOverview,
   StatCard,
@@ -64,5 +65,36 @@ describe("data display compositions", () => {
     expect(
       screen.getByRole("button", { name: "Create project" }),
     ).toBeVisible();
+  });
+
+  it("adds actions, custom content, and announced error details to the shared empty state", () => {
+    render(
+      <EmptyStateSection
+        title="Unable to load projects"
+        description="Try again or contact your workspace administrator."
+        variant="error"
+        icon={<span>!</span>}
+        primaryAction={<button type="button">Retry</button>}
+        secondaryAction={<button type="button">Contact support</button>}
+        errorDetails="Request ID: req-4821"
+      >
+        <p>Project data is temporarily unavailable.</p>
+      </EmptyStateSection>,
+    );
+
+    expect(
+      screen.getByRole("alert", { name: "Unable to load projects" }),
+    ).toHaveAttribute("aria-live", "assertive");
+    expect(
+      screen.getByRole("heading", {
+        name: "Unable to load projects",
+        level: 2,
+      }),
+    ).toBeVisible();
+    expect(screen.getByText("Project data is temporarily unavailable.")).toBeVisible();
+    fireEvent.click(screen.getByText("Error details"));
+    expect(screen.getByText("Request ID: req-4821")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Retry" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Contact support" })).toBeVisible();
   });
 });

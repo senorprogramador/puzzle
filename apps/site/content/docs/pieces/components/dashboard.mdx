@@ -6,6 +6,7 @@ description: Compose accessible dashboard headers, statistics, activity feeds, p
 import {
   DashboardActivityFeed,
   DashboardHeader,
+  DashboardOverviewSection,
   DashboardProgressCard,
   DashboardShell,
   DashboardSidebar,
@@ -14,6 +15,7 @@ import {
   DashboardTopbar,
 } from "@puzzle-ui/pieces";
 import { Badge, Button, Preview } from "@puzzle-ui/ui";
+import { DashboardOverviewStatesExample } from "../../../../src/components/doc-examples/pieces/dashboard-overview-section";
 
 Dashboard compositions provide reusable structure for product and admin interfaces without coupling presentation to a router, data model, or framework.
 
@@ -33,6 +35,74 @@ import {
   DashboardStatGroup,
 } from "@puzzle-ui/pieces";
 ```
+
+## Dashboard overview
+
+`DashboardOverviewSection` composes a labelled dashboard landmark with summary data, metric cards, a date-range slot, actions, optional charts, and arbitrary widgets. Metric trends can use `DashboardStatCard`; chart rendering remains the responsibility of the application because Pieces does not include a chart engine.
+
+<Preview
+  fit="device"
+  code={`\
+<DashboardOverviewSection
+  title="Workspace overview"
+  description="A clear view of this month's work."
+  variant="analytics"
+  dateRange={<Button variant="outline">Last 30 days</Button>}
+  actions={<Button>Create a project</Button>}
+  summary={<p>12 active projects across 3 teams.</p>}
+  metrics={
+    <DashboardStatGroup label="Workspace metrics" columns={3}>
+      <DashboardStatCard label="Active projects" value="12" trend={{ value: "+2", label: "this month", direction: "positive" }} />
+      <DashboardStatCard label="Tasks completed" value="126" trend={{ value: "+12%", label: "this week", direction: "positive" }} />
+      <DashboardStatCard label="Team capacity" value="84%" description="A healthy pace this month" />
+    </DashboardStatGroup>
+  }
+  charts={<WorkspaceRevenueChart data={revenueByMonth} />}
+>
+  <UpcomingLaunches />
+</DashboardOverviewSection>
+`}
+>
+  <DashboardOverviewSection
+    title="Workspace overview"
+    description="A clear view of this month's work."
+    variant="analytics"
+    eyebrow="Northstar Studio"
+    dateRange={<Button variant="outline">Last 30 days</Button>}
+    actions={<Button>Create a project</Button>}
+    summary={<p>12 active projects across design, product, and marketing.</p>}
+    metrics={
+      <DashboardStatGroup label="Workspace metrics" columns={3}>
+        <DashboardStatCard
+          label="Active projects"
+          value="12"
+          trend={{ value: "+2", label: "this month", direction: "positive" }}
+        />
+        <DashboardStatCard
+          label="Tasks completed"
+          value="126"
+          trend={{ value: "+12%", label: "this week", direction: "positive" }}
+        />
+        <DashboardStatCard
+          label="Team capacity"
+          value="84%"
+          description="A healthy pace this month"
+        />
+      </DashboardStatGroup>
+    }
+    charts={<p>Application-provided chart content goes here.</p>}
+  >
+    <p>Three launches are planned before the end of the month.</p>
+  </DashboardOverviewSection>
+</Preview>
+
+The interactive preview lets you switch between ready, loading, and error states. Loading uses the existing UI `Skeleton`; errors are announced as alerts.
+
+<Preview fit="device" code={`<DashboardOverviewSection loading={isLoading} error={error} ... />`}>
+  <DashboardOverviewStatesExample />
+</Preview>
+
+Supported `DashboardOverviewSection` variants: `grid`, `cards`, `metrics`, `split`, `compact`, `analytics`, `welcome`, `activity`, `full-width`, and `executive`.
 
 ## Dashboard header
 

@@ -11,7 +11,8 @@ import {
   SettingsRow,
   SettingsSection,
 } from "@puzzle-ui/pieces";
-import { Badge, Button, Preview, TextInput } from "@puzzle-ui/ui";
+import { Accordion, Badge, Button, Preview, TextInput } from "@puzzle-ui/ui";
+import { SettingsTabsExample } from "../../../../src/components/doc-examples/pieces/settings";
 
 Settings compositions provide layout and semantic structure only. Data loading, validation, and mutations remain in the application.
 
@@ -157,20 +158,75 @@ Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organi
 
 `FormActions` provides a labelled group for submit and cancel controls.
 
+## Interactive tabs and preferences
+
+The settings layout does not own application state. Compose it with UI `Tabs`, `Switch`, and other controls; the application supplies their values and change handlers.
+
+<Preview
+  fit="device"
+  code={`\
+<SettingsSection variant="tabs" title="Workspace settings">
+  <Tabs activeId={activeTab} onActivate={setActiveTab}>
+    <Tabs.Tab id="profile" tab="Profile">...</Tabs.Tab>
+    <Tabs.Tab id="notifications" tab="Notifications">...</Tabs.Tab>
+    <Tabs.Tab id="security" tab="Security">...</Tabs.Tab>
+  </Tabs>
+</SettingsSection>
+`}
+>
+  <SettingsTabsExample />
+</Preview>
+
+Supported variants: `list`, `grouped`, `cards`, `split`, `sidebar`, `tabs`, `accordion`, `profile`, `preferences`, `security`, `notifications`, and `compact`. Use the `navigation` slot for caller-owned navigation in sidebar layouts; use UI `Tabs` or `Accordion` when those interactions are needed.
+
+<Preview
+  fit="device"
+  code={`\
+<SettingsSection title="Account settings" variant="accordion">
+  <Accordion
+    type="multiple"
+    items={[
+      { id: "profile", title: "Profile", content: <ProfileSettings /> },
+      { id: "security", title: "Security", content: <SecuritySettings /> },
+    ]}
+  />
+</SettingsSection>
+`}
+>
+  <SettingsSection title="Account settings" variant="accordion">
+    <Accordion
+      type="multiple"
+      items={[
+        {
+          id: "profile",
+          title: "Profile",
+          content: <p>Update your name and contact details.</p>,
+        },
+        {
+          id: "security",
+          title: "Security",
+          content: <p>Review sign-in and device preferences.</p>,
+        },
+      ]}
+    />
+  </SettingsSection>
+</Preview>
+
 ## Accessibility and responsive behavior
 
 - Sections and groups are labelled by their headings.
-- Supply `htmlFor` and matching control IDs for form labels.
-- Keep each control's accessible description association in the consuming form when needed.
+- Supply `htmlFor` and matching control IDs for form labels. Row descriptions and errors are associated with a single control element when possible.
+- Error messages use an alert announcement; the consuming application remains responsible for validation and state.
+- Settings state, persistence, and validation rules remain in the application.
 - Layouts stack on narrow viewports and use Puzzle theme tokens.
 
 ## API
 
 | Component | Props |
 | --- | --- |
-| `SettingsSection` | `title` and `children` (required), `description`, `actions`, `className` |
+| `SettingsSection` | `title` and `children` (required), `description`, `actions`, `navigation`, `navigationLabel`, `variant`, `className` |
 | `SettingsGroup` | `children` (required), `title`, `className` |
-| `SettingsRow` | `label`, `control` (required), `description`, `htmlFor`, `className` |
+| `SettingsRow` | `label`, `control` (required), `description`, `error`, `htmlFor`, `className` |
 | `FormActions` | `children` (required), `className` |
 | `ProfileHeader` | `name` (required), `email`, `avatar`, `actions`, `className` |
 | `SecurityMethodCard` | `title` (required), `description`, `status`, `icon`, `action`, `className` |

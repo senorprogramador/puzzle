@@ -223,6 +223,16 @@ const components: TreeViewItem = {
       href: `${componentsFolder}/dashboard`,
     },
     {
+      id: "pieces-activity",
+      label: "Activity",
+      href: `${componentsFolder}/activity`,
+    },
+    {
+      id: "pieces-onboarding",
+      label: "Onboarding",
+      href: `${componentsFolder}/onboarding`,
+    },
+    {
       id: "pieces-dashboard-navigation",
       label: "Dashboard Navigation",
       href: `${componentsFolder}/navigation`,
@@ -236,6 +246,11 @@ const components: TreeViewItem = {
       id: "pieces-data-display",
       label: "Data Display",
       href: `${componentsFolder}/data-display`,
+    },
+    {
+      id: "pieces-empty-state",
+      label: "Empty State",
+      href: `${componentsFolder}/empty-state`,
     },
     {
       id: "pieces-settings",

@@ -1,0 +1,75 @@
+---
+title: Onboarding Section
+description: Present accessible, application-controlled onboarding steps, progress, and actions.
+---
+
+import { OnboardingSection } from "@puzzle-ui/pieces";
+import { Button, Preview } from "@puzzle-ui/ui";
+import { OnboardingInteractiveExample } from "../../../../src/components/doc-examples/pieces/onboarding-section";
+
+`OnboardingSection` presents step state supplied by your application. It does not own business logic, persistence, or completion rules.
+
+<Preview
+  fit="device"
+  code={`\
+<OnboardingSection
+  title="Set up your workspace"
+  variant="checklist"
+  currentStep="invite"
+  steps={[
+    { id: "workspace", title: "Create a workspace", completed: true },
+    { id: "invite", title: "Invite your team", description: "Bring your collaborators in." },
+    { id: "connect", title: "Connect a project", disabled: true },
+  ]}
+  onStepChange={setCurrentStep}
+  actions={<Button>Continue</Button>}
+>
+  <p>Your workspace is ready for its first project.</p>
+</OnboardingSection>
+`}
+>
+  <OnboardingSection
+    title="Set up your workspace"
+    description="A few small steps make the workspace your own."
+    variant="checklist"
+    currentStep="invite"
+    steps={[
+      {
+        id: "workspace",
+        title: "Create a workspace",
+        description: "Choose a home for your team's work.",
+        completed: true,
+      },
+      {
+        id: "invite",
+        title: "Invite your team",
+        description: "Bring your collaborators in.",
+      },
+      {
+        id: "connect",
+        title: "Connect a project",
+        disabled: true,
+      },
+    ]}
+    actions={<Button>Continue</Button>}
+  >
+    <p>Your workspace is ready for its first project.</p>
+  </OnboardingSection>
+</Preview>
+
+## Interactive onboarding
+
+The example controls its selected step and completion state in the consuming React component. Use the arrow keys, Home, and End to move through enabled steps; disabled steps are skipped and focus follows keyboard selection.
+
+<Preview fit="device" code={`<OnboardingSection steps={steps} currentStep={currentStep} onStepChange={setCurrentStep} />`}>
+  <OnboardingInteractiveExample />
+</Preview>
+
+Supported variants: `steps`, `checklist`, `progress`, `wizard`, `cards`, `split`, `welcome`, `centered`, `horizontal`, `vertical`, and `compact`.
+
+## Accessibility
+
+- The section is labelled by its heading; the progress indicator exposes a progressbar name and value.
+- Completion and progress are announced through a polite status message.
+- Provide stable step IDs. Disabled steps use native disabled buttons when step selection is enabled.
+- Steps remain application-controlled; update `currentStep` in `onStepChange` and move focus only through the provided keyboard navigation.

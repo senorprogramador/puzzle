@@ -54,6 +54,59 @@
     gap: var(--puzzle-space-2, 0.5rem);
 }
 
+.puzzle-empty-state-section {
+    min-width: 0;
+}
+
+.puzzle-empty-state-section[data-variant="minimal"] {
+    border: 0;
+    background: transparent;
+}
+
+.puzzle-empty-state-section[data-variant="centered"] .puzzle-empty-state__header,
+.puzzle-empty-state-section[data-variant="illustration"] .puzzle-empty-state__header,
+.puzzle-empty-state-section[data-variant="search"] .puzzle-empty-state__header,
+.puzzle-empty-state-section[data-variant="success"] .puzzle-empty-state__header,
+.puzzle-empty-state-section[data-variant="onboarding"] .puzzle-empty-state__header,
+.puzzle-empty-state-section[data-variant="action"] .puzzle-empty-state__header {
+    align-items: center;
+    text-align: center;
+}
+
+.puzzle-empty-state-section[data-variant="error"] .puzzle-empty-state {
+    border-color: var(--puzzle-color-danger);
+}
+
+.puzzle-empty-state-section[data-variant="success"] .puzzle-empty-state {
+    border-color: var(--puzzle-color-success);
+}
+
+.puzzle-empty-state-section[data-variant="compact"] {
+    padding: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-empty-state-section[data-variant="full-page"] {
+    min-height: min(60vh, 40rem);
+    align-content: center;
+}
+
+.puzzle-empty-state-section[data-variant="split"] .puzzle-empty-state__header,
+.puzzle-empty-state-section[data-variant="split"] .puzzle-empty-state__content {
+    align-items: flex-start;
+}
+
+.puzzle-empty-state-panel__error-details {
+    max-width: 100%;
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    text-align: start;
+}
+
+.puzzle-empty-state-panel__error-details > div {
+    overflow-wrap: anywhere;
+    margin-block-start: var(--puzzle-space-2, 0.5rem);
+}
+
 @media (max-width: 30rem) {
     .puzzle-metric-comparison__values {
         grid-template-columns: minmax(0, 1fr);

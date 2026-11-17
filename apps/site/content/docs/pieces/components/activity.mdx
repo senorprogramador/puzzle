@@ -1,0 +1,89 @@
+---
+title: Activity Section
+description: Display searchable, grouped, and linked activity records in product and admin interfaces.
+---
+
+import { ActivitySection } from "@puzzle-ui/pieces";
+import { Badge, Button, Preview } from "@puzzle-ui/ui";
+import { ActivityFilteringExample } from "../../../../src/components/doc-examples/pieces/activity-section";
+
+`ActivitySection` presents records supplied by the application. It does not fetch events, apply permissions, or decide which activity is visible.
+
+<Preview
+  fit="device"
+  code={`\
+const items: ActivityItem[] = [
+  {
+    id: "activity-1",
+    actor: "Alex Morgan",
+    action: "updated the launch plan",
+    description: "Moved the target date to November 30.",
+    timestamp: "10 minutes ago",
+    dateTime: "2026-11-17T17:20:00",
+    group: "today",
+    groupLabel: "Today",
+    href: "/projects/launch",
+    metadata: <Badge content="Project" color="info" />,
+  },
+];
+
+<ActivitySection title="Team activity" variant="grouped" items={items} />
+`}
+>
+  <ActivitySection
+    title="Team activity"
+    variant="grouped"
+    items={[
+      {
+        id: "activity-1",
+        actor: "Alex Morgan",
+        action: "updated the launch plan",
+        description: "Moved the target date to November 30.",
+        timestamp: "10 minutes ago",
+        dateTime: "2026-11-17T17:20:00",
+        group: "today",
+        groupLabel: "Today",
+        href: "/projects/launch",
+        metadata: <span>Launch project</span>,
+      },
+      {
+        id: "activity-2",
+        actor: "Riley Chen",
+        action: "completed a checklist",
+        timestamp: "34 minutes ago",
+        dateTime: "2026-11-17T16:56:00",
+        group: "today",
+        groupLabel: "Today",
+      },
+      {
+        id: "activity-3",
+        actor: "Jordan Lee",
+        action: "changed a workspace permission",
+        timestamp: "Yesterday",
+        dateTime: "2026-11-16T15:40:00",
+        group: "yesterday",
+        groupLabel: "Yesterday",
+      },
+    ]}
+  />
+</Preview>
+
+## Filtering
+
+Filter the source data in your application and pass the result as `items`. The example filters by category and keeps the selected filter in caller-owned state.
+
+<Preview fit="device" code={`<ActivitySection items={filteredItems} variant="grouped" />`}>
+  <ActivityFilteringExample />
+</Preview>
+
+Supported variants: `timeline`, `list`, `feed`, `grouped`, `cards`, `compact`, `avatars`, `audit`, `split`, and `horizontal`.
+
+## Accessibility and API
+
+- Each section is labelled by its heading. Events use ordered lists, semantic `<time>` elements, and native links when `href` is provided.
+- Supply stable unique item IDs. `group` controls grouping and `groupLabel` supplies the displayed heading.
+- `category` and `metadata` are application-defined fields for filtering and supplementary information.
+- Empty data uses the shared `EmptyStatePanel` composition. Supply a custom `emptyState` message when the default is not appropriate.
+- Use `renderItem` only when the default actor/action/time/metadata presentation does not meet the product's needs.
+
+`ActivityItem` supports `id`, `actor`, `action`, `timestamp`, `dateTime`, `icon`, `description`, `metadata`, `group`, `groupLabel`, `category`, and `href`.

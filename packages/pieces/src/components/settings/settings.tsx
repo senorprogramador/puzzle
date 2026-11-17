@@ -1,4 +1,9 @@
-import { useId, type ReactNode } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  useId,
+  type ReactNode,
+} from "react";
 
 import "./settings.css";
 
@@ -6,9 +11,26 @@ export type SettingsSectionProps = {
   title: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
+  navigation?: ReactNode;
+  navigationLabel?: string;
+  variant?: SettingsSectionVariant;
   children: ReactNode;
   className?: string;
 };
+
+export type SettingsSectionVariant =
+  | "list"
+  | "grouped"
+  | "cards"
+  | "split"
+  | "sidebar"
+  | "tabs"
+  | "accordion"
+  | "profile"
+  | "preferences"
+  | "security"
+  | "notifications"
+  | "compact";
 
 export type SettingsGroupProps = {
   title?: ReactNode;
@@ -19,6 +41,7 @@ export type SettingsGroupProps = {
 export type SettingsRowProps = {
   label: ReactNode;
   description?: ReactNode;
+  error?: ReactNode;
   htmlFor?: string;
   control: ReactNode;
   className?: string;
@@ -50,6 +73,9 @@ export const SettingsSection = ({
   title,
   description,
   actions,
+  navigation,
+  navigationLabel = "Settings navigation",
+  variant = "grouped",
   children,
   className,
 }: SettingsSectionProps) => {
@@ -60,6 +86,7 @@ export const SettingsSection = ({
       className={["puzzle-settings-section", className]
         .filter(Boolean)
         .join(" ")}
+      data-variant={variant}
       aria-labelledby={titleId}
     >
       <header className="puzzle-settings-section__header">
@@ -75,7 +102,17 @@ export const SettingsSection = ({
         </div>
         {actions}
       </header>
-      {children}
+      <div className="puzzle-settings-section__layout">
+        {navigation ? (
+          <nav
+            className="puzzle-settings-section__navigation"
+            aria-label={navigationLabel}
+          >
+            {navigation}
+          </nav>
+        ) : null}
+        <div className="puzzle-settings-section__content">{children}</div>
+      </div>
     </section>
   );
 };
@@ -107,10 +144,30 @@ export const SettingsGroup = ({
 export const SettingsRow = ({
   label,
   description,
+  error,
   htmlFor,
   control,
   className,
 }: SettingsRowProps) => {
+  const descriptionId = useId();
+  const errorId = useId();
+  const enhancedControl = isValidElement<{
+    "aria-describedby"?: string;
+    "aria-invalid"?: boolean | "grammar" | "spelling";
+  }>(control)
+    ? cloneElement(control, {
+        "aria-describedby":
+          [
+            control.props["aria-describedby"],
+            description ? descriptionId : undefined,
+            error ? errorId : undefined,
+          ]
+            .filter(Boolean)
+            .join(" ") || undefined,
+        ...(error ? { "aria-invalid": true } : {}),
+      })
+    : control;
+
   return (
     <div
       className={["puzzle-settings-row", className]
@@ -126,13 +183,18 @@ export const SettingsRow = ({
           <div className="puzzle-settings-row__label">{label}</div>
         )}
         {description && (
-          <div className="puzzle-settings-row__description">
+          <div id={descriptionId} className="puzzle-settings-row__description">
             {description}
           </div>
         )}
+        {error ? (
+          <div id={errorId} className="puzzle-settings-row__error" role="alert">
+            {error}
+          </div>
+        ) : null}
       </div>
       <div className="puzzle-settings-row__control">
-        {control}
+        {enhancedControl}
       </div>
     </div>
   );

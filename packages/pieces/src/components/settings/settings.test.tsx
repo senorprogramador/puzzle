@@ -1,4 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { useState } from "react";
+import { Switch } from "@puzzle-ui/ui";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -28,6 +30,25 @@ describe("SettingsSection", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Account details")).toBeVisible();
   });
+
+  it("renders navigation and responsive variants", () => {
+    render(
+      <SettingsSection
+        title="Workspace settings"
+        variant="sidebar"
+        navigation={<a href="#profile">Profile</a>}
+      >
+        <p>Workspace preferences</p>
+      </SettingsSection>,
+    );
+
+    expect(
+      screen.getByRole("region", { name: "Workspace settings" }),
+    ).toHaveAttribute("data-variant", "sidebar");
+    expect(
+      screen.getByRole("navigation", { name: "Settings navigation" }),
+    ).toContainElement(screen.getByRole("link", { name: "Profile" }));
+  });
 });
 
 describe("SettingsGroup and SettingsRow", () => {
@@ -48,6 +69,32 @@ describe("SettingsGroup and SettingsRow", () => {
     expect(
       screen.getByText("Used to verify your identity."),
     ).toBeInTheDocument();
+  });
+
+  it("associates descriptions and errors with the setting control", () => {
+    render(
+      <SettingsGroup title="Profile">
+        <SettingsRow
+          label="Work email"
+          description="Used for workspace notifications."
+          error="Enter a valid work email."
+          htmlFor="work-email"
+          control={<input id="work-email" type="email" />}
+        />
+      </SettingsGroup>,
+    );
+
+    const input = screen.getByLabelText("Work email");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    const describedBy = input.getAttribute("aria-describedby")?.split(" ");
+    expect(describedBy).toHaveLength(2);
+    expect(describedBy?.map((id) => document.getElementById(id)?.textContent)).toEqual([
+      "Used for workspace notifications.",
+      "Enter a valid work email.",
+    ]);
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Enter a valid work email.",
+    );
   });
 });
 
@@ -92,5 +139,38 @@ describe("ProfileHeader and SecurityMethodCard", () => {
       "Authenticator app",
     );
     expect(screen.getByRole("button", { name: "Manage" })).toBeVisible();
+  });
+});
+
+describe("application-owned settings state", () => {
+  it("forwards switch interaction without owning the setting value", () => {
+    const NotificationPreference = () => {
+      const [enabled, setEnabled] = useState(false);
+
+      return (
+        <SettingsSection title="Notifications" variant="notifications">
+          <SettingsGroup title="Email">
+            <SettingsRow
+              label="Weekly digest"
+              description="Receive a summary of your team's work."
+              htmlFor="weekly-digest"
+              control={
+                <Switch
+                  id="weekly-digest"
+                  checked={enabled}
+                  onChange={(event) => setEnabled(event.currentTarget.checked)}
+                />
+              }
+            />
+          </SettingsGroup>
+        </SettingsSection>
+      );
+    };
+
+    render(<NotificationPreference />);
+    const toggle = screen.getByRole("switch", { name: "Weekly digest" });
+    expect(toggle).not.toBeChecked();
+    fireEvent.click(toggle);
+    expect(toggle).toBeChecked();
   });
 });

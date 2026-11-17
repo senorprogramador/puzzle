@@ -1,0 +1,138 @@
+.puzzle-dashboard-overview {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-dashboard-overview__header,
+.puzzle-dashboard-overview__controls,
+.puzzle-dashboard-overview__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-dashboard-overview__header {
+  align-items: flex-end;
+  padding-block-end: var(--puzzle-space-4, 1rem);
+  border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-dashboard-overview__heading,
+.puzzle-dashboard-overview__body,
+.puzzle-dashboard-overview__summary,
+.puzzle-dashboard-overview__metrics,
+.puzzle-dashboard-overview__charts,
+.puzzle-dashboard-overview__widgets {
+  min-width: 0;
+}
+
+.puzzle-dashboard-overview__eyebrow,
+.puzzle-dashboard-overview__description {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-dashboard-overview__eyebrow {
+  margin-block-end: var(--puzzle-space-1, 0.25rem);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-dashboard-overview__title {
+  margin: 0;
+  color: var(--puzzle-color-text);
+  font-family: var(--puzzle-font-heading);
+  font-size: var(--puzzle-font-size-2xl, 1.5rem);
+  line-height: var(--puzzle-font-line-height-tight, 1.25);
+}
+
+.puzzle-dashboard-overview__description {
+  margin-block-start: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-dashboard-overview__controls,
+.puzzle-dashboard-overview__body,
+.puzzle-dashboard-overview__widgets {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-dashboard-overview__actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.puzzle-dashboard-overview__loading {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-dashboard-overview__skeletons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-dashboard-overview__error {
+  padding: var(--puzzle-space-4, 1rem);
+  color: var(--puzzle-color-danger);
+  background: var(--puzzle-color-surface);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-dashboard-overview[data-variant="compact"] {
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-dashboard-overview[data-variant="compact"] .puzzle-dashboard-overview__body,
+.puzzle-dashboard-overview[data-variant="compact"] .puzzle-dashboard-overview__widgets {
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-dashboard-overview[data-variant="split"] .puzzle-dashboard-overview__body {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.puzzle-dashboard-overview[data-variant="split"] .puzzle-dashboard-overview__summary,
+.puzzle-dashboard-overview[data-variant="split"] .puzzle-dashboard-overview__widgets {
+  grid-column: 1 / -1;
+}
+
+.puzzle-dashboard-overview[data-variant="full-width"] {
+  width: 100%;
+}
+
+.puzzle-dashboard-overview[data-variant="executive"] .puzzle-dashboard-overview__title,
+.puzzle-dashboard-overview[data-variant="welcome"] .puzzle-dashboard-overview__title {
+  font-size: var(--puzzle-font-size-3xl, 1.875rem);
+}
+
+.puzzle-dashboard-overview[data-variant="analytics"] .puzzle-dashboard-overview__charts,
+.puzzle-dashboard-overview[data-variant="cards"] .puzzle-dashboard-overview__charts,
+.puzzle-dashboard-overview[data-variant="activity"] .puzzle-dashboard-overview__charts {
+  padding: var(--puzzle-space-4, 1rem);
+  background: var(--puzzle-color-surface);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+@media (max-width: 48rem) {
+  .puzzle-dashboard-overview__header,
+  .puzzle-dashboard-overview__controls {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .puzzle-dashboard-overview[data-variant="split"] .puzzle-dashboard-overview__body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .puzzle-dashboard-overview__skeletons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

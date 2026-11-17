@@ -9,6 +9,7 @@ export {
 
 export type {
   SettingsSectionProps,
+  SettingsSectionVariant,
   SettingsGroupProps,
   SettingsRowProps,
   FormActionsProps,

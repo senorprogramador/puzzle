@@ -1,5 +1,7 @@
 export * from "./components/hero";
 export * from "./components/dashboard";
+export * from "./components/onboarding";
+export * from "./components/activity";
 export * from "./components/navigation";
 export * from "./components/project";
 export * from "./components/data-display";

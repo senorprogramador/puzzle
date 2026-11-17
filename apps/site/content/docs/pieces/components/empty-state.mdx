@@ -1,0 +1,82 @@
+---
+title: Empty State Section
+description: Explain empty, search, success, and error states with accessible actions and application content.
+---
+
+import { EmptyStateSection } from "@puzzle-ui/pieces";
+import { Button, Preview } from "@puzzle-ui/ui";
+import { Icon } from "@puzzle-ui/icons/icon";
+
+`EmptyStateSection` builds on Puzzle UI's existing EmptyState primitives. `EmptyStatePanel` remains available as a compact panel composition; both components share the same content and action slots.
+
+<Preview
+  fit="device"
+  code={`\
+<EmptyStateSection
+  variant="search"
+  title="No projects found"
+  description="Try another search or clear the current filters."
+  icon={<SearchIcon aria-hidden="true" />}
+  primaryAction={<Button>Clear filters</Button>}
+  secondaryAction={<Button variant="outline">Create a project</Button>}
+>
+  <p>Searches include project names, descriptions, and owners.</p>
+</EmptyStateSection>
+`}
+>
+  <EmptyStateSection
+    variant="search"
+    title="No projects found"
+    description="Try another search or clear the current filters."
+    icon={<Icon name="lucide:search" aria-hidden="true" />}
+    primaryAction={<Button>Clear filters</Button>}
+    secondaryAction={<Button variant="outline">Create a project</Button>}
+  >
+    <p>Searches include project names, descriptions, and owners.</p>
+  </EmptyStateSection>
+</Preview>
+
+## Error state
+
+Error details are optional and use a native disclosure, so technical context stays available without overwhelming the default message. Error variants announce the section as an alert; provide only details that are safe to show to the current user.
+
+<Preview
+  code={`\
+<EmptyStateSection
+  variant="error"
+  title="Unable to load reports"
+  description="Try again in a moment."
+  errorDetails={requestId}
+  primaryAction={<Button onClick={retry}>Retry</Button>}
+/>
+`}
+>
+  <EmptyStateSection
+    variant="error"
+    title="Unable to load reports"
+    description="Try again in a moment."
+    errorDetails="Request ID: rpt-2026-114"
+    primaryAction={<Button>Retry</Button>}
+  />
+</Preview>
+
+Supported variants: `centered`, `illustration`, `minimal`, `card`, `split`, `search`, `error`, `success`, `onboarding`, `full-page`, `compact`, and `action`.
+
+## Accessibility
+
+- The title labels a semantic section and uses a level-two heading; an illustration can be given an accessible name with `illustrationLabel`.
+- `status="status"` or `status="alert"` enables a live announcement; error variants announce as alerts by default, while static states are not announced automatically.
+- Actions are caller-provided buttons or links. Keep their labels specific and preserve normal keyboard focus.
+
+## API
+
+| Prop | Description |
+| --- | --- |
+| `title` | Required state heading. |
+| `description` | Supporting explanation. |
+| `illustration`, `icon`, `illustrationLabel` | Optional media or icon slot and its accessible name. |
+| `primaryAction`, `secondaryAction` | Caller-provided actions. Legacy `action` is supported. |
+| `children` | Additional state-specific content. |
+| `errorDetails` | Optional details disclosure. |
+| `variant` | One of the supported visual variants. |
+| `status` | Optional `status` or `alert` announcement; `off` disables it. |
