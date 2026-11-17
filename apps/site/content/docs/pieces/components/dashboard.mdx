@@ -1,0 +1,149 @@
+---
+title: Dashboard Components
+description: Compose accessible dashboard headers, statistics, activity feeds, progress cards, and layouts with Puzzle Pieces.
+---
+
+Dashboard compositions provide reusable structure for product and admin interfaces without coupling presentation to a router, data model, or framework.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions are new and may evolve based on feedback.
+
+## Installation
+
+Import the dashboard components from Puzzle Pieces:
+
+```tsx
+import {
+  DashboardActivityFeed,
+  DashboardHeader,
+  DashboardProgressCard,
+  DashboardShell,
+  DashboardStatCard,
+  DashboardStatGroup,
+} from "@puzzle-ui/pieces";
+```
+
+## Dashboard header
+
+Use the header for the page title, supporting text, and caller-provided actions.
+
+<Preview
+  code={`\
+<DashboardHeader
+  eyebrow="Workspace"
+  title="Good morning, Alex"
+  description="Here is what is happening with your team."
+  actions={<Button>Create project</Button>}
+/>
+`}
+>
+  <DashboardHeader
+    eyebrow="Workspace"
+    title="Good morning, Alex"
+    description="Here is what is happening with your team."
+    actions={<Button>Create project</Button>}
+  />
+</Preview>
+
+## Statistics
+
+`DashboardStatGroup` arranges any children into a responsive grid. Compose it with `DashboardStatCard`; the card supports an icon, trend, description, action slot, and loading state.
+
+<Preview
+  code={`\
+<DashboardStatGroup label="Workspace metrics" columns={3}>
+  <DashboardStatCard label="Active projects" value="8" description="Across 3 teams" />
+  <DashboardStatCard
+    label="Open tasks"
+    value="24"
+    trend={{ value: "+5%", label: "this week", direction: "positive" }}
+  />
+  <DashboardStatCard label="Completed" value="16" loading />
+</DashboardStatGroup>
+`}
+>
+  <DashboardStatGroup label="Workspace metrics" columns={3}>
+    <DashboardStatCard
+      label="Active projects"
+      value="8"
+      description="Across 3 teams"
+    />
+    <DashboardStatCard
+      label="Open tasks"
+      value="24"
+      trend={{ value: "+5%", label: "this week", direction: "positive" }}
+    />
+    <DashboardStatCard label="Completed" value="16" loading />
+  </DashboardStatGroup>
+</Preview>
+
+## Activity feed
+
+Activity items are generic records supplied by the consuming application. Use `renderItem` when an item needs a custom presentation; otherwise the component renders optional avatars, links, and semantic timestamps.
+
+```tsx
+<DashboardActivityFeed
+  title="Recent activity"
+  items={[
+    {
+      id: "activity-1",
+      description: "Alex updated the launch plan",
+      timestamp: "Today",
+      dateTime: "2026-11-16",
+      href: "/projects/launch",
+    },
+  ]}
+  emptyState="No recent activity."
+/>
+```
+
+## Progress card
+
+Use a native progress element with a title-derived accessible label.
+
+```tsx
+<DashboardProgressCard
+  title="Website refresh"
+  description="Target launch: November 30"
+  value={72}
+  status="On track"
+  action={<Button variant="secondary">View project</Button>}
+/>
+```
+
+## Dashboard shell
+
+`DashboardShell` composes caller-provided topbar, sidebar, and page content. Navigation and routing remain the responsibility of the application.
+
+```tsx
+<DashboardShell
+  topbar={<WorkspaceTopbar />}
+  sidebar={<WorkspaceNavigation />}
+  sidebarLabel="Workspace navigation"
+>
+  <DashboardHeader title="Overview" />
+  <DashboardStatGroup>{/* cards */}</DashboardStatGroup>
+</DashboardShell>
+```
+
+## Accessibility and responsive behavior
+
+- The header uses a level-one heading; place only one `DashboardHeader` on a page.
+- `DashboardStatGroup` is a labelled region. Cards expose their labels as headings.
+- Loading cards expose `aria-busy` and hide decorative placeholders from assistive technology.
+- Activity feeds use an ordered list and native `<time>` elements; provide stable item IDs and machine-readable `dateTime` values when available.
+- Progress cards use the native `<progress>` element. Provide a value from `0` to `100`.
+- Shell landmarks and sidebar labels are semantic; supply meaningful labels when composing multiple landmarks.
+- Layouts adapt to narrow viewports and use Puzzle theme tokens for colors, spacing, borders, and typography.
+
+## API
+
+| Component | Props |
+| --- | --- |
+| `DashboardHeader` | `title` (required), `eyebrow`, `description`, `actions`, `className` |
+| `DashboardStatCard` | `label` (required), `value`, `description`, `icon`, `trend` (`value`, `label`, optional `direction`), `action`, `loading`, `className` |
+| `DashboardStatGroup` | `children` (required), `label`, `columns` (`2`, `3`, or `4`), `className` |
+| `DashboardActivityFeed` | `items` (required; each has `id`, `description`, `timestamp`, optional `dateTime`, `avatar`, `href`), `title`, `emptyState`, `renderItem`, `className` |
+| `DashboardProgressCard` | `title` (required), `value` (required, from `0` to `100`), `description`, `status`, `action`, `className` |
+| `DashboardShell` | `children` (required), `sidebar`, `topbar`, `sidebarLabel`, `className` |
+
+All content and action slots accept React nodes. Callbacks and data retrieval belong to the application.

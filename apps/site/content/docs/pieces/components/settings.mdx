@@ -1,0 +1,99 @@
+---
+title: Settings Components
+description: Build consistent, accessible settings forms and security/profile sections with Puzzle Pieces.
+---
+
+Settings compositions provide layout and semantic structure only. Data loading, validation, and mutations remain in the application.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions are new and may evolve based on feedback.
+
+## Installation
+
+```tsx
+import {
+  FormActions,
+  ProfileHeader,
+  SecurityMethodCard,
+  SettingsGroup,
+  SettingsRow,
+  SettingsSection,
+} from "@puzzle-ui/pieces";
+```
+
+## Sections and rows
+
+Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organize related rows. Associate each form control with its label through `htmlFor` and the control's `id`.
+
+<Preview
+  code={`\
+<SettingsSection
+  title="Profile"
+  description="Manage your personal information."
+>
+  <SettingsGroup title="Account">
+    <SettingsRow
+      label="Display name"
+      htmlFor="display-name"
+      control={<TextInput id="display-name" value="Alex Morgan" onChange={() => {}} />}
+    />
+  </SettingsGroup>
+</SettingsSection>
+`}
+>
+  <SettingsSection
+    title="Profile"
+    description="Manage your personal information."
+  >
+    <SettingsGroup title="Account">
+      <SettingsRow
+        label="Display name"
+        htmlFor="display-name"
+        control={
+          <TextInput
+            id="display-name"
+            value="Alex Morgan"
+            onChange={() => {}}
+          />
+        }
+      />
+    </SettingsGroup>
+  </SettingsSection>
+</Preview>
+
+## Profile and security
+
+```tsx
+<ProfileHeader
+  name="Alex Morgan"
+  email="alex@example.com"
+  avatar={  <Avatar alt="Alex Morgan" />}
+  actions={<Button variant="secondary">Edit profile</Button>}
+/>
+
+<SecurityMethodCard
+  title="Authenticator app"
+  description="Use a time-based one-time password."
+  status="Enabled"
+  action={<Button variant="secondary">Manage</Button>}
+/>
+```
+
+`FormActions` provides a labelled group for submit and cancel controls.
+
+## Accessibility and responsive behavior
+
+- Sections and groups are labelled by their headings.
+- Supply `htmlFor` and matching control IDs for form labels.
+- Keep each control's accessible description association in the consuming form when needed.
+- Layouts stack on narrow viewports and use Puzzle theme tokens.
+
+## API
+
+| Component | Props |
+| --- | --- |
+| `SettingsSection` | `title` and `children` (required), `description`, `actions`, `className` |
+| `SettingsGroup` | `children` (required), `title`, `className` |
+| `SettingsRow` | `label`, `control` (required), `description`, `htmlFor`, `className` |
+| `FormActions` | `children` (required), `className` |
+| `ProfileHeader` | `name` (required), `email`, `avatar`, `actions`, `className` |
+| `SecurityMethodCard` | `title` (required), `description`, `status`, `icon`, `action`, `className` |

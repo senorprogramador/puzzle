@@ -87,6 +87,45 @@ The repository also contains the [documentation site](apps/site) and a
 [API stability audit](docs/api-stability-audit.md) for current component and
 package API maturity classifications.
 
+## Puzzle Workspace
+
+The repository includes two sample applications backed by the shared private
+`@puzzle-ui/workspace` domain package:
+
+- `apps/workspace-next` — Next.js App Router.
+- `apps/workspace-tanstack` — TanStack Start.
+
+Both use Puzzle Auth and a MongoDB replica set. For local development, start
+the app's MongoDB service and initialize it before starting the app:
+
+```bash
+bun install
+cd apps/workspace-next
+docker compose up -d
+bun run db:setup
+cd ../..
+bun run workspace:next
+```
+
+For TanStack Start, use `apps/workspace-tanstack` for the database setup and
+`bun run workspace:tanstack` from the repository root. Both apps use port
+3000, so run one at a time unless you change the app origin and port together.
+App checks are available with
+`bun run --filter workspace-next typecheck` /
+`bun run --filter workspace-next build` and the equivalent
+`workspace-tanstack` commands. The repository-wide `bun run build`,
+`bun run typecheck`, and `bun run test:all` commands are also documented in
+[Contributing](#contributing).
+
+There is not yet a database seed script. The intended commands are
+`bun run --filter workspace-next db:seed` and
+`bun run --filter workspace-tanstack db:seed`; they are not available until
+implemented in the corresponding app.
+
+For production Docker images, the private shared MongoDB replica set,
+reverse-proxy integration, SHA-tagged deploys, rollback, and troubleshooting,
+see the [Workspace deployment guide](docs/workspace/deployment.md).
+
 ## Installation
 
 Install only the published packages your application uses. For example, add

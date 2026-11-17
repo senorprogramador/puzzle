@@ -1,0 +1,81 @@
+.puzzle-notification-list {
+    min-width: 0;
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface);
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-notification-list__items {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.puzzle-notification-list__empty {
+    padding: var(--puzzle-space-4, 1rem);
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-notification-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--puzzle-space-3, 0.75rem);
+    padding: var(--puzzle-space-4, 1rem);
+    border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-notification-item:last-child {
+    border-block-end: 0;
+}
+
+.puzzle-notification-item[data-unread="true"] {
+    background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-notification-item__content {
+    min-width: 0;
+}
+
+.puzzle-notification-item__title {
+    font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-notification-item__title a {
+    color: inherit;
+}
+
+.puzzle-notification-item__description {
+    margin: var(--puzzle-space-1, 0.25rem) 0;
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-notification-item__time {
+    color: var(--puzzle-color-text-muted);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-notification-item__dismiss {
+    flex: none;
+    padding: var(--puzzle-space-1, 0.25rem);
+    color: var(--puzzle-color-text-muted);
+    background: transparent;
+    border: 0;
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+    cursor: pointer;
+}
+
+.puzzle-notification-item__dismiss:focus-visible,
+.puzzle-notification-item__title a:focus-visible {
+    outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+    outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-error-state-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-3, 0.75rem);
+}

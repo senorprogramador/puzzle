@@ -92,7 +92,7 @@ const createWebAuthnProvider = () => ({
   },
 });
 
-const createHarness = async (authOptions = {}) => {
+const createHarness = async (authOptions = {}, demoTotpBypass) => {
   let currentTime = new Date("2026-01-01T00:00:00.000Z");
 
   const clock = () => new Date(currentTime);
@@ -122,6 +122,7 @@ const createHarness = async (authOptions = {}) => {
       rateLimitKeySecret: RATE_LIMIT_SECRET,
       issuer: "Puzzle Test",
       requireVerifiedEmail: false,
+      ...(demoTotpBypass ? { demoTotpBypass } : {}),
       clock,
       webAuthn: {
         rpId: "example.com",
@@ -268,6 +269,41 @@ test("TOTP completes sign-in and creates an authenticated session", async () => 
       .getAuthState(authenticated.token)
       .then((state) => state.status),
     "authenticated",
+  );
+});
+
+test("the fixed demo TOTP code only completes sign-in for its configured account", async () => {
+  const demoHarness = await createHarness({}, {
+    code: "123456",
+    email: "mfa@example.com",
+  });
+
+  await enrollTotp(demoHarness);
+  await demoHarness.auth.signOut(demoHarness.registered.token);
+  const demoChallenge = await signInWithPassword(demoHarness);
+  const demoResult = await demoHarness.mfa.verifySignInTotp({
+    challengeToken: demoChallenge.challengeToken,
+    code: "123456",
+    ipAddress: "127.0.0.1",
+  });
+
+  assert.equal(demoResult.user.id, demoHarness.registered.user.id);
+
+  const otherHarness = await createHarness({}, {
+    code: "123456",
+    email: "other@example.com",
+  });
+
+  await enrollTotp(otherHarness);
+  await otherHarness.auth.signOut(otherHarness.registered.token);
+  const otherChallenge = await signInWithPassword(otherHarness);
+
+  await assert.rejects(() =>
+    otherHarness.mfa.verifySignInTotp({
+      challengeToken: otherChallenge.challengeToken,
+      code: "123456",
+      ipAddress: "127.0.0.1",
+    }),
   );
 });
 

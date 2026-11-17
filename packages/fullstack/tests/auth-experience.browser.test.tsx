@@ -63,9 +63,11 @@ const createClient = (
 
 const renderExperience = ({
   client = createClient(),
+  demoTotpCode,
   ...props
 }: {
   client?: ReturnType<typeof createClient>;
+  demoTotpCode?: string;
   mode?: "sign-in" | "sign-up";
   config?: React.ComponentProps<typeof AuthExperience>["config"];
   onSubmit?: React.ComponentProps<typeof AuthExperience>["onSubmit"];
@@ -75,6 +77,7 @@ const renderExperience = ({
     <AuthProvider
       client={client}
       initialSnapshot={unauthenticatedSnapshot}
+      demoTotpCode={demoTotpCode}
     >
       <AuthExperience {...props} />
     </AuthProvider>,
@@ -204,9 +207,19 @@ describe("AuthExperience browser behavior", () => {
     });
     client.verifyMfaTotp.mockResolvedValue(authenticatedSnapshot);
     const onSuccess = vi.fn();
-    renderExperience({ client, onSuccess, config: { offerPasskeyAfterSignIn: true } });
+    renderExperience({
+      client,
+      onSuccess,
+      demoTotpCode: "123456",
+      config: { offerPasskeyAfterSignIn: true },
+    });
     const user = await signIn();
     expect(await screen.findByRole("heading", { name: "Verify your identity" })).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Enter your authentication code to continue. Demo authentication code: 123456.",
+      ),
+    ).toBeInTheDocument();
     expect(client.listMfaFactors).not.toHaveBeenCalled();
     await user.type(screen.getByLabelText(/Authentication code/), "123456");
     await user.click(screen.getByRole("button", { name: "Verify", exact: true }));

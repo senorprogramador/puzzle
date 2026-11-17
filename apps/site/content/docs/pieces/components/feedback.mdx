@@ -1,0 +1,83 @@
+---
+title: Feedback Components
+description: Present notifications, confirmation dialogs, and recovery actions with Puzzle Pieces.
+---
+
+Feedback compositions provide presentation primitives and callbacks; applications remain responsible for notification delivery and action outcomes.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions are new and may evolve based on feedback.
+
+## Installation
+
+```tsx
+import {
+  ConfirmAction,
+  ErrorStatePanel,
+  NotificationItem,
+  NotificationList,
+} from "@puzzle-ui/pieces";
+```
+
+## Notifications
+
+Use `NotificationList` for an empty state and a collection of items. `NotificationItem` can be used separately inside a list when custom collection rendering is needed.
+
+```tsx
+<NotificationList
+  items={[
+    {
+      id: "notice-1",
+      title: "Task assigned",
+      description: "You were assigned a task.",
+      timestamp: "Today",
+      dateTime: "2026-11-16",
+      href: "/tasks/one",
+      unread: true,
+    },
+  ]}
+  emptyState="No notifications."
+/>
+```
+
+## Confirming an action
+
+`ConfirmAction` uses Puzzle's `Dialog` and `Button` components. The callback runs only after explicit confirmation; application code owns errors and persistence.
+
+```tsx
+<ConfirmAction
+  triggerLabel="Delete project"
+  title="Delete this project?"
+  description="This action cannot be undone."
+  confirmLabel="Delete"
+  onConfirm={deleteProject}
+/>
+```
+
+## Error recovery
+
+`ErrorStatePanel` composes Puzzle's error `Alert` with an optional recovery action.
+
+```tsx
+<ErrorStatePanel
+  title="Unable to load projects"
+  description="Try again in a moment."
+  action={<Button onClick={reload}>Retry</Button>}
+/>
+```
+
+## Accessibility and responsive behavior
+
+- Notification collections use list semantics and timestamps can include machine-readable `dateTime` values.
+- Dismiss buttons have accessible names.
+- Confirmation uses the Puzzle Dialog's labelled modal and keyboard dismissal behavior.
+- Error messages use the Puzzle Alert's assertive semantics.
+- Provide concise labels and avoid relying on color alone to communicate status.
+
+## API
+
+| Component | Props |
+| --- | --- |
+| `NotificationItem` | `title` (required), `description`, `timestamp`, `dateTime`, `href`, `unread`, `onDismiss`, `dismissLabel`, `className` |
+| `NotificationList` | `items` (required; each has `id` and `NotificationItem` props), `label`, `emptyState`, `className` |
+| `ConfirmAction` | `triggerLabel`, `title`, `confirmLabel`, `onConfirm` (required), `description`, `cancelLabel`, `confirmVariant`, `className` |
+| `ErrorStatePanel` | `title` (required), `description`, `action`, `className` |

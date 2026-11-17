@@ -1,0 +1,116 @@
+---
+title: Dashboard Navigation
+description: Build responsive, router-independent dashboard navigation and account controls with Puzzle Pieces.
+---
+
+Dashboard navigation compositions use native links and disclosure elements. They accept generic items and callbacks, so applications can connect their own router without coupling Pieces to a framework.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions are new and may evolve based on feedback.
+
+## Installation
+
+```tsx
+import {
+  DashboardBreadcrumbs,
+  DashboardMobileNavigation,
+  DashboardNavigation,
+  DashboardSidebar,
+  DashboardTopbar,
+  DashboardUserMenu,
+} from "@puzzle-ui/pieces";
+```
+
+## Navigation links
+
+`DashboardNavigation` supports nested items, an active pathname, horizontal or vertical orientation, and a collapsed icon mode. Labels are strings so collapsed links retain accessible names.
+
+```tsx
+const items = [
+  { id: "overview", label: "Overview", href: "/workspace" },
+  {
+    id: "projects",
+    label: "Projects",
+    href: "/workspace/projects",
+    children: [
+      {
+        id: "active",
+        label: "Active project",
+        href: "/workspace/projects/active",
+      },
+    ],
+  },
+];
+
+<DashboardNavigation
+  items={items}
+  pathname="/workspace/projects/active"
+  onNavigate={(href) => navigate({ to: href })}
+/>;
+```
+
+The callback handles unmodified primary clicks. Modified clicks retain native browser behavior, including opening a link in a new tab.
+
+## Sidebar and mobile navigation
+
+Use `DashboardSidebar` for vertical workspace navigation. `DashboardMobileNavigation` uses the browser's native `<details>` disclosure behavior and can be shown at mobile breakpoints by the application.
+
+```tsx
+<DashboardSidebar items={items} pathname={pathname} />
+<DashboardMobileNavigation
+  items={items}
+  pathname={pathname}
+  onNavigate={handleNavigate}
+/>
+```
+
+## Topbar and user menu
+
+```tsx
+<DashboardTopbar actions={<button type="button">Invite</button>}>
+  <span>Acme workspace</span>
+</DashboardTopbar>
+
+<DashboardUserMenu
+  trigger={<span>Alex Morgan</span>}
+  label="Account actions"
+>
+  <a href="/profile">Profile</a>
+  <button type="button">Sign out</button>
+</DashboardUserMenu>
+```
+
+The user menu is a native disclosure. Supply interactive items and their behavior from the consuming application.
+
+## Breadcrumbs
+
+```tsx
+<DashboardBreadcrumbs
+  items={[
+    { id: "workspace", label: "Workspace", href: "/workspace" },
+    { id: "projects", label: "Projects", href: "/workspace/projects" },
+    { id: "active", label: "Active project" },
+  ]}
+/>
+```
+
+The final breadcrumb is exposed as the current page. Earlier items become links only when they have an `href`.
+
+## Accessibility and responsive behavior
+
+- Navigation landmarks have descriptive labels; set a distinct `label` when a page has multiple navigation regions.
+- Current pages use `aria-current="page"`. Collapsed links retain accessible names.
+- Native anchors preserve keyboard and modified-click behavior. Callback navigation is only used for unmodified primary activation.
+- Mobile navigation and account controls use native disclosure semantics.
+- Provide stable IDs for navigation and breadcrumb items.
+- These components provide layout and behavior primitives; the application remains responsible for authorization and route visibility.
+
+## API
+
+| Component | Props |
+| --- | --- |
+| `DashboardNavigation` | `items` (required; nested items have `id`, string `label`, `href`, optional `icon` and `children`), `pathname`, `onNavigate`, `orientation`, `collapsed`, `label`, `className` |
+| `DashboardSidebar` | `items` (required), `pathname`, `onNavigate`, `label`, `collapsed`, `className` |
+| `DashboardTopbar` | `children`, `actions`, `className` |
+| `DashboardUserMenu` | `trigger`, `children`, `label`, `className` |
+| `DashboardMobileNavigation` | `items` (required), `pathname`, `onNavigate`, `label`, `className` |
+| `DashboardBreadcrumbs` | `items` (required; each has `id`, `label`, optional `href`), `label`, `onNavigate`, `className` |

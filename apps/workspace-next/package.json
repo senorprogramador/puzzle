@@ -1,0 +1,49 @@
+{
+  "name": "workspace-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun run db:setup && bun run db:seed && next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "fonts:download": "puzzle-theme fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
+    "db:setup": "node scripts/setup-mongodb.mjs",
+    "db:seed": "WORKSPACE_DEMO_RESET=yes bun ../../packages/workspace/scripts/seed.ts"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.2.2",
+    "@puzzle-ui/auth": "workspace:*",
+    "@puzzle-ui/fullstack": "workspace:*",
+    "@puzzle-ui/pieces": "workspace:*",
+    "@puzzle-ui/session": "workspace:*",
+    "@puzzle-ui/storage": "workspace:*",
+    "@puzzle-ui/storage-mongodb": "workspace:*",
+    "@puzzle-ui/theme": "workspace:*",
+    "@puzzle-ui/ui": "workspace:*",
+    "@puzzle-ui/workspace": "workspace:*",
+    "@puzzle-ui/workspace-ui": "workspace:*",
+    "mongodb": "^7.8.0",
+    "next": "16.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "typescript": "^7.0.2"
+  },
+  "packageManager": "bun@1.4.4",
+  "ignoreScripts": [
+    "sharp",
+    "unrs-resolver"
+  ],
+  "trustedDependencies": [
+    "sharp",
+    "unrs-resolver"
+  ]
+}

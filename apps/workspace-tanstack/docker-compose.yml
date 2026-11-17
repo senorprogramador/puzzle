@@ -1,0 +1,48 @@
+services:
+  mongodb:
+    image: mongo:8
+    restart: unless-stopped
+    # Auth needs transactions, which require a replica set. A replica set with
+    # access control needs a keyfile; one is generated on first start and kept
+    # in the mongodb-config volume.
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -euo pipefail
+        keyfile=/data/configdb/replica-set.key
+        if [ ! -s "$$keyfile" ]; then
+          head -c 756 /dev/urandom | base64 -w 0 > "$$keyfile"
+        fi
+        chown mongodb:mongodb "$$keyfile"
+        chmod 400 "$$keyfile"
+        exec docker-entrypoint.sh mongod --replSet rs0 --keyFile "$$keyfile" --bind_ip_all
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME:?Set MONGODB_ROOT_USERNAME in .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:?Set MONGODB_ROOT_PASSWORD in .env}
+      MONGODB_DATABASE: ${MONGODB_DATABASE:?Set MONGODB_DATABASE in .env}
+      MONGODB_APP_USERNAME: ${MONGODB_APP_USERNAME:?Set MONGODB_APP_USERNAME in .env}
+      MONGODB_APP_PASSWORD: ${MONGODB_APP_PASSWORD:?Set MONGODB_APP_PASSWORD in .env}
+    # Only reachable from this machine. Do not publish MongoDB publicly.
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - mongodb-data:/data/db
+      - mongodb-config:/data/configdb
+      - ./docker/mongodb/create-app-user.js:/docker-entrypoint-initdb.d/create-app-user.js:ro
+      - ./docker/mongodb/check.js:/opt/puzzle/mongodb/check.js:ro
+    healthcheck:
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --file
+        - /opt/puzzle/mongodb/check.js
+      interval: 5s
+      timeout: 10s
+      retries: 12
+      start_period: 10s
+
+volumes:
+  mongodb-data:
+  mongodb-config:

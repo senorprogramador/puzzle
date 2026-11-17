@@ -320,6 +320,10 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
   } | null;
 
   private readonly requireVerifiedEmail: boolean;
+  private readonly demoTotpBypass: {
+    readonly code: string;
+    readonly email: string;
+  } | null;
   private readonly clock: () => Date;
 
   private initialized = false;
@@ -381,6 +385,28 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
     this.requireVerifiedEmail = options.requireVerifiedEmail ?? false;
 
     this.clock = options.clock ?? (() => new Date());
+
+    if (options.demoTotpBypass) {
+      const email = options.demoTotpBypass.email.trim().toLowerCase();
+
+      if (
+        !new RegExp(`^\\d{${this.totp.digits}}$`).test(
+          options.demoTotpBypass.code,
+        ) ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      ) {
+        throw new AuthConfigurationError(
+          "The demo TOTP bypass must have a valid code and account email.",
+        );
+      }
+
+      this.demoTotpBypass = {
+        code: options.demoTotpBypass.code,
+        email,
+      };
+    } else {
+      this.demoTotpBypass = null;
+    }
 
     if (
       !Number.isInteger(this.challengeLifetimeSeconds) ||
@@ -2258,6 +2284,21 @@ export class StorageAuthMfaManager implements AuthMfaGateway {
       input.ipAddress,
       challenge.userId,
     );
+
+    if (this.demoTotpBypass?.code === input.code) {
+      const user = await this.storage.findById<AuthUserStorageRecord>(
+        this.usersCollection,
+        challenge.userId,
+      );
+
+      if (user?.normalizedEmail === this.demoTotpBypass.email) {
+        return this.completeChallenge({
+          challenge,
+          userId: challenge.userId,
+          method: "demo-fixed-code",
+        });
+      }
+    }
 
     for (const factorId of challenge.factorIds) {
       const factor = await this.storage.findById<AuthMfaFactorStorageRecord>(

@@ -42,7 +42,7 @@ import { baseOptions } from "@/lib/layout.shared";
 
 import { useFumadocsLoader } from "fumadocs-core/source/client";
 
-import { Suspense, use } from "react";
+import { use } from "react";
 
 import { useMDXComponents } from "@/components/mdx";
 
@@ -135,7 +135,15 @@ export const Route = createFileRoute("/docs/$")({
       data: slugs,
     });
 
-    await docs.getPage(data.path)?.preload();
+    const page = docs.getPage(data.path);
+
+    if (!page) {
+      throw notFound();
+    }
+
+    await page.preload();
+
+    await page.load();
 
     return data;
   },
@@ -219,7 +227,10 @@ function Content({ path }: { path: string }) {
   const mdxComponents = useMDXComponents();
 
   const pageToc = faq
-    ? [...toc, { title: FAQ_SECTION_TITLE, url: `#${FAQ_SECTION_ID}`, depth: 2 }]
+    ? [
+        ...toc,
+        { title: FAQ_SECTION_TITLE, url: `#${FAQ_SECTION_ID}`, depth: 2 },
+      ]
     : toc;
 
   return (
@@ -325,9 +336,7 @@ function Page() {
               enabled: false,
             }}
           >
-            <Suspense>
-              <Content path={data.path} />
-            </Suspense>
+            <Content path={data.path} />
           </DocsLayout>
         </RootProvider>
       </PageLayout.Main>

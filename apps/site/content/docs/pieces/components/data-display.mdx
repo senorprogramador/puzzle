@@ -1,0 +1,68 @@
+---
+title: Data Display Components
+description: Reuse Puzzle Pieces stat, timeline, progress, comparison, and empty-state compositions.
+---
+
+Data display compositions present application-provided values without owning data fetching, formatting, or business rules. Shared dashboard patterns are re-exported here rather than implemented twice.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions are new and may evolve based on feedback.
+
+## Installation
+
+```tsx
+import {
+  ActivityTimeline,
+  EmptyStatePanel,
+  MetricComparison,
+  ProgressOverview,
+  StatCard,
+  StatGroup,
+} from "@puzzle-ui/pieces";
+```
+
+`StatCard`, `StatGroup`, `ActivityTimeline`, and `ProgressOverview` are aliases of `DashboardStatCard`, `DashboardStatGroup`, `DashboardActivityFeed`, and `DashboardProgressCard`. Their APIs and behavior are identical.
+
+## Metric comparison
+
+Use definition-list semantics to compare related values:
+
+```tsx
+<MetricComparison
+  title="Monthly signups"
+  description="New accounts created."
+  primaryLabel="This month"
+  primaryValue="128"
+  comparisonLabel="Last month"
+  comparisonValue="104"
+/>
+```
+
+## Empty state
+
+An empty state can include an illustration and a caller-provided action. Keep the action appropriate to the empty resource and preserve the surrounding page context.
+
+```tsx
+<EmptyStatePanel
+  title="No projects yet"
+  description="Create a project to get started."
+  action={<Button>Create project</Button>}
+/>
+```
+
+## Accessibility and responsive behavior
+
+- Comparison values use a definition list with explicit labels.
+- Empty states use a labelled section and heading; provide useful action names.
+- Activity timelines and progress indicators retain the native semantics documented on the Dashboard page.
+- Grid and comparison layouts adapt at narrow widths and use Puzzle theme tokens.
+
+## API
+
+| Component | Props |
+| --- | --- |
+| `StatCard` | Same as `DashboardStatCard`: `label`, `value`, `description`, `icon`, `trend`, `action`, `loading`, `className` |
+| `StatGroup` | Same as `DashboardStatGroup`: `children`, `label`, `columns`, `className` |
+| `ActivityTimeline` | Same as `DashboardActivityFeed`: `items`, `title`, `emptyState`, `renderItem`, `className` |
+| `ProgressOverview` | Same as `DashboardProgressCard`: `title`, `value`, `description`, `status`, `action`, `className` |
+| `MetricComparison` | `title`, `primaryLabel`, `primaryValue`, `comparisonLabel`, `comparisonValue` (required), `description`, `className` |
+| `EmptyStatePanel` | `title` (required), `description`, `illustration`, `action`, `className` |

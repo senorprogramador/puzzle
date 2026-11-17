@@ -1,1 +1,7 @@
 export * from "./components/hero";
+export * from "./components/dashboard";
+export * from "./components/navigation";
+export * from "./components/project";
+export * from "./components/data-display";
+export * from "./components/settings";
+export * from "./components/feedback";

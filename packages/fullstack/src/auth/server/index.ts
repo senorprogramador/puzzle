@@ -268,6 +268,46 @@ export const createAuthRouteHandlers = (
           },
         }
       : {}),
+
+    ...(handlers.requestEmailChange
+      ? {
+          [route("/email/change/request")]: {
+            POST: handlers.requestEmailChange,
+          },
+        }
+      : {}),
+
+    ...(handlers.verifyEmailChange
+      ? {
+          [route("/email/change/verify")]: {
+            POST: handlers.verifyEmailChange,
+          },
+        }
+      : {}),
+
+    ...(handlers.updateProfile
+      ? {
+          [route("/profile")]: {
+            POST: handlers.updateProfile,
+          },
+        }
+      : {}),
+
+    ...(handlers.listSessions
+      ? {
+          [route("/sessions")]: {
+            GET: handlers.listSessions,
+          },
+        }
+      : {}),
+
+    ...(handlers.revokeSession
+      ? {
+          [route("/sessions/revoke")]: {
+            POST: handlers.revokeSession,
+          },
+        }
+      : {}),
   };
 };
 

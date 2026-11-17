@@ -12,6 +12,36 @@ const components: TreeViewItem = {
       label: "Hero",
       href: `${componentsFolder}/hero`,
     },
+    {
+      id: "pieces-dashboard",
+      label: "Dashboard",
+      href: `${componentsFolder}/dashboard`,
+    },
+    {
+      id: "pieces-dashboard-navigation",
+      label: "Dashboard Navigation",
+      href: `${componentsFolder}/navigation`,
+    },
+    {
+      id: "pieces-project",
+      label: "Project",
+      href: `${componentsFolder}/project`,
+    },
+    {
+      id: "pieces-data-display",
+      label: "Data Display",
+      href: `${componentsFolder}/data-display`,
+    },
+    {
+      id: "pieces-settings",
+      label: "Settings",
+      href: `${componentsFolder}/settings`,
+    },
+    {
+      id: "pieces-feedback",
+      label: "Feedback",
+      href: `${componentsFolder}/feedback`,
+    },
   ],
 };
 //#endregion

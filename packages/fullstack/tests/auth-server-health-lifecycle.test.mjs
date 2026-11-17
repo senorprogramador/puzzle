@@ -20,7 +20,7 @@ const jsonRequest = (pathname, body, extraHeaders = {}) =>
     body: JSON.stringify(body),
   });
 
-const createLifecycleHarness = (overrides = {}) => {
+const createLifecycleHarness = (overrides = {}, allowPasswordChange = true) => {
   const calls = [];
   const lifecycle = {
     async sendEmailVerification(input) { calls.push(["sendEmailVerification", input]); },
@@ -28,6 +28,15 @@ const createLifecycleHarness = (overrides = {}) => {
     async requestPasswordReset(input) { calls.push(["requestPasswordReset", input]); },
     async resetPassword(input) { calls.push(["resetPassword", input]); },
     async changePassword(input) { calls.push(["changePassword", input]); },
+    async requestEmailChange(input) { calls.push(["requestEmailChange", input]); },
+    async verifyEmailChange(token) {
+      calls.push(["verifyEmailChange", token]);
+      return { id: "user-1", email: "new@example.com" };
+    },
+    async updateProfile(input) {
+      calls.push(["updateProfile", input]);
+      return { id: "user-1", name: input.name ?? "Example", image: input.image ?? null };
+    },
     ...overrides,
   };
   const cookie = createSessionCookieOptions({ production: false });
@@ -36,8 +45,44 @@ const createLifecycleHarness = (overrides = {}) => {
     sessions: {
       async validate(token) {
         return token === "session-token"
-          ? { id: token, kind: "authenticated", userId: "user-1" }
+          ? {
+              id: token,
+              kind: "authenticated",
+              userId: "user-1",
+              createdAt: new Date("2025-01-01T00:00:00.000Z"),
+              lastSeenAt: new Date("2025-01-02T00:00:00.000Z"),
+              expiresAt: new Date("2025-02-01T00:00:00.000Z"),
+              revokedAt: null,
+            }
           : null;
+      },
+      async list(userId, currentSessionId) {
+        return [
+          {
+            sessionId: currentSessionId,
+            kind: "authenticated",
+            createdAt: new Date("2025-01-01T00:00:00.000Z"),
+            lastSeenAt: new Date("2025-01-02T00:00:00.000Z"),
+            expiresAt: new Date("2025-02-01T00:00:00.000Z"),
+            current: true,
+          },
+        ];
+      },
+      async get(sessionId) {
+        return sessionId === "other-session"
+          ? {
+              id: sessionId,
+              kind: "authenticated",
+              userId: "user-1",
+              createdAt: new Date("2025-01-01T00:00:00.000Z"),
+              lastSeenAt: new Date("2025-01-02T00:00:00.000Z"),
+              expiresAt: new Date("2025-02-01T00:00:00.000Z"),
+              revokedAt: null,
+            }
+          : null;
+      },
+      async revoke(sessionId) {
+        calls.push(["revoke", sessionId]);
       },
     },
     cookie,
@@ -45,6 +90,8 @@ const createLifecycleHarness = (overrides = {}) => {
     resolveClientIp: () => "203.0.113.8",
     verificationUrl: () => "https://example.com/verify?token=verified-token",
     passwordResetUrl: () => "https://example.com/reset?token=reset-token",
+    emailChangeUrl: () => "https://example.com/verify-email-change?token=email-token",
+    allowPasswordChange,
   });
   return { calls, handlers, cookie };
 };
@@ -123,6 +170,26 @@ test("lifecycle handlers reject invalid methods, bodies, CSRF, and missing sessi
     error: { code: "METHOD_NOT_ALLOWED", message: "Only POST requests are supported." },
   });
 
+  test("lifecycle handler can reject password changes without invoking persistence", async () => {
+    const { calls, handlers, cookie } = createLifecycleHarness({}, false);
+    const response = await handlers.changePassword(
+      jsonRequest(
+        "/password/change",
+        { currentPassword: "old-password", newPassword: "new-password" },
+        { cookie: `${cookie.name}=session-token` },
+      ),
+    );
+
+    assert.equal(response.status, 403);
+    assert.deepEqual(await response.json(), {
+      error: {
+        code: "PASSWORD_CHANGE_DISABLED",
+        message: "Password changes are disabled.",
+      },
+    });
+    assert.equal(calls.some(([name]) => name === "changePassword"), false);
+  });
+
   const malformed = await handlers.verifyEmail(new Request(`${origin}/verification/verify`, {
     method: "POST",
     headers: { origin, "content-type": "application/json" },
@@ -153,6 +220,87 @@ test("lifecycle handlers reject invalid methods, bodies, CSRF, and missing sessi
     }),
   );
   assert.equal(noCookie.status, 401);
+});
+
+test("profile and session handlers are authenticated, scoped, and revoke other sessions only", async () => {
+  const harness = createLifecycleHarness();
+  const cookie = `${harness.cookie.name}=session-token`;
+
+  const profile = await harness.handlers.updateProfile(
+    jsonRequest(
+      "/profile",
+      { name: "Updated User", image: null },
+      { cookie },
+    ),
+  );
+  assert.equal(profile.status, 200);
+  assert.deepEqual(await profile.json(), {
+    user: { id: "user-1", name: "Updated User", image: null },
+  });
+  assert.deepEqual(harness.calls[0], [
+    "updateProfile",
+    {
+      sessionToken: "session-token",
+      name: "Updated User",
+      image: null,
+    },
+  ]);
+
+  const sessions = await harness.handlers.listSessions(
+    new Request(`${origin}/sessions`, { headers: { cookie } }),
+  );
+  assert.equal(sessions.status, 200);
+  assert.equal((await sessions.json()).sessions[0].current, true);
+
+  const revoked = await harness.handlers.revokeSession(
+    jsonRequest("/sessions/revoke", { sessionId: "other-session" }, { cookie }),
+  );
+  assert.equal(revoked.status, 200);
+  assert.deepEqual(await revoked.json(), { status: "session-revoked" });
+  assert.deepEqual(harness.calls[1], ["revoke", "other-session"]);
+
+  const selfRevocation = await harness.handlers.revokeSession(
+    jsonRequest("/sessions/revoke", { sessionId: "session-token" }, { cookie }),
+  );
+  assert.equal(selfRevocation.status, 404);
+});
+
+test("email change requires the current password and verifies the new address", async () => {
+  const harness = createLifecycleHarness();
+  const cookie = `${harness.cookie.name}=session-token`;
+
+  const requested = await harness.handlers.requestEmailChange(
+    jsonRequest(
+      "/email/change/request",
+      { currentPassword: "current-password", email: "new@example.com" },
+      { cookie },
+    ),
+  );
+  assert.equal(requested.status, 200);
+  assert.deepEqual(await requested.json(), { status: "email-change-requested" });
+
+  const verified = await harness.handlers.verifyEmailChange(
+    jsonRequest("/email/change/verify", { token: "verification-token" }),
+  );
+  assert.equal(verified.status, 200);
+  assert.deepEqual(await verified.json(), {
+    status: "email-changed",
+    user: { id: "user-1", email: "new@example.com" },
+  });
+
+  assert.deepEqual(harness.calls, [
+    [
+      "requestEmailChange",
+      {
+        sessionToken: "session-token",
+        currentPassword: "current-password",
+        email: "new@example.com",
+        verificationUrl: "https://example.com/verify-email-change?token=email-token",
+        ipAddress: "203.0.113.8",
+      },
+    ],
+    ["verifyEmailChange", "verification-token"],
+  ]);
 });
 
 test("lifecycle callback failures are sanitized and use the internal-error status", async () => {

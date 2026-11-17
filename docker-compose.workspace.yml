@@ -1,0 +1,124 @@
+services:
+  mongodb:
+    image: mongo:8
+    restart: unless-stopped
+    entrypoint:
+      - bash
+      - -c
+      - |
+        set -euo pipefail
+        keyfile=/data/configdb/replica-set.key
+        if [ ! -s "$$keyfile" ]; then
+          head -c 756 /dev/urandom | base64 | tr -d '\n' > "$$keyfile"
+        fi
+        chown mongodb:mongodb "$$keyfile"
+        chmod 400 "$$keyfile"
+        exec docker-entrypoint.sh mongod --replSet rs0 --keyFile "$$keyfile" --bind_ip_all
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME:?Set MONGODB_ROOT_USERNAME in the Workspace environment file}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD:?Set MONGODB_ROOT_PASSWORD in the Workspace environment file}
+      MONGODB_NEXT_DATABASE: ${MONGODB_NEXT_DATABASE:?Set MONGODB_NEXT_DATABASE in the Workspace environment file}
+      MONGODB_NEXT_APP_USERNAME: ${MONGODB_NEXT_APP_USERNAME:?Set MONGODB_NEXT_APP_USERNAME in the Workspace environment file}
+      MONGODB_NEXT_APP_PASSWORD: ${MONGODB_NEXT_APP_PASSWORD:?Set MONGODB_NEXT_APP_PASSWORD in the Workspace environment file}
+      MONGODB_TANSTACK_DATABASE: ${MONGODB_TANSTACK_DATABASE:?Set MONGODB_TANSTACK_DATABASE in the Workspace environment file}
+      MONGODB_TANSTACK_APP_USERNAME: ${MONGODB_TANSTACK_APP_USERNAME:?Set MONGODB_TANSTACK_APP_USERNAME in the Workspace environment file}
+      MONGODB_TANSTACK_APP_PASSWORD: ${MONGODB_TANSTACK_APP_PASSWORD:?Set MONGODB_TANSTACK_APP_PASSWORD in the Workspace environment file}
+    volumes:
+      - mongodb-data:/data/db
+      - mongodb-config:/data/configdb
+      - ./docker/workspace/mongodb/create-app-users.js:/docker-entrypoint-initdb.d/create-app-users.js:ro
+      - ./docker/workspace/mongodb/healthcheck.js:/opt/puzzle/mongodb/healthcheck.js:ro
+    networks:
+      - database
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--file", "/opt/puzzle/mongodb/healthcheck.js"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 15s
+
+  workspace-next:
+    image: puzzle-workspace-next:${WORKSPACE_IMAGE_TAG:?Set WORKSPACE_IMAGE_TAG to a built image SHA}
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+      APP_ORIGIN: ${WORKSPACE_NEXT_APP_ORIGIN:?Set WORKSPACE_NEXT_APP_ORIGIN}
+      AUTH_ENCRYPTION_KEY_HEX: ${WORKSPACE_NEXT_AUTH_ENCRYPTION_KEY_HEX:?Set WORKSPACE_NEXT_AUTH_ENCRYPTION_KEY_HEX}
+      AUTH_RATE_LIMIT_SECRET: ${WORKSPACE_NEXT_AUTH_RATE_LIMIT_SECRET:?Set WORKSPACE_NEXT_AUTH_RATE_LIMIT_SECRET}
+      MONGODB_DATABASE: ${MONGODB_NEXT_DATABASE:?Set MONGODB_NEXT_DATABASE}
+      MONGODB_URI: "mongodb://${MONGODB_NEXT_APP_USERNAME:?Set MONGODB_NEXT_APP_USERNAME}:${MONGODB_NEXT_APP_PASSWORD:?Set MONGODB_NEXT_APP_PASSWORD}@mongodb:27017/${MONGODB_NEXT_DATABASE:?Set MONGODB_NEXT_DATABASE}?authSource=${MONGODB_NEXT_DATABASE:?Set MONGODB_NEXT_DATABASE}&replicaSet=rs0"
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      WORKSPACE_EMAIL_FROM: ${WORKSPACE_EMAIL_FROM:-}
+      TRUSTED_CLIENT_IP_HEADER: ${TRUSTED_CLIENT_IP_HEADER:-}
+      VIRTUAL_HOST: ${WORKSPACE_NEXT_DOMAIN:?Set WORKSPACE_NEXT_DOMAIN}
+      VIRTUAL_PORT: 3000
+      LETSENCRYPT_HOST: ${WORKSPACE_NEXT_DOMAIN:?Set WORKSPACE_NEXT_DOMAIN}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?Set LETSENCRYPT_EMAIL}
+    labels:
+      com.puzzle.workspace.application: workspace-next
+      com.puzzle.workspace.proxy-host: ${WORKSPACE_NEXT_DOMAIN:?Set WORKSPACE_NEXT_DOMAIN}
+      com.puzzle.workspace.proxy-port: "3000"
+    networks:
+      - webproxy
+      - database
+    healthcheck:
+      test: ["CMD", "node", "-e", "const net=require('node:net');const s=net.connect(3000,'127.0.0.1');s.setTimeout(2500);s.on('connect',()=>{s.end();process.exit(0)});s.on('error',()=>process.exit(1));s.on('timeout',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+  workspace-tanstack:
+    image: puzzle-workspace-tanstack:${WORKSPACE_IMAGE_TAG:?Set WORKSPACE_IMAGE_TAG to a built image SHA}
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      APP_ORIGIN: ${WORKSPACE_TANSTACK_APP_ORIGIN:?Set WORKSPACE_TANSTACK_APP_ORIGIN}
+      AUTH_ENCRYPTION_KEY_HEX: ${WORKSPACE_TANSTACK_AUTH_ENCRYPTION_KEY_HEX:?Set WORKSPACE_TANSTACK_AUTH_ENCRYPTION_KEY_HEX}
+      AUTH_RATE_LIMIT_SECRET: ${WORKSPACE_TANSTACK_AUTH_RATE_LIMIT_SECRET:?Set WORKSPACE_TANSTACK_AUTH_RATE_LIMIT_SECRET}
+      MONGODB_DATABASE: ${MONGODB_TANSTACK_DATABASE:?Set MONGODB_TANSTACK_DATABASE}
+      MONGODB_URI: "mongodb://${MONGODB_TANSTACK_APP_USERNAME:?Set MONGODB_TANSTACK_APP_USERNAME}:${MONGODB_TANSTACK_APP_PASSWORD:?Set MONGODB_TANSTACK_APP_PASSWORD}@mongodb:27017/${MONGODB_TANSTACK_DATABASE:?Set MONGODB_TANSTACK_DATABASE}?authSource=${MONGODB_TANSTACK_DATABASE:?Set MONGODB_TANSTACK_DATABASE}&replicaSet=rs0"
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      WORKSPACE_EMAIL_FROM: ${WORKSPACE_EMAIL_FROM:-}
+      TRUSTED_CLIENT_IP_HEADER: ${TRUSTED_CLIENT_IP_HEADER:-}
+      VIRTUAL_HOST: ${WORKSPACE_TANSTACK_DOMAIN:?Set WORKSPACE_TANSTACK_DOMAIN}
+      VIRTUAL_PORT: 3000
+      LETSENCRYPT_HOST: ${WORKSPACE_TANSTACK_DOMAIN:?Set WORKSPACE_TANSTACK_DOMAIN}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?Set LETSENCRYPT_EMAIL}
+    labels:
+      com.puzzle.workspace.application: workspace-tanstack
+      com.puzzle.workspace.proxy-host: ${WORKSPACE_TANSTACK_DOMAIN:?Set WORKSPACE_TANSTACK_DOMAIN}
+      com.puzzle.workspace.proxy-port: "3000"
+    networks:
+      - webproxy
+      - database
+    healthcheck:
+      test: ["CMD", "bun", "-e", "await fetch('http://127.0.0.1:3000/')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
+networks:
+  webproxy:
+    external: true
+    name: ${WEBPROXY_NETWORK:-webproxy}
+  database:
+    name: puzzle-workspace-database
+    internal: true
+
+volumes:
+  mongodb-data:
+    name: puzzle-workspace-mongodb-data
+  mongodb-config:
+    name: puzzle-workspace-mongodb-config

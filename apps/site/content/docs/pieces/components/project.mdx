@@ -1,0 +1,103 @@
+---
+title: Project Components
+description: Compose generic project cards, collections, progress, member lists, and headers with Puzzle Pieces.
+---
+
+Project compositions are presentation-only. They accept generic content and do not depend on a Workspace model, database, or router.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions are new and may evolve based on feedback.
+
+## Installation
+
+```tsx
+import {
+  ProjectCard,
+  ProjectGrid,
+  ProjectHeader,
+  ProjectList,
+  ProjectMembers,
+  ProjectProgress,
+  ProjectStatusBadge,
+} from "@puzzle-ui/pieces";
+```
+
+## Project collections
+
+Use the grid or list layout to arrange `ProjectCard` compositions. Each card accepts caller-provided content and can link its title using a native anchor.
+
+<Preview
+  code={`\
+<ProjectGrid label="Projects">
+  <ProjectCard
+    title="Website refresh"
+    href="/projects/website"
+    description="A redesign for the marketing site."
+    status={<ProjectStatusBadge label="In progress" tone="info" />}
+    progress={72}
+    members={[
+      { id: "jordan", name: "Jordan Lee" },
+      { id: "alex", name: "Alex Morgan" },
+    ]}
+  />
+  <ProjectCard
+    title="Mobile launch"
+    description="Prepare the next mobile release."
+    status={<ProjectStatusBadge label="On track" tone="success" />}
+  />
+</ProjectGrid>
+`}
+>
+  <ProjectGrid label="Projects">
+    <ProjectCard
+      title="Website refresh"
+      href="/projects/website"
+      description="A redesign for the marketing site."
+      status={<ProjectStatusBadge label="In progress" tone="info" />}
+      progress={72}
+      members={[
+        { id: "jordan", name: "Jordan Lee" },
+        { id: "alex", name: "Alex Morgan" },
+      ]}
+    />
+    <ProjectCard
+      title="Mobile launch"
+      description="Prepare the next mobile release."
+      status={<ProjectStatusBadge label="On track" tone="success" />}
+    />
+  </ProjectGrid>
+</Preview>
+
+## Project details
+
+`ProjectHeader` provides a level-one heading, description, metadata, status, and action slots. `ProjectProgress` uses a native `<progress>` element. `ProjectMembers` renders a labelled list; provide accessible avatar content when an avatar conveys information.
+
+```tsx
+<ProjectHeader
+  title="Website refresh"
+  description="A redesign for the marketing site."
+  status={<ProjectStatusBadge label="In progress" tone="info" />}
+  meta={<span>Updated today</span>}
+  actions={<Button>Edit project</Button>}
+/>
+```
+
+`ProjectStatusBadge` supports `default`, `info`, `success`, `warning`, and `danger` tones. Use concise status labels and do not rely on color alone to communicate meaning.
+
+## Accessibility and responsive behavior
+
+- Collection regions and member lists have accessible names.
+- Project titles are headings; use `ProjectHeader` for a project detail page and `ProjectCard` within a collection.
+- Link titles use native anchor behavior and visible focus indicators.
+- Progress indicators use native semantics and a visible percentage.
+- Layouts respond to available width and Puzzle theme tokens adapt to light and dark themes.
+
+## API
+
+| Component | Props |
+| --- | --- |
+| `ProjectCard` | `title` (required), `description`, `status`, `progress`, `members`, `href`, `actions`, `className` |
+| `ProjectGrid` / `ProjectList` | `children` (required), `label`, `className` |
+| `ProjectHeader` | `title` (required), `description`, `status`, `actions`, `meta`, `className` |
+| `ProjectProgress` | `label` and `value` (required; value from `0` to `100`), `className` |
+| `ProjectMembers` | `members` (required; each has `id`, `name`, optional `avatar`), `label`, `className` |
+| `ProjectStatusBadge` | `label` (required), `tone`, `className` |

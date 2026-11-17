@@ -34,7 +34,11 @@ const PASSWORD = "correct-horse-battery-staple";
 const ORIGIN = "https://example.com";
 const RP_ID = "example.com";
 
-const createHarness = async ({ webAuthn = false } = {}) => {
+const createHarness = async ({
+  webAuthn = false,
+  requireMfa = true,
+  demoTotpBypass,
+} = {}) => {
   // HTTP cookie lifetimes use the real clock, so challenges must start current.
   let currentTime = new Date();
 
@@ -69,6 +73,7 @@ const createHarness = async ({ webAuthn = false } = {}) => {
       rateLimitKeySecret: RATE_LIMIT_SECRET,
       issuer: "Puzzle Test",
       requireVerifiedEmail: false,
+      ...(demoTotpBypass ? { demoTotpBypass } : {}),
       clock,
       ...(webAuthn
         ? {
@@ -94,7 +99,7 @@ const createHarness = async ({ webAuthn = false } = {}) => {
       rateLimitKeySecret: RATE_LIMIT_SECRET,
       requireVerifiedEmail: false,
       mfaPolicy: {
-        required: true,
+        required: requireMfa,
       },
       clock,
     },
@@ -187,6 +192,74 @@ const getEnrollmentChallengeToken = (response) => {
 
   return token;
 };
+
+test("fixed demo code completes the sign-in HTTP flow for the configured account", async () => {
+  const harness = await createHarness({
+    requireMfa: false,
+    demoTotpBypass: {
+      code: "123456",
+      email: "demo@puzzle-ui.com",
+    },
+  });
+  const registered = await harness.auth.register({
+    email: "demo@puzzle-ui.com",
+    password: PASSWORD,
+    name: "Puzzle Demo",
+    ipAddress: "127.0.0.1",
+  });
+  const enrollment = await harness.mfa.beginTotpEnrollment({
+    sessionToken: registered.token,
+    currentPassword: PASSWORD,
+    ipAddress: "127.0.0.1",
+  });
+  const currentCode = await generateTotpCode(
+    enrollment.secret,
+    harness.currentTime().getTime(),
+    {
+      digits: 6,
+      periodSeconds: 30,
+    },
+  );
+
+  await harness.mfa.verifyTotpEnrollment({
+    sessionToken: registered.token,
+    factorId: enrollment.factorId,
+    code: currentCode,
+    ipAddress: "127.0.0.1",
+  });
+  await harness.auth.signOut(registered.token);
+
+  const signInResponse = await harness.handlers.signIn(
+    postRequest("/sign-in", {
+      email: "demo@puzzle-ui.com",
+      password: PASSWORD,
+    }),
+  );
+  assert.equal(signInResponse.status, 200);
+  assert.equal((await signInResponse.json()).status, "mfa-pending");
+
+  const challengeToken = readMfaChallengeCookie(
+    signInResponse.headers.get("set-cookie"),
+  );
+  assert.ok(challengeToken);
+
+  const verifyResponse = await harness.handlers.verifySignInTotp(
+    postRequest(
+      "/mfa/sign-in/totp",
+      { code: "123456" },
+      `${MFA_CHALLENGE_COOKIE_NAME}=${challengeToken}`,
+    ),
+  );
+
+  assert.equal(verifyResponse.status, 200);
+  const result = await verifyResponse.json();
+  assert.equal(result.status, "authenticated");
+  assert.equal(result.user.email, "demo@puzzle-ui.com");
+  assert.match(
+    verifyResponse.headers.get("set-cookie"),
+    new RegExp(`${harness.cookie.name}=`),
+  );
+});
 
 test("required TOTP enrollment completes the entire registration flow", async () => {
   const harness = await createHarness();

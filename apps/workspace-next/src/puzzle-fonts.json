@@ -1,0 +1,26 @@
+{
+  "heading": {
+    "family": "Geist",
+    "weightRange": [
+      400,
+      700
+    ],
+    "display": "swap",
+    "fallback": [
+      "system-ui",
+      "sans-serif"
+    ]
+  },
+  "body": {
+    "family": "Geist",
+    "weightRange": [
+      400,
+      700
+    ],
+    "display": "swap",
+    "fallback": [
+      "system-ui",
+      "sans-serif"
+    ]
+  }
+}

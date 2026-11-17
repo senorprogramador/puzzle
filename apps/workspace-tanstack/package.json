@@ -1,0 +1,52 @@
+{
+  "name": "workspace-tanstack",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "bun run db:setup && bun run db:seed && vite dev --port 3000",
+    "generate-routes": "vite build",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node .output/server/index.mjs",
+    "typecheck": "tsc --noEmit -p .",
+    "fonts:download": "puzzle-theme fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
+    "db:setup": "node scripts/setup-mongodb.mjs",
+    "db:seed": "WORKSPACE_DEMO_RESET=yes bun ../../packages/workspace/scripts/seed.ts"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.2.2",
+    "@puzzle-ui/auth": "workspace:*",
+    "@puzzle-ui/fullstack": "workspace:*",
+    "@puzzle-ui/pieces": "workspace:*",
+    "@puzzle-ui/session": "workspace:*",
+    "@puzzle-ui/storage": "workspace:*",
+    "@puzzle-ui/storage-mongodb": "workspace:*",
+    "@puzzle-ui/theme": "workspace:*",
+    "@puzzle-ui/ui": "workspace:*",
+    "@puzzle-ui/workspace": "workspace:*",
+    "@puzzle-ui/workspace-ui": "workspace:*",
+    "@tanstack/react-router": "1.170.46",
+    "@tanstack/react-start": "1.169.5",
+    "mongodb": "^7.8.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.3",
+    "nitro": "^3.0.261103-rc"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "lightningcss"
+    ]
+  }
+}

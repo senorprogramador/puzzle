@@ -39,6 +39,15 @@ const capture = (chunk: Buffer) => {
 server.stdout.on("data", capture);
 server.stderr.on("data", capture);
 
+const extractVisibleText = (html: string): string =>
+  html
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
 try {
   const origin = await new Promise<string>((resolveOrigin, reject) => {
     const timer = setTimeout(() => reject(new Error(`Site did not start:\n${output}`)), 30000);
@@ -87,6 +96,13 @@ try {
   assert.ok(sourceUrls.includes(`${SITE_URL}/docs/storage`));
   assert.match(fullDocsText, /```(?:tsx?|bash|sh)/);
   assert.match(fullDocsText, new RegExp(`${SITE_URL}/docs/`));
+  const docsPaths = sourceUrls.map((sourceUrl) => {
+    const url = new URL(sourceUrl);
+    assert.equal(url.origin, SITE_URL, `documentation source origin: ${sourceUrl}`);
+    assert.ok(url.pathname.startsWith("/docs/"), `documentation source path: ${sourceUrl}`);
+    return url.pathname;
+  });
+  assert.equal(new Set(docsPaths).size, docsPaths.length, "unique documentation paths");
 
   const sitemapResponse = await fetch(`${origin}/sitemap.xml`);
   assert.equal(sitemapResponse.status, 200, "/sitemap.xml status");
@@ -99,6 +115,57 @@ try {
   assert.ok(sitemapUrls.includes(`${SITE_URL}/`), "sitemap homepage");
   for (const sourceUrl of sourceUrls) {
     assert.ok(sitemapUrls.includes(sourceUrl), `sitemap includes ${sourceUrl}`);
+  }
+
+  for (const path of docsPaths) {
+    const response = await fetch(`${origin}${path}`);
+    assert.equal(response.status, 200, `${path}: direct HTTP status`);
+    assert.match(
+      response.headers.get("content-type") ?? "",
+      /^text\/html/,
+      `${path}: HTML content type`,
+    );
+    assert.equal(
+      response.headers.get("cache-control"),
+      "public, max-age=86400, s-maxage=86400",
+      `${path}: CDN cache policy`,
+    );
+    const html = await response.text();
+    assert.equal((html.match(/<title>/g) ?? []).length, 1, `${path}: SSR title`);
+    assert.match(html, /<h1(?:\s[^>]*)?>[\s\S]*?<\/h1>/i, `${path}: SSR page heading`);
+    assert.match(
+      html,
+      /class="[^"]*\bprose\b[^"]*\bflex-1\b[^"]*"/,
+      `${path}: SSR Fumadocs content container`,
+    );
+    assert.doesNotMatch(html, /<header\b[^>]*id="nd-subnav"/i, `${path}: no Fumadocs subnav`);
+    assert.match(html, /type="application\/ld\+json"/, `${path}: SSR structured data`);
+    assert.ok(
+      html.includes(`${SITE_URL}${path}`),
+      `${path}: canonical URL is present in the original HTML`,
+    );
+    assert.ok(
+      extractVisibleText(html).length > 100,
+      `${path}: documentation content is server-rendered`,
+    );
+
+    const googlebotResponse = await fetch(`${origin}${path}`, {
+      headers: {
+        "user-agent":
+          "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+      },
+    });
+    assert.equal(googlebotResponse.status, 200, `${path}: Googlebot HTTP status`);
+    assert.equal(
+      googlebotResponse.headers.get("cache-control"),
+      response.headers.get("cache-control"),
+      `${path}: Googlebot cache policy`,
+    );
+    assert.equal(
+      extractVisibleText(await googlebotResponse.text()),
+      extractVisibleText(html),
+      `${path}: Googlebot receives the same rendered content`,
+    );
   }
 
   const robotsResponse = await fetch(`${origin}/robots.txt`);
@@ -116,6 +183,17 @@ try {
   const noJsPage = await noJsContext.newPage();
   await noJsPage.goto(origin);
   assert.equal(await noJsPage.locator(".home-component-fallback a").count(), 16);
+  for (const path of docsPaths) {
+    const response = await noJsPage.goto(`${origin}${path}`);
+    assert.equal(response?.status(), 200, `${path}: JavaScript-disabled status`);
+    assert.ok(await noJsPage.locator("h1").count(), `${path}: JavaScript-disabled heading`);
+    const docsContent = noJsPage.locator(".puzzle-site-docs .prose.flex-1");
+    assert.equal(await docsContent.count(), 1, `${path}: JavaScript-disabled content container`);
+    assert.ok(
+      (await docsContent.innerText()).trim().length > 100,
+      `${path}: JavaScript-disabled content`,
+    );
+  }
   await noJsContext.close();
 
   const lazyPage = await browser.newPage({ viewport: { width: 1280, height: 720 } });
@@ -199,6 +277,16 @@ try {
   const check = async (path: string) => {
     await page.waitForLoadState("networkidle");
     assert.deepEqual(errors, [], `Browser errors on ${path}`);
+    if (path !== "/") {
+      const docsContent = page.locator(".puzzle-site-docs .prose.flex-1");
+      await docsContent.waitFor({ state: "attached" });
+      assert.equal(await docsContent.count(), 1, `${path}: hydrated content container`);
+      assert.equal(await page.locator("header#nd-subnav").count(), 0, `${path}: no Fumadocs subnav`);
+      assert.ok(
+        (await docsContent.innerText()).trim().length > 100,
+        `${path}: hydrated documentation content`,
+      );
+    }
     await page.waitForFunction((pathname) => {
       const canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]');
       const script = document.querySelector('script[type="application/ld+json"]');
@@ -268,11 +356,7 @@ try {
     }
   };
 
-  for (const path of [
-    "/", "/docs/getting-started", "/docs/tutorials/seo", "/docs/tutorials/auth",
-    "/docs/tutorials/auth-tanstack-start", "/docs/tutorials/auth-nextjs",
-    "/docs/tutorials/storage", "/docs/tutorials",
-  ]) {
+  for (const path of ["/", ...docsPaths]) {
     const response = await page.goto(`${origin}${path}`);
     assert.equal(response?.status(), 200);
     const html = await response!.text();
@@ -280,6 +364,8 @@ try {
     assert.equal((html.match(/type="application\/ld\+json"/g) ?? []).length, 1, `${path}: SSR graph`);
     await check(path);
   }
+  await page.goto(`${origin}/docs/tutorials`);
+  await check("/docs/tutorials");
   for (const path of ["/docs/tutorials/seo", "/docs/tutorials/storage", "/docs/tutorials/auth"]) {
     await page.locator(`a[href="${path}"]`).first().click();
     await page.waitForURL((url) => url.pathname === path);

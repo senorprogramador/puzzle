@@ -39,6 +39,7 @@ export type AuthProviderProps = {
   readonly initialSnapshot?: AuthClientSnapshot;
   readonly locale?: string;
   readonly messages?: AuthMessageOverrides;
+  readonly demoTotpCode?: string;
   readonly onAuthStateChange?: (snapshot: AuthClientSnapshot) => void;
 };
 
@@ -46,6 +47,7 @@ export type AuthContextValue = {
   readonly client: AuthClient;
   readonly snapshot: AuthClientSnapshot;
   readonly messages: AuthMessages;
+  readonly demoTotpCode?: string;
   readonly locale: AuthLocale;
   readonly error: Error | null;
   readonly isLoading: boolean;
@@ -289,6 +291,7 @@ const AuthProvider = ({
   initialSnapshot = loadingSnapshot,
   locale: localeInput,
   messages: messageOverrides,
+  demoTotpCode,
   onAuthStateChange,
 }: AuthProviderProps) => {
   const [createdClient] = useState(() => createAuthClient(options));
@@ -456,6 +459,7 @@ const AuthProvider = ({
       client,
       snapshot,
       messages: resolvedMessages,
+      demoTotpCode,
       locale,
       error,
       isLoading: snapshot.status === "loading",
@@ -481,6 +485,7 @@ const AuthProvider = ({
       client,
       snapshot,
       resolvedMessages,
+      demoTotpCode,
       locale,
       error,
       refresh,
@@ -1190,6 +1195,7 @@ const MfaChallengeForm = ({
     verifyMfaWithPasskey,
     client,
     messages,
+    demoTotpCode,
   } = useAuth();
   const passkeySupported = usePasskeySupport(client);
 
@@ -1249,7 +1255,12 @@ const MfaChallengeForm = ({
     <section className={`puzzle-auth ${className ?? ""}`}>
       <header className="puzzle-auth__header">
         <h1>{messages.mfaTitle}</h1>
-        <p>{messages.mfaDescription}</p>
+        <p>
+          {messages.mfaDescription}
+          {snapshot.mfa?.purpose === "sign-in" && demoTotpCode
+            ? ` Demo authentication code: ${demoTotpCode}.`
+            : ""}
+        </p>
       </header>
 
       {error && <Alert severity="error">{error}</Alert>}

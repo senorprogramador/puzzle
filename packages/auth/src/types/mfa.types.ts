@@ -225,6 +225,12 @@ export type AuthMfaManagerOptions = {
   /** Keep this aligned with AuthManagerOptions.requireVerifiedEmail. */
   readonly requireVerifiedEmail?: boolean;
 
+  /** Optional fixed code for a single demo account; never use for other users. */
+  readonly demoTotpBypass?: {
+    readonly code: string;
+    readonly email: string;
+  };
+
   readonly clock?: () => Date;
 };
 

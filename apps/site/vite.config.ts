@@ -8,13 +8,18 @@ import { fumadocsMdx } from "fumadocs-mdx/vite";
 import { createFontRouteRules } from "@puzzle-ui/theme/nitro";
 
 const logger = createLogger();
-const routerEntry = createRequire(import.meta.url).resolve("@tanstack/react-router");
+const routerEntry = createRequire(import.meta.url).resolve(
+  "@tanstack/react-router",
+);
 
 const routerCoreResolution: Plugin = {
   name: "puzzle:router-core-resolution",
   enforce: "pre",
   resolveId(source, _importer, options) {
-    if (source === "@tanstack/router-core" || source.startsWith("@tanstack/router-core/")) {
+    if (
+      source === "@tanstack/router-core" ||
+      source.startsWith("@tanstack/router-core/")
+    ) {
       // Use React Router's core dependency for both SSR transport and hydration.
       return this.resolve(source, routerEntry, { ...options, skipSelf: true });
     }
@@ -73,6 +78,12 @@ export default defineConfig({
   },
   resolve: {
     tsconfigPaths: true,
+    noExternal: [
+      "fumadocs-core",
+      "fumadocs-ui",
+      "fumadocs-openapi",
+      "@fumadocs/base-ui",
+    ],
   },
   build: {
     cssMinify: "esbuild",

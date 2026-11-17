@@ -4,7 +4,7 @@ export function baseOptions(): BaseLayoutProps {
   return {
     themeSwitch: { enabled: false },
     nav: {
-      title: "Puzzle",
+      enabled: false,
     },
   };
 }

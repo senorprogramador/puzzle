@@ -18,6 +18,8 @@ export type AuthLifecycleHandlersOptions = {
   readonly resolveClientIp: (request: Request) => string;
   readonly verificationUrl: (request: Request) => string;
   readonly passwordResetUrl: (request: Request) => string;
+  readonly emailChangeUrl: (request: Request) => string;
+  readonly allowPasswordChange?: boolean;
 };
 
 export type AuthLifecycleHandlers = {
@@ -26,6 +28,11 @@ export type AuthLifecycleHandlers = {
   readonly requestPasswordReset: (request: Request) => Promise<Response>;
   readonly resetPassword: (request: Request) => Promise<Response>;
   readonly changePassword: (request: Request) => Promise<Response>;
+  readonly requestEmailChange: (request: Request) => Promise<Response>;
+  readonly verifyEmailChange: (request: Request) => Promise<Response>;
+  readonly updateProfile: (request: Request) => Promise<Response>;
+  readonly listSessions: (request: Request) => Promise<Response>;
+  readonly revokeSession: (request: Request) => Promise<Response>;
 };
 
 type JsonObject = Record<string, unknown>;
@@ -75,6 +82,23 @@ const requiredString = (
   }
 
   return value;
+};
+
+const optionalNullableString = (
+  body: JsonObject,
+  field: string,
+  maximumLength: number,
+): { readonly present: false } | { readonly present: true; readonly value: string | null } => {
+  if (!Object.hasOwn(body, field)) return { present: false };
+
+  const value = body[field];
+
+  if (value === null) return { present: true, value: null };
+  if (typeof value !== "string" || value.length > maximumLength) {
+    throw new Error("INVALID_REQUEST");
+  }
+
+  return { present: true, value };
 };
 
 const getErrorResponse = (error: unknown): Response => {
@@ -238,6 +262,18 @@ const createAuthLifecycleHandlers = (
   const changePassword = endpoint(async (request) => {
     protect(request);
 
+    if (options.allowPasswordChange === false) {
+      return jsonResponse(
+        {
+          error: {
+            code: "PASSWORD_CHANGE_DISABLED",
+            message: "Password changes are disabled.",
+          },
+        },
+        403,
+      );
+    }
+
     const sessionToken = getSessionToken(request, options.cookie);
 
     if (!sessionToken) {
@@ -265,12 +301,173 @@ const createAuthLifecycleHandlers = (
     });
   });
 
+  const requestEmailChange = endpoint(async (request) => {
+    protect(request);
+
+    const sessionToken = getSessionToken(request, options.cookie);
+
+    if (!sessionToken) {
+      return jsonResponse(
+        {
+          error: {
+            code: "UNAUTHENTICATED",
+            message: "Authentication is required.",
+          },
+        },
+        401,
+      );
+    }
+
+    const body = await readBody(request);
+
+    await options.lifecycle.requestEmailChange({
+      sessionToken,
+      currentPassword: requiredString(body, "currentPassword"),
+      email: requiredString(body, "email", 320),
+      verificationUrl: options.emailChangeUrl(request),
+      ipAddress: options.resolveClientIp(request),
+    });
+
+    return jsonResponse({ status: "email-change-requested" });
+  });
+
+  const verifyEmailChange = endpoint(async (request) => {
+    protect(request);
+
+    const body = await readBody(request);
+    const user = await options.lifecycle.verifyEmailChange(
+      requiredString(body, "token"),
+    );
+
+    return jsonResponse({ status: "email-changed", user });
+  });
+
+  const updateProfile = endpoint(async (request) => {
+    protect(request);
+
+    const sessionToken = getSessionToken(request, options.cookie);
+
+    if (!sessionToken) {
+      return jsonResponse(
+        {
+          error: {
+            code: "UNAUTHENTICATED",
+            message: "Authentication is required.",
+          },
+        },
+        401,
+      );
+    }
+
+    const body = await readBody(request);
+    const name = optionalNullableString(body, "name", 120);
+    const image = optionalNullableString(body, "image", 2048);
+
+    if (!name.present && !image.present) {
+      throw new Error("INVALID_REQUEST");
+    }
+
+    const user = await options.lifecycle.updateProfile({
+      sessionToken,
+      ...(name.present ? { name: name.value } : {}),
+      ...(image.present ? { image: image.value } : {}),
+    });
+
+    return jsonResponse({ user });
+  });
+
+  const listSessions = async (request: Request): Promise<Response> => {
+    if (request.method !== "GET") {
+      return jsonResponse(
+        {
+          error: {
+            code: "METHOD_NOT_ALLOWED",
+            message: "Only GET requests are supported.",
+          },
+        },
+        405,
+      );
+    }
+
+    try {
+      const session = await getRequestSession(request, sessionOptions);
+
+      if (!session || session.kind !== "authenticated" || !session.userId) {
+        return jsonResponse(
+          {
+            error: {
+              code: "UNAUTHENTICATED",
+              message: "Authentication is required.",
+            },
+          },
+          401,
+        );
+      }
+
+      const sessions = await options.sessions.list(
+        session.userId,
+        session.id,
+      );
+
+      return jsonResponse({ sessions });
+    } catch (error) {
+      return getErrorResponse(error);
+    }
+  };
+
+  const revokeSession = endpoint(async (request) => {
+    protect(request);
+
+    const session = await getRequestSession(request, sessionOptions);
+
+    if (!session || session.kind !== "authenticated" || !session.userId) {
+      return jsonResponse(
+        {
+          error: {
+            code: "UNAUTHENTICATED",
+            message: "Authentication is required.",
+          },
+        },
+        401,
+      );
+    }
+
+    const body = await readBody(request);
+    const sessionId = requiredString(body, "sessionId", 256);
+    const target = await options.sessions.get(sessionId);
+
+    if (
+      !target ||
+      target.userId !== session.userId ||
+      target.id === session.id
+    ) {
+      return jsonResponse(
+        {
+          error: {
+            code: "SESSION_NOT_FOUND",
+            message: "The session could not be revoked.",
+          },
+        },
+        404,
+      );
+    }
+
+    await options.sessions.revoke(target.id);
+
+    return jsonResponse({ status: "session-revoked" });
+  });
+
   return {
     requestEmailVerification,
     verifyEmail,
     requestPasswordReset,
     resetPassword,
     changePassword,
+    requestEmailChange,
+    verifyEmailChange,
+    updateProfile,
+    listSessions,
+    revokeSession,
   };
 };
 

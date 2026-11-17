@@ -560,6 +560,12 @@ export {
   MfaChallengeForm,
   AuthScreen,
   MfaSettings,
+  PasswordResetRequestForm,
+  PasswordResetForm,
+  EmailVerificationNotice,
+  ChangePasswordForm,
+  RequiredMfaEnrollment,
+  EmailVerificationForm,
   type AuthProviderProps,
   type AuthContextValue,
   type AuthFormProps,
@@ -568,6 +574,11 @@ export {
   type MfaChallengeFormProps,
   type AuthScreenProps,
   type MfaSettingsProps,
+  type PasswordResetRequestFormProps,
+  type PasswordResetFormProps,
+  type EmailVerificationFormProps,
+  type EmailVerificationNoticeProps,
+  type ChangePasswordFormProps,
 } from "./react";
 
 export {

@@ -19,7 +19,7 @@
     "test:catalog": "bun test src/components/component-catalog.test.ts",
     "test:tutorials": "bun scripts/validate-tutorials.ts",
     "test:hydration": "bun scripts/validate-hydration.ts",
-    "validate:seo": "bun run test:seo && bun run test:catalog && bun run test:tutorials && bun run test:hydration && bun run typecheck && bun run build && bun run test:seo:smoke",
+    "validate:seo": "bun run test:seo && bun run test:catalog && bun run test:tutorials && bun run typecheck && bun run build && bun run test:hydration && bun run test:seo:smoke",
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
