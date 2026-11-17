@@ -1,11 +1,12 @@
 import { cn } from "@puzzle-ui/core";
+import type { ElementType } from "react";
 import type { SectionProps } from "./types";
 import { getContainerPresetClass } from "../container/container.utils";
 
 import "./section.css";
 import "../container/container.css";
 
-export const Section = ({
+export const Section = <C extends ElementType = "section">({
   children,
   className,
   style,
@@ -15,8 +16,10 @@ export const Section = ({
   compactTop = false,
   compactBottom = false,
   divider = false,
-  as: Component = "section",
-}: SectionProps) => {
+  as,
+  ...props
+}: SectionProps<C>) => {
+  const Component = as ?? "section";
   const constrainContent = theme !== "default" && !fullWidth;
   const content = (
     <>
@@ -27,6 +30,7 @@ export const Section = ({
 
   return (
     <Component
+      {...props}
       className={cn(
         "puzzle-section",
         !fullWidth &&

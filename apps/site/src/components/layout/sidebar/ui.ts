@@ -272,6 +272,11 @@ const layout: TreeViewItem = {
       href: `${folder}/layout/section`,
     },
     {
+      id: "ui-section-header",
+      label: "Section Header",
+      href: `${folder}/layout/section-header`,
+    },
+    {
       id: "ui-section-stack",
       label: "Section Stack",
       href: `${folder}/layout/section-stack`,

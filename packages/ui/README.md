@@ -12,6 +12,8 @@ Component API maturity is listed on each component's documentation page.
 [Toggle Group](https://puzzle-ui.com/docs/ui/actions/toggle-group), including
 `ToggleGroup.Item`, have Stable public APIs with component/browser coverage
 and backward-compatibility intent within a major version.
+`SectionHeader` is Beta while its shared section API is exercised by upcoming
+Pieces families.
 Paper, Skeleton, Label, Background, Breadcrumbs, Sidebar, and Backdrop are
 Experimental because their current validation evidence is limited. Review
 documented accessibility and framework details when integrating components.
@@ -67,7 +69,7 @@ export const App = () => (
 | Data display | Alert, Avatar, Badge, Card, EmptyState, Image, Paper, Progress, Rating, Skeleton                              |
 | Editors      | TextEditor, TextEditorToolbar, TextRenderer                                                                   |
 | Forms        | Autocomplete, Checkbox, ColorPicker, DatePicker, FileUpload, FormField, inputs, Radio, Select, Slider, Switch |
-| Layout       | AppBar, AspectRatio, Container, Grid, GridItem, PageLayout, ResizablePanels, ScrollArea, Section, Separator, Sidebar, Stack |
+| Layout       | AppBar, AspectRatio, Container, Grid, GridItem, PageLayout, ResizablePanels, ScrollArea, Section, SectionHeader, Separator, Sidebar, Stack |
 | Navigation   | Accordion, Breadcrumbs, Carousel, Link, Pagination, Tabs, TreeView                                            |
 | Overlays     | Command, ContextMenu, Dialog, Drawer, DropdownMenu, Notification, Popover, Tooltip                            |
 | Typography   | Heading, Text                                                                                                 |

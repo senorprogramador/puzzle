@@ -367,6 +367,11 @@ export type {
   SectionProps,
 } from "./components/layout/section/types";
 export {
+  SectionHeader,
+  type SectionHeaderAlignment,
+  type SectionHeaderProps,
+} from "./components/layout/section-header";
+export {
   SectionStack,
   type SectionStackProps,
 } from "./components/layout/section-stack";

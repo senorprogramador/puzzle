@@ -1,0 +1,43 @@
+.puzzle-section-header {
+    display: flex;
+    width: 100%;
+    max-width: var(--puzzle-content-width, 64rem);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-section-header[data-alignment="center"] {
+    align-items: center;
+    margin-inline: auto;
+    text-align: center;
+}
+
+.puzzle-section-header[data-alignment="end"] {
+    align-items: flex-end;
+    margin-inline-start: auto;
+    text-align: end;
+}
+
+.puzzle-section-header__eyebrow,
+.puzzle-section-header__title,
+.puzzle-section-header__description {
+    margin: 0;
+}
+
+.puzzle-section-header__actions {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-section-header[data-alignment="center"]
+    .puzzle-section-header__actions {
+    justify-content: center;
+}
+
+.puzzle-section-header[data-alignment="end"] .puzzle-section-header__actions {
+    justify-content: flex-end;
+}

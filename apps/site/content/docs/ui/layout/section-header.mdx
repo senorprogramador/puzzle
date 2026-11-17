@@ -1,0 +1,137 @@
+---
+title: React Section Header Component
+description: Compose a section eyebrow, heading, description, and action group with responsive alignment and theme-aware typography.
+---
+
+Use `SectionHeader` to compose the introductory content shared by page
+sections. It uses the UI package's `Heading` and `Text` primitives, inherits
+colors from its parent section, and omits the header entirely when all slots
+are empty.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This shared API
+will be exercised by upcoming Pieces section families before its shape is
+considered stable.
+
+## Import
+
+```tsx
+import { Section, SectionHeader } from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+Use `Section` for the section root and `SectionHeader` for its introductory
+content. Pass controls and framework-specific links through `actions`; the
+header does not own navigation or application state.
+
+<Preview
+  code={`\
+<Section theme="light" aria-labelledby="features-heading">
+  <SectionHeader
+    eyebrow="Platform"
+    title="Everything your team needs."
+    titleId="features-heading"
+    description="Bring planning, collaboration, and delivery together."
+    actions={<Button href="/docs">Explore the docs</Button>}
+  />
+</Section>
+`}
+>
+  <Section theme="light" aria-labelledby="features-heading">
+    <SectionHeader
+      eyebrow="Platform"
+      title="Everything your team needs."
+      titleId="features-heading"
+      description="Bring planning, collaboration, and delivery together."
+      actions={<Button href="/docs">Explore the docs</Button>}
+    />
+  </Section>
+</Preview>
+
+## Alignment and heading semantics
+
+`alignment` controls the header's content alignment. It does not change the
+DOM order. Choose `titleAs` to match the page's heading hierarchy; `titleLevel`
+controls visual typography independently.
+
+<Preview
+  code={`\
+<Section theme="primary" aria-labelledby="contact-heading">
+  <SectionHeader
+    alignment="center"
+    eyebrow="Talk to our team"
+    title="Let's make a plan."
+    titleAs="h2"
+    titleId="contact-heading"
+    titleLevel="headline2"
+    description="Tell us what you are working on."
+    actions={<Button href="/contact">Contact us</Button>}
+  />
+</Section>
+`}
+>
+  <Section theme="primary" aria-labelledby="contact-heading">
+    <SectionHeader
+      alignment="center"
+      eyebrow="Talk to our team"
+      title="Let's make a plan."
+      titleAs="h2"
+      titleId="contact-heading"
+      titleLevel="headline2"
+      description="Tell us what you are working on."
+      actions={<Button href="/contact">Contact us</Button>}
+    />
+  </Section>
+</Preview>
+
+Use `alignment="end"` for a right-aligned introduction. Action items wrap when
+they do not fit on one line. The component uses CSS and does not measure the
+viewport or require a container query.
+
+## API
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `eyebrow` | `ReactNode` | — | Optional short label above the heading. |
+| `title` | `ReactNode` | — | Optional section heading. When omitted, no heading is rendered. |
+| `titleAs` | `ElementType` | `"h2"` | Semantic element used for the title. |
+| `titleId` | `string` | — | ID for associating the title with the enclosing section's `aria-labelledby`. |
+| `titleLevel` | `HeadingLevel` | `"headline2"` | Theme typography role, independent of the heading element. |
+| `description` | `ReactNode` | — | Optional supporting content. |
+| `actions` | `ReactNode` | — | Optional consumer-provided links, buttons, or other controls. |
+| `alignment` | `"start" \| "center" \| "end"` | `"start"` | Alignment for content and the action group. |
+| `className` | `string` | — | Additional class on the semantic `<header>`. |
+| `style` | `CSSProperties` | — | Inline styles for the header root. |
+| `id`, `role`, `aria-*`, `data-*` | Native `<header>` attributes | — | Native attributes are forwarded to the root element. |
+
+`SectionHeader` does not accept arbitrary `children`; use its named content
+slots. If all slots are absent or empty, it returns `null`. Numeric content
+such as `title={0}` remains renderable.
+
+## Theme and responsive behavior
+
+The header uses `Heading` and `Text` from `@puzzle-ui/ui` and inherits its
+foreground color from the surrounding section. Spacing and content width use
+Theme CSS variables (`--puzzle-space-3` and `--puzzle-content-width`). Use
+`Section` for themed backgrounds and content width, and `Container`, `Grid`,
+or `Stack` for surrounding layout; do not add another section/container
+wrapper around this component.
+
+## Accessibility and rendering
+
+- Keep the heading level in the document hierarchy; changing `titleAs` does
+  not automatically change the visual `titleLevel`.
+- Connect the enclosing section with `aria-labelledby={titleId}` when the
+  heading should name that section.
+- Pass native buttons, links, or UI controls in `actions`; ensure each has an
+  accessible name and visible focus.
+- The component renders no browser APIs or effects and can produce server
+  markup. Verify framework and hydration behavior in the target application.
+- There is no animation, so no reduced-motion override is necessary.
+
+## Related documentation
+
+- [Section](/docs/ui/layout/section)
+- [Container](/docs/ui/layout/container)
+- [Heading](/docs/ui/typography/heading)
+- [Theme design tokens](/docs/theme/tokens)

@@ -33,6 +33,9 @@
     "apps/workspace-tanstack",
     "packages/*"
   ],
+  "trustedDependencies": [
+    "bun"
+  ],
   "devDependencies": {
     "@types/bun": "^1.4.4",
     "bun": "^1.4.4",

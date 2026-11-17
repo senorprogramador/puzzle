@@ -442,6 +442,7 @@
   },
   "trustedDependencies": [
     "sharp",
+    "bun",
     "unrs-resolver",
   ],
   "packages": {

@@ -288,6 +288,13 @@ export const components = [
     description: "Define page sections with themed spacing and surfaces.",
   },
   {
+    name: "Section Header",
+    href: "/docs/ui/layout/section-header",
+    icon: "lucide:heading-2",
+    description:
+      "Compose a section eyebrow, heading, description, and actions.",
+  },
+  {
     name: "Section Stack",
     href: "/docs/ui/layout/section-stack",
     icon: "lucide:layers",
