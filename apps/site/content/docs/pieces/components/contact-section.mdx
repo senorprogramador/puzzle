@@ -1,0 +1,58 @@
+---
+title: ContactSection
+description: Share contact details, department contacts, opening hours, a form slot, map slot, CTA, and success-state content.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+import { ContactSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/business-sections";
+
+`ContactSection` lays out business contact information and optional consumer-provided content slots. It does not submit forms, send email, validate requests, or connect to a map provider.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  ContactSection,
+  type ContactSectionProps,
+  type ContactSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Every one of the thirteen layouts has an individual preview. The examples include business details, department contacts, a form slot, map slot, and success-state slot.
+
+<ContactSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `ContactSectionVariant` | `split` (default), `centered`, `form`, `card`, `map`, `details`, `minimal`, `full-width`, `departments`, `multi-column`, `editorial`, `support`, or `inquiry`. |
+| `address` | `ReactNode` | Optional postal address. |
+| `phone`, `email` | `string` | Optional values rendered with `tel:` and `mailto:` links. |
+| `openingHours` | `ReactNode` | Optional hours or availability content. |
+| `details` | `readonly BusinessContactItem[]` | Additional labeled contact data. |
+| `departments` | `readonly BusinessContactDepartment[]` | Optional named groups and department contacts. |
+| `formSlot` | `ReactNode` | Consumer-owned form markup; this component adds no submission behavior. |
+| `mapSlot` | `ReactNode` | Consumer-owned map or location content; `mapLabel` names its region. |
+| `successSlot` | `ReactNode` | Optional consumer-owned success content announced politely. |
+| Shared section props | `MarketingSectionBaseProps` | Heading, CTA actions, root element, native section attributes, and children. |
+
+## Usage
+
+```tsx
+<ContactSection
+  variant="split"
+  title="Start a conversation"
+  address="12 Market Street, Amsterdam"
+  phone="+31 20 123 4567"
+  email="hello@example.com"
+  formSlot={<ContactRequestForm />}
+  mapSlot={<OfficeMap />}
+/>
+```
+
+`ContactRequestForm` and `OfficeMap` above are application-owned components passed through the slots. Provide accessible names and labels in the supplied markup. Missing contact details are omitted, and the section never fabricates a contact endpoint or success response. Server rendering is supported.

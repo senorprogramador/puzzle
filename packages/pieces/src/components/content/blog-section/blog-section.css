@@ -1,0 +1,187 @@
+.puzzle-blog-section__items,
+.puzzle-blog-section__supporting {
+  display: grid;
+  gap: var(--puzzle-space-5, 1.25rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-blog-section__article {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-blog-section__article-title,
+.puzzle-blog-section__category-group h3 {
+  margin: 0;
+}
+
+.puzzle-blog-section__article-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.puzzle-blog-section__article-title a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.puzzle-blog-section__items:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-blog-section__article-content {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-blog-section__excerpt {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-blog-section__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-blog-section__featured {
+  display: grid;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-blog-section__category-group {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-blog-section__categories {
+  display: grid;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-blog-section[data-variant="grid"] .puzzle-blog-section__items,
+.puzzle-blog-section[data-variant="cards"] .puzzle-blog-section__items,
+.puzzle-blog-section[data-variant="magazine"] .puzzle-blog-section__supporting {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.puzzle-blog-section[data-variant="cards"] .puzzle-blog-section__article {
+  height: 100%;
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-blog-section[data-variant="masonry"] .puzzle-blog-section__items {
+  display: block;
+  columns: 1;
+  column-gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-blog-section[data-variant="masonry"] .puzzle-blog-section__items > li {
+  display: inline-block;
+  width: 100%;
+  margin-block-end: var(--puzzle-space-5, 1.25rem);
+  break-inside: avoid;
+}
+
+.puzzle-blog-section[data-variant="carousel"] .puzzle-blog-section__items,
+.puzzle-blog-section[data-variant="horizontal"] .puzzle-blog-section__items {
+  grid-auto-columns: minmax(min(80vw, 20rem), 1fr);
+  grid-auto-flow: column;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding-block-end: var(--puzzle-space-2, 0.5rem);
+  scroll-snap-type: inline mandatory;
+}
+
+.puzzle-blog-section[data-variant="carousel"] .puzzle-blog-section__items > li,
+.puzzle-blog-section[data-variant="horizontal"] .puzzle-blog-section__items > li {
+  scroll-snap-align: start;
+}
+
+.puzzle-blog-section[data-variant="list"] .puzzle-blog-section__article,
+.puzzle-blog-section[data-variant="compact"] .puzzle-blog-section__article {
+  grid-template-columns: minmax(7rem, 0.7fr) minmax(0, 2fr);
+  align-items: center;
+}
+
+.puzzle-blog-section[data-variant="compact"] .puzzle-blog-section__article {
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-blog-section[data-variant="compact"] .puzzle-blog-section__excerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.puzzle-blog-section[data-variant="featured"] .puzzle-blog-section__featured > .puzzle-blog-section__article,
+.puzzle-blog-section[data-variant="editorial"] .puzzle-blog-section__featured > .puzzle-blog-section__article,
+.puzzle-blog-section[data-variant="magazine"] .puzzle-blog-section__featured > .puzzle-blog-section__article,
+.puzzle-blog-section[data-variant="split"] .puzzle-blog-section__featured > .puzzle-blog-section__article,
+.puzzle-blog-section[data-variant="latest"] .puzzle-blog-section__featured > .puzzle-blog-section__article {
+  align-items: center;
+}
+
+.puzzle-blog-section[data-variant="split"] .puzzle-blog-section__featured > .puzzle-blog-section__article {
+  border-block: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  padding-block: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-blog-section[data-variant="editorial"] .puzzle-blog-section__featured > .puzzle-blog-section__article-title,
+.puzzle-blog-section[data-variant="latest"] .puzzle-blog-section__featured > .puzzle-blog-section__article-title {
+  font-size: var(--puzzle-font-size-headline3, 1.5rem);
+}
+
+@media (min-width: 40rem) {
+  .puzzle-blog-section[data-variant="masonry"] .puzzle-blog-section__items {
+    columns: 2;
+  }
+
+  .puzzle-blog-section[data-variant="featured"] .puzzle-blog-section__featured,
+  .puzzle-blog-section[data-variant="editorial"] .puzzle-blog-section__featured,
+  .puzzle-blog-section[data-variant="magazine"] .puzzle-blog-section__featured,
+  .puzzle-blog-section[data-variant="split"] .puzzle-blog-section__featured,
+  .puzzle-blog-section[data-variant="latest"] .puzzle-blog-section__featured {
+    grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr);
+    align-items: start;
+  }
+
+  .puzzle-blog-section[data-variant="featured"] .puzzle-blog-section__featured > .puzzle-blog-section__article,
+  .puzzle-blog-section[data-variant="editorial"] .puzzle-blog-section__featured > .puzzle-blog-section__article,
+  .puzzle-blog-section[data-variant="magazine"] .puzzle-blog-section__featured > .puzzle-blog-section__article,
+  .puzzle-blog-section[data-variant="split"] .puzzle-blog-section__featured > .puzzle-blog-section__article,
+  .puzzle-blog-section[data-variant="latest"] .puzzle-blog-section__featured > .puzzle-blog-section__article {
+    grid-row: span 2;
+  }
+}
+
+@media (min-width: 64rem) {
+  .puzzle-blog-section[data-variant="masonry"] .puzzle-blog-section__items {
+    columns: 3;
+  }
+
+  .puzzle-blog-section[data-variant="magazine"] .puzzle-blog-section__featured {
+    grid-template-columns: minmax(0, 3fr) repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 39.99rem) {
+  .puzzle-blog-section[data-variant="list"] .puzzle-blog-section__article,
+  .puzzle-blog-section[data-variant="compact"] .puzzle-blog-section__article {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

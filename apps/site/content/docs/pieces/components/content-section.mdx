@@ -1,0 +1,70 @@
+---
+title: ContentSection
+description: Compose semantic editorial content with flexible columns, media, image placement, quotations, and optional sidebars.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`ContentSection` is a flexible layout for application-owned rich content. Supply regular React children, content columns, media, a figure, and an optional related-content sidebar.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  ContentSection,
+  type ContentSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Every variant has an independent preview using a fictional Morrow studio story and real editorial imagery.
+
+import { ContentSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/content-section";
+
+<ContentSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `ContentSectionVariant` | `single-column` (default), `two-column`, `three-column`, `split`, `image-left`, `image-right`, `media`, `editorial`, `quote`, `narrow`, `wide`, or `full-width`. |
+| `children` | `ReactNode` | Flexible rich content, rendered without extra per-paragraph wrappers. |
+| `columns` | `readonly ReactNode[]` | Optional content slots for the two- and three-column variants. Each slot is wrapped only for grid layout. |
+| `image` | `EditorialImage` | Optional semantic figure with responsive image data and caption. |
+| `media` | `ReactNode` | Optional custom media slot, such as a video or an existing UI component. Takes precedence over `image`. |
+| `sidebar` | `ReactNode` | Optional complementary content rendered as an `<aside>`. |
+| `attribution` | `string` | Optional citation displayed in the `quote` variant. |
+| Shared section props | `MarketingSectionBaseProps` | Header, root element, section attributes, actions, and children. |
+
+## Usage
+
+```tsx
+<ContentSection
+  variant="image-right"
+  eyebrow="Our point of view"
+  title="Objects with a longer story"
+  description="Thoughtful design starts with what we choose to keep."
+  image={{
+    src: "/stories/materials.jpg",
+    alt: "Natural materials arranged on a studio worktable",
+    width: 1200,
+    height: 800,
+    caption: "A selection of materials in the Morrow studio.",
+  }}
+  sidebar={<a href="/about/materials">How we choose materials</a>}
+>
+  <p>
+    Useful things can be beautiful without asking for attention. We design
+    objects to be repaired, shared, and kept for a long time.
+  </p>
+</ContentSection>;
+```
+
+For custom media, provide `media={<video ... />}` instead of `image`. Column slots are useful for short, independent blocks; use ordinary children for long-form copy. The `quote` variant wraps supplied children in a `<blockquote>` and renders the optional attribution in `<cite>`.
+
+## Accessibility and responsive behavior
+
+The section uses semantic `<section>`, `<figure>`, `<figcaption>`, `<blockquote>`, `<cite>`, and `<aside>` elements where appropriate. Set meaningful image alternatives and keep heading levels in sequence with the surrounding page. Two- and three-column layouts collapse at narrow widths; the sidebar and custom media stay in normal document flow. Content is supplied by the application and is server-renderable.

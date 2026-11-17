@@ -1,0 +1,95 @@
+.puzzle-content-section__layout {
+  display: grid;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-content-section__body {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-4, 1rem);
+  min-width: 0;
+}
+
+.puzzle-content-section__columns {
+  display: grid;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-content-section__column {
+  min-width: 0;
+}
+
+.puzzle-content-section__sidebar {
+  min-width: 0;
+  padding: var(--puzzle-space-4, 1rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-content-section__quote {
+  margin: 0;
+  padding-inline-start: var(--puzzle-space-5, 1.25rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  font-size: var(--puzzle-font-size-headline4, 1.25rem);
+}
+
+.puzzle-content-section__quote cite {
+  display: block;
+  margin-block-start: var(--puzzle-space-4, 1rem);
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-body1, 1rem);
+  font-style: normal;
+}
+
+.puzzle-content-section[data-variant="narrow"] {
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+.puzzle-content-section[data-variant="wide"] {
+  max-width: 80rem;
+  margin-inline: auto;
+}
+
+.puzzle-content-section[data-variant="full-width"] {
+  width: 100%;
+  max-width: none;
+}
+
+.puzzle-content-section[data-variant="media"] .puzzle-content-section__body,
+.puzzle-content-section[data-variant="editorial"] .puzzle-content-section__body {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+}
+
+@media (min-width: 40rem) {
+  .puzzle-content-section[data-variant="two-column"] .puzzle-content-section__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .puzzle-content-section[data-variant="three-column"] .puzzle-content-section__columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .puzzle-content-section[data-variant="split"] .puzzle-content-section__layout,
+  .puzzle-content-section[data-variant="image-left"] .puzzle-content-section__body,
+  .puzzle-content-section[data-variant="image-right"] .puzzle-content-section__body,
+  .puzzle-content-section[data-variant="media"] .puzzle-content-section__body,
+  .puzzle-content-section[data-variant="editorial"] .puzzle-content-section__body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
+
+  .puzzle-content-section[data-variant="image-right"] .puzzle-content-section__figure {
+    order: 1;
+  }
+
+  .puzzle-content-section[data-variant="split"] .puzzle-content-section__layout {
+    grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr);
+  }
+}
+
+@media (max-width: 39.99rem) {
+  .puzzle-content-section[data-variant="three-column"] .puzzle-content-section__columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

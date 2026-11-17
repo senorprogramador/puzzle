@@ -1,0 +1,176 @@
+.puzzle-categories__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  align-items: stretch;
+  gap: var(--puzzle-space-5, 1.25rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-categories__card {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-4, 1rem);
+  height: 100%;
+  min-width: 0;
+  padding: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-categories__copy h3,
+.puzzle-categories__copy p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-categories__copy p {
+  margin-block-start: var(--puzzle-space-2, 0.5rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-categories__copy h3 a {
+  color: inherit;
+}
+
+.puzzle-categories__horizontal {
+  overflow-x: auto;
+  padding-block: var(--puzzle-space-2, 0.5rem);
+  scroll-snap-type: inline mandatory;
+}
+
+.puzzle-categories__horizontal:focus-visible,
+.puzzle-categories__controls button:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-categories__horizontal .puzzle-categories__list {
+  display: flex;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-categories__horizontal .puzzle-categories__list > li {
+  flex: 0 0 min(82vw, 22rem);
+  scroll-snap-align: start;
+}
+
+.puzzle-categories__carousel {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+  max-width: 40rem;
+  margin-inline: auto;
+}
+
+.puzzle-categories__carousel > div:first-child {
+  min-width: 0;
+}
+
+.puzzle-categories__position {
+  margin: var(--puzzle-space-3, 0.75rem) 0 0;
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-categories__controls {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-categories__controls button {
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  cursor: pointer;
+}
+
+.puzzle-categories__controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.puzzle-categories__featured,
+.puzzle-categories__split,
+.puzzle-categories__editorial {
+  display: grid;
+  gap: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-categories[data-variant="image-grid"] .puzzle-categories__card {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.puzzle-categories[data-variant="image-grid"] .puzzle-commerce__image {
+  aspect-ratio: 1;
+}
+
+.puzzle-categories[data-variant="featured"] .puzzle-categories__list:first-child .puzzle-categories__card {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-categories[data-variant="featured"] .puzzle-categories__list:first-child .puzzle-commerce__image {
+  aspect-ratio: 16 / 9;
+}
+
+.puzzle-categories[data-variant="split"] .puzzle-categories__list:first-child .puzzle-categories__card {
+  height: 100%;
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-categories[data-variant="editorial"] .puzzle-categories__list:first-child .puzzle-categories__card {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.puzzle-categories[data-variant="editorial"] .puzzle-categories__list:first-child .puzzle-commerce__image {
+  aspect-ratio: 16 / 9;
+}
+
+.puzzle-categories[data-variant="list"] .puzzle-categories__list {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.puzzle-categories[data-variant="list"] .puzzle-categories__list > li + li {
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-categories[data-variant="list"] .puzzle-categories__card {
+  grid-template-columns: minmax(6rem, 0.5fr) minmax(0, 1.5fr);
+  align-items: center;
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-categories[data-variant="compact"] .puzzle-categories__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-categories[data-variant="compact"] .puzzle-categories__card {
+  gap: var(--puzzle-space-2, 0.5rem);
+  padding: var(--puzzle-space-3, 0.75rem);
+}
+
+@media (min-width: 48rem) {
+  .puzzle-categories__featured,
+  .puzzle-categories__split,
+  .puzzle-categories__editorial {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+  }
+
+  .puzzle-categories[data-variant="editorial"] .puzzle-categories__list:first-child .puzzle-categories__card {
+    gap: var(--puzzle-space-6, 1.5rem);
+  }
+
+  .puzzle-categories[data-variant="editorial"] .puzzle-categories__list:first-child .puzzle-categories__copy {
+    padding-block: var(--puzzle-space-4, 1rem);
+  }
+}

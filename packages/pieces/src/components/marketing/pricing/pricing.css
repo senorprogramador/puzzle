@@ -1,0 +1,304 @@
+.puzzle-pricing__billing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0 0 var(--puzzle-space-6, 1.5rem);
+  padding: var(--puzzle-space-3, 0.75rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-pricing__billing legend {
+  padding-inline: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-pricing__single-interval {
+  margin: 0 0 var(--puzzle-space-4, 1rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-pricing__billing label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--puzzle-space-2, 0.5rem);
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  cursor: pointer;
+}
+
+.puzzle-pricing__billing input:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-pricing__plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  align-items: stretch;
+  gap: var(--puzzle-space-5, 1.25rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-pricing__plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--puzzle-space-4, 1rem);
+  height: 100%;
+  min-width: 0;
+  padding: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-pricing__plan h3,
+.puzzle-pricing__plan p {
+  margin: 0;
+}
+
+.puzzle-pricing__description,
+.puzzle-pricing__usage {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-pricing__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-pricing__original-price {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-pricing__amount {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-pricing__interval {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-pricing__custom {
+  font-weight: 600;
+}
+
+.puzzle-pricing__features {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0;
+  padding-inline-start: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-pricing__features li[data-included="false"] {
+  color: var(--puzzle-color-text-muted);
+  text-decoration: line-through;
+}
+
+.puzzle-pricing__feature-value {
+  margin-inline-start: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-pricing__cta {
+  margin-block-start: auto;
+  padding-block-start: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-pricing__comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-pricing__comparison section {
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-pricing__comparison h3 {
+  margin: 0 0 var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-pricing__table-scroll {
+  overflow-x: auto;
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-pricing__table-scroll:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-pricing__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: start;
+}
+
+.puzzle-pricing__table caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.puzzle-pricing__table :is(th, td) {
+  min-width: 8rem;
+  padding: var(--puzzle-space-3, 0.75rem);
+  border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.puzzle-pricing__table thead th {
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-pricing__table tbody th {
+  font-weight: 600;
+}
+
+.puzzle-pricing__split,
+.puzzle-pricing__featured {
+  display: grid;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-pricing__calculator {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  max-width: 42rem;
+  margin-block-end: var(--puzzle-space-6, 1.5rem);
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-pricing__calculator input {
+  width: 100%;
+  accent-color: var(--puzzle-color-primary);
+}
+
+.puzzle-pricing__calculator input:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-pricing__calculator output {
+  font-weight: 600;
+}
+
+.puzzle-pricing__estimate {
+  padding-block-start: var(--puzzle-space-3, 0.75rem);
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-pricing[data-variant="horizontal"] .puzzle-pricing__plans {
+  display: flex;
+  overflow-x: auto;
+  align-items: stretch;
+  padding-block: var(--puzzle-space-2, 0.5rem);
+  scroll-snap-type: inline mandatory;
+}
+
+.puzzle-pricing[data-variant="horizontal"] .puzzle-pricing__plans > li {
+  flex: 0 0 min(82vw, 22rem);
+  scroll-snap-align: start;
+}
+
+.puzzle-pricing[data-variant="toggle"] .puzzle-pricing__billing {
+  width: fit-content;
+  margin-inline: auto;
+}
+
+.puzzle-pricing[data-variant="featured"] .puzzle-pricing__plan[data-highlighted="true"] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-pricing[data-variant="compact"] .puzzle-pricing__plans {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-pricing[data-variant="compact"] .puzzle-pricing__plan {
+  gap: var(--puzzle-space-3, 0.75rem);
+  padding: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-pricing[data-variant="enterprise"] .puzzle-pricing__plan[data-highlighted="true"],
+.puzzle-pricing[data-variant="enterprise"] .puzzle-pricing__custom {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-pricing[data-variant="usage-based"] .puzzle-pricing__usage {
+  padding: var(--puzzle-space-3, 0.75rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-pricing[data-variant="subscription"] .puzzle-pricing__interval {
+  padding-inline-start: var(--puzzle-space-2, 0.5rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-pricing[data-variant="tiered"] .puzzle-pricing__plans {
+  align-items: end;
+}
+
+.puzzle-pricing[data-variant="tiered"] .puzzle-pricing__plan[data-highlighted="true"] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-pricing[data-variant="minimal"] .puzzle-pricing__plan {
+  padding-inline: 0;
+  border: 0;
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-pricing[data-variant="slider"] .puzzle-pricing__calculator {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  max-width: none;
+}
+
+.puzzle-pricing[data-variant="slider"] .puzzle-pricing__calculator label {
+  grid-column: 1;
+}
+
+.puzzle-pricing[data-variant="slider"] .puzzle-pricing__calculator input {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.puzzle-pricing[data-variant="slider"] .puzzle-pricing__calculator output {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.puzzle-pricing[data-variant="calculator"] .puzzle-pricing__calculator {
+  margin-inline: auto;
+}
+
+@media (min-width: 48rem) {
+  .puzzle-pricing__split,
+  .puzzle-pricing__featured {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+  }
+
+  .puzzle-pricing__split > .puzzle-pricing__plans:first-child,
+  .puzzle-pricing__featured > .puzzle-pricing__plans:first-child {
+    position: sticky;
+    inset-block-start: var(--puzzle-space-4, 1rem);
+  }
+}

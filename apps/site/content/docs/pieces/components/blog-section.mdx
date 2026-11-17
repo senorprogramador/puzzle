@@ -1,0 +1,87 @@
+---
+title: BlogSection
+description: Present editorial articles with responsive grids, featured stories, bylines, categories, and reading details.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`BlogSection` renders consumer-provided article data as semantic article cards. Choose from responsive grids, lists, editorial feature layouts, category groups, and horizontal rails.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  BlogSection,
+  type BlogArticle,
+  type BlogSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the thirteen variants has its own preview. The examples use fictional Morrow Journal stories, authors, dates, and photographs.
+
+import { BlogSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/blog-section";
+
+<BlogSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `BlogSectionVariant` | `grid` (default), `featured`, `list`, `masonry`, `carousel`, `editorial`, `magazine`, `split`, `compact`, `categories`, `latest`, `horizontal`, or `cards`. |
+| `items` | `readonly BlogArticle[]` | Article data. Each article needs a stable, unique `id` and `title`. |
+| `featuredArticle` | `BlogArticle` | Optional lead article; it replaces an item with the same ID rather than duplicating it. |
+| `BlogArticle.excerpt` | `string` | Optional short summary. |
+| `BlogArticle.image` | `EditorialImage` | Optional responsive image, alt text, dimensions, loading preference, and caption. |
+| `BlogArticle.author` | `EditorialAuthor` | Optional author name, link, and decorative portrait. |
+| `BlogArticle.date` | `string` | Optional date string. A valid date is formatted in UTC and exposed with a `<time>` element. |
+| `BlogArticle.category` | `string` | Optional category label; the `categories` variant groups by this value. |
+| `BlogArticle.readingTime` | `string \| number` | Optional reading-time label; numeric values are rendered in minutes. |
+| `BlogArticle.href` | `string` | Optional native link for the article title. |
+| `BlogArticle.featured` | `boolean` | Marks the article used by featured layouts when `featuredArticle` is not supplied. |
+| Shared section props | `MarketingSectionBaseProps` | Header, root element, section attributes, actions, and children. |
+
+## Usage
+
+```tsx
+const articles: BlogArticle[] = [
+  {
+    id: "slow-mornings",
+    title: "The case for slower mornings",
+    excerpt: "Small rituals can change the pace of a working day.",
+    image: {
+      src: "/journal/slow-mornings.jpg",
+      alt: "Morning light across a quiet studio",
+      width: 1200,
+      height: 800,
+      caption: "The studio before the day begins.",
+    },
+    author: { name: "Mara Chen", href: "/journal/authors/mara-chen" },
+    date: "2025-05-12",
+    category: "Studio notes",
+    readingTime: 6,
+    href: "/journal/slow-mornings",
+    featured: true,
+  },
+];
+
+<BlogSection
+  variant="featured"
+  eyebrow="Morrow Journal"
+  title="Notes for more considered days"
+  items={articles}
+/>;
+```
+
+The `masonry` composition uses responsive CSS columns. `carousel` and `horizontal` use a native, focusable horizontal scroll rail. Article order is supplied by the application; the `latest` variant emphasizes the first article and does not sort data.
+
+## Images and editorial data
+
+An article image may include `src`, descriptive `alt`, intrinsic `width` and `height`, `loading`, and an optional caption. Article images are lazy-loaded by default. If an image object has no usable source, the section shows an accessible placeholder. Authors, dates, categories, and reading time remain independent optional fields.
+
+## Accessibility and rendering
+
+Articles are list items containing semantic `<article>` elements and level-three headings. Give informative photos concise alt text and decorative images an empty alt. Dates use `<time>`; links remain native anchors. The component does not fetch or sort stories and renders on the server.

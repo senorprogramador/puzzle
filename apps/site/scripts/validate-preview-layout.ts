@@ -29,6 +29,7 @@ const paths = [
     "navigation",
     "project",
     "settings",
+    "product-showcase",
   ].map((component) => `/docs/pieces/components/${component}`),
 ];
 
@@ -90,12 +91,25 @@ try {
           return viewport && getComputedStyle(viewport).position === "relative";
         });
         await page.evaluate(() => document.fonts.ready.then(() => undefined));
+        assert.equal(await page.locator(".puzzle-preview__frame").count(), 0, `${path}: no SSR iframes`);
+        assert.equal(await page.locator("[data-preview-placeholder]").count(), 0, `${path}: no SSR example mounts`);
+        const getText = () => page.locator(".puzzle-site-docs .prose.flex-1").evaluate((body) => {
+          const text = body.cloneNode(true) as HTMLElement;
+          text.querySelectorAll(".puzzle-preview").forEach((preview) => preview.remove());
+          return text.textContent;
+        });
+        const serverText = await getText();
+        assert.ok(serverText && serverText.trim().length > 100, `${path}: server-rendered documentation`);
         const geometry = await page.evaluateHandle(() => {
           const previews = [...document.querySelectorAll(".puzzle-preview")];
           const state = {
             initial: previews.map((preview) => preview.getBoundingClientRect().height),
             maxShift: 0,
+            framesAtLoad: -1,
           };
+          window.addEventListener("load", () => {
+            state.framesAtLoad = document.querySelectorAll(".puzzle-preview__frame").length;
+          }, { once: true });
           const observer = new ResizeObserver(() => {
             previews.forEach((preview, index) => {
               state.maxShift = Math.max(
@@ -109,9 +123,17 @@ try {
         });
 
         releaseScripts();
+        await page.waitForLoadState("load");
+        const previews = page.locator(".puzzle-preview");
+        for (let index = 0; index < await previews.count(); index++) {
+          const preview = previews.nth(index);
+          await preview.scrollIntoViewIfNeeded();
+          await preview.locator(".puzzle-preview__frame").waitFor();
+          await preview.getByRole("progressbar", { name: "Loading preview" }).waitFor({ state: "detached" });
+        }
         await page.waitForFunction(() => {
           const frames = [...document.querySelectorAll<HTMLIFrameElement>(".puzzle-preview__frame")];
-          return frames.every((frame) =>
+          return frames.length === document.querySelectorAll(".puzzle-preview").length && frames.every((frame) =>
             frame.contentDocument?.querySelector(".puzzle-preview__content"),
           );
         });
@@ -126,11 +148,13 @@ try {
 
         const result = await geometry.evaluate(({ state, observer }) => {
           observer.disconnect();
-          return { previews: state.initial.length, maxShift: state.maxShift };
+          return { previews: state.initial.length, maxShift: state.maxShift, framesAtLoad: state.framesAtLoad };
         });
         await geometry.dispose();
         assert.ok(result.previews > 0, `${path}: server-rendered previews`);
         assert.deepEqual(errors, [], `${width}px ${path}: browser errors`);
+        assert.equal(result.framesAtLoad, 0, `${width}px ${path}: previews did not block window load`);
+        assert.equal(await getText(), serverText, `${width}px ${path}: MDX text is unchanged by hydration`);
         assert.ok(
           result.maxShift <= 1,
           `${width}px ${path}: preview height shifted by ${result.maxShift}px`,

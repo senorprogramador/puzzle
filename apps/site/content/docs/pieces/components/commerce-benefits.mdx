@@ -1,0 +1,76 @@
+---
+title: CommerceBenefitsSection
+description: Display retailer-provided delivery, returns, warranty, checkout, and service information in responsive commerce layouts.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`CommerceBenefitsSection` presents store information supplied by the consuming application. Benefit titles, descriptions, icons, labels, links, and actions are never generated as policy or trust claims.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  CommerceBenefitsSection,
+  type CommerceBenefitItem,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the ten variants has a separate preview using a fictional homewares retailer. All delivery, return, warranty, and checkout statements are illustrative only.
+
+import { CommerceBenefitsSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/commerce-benefits";
+
+<CommerceBenefitsSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `CommerceBenefitsVariant` | Selects one of ten compositions; defaults to `grid`. |
+| `items` | `readonly CommerceBenefitItem[]` | Consumer-provided benefit data with stable `id` and `title`. |
+| `CommerceBenefitItem.description` | `ReactNode` | Optional explanatory copy. |
+| `CommerceBenefitItem.icon` | `ReactNode` | Optional consumer-provided icon. |
+| `CommerceBenefitItem.kind` | `"shipping" \| "returns" \| "warranty" \| "secure-checkout" \| "service"` | Optional presentation category. |
+| `CommerceBenefitItem.label` | `ReactNode` | Optional retailer-provided label. |
+| `CommerceBenefitItem.href` | `string` | Optional destination rendered as a native link. |
+| `CommerceBenefitItem.action` | `ReactNode` | Optional consumer-provided action. |
+| Shared section props | Marketing section props | Header, root element, theme, native attributes, and children. |
+
+## Usage
+
+```tsx
+const benefits: CommerceBenefitItem[] = [
+  {
+    id: "delivery",
+    title: "Delivery options",
+    description: "Describe the regions and delivery options your store supports.",
+    icon: <ShippingIcon aria-hidden="true" />,
+    kind: "shipping",
+    href: "/delivery",
+  },
+  {
+    id: "returns",
+    title: "Returns and exchanges",
+    description: "Add the return policy published by your retailer.",
+    kind: "returns",
+  },
+];
+
+<CommerceBenefitsSection
+  variant="cards"
+  title="Helpful store information"
+  items={benefits}
+/>;
+```
+
+## Accessibility
+
+Benefit content remains visible text, links use native anchors, and action slots remain under application control. Provide accessible names for interactive actions and appropriate alternatives for informative icons.
+
+## Data and business logic
+
+The component does not promise free shipping, a warranty, secure payment, or a return period by default. It neither retrieves policies nor handles shipping, returns, checkout, or payment.

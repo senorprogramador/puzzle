@@ -1,0 +1,83 @@
+---
+title: ProductGridSection
+description: Display structured ecommerce products with responsive layouts, localized prices, optional ratings, labels, links, and actions.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`ProductGridSection` presents product data supplied by your application. Product cards have a structured API for names, images, prices, comparison prices, labels, ratings, categories, collections, links, and optional action slots.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  ProductGridSection,
+  type ProductGridItem,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the fourteen layouts has a separate preview using a fictional outdoor retailer’s catalog.
+
+import { ProductGridSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/product-grid";
+
+<ProductGridSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `ProductGridVariant` | Selects one of fourteen compositions; defaults to `grid`. |
+| `items` | `readonly ProductGridItem[]` | Structured products with stable `id`, `name`, and `price`. |
+| `ProductGridItem.image` | `CommerceImage` | Optional `{ src, alt, width?, height?, loading? }` data. |
+| `ProductGridItem.price` | `CommerceMoney` | Required `{ amount, currency }` value. |
+| `ProductGridItem.compareAtPrice` | `CommerceMoney` | Optional supplied comparison price, rendered with strikethrough. |
+| `ProductGridItem.labels` | `readonly ProductGridLabel[]` | Optional labels with stable IDs and consumer-provided content. |
+| `ProductGridItem.rating` | `CommerceRating` | Optional `{ value, count?, max? }`; `max` defaults to `5`. |
+| `ProductGridItem.category` / `collection` | `string` | Optional values for category or collection grouping variants. |
+| `ProductGridItem.href` | `string` | Optional product destination. |
+| `ProductGridItem.action` | `ReactNode` | Optional customization slot; the component does not build a cart action. |
+| `locale` | `string` | BCP 47 locale used by `Intl.NumberFormat`; defaults to `en-US`. |
+| Shared section props | Marketing section props | Header, root element, theme, native attributes, and children. |
+
+Prices use locale-aware `Intl.NumberFormat` currency formatting. Comparison prices are shown as supplied; the component does not calculate savings, discounts, or totals. Unsupported currency codes, invalid locales, and non-finite amounts throw instead of rendering a fabricated value. Missing or failed images show a placeholder; image alternatives should describe the supplied image.
+
+## Usage
+
+```tsx
+const products: ProductGridItem[] = [
+  {
+    id: "ridge-shell",
+    name: "Ridge Shell Jacket",
+    image: {
+      src: "/products/ridge-shell.jpg",
+      alt: "Olive weatherproof shell jacket",
+    },
+    price: { amount: 148, currency: "USD" },
+    compareAtPrice: { amount: 168, currency: "USD" },
+    labels: [{ id: "new", content: "New" }],
+    rating: { value: 4.8, count: 36 },
+    category: "Outerwear",
+    collection: "Trail essentials",
+    href: "/products/ridge-shell",
+  },
+];
+
+<ProductGridSection
+  variant="category"
+  title="Field-tested everyday gear"
+  items={products}
+  locale="en-US"
+/>;
+```
+
+## Accessibility
+
+Product names remain headings, product destinations are native links, and carousel navigation uses labeled buttons with disabled boundary states. Ratings include a text equivalent; they are not conveyed by color alone. Product actions are consumer-provided so their labels and behavior remain under application control.
+
+## Data and business logic
+
+The component does not fetch products, inventory, ratings, or prices. It has no cart, checkout, stock, or payment behavior; the application supplies every product field.

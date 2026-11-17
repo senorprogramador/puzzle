@@ -1,0 +1,105 @@
+---
+title: List Filter
+description: Filter typed React collections by normalized search text and an optional category while keeping query state in a reusable hook.
+---
+
+`useListFilter` manages query text, selected category, unique category options, and the filtered items for a collection. It leaves rendering and accessible filter controls to the consuming component.
+
+## Quick start
+
+```tsx
+import { useListFilter } from "@puzzle-ui/hooks";
+
+type Integration = {
+  id: string;
+  name: string;
+  category?: string;
+  description?: string;
+};
+
+function IntegrationDirectory({
+  items,
+}: {
+  items: readonly Integration[];
+}) {
+  const filter = useListFilter({
+    items,
+    getSearchText: (item) => `${item.name} ${item.description ?? ""}`,
+    getCategory: (item) => item.category,
+  });
+
+  return (
+    <>
+      <label>
+        Search integrations
+        <input
+          type="search"
+          value={filter.query}
+          onChange={(event) => filter.setQuery(event.currentTarget.value)}
+        />
+      </label>
+      <label>
+        Category
+        <select
+          value={filter.selectedCategory}
+          onChange={(event) =>
+            filter.setSelectedCategory(event.currentTarget.value)
+          }
+        >
+          <option value="">All categories</option>
+          {filter.categories.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </select>
+      </label>
+      <ul>
+        {filter.filteredItems.map((item) => (
+          <li key={item.id}>{item.name}</li>
+        ))}
+      </ul>
+    </>
+  );
+}
+```
+
+Provide associated labels and the correct empty-result message in the consuming UI. The hook does not render inputs or make assumptions about markup.
+
+## API
+
+```ts
+useListFilter<T>(options: UseListFilterOptions<T>): UseListFilterReturn<T>
+```
+
+### Options
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `readonly T[]` | Required | Current collection to filter. |
+| `getSearchText` | `(item: T) => string` | Required | Returns plain text used for a trimmed, case-insensitive substring search. |
+| `getCategory` | `(item: T) => string \| undefined` | `undefined` | Returns an optional category; unique values are exposed in encounter order. |
+| `enabled` | `boolean` | `true` | When false, returns all items while retaining the current query and category for later use. |
+
+### Return value
+
+| Member | Type | Description |
+| --- | --- | --- |
+| `query` | `string` | Current search query. |
+| `setQuery` | `(query: string) => void` | Updates the search query. |
+| `selectedCategory` | `string` | Selected category, or an empty string for all categories. |
+| `setSelectedCategory` | `(category: string) => void` | Updates the selected category. |
+| `categories` | `string[]` | Unique, non-empty category values in item order. |
+| `filteredItems` | `readonly T[]` | Items matching the enabled query and category filters. |
+
+## Behavior
+
+Search trims surrounding whitespace and compares lowercase strings. Category matching is exact. The hook does not perform fuzzy matching, normalize locale-specific text, or search values outside the string returned by `getSearchText`.
+
+## SSR and client components
+
+The hook uses React state and memoization, so call it from a client component in React Server Component frameworks. It does not access browser globals and is safe to render on the server when called from the appropriate boundary.
+
+## Exports
+
+Import `useListFilter`, `UseListFilterOptions`, and `UseListFilterReturn` from `@puzzle-ui/hooks`.

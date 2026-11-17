@@ -1,0 +1,67 @@
+---
+title: CareersSection
+description: Present job openings by role, department, location, employment type, benefits, culture, and application link.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+import { CareersSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/business-sections";
+
+`CareersSection` displays application-owned job data and benefits. It can group opportunities by department or location and provides an empty state when no openings are supplied.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  CareersSection,
+  type BusinessCareerPosition,
+  type CareersSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the twelve variants has its own preview, using fictional consultancy roles across product, brand, and research teams.
+
+<CareersSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `CareersSectionVariant` | `list` (default), `grid`, `featured`, `departments`, `culture`, `split`, `benefits`, `editorial`, `cards`, `locations`, `compact`, or `hiring`. |
+| `positions` | `readonly BusinessCareerPosition[]` | Openings with unique ID and title; optional department, location, employment type, description, application link, and featured state. |
+| `benefits` | `readonly BusinessBenefit[]` | Optional benefit items with unique IDs and titles. |
+| `culture` | `ReactNode` | Optional company culture content. |
+| `emptyState` | `ReactNode` | Optional replacement for the default no-openings message. |
+| `featuredPosition` | `BusinessCareerPosition \| string` | Optional position object or ID promoted in the featured layouts. |
+| Shared section props | `MarketingSectionBaseProps` | Heading, actions, root element, native section attributes, and children. |
+
+## Usage
+
+```tsx
+<CareersSection
+  variant="departments"
+  title="Work with us"
+  positions={[
+    {
+      id: "designer",
+      title: "Senior product designer",
+      department: "Product",
+      location: "Amsterdam",
+      employmentType: "Full-time",
+      description: "Shape tools for growing teams.",
+      href: "/careers/product-designer",
+    },
+  ]}
+  benefits={[
+    { id: "learning", title: "Learning budget" },
+    { id: "flexibility", title: "Flexible work" },
+  ]}
+/>
+```
+
+## Accessibility and rendering
+
+Position titles and application links are semantic headings and native anchors. Department and location groupings retain their heading structure. The default empty state remains visible when `positions` is empty, including grouped layouts. Keep IDs unique and stable; the component validates supplied positions and benefits. There is no application workflow or backend, and rendering is server compatible.

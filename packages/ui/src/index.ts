@@ -25,6 +25,29 @@ export {
 
 // #region Data Display
 export {
+  CaseStudyCard,
+  CompanyInfo,
+  ContactDetails,
+  BusinessImageView,
+  LogoCollection,
+  MetricList,
+  ProfileCard,
+  ServiceCard,
+  SocialLinks,
+  type BusinessContactItem,
+  type BusinessImage,
+  type BusinessImageViewProps,
+  type BusinessLogoItem,
+  type BusinessMetricItem,
+  type BusinessSocialLink,
+  type CaseStudyCardProps,
+  type CompanyInfoProps,
+  type LogoCollectionProps,
+  type ProfileCardProps,
+  type ServiceCardProps,
+} from "./components/business";
+
+export {
   Alert,
   type AlertProps,
   type AlertSeverity,
@@ -101,6 +124,12 @@ export {
   type ImageBoxImage,
   type ImageBoxProps,
 } from "./components/data-display/image-box";
+
+export {
+  MediaFrame,
+  type MediaFrameProps,
+  type MediaFrameType,
+} from "./components/data-display/media-frame";
 
 export { Paper, type PaperProps } from "./components/data-display/paper";
 
@@ -588,7 +617,9 @@ export {
 
 export {
   Preview,
+  PreviewProvider,
   type PreviewProps,
+  type PreviewProviderProps,
   type PreviewDevice,
   type PreviewAlign,
   type PreviewJustify,

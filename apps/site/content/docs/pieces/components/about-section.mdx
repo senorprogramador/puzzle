@@ -1,0 +1,63 @@
+---
+title: AboutSection
+description: Tell a company story with mission, values, milestones, team profiles, images, and measurable outcomes.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+import { AboutSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/business-sections";
+
+`AboutSection` combines company information and story content into a responsive introduction. Supply only the content that is relevant to your organization; empty collections are omitted.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  AboutSection,
+  type AboutSectionProps,
+  type AboutSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Every layout has an individual preview. The examples use Northstar Advisory, a fictional consultancy.
+
+<AboutSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `AboutSectionVariant` | `split` (default), `centered`, `editorial`, `image-led`, `story`, `timeline`, `stats`, `team`, `mission`, `values`, `asymmetric`, or `full-width`. |
+| `company` | `CompanyInfoProps` without `className` | Optional company name, logo, tagline, description, and native website link. |
+| `story` | `AboutStory` | Story description, optional title, and optional editorial image. |
+| `mission`, `vision` | `ReactNode` | Purpose statements, shown when provided. |
+| `images` | `readonly EditorialImage[]` | Supporting images with alt text and optional captions. |
+| `stats` | `readonly BusinessMetricItem[]` | Stable IDs, labels, values, and optional descriptions. |
+| `values` | `readonly BusinessValue[]` | Values with stable IDs, titles, optional descriptions, and decorative icons. |
+| `timeline` | `readonly BusinessTimelineItem[]` | Milestones with stable IDs, year, title, and optional description. |
+| `team` | `readonly BusinessProfile[]` | Optional profiles for the `team` composition. |
+| Shared section props | `MarketingSectionBaseProps` | Heading, actions, root element, native section attributes, and children. |
+
+## Usage
+
+```tsx
+<AboutSection
+  variant="mission"
+  eyebrow="About Northstar"
+  title="Make meaningful progress."
+  description="An independent partner for complex change."
+  mission="Make complex change manageable for every team."
+  vision="Build a more resilient, thoughtful future."
+  values={[
+    { id: "care", title: "Care", description: "Start with people." },
+    { id: "clarity", title: "Clarity", description: "Make the complex useful." },
+  ]}
+/>
+```
+
+## Content and accessibility
+
+All data is supplied by the application; the component does not fetch company information. Provide meaningful alt text for informative images and empty alt text for decorative images. Timelines and value collections use semantic lists, metrics use a description list, and profile links remain native anchors. The section renders on the server.

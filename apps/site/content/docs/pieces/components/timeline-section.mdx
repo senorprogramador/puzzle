@@ -1,0 +1,74 @@
+---
+title: TimelineSection
+description: Show ordered milestones with semantic event lists, dates, descriptions, imagery, icons, and optional actions.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`TimelineSection` presents ordered events as a vertical chronology, horizontal rail, milestone sequence, or editorial history. The caller controls event order and supplies all event content.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  TimelineSection,
+  type TimelineEvent,
+  type TimelineSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Every variant is shown in its own preview with fictional Morrow studio milestones and editorial imagery.
+
+import { TimelineSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/timeline-section";
+
+<TimelineSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `TimelineSectionVariant` | `vertical` (default), `horizontal`, `alternating`, `centered`, `cards`, `milestones`, `history`, `editorial`, `compact`, `numbered`, `connected`, or `split`. |
+| `items` | `readonly TimelineEvent[]` | Events with stable, unique IDs and required titles. |
+| `TimelineEvent.date` | `string` | Optional valid date, formatted in UTC and exposed with `<time>`. |
+| `TimelineEvent.description` | `ReactNode` | Optional rich description. |
+| `TimelineEvent.image` | `EditorialImage` | Optional image with alt text, dimensions, loading preference, and caption. |
+| `TimelineEvent.icon` | `ReactNode` | Optional decorative node icon; hidden from assistive technology. |
+| `TimelineEvent.action` | `ReactNode` | Optional consumer-provided link or action. |
+| Shared section props | `MarketingSectionBaseProps` | Header, root element, section attributes, actions, and children. |
+
+## Usage
+
+```tsx
+const events: TimelineEvent[] = [
+  {
+    id: "studio-opened",
+    title: "Doors open at the studio",
+    date: "2024-04-06",
+    description: "Neighbors join us for workshops and a shared lunch.",
+    image: {
+      src: "/journal/open-studio.jpg",
+      alt: "Neighbors gathered around the studio table",
+      width: 1200,
+      height: 800,
+      caption: "Our first open studio afternoon.",
+    },
+    action: <a href="/journal/open-studio">Read the story</a>,
+  },
+];
+
+<TimelineSection
+  variant="connected"
+  title="A few moments that shaped our studio"
+  items={events}
+/>;
+```
+
+Dates are display metadata and do not reorder the array. Use the `numbered` variant to display sequence numbers; other variants show a node only when an icon is supplied. Image content is optional, and missing image sources use a labeled placeholder.
+
+## Accessibility and responsive behavior
+
+Events render as an ordered list (`<ol>`) with each event in an `<article>`. Dates use `<time>`, icons are decorative, and caller-supplied actions retain their native semantics. The horizontal variant is a scrollable list; vertical connectors and alternating layouts adapt to the available viewport. The component does not access browser APIs and can render on the server.

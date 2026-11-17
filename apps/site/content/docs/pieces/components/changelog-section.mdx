@@ -1,0 +1,84 @@
+---
+title: ChangelogSection
+description: Publish versioned release notes with dates, release types, change categories, featured updates, and grouping.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`ChangelogSection` formats application-owned release data as a timeline, list, cards, grouped notes, or featured release. It does not fetch updates or interpret semantic-version ordering.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  ChangelogSection,
+  type ChangelogCategory,
+  type ChangelogRelease,
+  type ChangelogSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+All twelve variants have their own preview. The examples use fictional Morrow workspace releases with versions, dates, release types, and categorized changes.
+
+import { ChangelogSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/changelog-section";
+
+<ChangelogSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `ChangelogSectionVariant` | `timeline` (default), `list`, `cards`, `grouped`, `versioned`, `featured`, `compact`, `release-notes`, `categories`, `split`, `vertical`, or `horizontal`. |
+| `items` | `readonly ChangelogRelease[]` | Release data with stable, unique IDs and required version strings. |
+| `featuredRelease` | `ChangelogRelease` | Optional lead release; it replaces a collection item with the same ID. |
+| `ChangelogRelease.date` | `string` | Optional valid date, formatted in UTC and exposed with `<time>`. |
+| `ChangelogRelease.type` | `string` | Optional release type label, such as Feature release, Minor, or Patch. |
+| `ChangelogRelease.description` | `ReactNode` | Optional release summary. |
+| `ChangelogRelease.categories` | `readonly ChangelogCategory[]` | Optional change groups with names and rich change entries. |
+| `ChangelogRelease.href` | `string` | Optional native link on the version heading. |
+| `ChangelogRelease.featured` | `boolean` | Marks a release for featured layouts when `featuredRelease` is not provided. |
+| `ChangelogRelease.group` | `string` | Optional group heading. `grouped` uses this value or the UTC year of the date. |
+| Shared section props | `MarketingSectionBaseProps` | Header, root element, section attributes, actions, and children. |
+
+## Usage
+
+```tsx
+const releases: ChangelogRelease[] = [
+  {
+    id: "2-4",
+    version: "2.4.0",
+    date: "2025-05-12",
+    type: "Feature release",
+    description: "A more focused workspace for thoughtful collaboration.",
+    categories: [
+      {
+        name: "New",
+        changes: ["Editorial collections now support shared review."],
+      },
+      {
+        name: "Improved",
+        changes: ["Keyboard navigation is more consistent."],
+      },
+    ],
+    href: "/releases/2.4.0",
+    group: "Spring 2025",
+    featured: true,
+  },
+];
+
+<ChangelogSection
+  variant="grouped"
+  title="What's new"
+  items={releases}
+/>;
+```
+
+`grouped` groups releases by the explicit `group` value, falling back to the date's UTC year and then `Undated`. `categories` groups each release by its first category, or under `Other changes`. The supplied order is preserved in every variant; provide releases in the order you want to show.
+
+## Accessibility and rendering
+
+Releases and change entries use semantic ordered lists, with headings for versions and groups. Dates use `<time>`, release types are text labels, and version links remain native anchors. Horizontal notes are keyboard-focusable scroll regions. Dates are validated during rendering; malformed values raise a `RangeError`. The component is server-renderable and does not fetch release data.

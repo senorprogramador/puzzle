@@ -1,0 +1,83 @@
+---
+title: CodeShowcaseSection
+description: Present copyable SaaS integration snippets with accessible tabs, optional line numbers, and a lightweight editable playground.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`CodeShowcaseSection` renders consumer-provided code as plain text with optional language tabs, line numbers, highlighted lines, and a copy action. It adds no code editor dependency and does not execute snippets.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  CodeShowcaseSection,
+  type CodeSnippet,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each variant has a standalone preview. Copy buttons and language tabs are interactive, and the playground uses a native `<textarea>`.
+
+import { CodeShowcaseSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/code-showcase";
+
+<CodeShowcaseSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `CodeShowcaseVariant` | Selects one of twelve compositions; defaults to `single`. |
+| `items` | `readonly CodeSnippet[]` | Snippets with stable `id`, `language`, and `code`. |
+| `CodeSnippet.title` | `string` | Optional tab label and snippet heading. |
+| `CodeSnippet.filename` | `string` | Optional filename or command context. |
+| `CodeSnippet.highlightedLines` | `readonly number[]` | Optional 1-based line emphasis; this is presentation only, not syntax highlighting. |
+| `copyable` | `boolean` | Shows a copy action; defaults to `true`. |
+| `showLineNumbers` | `boolean` | Overrides line numbering; the `numbered` variant enables it by default. |
+| `editable` | `boolean` | Enables the plain-text editor surface; `playground` enables it by default. |
+| `onCopy` | `(code: string) => void` | Called after a successful copy. |
+| `onCopyError` | `(error: unknown) => void` | Receives clipboard errors so the consumer can handle them. |
+
+The `single` variant requires exactly one snippet and throws a `RangeError` if more are supplied.
+
+## Usage
+
+```tsx
+const snippets: CodeSnippet[] = [
+  {
+    id: "typescript",
+    title: "Load project data",
+    language: "typescript",
+    filename: "projects.ts",
+    code: [
+      'const response = await fetch("/api/projects");',
+      "if (!response.ok) throw new Error(\"Request failed\");",
+      "const projects = await response.json();",
+    ].join("\n"),
+    highlightedLines: [2],
+  },
+  {
+    id: "shell",
+    title: "Request project data",
+    language: "bash",
+    code: 'curl -H "Accept: application/json" /api/projects',
+  },
+];
+
+<CodeShowcaseSection
+  variant="multi-language"
+  title="Use the projects endpoint"
+  items={snippets}
+/>;
+```
+
+The component copies the current editor contents when editable. If the Clipboard API is unavailable or rejects the request, an inline live status explains that manual copying is available. Syntax highlighting is intentionally not included; use a separate code-rendering component when syntax tokenization is required.
+
+## Accessibility
+
+Tabs use the keyboard-operable UI `Tabs` primitive. Copy buttons have accessible names and report success or failure through a live status. Line numbers are hidden from assistive technology while the code remains readable as text. The playground is a labeled native textarea and does not evaluate code.
+
+The component is server-renderable and does not access the clipboard until a user activates the copy button.

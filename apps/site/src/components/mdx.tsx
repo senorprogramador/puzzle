@@ -1,23 +1,8 @@
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import type { ComponentProps, ComponentType } from "react";
 import type { MDXComponents } from "mdx/types";
-import * as PuzzleUI from "@puzzle-ui/ui";
-import * as PuzzlePieces from "@puzzle-ui/pieces";
-import * as PuzzleIcons from "@puzzle-ui/icons";
 import { cn } from "@puzzle-ui/core";
 import { PackageManagerTab, PackageManagerTabs } from "./package-manager-tabs";
-
-// Puzzle's exports include non-component values (e.g. hooks), which MDX would
-// treat as components; keep only capitalized exports.
-const puzzleComponentEntries = [
-  Object.entries(PuzzleUI),
-  Object.entries(PuzzlePieces),
-  Object.entries(PuzzleIcons),
-].flat();
-
-const puzzleComponents = Object.fromEntries(
-  puzzleComponentEntries.filter(([name]) => /^[A-Z]/.test(name)),
-) as MDXComponents;
 
 type HeadingTag = "h1" | "h2" | "h3" | "h4";
 
@@ -53,7 +38,6 @@ export const DocsHeading2 = headings.h2;
 export function getMDXComponents(components?: MDXComponents) {
   return {
     ...defaultMdxComponents,
-    ...puzzleComponents,
     ...headings,
     PackageManagerTabs,
     PackageManagerTab,

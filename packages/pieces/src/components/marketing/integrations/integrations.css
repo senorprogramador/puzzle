@@ -1,0 +1,289 @@
+.puzzle-integrations__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-4, 1rem);
+  margin-block-end: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-integrations__filters label {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: min(100%, 14rem);
+}
+
+.puzzle-integrations__filters input,
+.puzzle-integrations__filters select {
+  min-height: var(--puzzle-space-8, 2rem);
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-integrations__filters :is(input, select):focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-integrations__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: var(--puzzle-space-4, 1rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-integrations__tile {
+  display: flex;
+  align-items: center;
+  gap: var(--puzzle-space-4, 1rem);
+  height: 100%;
+  min-width: 0;
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  text-decoration: none;
+}
+
+.puzzle-integrations__tile:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-integrations__logo {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  min-width: var(--puzzle-space-8, 2rem);
+  min-height: var(--puzzle-space-8, 2rem);
+}
+
+.puzzle-integrations__logo > * {
+  max-width: 100%;
+}
+
+.puzzle-integrations__copy {
+  display: grid;
+  align-content: center;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-integrations__name {
+  font-weight: 600;
+}
+
+.puzzle-integrations__description {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-integrations__groups,
+.puzzle-integrations__grouped {
+  display: grid;
+  gap: var(--puzzle-space-8, 2rem);
+}
+
+.puzzle-integrations__groups section > h3,
+.puzzle-integrations__grouped section > h3 {
+  margin: 0 0 var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-integrations__grouped section {
+  padding-block-end: var(--puzzle-space-6, 1.5rem);
+  border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-integrations__featured,
+.puzzle-integrations__split {
+  display: grid;
+  gap: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-integrations__featured-item .puzzle-integrations__list {
+  grid-template-columns: 1fr;
+}
+
+.puzzle-integrations__featured-item .puzzle-integrations__tile {
+  min-height: 100%;
+  padding: var(--puzzle-space-6, 1.5rem);
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-integrations__split aside {
+  padding: var(--puzzle-space-5, 1.25rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-integrations__split aside h3,
+.puzzle-integrations__split aside p {
+  margin: 0;
+}
+
+.puzzle-integrations__split aside p {
+  margin-block: var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-integrations__relationship {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--puzzle-space-6, 1.5rem);
+  padding: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-integrations__center {
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-width: var(--puzzle-space-8, 2rem);
+  min-height: var(--puzzle-space-8, 2rem);
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  border-radius: 50%;
+  color: var(--puzzle-color-primary-foreground);
+  background: var(--puzzle-color-primary);
+  text-align: center;
+}
+
+.puzzle-integrations[data-variant="ecosystem"] .puzzle-integrations__relationship::before {
+  position: absolute;
+  inset: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  content: "";
+}
+
+.puzzle-integrations[data-variant="orbit"] .puzzle-integrations__relationship::before {
+  position: absolute;
+  inset: 12%;
+  border: var(--puzzle-border-width, 1px) dashed var(--puzzle-color-border);
+  border-radius: 50%;
+  content: "";
+}
+
+.puzzle-integrations[data-variant="orbit"] .puzzle-integrations__center {
+  border-radius: 50%;
+}
+
+.puzzle-integrations[data-variant="network"] .puzzle-integrations__list {
+  position: relative;
+  width: 100%;
+}
+
+.puzzle-integrations[data-variant="network"] .puzzle-integrations__list::before {
+  position: absolute;
+  inset-block: var(--puzzle-space-4, 1rem);
+  inset-inline-start: 50%;
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  content: "";
+}
+
+.puzzle-integrations[data-variant="connected"] .puzzle-integrations__list {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.puzzle-integrations[data-variant="connected"] .puzzle-integrations__list li {
+  position: relative;
+  padding-inline-start: var(--puzzle-space-6, 1.5rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-integrations[data-variant="connected"] .puzzle-integrations__list li::before {
+  position: absolute;
+  inset-block-start: var(--puzzle-space-5, 1.25rem);
+  inset-inline-start: calc(var(--puzzle-space-2, 0.5rem) * -1);
+  width: var(--puzzle-space-2, 0.5rem);
+  height: var(--puzzle-space-2, 0.5rem);
+  border-radius: 50%;
+  background: var(--puzzle-color-primary);
+  content: "";
+}
+
+.puzzle-integrations[data-variant="carousel"] .puzzle-integrations__list {
+  display: flex;
+  overflow-x: auto;
+  gap: var(--puzzle-space-4, 1rem);
+  padding-block: var(--puzzle-space-2, 0.5rem);
+  scroll-snap-type: inline mandatory;
+}
+
+.puzzle-integrations[data-variant="carousel"] .puzzle-integrations__list > li {
+  flex: 0 0 min(82vw, 20rem);
+  scroll-snap-align: start;
+}
+
+.puzzle-integrations[data-variant="carousel"] .puzzle-integrations__carousel:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-integrations[data-variant="list"] .puzzle-integrations__list {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.puzzle-integrations[data-variant="list"] .puzzle-integrations__list li + li {
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-integrations[data-variant="list"] .puzzle-integrations__tile {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-integrations[data-variant="logo-wall"] .puzzle-integrations__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  align-items: center;
+}
+
+.puzzle-integrations[data-variant="logo-wall"] .puzzle-integrations__tile {
+  justify-content: center;
+  min-height: var(--puzzle-space-8, 2rem);
+  border-color: transparent;
+  background: transparent;
+  text-align: center;
+}
+
+.puzzle-integrations[data-variant="logo-wall"] .puzzle-integrations__description,
+.puzzle-integrations[data-variant="logo-wall"] .puzzle-integrations__category {
+  display: none;
+}
+
+.puzzle-integrations__empty {
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) dashed var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+@media (min-width: 48rem) {
+  .puzzle-integrations[data-variant="grid"] .puzzle-integrations__list,
+  .puzzle-integrations[data-variant="categorized"] .puzzle-integrations__list,
+  .puzzle-integrations[data-variant="grouped"] .puzzle-integrations__list,
+  .puzzle-integrations[data-variant="network"] .puzzle-integrations__list,
+  .puzzle-integrations[data-variant="logo-wall"] .puzzle-integrations__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .puzzle-integrations__featured,
+  .puzzle-integrations__split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+  }
+
+  .puzzle-integrations__featured-item {
+    grid-row: span 2;
+  }
+
+  .puzzle-integrations__split {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  }
+}

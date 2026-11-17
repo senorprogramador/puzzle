@@ -1,0 +1,77 @@
+---
+title: ProductGallerySection
+description: Present structured product images in responsive ecommerce galleries with thumbnail navigation, keyboard controls, optional zoom, and a lightbox.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`ProductGallerySection` displays application-supplied product images and captions. It provides local image selection, optional zoom, and an accessible lightbox without fetching product data or adding a gallery dependency.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  ProductGallerySection,
+  type ProductGalleryImage,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the twelve compositions has a separate preview. The thumbnails, carousel controls, zoom control, and fullscreen lightbox are interactive within the preview.
+
+import { ProductGallerySectionVariantsExample } from "../../../../src/components/doc-examples/pieces/product-gallery";
+
+<ProductGallerySectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `ProductGalleryVariant` | Selects one of twelve compositions; defaults to `grid`. |
+| `images` | `readonly ProductGalleryImage[]` | Images with unique `id`, `src`, and required `alt`. |
+| `ProductGalleryImage.caption` | `string` | Optional visible caption and lightbox title. |
+| `ProductGalleryImage.width` / `height` | `number` | Optional intrinsic dimensions. |
+| `ProductGalleryImage.loading` | `"eager" \| "lazy"` | Optional image loading preference; secondary images default to lazy loading. |
+| `initialImageId` | `string` | Optional initially selected image ID; an unknown ID throws. |
+| `lightbox` | `boolean` | Enables the dialog viewer; defaults to `true` for `fullscreen`. |
+| `zoom` | `boolean` | Adds a local zoom toggle for the selected image. |
+| Shared section props | Marketing section props | Header, root element, theme, native attributes, and children. |
+
+Empty image lists render no gallery. A missing or failed image source shows an image placeholder. The carousel and lightbox use bounded navigation and do not auto-advance.
+
+## Usage
+
+```tsx
+const images: ProductGalleryImage[] = [
+  {
+    id: "front",
+    src: "/products/pour-over-front.jpg",
+    alt: "Stoneware pour-over set viewed from the front",
+    caption: "Chalk glaze",
+  },
+  {
+    id: "detail",
+    src: "/products/pour-over-detail.jpg",
+    alt: "Close-up of the stoneware glaze",
+  },
+];
+
+<ProductGallerySection
+  variant="thumbnails"
+  images={images}
+  initialImageId="front"
+  lightbox
+  zoom
+/>;
+```
+
+## Accessibility
+
+Informative images require alternative text. The `thumbnails` variant uses keyboard-operable UI tabs; other variants expose a labeled gallery region with Left/Right arrow navigation. Lightbox mode uses the UI `Dialog` primitive, an accessible title, a close button, Escape handling, and labeled previous/next controls. Zoom state is exposed with `aria-pressed`.
+
+## Data and business logic
+
+Images, captions, and product information come from the caller. The component performs no product lookup, image transformation, inventory check, or purchase action.

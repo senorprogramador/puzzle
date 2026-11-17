@@ -1,0 +1,77 @@
+---
+title: GallerySection
+description: Arrange responsive editorial images with captions, native links, masonry layouts, and an accessible keyboard-operable lightbox.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`GallerySection` displays application-provided images in responsive gallery compositions. It supports image dimensions, captions, optional destinations, and an optional modal lightbox with keyboard navigation.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  GallerySection,
+  type GalleryItem,
+  type GallerySectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the fifteen variants has its own interactive preview. Lightboxes are enabled so image navigation can be tried directly.
+
+import { GallerySectionVariantsExample } from "../../../../src/components/doc-examples/pieces/gallery-section";
+
+<GallerySectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `GallerySectionVariant` | `grid` (default), `masonry`, `justified`, `bento`, `featured`, `carousel`, `collage`, `editorial`, `fullscreen`, `thumbnails`, `horizontal`, `vertical`, `asymmetric`, `mixed`, or `portfolio`. |
+| `items` | `readonly GalleryItem[]` | Images with stable, unique IDs and descriptive image data. |
+| `lightbox` | `boolean` | Enables the dialog lightbox. Defaults to `true` for `fullscreen` and `false` otherwise. |
+| `GalleryItem.image` | `EditorialImage` | `src`, `alt`, optional intrinsic dimensions, loading preference, and caption. |
+| `GalleryItem.caption` | `ReactNode` | Optional item-level caption; takes precedence over `image.caption`. |
+| `GalleryItem.href` | `string` | Optional native image link when the lightbox is disabled. With the lightbox on, a caption links to this destination. |
+| `GalleryItem.featured` | `boolean` | Marks an item for featured and asymmetric layouts. |
+| Shared section props | `MarketingSectionBaseProps` | Header, root element, section attributes, actions, and children. |
+
+## Usage
+
+```tsx
+const images: GalleryItem[] = [
+  {
+    id: "studio",
+    image: {
+      src: "/journal/studio.jpg",
+      alt: "A bright studio with a shared worktable",
+      width: 1200,
+      height: 800,
+    },
+    caption: "The studio, just after opening",
+    href: "/journal/our-studio",
+    featured: true,
+  },
+];
+
+<GallerySection
+  variant="masonry"
+  title="Scenes from the studio"
+  items={images}
+  lightbox
+/>;
+```
+
+Image dimensions reserve the intended aspect ratio before loading. Images are lazy-loaded by default; the first item is eager-loaded. Missing sources render an accessible placeholder. Masonry and portfolio variants use responsive CSS columns; horizontal layouts remain scrollable at narrow widths.
+
+## Lightbox interaction
+
+The lightbox uses the UI package's modal `Dialog`. The close control and native Escape behavior dismiss it; the Previous/Next buttons and Left/Right Arrow keys move between images without wrapping past the ends. Focus is managed by the dialog primitive. When lightbox mode is off, optional destinations are ordinary links.
+
+## Accessibility and rendering
+
+The gallery is a semantic list of figures with optional `<figcaption>` content. Every image requires alt text; use an empty string when the image is decorative. Lightbox triggers have names derived from that alternative text. The gallery is server-renderable while the dialog is closed and does not fetch image data itself.

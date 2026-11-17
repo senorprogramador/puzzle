@@ -1,0 +1,133 @@
+.puzzle-careers-section__content {
+  display: grid;
+  gap: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-careers-section__positions {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+}
+
+.puzzle-careers-section__position,
+.puzzle-careers-section__benefits article {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+  height: 100%;
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-careers-section__position h3,
+.puzzle-careers-section__benefits h3,
+.puzzle-careers-section__group h3 {
+  margin: 0;
+}
+
+.puzzle-careers-section__position h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.puzzle-careers-section__position h3 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.puzzle-careers-section__position p,
+.puzzle-careers-section__benefits p,
+.puzzle-careers-section__culture {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-careers-section__metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-2, 0.5rem);
+  margin: 0;
+  padding: 0;
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+  list-style: none;
+}
+
+.puzzle-careers-section__metadata > li + li::before {
+  content: "·";
+  margin-inline-end: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-careers-section__position[data-featured] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-careers-section__position[data-compact] {
+  gap: var(--puzzle-space-2, 0.5rem);
+  padding: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-careers-section__groups {
+  display: grid;
+  gap: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-careers-section__group {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-careers-section__empty {
+  margin: 0;
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) dashed var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-careers-section[data-variant="list"] .puzzle-careers-section__positions,
+.puzzle-careers-section[data-variant="compact"] .puzzle-careers-section__positions {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.puzzle-careers-section[data-variant="list"] .puzzle-careers-section__position {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.puzzle-careers-section[data-variant="culture"] .puzzle-careers-section__culture,
+.puzzle-careers-section[data-variant="editorial"] .puzzle-careers-section__culture {
+  max-width: 60rem;
+  font-size: var(--puzzle-font-size-lg, 1.125rem);
+}
+
+.puzzle-careers-section[data-variant="benefits"] .puzzle-careers-section__benefits article {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-careers-section[data-variant="featured"] .puzzle-careers-section__featured-layout,
+.puzzle-careers-section[data-variant="hiring"] .puzzle-careers-section__featured-layout {
+  display: grid;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+@media (min-width: 48rem) {
+  .puzzle-careers-section[data-variant="split"] .puzzle-careers-section__content,
+  .puzzle-careers-section[data-variant="culture"] .puzzle-careers-section__content {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .puzzle-careers-section[data-variant="split"] .puzzle-careers-section__culture,
+  .puzzle-careers-section[data-variant="split"] .puzzle-careers-section__benefits,
+  .puzzle-careers-section[data-variant="culture"] .puzzle-careers-section__culture {
+    grid-column: 1 / -1;
+  }
+
+  .puzzle-careers-section[data-variant="featured"] .puzzle-careers-section__featured-layout,
+  .puzzle-careers-section[data-variant="hiring"] .puzzle-careers-section__featured-layout {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+}

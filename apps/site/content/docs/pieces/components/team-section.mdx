@@ -1,0 +1,65 @@
+---
+title: TeamSection
+description: Introduce people with responsive profile layouts, biography, avatar, social links, featured profiles, and departments.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+import { TeamSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/business-sections";
+
+`TeamSection` renders people as reusable profile cards. Use one flat member collection for a simple team, or provide department groups when the organization needs more structure.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  TeamSection,
+  type BusinessProfile,
+  type TeamSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the twelve variants has a separate preview. The fictional Northstar team includes a missing portrait to demonstrate the accessible avatar fallback.
+
+<TeamSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `TeamSectionVariant` | `grid` (default), `cards`, `featured`, `leadership`, `departments`, `horizontal`, `carousel`, `editorial`, `compact`, `asymmetric`, `profile`, or `split`. |
+| `items` | `readonly BusinessProfile[]` | Team members with unique IDs, name, role, and optional avatar, biography, profile link, department, and social links. |
+| `departments` | `readonly BusinessDepartment[]` | Optional named groups, each with a stable ID and member collection. The `departments` variant groups `items` by member department when explicit groups are absent. |
+| `featuredMember` | `BusinessProfile \| string` | Optional profile or member ID emphasized in `featured` and `leadership` layouts. |
+| `BusinessSocialLink.external` | `boolean` | Opens a social link in a new browsing context with `noopener noreferrer`. |
+| Shared section props | `MarketingSectionBaseProps` | Heading, actions, root element, native section attributes, and children. |
+
+## Usage
+
+```tsx
+<TeamSection
+  variant="departments"
+  title="Meet the team"
+  departments={[
+    {
+      id: "design",
+      name: "Design",
+      members: [
+        {
+          id: "leo",
+          name: "Leo Okafor",
+          role: "Design director",
+          biography: "He turns ambitious ideas into useful experiences.",
+        },
+      ],
+    },
+  ]}
+/>
+```
+
+## Accessibility and rendering
+
+Member names are headings, missing avatars fall back to initials with an accessible name, and social links are native anchors. Horizontal layouts are keyboard-focusable scroll regions. Keep IDs unique and stable between renders; the component validates member and department IDs. Empty and single-member teams are supported without placeholder cards. Rendering is server compatible.

@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { act } from "react";
+import { act, lazy, useState } from "react";
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -36,6 +36,57 @@ const expectNoOverflow = () => {
 };
 
 describe("Preview sizing", () => {
+  it("keeps lazy previews stable while loading styles and suspended content", async () => {
+    let resolveExample: (value: { default: () => React.ReactNode }) => void = () => {};
+    const Example = lazy(() => new Promise<{ default: () => React.ReactNode }>((resolve) => {
+      resolveExample = resolve;
+    }));
+    render(
+      <Preview loading="lazy" padding={0} defaultDevice="mobile" height={240}>
+        <Example />
+      </Preview>,
+    );
+    const viewport = document.querySelector<HTMLElement>(".puzzle-preview__viewport")!;
+    const initialHeight = viewport.getBoundingClientRect().height;
+    expect(screen.getByRole("progressbar", { name: "Loading preview" })).toBeVisible();
+    expect(document.querySelector("[data-preview-placeholder]")).toBeNull();
+
+    await waitFor(() => expect(getFrame().contentDocument?.querySelector("[id$='-root']")).not.toBeNull());
+    expect(screen.getByRole("progressbar", { name: "Loading preview" })).toBeVisible();
+    await act(async () => resolveExample({ default: () => <div data-content>Loaded example</div> }));
+    await waitFor(() => expect(screen.queryByRole("progressbar", { name: "Loading preview" })).toBeNull());
+    expect(getFrame().style.visibility).toBe("");
+    expect(viewport.getBoundingClientRect().height).toBe(initialHeight);
+    expect(getFrame().contentDocument?.body).toHaveTextContent("Loaded example");
+  });
+
+  it("does not mount offscreen lazy children until approached, and preserves their state across tabs", async () => {
+    let mounts = 0;
+    const Example = () => {
+      const [count, setCount] = useState(() => {
+        mounts++;
+        return 0;
+      });
+      return <button onClick={() => setCount(count + 1)}>Count {count}</button>;
+    };
+    const { container } = render(
+      <>
+        <div style={{ height: 3000 }} />
+        <Preview loading="lazy" height={240} code="<Example />"><Example /></Preview>
+      </>,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(mounts).toBe(0);
+    container.querySelector(".puzzle-preview")!.scrollIntoView();
+    await waitFor(() => expect(getFrame().contentDocument?.querySelector("button")).not.toBeNull());
+    fireEvent.click(getFrame().contentDocument!.querySelector("button")!);
+    fireEvent.click(screen.getByRole("tab", { name: "Code" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Preview" }));
+    expect(getFrame().contentDocument?.body).toHaveTextContent("Count 1");
+    expect(mounts).toBe(1);
+  });
+
   it("replaces the inline placeholder with the measured frame", async () => {
     render(
       <Preview padding={0}>
@@ -46,8 +97,8 @@ describe("Preview sizing", () => {
     await expectHeight(120);
     await waitFor(() => {
       expect(document.querySelector("[data-preview-placeholder]")).toBeNull();
+      expect(getFrame().style.visibility).toBe("");
     });
-    expect(getFrame().style.visibility).toBe("");
     expect(viewport.getBoundingClientRect().height).toBe(120);
     expectNoOverflow();
   });

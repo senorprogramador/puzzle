@@ -1,0 +1,84 @@
+---
+title: ProductShowcaseSection
+description: Present SaaS product screens in responsive layouts with device frames, annotations, tabs, and carousels.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`ProductShowcaseSection` presents consumer-provided product media and supporting copy. Its layouts range from single-screen browser and device frames to interactive tabs, galleries, and a controlled carousel.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  ProductShowcaseSection,
+  type ProductShowcaseItem,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Every layout below is rendered in its own preview, with the same realistic Northstar workspace data so the composition differences are easy to compare.
+
+import { ProductShowcaseSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/product-showcase";
+
+<ProductShowcaseSectionVariantsExample />
+
+## Data model
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `items` | `readonly ProductShowcaseItem[]` | Product screens and their accompanying content. |
+| `ProductShowcaseItem.id` | `string` | Stable, unique item ID; required by tabs and lists. |
+| `ProductShowcaseItem.title` | `ReactNode` | Item heading and default browser-frame label. |
+| `ProductShowcaseItem.media` | `ReactNode` | Consumer-provided screenshot, video, or other media. |
+| `ProductShowcaseItem.frame` | `"none" \| "browser" \| "desktop" \| "mobile"` | Optional frame override for an item. |
+| `ProductShowcaseItem.caption` | `ReactNode` | Optional media caption. |
+| `ProductShowcaseItem.annotations` | `readonly ProductShowcaseAnnotation[]` | Optional native disclosure annotations. |
+| `ProductShowcaseItem.description` | `ReactNode` | Supporting product explanation. |
+| `ProductShowcaseItem.action` | `ReactNode` | Optional action supplied by the consumer. |
+| `ProductShowcaseItem.featured` | `boolean` | Emphasizes an item in layouts that support a featured item. |
+
+`variant` defaults to `split`. Shared section props include the semantic root element, header content, section theme, native attributes, and children.
+
+## Usage
+
+```tsx
+const items: ProductShowcaseItem[] = [
+  {
+    id: "workspace",
+    title: "Keep launches in view",
+    description: "See owners, milestones, and decisions together.",
+    media: <img src="/screens/launch.png" alt="Launch dashboard with milestones" />,
+    caption: "Launch dashboard",
+    annotations: [
+      {
+        id: "owners",
+        label: "Owners",
+        description: "Review the person responsible for each milestone.",
+      },
+    ],
+  },
+  {
+    id: "workflows",
+    title: "Bring context together",
+    media: <img src="/screens/workflows.png" alt="Workflow builder screen" />,
+  },
+];
+
+<ProductShowcaseSection
+  variant="tabs"
+  title="A clear view from brief to launch"
+  items={items}
+/>;
+```
+
+`browser`, `desktop`, and `mobile` apply a default frame to each item. An item's `frame` can override that default. The `carousel` variant has explicit previous/next buttons and does not auto-advance. The `interactive` variant renders annotations as native `<details>` disclosures.
+
+## Accessibility
+
+Provide meaningful alternative text for informative screenshots and captions where they add context. Decorative media should use an empty alternative. Tabs use the UI package's keyboard-operable `Tabs`; the carousel buttons have accessible names and disabled states. Annotation disclosures use native keyboard behavior.
+
+The component does not fetch, create, or infer screenshots. It is server-renderable and does not access browser APIs during render.

@@ -1,0 +1,179 @@
+.puzzle-security__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--puzzle-space-4, 1rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-security__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--puzzle-space-3, 0.75rem);
+  height: 100%;
+  min-width: 0;
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  text-decoration: none;
+}
+
+.puzzle-security__item:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-security__card-link {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--puzzle-space-3, 0.75rem);
+  color: inherit;
+  text-decoration: none;
+}
+
+.puzzle-security__card-link:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-security__copy {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-security__title {
+  font-weight: 600;
+}
+
+.puzzle-security__description {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-security__icon,
+.puzzle-security__value {
+  flex: 0 0 auto;
+}
+
+.puzzle-security__groups {
+  display: grid;
+  gap: var(--puzzle-space-8, 2rem);
+}
+
+.puzzle-security__groups h3 {
+  margin: 0 0 var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-security__featured,
+.puzzle-security__split {
+  display: grid;
+  gap: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-security__featured > .puzzle-security__list:first-child .puzzle-security__item {
+  padding: var(--puzzle-space-6, 1.5rem);
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-security__audit {
+  margin-block-start: var(--puzzle-space-6, 1.5rem);
+  padding: var(--puzzle-space-5, 1.25rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-security__audit h3 {
+  margin-block: 0 var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-security[data-variant="badges"] .puzzle-security__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-security[data-variant="badges"] .puzzle-security__item {
+  align-items: center;
+  width: auto;
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-security[data-variant="badges"] .puzzle-security__description {
+  display: none;
+}
+
+.puzzle-security[data-variant="compliance"] .puzzle-security__item {
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  border-radius: 0;
+}
+
+.puzzle-security[data-variant="certifications"] .puzzle-security__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.puzzle-security[data-variant="checklist"] .puzzle-security__list {
+  grid-template-columns: 1fr;
+}
+
+.puzzle-security[data-variant="checklist"] .puzzle-security__item {
+  align-items: center;
+  border: 0;
+  border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-security[data-variant="cards"] .puzzle-security__item {
+  flex-direction: column;
+}
+
+.puzzle-security[data-variant="dark"] {
+  padding: var(--puzzle-space-6, 1.5rem);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  color: var(--puzzle-color-background);
+  background: var(--puzzle-color-text);
+}
+
+.puzzle-security[data-variant="dark"] .puzzle-security__item {
+  border-color: var(--puzzle-color-background);
+  color: var(--puzzle-color-background);
+  background: transparent;
+}
+
+.puzzle-security[data-variant="dark"] .puzzle-security__description {
+  color: var(--puzzle-color-background);
+  opacity: 0.8;
+}
+
+.puzzle-security[data-variant="metrics"] .puzzle-security__item {
+  display: grid;
+  align-content: start;
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+}
+
+.puzzle-security[data-variant="metrics"] .puzzle-security__value {
+  font-weight: 700;
+}
+
+.puzzle-security[data-variant="audit"] .puzzle-security__list {
+  grid-template-columns: 1fr;
+}
+
+.puzzle-security[data-variant="trust-center"] {
+  border-block: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-security[data-variant="trust-center"] .puzzle-security__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+@media (min-width: 48rem) {
+  .puzzle-security__split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+  }
+}

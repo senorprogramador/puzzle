@@ -1,0 +1,66 @@
+---
+title: ServicesSection
+description: Present consulting, agency, hospitality, or product services with responsive layouts, optional media, pricing, categories, and links.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+import { ServicesSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/business-sections";
+
+`ServicesSection` turns service data into responsive cards, lists, categorized offerings, and horizontal rails. Descriptions, icons, images, pricing content, and links are optional.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  ServicesSection,
+  type BusinessService,
+  type ServicesSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+All twelve variants have an individual preview. Examples combine SaaS, agency, consultancy, and hospitality services.
+
+<ServicesSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `ServicesSectionVariant` | `grid` (default), `cards`, `list`, `split`, `alternating`, `featured`, `icons`, `numbered`, `pricing`, `editorial`, `categorized`, or `carousel`. |
+| `items` | `readonly BusinessService[]` | Services with unique IDs and titles; optional description, icon, image, pricing content, category, native link, consumer-provided CTA, and featured state. |
+| `featuredService` | `BusinessService \| string` | Optional service object or ID promoted in the featured layouts. |
+| `BusinessService.pricing` | `ReactNode` | Consumer-provided pricing or package content; no billing behavior is included. |
+| Shared section props | `MarketingSectionBaseProps` | Heading, actions, root element, native section attributes, and children. |
+
+## Usage
+
+```tsx
+<ServicesSection
+  variant="categorized"
+  title="How we help"
+  items={[
+    {
+      id: "strategy",
+      title: "Business strategy",
+      description: "Find a clear direction for your next stage.",
+      category: "Consulting",
+      pricing: "Engagements from $8,000",
+      href: "/services/strategy",
+    },
+    {
+      id: "identity",
+      title: "Brand identity",
+      description: "Build a visual system that grows with your business.",
+      category: "Creative",
+    },
+  ]}
+/>
+```
+
+## Accessibility and rendering
+
+Service titles and links use semantic headings and native anchors. Decorative icon nodes are hidden from assistive technology; images should have useful alt text when informative. Carousel content stays in a native keyboard-scrollable region and respects reduced-motion defaults. IDs must be unique and stable. The component does not implement checkout or service fulfillment and renders on the server.

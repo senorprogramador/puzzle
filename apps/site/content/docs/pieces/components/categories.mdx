@@ -1,0 +1,74 @@
+---
+title: CategoriesSection
+description: Organize ecommerce category links into responsive image grids, featured collections, lists, and carousels.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`CategoriesSection` displays structured category data for a storefront. Each category can supply an image, title, description, destination, and featured emphasis.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  CategoriesSection,
+  type CategoryItem,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Every variant is shown in its own preview using fictional Morrow Home collections.
+
+import { CategoriesSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/categories";
+
+<CategoriesSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `CategoriesVariant` | Selects one of ten compositions; defaults to `grid`. |
+| `items` | `readonly CategoryItem[]` | Category data with stable `id` and `title`. |
+| `CategoryItem.image` | `CommerceImage` | Optional `{ src, alt, width?, height?, loading? }` data. |
+| `CategoryItem.description` | `ReactNode` | Optional category description. |
+| `CategoryItem.href` | `string` | Optional category destination rendered as a native link. |
+| `CategoryItem.featured` | `boolean` | Marks an item for featured layouts. |
+| Shared section props | Marketing section props | Header, root element, theme, native attributes, and children. |
+
+## Usage
+
+```tsx
+const categories: CategoryItem[] = [
+  {
+    id: "lighting",
+    title: "Lighting",
+    description: "Soft light for considered rooms.",
+    image: {
+      src: "/collections/lighting.jpg",
+      alt: "Pendant lighting over a dining table",
+    },
+    href: "/collections/lighting",
+    featured: true,
+  },
+  { id: "textiles", title: "Textiles", href: "/collections/textiles" },
+];
+
+<CategoriesSection
+  variant="image-grid"
+  title="Shop by room and ritual"
+  items={categories}
+/>;
+```
+
+Missing images use a placeholder. Category cards and links are presentational; the component does not query categories or rewrite destinations.
+
+## Accessibility
+
+Category titles remain headings and destinations are native anchors. Give informative category images meaningful alternative text; use an empty alternative for decorative images. The carousel has explicit previous/next buttons, and the horizontal rail can receive keyboard focus.
+
+## Data and business logic
+
+The application supplies category names, descriptions, images, links, and featured state. No product catalog or remote category data is requested.

@@ -21,5 +21,10 @@ export const hooks: TreeViewItem = {
       label: "Roving Focus",
       href: `${folder}/use-roving-focus`,
     },
+    {
+      id: "hooks-use-list-filter",
+      label: "List Filter",
+      href: `${folder}/use-list-filter`,
+    },
   ],
 } as const;

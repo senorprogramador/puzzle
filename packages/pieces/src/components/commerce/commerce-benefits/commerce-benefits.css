@@ -1,0 +1,156 @@
+.puzzle-commerce-benefits__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  align-items: stretch;
+  gap: var(--puzzle-space-4, 1rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-commerce-benefits__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--puzzle-space-4, 1rem);
+  height: 100%;
+  min-width: 0;
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  text-decoration: none;
+}
+
+.puzzle-commerce-benefits__link {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--puzzle-space-4, 1rem);
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.puzzle-commerce-benefits__link:focus-visible,
+.puzzle-commerce-benefits__action :focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-commerce-benefits__copy {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-commerce-benefits__title {
+  font-weight: 600;
+}
+
+.puzzle-commerce-benefits__description {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-commerce-benefits__icon {
+  flex: 0 0 auto;
+  color: var(--puzzle-color-primary);
+}
+
+.puzzle-commerce-benefits__action {
+  margin-inline-start: auto;
+}
+
+.puzzle-commerce-benefits__split {
+  display: grid;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-commerce-benefits[data-variant="inline"] .puzzle-commerce-benefits__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-commerce-benefits[data-variant="inline"] .puzzle-commerce-benefits__item {
+  align-items: center;
+  width: auto;
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  border: 0;
+  background: transparent;
+}
+
+.puzzle-commerce-benefits[data-variant="icons"] .puzzle-commerce-benefits__item {
+  flex-direction: column;
+}
+
+.puzzle-commerce-benefits[data-variant="icons"] .puzzle-commerce-benefits__icon {
+  display: grid;
+  place-items: center;
+  min-width: var(--puzzle-space-8, 2rem);
+  min-height: var(--puzzle-space-8, 2rem);
+}
+
+.puzzle-commerce-benefits[data-variant="banner"] .puzzle-commerce-benefits__list {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-block: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-commerce-benefits[data-variant="banner"] .puzzle-commerce-benefits__item {
+  align-items: center;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-commerce-benefits[data-variant="compact"] .puzzle-commerce-benefits__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-commerce-benefits[data-variant="compact"] .puzzle-commerce-benefits__item {
+  gap: var(--puzzle-space-2, 0.5rem);
+  padding: var(--puzzle-space-3, 0.75rem);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-commerce-benefits[data-variant="trust"] .puzzle-commerce-benefits__item {
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+}
+
+.puzzle-commerce-benefits[data-variant="shipping"] .puzzle-commerce-benefits__item[data-kind="shipping"] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-commerce-benefits[data-variant="shipping"] .puzzle-commerce-benefits__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+.puzzle-commerce-benefits[data-variant="service"] .puzzle-commerce-benefits__list {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.puzzle-commerce-benefits[data-variant="service"] .puzzle-commerce-benefits__list > li + li {
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-commerce-benefits[data-variant="service"] .puzzle-commerce-benefits__item {
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+@media (min-width: 48rem) {
+  .puzzle-commerce-benefits__split {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    align-items: start;
+  }
+
+  .puzzle-commerce-benefits[data-variant="banner"] .puzzle-commerce-benefits__list {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+}

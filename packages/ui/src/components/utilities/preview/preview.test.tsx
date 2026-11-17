@@ -1,9 +1,9 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { Preview } from "./index";
+import { Preview, PreviewProvider } from "./index";
 
 beforeEach(() => {
   vi.stubGlobal("matchMedia", vi.fn((media: string) => ({
@@ -22,7 +22,148 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+const loadTestFrame = (frame: HTMLIFrameElement) => {
+  const frameDocument = document.implementation.createHTMLDocument();
+  const frameRoot = frameDocument.createElement("div");
+  const rootId = frame.getAttribute("srcdoc")?.match(/<div id="([^"]+)"/)?.[1];
+  if (!rootId) throw new Error("Missing preview root ID.");
+  frameRoot.id = rootId;
+  frameDocument.body.appendChild(frameRoot);
+  Object.defineProperty(frame, "contentDocument", { configurable: true, value: frameDocument });
+  fireEvent.load(frame);
+  return frameDocument;
+};
+
 describe("Preview", () => {
+  it("waits for the current stylesheets even when a pending link is replaced", async () => {
+    const source = document.createElement("link");
+    source.rel = "stylesheet";
+    source.href = "/preview-theme.css";
+    document.head.appendChild(source);
+    try {
+      render(<Preview height={200}>Styled preview</Preview>);
+      const frameDocument = loadTestFrame(screen.getByTitle<HTMLIFrameElement>("Desktop component preview"));
+      await waitFor(() => expect(frameDocument.body.textContent).toContain("Styled preview"));
+      expect(screen.getByRole("progressbar", { name: "Loading preview" })).toBeVisible();
+      source.href = "/updated-preview-theme.css";
+      await waitFor(() => expect(frameDocument.querySelector("link")?.getAttribute("href")).toBe("/updated-preview-theme.css"));
+
+      const clone = frameDocument.querySelector("link")!;
+      Object.defineProperty(clone, "sheet", { value: new CSSStyleSheet() });
+      fireEvent(clone, new Event("load"));
+      await waitFor(() => expect(screen.queryByRole("progressbar", { name: "Loading preview" })).toBeNull());
+
+      const meta = document.createElement("meta");
+      document.head.appendChild(meta);
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      expect(frameDocument.querySelector("link")).toBe(clone);
+      meta.remove();
+    } finally {
+      source.remove();
+    }
+  });
+
+  it("reports stylesheet errors instead of leaving a spinner indefinitely", async () => {
+    const source = document.createElement("link");
+    source.rel = "stylesheet";
+    source.href = "/missing-preview-theme.css";
+    document.head.appendChild(source);
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      render(<Preview height={200}>Preview content</Preview>);
+      const frameDocument = loadTestFrame(screen.getByTitle<HTMLIFrameElement>("Desktop component preview"));
+      await waitFor(() => expect(frameDocument.body.textContent).toContain("Preview content"));
+      fireEvent(frameDocument.querySelector("link")!, new Event("error"));
+      expect(await screen.findByRole("alert")).toHaveTextContent("Unable to load preview.");
+      expect(error).toHaveBeenCalledWith("Unable to load component preview.", expect.any(Error));
+    } finally {
+      source.remove();
+      error.mockRestore();
+    }
+  });
+
+  it("server-renders lazy loading UI and MDX text without mounting the example or iframe", () => {
+    const Example = vi.fn(() => <button>Expensive example</button>);
+    const markup = renderToString(
+      <PreviewProvider loading="lazy">
+        <h2>Server-rendered documentation</h2>
+        <p>Text remains available without JavaScript.</p>
+        <Preview><Example /></Preview>
+      </PreviewProvider>,
+    );
+    const container = document.createElement("div");
+    container.innerHTML = markup;
+
+    expect(container).toHaveTextContent("Server-rendered documentation");
+    expect(container).toHaveTextContent("Text remains available without JavaScript.");
+    expect(container.querySelector("iframe")).toBeNull();
+    expect(container.querySelector("[data-preview-placeholder]")).toBeNull();
+    expect(container.querySelector("[role='progressbar']")).toHaveAttribute("aria-label", "Loading preview");
+    expect(container.querySelector("[role='tabpanel']")).toHaveAttribute("aria-busy", "true");
+    expect(Example).not.toHaveBeenCalled();
+  });
+
+  it("lets a preview override the provider's loading default", () => {
+    const markup = renderToString(
+      <PreviewProvider loading="lazy">
+        <Preview loading="eager">Immediate example</Preview>
+      </PreviewProvider>,
+    );
+    expect(markup).toContain("<iframe");
+    expect(markup).toContain("Immediate example");
+  });
+
+  it("waits for visibility, page load and an idle task, and cancels pending work", () => {
+    let notifyIntersection: (entries: { isIntersecting: boolean }[]) => void = () => {};
+    let idleCallback: IdleRequestCallback | undefined;
+    const disconnect = vi.fn();
+    vi.stubGlobal("IntersectionObserver", class {
+      constructor(callback: typeof notifyIntersection) {
+        notifyIntersection = callback;
+      }
+      observe() {}
+      disconnect = disconnect;
+    });
+    const requestIdle = vi.fn((callback: IdleRequestCallback) => {
+      idleCallback = callback;
+      return 1;
+    });
+    const cancelIdle = vi.fn();
+    vi.stubGlobal("requestIdleCallback", requestIdle);
+    vi.stubGlobal("cancelIdleCallback", cancelIdle);
+    const readyState = vi.spyOn(document, "readyState", "get").mockReturnValue("loading");
+    const { container, unmount } = render(<Preview loading="lazy">Deferred</Preview>);
+
+    act(() => notifyIntersection([{ isIntersecting: true }]));
+    expect(requestIdle).not.toHaveBeenCalled();
+    expect(container.querySelector("iframe")).toBeNull();
+
+    readyState.mockReturnValue("complete");
+    fireEvent.load(window);
+    expect(requestIdle).toHaveBeenCalledOnce();
+    expect(container.querySelector("iframe")).toBeNull();
+
+    act(() => notifyIntersection([{ isIntersecting: false }]));
+    expect(cancelIdle).toHaveBeenCalledWith(1);
+    act(() => notifyIntersection([{ isIntersecting: true }]));
+    act(() => idleCallback?.({ didTimeout: false, timeRemaining: () => 50 }));
+    expect(container.querySelector("iframe")).not.toBeNull();
+    expect(disconnect).toHaveBeenCalled();
+    unmount();
+    readyState.mockRestore();
+  });
+
+  it("cancels a queued lazy mount on unmount", () => {
+    vi.spyOn(document, "readyState", "get").mockReturnValue("complete");
+    vi.stubGlobal("IntersectionObserver", undefined);
+    vi.stubGlobal("requestIdleCallback", vi.fn(() => 7));
+    const cancelIdle = vi.fn();
+    vi.stubGlobal("cancelIdleCallback", cancelIdle);
+    const { unmount } = render(<Preview loading="lazy">Deferred</Preview>);
+    unmount();
+    expect(cancelIdle).toHaveBeenCalledWith(7);
+  });
+
   it("server-renders an inert content placeholder instead of a device-height frame", () => {
     const markup = renderToString(<Preview>Server content</Preview>);
     const container = document.createElement("div");

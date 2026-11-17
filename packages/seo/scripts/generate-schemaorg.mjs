@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { assertValidSchemaSource } from "./schemaorg/source-validation.mjs";
@@ -15,7 +15,12 @@ const SOURCE_FILE = resolve(SOURCE_DIRECTORY, "source.jsonld");
 
 const GENERATED_DIRECTORY = resolve(PACKAGE_DIRECTORY, "src/schema/generated");
 const GENERATED_FILE = resolve(GENERATED_DIRECTORY, "schemaorg.ts");
+const GENERATED_CHUNKS_DIRECTORY = resolve(
+  GENERATED_DIRECTORY,
+  "schemaorg-chunks",
+);
 const MANIFEST_FILE = resolve(GENERATED_DIRECTORY, "manifest.json");
+const MAX_GENERATED_CHUNK_BYTES = 256 * 1024;
 
 const SCHEMA_PREFIX = "https://schema.org/";
 const CHECK_MODE = process.argv.includes("--check");
@@ -454,8 +459,55 @@ const createSchemaDefinitions = (document) => {
   };
 };
 
+const splitGeneratedDefinitions = (definitions) => {
+  const chunks = [];
+  let current = [];
+  let currentBytes = 0;
+
+  for (const definition of definitions) {
+    const definitionBytes =
+      Buffer.byteLength(JSON.stringify(definition, null, 2), "utf8") + 3;
+
+    if (
+      current.length > 0 &&
+      currentBytes + definitionBytes > MAX_GENERATED_CHUNK_BYTES
+    ) {
+      chunks.push(current);
+      current = [];
+      currentBytes = 0;
+    }
+
+    current.push(definition);
+    currentBytes += definitionBytes;
+  }
+
+  if (current.length > 0) {
+    chunks.push(current);
+  }
+
+  return chunks;
+};
+
+const generatedChunkName = (index) =>
+  `schemaorg-${String(index).padStart(3, "0")}.ts`;
+
+const createGeneratedChunkSource = (definitions, sourceHash, index) =>
+  [
+    "/*",
+    " * This file is generated. Do not edit manually.",
+    ` * Schema.org version: ${SCHEMA_VERSION}`,
+    ` * Source SHA-256: ${sourceHash}`,
+    " */",
+    "",
+    'import type { SchemaDefinition } from "../../types";',
+    "",
+    `export const generatedSchemaDefinitions${index}: readonly SchemaDefinition[] =`,
+    `${JSON.stringify(definitions, null, 2)} satisfies readonly SchemaDefinition[];`,
+    "",
+  ].join("\n");
+
 const createGeneratedSource = (definitions, sourceHash) => {
-  const serialized = JSON.stringify(definitions, null, 2);
+  const definitionChunks = splitGeneratedDefinitions(definitions);
   const definitionsByType = new Map(
     definitions.map((definition) => [definition.type, definition]),
   );
@@ -487,7 +539,15 @@ const createGeneratedSource = (definitions, sourceHash) => {
       return `  ${JSON.stringify(definition.name)}: ${properties || "never"};`;
     });
 
-  return [
+  const chunkImports = definitionChunks.map(
+    (_, index) =>
+      `import { generatedSchemaDefinitions${index} } from "./schemaorg-chunks/${generatedChunkName(index).replace(/\.ts$/, "")}";`,
+  );
+  const chunkContents = definitionChunks.map((chunk, index) => ({
+    name: generatedChunkName(index),
+    source: createGeneratedChunkSource(chunk, sourceHash, index),
+  }));
+  const source = [
     "/*",
     " * This file is generated. Do not edit manually.",
     ` * Schema.org version: ${SCHEMA_VERSION}`,
@@ -495,6 +555,7 @@ const createGeneratedSource = (definitions, sourceHash) => {
     " */",
     "",
     'import type { SchemaDefinition } from "../types";',
+    ...chunkImports,
     "",
     `export const SCHEMAORG_VERSION = "${SCHEMA_VERSION}";`,
     `export const SCHEMAORG_SOURCE_HASH = "${sourceHash}";`,
@@ -503,10 +564,13 @@ const createGeneratedSource = (definitions, sourceHash) => {
     ...propertyTypes,
     "}",
     "",
-    "export const generatedSchemaDefinitions: readonly SchemaDefinition[] =",
-    `${serialized} satisfies readonly SchemaDefinition[];`,
+    "export const generatedSchemaDefinitions: readonly SchemaDefinition[] = [",
+    ...definitionChunks.map((_, index) => `  ...generatedSchemaDefinitions${index},`),
+    "] satisfies readonly SchemaDefinition[];",
     "",
   ].join("\n");
+
+  return { source, chunks: chunkContents };
 };
 
 const createManifest = (sourceHash, definitions, diagnostics) => {
@@ -590,6 +654,66 @@ const writeGeneratedFile = async (path, content) => {
   await writeFile(path, content, "utf8");
 };
 
+const compareGeneratedChunks = async (chunks) => {
+  let actualNames = [];
+
+  try {
+    actualNames = await readdir(GENERATED_CHUNKS_DIRECTORY);
+  } catch (error) {
+    if (error?.code !== "ENOENT") {
+      throw error;
+    }
+  }
+
+  const expectedNames = new Set(chunks.map(({ name }) => name));
+  let matches = true;
+
+  for (const chunk of chunks) {
+    matches =
+      (await compareFile(
+        resolve(GENERATED_CHUNKS_DIRECTORY, chunk.name),
+        chunk.source,
+      )) && matches;
+  }
+
+  for (const name of actualNames) {
+    if (
+      /^schemaorg-\d+\.ts$/.test(name) &&
+      !expectedNames.has(name)
+    ) {
+      console.error(
+        `Unexpected generated file: ${resolve(GENERATED_CHUNKS_DIRECTORY, name)}`,
+      );
+      matches = false;
+    }
+  }
+
+  return matches;
+};
+
+const writeGeneratedChunks = async (chunks) => {
+  await mkdir(GENERATED_CHUNKS_DIRECTORY, { recursive: true });
+  const expectedNames = new Set(chunks.map(({ name }) => name));
+
+  for (const chunk of chunks) {
+    await writeGeneratedFile(
+      resolve(GENERATED_CHUNKS_DIRECTORY, chunk.name),
+      chunk.source,
+    );
+  }
+
+  const existingNames = await readdir(GENERATED_CHUNKS_DIRECTORY);
+
+  for (const name of existingNames) {
+    if (
+      /^schemaorg-\d+\.ts$/.test(name) &&
+      !expectedNames.has(name)
+    ) {
+      await unlink(resolve(GENERATED_CHUNKS_DIRECTORY, name));
+    }
+  }
+};
+
 const main = async () => {
   console.log(
     `${CHECK_MODE ? "Checking" : "Generating"} Schema.org ${SCHEMA_VERSION}...`,
@@ -607,16 +731,17 @@ const main = async () => {
     );
   }
 
-  const generatedSource = createGeneratedSource(definitions, sourceHash);
+  const generated = createGeneratedSource(definitions, sourceHash);
 
   const manifest = createManifest(sourceHash, definitions, diagnostics);
 
   if (CHECK_MODE) {
-    const sourceMatches = await compareFile(GENERATED_FILE, generatedSource);
+    const sourceMatches = await compareFile(GENERATED_FILE, generated.source);
+    const chunksMatch = await compareGeneratedChunks(generated.chunks);
 
     const manifestMatches = await compareFile(MANIFEST_FILE, manifest);
 
-    if (!sourceMatches || !manifestMatches) {
+    if (!sourceMatches || !chunksMatch || !manifestMatches) {
       console.error(
         "Schema.org generated files are out of date. Run `bun run schema:generate`.",
       );
@@ -638,7 +763,8 @@ const main = async () => {
     return;
   }
 
-  await writeGeneratedFile(GENERATED_FILE, generatedSource);
+  await writeGeneratedFile(GENERATED_FILE, generated.source);
+  await writeGeneratedChunks(generated.chunks);
   await writeGeneratedFile(MANIFEST_FILE, manifest);
 
   console.log(`Generated ${definitions.length} Schema.org types.`);

@@ -1,0 +1,78 @@
+---
+title: RoadmapSection
+description: Present SaaS roadmap milestones by date, status, release, or group with optional accessible progress indicators.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`RoadmapSection` displays milestones in timeline, grouped, column, list, and kanban compositions. Status, date, progress, group, and release values are always provided by the caller.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  RoadmapSection,
+  type RoadmapItem,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the twelve roadmap variants is previewed separately using illustrative release and milestone data.
+
+import { RoadmapSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/roadmap";
+
+<RoadmapSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `RoadmapVariant` | Selects one of twelve compositions; defaults to `timeline`. |
+| `items` | `readonly RoadmapItem[]` | Milestones with stable `id`, `title`, and required `status`. |
+| `RoadmapItem.status` | `"planned" \| "in-progress" \| "completed" \| "delayed" \| "on-hold"` | Status rendered as visible text with a badge treatment. |
+| `RoadmapItem.statusLabel` | `ReactNode` | Optional consumer-provided status label. |
+| `RoadmapItem.date` | `ReactNode` | Optional date or date label. |
+| `RoadmapItem.group` | `string` | Optional group used by grouped, quarter, and column variants. |
+| `RoadmapItem.release` | `string` | Optional release label used by the `release` variant. |
+| `RoadmapItem.description` | `ReactNode` | Optional milestone description. |
+| `RoadmapItem.progress` | `number` | Optional progress value from `0` to `100`; shown in the `progress` variant. |
+
+## Usage
+
+```tsx
+const roadmapItems: RoadmapItem[] = [
+  {
+    id: "exports",
+    title: "Workspace data exports",
+    status: "planned",
+    date: "Q2 2027",
+    group: "Q2 2027",
+    release: "Summer release",
+    description: "Plan an export flow for workspace administrators.",
+  },
+  {
+    id: "templates",
+    title: "Reusable project templates",
+    status: "in-progress",
+    progress: 45,
+    group: "Q2 2027",
+  },
+];
+
+<RoadmapSection
+  variant="kanban"
+  title="Product direction"
+  items={roadmapItems}
+/>;
+```
+
+The `kanban` variant groups items by status. Quarter, column, grouped, and release compositions use the supplied group labels; items without one appear under “Other milestones.” Progress values outside the inclusive `0`–`100` range throw an explicit `RangeError`.
+
+## Accessibility
+
+Status text is visible and does not rely on color alone. Native progress elements are labeled with their milestone title. Horizontal and kanban layouts are keyboard-focusable scrolling regions; grouped milestones use headings and ordered lists.
+
+The section does not infer dates, progress, completion, or release timing.

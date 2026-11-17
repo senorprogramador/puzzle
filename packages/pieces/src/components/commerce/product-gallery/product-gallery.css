@@ -1,0 +1,254 @@
+.puzzle-product-gallery__layout {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+  min-width: 0;
+}
+
+.puzzle-product-gallery__layout:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-product-gallery__main {
+  min-width: 0;
+  margin: 0;
+}
+
+.puzzle-product-gallery__main .puzzle-commerce__image {
+  aspect-ratio: 4 / 3;
+}
+
+.puzzle-product-gallery__main img {
+  transition: none;
+}
+
+.puzzle-product-gallery__main[data-zoomed="true"] img {
+  transform: scale(1.5);
+  cursor: zoom-out;
+}
+
+.puzzle-product-gallery__caption {
+  margin-block-start: var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-product-gallery__actions,
+.puzzle-product-gallery__controls,
+.puzzle-product-gallery__dialog-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin-block-start: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-product-gallery__actions button,
+.puzzle-product-gallery__controls button,
+.puzzle-product-gallery__dialog-controls button {
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  cursor: pointer;
+}
+
+.puzzle-product-gallery__actions button:focus-visible,
+.puzzle-product-gallery__controls button:focus-visible,
+.puzzle-product-gallery__dialog-controls button:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-product-gallery__controls button:disabled,
+.puzzle-product-gallery__dialog-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.puzzle-product-gallery__controls span,
+.puzzle-product-gallery__dialog-controls span {
+  color: var(--puzzle-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-product-gallery__thumbnails {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 5rem), 1fr));
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-product-gallery__thumbnail {
+  display: block;
+  width: 100%;
+  padding: var(--puzzle-space-1, 0.25rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface);
+  cursor: pointer;
+}
+
+.puzzle-product-gallery__thumbnail[aria-pressed="true"] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-product-gallery__thumbnail:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-product-gallery__thumbnail .puzzle-commerce__image {
+  aspect-ratio: 1;
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-product-gallery__tabs {
+  width: 100%;
+}
+
+.puzzle-product-gallery__tab {
+  display: block;
+  width: min(12vw, 5rem);
+  min-width: var(--puzzle-space-8, 2rem);
+}
+
+.puzzle-product-gallery__tab .puzzle-commerce__image {
+  aspect-ratio: 1;
+}
+
+.puzzle-product-gallery__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.puzzle-product-gallery__lightbox-image {
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.puzzle-product-gallery__lightbox-image .puzzle-commerce__image {
+  aspect-ratio: auto;
+  max-height: 70vh;
+}
+
+.puzzle-product-gallery__lightbox-image img {
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.puzzle-product-gallery[data-variant="grid"] .puzzle-product-gallery__thumbnails {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.puzzle-product-gallery[data-variant="masonry"] .puzzle-product-gallery__thumbnails {
+  display: block;
+  columns: 1;
+  column-gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-product-gallery[data-variant="masonry"] .puzzle-product-gallery__thumbnails > li {
+  display: inline-block;
+  width: 100%;
+  margin-block-end: var(--puzzle-space-4, 1rem);
+  break-inside: avoid;
+}
+
+.puzzle-product-gallery[data-variant="featured"] .puzzle-product-gallery__main .puzzle-commerce__image {
+  aspect-ratio: 16 / 10;
+}
+
+.puzzle-product-gallery[data-variant="carousel"] .puzzle-product-gallery__layout {
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.puzzle-product-gallery[data-variant="split"] .puzzle-product-gallery__main {
+  align-self: center;
+}
+
+.puzzle-product-gallery[data-variant="editorial"] .puzzle-product-gallery__main .puzzle-commerce__image {
+  aspect-ratio: 16 / 9;
+}
+
+.puzzle-product-gallery[data-variant="fullscreen"] .puzzle-product-gallery__main .puzzle-commerce__image {
+  aspect-ratio: 1;
+}
+
+.puzzle-product-gallery[data-variant="stacked"] .puzzle-product-gallery__thumbnails {
+  grid-template-columns: 1fr;
+}
+
+.puzzle-product-gallery[data-variant="stacked"] .puzzle-product-gallery__thumbnail .puzzle-commerce__image {
+  aspect-ratio: 16 / 9;
+}
+
+.puzzle-product-gallery[data-variant="collage"] .puzzle-product-gallery__thumbnails {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.puzzle-product-gallery[data-variant="collage"] .puzzle-product-gallery__thumbnails > li:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.puzzle-product-gallery[data-variant="collage"] .puzzle-product-gallery__thumbnails > li:first-child .puzzle-commerce__image {
+  aspect-ratio: 4 / 3;
+}
+
+.puzzle-product-gallery[data-variant="horizontal"] .puzzle-product-gallery__thumbnails {
+  display: flex;
+  overflow-x: auto;
+  gap: var(--puzzle-space-3, 0.75rem);
+  padding-block: var(--puzzle-space-2, 0.5rem);
+  scroll-snap-type: inline mandatory;
+}
+
+.puzzle-product-gallery[data-variant="horizontal"] .puzzle-product-gallery__thumbnails > li {
+  flex: 0 0 min(28vw, 8rem);
+  scroll-snap-align: start;
+}
+
+.puzzle-product-gallery[data-variant="vertical"] .puzzle-product-gallery__layout {
+  grid-template-columns: minmax(0, 1fr) minmax(4rem, 0.2fr);
+  align-items: start;
+}
+
+.puzzle-product-gallery[data-variant="vertical"] .puzzle-product-gallery__thumbnails {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 36rem) {
+  .puzzle-product-gallery[data-variant="masonry"] .puzzle-product-gallery__thumbnails {
+    columns: 2;
+  }
+}
+
+@media (min-width: 48rem) {
+  .puzzle-product-gallery[data-variant="split"] .puzzle-product-gallery__layout,
+  .puzzle-product-gallery[data-variant="editorial"] .puzzle-product-gallery__layout {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .puzzle-product-gallery[data-variant="masonry"] .puzzle-product-gallery__thumbnails {
+    columns: 3;
+  }
+
+  .puzzle-product-gallery[data-variant="collage"] .puzzle-product-gallery__thumbnails > li:first-child {
+    grid-row: span 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-product-gallery * {
+    scroll-behavior: auto;
+  }
+}

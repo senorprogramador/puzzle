@@ -1,0 +1,249 @@
+.puzzle-roadmap__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--puzzle-space-4, 1rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-roadmap__item {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-3, 0.75rem);
+  height: 100%;
+  min-width: 0;
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-roadmap__item h3,
+.puzzle-roadmap__item p {
+  margin: 0;
+}
+
+.puzzle-roadmap__item > p {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-roadmap__item-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-roadmap__date {
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-roadmap__progress {
+  width: 100%;
+  accent-color: var(--puzzle-color-primary);
+}
+
+.puzzle-roadmap__groups {
+  display: grid;
+  gap: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-roadmap__group h3 {
+  margin: 0 0 var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-roadmap__kanban {
+  display: grid;
+  grid-auto-columns: minmax(min(100%, 15rem), 1fr);
+  grid-auto-flow: column;
+  gap: var(--puzzle-space-4, 1rem);
+  overflow-x: auto;
+  padding-block: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-roadmap__kanban:focus-visible,
+.puzzle-roadmap__groups:focus-visible,
+.puzzle-roadmap__horizontal:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-roadmap__kanban > section {
+  min-width: 0;
+  padding: var(--puzzle-space-3, 0.75rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-roadmap__kanban h3 {
+  margin: 0 0 var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-roadmap__kanban .puzzle-roadmap__list {
+  grid-template-columns: 1fr;
+}
+
+.puzzle-roadmap[data-variant="timeline"] .puzzle-roadmap__list,
+.puzzle-roadmap[data-variant="vertical"] .puzzle-roadmap__list,
+.puzzle-roadmap[data-variant="milestones"] .puzzle-roadmap__list {
+  position: relative;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.puzzle-roadmap[data-variant="timeline"] .puzzle-roadmap__list::before,
+.puzzle-roadmap[data-variant="vertical"] .puzzle-roadmap__list::before,
+.puzzle-roadmap[data-variant="milestones"] .puzzle-roadmap__list::before {
+  position: absolute;
+  inset-block: var(--puzzle-space-4, 1rem);
+  inset-inline-start: var(--puzzle-space-2, 0.5rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  content: "";
+}
+
+.puzzle-roadmap[data-variant="timeline"] .puzzle-roadmap__list > li,
+.puzzle-roadmap[data-variant="vertical"] .puzzle-roadmap__list > li,
+.puzzle-roadmap[data-variant="milestones"] .puzzle-roadmap__list > li {
+  position: relative;
+  padding-inline-start: var(--puzzle-space-6, 1.5rem);
+  padding-block-end: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-roadmap[data-variant="timeline"] .puzzle-roadmap__list > li::before,
+.puzzle-roadmap[data-variant="vertical"] .puzzle-roadmap__list > li::before,
+.puzzle-roadmap[data-variant="milestones"] .puzzle-roadmap__list > li::before {
+  position: absolute;
+  inset-block-start: var(--puzzle-space-5, 1.25rem);
+  inset-inline-start: var(--puzzle-space-2, 0.5rem);
+  width: var(--puzzle-space-2, 0.5rem);
+  height: var(--puzzle-space-2, 0.5rem);
+  border-radius: 50%;
+  background: var(--puzzle-color-primary);
+  content: "";
+}
+
+.puzzle-roadmap[data-variant="timeline"] .puzzle-roadmap__item {
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+}
+
+.puzzle-roadmap[data-variant="vertical"] .puzzle-roadmap__item {
+  border: 0;
+  border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-roadmap[data-variant="milestones"] .puzzle-roadmap__list {
+  counter-reset: roadmap;
+}
+
+.puzzle-roadmap[data-variant="milestones"] .puzzle-roadmap__list > li {
+  counter-increment: roadmap;
+}
+
+.puzzle-roadmap[data-variant="milestones"] .puzzle-roadmap__list > li::after {
+  position: absolute;
+  inset-inline-start: var(--puzzle-space-2, 0.5rem);
+  color: var(--puzzle-color-primary-foreground);
+  content: counter(roadmap);
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-roadmap[data-variant="milestones"] .puzzle-roadmap__list > li::before {
+  width: var(--puzzle-space-5, 1.25rem);
+  height: var(--puzzle-space-5, 1.25rem);
+  inset-block-start: var(--puzzle-space-4, 1rem);
+  inset-inline-start: 0;
+  background: var(--puzzle-color-primary);
+}
+
+.puzzle-roadmap[data-variant="quarters"] .puzzle-roadmap__groups {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  align-items: start;
+}
+
+.puzzle-roadmap[data-variant="quarters"] .puzzle-roadmap__group {
+  padding: var(--puzzle-space-4, 1rem);
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+}
+
+.puzzle-roadmap[data-variant="columns"] .puzzle-roadmap__groups {
+  grid-auto-columns: minmax(min(100%, 18rem), 1fr);
+  grid-auto-flow: column;
+  overflow-x: auto;
+  align-items: start;
+}
+
+.puzzle-roadmap[data-variant="columns"] .puzzle-roadmap__group {
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-roadmap[data-variant="cards"] .puzzle-roadmap__item {
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+}
+
+.puzzle-roadmap[data-variant="list"] .puzzle-roadmap__list {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.puzzle-roadmap[data-variant="list"] .puzzle-roadmap__list > li + li {
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-roadmap[data-variant="list"] .puzzle-roadmap__item {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-roadmap[data-variant="progress"] .puzzle-roadmap__item {
+  border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+}
+
+.puzzle-roadmap[data-variant="horizontal"] .puzzle-roadmap__horizontal .puzzle-roadmap__list {
+  display: flex;
+  overflow-x: auto;
+  gap: var(--puzzle-space-4, 1rem);
+  padding-block: var(--puzzle-space-2, 0.5rem);
+  scroll-snap-type: inline mandatory;
+}
+
+.puzzle-roadmap[data-variant="horizontal"] .puzzle-roadmap__list > li {
+  flex: 0 0 min(82vw, 22rem);
+  scroll-snap-align: start;
+}
+
+.puzzle-roadmap[data-variant="grouped"] .puzzle-roadmap__group + .puzzle-roadmap__group {
+  padding-block-start: var(--puzzle-space-5, 1.25rem);
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-roadmap[data-variant="kanban"] .puzzle-roadmap__kanban {
+  grid-auto-columns: minmax(min(100%, 15rem), 1fr);
+}
+
+.puzzle-roadmap[data-variant="release"] .puzzle-roadmap__group {
+  padding-inline-start: var(--puzzle-space-4, 1rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+.puzzle-roadmap [data-status="completed"] .puzzle-roadmap__item {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-roadmap [data-status="delayed"] .puzzle-roadmap__item {
+  border-style: dashed;
+}
+
+.puzzle-roadmap [data-status="on-hold"] .puzzle-roadmap__item {
+  background: var(--puzzle-color-surface-sunken);
+}

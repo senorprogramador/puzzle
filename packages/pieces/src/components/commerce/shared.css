@@ -1,0 +1,38 @@
+.puzzle-commerce__image {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  place-items: center;
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-commerce__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.puzzle-commerce__image-placeholder {
+  padding: var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+  text-align: center;
+}
+
+.puzzle-commerce__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-commerce__current-price {
+  font-weight: 600;
+}
+
+.puzzle-commerce__compare-price {
+  color: var(--puzzle-color-text-muted);
+}

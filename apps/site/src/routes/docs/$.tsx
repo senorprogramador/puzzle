@@ -49,6 +49,7 @@ import { useMDXComponents } from "@/components/mdx";
 import { RootProvider } from "fumadocs-ui/provider/tanstack";
 
 import { PageLayout } from "@puzzle-ui/ui/components/layout/page-layout";
+import { PreviewProvider } from "@puzzle-ui/ui/components/utilities/preview";
 
 import { Sidebar } from "@/components/layout/sidebar";
 
@@ -140,8 +141,6 @@ export const Route = createFileRoute("/docs/$")({
     if (!page) {
       throw notFound();
     }
-
-    await page.preload();
 
     await page.load();
 
@@ -303,7 +302,9 @@ function Content({ path }: { path: string }) {
         <DocsDescription>{page.description}</DocsDescription>
 
         <DocsBody>
-          <MDX components={mdxComponents} />
+          <PreviewProvider loading="lazy">
+            <MDX components={mdxComponents} />
+          </PreviewProvider>
           {faq ? <DocsFaq faq={faq} /> : null}
         </DocsBody>
       </DocsPage>

@@ -1,0 +1,61 @@
+---
+title: AwardsSection
+description: Share awards and recognition with the awarding organization, year, logo, description, and external destination.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+import { AwardsSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/business-sections";
+
+`AwardsSection` presents recognition as cards, badges, timelines, or a logo wall. Award details and destinations are supplied by the application.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  AwardsSection,
+  type BusinessAward,
+  type AwardsSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the ten variants has a separate preview, using fictional creative and hospitality awards.
+
+<AwardsSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `AwardsSectionVariant` | `grid` (default), `list`, `featured`, `badges`, `timeline`, `cards`, `logo-wall`, `split`, `compact`, or `editorial`. |
+| `items` | `readonly BusinessAward[]` | Awards with unique IDs, title, organization, and year; optional logo, description, link, and featured state. |
+| `featuredAward` | `BusinessAward \| string` | Optional award object or ID promoted to the lead position. |
+| `BusinessAward.external` | `boolean` | Opens the award destination in a new browsing context with `noopener noreferrer`. |
+| Shared section props | `MarketingSectionBaseProps` | Heading, actions, root element, native section attributes, and children. |
+
+## Usage
+
+```tsx
+<AwardsSection
+  variant="timeline"
+  title="Recognition"
+  items={[
+    {
+      id: "studio-award",
+      title: "Independent Studio of the Year",
+      organization: "Design Guild",
+      year: 2025,
+      description: "Recognizing thoughtful work and lasting impact.",
+      href: "https://example.com/awards/studio",
+      external: true,
+    },
+  ]}
+/>
+```
+
+## Accessibility and rendering
+
+Award names and organization names remain visible if a logo is absent. Provide useful alt text for informative logo images. Cards use semantic articles, award years are displayed as text, and links remain native anchors. The `logo-wall` variant uses a labeled list. IDs must be unique and stable. The component has no award-provider integration and renders on the server.

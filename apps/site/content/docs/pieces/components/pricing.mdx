@@ -1,0 +1,108 @@
+---
+title: PricingSection
+description: Compose subscription and usage-based SaaS plans with explicit billing options, accessible comparisons, and optional calculators.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`PricingSection` renders the pricing and feature values that you provide. It does not derive prices, apply discounts, or calculate estimates unless you supply a calculator renderer.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  PricingSection,
+  type PricingPlan,
+  type PricingBillingInterval,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each pricing layout has its own preview. The fictional plans include explicit monthly and annual values so the billing control can be exercised interactively.
+
+import { PricingSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/pricing";
+
+<PricingSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `PricingVariant` | Selects one of fifteen compositions; defaults to `cards`. |
+| `plans` | `readonly PricingPlan[]` | Plan data with stable `id` and `name`. |
+| `PricingPlan.prices` | `readonly PricingPlanPrice[]` | Supplied values, optional interval ID, currency, interval label, original amount, and discount content. |
+| `PricingPlan.features` | `readonly PricingFeature[]` | Feature rows with a stable ID, label, and optional inclusion/value data. |
+| `PricingPlan.customPricing` | `ReactNode` | Consumer-provided custom-price content, such as a contact link. |
+| `PricingPlan.usage` | `ReactNode` | Optional usage-based terms or explanation. |
+| `PricingPlan.highlighted` | `boolean` | Marks the plan for featured layouts. |
+| `PricingPlan.cta` | `ReactNode` | Optional plan-specific action. |
+| `billingIntervals` | `readonly PricingBillingInterval[]` | Optional labeled choices with unique IDs. More than one choice renders a native radio group. |
+| `billingInterval` | `string` | Controlled selected interval ID. |
+| `defaultBillingInterval` | `string` | Initial interval for uncontrolled use. |
+| `onBillingIntervalChange` | `(intervalId: string) => void` | Notifies the consumer when an interval changes. |
+| `calculator` | `PricingCalculator` | Optional labeled range control with a consumer-supplied estimate renderer. |
+
+`PricingPlanPrice.amount`, `currency`, `interval`, `originalAmount`, and `discount` are presentation values. The `table` variant renders an accessible table with column and row headers. Empty plan collections render no cards or comparison table.
+
+## Usage
+
+```tsx
+const plans: PricingPlan[] = [
+  {
+    id: "team",
+    name: "Team",
+    prices: [
+      { intervalId: "monthly", currency: "$", amount: 49, interval: "per month" },
+      { intervalId: "annual", currency: "$", amount: 490, interval: "per year" },
+    ],
+    features: [
+      { id: "projects", label: "Projects", value: "Unlimited" },
+      { id: "support", label: "Priority support", included: true },
+    ],
+    highlighted: true,
+    cta: <a href="/signup">Choose Team</a>,
+  },
+];
+
+const billingIntervals: PricingBillingInterval[] = [
+  { id: "monthly", label: "Monthly" },
+  { id: "annual", label: "Annually" },
+];
+
+<PricingSection
+  variant="toggle"
+  title="Choose a plan"
+  plans={plans}
+  billingIntervals={billingIntervals}
+  defaultBillingInterval="monthly"
+/>;
+```
+
+### Explicit calculator logic
+
+The `slider` variant presents a compact range control; `calculator` also renders `renderEstimate`. The component never supplies calculation logic. This example deliberately supplies its own estimate function:
+
+```tsx
+<PricingSection
+  variant="calculator"
+  plans={plans}
+  calculator={{
+    label: "Monthly events",
+    min: 1000,
+    max: 10000,
+    step: 1000,
+    initialValue: 3000,
+    formatValue: (value) => `${value} events`,
+    renderEstimate: (value) => <p>Example estimate: ${(value / 1000) * 8} per month.</p>,
+  }}
+/>;
+```
+
+Invalid or duplicate billing interval IDs and invalid calculator bounds throw an explicit error. Price conversion and discount math are never inferred from plan data.
+
+## Accessibility
+
+Billing choices use a labeled native radio group with keyboard behavior. The comparison table uses a caption and scoped headers, and its horizontal overflow area can receive keyboard focus. Calculator controls use an associated label and output; consumers remain responsible for accessible names and destinations in CTA content.

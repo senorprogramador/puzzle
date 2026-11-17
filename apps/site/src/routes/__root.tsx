@@ -192,6 +192,7 @@ function RootDocument({
           theme="light"
           fonts={fonts}
           fontSource="local"
+          fontPreload={false}
           components={{
             link: {
               component: TanStackLink,

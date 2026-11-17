@@ -1,7 +1,11 @@
 "use client";
 
 import {
+  createContext,
+  startTransition,
+  Suspense,
   useCallback,
+  useContext,
   useEffect,
   useId,
   useLayoutEffect,
@@ -24,12 +28,25 @@ import {
 } from "@puzzle-ui/theme/scope-context";
 
 import { Background } from "../../layout/background";
+import { CircularProgress } from "../../data-display/progress/circular-progress";
 import { highlightCode } from "./highlight";
 
 import "./preview.css";
 
 type PreviewDevice = "mobile" | "tablet" | "desktop";
 type PreviewTab = "preview" | "code";
+type PreviewLoading = "eager" | "lazy";
+
+type PreviewProviderProps = {
+  children: ReactNode;
+  loading: PreviewLoading;
+};
+
+const PreviewLoadingContext = createContext<PreviewLoading>("eager");
+
+const PreviewProvider = ({ children, loading }: PreviewProviderProps) => (
+  <PreviewLoadingContext value={loading}>{children}</PreviewLoadingContext>
+);
 
 type DeviceConfig = {
   label: string;
@@ -66,6 +83,8 @@ type PreviewProps = {
   justify?: PreviewJustify;
   /** Hides the device selector. The default device is still used. */
   hideDevices?: boolean;
+  /** Lazy previews mount near the viewport after page load and reserve device height. */
+  loading?: PreviewLoading;
 };
 
 const PREVIEW_DEVICES: Record<PreviewDevice, DeviceConfig> = {
@@ -136,7 +155,10 @@ const Preview = ({
   align = "center",
   justify = "center",
   hideDevices = false,
+  loading: loadingProp,
 }: PreviewProps) => {
+  const defaultLoading = useContext(PreviewLoadingContext);
+  const loading = loadingProp ?? defaultLoading;
   const generatedId = useId();
   const frameRootId = `${generatedId}-root`;
   const previewTabId = `${generatedId}-tab-preview`;
@@ -157,13 +179,17 @@ const Preview = ({
   const [copied, setCopied] = useState(false);
   const [contentHeight, setContentHeight] = useState(PREVIEW_DEVICES.mobile.height);
   const [contentMeasured, setContentMeasured] = useState(false);
+  const [shouldRender, setShouldRender] = useState(loading === "eager");
+  const [frameReady, setFrameReady] = useState(false);
+  const [frameError, setFrameError] = useState(false);
+  const [content, setContent] = useState<HTMLDivElement | null>(null);
 
-  const contentRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const styleClonesRef = useRef(new Map<Element, HTMLElement>());
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const config = PREVIEW_DEVICES[device];
-  const fitsContent = height === undefined && fit === "content";
+  const fitsContent = height === undefined && fit === "content" && loading !== "lazy";
   const frameHeight = height ?? (fitsContent ? contentHeight : config.height);
   // Keep the content's natural height in the server render until the iframe is measured.
   const showPlaceholder = fitsContent && !contentMeasured;
@@ -172,6 +198,59 @@ const Preview = ({
   const [desktopControlsVisible, setDesktopControlsVisible] = useState(true);
   const sectionRef = useRef<HTMLElement>(null);
   const isKeyboardNavigation = useRef(false);
+
+  useEffect(() => {
+    if (shouldRender) return;
+
+    if (loading === "eager") {
+      setShouldRender(true);
+      return;
+    }
+
+    const section = sectionRef.current;
+    if (!section) return;
+
+    let nearViewport = false;
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const cancel = () => {
+      if (idleId !== undefined) window.cancelIdleCallback(idleId);
+      clearTimeout(timeoutId);
+      idleId = undefined;
+      timeoutId = undefined;
+    };
+    const schedule = () => {
+      cancel();
+      if (!nearViewport || document.readyState !== "complete") return;
+
+      const mount = () => startTransition(() => setShouldRender(true));
+      if (typeof window.requestIdleCallback === "function") {
+        idleId = window.requestIdleCallback(mount, { timeout: 1000 });
+      } else {
+        timeoutId = setTimeout(mount, 0);
+      }
+    };
+    const observer = typeof IntersectionObserver === "undefined"
+      ? undefined
+      : new IntersectionObserver(([entry]) => {
+          nearViewport = entry?.isIntersecting ?? false;
+          schedule();
+        }, { rootMargin: "200px" });
+
+    if (observer) {
+      observer.observe(section);
+    } else {
+      nearViewport = true;
+      schedule();
+    }
+    window.addEventListener("load", schedule);
+
+    return () => {
+      cancel();
+      observer?.disconnect();
+      window.removeEventListener("load", schedule);
+    };
+  }, [loading, shouldRender]);
 
   useEffect(() => {
     const query = window.matchMedia(`(min-width: ${BREAKPOINTS.desktop}px)`);
@@ -259,25 +338,37 @@ const Preview = ({
 
     const frameHead = frameDocument.head;
 
-    frameHead
-      .querySelectorAll("[data-puzzle-preview-style]")
-      .forEach((element) => element.remove());
+    const sourceStyles = document.querySelectorAll(
+      [
+        "head link[rel='stylesheet']",
+        "head style",
+        "style[data-puzzle-theme]",
+        "style[data-puzzle-theme-scope-style]",
+      ].join(", "),
+    );
+    const nextClones = new Map<Element, HTMLElement>();
+    let previousClone: HTMLElement | null = null;
 
-    document
-      .querySelectorAll(
-        [
-          "head link[rel='stylesheet']",
-          "head style",
-          "style[data-puzzle-theme]",
-          "style[data-puzzle-theme-scope-style]",
-        ].join(", "),
-      )
-      .forEach((element) => {
-        const clone = element.cloneNode(true) as HTMLElement;
+    sourceStyles.forEach((element) => {
+      const candidate = element.cloneNode(true) as HTMLElement;
+      candidate.setAttribute("data-puzzle-preview-style", "");
+      const previous = styleClonesRef.current.get(element);
+      const clone = previous?.ownerDocument === frameDocument && previous.isEqualNode(candidate)
+        ? previous
+        : candidate;
+      const insertionPoint = previousClone
+        ? previousClone.nextSibling
+        : frameHead.querySelector("[data-puzzle-preview-style], [data-puzzle-preview-scrollbars]");
 
-        clone.setAttribute("data-puzzle-preview-style", "");
-        frameHead.appendChild(clone);
-      });
+      if (clone !== insertionPoint) frameHead.insertBefore(clone, insertionPoint);
+      if (previous !== clone) previous?.remove();
+      nextClones.set(element, clone);
+      previousClone = clone;
+    });
+    styleClonesRef.current.forEach((clone, source) => {
+      if (!nextClones.has(source)) clone.remove();
+    });
+    styleClonesRef.current = nextClones;
 
     const sourceRoot = document.documentElement;
     const targetRoot = frameDocument.documentElement;
@@ -323,9 +414,10 @@ const Preview = ({
 
     previewRoot?.style.removeProperty("min-height");
 
-    const scrollbarStyle = frameDocument.createElement("style");
+    if (frameHead.querySelector("[data-puzzle-preview-scrollbars]")) return;
 
-    scrollbarStyle.setAttribute("data-puzzle-preview-style", "");
+    const scrollbarStyle = frameDocument.createElement("style");
+    scrollbarStyle.setAttribute("data-puzzle-preview-scrollbars", "");
     scrollbarStyle.textContent = `
       html,
       body {
@@ -345,21 +437,22 @@ const Preview = ({
   }, [frameRootId]);
 
   useEffect(() => {
+    if (!frameRoot) return;
+
     const isStyleNode = (node: Node) =>
       node instanceof Element &&
       (node.matches("style, link[rel='stylesheet']") ||
         node.querySelector("style, link[rel='stylesheet']") !== null);
 
-    const headObserver = new MutationObserver(syncStyles);
-
-    headObserver.observe(document.head, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-      attributes: true,
-    });
-
-    const bodyObserver = new MutationObserver((mutations) => {
+    let syncId: number | undefined;
+    const scheduleSync = () => {
+      if (syncId !== undefined) return;
+      syncId = requestAnimationFrame(() => {
+        syncId = undefined;
+        syncStyles();
+      });
+    };
+    const handleMutations = (mutations: MutationRecord[]) => {
       const affectsStyles = mutations.some((mutation) => {
         const target =
           mutation.target instanceof Element
@@ -367,18 +460,25 @@ const Preview = ({
             : mutation.target.parentElement;
 
         return (
-          target?.closest(
-            "style[data-puzzle-theme], style[data-puzzle-theme-scope-style]",
-          ) != null ||
+          target?.closest("style, link[rel='stylesheet']") != null ||
           Array.from(mutation.addedNodes).some(isStyleNode) ||
           Array.from(mutation.removedNodes).some(isStyleNode)
         );
       });
 
       if (affectsStyles) {
-        syncStyles();
+        scheduleSync();
       }
+    };
+    const headObserver = new MutationObserver(handleMutations);
+    headObserver.observe(document.head, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+      attributes: true,
     });
+
+    const bodyObserver = new MutationObserver(handleMutations);
 
     bodyObserver.observe(document.body, {
       childList: true,
@@ -391,8 +491,9 @@ const Preview = ({
     return () => {
       headObserver.disconnect();
       bodyObserver.disconnect();
+      if (syncId !== undefined) cancelAnimationFrame(syncId);
     };
-  }, [syncStyles]);
+  }, [frameRoot, syncStyles]);
 
   const initializeFrame = useCallback(() => {
     const frameDocument = iframeRef.current?.contentDocument;
@@ -405,12 +506,10 @@ const Preview = ({
   }, [frameRootId, syncStyles]);
 
   useEffect(() => {
-    initializeFrame();
-  }, [initializeFrame]);
+    if (shouldRender) initializeFrame();
+  }, [initializeFrame, shouldRender]);
 
   useIsomorphicLayoutEffect(() => {
-    const content = contentRef.current;
-
     if (!fitsContent || !frameRoot || !content || activeTab !== "preview") return;
 
     const measure = () => {
@@ -441,7 +540,54 @@ const Preview = ({
       observer.disconnect();
       mutations.disconnect();
     };
-  }, [activeTab, fitsContent, frameRoot]);
+  }, [activeTab, content, fitsContent, frameRoot]);
+
+  useEffect(() => {
+    if (!content) return;
+
+    const frameDocument = content.ownerDocument;
+    let cancelled = false;
+    let paintId: number | undefined;
+    let revision = 0;
+    const reportError = (error: unknown) => {
+      if (cancelled) return;
+      console.error("Unable to load component preview.", error);
+      setFrameError(true);
+    };
+    const checkReady = () => {
+      const currentRevision = ++revision;
+      if (paintId !== undefined) cancelAnimationFrame(paintId);
+      const links = frameDocument.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']");
+      if (Array.from(links).some((link) => !link.sheet)) return;
+
+      Promise.resolve(frameDocument.fonts?.ready).then(() => {
+        if (cancelled || revision !== currentRevision) return;
+        paintId = requestAnimationFrame(() => setFrameReady(true));
+      }).catch(reportError);
+    };
+    const handleError = (event: Event) => {
+      const link = Array.from(
+        frameDocument.querySelectorAll<HTMLLinkElement>("link[rel='stylesheet']"),
+      ).find((element) => element === event.target);
+      if (link) {
+        reportError(new Error(`Unable to load preview stylesheet: ${link.href}`));
+      }
+    };
+    // Theme changes and HMR can replace stylesheet links before they finish loading.
+    const observer = new MutationObserver(checkReady);
+    observer.observe(frameDocument.head, { childList: true, subtree: true, attributes: true, characterData: true });
+    frameDocument.head.addEventListener("load", checkReady, true);
+    frameDocument.head.addEventListener("error", handleError, true);
+    checkReady();
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      frameDocument.head.removeEventListener("load", checkReady, true);
+      frameDocument.head.removeEventListener("error", handleError, true);
+      if (paintId !== undefined) cancelAnimationFrame(paintId);
+    };
+  }, [content]);
 
   const handleCopyCode = useCallback(async () => {
     if (code === undefined) return;
@@ -479,7 +625,7 @@ const Preview = ({
 
   const frameStyle: CSSProperties = {
     height: fitsContent ? frameHeight : "var(--_puzzle-preview-device-height)",
-    visibility: showPlaceholder || !deviceResolved ? "hidden" : undefined,
+    visibility: showPlaceholder || !deviceResolved || !frameReady ? "hidden" : undefined,
   };
 
   const contentStyle: CSSProperties = {
@@ -626,20 +772,25 @@ const Preview = ({
         )}
       </div>
 
-      <PreviewBackground {...panelProps} className="puzzle-preview__panel">
+      <PreviewBackground
+        {...panelProps}
+        className="puzzle-preview__panel"
+        aria-busy={activeTab === "preview" && !frameReady && !frameError}
+      >
         <div
           className="puzzle-preview__stage"
           hidden={activeTab !== "preview"}
         >
           <div className="puzzle-preview__viewport" style={viewportStyle}>
-            <iframe
+            {shouldRender && <iframe
               ref={iframeRef}
               className="puzzle-preview__frame"
               srcDoc={createPreviewDocument(frameRootId)}
               title={`${config.label} component preview`}
               onLoad={initializeFrame}
               style={frameStyle}
-            />
+              loading={loading}
+            />}
 
             {showPlaceholder && (
               <div
@@ -653,20 +804,32 @@ const Preview = ({
               </div>
             )}
 
+            {!frameReady && (
+              <div className="puzzle-preview__loading">
+                {frameError ? (
+                  <span role="alert">Unable to load preview.</span>
+                ) : (
+                  <CircularProgress aria-label="Loading preview" />
+                )}
+              </div>
+            )}
+
             {frameRoot &&
               createPortal(
-                <ThemeScopeProvider
-                  scopeId={themeScope?.scopeId ?? null}
-                  theme={themeScope?.theme ?? "system"}
-                >
-                  <div
-                    ref={contentRef}
-                    className="puzzle-preview__content"
-                    style={contentStyle}
+                <Suspense fallback={null}>
+                  <ThemeScopeProvider
+                    scopeId={themeScope?.scopeId ?? null}
+                    theme={themeScope?.theme ?? "system"}
                   >
-                    {children}
-                  </div>
-                </ThemeScopeProvider>,
+                    <div
+                      ref={setContent}
+                      className="puzzle-preview__content"
+                      style={contentStyle}
+                    >
+                      {children}
+                    </div>
+                  </ThemeScopeProvider>
+                </Suspense>,
                 frameRoot,
               )}
           </div>
@@ -696,7 +859,9 @@ const Preview = ({
 
 export {
   Preview,
+  PreviewProvider,
   type PreviewProps,
+  type PreviewProviderProps,
   type PreviewDevice,
   type PreviewAlign,
   type PreviewJustify,

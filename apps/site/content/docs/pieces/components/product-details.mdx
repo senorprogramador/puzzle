@@ -1,0 +1,93 @@
+---
+title: ProductDetailsSection
+description: Present structured product descriptions, imagery, specifications, selectors, features, comparison data, and caller-supplied availability.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`ProductDetailsSection` presents one product using structured data. It supports description, media, localized prices, feature and specification lists, a consumer-rendered selector slot, availability content, actions, and optional comparison data.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  ProductDetailsSection,
+  type ProductDetailsData,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the twelve variants has a separate preview using a fictional home and kitchen product.
+
+import { ProductDetailsSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/product-details";
+
+<ProductDetailsSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `ProductDetailsVariant` | Selects one of twelve compositions; defaults to `split`. |
+| `product` | `ProductDetailsData` | Product data with stable `id` and `name`. |
+| `product.description` | `ReactNode` | Optional description. |
+| `product.media` | `readonly CommerceImage[]` | Optional images with alternative text. |
+| `product.price` / `compareAtPrice` | `CommerceMoney` | Optional supplied currency values; no discount calculation is performed. |
+| `product.labels` | `readonly ProductGridLabel[]` | Optional consumer-provided product labels. |
+| `product.rating` | `CommerceRating` | Optional supplied rating and count. |
+| `product.availability` | `ReactNode` | Optional retailer-provided availability presentation. |
+| `product.variantSelector` | `ReactNode` | Optional selector slot; the consuming application owns its state and behavior. |
+| `product.features` | `readonly ReactNode[]` | Optional feature list. |
+| `product.specifications` | `readonly ProductSpecification[]` | Optional labeled specification values. |
+| `product.comparison` | `ProductDetailsComparison` | Optional comparison name and explicit row values for the `comparison` variant. |
+| `product.actions` | `ReactNode` | Optional consumer-provided product actions. |
+| `locale` | `string` | BCP 47 locale used for currency formatting; defaults to `en-US`. |
+| Shared section props | Marketing section props | Header, root element, theme, native attributes, and children. |
+
+## Usage
+
+```tsx
+const product: ProductDetailsData = {
+  id: "pour-over",
+  name: "Stoneware Pour-over Set",
+  description: "A hand-finished dripper for a slower morning ritual.",
+  media: [
+    {
+      src: "/products/pour-over.jpg",
+      alt: "Stoneware pour-over set with a ceramic cup",
+    },
+  ],
+  price: { amount: 68, currency: "USD" },
+  availability: <p>Availability copy supplied by the retailer.</p>,
+  variantSelector: (
+    <label>
+      Glaze
+      <select defaultValue="chalk">
+        <option value="chalk">Chalk</option>
+        <option value="sand">Sand</option>
+      </select>
+    </label>
+  ),
+  specifications: [
+    { id: "material", label: "Material", value: "Stoneware and steel" },
+  ],
+};
+
+<ProductDetailsSection
+  variant="tabs"
+  product={product}
+  locale="en-US"
+/>;
+```
+
+`tabs` uses the UI package’s accessible tabs; `accordion` uses its accessible accordion. Comparison rows are rendered exactly as supplied. Availability, selectors, descriptions, and actions are optional and are never inferred from an external service.
+
+## Accessibility
+
+Use descriptive image alternatives, associate native selectors with labels, and ensure action slots have accessible names. Tab and accordion variants use the UI package’s keyboard behavior. Comparison uses a semantic table with scoped headers.
+
+## Data and business logic
+
+The application supplies product data and owns selectors, availability, pricing, and actions. No product lookup, inventory query, purchase, or payment logic is included.

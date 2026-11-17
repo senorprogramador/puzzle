@@ -28,6 +28,41 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/features`,
         },
         {
+          id: "pieces-product-showcase",
+          label: "Product Showcase",
+          href: `${componentsFolder}/product-showcase`,
+        },
+        {
+          id: "pieces-integrations",
+          label: "Integrations",
+          href: `${componentsFolder}/integrations`,
+        },
+        {
+          id: "pieces-use-cases",
+          label: "Use Cases",
+          href: `${componentsFolder}/use-cases`,
+        },
+        {
+          id: "pieces-security",
+          label: "Security",
+          href: `${componentsFolder}/security`,
+        },
+        {
+          id: "pieces-pricing",
+          label: "Pricing",
+          href: `${componentsFolder}/pricing`,
+        },
+        {
+          id: "pieces-code-showcase",
+          label: "Code Showcase",
+          href: `${componentsFolder}/code-showcase`,
+        },
+        {
+          id: "pieces-roadmap",
+          label: "Roadmap",
+          href: `${componentsFolder}/roadmap`,
+        },
+        {
           id: "pieces-benefits",
           label: "Benefits",
           href: `${componentsFolder}/benefits`,
@@ -61,6 +96,119 @@ const components: TreeViewItem = {
           id: "pieces-comparison",
           label: "Comparison",
           href: `${componentsFolder}/comparison`,
+        },
+      ],
+    },
+    {
+      id: "pieces-commerce",
+      label: "Commerce & Retail",
+      children: [
+        {
+          id: "pieces-product-grid",
+          label: "Product Grid",
+          href: `${componentsFolder}/product-grid`,
+        },
+        {
+          id: "pieces-categories",
+          label: "Categories",
+          href: `${componentsFolder}/categories`,
+        },
+        {
+          id: "pieces-product-gallery",
+          label: "Product Gallery",
+          href: `${componentsFolder}/product-gallery`,
+        },
+        {
+          id: "pieces-cart-summary",
+          label: "Cart Summary",
+          href: `${componentsFolder}/cart-summary`,
+        },
+        {
+          id: "pieces-product-details",
+          label: "Product Details",
+          href: `${componentsFolder}/product-details`,
+        },
+        {
+          id: "pieces-commerce-benefits",
+          label: "Commerce Benefits",
+          href: `${componentsFolder}/commerce-benefits`,
+        },
+      ],
+    },
+    {
+      id: "pieces-content",
+      label: "Content & Editorial",
+      children: [
+        {
+          id: "pieces-blog-section",
+          label: "Blog Section",
+          href: `${componentsFolder}/blog-section`,
+        },
+        {
+          id: "pieces-content-section",
+          label: "Content Section",
+          href: `${componentsFolder}/content-section`,
+        },
+        {
+          id: "pieces-gallery-section",
+          label: "Gallery Section",
+          href: `${componentsFolder}/gallery-section`,
+        },
+        {
+          id: "pieces-timeline-section",
+          label: "Timeline Section",
+          href: `${componentsFolder}/timeline-section`,
+        },
+        {
+          id: "pieces-changelog-section",
+          label: "Changelog Section",
+          href: `${componentsFolder}/changelog-section`,
+        },
+      ],
+    },
+    {
+      id: "pieces-business",
+      label: "Business & Corporate",
+      children: [
+        {
+          id: "pieces-about-section",
+          label: "About Section",
+          href: `${componentsFolder}/about-section`,
+        },
+        {
+          id: "pieces-team-section",
+          label: "Team Section",
+          href: `${componentsFolder}/team-section`,
+        },
+        {
+          id: "pieces-services-section",
+          label: "Services Section",
+          href: `${componentsFolder}/services-section`,
+        },
+        {
+          id: "pieces-case-studies-section",
+          label: "Case Studies Section",
+          href: `${componentsFolder}/case-studies-section`,
+        },
+        {
+          id: "pieces-contact-section",
+          label: "Contact Section",
+          href: `${componentsFolder}/contact-section`,
+        },
+        {
+          id: "pieces-careers-section",
+          label: "Careers Section",
+          href: `${componentsFolder}/careers-section`,
+        },
+        {
+          id: "pieces-partners-section",
+          label: "Partners Section",
+          href: `${componentsFolder}/partners-section`,
+        },
+        {
+          id: "pieces-awards-section",
+          label: "Awards Section",
+          href: `${componentsFolder}/awards-section`,
         },
       ],
     },

@@ -7,3 +7,6 @@ export * from "./components/settings";
 export * from "./components/feedback";
 export * from "./components/section";
 export * from "./components/marketing";
+export * from "./components/commerce";
+export * from "./components/content";
+export * from "./components/business";

@@ -1,0 +1,114 @@
+.puzzle-media-frame {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+.puzzle-media-frame__shell {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.puzzle-media-frame__viewport {
+  min-width: 0;
+  overflow: hidden;
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-media-frame__viewport > :is(img, video, iframe, canvas, svg) {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+.puzzle-media-frame[data-frame="none"] .puzzle-media-frame__viewport {
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-media-frame[data-frame="browser"] .puzzle-media-frame__shell {
+  overflow: hidden;
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-media-frame[data-frame="browser"] .puzzle-media-frame__viewport {
+  border: 0;
+  border-radius: 0;
+}
+
+.puzzle-media-frame__browser-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-height: var(--puzzle-space-8, 2rem);
+  padding-inline: var(--puzzle-space-3, 0.75rem);
+  border-block-end: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  color: var(--puzzle-color-text-muted);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-media-frame__browser-dot {
+  width: var(--puzzle-space-2, 0.5rem);
+  height: var(--puzzle-space-2, 0.5rem);
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.puzzle-media-frame__browser-title {
+  overflow: hidden;
+  margin-inline-start: var(--puzzle-space-2, 0.5rem);
+  color: var(--puzzle-color-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.puzzle-media-frame[data-frame="desktop"] .puzzle-media-frame__viewport {
+  aspect-ratio: 16 / 10;
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-media-frame__desktop-stand {
+  display: block;
+  width: 74%;
+  height: var(--puzzle-space-3, 0.75rem);
+  margin-inline: auto;
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-block-start: 0;
+  border-radius: 0 0 var(--puzzle-radius-md, 0.5rem) var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-media-frame[data-frame="mobile"] .puzzle-media-frame__shell {
+  width: 100%;
+  max-width: 20rem;
+  margin-inline: auto;
+  padding: var(--puzzle-space-2, 0.5rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-media-frame[data-frame="mobile"] .puzzle-media-frame__viewport {
+  aspect-ratio: 9 / 19;
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-media-frame[data-frame="mobile"] .puzzle-media-frame__viewport > :is(img, video, iframe, canvas) {
+  height: 100%;
+  object-fit: cover;
+}
+
+.puzzle-media-frame__caption {
+  color: var(--puzzle-color-text-muted);
+}

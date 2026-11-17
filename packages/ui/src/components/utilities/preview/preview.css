@@ -192,6 +192,19 @@
   background: var(--puzzle-color-background, #ffffff);
 }
 
+.puzzle-preview__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--puzzle-space-4, 1rem);
+  text-align: center;
+}
+
+.puzzle-preview__loading .puzzle-circular-progress {
+  max-width: 100%;
+}
+
 .puzzle-preview__content {
   font-family: var(--puzzle-font-family-body1, system-ui, sans-serif);
   font-size: var(--puzzle-font-size-body1, 1rem);
@@ -324,6 +337,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .puzzle-preview__loading .puzzle-circular-progress {
+    animation: none;
+  }
+
   .puzzle-preview__tab,
   .puzzle-preview__device,
   .puzzle-preview__copy {

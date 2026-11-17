@@ -1,0 +1,89 @@
+---
+title: CartSummarySection
+description: Present caller-supplied cart items, quantities, totals, discounts, shipping, and optional checkout actions without order logic.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`CartSummarySection` is a presentation-only summary of values supplied by the application. It does not update quantities, calculate line totals, create orders, or process payment.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  CartSummarySection,
+  type CartSummaryItem,
+  type CartSummaryTotals,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Every variant has an independent preview using a fictional coffee shop’s explicitly supplied items and totals.
+
+import { CartSummarySectionVariantsExample } from "../../../../src/components/doc-examples/pieces/cart-summary";
+
+<CartSummarySectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `CartSummaryVariant` | Selects one of ten compositions; defaults to `card`. |
+| `items` | `readonly CartSummaryItem[]` | Items with unique IDs, names, non-negative integer quantities, and supplied unit prices. |
+| `CartSummaryItem.unitPrice` | `CommerceMoney` | Required per-unit price; it is not multiplied by quantity. |
+| `CartSummaryItem.lineTotal` | `CommerceMoney` | Optional supplied line total; never calculated from quantity. |
+| `CartSummaryItem.image` | `CommerceImage` | Optional image and alternative text. |
+| `CartSummaryItem.description` | `ReactNode` | Optional item detail. |
+| `CartSummaryItem.href` | `string` | Optional item destination. |
+| `totals.subtotal` | `CommerceMoney` | Optional supplied subtotal. |
+| `totals.discounts` | `readonly CartSummaryAdjustment[]` | Optional supplied discount labels and signed amounts. |
+| `totals.shipping` | `CommerceMoney` | Optional supplied shipping amount. |
+| `totals.total` | `CommerceMoney` | Optional supplied total. |
+| `emptyState` | `ReactNode` | Optional empty-cart message; defaults to “Your cart is empty.” |
+| `locale` | `string` | BCP 47 locale used for currency and quantity formatting; defaults to `en-US`. |
+| `actions` | `ReactNode` | Optional consumer-provided action content; the component does not implement checkout. |
+
+Currency values use locale-aware `Intl.NumberFormat`. A discount amount should be passed with the sign that the application wants displayed. If an item or cart is empty, the component does not show supplied totals. Quantities must be non-negative safe integers; zero is displayed as supplied.
+
+## Usage
+
+```tsx
+const items: CartSummaryItem[] = [
+  {
+    id: "coffee",
+    name: "House Blend Coffee",
+    quantity: 2,
+    unitPrice: { amount: 18, currency: "USD" },
+    lineTotal: { amount: 36, currency: "USD" },
+  },
+];
+
+const totals: CartSummaryTotals = {
+  subtotal: { amount: 36, currency: "USD" },
+  discounts: [
+    { id: "welcome", label: "Welcome offer", amount: { amount: -5, currency: "USD" } },
+  ],
+  shipping: { amount: 0, currency: "USD" },
+  total: { amount: 31, currency: "USD" },
+};
+
+<CartSummarySection
+  variant="checkout"
+  items={items}
+  totals={totals}
+  actions={<a href="/checkout">Continue</a>}
+/>;
+```
+
+The sample values are internally consistent only because the application supplied them that way; the component does not verify or derive totals.
+
+## Accessibility
+
+Items remain a semantic list, quantities have visible labels, and totals use definition-list semantics. Empty content is announced with a status role. Supplied links and actions should have meaningful accessible names.
+
+## Data and business logic
+
+This component is not a cart engine. It does not mutate items, change quantity, calculate subtotal/discount/shipping/tax, validate stock, submit orders, or handle payment.

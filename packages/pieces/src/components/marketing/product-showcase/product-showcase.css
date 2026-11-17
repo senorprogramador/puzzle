@@ -1,0 +1,280 @@
+.puzzle-product-showcase__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--puzzle-space-6, 1.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-product-showcase__item {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-4, 1rem);
+  min-width: 0;
+}
+
+.puzzle-product-showcase__copy h3,
+.puzzle-product-showcase__copy p,
+.puzzle-product-showcase__carousel-position {
+  margin: 0;
+}
+
+.puzzle-product-showcase__copy p {
+  margin-block-start: var(--puzzle-space-2, 0.5rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-product-showcase__action {
+  margin-block-start: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-product-showcase__media {
+  min-width: 0;
+}
+
+.puzzle-product-showcase__annotations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-2, 0.5rem);
+  margin: var(--puzzle-space-3, 0.75rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-product-showcase__annotations details {
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-product-showcase__annotations summary {
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  cursor: pointer;
+}
+
+.puzzle-product-showcase__annotations details p {
+  margin: 0;
+  padding: 0 var(--puzzle-space-3, 0.75rem) var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-product-showcase__tabs {
+  width: 100%;
+}
+
+.puzzle-product-showcase__carousel {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-product-showcase__carousel-slide {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-product-showcase__carousel-position {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-product-showcase__carousel-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-product-showcase__carousel-controls button {
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-product-showcase__carousel-controls button:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-product-showcase__carousel-controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.puzzle-product-showcase__sticky-layout,
+.puzzle-product-showcase__device-stack,
+.puzzle-product-showcase__layered {
+  display: grid;
+  gap: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-product-showcase__sticky-media {
+  min-width: 0;
+}
+
+.puzzle-product-showcase__device-stack-media {
+  display: grid;
+  justify-items: center;
+  gap: var(--puzzle-space-4, 1rem);
+  min-width: 0;
+}
+
+.puzzle-product-showcase__layers {
+  display: grid;
+  align-items: center;
+  min-width: 0;
+}
+
+.puzzle-product-showcase__layer {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.puzzle-product-showcase__layer:nth-child(2) {
+  transform: translate(var(--puzzle-space-4, 1rem), var(--puzzle-space-4, 1rem)) scale(0.94);
+}
+
+.puzzle-product-showcase__layer:nth-child(3) {
+  transform: translate(calc(var(--puzzle-space-4, 1rem) * -1), calc(var(--puzzle-space-4, 1rem) * -1)) scale(0.88);
+}
+
+.puzzle-product-showcase__layer:not(:first-child) {
+  opacity: 0.88;
+}
+
+.puzzle-product-showcase__layer:first-child {
+  position: relative;
+  z-index: 1;
+}
+
+.puzzle-product-showcase[data-variant="split"] .puzzle-product-showcase__item {
+  align-items: center;
+}
+
+.puzzle-product-showcase[data-variant="centered"] .puzzle-product-showcase__item {
+  text-align: center;
+}
+
+.puzzle-product-showcase[data-variant="centered"] .puzzle-product-showcase__media {
+  width: min(100%, 56rem);
+  margin-inline: auto;
+}
+
+.puzzle-product-showcase[data-variant="browser"] .puzzle-product-showcase__list,
+.puzzle-product-showcase[data-variant="desktop"] .puzzle-product-showcase__list {
+  grid-template-columns: 1fr;
+}
+
+.puzzle-product-showcase[data-variant="mobile"] .puzzle-product-showcase__item {
+  justify-items: center;
+}
+
+.puzzle-product-showcase[data-variant="device-stack"] .puzzle-product-showcase__device-stack-media > :nth-child(2) {
+  transform: translateX(var(--puzzle-space-5, 1.25rem));
+}
+
+.puzzle-product-showcase[data-variant="device-stack"] .puzzle-product-showcase__device-stack-media > :nth-child(3) {
+  transform: translateX(calc(var(--puzzle-space-5, 1.25rem) * -1));
+}
+
+.puzzle-product-showcase[data-variant="gallery"] .puzzle-product-showcase__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+}
+
+.puzzle-product-showcase[data-variant="gallery"] .puzzle-product-showcase__item {
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-product-showcase[data-variant="sticky"] .puzzle-product-showcase__list {
+  gap: var(--puzzle-space-8, 2rem);
+}
+
+.puzzle-product-showcase[data-variant="sticky"] .puzzle-product-showcase__list h3 {
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-product-showcase[data-variant="bento"] .puzzle-product-showcase__item {
+  height: 100%;
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-product-showcase[data-variant="full-width"] .puzzle-product-showcase__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+}
+
+.puzzle-product-showcase[data-variant="layered"] .puzzle-product-showcase__layers {
+  min-height: 16rem;
+}
+
+.puzzle-product-showcase[data-variant="editorial"] .puzzle-product-showcase__list {
+  gap: var(--puzzle-space-8, 2rem);
+}
+
+.puzzle-product-showcase[data-variant="editorial"] .puzzle-product-showcase__item {
+  align-items: end;
+}
+
+.puzzle-product-showcase[data-variant="video"] .puzzle-product-showcase__media :is(video, iframe) {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: auto;
+}
+
+.puzzle-product-showcase[data-variant="interactive"] .puzzle-product-showcase__annotations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+}
+
+@media (min-width: 36rem) {
+  .puzzle-product-showcase[data-variant="gallery"] .puzzle-product-showcase__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 48rem) {
+  .puzzle-product-showcase[data-variant="split"] .puzzle-product-showcase__item,
+  .puzzle-product-showcase[data-variant="editorial"] .puzzle-product-showcase__item {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .puzzle-product-showcase[data-variant="bento"] .puzzle-product-showcase__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .puzzle-product-showcase[data-variant="bento"] li[data-featured="true"] {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .puzzle-product-showcase[data-variant="sticky"] .puzzle-product-showcase__sticky-layout,
+  .puzzle-product-showcase[data-variant="device-stack"] .puzzle-product-showcase__device-stack,
+  .puzzle-product-showcase[data-variant="layered"] .puzzle-product-showcase__layered {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
+
+  .puzzle-product-showcase[data-variant="sticky"] .puzzle-product-showcase__sticky-media {
+    position: sticky;
+    inset-block-start: var(--puzzle-space-4, 1rem);
+  }
+
+  .puzzle-product-showcase[data-variant="device-stack"] .puzzle-product-showcase__device-stack-media {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-product-showcase *,
+  .puzzle-product-showcase *::before,
+  .puzzle-product-showcase *::after {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
+}

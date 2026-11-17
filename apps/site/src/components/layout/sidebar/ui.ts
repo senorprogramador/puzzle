@@ -72,6 +72,11 @@ const dataDisplay: TreeViewItem = {
       href: `${folder}/data-display/image-box`,
     },
     {
+      id: "ui-media-frame",
+      label: "Media Frame",
+      href: `${folder}/data-display/media-frame`,
+    },
+    {
       id: "ui-paper",
       label: "Paper",
       href: `${folder}/data-display/paper`,

@@ -179,6 +179,36 @@ try {
 
   assert.equal((await fetch(`${origin}/docs/getting-started`)).status, 200);
   browser = await chromium.launch();
+  for (const component of [undefined, "code-showcase", "product-showcase"]) {
+    const path = component ? `/docs/pieces/components/${component}` : "/docs/getting-started";
+    const page = await browser.newPage();
+    await page.route("**/*", (route) =>
+      new URL(route.request().url()).origin === origin ? route.continue() : route.abort(),
+    );
+    await page.goto(`${origin}${path}`, { waitUntil: "networkidle" });
+    const assets = await page.evaluate(() =>
+      performance.getEntriesByType("resource").map((entry) => new URL(entry.name).pathname),
+    );
+    for (const isolated of ["code-showcase", "product-showcase", "pricing", "date-picker"]) {
+      const matches = assets.filter((asset) =>
+        new RegExp(`/assets/${isolated}[-.]`).test(asset),
+      );
+      if (isolated === component) {
+        assert.ok(matches.some((asset) => asset.endsWith(".css")), `${path}: required example styles load`);
+        assert.ok(matches.some((asset) => asset.endsWith(".js")), `${path}: required example JavaScript loads`);
+      } else {
+        assert.deepEqual(matches, [], `${path}: does not load unused ${isolated} JavaScript or CSS`);
+      }
+    }
+    if (!component) {
+      await page.locator('a[href="/docs/ui/actions/button"]').first().click();
+      await page.waitForURL((url) => url.pathname === "/docs/ui/actions/button");
+      const preview = page.locator(".puzzle-preview").first();
+      await preview.scrollIntoViewIfNeeded();
+      await preview.frameLocator("iframe").getByRole("button", { name: "Click me", exact: true }).waitFor();
+    }
+    await page.close();
+  }
   const noJsContext = await browser.newContext({ javaScriptEnabled: false });
   const noJsPage = await noJsContext.newPage();
   await noJsPage.goto(origin);
@@ -382,7 +412,7 @@ try {
     await page.waitForURL((url) => url.pathname === path);
     await check(path);
   }
-  console.log("Hydration, navigation, history, reload, metadata and JSON-LD checks passed.");
+  console.log("Page-scoped assets, hydration, navigation, history, reload, metadata and JSON-LD checks passed.");
 } finally {
   await browser?.close();
   if (server.exitCode === null && server.signalCode === null) {

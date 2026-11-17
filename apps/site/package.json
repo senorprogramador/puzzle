@@ -17,10 +17,11 @@
     "test:sitemap": "bun test src/lib/seo-routes.test.ts",
     "test:seo:smoke": "bun scripts/validate-seo-endpoints.ts",
     "test:catalog": "bun test src/components/component-catalog.test.ts",
+    "test:mdx": "bun test src/lib/mdx-imports.test.ts",
     "test:tutorials": "bun scripts/validate-tutorials.ts",
     "test:hydration": "bun scripts/validate-hydration.ts",
     "test:preview-layout": "bun scripts/validate-preview-layout.ts",
-    "validate:seo": "bun run test:seo && bun run test:catalog && bun run test:tutorials && bun run typecheck && bun run build && bun run test:hydration && bun run test:seo:smoke",
+    "validate:seo": "bun run test:seo && bun run test:catalog && bun run test:mdx && bun run test:tutorials && bun run typecheck && bun run build && bun run test:hydration && bun run test:seo:smoke",
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {

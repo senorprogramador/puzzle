@@ -1,0 +1,60 @@
+---
+title: PartnersSection
+description: Introduce partner organizations with logos, descriptions, categories, featured placements, and website links.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+import { PartnersSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/business-sections";
+
+`PartnersSection` uses the reusable UI logo collection to present a network of collaborators. Partner names remain visible when logo data is missing.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  PartnersSection,
+  type BusinessPartner,
+  type PartnersSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+All ten variants have an individual preview, with fictional partners from creative, technology, and hospitality contexts.
+
+<PartnersSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `PartnersSectionVariant` | `grid` (default), `logo-wall`, `featured`, `categories`, `cards`, `network`, `split`, `carousel`, `ecosystem`, or `minimal`. |
+| `items` | `readonly BusinessPartner[]` | Partners with unique IDs and names; optional image, description, category, website link, and featured state. |
+| `featuredPartner` | `BusinessPartner \| string` | Optional partner object or ID moved to the lead position. |
+| `BusinessPartner.external` | `boolean` | Opens a partner website in a new context with `noopener noreferrer`. |
+| Shared section props | `MarketingSectionBaseProps` | Heading, actions, root element, native section attributes, and children. |
+
+## Usage
+
+```tsx
+<PartnersSection
+  variant="categories"
+  title="Our partners"
+  items={[
+    {
+      id: "fieldwork",
+      name: "Fieldwork Studio",
+      description: "Independent brand and digital studio.",
+      category: "Creative",
+      href: "https://example.com/fieldwork",
+      external: true,
+    },
+  ]}
+/>
+```
+
+## Accessibility and rendering
+
+Logo collections are labeled lists. Supply informative alternative text for logos; when an image is unavailable, the partner name is shown instead. The carousel variant is keyboard-focusable and uses native horizontal scrolling. Links are native anchors and external links are protected with `noopener noreferrer`. The component does not fetch partner data and renders on the server.

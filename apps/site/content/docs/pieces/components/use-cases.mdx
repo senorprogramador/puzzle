@@ -1,0 +1,76 @@
+---
+title: UseCasesSection
+description: Explain SaaS workflows with audience details, benefits, media, actions, and optional category filters.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`UseCasesSection` describes the teams, industries, and workflows a product serves. Each item can include a summary, benefits, media, category, persona or industry label, and a consumer-provided action.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  UseCasesSection,
+  type UseCaseItem,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the thirteen variants is previewed independently with fictional product, operations, and customer-success workflows.
+
+import { UseCasesSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/use-cases";
+
+<UseCasesSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `UseCasesVariant` | Selects one of thirteen compositions; defaults to `grid`. |
+| `items` | `readonly UseCaseItem[]` | Use-case content with stable `id` and required `title`. |
+| `UseCaseItem.persona` | `string` | Optional audience persona shown in persona layouts and searched when filtering. |
+| `UseCaseItem.industry` | `string` | Optional industry label shown in industry layouts and searched when filtering. |
+| `UseCaseItem.category` | `string` | Optional grouping and filter value. |
+| `UseCaseItem.benefits` | `readonly ReactNode[]` | Optional benefit list. |
+| `UseCaseItem.media` | `ReactNode` | Optional image, video, or other consumer-provided media. |
+| `UseCaseItem.action` | `ReactNode` | Optional action supplied by the consumer. |
+| `UseCaseItem.featured` | `boolean` | Emphasizes an item in featured layouts. |
+| `filterable` | `boolean` | Adds a labeled search field and category select when categories exist. Defaults to `false`. |
+| Shared section props | Marketing section props | Semantic root element, header, theme, native attributes, and children. |
+
+## Usage
+
+```tsx
+const useCases: UseCaseItem[] = [
+  {
+    id: "launch",
+    title: "Plan a product launch",
+    persona: "Product manager",
+    industry: "Software",
+    category: "Planning",
+    description: "Coordinate decisions, owners, and milestones.",
+    benefits: ["Align work across teams", "Make dependencies visible"],
+    media: <img src="/launch.png" alt="Product launch plan with milestones" />,
+    action: <a href="/workflows/launch">Explore the workflow</a>,
+  },
+];
+
+<UseCasesSection
+  variant="tabs"
+  title="Workflows by team"
+  items={useCases}
+  filterable
+/>;
+```
+
+Filtering searches the title, category, persona, industry, and plain-text description. Rich React descriptions are not searched. When no items match, the section presents a status message instead of an empty list.
+
+## Accessibility
+
+Tabs use the keyboard-operable UI `Tabs` primitive. Search and category controls have visible labels, carousel content is a native horizontal scroller, and benefit lists retain list semantics. Supply meaningful alternative text for informative media and ensure action nodes have accessible names.
+
+The section does not infer a product's target audience or outcomes; all claims and actions come from the supplied data.

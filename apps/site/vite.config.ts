@@ -1,4 +1,5 @@
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 import { createLogger, defineConfig, type Plugin } from "vite";
 import { nitro } from "nitro/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
@@ -78,6 +79,13 @@ export default defineConfig({
   },
   resolve: {
     tsconfigPaths: true,
+    // MDX importers must share source modules and contexts with TSX importers.
+    alias: ["ui", "pieces", "icons"].map((name) => ({
+      find: `@puzzle-ui/${name}`,
+      replacement: fileURLToPath(
+        new URL(`../../packages/${name}/src`, import.meta.url),
+      ),
+    })),
     noExternal: [
       "fumadocs-core",
       "fumadocs-ui",
@@ -87,11 +95,61 @@ export default defineConfig({
   },
   build: {
     cssMinify: "esbuild",
+
+    rolldownOptions: {
+      output: {
+        // Keep shared source bounded without pulling component CSS out of page assets.
+        groups: [
+          {
+            name: "schemaorg",
+            test: /schemaorg-chunks[\\/]/,
+            maxSize: 400 * 1024,
+          },
+          {
+            name: "puzzle-pieces",
+            test: (id) =>
+              /packages[\\/]pieces[\\/]src[\\/]/.test(id) &&
+              !/\.css(?:\?.*)?$/.test(id),
+            entriesAware: true,
+            includeDependenciesRecursively: false,
+            maxSize: 350 * 1024,
+          },
+          {
+            name: "puzzle-ui",
+            test: (id) =>
+              /packages[\\/]ui[\\/]src[\\/]/.test(id) &&
+              !/\.css(?:\?.*)?$/.test(id),
+            entriesAware: true,
+            includeDependenciesRecursively: false,
+            maxSize: 350 * 1024,
+          },
+          {
+            name: "puzzle-icons",
+            test: (id) =>
+              /packages[\\/]icons[\\/]src[\\/]/.test(id) &&
+              !/\.css(?:\?.*)?$/.test(id),
+            entriesAware: true,
+            maxSize: 350 * 1024,
+          },
+          {
+            name: "site-doc-examples",
+            test: (id) =>
+              /apps[\\/]site[\\/]src[\\/]components[\\/]doc-examples[\\/]/.test(
+                id,
+              ) && !/\.css(?:\?.*)?$/.test(id),
+            entriesAware: true,
+            includeDependenciesRecursively: false,
+            maxSize: 350 * 1024,
+          },
+        ],
+      },
+    },
   },
   plugins: [
     routerCoreResolution,
     tanstackStart(),
     nitro({
+      compressPublicAssets: true,
       routeRules: {
         ...Object.fromEntries([
           ...cachedForADay.map((path) => [path, dayCache]),

@@ -1,0 +1,78 @@
+---
+title: IntegrationsSection
+description: Organize SaaS integrations by category, highlight key connections, and optionally filter the directory.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`IntegrationsSection` displays integration names, consumer-supplied logos, descriptions, categories, and links. Its variants include categorized directories, featured integrations, relationship diagrams, and a horizontal carousel.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  IntegrationsSection,
+  type IntegrationItem,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each variant has a standalone preview. The examples use fictional SaaS integrations and enable the search and category filters.
+
+import { IntegrationsSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/integrations";
+
+<IntegrationsSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `IntegrationsVariant` | Selects one of twelve compositions; defaults to `grid`. |
+| `items` | `readonly IntegrationItem[]` | Integration data with stable `id` and `name`. |
+| `IntegrationItem.logo` | `ReactNode` | Optional consumer-provided logo or mark. |
+| `IntegrationItem.category` | `string` | Optional category used for grouping and filtering. |
+| `IntegrationItem.description` | `ReactNode` | Optional integration summary. |
+| `IntegrationItem.href` | `string` | Optional link; the component preserves the supplied destination. |
+| `IntegrationItem.featured` | `boolean` | Marks an item for featured layouts. |
+| `filterable` | `boolean` | Adds a labeled search field and, when categories exist, a category select. Defaults to `false`. |
+| `centerLabel` | `ReactNode` | Optional center label for ecosystem and relationship layouts; defaults to `Platform`. |
+| Shared section props | `MarketingSectionBaseProps` | Header, section element, theme, native attributes, and children. |
+
+## Usage
+
+```tsx
+const integrations: IntegrationItem[] = [
+  {
+    id: "relay",
+    name: "Relay Email",
+    logo: <img src="/logos/relay.svg" alt="" />,
+    category: "Messaging",
+    description: "Send project updates to the right channel.",
+    href: "https://example.com/relay",
+  },
+  {
+    id: "beacon",
+    name: "Beacon Analytics",
+    category: "Analytics",
+    description: "Include product events in workspace reports.",
+  },
+];
+
+<IntegrationsSection
+  variant="categorized"
+  title="Connect your stack"
+  items={integrations}
+  filterable
+/>;
+```
+
+Filtering searches the integration name, category, and plain-text descriptions. An empty result announces that no integrations match. If `description` contains rich React content, only the name and category are searchable.
+
+## Accessibility
+
+Search and category controls have visible labels and use native inputs. Linked integrations are native anchors; logo alternatives remain the consumer's responsibility. The carousel is a keyboard-focusable horizontal scroller and does not auto-advance.
+
+All integration content is provided by the caller. The component is server-renderable and does not make network requests or infer integration availability.

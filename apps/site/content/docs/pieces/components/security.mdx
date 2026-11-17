@@ -1,0 +1,77 @@
+---
+title: SecuritySection
+description: Present consumer-supplied security controls, compliance labels, links, metrics, and optional audit information.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+`SecuritySection` provides layouts for security controls, certification records, compliance labels, and trust-center content. It renders only the information supplied by the consumer and does not create, verify, or imply security claims.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  SecuritySection,
+  type SecurityItem,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each variant has a standalone preview. The records are explicitly fictional examples, not claims about Puzzle or another service.
+
+import { SecuritySectionVariantsExample } from "../../../../src/components/doc-examples/pieces/security";
+
+<SecuritySectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `SecurityVariant` | Selects one of twelve compositions; defaults to `grid`. |
+| `items` | `readonly SecurityItem[]` | Consumer-provided security information with stable `id` and `title`. |
+| `SecurityItem.description` | `ReactNode` | Optional explanatory copy. |
+| `SecurityItem.category` | `string` | Optional grouping value for compliance and certification layouts. |
+| `SecurityItem.label` | `ReactNode` | Optional compliance, certification, or status label. |
+| `SecurityItem.value` | `ReactNode` | Optional metric value, rendered in the `metrics` variant. |
+| `SecurityItem.href` | `string` | Optional link to a record or external resource. |
+| `SecurityItem.icon` | `ReactNode` | Optional consumer-provided icon. |
+| `auditInfo` | `ReactNode` | Optional audit details, rendered only by the `audit` variant. |
+| Shared section props | Marketing section props | Header, section element, theme, native attributes, actions, and children. |
+
+## Usage
+
+```tsx
+const securityItems: SecurityItem[] = [
+  {
+    id: "access-policy",
+    title: "Workspace access policy",
+    description: "Describe the controls configured by your organization.",
+    category: "Access",
+    label: "Customer-provided",
+  },
+  {
+    id: "audit-material",
+    title: "Audit documentation",
+    description: "Link the materials your team has reviewed.",
+    href: "https://example.com/security",
+  },
+];
+
+<SecuritySection
+  variant="trust-center"
+  title="Security information"
+  items={securityItems}
+  actions={<a href="https://example.com/trust">Open trust center</a>}
+/>;
+```
+
+For `audit`, pass `auditInfo` only when there is actual content to display. Certification and compliance links remain the supplied destinations; the component does not validate those records.
+
+## Accessibility
+
+Status and compliance text remains visible rather than relying on color alone. Linked items use native anchors, and the cards, checklist, and metric layouts preserve semantic lists. Provide meaningful labels for informative icons and use appropriate link text.
+
+No certifications, audit dates, metrics, or controls are generated as defaults.

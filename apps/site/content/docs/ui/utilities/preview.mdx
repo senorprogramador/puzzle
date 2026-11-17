@@ -3,6 +3,8 @@ title: React Component Preview and Code Examples
 description: Preview React components in isolated iframes with source code and device-size controls. Learn Preview sizing, live examples, code display, and props.
 ---
 
+import { Badge, Button, Preview } from "@puzzle-ui/ui";
+
 Use the React `Preview` component to display live UI examples in an isolated iframe, with optional source code and device-size controls. It is useful for component documentation and responsive demos.
 
 <Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented public API is covered by tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
@@ -80,6 +82,36 @@ It is measured in pixels before scaling.
 
 The code on this page includes the `Preview` wrapper when demonstrating its props; it is not another nested preview.
 
+## Deferred loading
+
+The documentation site defers previews while keeping the surrounding MDX text,
+headings, tables, and structured data in the first server response. A centered
+`CircularProgress` appears until each preview's styles and content are ready.
+Examples mount near the viewport, after the window's `load` event, in an idle
+task with a non-urgent React update. Offscreen examples do not create iframes or
+mount their children until approached.
+
+Use `loading="lazy"` to opt in elsewhere, or set a default for a documentation
+subtree with `PreviewProvider`. The library default remains `"eager"`; an
+individual preview's `loading` prop overrides the provider.
+
+```tsx
+import { Preview, PreviewProvider } from "@puzzle-ui/ui";
+
+<PreviewProvider loading="lazy">
+  <Preview height={240}>
+    <Button>Deferred example</Button>
+  </Preview>
+</PreviewProvider>;
+```
+
+Lazy previews reserve the selected device's height instead of measuring a
+content-fit placeholder. This avoids rendering examples on the server and
+prevents loading-related layout shifts. `height` still overrides the reserved
+height. Content taller than the frame scrolls inside it. Use `loading="eager"`
+when natural content-fit sizing or server-rendered example content is needed.
+Changing tabs does not unmount an initialized example.
+
 ## Padding
 
 `padding` sets the space inside the preview frame, around the content. It defaults to
@@ -143,11 +175,16 @@ At 1024px and wider all three are shown. This does not change the selected devic
 | `align`         | `"start" \| "center" \| "end" \| "stretch"`                         | `"center"`    | Vertical alignment of frame content.                                     |
 | `justify`       | `"start" \| "center" \| "end" \| "between" \| "around" \| "evenly"` | `"center"`    | Horizontal distribution of frame content.                                |
 | `hideDevices`   | `boolean`                                                           | `false`       | Hides the device selector.                                               |
+| `loading`       | `"eager" \| "lazy"`                                                 | Provider or `"eager"` | Lazy loading waits for page load and viewport proximity, and reserves device height unless `height` is set. |
 | `className`     | `string`                                                            | -             | Additional class on the outer section.                                   |
 
 ## Accessibility
 
 Each instance generates its own tab, panel, and iframe-root IDs, so multiple previews can share a page. Preview/Code tabs support arrow-key activation. Device buttons use arrow keys to move focus and Enter or Space to select. Copy feedback is announced through a live region.
+
+Loading previews expose a named progress indicator and mark the panel busy.
+The indicator stops animating when reduced motion is requested. A stylesheet
+loading failure displays an error instead of leaving an indefinite spinner.
 
 **Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.
 

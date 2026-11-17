@@ -1,0 +1,65 @@
+---
+title: CaseStudiesSection
+description: Explain client work with challenge, solution, results, media, metrics, and responsive portfolio layouts.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+import { CaseStudiesSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/business-sections";
+
+`CaseStudiesSection` presents client projects with optional industry context, narrative, imagery, measurable outcomes, and native links. A featured case can be selected explicitly or marked in the data.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  CaseStudiesSection,
+  type BusinessCaseStudy,
+  type CaseStudiesSectionVariant,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each of the thirteen variants has a separate preview, including a hospitality before-and-after example and SaaS outcome metrics.
+
+<CaseStudiesSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `CaseStudiesSectionVariant` | `grid` (default), `featured`, `split`, `masonry`, `carousel`, `editorial`, `metrics`, `before-after`, `cards`, `list`, `portfolio`, `bento`, or `horizontal`. |
+| `items` | `readonly BusinessCaseStudy[]` | Case studies with unique IDs and titles; optional client, industry, challenge, solution, results, image, metrics, and link. |
+| `featuredCase` | `BusinessCaseStudy \| string` | Optional case object or ID promoted to the lead position. |
+| `BusinessCaseStudy.beforeAfter` | `{ before, after }` | Optional pair of editorial images displayed by the `before-after` variant. |
+| `BusinessCaseStudy.external` | `boolean` | Opens the case link in a new browsing context with `noopener noreferrer`. |
+| Shared section props | `MarketingSectionBaseProps` | Heading, actions, root element, native section attributes, and children. |
+
+## Usage
+
+```tsx
+<CaseStudiesSection
+  variant="metrics"
+  title="Selected work"
+  items={[
+    {
+      id: "cedar-house",
+      title: "A more considered guest journey",
+      client: "Cedar House",
+      industry: "Hospitality",
+      challenge: "Connect a fragmented guest experience.",
+      solution: "Unify booking and on-property service.",
+      results: "Increase direct bookings and guest satisfaction.",
+      metrics: [{ id: "bookings", label: "Direct bookings", value: "+28%" }],
+      href: "https://example.com/work/cedar-house",
+      external: true,
+    },
+  ]}
+/>
+```
+
+## Images, accessibility, and rendering
+
+Use descriptive alt text for project images. Missing image sources render an accessible placeholder rather than a broken image. Case studies are semantic articles in a list; challenge, solution, and results use labeled sections, and metrics use a description list. Rails remain keyboard-scrollable and images are lazy-loaded. The component does not fetch case data and renders on the server.

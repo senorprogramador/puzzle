@@ -1,0 +1,72 @@
+---
+title: MediaFrame
+description: Wrap consumer-provided product media in responsive browser, desktop, or mobile device frames.
+---
+
+import { MediaFrame, Preview } from "@puzzle-ui/ui";
+
+`MediaFrame` adds optional browser, desktop, or mobile device chrome around consumer-provided media. It can also render the media without a frame.
+
+## Import
+
+```tsx
+import { MediaFrame, type MediaFrameProps } from "@puzzle-ui/ui";
+```
+
+## Browser frame
+
+Decorative browser controls are hidden from assistive technology. The `title` labels the visual browser bar, while `caption` renders as a semantic figure caption.
+
+<Preview
+  fit="device"
+  code={`\
+<MediaFrame
+  frame="browser"
+  title="Team dashboard"
+  caption="Project overview"
+>
+  <img src="/dashboard.png" alt="Project dashboard with milestones" />
+</MediaFrame>
+`}
+>
+  <MediaFrame
+    frame="browser"
+    title="Team dashboard"
+    caption="Project overview"
+  >
+    <div
+      style={{
+        display: "grid",
+        aspectRatio: "16 / 9",
+        placeItems: "center",
+        background: "var(--puzzle-color-surface-sunken)",
+      }}
+    >
+      Team dashboard preview
+    </div>
+  </MediaFrame>
+</Preview>
+
+## Device frames
+
+Use `frame="desktop"` for a wide screen composition and `frame="mobile"` for a narrow portrait composition. The mobile frame is capped in width and shrinks to fit its container. The component does not crop, load, or generate media for you.
+
+```tsx
+<MediaFrame frame="mobile" caption="Mobile app">
+  <img src="/mobile.png" alt="Mobile view of the project workspace" />
+</MediaFrame>
+```
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `frame` | `"none" \| "browser" \| "desktop" \| "mobile"` | Frame style; defaults to `none`. |
+| `title` | `ReactNode` | Optional browser-bar label. |
+| `caption` | `ReactNode` | Optional semantic `<figcaption>`. |
+| `children` | `ReactNode` | Consumer-provided media content. |
+| `className` | `string` | Optional class name for the figure root. |
+
+## Accessibility
+
+Use informative alternative text for images and captions when useful. Browser chrome and device stands are decorative. The component is presentational and server-renderable.

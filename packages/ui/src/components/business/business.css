@@ -1,0 +1,271 @@
+.puzzle-business-image {
+  display: block;
+  max-width: 100%;
+}
+
+.puzzle-business-image-placeholder {
+  display: grid;
+  min-height: 8rem;
+  place-items: center;
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface);
+  color: var(--puzzle-color-text-muted);
+  text-align: center;
+}
+
+.puzzle-business-profile,
+.puzzle-business-company,
+.puzzle-business-service,
+.puzzle-business-case-study {
+  min-width: 0;
+}
+
+.puzzle-business-profile {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-business-profile__content,
+.puzzle-business-company__content,
+.puzzle-business-service__content,
+.puzzle-business-case-study__content {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-business-profile__name,
+.puzzle-business-company__name,
+.puzzle-business-service h3,
+.puzzle-business-case-study h3,
+.puzzle-business-case-study h4 {
+  margin: 0;
+}
+
+.puzzle-business-profile__name a,
+.puzzle-business-company__name a,
+.puzzle-business-service h3 a,
+.puzzle-business-case-study h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.puzzle-business-profile__name a:hover,
+.puzzle-business-company__name a:hover,
+.puzzle-business-service h3 a:hover,
+.puzzle-business-case-study h3 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.puzzle-business-profile__role,
+.puzzle-business-profile__biography,
+.puzzle-business-company__tagline,
+.puzzle-business-company__description,
+.puzzle-business-service__content p,
+.puzzle-business-case-study__detail p {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-business-social-links,
+.puzzle-business-logo-collection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-business-social-links a,
+.puzzle-business-contact-details a {
+  color: var(--puzzle-color-primary);
+  text-underline-offset: 0.15em;
+}
+
+.puzzle-business-company {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-business-company__logo {
+  width: 4rem;
+  height: 4rem;
+  object-fit: contain;
+}
+
+.puzzle-business-contact-details,
+.puzzle-business-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--puzzle-space-4, 1rem);
+  margin: 0;
+}
+
+.puzzle-business-contact-details__item,
+.puzzle-business-metrics__item {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-business-contact-details dt,
+.puzzle-business-metrics dt {
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-business-contact-details dd,
+.puzzle-business-metrics dd {
+  margin: 0;
+}
+
+.puzzle-business-metrics dd {
+  font-size: var(--puzzle-font-size-headline3, 1.5rem);
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-business-metrics__item p {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-business-logo-collection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  align-items: stretch;
+}
+
+.puzzle-business-logo-collection > li {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+  padding: var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface);
+  text-align: center;
+}
+
+.puzzle-business-logo-collection > li > a {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.puzzle-business-logo-collection > li > a:focus-visible {
+  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-business-logo-collection__image {
+  display: block;
+  max-width: min(100%, 10rem);
+  max-height: 3rem;
+  object-fit: contain;
+}
+
+.puzzle-business-logo-collection__name {
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-business-logo-collection__description {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-business-service {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: var(--puzzle-space-4, 1rem);
+  height: 100%;
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-business-service[data-featured] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-business-service__number {
+  color: var(--puzzle-color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-business-service__media > * {
+  display: block;
+  width: 100%;
+  max-height: 14rem;
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  object-fit: cover;
+}
+
+.puzzle-business-service__pricing {
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-business-service__action {
+  margin-block-start: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-business-case-study {
+  display: grid;
+  overflow: hidden;
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-business-case-study__media > * {
+  display: block;
+  width: 100%;
+}
+
+.puzzle-business-case-study__media img {
+  max-height: 24rem;
+  object-fit: cover;
+}
+
+.puzzle-business-case-study__content {
+  padding: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-business-case-study__meta {
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-business-case-study__detail h4 {
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-business-case-study__metrics {
+  width: 100%;
+  padding-block-start: var(--puzzle-space-3, 0.75rem);
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+}
+
+@media (max-width: 39.99rem) {
+  .puzzle-business-profile,
+  .puzzle-business-company {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

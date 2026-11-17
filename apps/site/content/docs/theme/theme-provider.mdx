@@ -3,6 +3,8 @@ title: Theme Provider
 description: The Theme component injects design token CSS variables, loads fonts, and applies Puzzle's global styles.
 ---
 
+import { Badge } from "@puzzle-ui/ui";
+
 The `Theme` component is the entry point of the theme system. It resolves tokens into CSS custom properties, renders font stylesheet links, preloads local fonts when configured, and provides theme context to Puzzle components.
 
 <Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented `Theme` component API is covered by tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.

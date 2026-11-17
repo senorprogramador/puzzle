@@ -11,3 +11,9 @@ export {
   type UseRovingFocusOptions,
   type UseRovingFocusReturn,
 } from "./use-roving-focus";
+
+export {
+  useListFilter,
+  type UseListFilterOptions,
+  type UseListFilterReturn,
+} from "./use-list-filter";
