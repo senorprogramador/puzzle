@@ -56,8 +56,13 @@ The app bar adapts its navigation to a mobile drawer. Resize the preview to see 
 | `sticky`                      | `boolean`                                                                  | `false`             | Sticky positioning and PageLayout offset integration. |
 | `ariaLabel`                   | `string`                                                                   | `"Main navigation"` | Accessible navigation name.                           |
 | `className`                   | `string`                                                                   | -                   | Root styling hook.                                    |
+| `nonce`                       | `string`                                                                   | -                   | CSP nonce for the initial sticky-offset script and stylesheet. |
 
 Use descriptive destinations and label icon-only actions. Place sticky bars in `PageLayout.Header` to scope their measured layout offset to that page. Make the header region itself sticky (`position: sticky; top: 0`) when it wraps the bar, so the wrapper does not limit its sticky travel.
+
+Sticky bars emit a small inline script and stylesheet with the server-rendered markup. The script measures the rendered bar and sets `--puzzle-sticky-offset` before the following page content paints, without waiting for hydration or estimating the height. After hydration, a resize observer keeps the offset in sync with content and viewport changes. Bars nested in page content do not change the page's offset; standalone bars target the document root.
+
+If your Content Security Policy requires nonces, pass the request's nonce to `AppBar` to authorize both elements. If the script is blocked, the offset is measured after hydration instead.
 
 ## Keyboard behavior
 

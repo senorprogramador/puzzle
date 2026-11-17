@@ -2,8 +2,8 @@
 
 `@puzzle-ui/pieces` contains composed, reusable page sections built on Puzzle UI.
 This document records the E0 architecture audit, E1 shared foundations, and
-the proposed catalog for the upcoming website-section work. The shared
-foundations are implemented; the listed complete sections are not.
+the section catalog. The E1 foundations and the ten E2 Marketing & Conversion
+sections are implemented; the other catalog families remain planned.
 
 ## E1 shared foundations
 
@@ -479,3 +479,35 @@ of E0.
       UI package root README.
 - [x] Added no Core or Hooks APIs, duplicate UI primitives, dependencies, or
       complete website sections.
+
+## E2 Marketing & Conversion sections
+
+The ten E2 families are published from the existing Pieces package root and
+share the E1 section-root and heading contracts. Their family item types remain
+explicit; Accordion, Tabs, Carousel, Button, Rating, and Section are reused
+from UI. No new dependency, Core API, Hook, or competing layout primitive was
+needed.
+
+| Family | Variants | Distinct interaction or content model |
+| --- | ---: | --- |
+| AnnouncementSection | 10 | Dismiss controls, multiple messages, and a live countdown. |
+| LogoCloudSection | 12 | Accessible logo links, groups, and a scrollable carousel/marquee. |
+| FeaturesSection | 17 | Feature items, UI Tabs, and UI Accordion. |
+| BenefitsSection | 12 | Outcome-focused items with optional media and emphasis. |
+| StatsSection | 12 | Values, trends, progress, and reduced-motion-aware counters. |
+| TestimonialsSection | 14 | Attributed quotes, read-only ratings, and keyboard carousel navigation. |
+| CTASection | 16 | Consumer-provided media, actions, and custom content. |
+| FAQSection | 12 | Single/multiple disclosures, categories, local search, and empty states. |
+| HowItWorksSection | 14 | Ordered steps and keyboard-operable carousel navigation. |
+| ComparisonSection | 12 | Semantic tables, responsive scroll viewport, and optional selection. |
+
+Each family has its own component, explicit types, token-based CSS, public
+index, and variant/component tests. Browser tests cover dismissal, disclosure
+and tab keyboard behavior, carousel navigation, comparison selection, reduced
+motion, and narrow/wide layout. Docs include a marketing overview, individual
+API references, and a runnable preview for each named variant.
+
+Consumers own links, application data, forms, persistence, media alternatives,
+and domain behavior. Marquees do not auto-animate; numeric stat animation
+respects `prefers-reduced-motion`. Empty optional collections omit their
+collection markup.

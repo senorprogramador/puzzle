@@ -1,0 +1,105 @@
+.puzzle-comparison__table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-comparison__table-scroll:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-comparison table {
+  min-width: 34rem;
+  width: 100%;
+  border-collapse: collapse;
+  text-align: start;
+}
+
+.puzzle-comparison caption {
+  padding: var(--puzzle-space-3, 0.75rem);
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+  text-align: start;
+}
+
+.puzzle-comparison th,
+.puzzle-comparison td {
+  min-width: 7rem;
+  padding: var(--puzzle-space-3, 0.75rem);
+  border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  vertical-align: top;
+}
+
+.puzzle-comparison th:first-child {
+  min-width: 9rem;
+}
+
+.puzzle-comparison thead th {
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-comparison th p {
+  margin: var(--puzzle-space-2, 0.5rem) 0 0;
+  color: var(--puzzle-color-text-muted);
+  font-weight: normal;
+}
+
+.puzzle-comparison th label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-comparison [data-selected="true"] {
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-comparison__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  align-items: stretch;
+  gap: var(--puzzle-space-5, 1.25rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-comparison__card {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-4, 1rem);
+  height: 100%;
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-comparison__card h3,
+.puzzle-comparison__card p {
+  margin: 0;
+}
+
+.puzzle-comparison__card dl,
+.puzzle-comparison__card dl > div {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-comparison__card dl {
+  margin: 0;
+}
+
+.puzzle-comparison__card dt {
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-comparison__card dd {
+  margin: 0;
+}
+
+.puzzle-comparison__cards [data-featured="true"] .puzzle-comparison__card {
+  border-color: var(--puzzle-color-primary);
+}

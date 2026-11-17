@@ -6,3 +6,4 @@ export * from "./components/data-display";
 export * from "./components/settings";
 export * from "./components/feedback";
 export * from "./components/section";
+export * from "./components/marketing";

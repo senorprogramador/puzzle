@@ -1,0 +1,58 @@
+---
+title: LogoCloudSection
+description: Display accessible customer, partner, and integration logos in responsive grids, groups, or carousels.
+---
+
+`LogoCloudSection` presents consumer-provided logo collections. Each item must have a stable ID, name, and alt text, and must provide either an image `src` or a custom `logo` node.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { LogoCloudSection, type LogoCloudItem } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The marquee is scrollable and intentionally motion-free. The carousel includes labeled controls and supports left/right arrow keys when its navigation group is focused.
+
+import { LogoCloudSectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<LogoCloudSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `LogoCloudVariant` | Selects one of the twelve logo compositions; defaults to `grid`. |
+| `logos` | `readonly LogoCloudItem[]` | Logo data. `LogoCloudItem` requires `id`, `name`, and `alt`, plus either `src` or `logo`. |
+| `group` | `string` on each item | Groups logos when `variant="grouped"`. |
+| `featured` | `boolean` on each item | Emphasizes an item in the `featured` layout. |
+| `href` | `string` on each item | Optional destination for a logo. |
+| Shared section props | `SectionRootProps` and heading props | Semantic root, theme, native attributes, heading, actions, and children. |
+
+## Usage
+
+```tsx
+<LogoCloudSection
+  variant="grouped"
+  title="Our partners"
+  logos={[
+    {
+      id: "acme",
+      name: "Acme",
+      alt: "Acme logo",
+      src: "/logos/acme.svg",
+      group: "Technology",
+      href: "/partners/acme",
+    },
+  ]}
+/>
+```
+
+Custom logo nodes are wrapped in an image role using the supplied `alt` text. Image sources are lazy-loaded. Empty collections render no list; the optional heading remains available.
+
+## Accessibility
+
+Provide an accurate `alt` for every logo. A linked logo uses the supplied `name` as its link name. The carousel has named previous/next buttons and an arrow-key-operable group. No carousel or marquee autoplay is enabled.

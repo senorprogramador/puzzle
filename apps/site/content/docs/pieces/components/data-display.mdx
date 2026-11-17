@@ -26,28 +26,68 @@ import {
 
 Use definition-list semantics to compare related values:
 
-```tsx
+<Preview
+  code={`\
 <MetricComparison
-  title="Monthly signups"
-  description="New accounts created."
+  title="A month of momentum"
+  description="More of the right people are finding us."
   primaryLabel="This month"
-  primaryValue="128"
+  primaryValue="1,284"
   comparisonLabel="Last month"
-  comparisonValue="104"
+  comparisonValue="1,046"
 />
-```
+`}
+>
+  <MetricComparison
+    title="A month of momentum"
+    description="More of the right people are finding us."
+    primaryLabel="This month"
+    primaryValue="1,284"
+    comparisonLabel="Last month"
+    comparisonValue="1,046"
+  />
+</Preview>
 
 ## Empty state
 
 An empty state can include an illustration and a caller-provided action. Keep the action appropriate to the empty resource and preserve the surrounding page context.
 
-```tsx
+<Preview
+  fit="device"
+  code={`\
 <EmptyStatePanel
-  title="No projects yet"
-  description="Create a project to get started."
-  action={<Button>Create project</Button>}
+  title="A clean slate"
+  description="Your next great project starts with one small idea."
+  illustration={
+    <img
+      src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=720&q=85"
+      alt=""
+    />
+  }
+  action={<Button>Create your first project</Button>}
 />
-```
+`}
+>
+  <EmptyStatePanel
+    title="A clean slate"
+    description="Your next great project starts with one small idea."
+    illustration={
+      <img
+        src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=720&q=85"
+        alt=""
+        loading="lazy"
+        style={{
+          display: "block",
+          width: "min(100%, 20rem)",
+          aspectRatio: "16 / 9",
+          borderRadius: "var(--puzzle-radius-lg, 0.75rem)",
+          objectFit: "cover",
+        }}
+      />
+    }
+    action={<Button>Create your first project</Button>}
+  />
+</Preview>
 
 ## Accessibility and responsive behavior
 

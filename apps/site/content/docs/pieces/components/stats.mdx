@@ -1,0 +1,53 @@
+---
+title: StatsSection
+description: Present numeric metrics, trends, descriptions, and progress with responsive layouts and reduced-motion support.
+---
+
+`StatsSection` presents consumer-provided values without requiring an external data source. Values may be numbers or formatted strings, with optional prefixes, suffixes, descriptions, trend labels, progress, and emphasis.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { StatsSection, type StatItem } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The `animated` variant counts numeric values after mount. It renders the final value immediately when `prefers-reduced-motion` is enabled. String values remain unchanged.
+
+import { StatsSectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<StatsSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `StatsVariant` | Selects one of twelve metric layouts; defaults to `grid`. |
+| `items` | `readonly StatItem[]` | Data with stable `id`, `label`, and required `value`. |
+| `StatItem.prefix` / `suffix` | `ReactNode` | Optional content displayed beside the value. |
+| `StatItem.trend` | `{ direction: "up" \| "down" \| "neutral"; label: ReactNode }` | Direction and consumer-supplied trend description. |
+| `StatItem.progress` | `number` | Optional progress percentage, clamped to 0-100. |
+| `StatItem.featured` | `boolean` | Emphasizes a metric in supported layouts. |
+| Shared section props | `SectionRootProps` and heading props | Semantic root, theme, native attributes, heading, actions, and children. |
+
+## Usage
+
+```tsx
+<StatsSection
+  variant="progress"
+  title="Quarterly results"
+  items={[
+    { id: "uptime", label: "Uptime", value: 99.9, suffix: "%" },
+    { id: "users", label: "Active users", value: 2400, progress: 75 },
+  ]}
+/>
+```
+
+Progress values outside 0-100 are clamped for display. Animated values do not use a live region, avoiding continuous announcements to assistive technology.
+
+## Accessibility
+
+Use clear labels and meaningful trend descriptions. Progress indicators receive an accessible name based on the string label or item ID. Reduced-motion preferences disable the counter animation.

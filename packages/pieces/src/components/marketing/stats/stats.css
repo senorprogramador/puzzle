@@ -1,0 +1,83 @@
+.puzzle-stats__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--puzzle-space-6, 1.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-stats__item {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-stats__value {
+  font-size: var(--puzzle-font-size-3xl, 1.875rem);
+  font-weight: var(--puzzle-font-weight-bold, 700);
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-stats__item h3,
+.puzzle-stats__item p {
+  margin: 0;
+}
+
+.puzzle-stats__item p {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-stats__item progress {
+  width: 100%;
+  accent-color: var(--puzzle-color-primary);
+}
+
+.puzzle-stats[data-variant="inline"] .puzzle-stats__list,
+.puzzle-stats[data-variant="horizontal"] .puzzle-stats__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+}
+
+.puzzle-stats[data-variant="centered"] .puzzle-stats__item {
+  text-align: center;
+}
+
+.puzzle-stats[data-variant="cards"] .puzzle-stats__item,
+.puzzle-stats[data-variant="dashboard"] .puzzle-stats__item,
+.puzzle-stats[data-variant="featured"] li[data-featured="true"] .puzzle-stats__item {
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-stats[data-variant="split"] .puzzle-stats__list {
+  grid-template-columns: 1fr;
+}
+
+.puzzle-stats[data-variant="vertical"] .puzzle-stats__list {
+  grid-template-columns: 1fr;
+}
+
+.puzzle-stats[data-variant="comparison"] .puzzle-stats__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.puzzle-stats[data-variant="progress"] .puzzle-stats__list {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 36rem) {
+  .puzzle-stats__list,
+  .puzzle-stats[data-variant="split"] .puzzle-stats__list,
+  .puzzle-stats[data-variant="progress"] .puzzle-stats__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 48rem) {
+  .puzzle-stats__list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

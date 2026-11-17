@@ -27,20 +27,21 @@ import {
 Use the header for the page title, supporting text, and caller-provided actions.
 
 <Preview
+  fit="device"
   code={`\
 <DashboardHeader
   eyebrow="Workspace"
-  title="Good morning, Alex"
-  description="Here is what is happening with your team."
-  actions={<Button>Create project</Button>}
+  title="Good morning, Jordan"
+  description="A clear view of the projects your team is moving forward today."
+  actions={<Button>Create a project</Button>}
 />
 `}
 >
   <DashboardHeader
     eyebrow="Workspace"
-    title="Good morning, Alex"
-    description="Here is what is happening with your team."
-    actions={<Button>Create project</Button>}
+    title="Good morning, Jordan"
+    description="A clear view of the projects your team is moving forward today."
+    actions={<Button>Create a project</Button>}
   />
 </Preview>
 
@@ -49,30 +50,43 @@ Use the header for the page title, supporting text, and caller-provided actions.
 `DashboardStatGroup` arranges any children into a responsive grid. Compose it with `DashboardStatCard`; the card supports an icon, trend, description, action slot, and loading state.
 
 <Preview
+  fit="device"
   code={`\
 <DashboardStatGroup label="Workspace metrics" columns={3}>
   <DashboardStatCard label="Active projects" value="8" description="Across 3 teams" />
   <DashboardStatCard
-    label="Open tasks"
-    value="24"
-    trend={{ value: "+5%", label: "this week", direction: "positive" }}
+    label="Tasks completed"
+    value="126"
+    description="Across all active projects"
+    trend={{ value: "+12%", label: "this week", direction: "positive" }}
   />
-  <DashboardStatCard label="Completed" value="16" loading />
+  <DashboardStatCard
+    label="Team capacity"
+    value="84%"
+    description="A healthy pace this month"
+    trend={{ value: "+4%", label: "this month", direction: "positive" }}
+  />
 </DashboardStatGroup>
 `}
 >
   <DashboardStatGroup label="Workspace metrics" columns={3}>
     <DashboardStatCard
       label="Active projects"
-      value="8"
-      description="Across 3 teams"
+      value="12"
+      description="Across design, product, and marketing"
     />
     <DashboardStatCard
-      label="Open tasks"
-      value="24"
-      trend={{ value: "+5%", label: "this week", direction: "positive" }}
+      label="Tasks completed"
+      value="126"
+      description="Across all active projects"
+      trend={{ value: "+12%", label: "this week", direction: "positive" }}
     />
-    <DashboardStatCard label="Completed" value="16" loading />
+    <DashboardStatCard
+      label="Team capacity"
+      value="84%"
+      description="A healthy pace this month"
+      trend={{ value: "+4%", label: "this month", direction: "positive" }}
+    />
   </DashboardStatGroup>
 </Preview>
 
@@ -80,35 +94,87 @@ Use the header for the page title, supporting text, and caller-provided actions.
 
 Activity items are generic records supplied by the consuming application. Use `renderItem` when an item needs a custom presentation; otherwise the component renders optional avatars, links, and semantic timestamps.
 
-```tsx
+<Preview
+  code={`\
 <DashboardActivityFeed
   title="Recent activity"
   items={[
     {
       id: "activity-1",
-      description: "Alex updated the launch plan",
-      timestamp: "Today",
-      dateTime: "2026-11-16",
+      description: "Jordan moved the website refresh into review",
+      timestamp: "12 minutes ago",
+      dateTime: "2026-11-17T13:54:00",
+      href: "/projects/website",
+    },
+    {
+      id: "activity-2",
+      description: "Riley completed the launch checklist",
+      timestamp: "1 hour ago",
+      dateTime: "2026-11-17T13:06:00",
       href: "/projects/launch",
+    },
+    {
+      id: "activity-3",
+      description: "Alex shared a new research summary",
+      timestamp: "Yesterday",
+      dateTime: "2026-11-16T16:42:00",
     },
   ]}
   emptyState="No recent activity."
 />
-```
+`}
+>
+  <DashboardActivityFeed
+    title="Recent activity"
+    items={[
+      {
+        id: "activity-1",
+        description: "Jordan moved the website refresh into review",
+        timestamp: "12 minutes ago",
+        dateTime: "2026-11-17T13:54:00",
+        href: "/projects/website",
+      },
+      {
+        id: "activity-2",
+        description: "Riley completed the launch checklist",
+        timestamp: "1 hour ago",
+        dateTime: "2026-11-17T13:06:00",
+        href: "/projects/launch",
+      },
+      {
+        id: "activity-3",
+        description: "Alex shared a new research summary",
+        timestamp: "Yesterday",
+        dateTime: "2026-11-16T16:42:00",
+      },
+    ]}
+    emptyState="No recent activity."
+  />
+</Preview>
 
 ## Progress card
 
 Use a native progress element with a title-derived accessible label.
 
-```tsx
+<Preview
+  code={`\
 <DashboardProgressCard
   title="Website refresh"
-  description="Target launch: November 30"
-  value={72}
-  status="On track"
+  description="Brand, design, and content are coming together."
+  value={78}
+  status="On track for Nov 30"
   action={<Button variant="secondary">View project</Button>}
 />
-```
+`}
+>
+  <DashboardProgressCard
+    title="Website refresh"
+    description="Brand, design, and content are coming together."
+    value={78}
+    status="On track for Nov 30"
+    action={<Button variant="secondary">View project</Button>}
+  />
+</Preview>
 
 ## Dashboard shell
 
@@ -124,6 +190,79 @@ Use a native progress element with a title-derived accessible label.
   <DashboardStatGroup>{/* cards */}</DashboardStatGroup>
 </DashboardShell>
 ```
+
+<Preview
+  fit="device"
+  code={`\
+const items = [
+  { id: "overview", label: "Overview", href: "/workspace" },
+  { id: "projects", label: "Projects", href: "/workspace/projects" },
+  { id: "insights", label: "Insights", href: "/workspace/insights" },
+];
+
+<DashboardShell
+  topbar={<DashboardTopbar><strong>Northstar Studio</strong></DashboardTopbar>}
+  sidebar={<DashboardSidebar items={items} pathname="/workspace" label="Workspace" />}
+  sidebarLabel="Workspace navigation"
+>
+  <DashboardHeader
+    eyebrow="Tuesday, November 17"
+    title="Good morning, Jordan"
+    description="Three projects are moving forward today."
+    actions={<Button>Create a project</Button>}
+  />
+  <DashboardStatGroup label="Workspace metrics" columns={3}>
+    <DashboardStatCard label="Active projects" value="12" description="Across 3 teams" />
+    <DashboardStatCard label="Tasks completed" value="126" description="+12% this week" />
+    <DashboardStatCard label="Team capacity" value="84%" description="A healthy pace" />
+  </DashboardStatGroup>
+</DashboardShell>
+`}
+>
+  <DashboardShell
+    topbar={
+      <DashboardTopbar>
+        <strong>Northstar Studio</strong>
+      </DashboardTopbar>
+    }
+    sidebar={
+      <DashboardSidebar
+        items={[
+          { id: "overview", label: "Overview", href: "/workspace" },
+          { id: "projects", label: "Projects", href: "/workspace/projects" },
+          { id: "insights", label: "Insights", href: "/workspace/insights" },
+        ]}
+        pathname="/workspace"
+        label="Workspace"
+      />
+    }
+    sidebarLabel="Workspace navigation"
+  >
+    <DashboardHeader
+      eyebrow="Tuesday, November 17"
+      title="Good morning, Jordan"
+      description="Three projects are moving forward today."
+      actions={<Button>Create a project</Button>}
+    />
+    <DashboardStatGroup label="Workspace metrics" columns={3}>
+      <DashboardStatCard
+        label="Active projects"
+        value="12"
+        description="Across 3 teams"
+      />
+      <DashboardStatCard
+        label="Tasks completed"
+        value="126"
+        description="+12% this week"
+      />
+      <DashboardStatCard
+        label="Team capacity"
+        value="84%"
+        description="A healthy pace"
+      />
+    </DashboardStatGroup>
+  </DashboardShell>
+</Preview>
 
 ## Accessibility and responsive behavior
 

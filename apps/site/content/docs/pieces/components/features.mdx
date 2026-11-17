@@ -1,0 +1,59 @@
+---
+title: FeaturesSection
+description: Explain product capabilities using responsive feature layouts, optional media, and accessible tabs or accordions.
+---
+
+`FeaturesSection` renders product capabilities from consumer-provided items. Each feature has a stable `id` and `title`, with optional description, icon, media, action, nested content, and featured emphasis.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { FeaturesSection, type FeatureItem } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The `tabs` and `accordion` variants reuse the corresponding accessible UI primitives. Tabs are keyboard-operable; accordion expansion follows the UI Accordion behavior.
+
+import { FeaturesSectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<FeaturesSectionVariantsExample />
+
+## API
+
+| Prop                   | Type                                 | Description                                                                       |
+| ---------------------- | ------------------------------------ | --------------------------------------------------------------------------------- |
+| `variant`              | `FeaturesVariant`                    | Selects one of the seventeen feature layouts; defaults to `grid`.                 |
+| `items`                | `readonly FeatureItem[]`             | Feature data with stable `id`, required `title`, and optional presentation slots. |
+| `FeatureItem.icon`     | `ReactNode`                          | Consumer-provided icon node.                                                      |
+| `FeatureItem.media`    | `ReactNode`                          | Optional image, video, or other media.                                            |
+| `FeatureItem.content`  | `ReactNode`                          | Additional item content.                                                          |
+| `FeatureItem.action`   | `ReactNode`                          | Optional consumer-provided action.                                                |
+| `FeatureItem.featured` | `boolean`                            | Emphasizes an item in layouts that support it.                                    |
+| Shared section props   | `SectionRootProps` and heading props | Semantic root, theme, native attributes, heading, actions, and children.          |
+
+## Usage
+
+```tsx
+<FeaturesSection
+  variant="tabs"
+  title="Built for focused teams"
+  items={[
+    {
+      id: "automation",
+      title: "Automate routine work",
+      description: "Spend more time on important decisions.",
+      media: <img src="/automation.png" alt="Automation settings" />,
+    },
+    { id: "insights", title: "Understand progress" },
+  ]}
+/>
+```
+
+An empty collection omits its list or interactive control. The `tabs` composition uses item IDs as tab IDs; keep IDs stable and unique. Media must have suitable alternatives when it conveys information.
+
+## Accessibility
+
+Interactive tabs and accordions use UI keyboard and ARIA behavior. Keep the shared section heading at an appropriate page level, and ensure the item title hierarchy remains meaningful. Decorative icons should be hidden from assistive technology by their consumer-provided markup.

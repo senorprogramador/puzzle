@@ -1,0 +1,129 @@
+.puzzle-features__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--puzzle-space-6, 1.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-features__item {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-4, 1rem);
+  min-width: 0;
+}
+
+.puzzle-features__copy h3,
+.puzzle-features__copy p {
+  margin: 0;
+}
+
+.puzzle-features__copy p {
+  margin-block-start: var(--puzzle-space-2, 0.5rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-features__media > *,
+.puzzle-features__media img,
+.puzzle-features__media video {
+  max-width: 100%;
+}
+
+.puzzle-features[data-variant="cards"] .puzzle-features__item,
+.puzzle-features[data-variant="bento"] .puzzle-features__item,
+.puzzle-features[data-variant="media-grid"] .puzzle-features__item {
+  height: 100%;
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-features[data-variant="split"] .puzzle-features__list,
+.puzzle-features[data-variant="alternating"] .puzzle-features__list,
+.puzzle-features[data-variant="editorial"] .puzzle-features__list {
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+
+.puzzle-features[data-variant="numbered"] .puzzle-features__copy h3 {
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-features[data-variant="icons"] .puzzle-features__icon {
+  color: var(--puzzle-color-primary);
+}
+
+.puzzle-features[data-variant="horizontal"] .puzzle-features__list,
+.puzzle-features[data-variant="full-width"] .puzzle-features__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+
+.puzzle-features[data-variant="vertical"] .puzzle-features__list {
+  grid-template-columns: 1fr;
+}
+
+.puzzle-features[data-variant="compact"] .puzzle-features__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-features__sticky-layout {
+  display: grid;
+  gap: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-features__sticky-media > * {
+  max-width: 100%;
+}
+
+.puzzle-features__accordion,
+.puzzle-features__tabs {
+  width: 100%;
+}
+
+@media (min-width: 36rem) {
+  .puzzle-features__list,
+  .puzzle-features[data-variant="split"] .puzzle-features__list,
+  .puzzle-features[data-variant="alternating"] .puzzle-features__list,
+  .puzzle-features[data-variant="editorial"] .puzzle-features__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 48rem) {
+  .puzzle-features__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .puzzle-features[data-variant="split"] .puzzle-features__list,
+  .puzzle-features[data-variant="alternating"] .puzzle-features__list,
+  .puzzle-features[data-variant="editorial"] .puzzle-features__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .puzzle-features[data-variant="bento"] li[data-featured="true"] {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  .puzzle-features[data-variant="alternating"] li:nth-child(even) {
+    transform: translateY(var(--puzzle-space-8, 2rem));
+  }
+
+  .puzzle-features[data-variant="asymmetric"] .puzzle-features__list > :nth-child(3n + 1) {
+    grid-column: span 2;
+  }
+
+  .puzzle-features[data-variant="sticky"] .puzzle-features__sticky-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .puzzle-features[data-variant="sticky"] .puzzle-features__sticky-media {
+    position: sticky;
+    inset-block-start: var(--puzzle-space-4, 1rem);
+  }
+
+}

@@ -1,8 +1,11 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act } from "react";
+import { hydrateRoot, type Root } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { page } from "vitest/browser";
 
-import { Preview } from "./index";
+import { Preview, type PreviewDevice } from "./index";
 
 beforeEach(async () => {
   await page.viewport(1200, 1000);
@@ -18,7 +21,7 @@ const getFrame = () => {
 
 const expectHeight = async (height: number) => {
   await waitFor(() => {
-    expect(getFrame().style.height).toBe(`${height}px`);
+    expect(getComputedStyle(getFrame()).height).toBe(`${height}px`);
     expect(getFrame().contentDocument?.querySelector("[data-content]")).not.toBeNull();
   });
 };
@@ -109,6 +112,134 @@ describe("Preview sizing", () => {
     }
   });
 
+  it.each([
+    [390, "Mobile", 844],
+    [800, "Tablet", 1024],
+    [1200, "Desktop", 768],
+  ] as const)(
+    "matches the %s preview at %i pixels",
+    async (width, device, height) => {
+      await page.viewport(width, 1000);
+      render(
+        <Preview padding={0} fit="device">
+          <div data-content>Content</div>
+        </Preview>,
+      );
+
+      await expectHeight(height);
+      expect(getFrame().title).toBe(`${device} component preview`);
+    },
+  );
+
+  it("matches the viewport device until the user chooses a device", async () => {
+    render(
+      <Preview padding={0} fit="device">
+        <div data-content>Content</div>
+      </Preview>,
+    );
+
+    await expectHeight(768);
+    expect(getFrame().title).toBe("Desktop component preview");
+
+    await page.viewport(800, 1000);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Tablet" })).toHaveAttribute(
+        "aria-pressed",
+        "true",
+      );
+    });
+    await expectHeight(1024);
+    fireEvent.click(screen.getByRole("button", { name: "Mobile" }));
+    await expectHeight(844);
+
+    await page.viewport(1200, 1000);
+    expect(screen.getByRole("button", { name: "Mobile" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expectHeight(844);
+  });
+
+  const hydrationCases: {
+    browserWidth: number;
+    containerWidth: number;
+    defaultDevice?: PreviewDevice;
+    device: PreviewDevice;
+    deviceWidth: number;
+    deviceHeight: number;
+  }[] = [
+    { browserWidth: 390, containerWidth: 280, device: "mobile", deviceWidth: 390, deviceHeight: 844 },
+    { browserWidth: 800, containerWidth: 400, device: "tablet", deviceWidth: 768, deviceHeight: 1024 },
+    { browserWidth: 1440, containerWidth: 640, device: "desktop", deviceWidth: 1024, deviceHeight: 768 },
+    { browserWidth: 1440, containerWidth: 240, device: "desktop", deviceWidth: 1024, deviceHeight: 768 },
+    { browserWidth: 1440, containerWidth: 640, defaultDevice: "mobile", device: "mobile", deviceWidth: 390, deviceHeight: 844 },
+    { browserWidth: 800, containerWidth: 400, defaultDevice: "desktop", device: "desktop", deviceWidth: 1024, deviceHeight: 768 },
+  ];
+
+  for (const sizing of ["content", "device", "height"] as const) {
+    it.each(hydrationCases)(
+      `preserves ${sizing} geometry throughout hydration at $browserWidth/$containerWidth with $defaultDevice`,
+      async ({ browserWidth, containerWidth, defaultDevice, device, deviceWidth, deviceHeight }) => {
+        await page.viewport(browserWidth, 1000);
+        const example = (
+          <Preview
+            padding={12}
+            defaultDevice={defaultDevice}
+            fit={sizing === "device" ? "device" : "content"}
+            height={sizing === "height" ? 300 : undefined}
+          >
+            <div data-content style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
+              <p>A longer example wraps at the selected device width, not the documentation column width.</p>
+              <p>Server rendering and the loaded iframe must reserve the same amount of space.</p>
+            </div>
+          </Preview>
+        );
+        const container = document.createElement("div");
+        container.style.width = `${containerWidth}px`;
+        container.innerHTML = renderToString(example);
+        document.body.append(container);
+        const viewport = container.querySelector<HTMLElement>(".puzzle-preview__viewport")!;
+        const preview = container.querySelector<HTMLElement>(".puzzle-preview")!;
+        const before = viewport.getBoundingClientRect();
+        const scale = Math.min(1, (containerWidth - 2 - (browserWidth <= 480 ? 32 : 48)) / deviceWidth);
+        expect(before.width).toBeCloseTo(deviceWidth * scale, 0);
+        if (sizing !== "content") {
+          expect(before.height).toBeCloseTo((sizing === "height" ? 300 : deviceHeight) * scale, 0);
+        }
+        const initialPreviewHeight = preview.getBoundingClientRect().height;
+        const heights: number[] = [];
+        const observer = new ResizeObserver(() => {
+          heights.push(preview.getBoundingClientRect().height);
+        });
+        observer.observe(preview);
+        const hydrationErrors: unknown[] = [];
+        let root: Root | undefined;
+        try {
+          await act(async () => {
+            root = hydrateRoot(container, example, {
+              onRecoverableError: (error) => hydrationErrors.push(error),
+            });
+          });
+          await waitFor(() => {
+            const frame = container.querySelector("iframe")!;
+            expect(frame.title.toLowerCase()).toBe(`${device} component preview`);
+            expect(frame.contentDocument?.querySelector("[data-content]")).not.toBeNull();
+            expect(container.querySelector("[data-preview-placeholder]")).toBeNull();
+          });
+          await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+          expect(viewport.getBoundingClientRect().width).toBeCloseTo(before.width, 0);
+          expect(viewport.getBoundingClientRect().height).toBeCloseTo(before.height, 0);
+          expect(Math.max(...heights.map((value) => Math.abs(value - initialPreviewHeight)))).toBeLessThanOrEqual(1);
+          expect(hydrationErrors).toEqual([]);
+        } finally {
+          observer.disconnect();
+          await act(async () => root?.unmount());
+          container.remove();
+        }
+      },
+    );
+  }
+
   it("skips the hidden Desktop button during tablet keyboard navigation", async () => {
     await page.viewport(800, 1000);
     render(<Preview padding={0} defaultDevice="desktop">Content</Preview>);
@@ -174,7 +305,7 @@ describe("Preview sizing", () => {
         <div data-content>Content</div>
       </Preview>,
     );
-    await expectHeight(844);
+    await expectHeight(768);
     fireEvent.click(screen.getByRole("button", { name: "Tablet" }));
     await expectHeight(1024);
     fireEvent.click(screen.getByRole("button", { name: "Desktop" }));
@@ -206,7 +337,7 @@ describe("Preview sizing", () => {
         <div data-content>Responsive content</div>
       </Preview>,
     );
-    await expectHeight(120);
+    await expectHeight(60);
     fireEvent.click(screen.getByRole("button", { name: "Tablet" }));
     await expectHeight(60);
     fireEvent.click(screen.getByRole("button", { name: "Mobile" }));
@@ -226,7 +357,7 @@ describe("Preview sizing", () => {
     fireEvent.click(screen.getByRole("tab", { name: "Preview" }));
     await expectHeight(64);
     rerender(example("device"));
-    await expectHeight(844);
+    await expectHeight(768);
     rerender(example("content"));
     await expectHeight(64);
     expectNoOverflow();

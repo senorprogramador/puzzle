@@ -25,6 +25,7 @@ import {
 Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organize related rows. Associate each form control with its label through `htmlFor` and the control's `id`.
 
 <Preview
+  fit="device"
   code={`\
 <SettingsSection
   title="Profile"
@@ -36,7 +37,28 @@ Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organi
       htmlFor="display-name"
       control={<TextInput id="display-name" value="Alex Morgan" onChange={() => {}} />}
     />
+    <SettingsRow
+      label="Work email"
+      htmlFor="work-email"
+      description="Used for workspace updates and sign-in."
+      control={<TextInput id="work-email" type="email" value="alex@northstar.studio" onChange={() => {}} />}
+    />
+    <SettingsRow
+      label="Role"
+      htmlFor="role"
+      control={
+        <select id="role" defaultValue="design">
+          <option value="design">Design lead</option>
+          <option value="product">Product manager</option>
+          <option value="other">Other</option>
+        </select>
+      }
+    />
   </SettingsGroup>
+  <FormActions>
+    <Button>Save changes</Button>
+    <Button variant="outline">Cancel</Button>
+  </FormActions>
 </SettingsSection>
 `}
 >
@@ -56,27 +78,72 @@ Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organi
           />
         }
       />
+      <SettingsRow
+        label="Work email"
+        htmlFor="work-email"
+        description="Used for workspace updates and sign-in."
+        control={
+          <TextInput
+            id="work-email"
+            type="email"
+            value="alex@northstar.studio"
+            onChange={() => {}}
+          />
+        }
+      />
+      <SettingsRow
+        label="Role"
+        htmlFor="role"
+        control={
+          <select id="role" defaultValue="design">
+            <option value="design">Design lead</option>
+            <option value="product">Product manager</option>
+            <option value="other">Other</option>
+          </select>
+        }
+      />
     </SettingsGroup>
+    <FormActions>
+      <Button>Save changes</Button>
+      <Button variant="outline">Cancel</Button>
+    </FormActions>
   </SettingsSection>
 </Preview>
 
 ## Profile and security
 
-```tsx
+<Preview
+  fit="device"
+  code={`\
 <ProfileHeader
-  name="Alex Morgan"
-  email="alex@example.com"
-  avatar={  <Avatar alt="Alex Morgan" />}
+  name="Jordan Lee"
+  email="jordan@northstar.studio"
+  avatar={<span aria-hidden="true">JL</span>}
   actions={<Button variant="secondary">Edit profile</Button>}
 />
 
 <SecurityMethodCard
-  title="Authenticator app"
-  description="Use a time-based one-time password."
-  status="Enabled"
-  action={<Button variant="secondary">Manage</Button>}
+  title="Two-step verification"
+  description="An authenticator app is protecting your workspace access."
+  status="Active"
+  action={<Button variant="secondary">Manage security</Button>}
 />
-```
+`}
+>
+  <ProfileHeader
+    name="Jordan Lee"
+    email="jordan@northstar.studio"
+    avatar={<span aria-hidden="true">JL</span>}
+    actions={<Button variant="secondary">Edit profile</Button>}
+  />
+  <SecurityMethodCard
+    title="Two-step verification"
+    description="An authenticator app is protecting your workspace access."
+    status="Active"
+    icon={<span aria-hidden="true">2FA</span>}
+    action={<Button variant="secondary">Manage security</Button>}
+  />
+</Preview>
 
 `FormActions` provides a labelled group for submit and cancel controls.
 

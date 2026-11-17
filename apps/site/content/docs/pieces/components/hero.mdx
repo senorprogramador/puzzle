@@ -64,6 +64,7 @@ should take only the height required by its content.
 Use Hero for complete control over the layout and content.
 
 <Preview
+  fit="device"
   code={`\
   <Hero
     eyebrow="Welcome to Puzzle"
@@ -90,6 +91,7 @@ The Hero component supports four layout configurations.
 Text and media are displayed in separate columns.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   layout="split"
@@ -117,6 +119,7 @@ Text and media are displayed in separate columns.
 Content is centered horizontally.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   layout="centered"
@@ -139,11 +142,14 @@ Content is centered horizontally.
 The inner container uses the full available width.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   layout="full-width"
   title="Make an impression."
   mediaPosition="background"
+  backgroundImage="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=85"
+  overlay="gradient"
 />
 `}
 >
@@ -151,6 +157,8 @@ The inner container uses the full available width.
     layout="full-width"
     title="Make an impression."
     mediaPosition="background"
+    backgroundImage="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=85"
+    overlay="gradient"
   />
 </Preview>
 
@@ -159,6 +167,7 @@ The inner container uses the full available width.
 The media and content columns use different proportions.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   layout="asymmetric"
@@ -190,6 +199,7 @@ Control where media is displayed using mediaPosition.
 | background | Media behind content |
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   layout="split"
@@ -215,6 +225,7 @@ Control where media is displayed using mediaPosition.
 Background media can also be supplied directly.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   mediaPosition="background"
@@ -232,6 +243,47 @@ Background media can also be supplied directly.
   />
 </Preview>
 
+Video can be supplied through the same media slot. The example uses a real,
+playable video with controls rather than a static placeholder.
+
+<Preview
+  fit="device"
+  code={`\
+<Hero
+  layout="split"
+  title="See the process in motion."
+  media={
+    <video controls muted playsInline preload="none" poster="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=85">
+      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
+    </video>
+  }
+/>
+`}
+>
+  <Hero
+    layout="split"
+    eyebrow="A short preview"
+    title="See the process in motion."
+    description="Use a real video asset when movement helps tell the story."
+    media={
+      <video
+        aria-label="Short video preview"
+        controls
+        muted
+        playsInline
+        preload="none"
+        poster="https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1200&q=85"
+      >
+        <source
+          src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+          type="video/mp4"
+        />
+        Your browser does not support embedded video.
+      </video>
+    }
+  />
+</Preview>
+
 ## Height
 
 Control the minimum height of the hero.
@@ -243,6 +295,7 @@ Control the minimum height of the hero.
 | viewport | Minimum height of the viewport |
 
 <Preview
+  fit="device"
   code={`\
 <Hero height="viewport" title="Welcome." />
 `}
@@ -262,6 +315,7 @@ Hero supports four theme configurations.
 | brand    | Primary brand appearance       |
 
 <Preview
+  fit="device"
   code={`\
 <Hero theme="brand" title="Your brand, your experience." />
 `}
@@ -283,6 +337,7 @@ Overlays improve text readability when using background media.
 | gradient | Directional gradient |
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   backgroundImage="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?q=90&w=1920&h=1200&fit=crop&auto=format"
@@ -309,6 +364,7 @@ Hero supports several content slots.
 A short introductory label above the heading.
 
 <Preview
+  fit="device"
   code={`\
 <Hero eyebrow="Digital experiences" title="Build something remarkable." />
 `}
@@ -321,6 +377,7 @@ A short introductory label above the heading.
 Additional introductory text.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   title="Everything in one place."
@@ -339,6 +396,7 @@ Additional introductory text.
 Use existing Puzzle UI components for buttons and other actions.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   title="Get started."
@@ -367,6 +425,7 @@ Use existing Puzzle UI components for buttons and other actions.
 The search slot can contain any existing Puzzle form components.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   layout="centered"
@@ -393,6 +452,7 @@ The search slot can contain any existing Puzzle form components.
 Use meta for supplementary information such as availability, opening hours or product details.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   title="Stay somewhere special."
@@ -421,6 +481,7 @@ Use meta for supplementary information such as availability, opening hours or pr
 Additional content can be placed between the description and the action slots.
 
 <Preview
+  fit="device"
   code={`\
 <Hero title="Welcome">
   <p>Additional content goes here.</p>
@@ -447,6 +508,7 @@ columns at wider tablet and desktop widths.
 Use reverseOnMobile to control the order of content and media on mobile.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   layout="split"
@@ -472,6 +534,7 @@ Use reverseOnMobile to control the order of content and media on mobile.
 Disable reversal when the content should remain before the media.
 
 <Preview
+  fit="device"
   code={`\
 <Hero
   layout="split"
@@ -503,6 +566,7 @@ All presets inherit the properties of Hero and can be customized.
 ### SplitHero
 
 <Preview
+  fit="device"
   code={`\
 <SplitHero
   eyebrow="Our services"
@@ -528,6 +592,7 @@ All presets inherit the properties of Hero and can be customized.
 ### CenteredHero
 
 <Preview
+  fit="device"
   code={`\
 <CenteredHero
   title="Welcome to our platform."
@@ -546,6 +611,7 @@ All presets inherit the properties of Hero and can be customized.
 ### FullScreenHero
 
 <Preview
+  fit="device"
   code={`\
 <FullScreenHero
   backgroundImage="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=90&w=1920&h=1200&fit=crop&auto=format"
@@ -564,6 +630,7 @@ All presets inherit the properties of Hero and can be customized.
 ### VideoHero
 
 <Preview
+  fit="device"
   code={`\
 <VideoHero
   backgroundVideo={{
@@ -591,6 +658,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 ### ImageHero
 
 <Preview
+  fit="device"
   code={`\
 <ImageHero
   backgroundImage="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?q=90&w=1920&h=1200&fit=crop&auto=format"
@@ -609,6 +677,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 ### MinimalHero
 
 <Preview
+  fit="device"
   code={`\
 <MinimalHero
   eyebrow="About us"
@@ -627,6 +696,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 ### AsymmetricHero
 
 <Preview
+  fit="device"
   code={`\
 <AsymmetricHero
   eyebrow="Field notes"
@@ -650,6 +720,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 ### AgencyHero
 
 <Preview
+  fit="device"
   code={`\
 <AgencyHero
   eyebrow="Digital agency"
@@ -677,6 +748,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 ### RestaurantHero
 
 <Preview
+  fit="device"
   code={`\
 <RestaurantHero
   eyebrow="Restaurant"
@@ -699,6 +771,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 ### DashboardWelcomeHero
 
 <Preview
+  fit="device"
   code={`\
 <DashboardWelcomeHero
   eyebrow="Workspace overview"
@@ -731,6 +804,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 ### CampaignHero
 
 <Preview
+  fit="device"
   code={`\
 <CampaignHero
   eyebrow="Limited offer"
@@ -751,6 +825,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 ### ComingSoonHero
 
 <Preview
+  fit="device"
   code={`\
 <ComingSoonHero
   eyebrow="Coming soon"
@@ -779,6 +854,7 @@ Background videos are muted, loop automatically and respect the user's reduced-m
 ### SearchHero
 
 <Preview
+  fit="device"
   code={`\
 <SearchHero
   eyebrow="Discover"
@@ -803,6 +879,7 @@ All presets inherit the full Hero API.
 For example, a FullScreenHero can use a split layout instead of its default background layout.
 
 <Preview
+  fit="device"
   code={`\
 <FullScreenHero
   layout="split"

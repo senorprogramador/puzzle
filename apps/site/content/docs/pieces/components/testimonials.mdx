@@ -1,0 +1,61 @@
+---
+title: TestimonialsSection
+description: Present attributed customer quotes, ratings, logos, avatars, and media in responsive testimonial layouts.
+---
+
+`TestimonialsSection` renders customer statements with required attribution. Items require a stable `id`, quote, and author; role, organization, avatar, company logo, rating, media, and featured styling are optional.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { TestimonialsSection, type TestimonialItem } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The carousel includes labeled buttons and supports left/right arrow keys while its navigation group is focused. Ratings are read-only and use the UI Rating primitive.
+
+import { TestimonialsSectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<TestimonialsSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `TestimonialsVariant` | Selects one of fourteen testimonial compositions; defaults to `grid`. |
+| `items` | `readonly TestimonialItem[]` | Attributed quote data. |
+| `TestimonialItem.quote` | `ReactNode` | Required quote content. |
+| `TestimonialItem.author` | `string` | Required author name. |
+| `TestimonialItem.rating` | `number` | Optional read-only rating. |
+| `TestimonialItem.avatar` / `companyLogo` | `ReactNode` | Optional consumer-provided identity nodes. |
+| `TestimonialItem.media` | `ReactNode` | Optional image, video, or other media. |
+| `carouselLabel` | `string` | Accessible carousel name; defaults to `Customer testimonials`. |
+| Shared section props | `SectionRootProps` and heading props | Semantic root, theme, native attributes, heading, actions, and children. |
+
+## Usage
+
+```tsx
+<TestimonialsSection
+  variant="carousel"
+  title="What customers say"
+  items={[
+    {
+      id: "riley",
+      quote: "The team can focus on work that matters.",
+      author: "Riley Chen",
+      role: "Product lead",
+      organization: "Acme",
+      rating: 5,
+    },
+  ]}
+/>
+```
+
+The quote is rendered as a blockquote with attribution in its footer. Supply alternatives for meaningful media and ensure any consumer-provided avatar content does not repeat the visible author name.
+
+## Accessibility
+
+Each quote is semantically attributed. Carousel controls have accessible names and support both buttons and arrow-key navigation. Ratings are read-only and labeled. Keep the author and organization text available even when logos or avatars are supplied.

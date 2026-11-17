@@ -1,0 +1,53 @@
+---
+title: HowItWorksSection
+description: Explain a product or process with semantic ordered steps, media, actions, and optional carousel navigation.
+---
+
+`HowItWorksSection` describes a process with consumer-provided ordered steps. Each item needs a stable ID and title; descriptions, icons, media, custom content, and actions are optional.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { HowItWorksSection, type HowItWorksItem } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+List-based variants use an ordered list. Visible number markers are reserved for `numbered`, `timeline`, `connected`, and `process`; other variants lead with their supplied icons or media. The carousel variant includes named controls and left/right arrow-key navigation.
+
+import { HowItWorksSectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<HowItWorksSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `HowItWorksVariant` | Selects one of fourteen process layouts; defaults to `steps`. |
+| `steps` | `readonly HowItWorksItem[]` | Ordered content with stable `id` and required `title`. |
+| `HowItWorksItem.media` | `ReactNode` | Optional image, video, or other media. |
+| `HowItWorksItem.icon` | `ReactNode` | Optional consumer-provided icon. |
+| `HowItWorksItem.content` / `action` | `ReactNode` | Optional additional content and action. |
+| `carouselLabel` | `string` | Accessible carousel name; defaults to `Process steps`. |
+| Shared section props | `SectionRootProps` and heading props | Semantic root, theme, native attributes, heading, actions, and children. |
+
+## Usage
+
+```tsx
+<HowItWorksSection
+  variant="numbered"
+  title="How it works"
+  steps={[
+    { id: "connect", title: "Connect your tools", description: "Choose your services." },
+    { id: "organize", title: "Organize the workflow" },
+  ]}
+/>
+```
+
+Empty steps omit the ordered list. The component does not infer a process or perform step navigation outside the carousel presentation.
+
+## Accessibility
+
+The default composition uses ordered-list semantics. The carousel provides labeled controls and arrow-key support; provide concise labels and useful alternatives for informative media.

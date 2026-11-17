@@ -1,4 +1,6 @@
 .puzzle-preview {
+  --_puzzle-preview-device-width: 390px;
+  --_puzzle-preview-device-height: 844px;
   width: 100%;
   min-width: 0;
   margin-block: var(--puzzle-space-6, 1.5rem);
@@ -144,6 +146,7 @@
 
 .puzzle-preview__stage {
   display: flex;
+  container-type: inline-size;
   min-width: 0;
   padding: var(--puzzle-space-6, 1.5rem);
   overflow: clip;
@@ -162,12 +165,14 @@
 }
 
 .puzzle-preview__viewport {
+  /* atan2/tan converts the container/device width ratio to a unitless scale. */
+  --_puzzle-preview-scale: min(1, tan(atan2(100cqw, var(--_puzzle-preview-device-width))));
   position: relative;
   flex: 0 1 auto;
   /* Auto margins center without clipping the top when the stage scrolls. */
   margin: auto;
   min-width: 0;
-  max-width: 100%;
+  width: min(100%, var(--_puzzle-preview-device-width));
   box-sizing: border-box;
   overflow: hidden;
   background: var(--puzzle-color-background, #ffffff);
@@ -179,19 +184,45 @@
   top: 0;
   left: 0;
   display: block;
+  width: var(--_puzzle-preview-device-width);
   max-width: none;
   border: 0;
+  transform: scale(var(--_puzzle-preview-scale));
   transform-origin: top left;
   background: var(--puzzle-color-background, #ffffff);
 }
 
+.puzzle-preview__content {
+  font-family: var(--puzzle-font-family-body1, system-ui, sans-serif);
+  font-size: var(--puzzle-font-size-body1, 1rem);
+  font-weight: var(--puzzle-font-weight-body1, 400);
+  line-height: var(--puzzle-font-line-height-body1, 1.5);
+  letter-spacing: var(--puzzle-font-letter-spacing-body1, 0);
+}
+
 /* Server-rendered stand-in shown until the iframe content has been measured. */
 .puzzle-preview__placeholder {
+  width: var(--_puzzle-preview-device-width);
   max-width: none;
+  zoom: var(--_puzzle-preview-scale);
   overflow: hidden;
   color: var(--puzzle-color-text, #171717);
   pointer-events: none;
   user-select: none;
+}
+
+@media (min-width: 768px) {
+  .puzzle-preview[data-auto-device] {
+    --_puzzle-preview-device-width: 768px;
+    --_puzzle-preview-device-height: 1024px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .puzzle-preview[data-auto-device] {
+    --_puzzle-preview-device-width: 1024px;
+    --_puzzle-preview-device-height: 768px;
+  }
 }
 
 /* Code view */

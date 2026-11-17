@@ -1,6 +1,7 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentPropsWithRef, CSSProperties } from "react";
+import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Theme } from "@puzzle-ui/theme";
 import { AppBar } from "./index";
@@ -18,6 +19,36 @@ const navigationItems = [
 ];
 
 describe("AppBar", () => {
+  it("includes a nonce-authorized offset initializer in sticky server markup", () => {
+    const container = document.createElement("div");
+    container.innerHTML = renderToString(
+      <AppBar title="Puzzle" sticky nonce="request-nonce" />,
+    );
+
+    expect(container.querySelector("script")).toHaveAttribute(
+      "nonce",
+      "request-nonce",
+    );
+    expect(container.querySelector("script")?.textContent).toContain(
+      "--puzzle-sticky-offset",
+    );
+    expect(container.querySelector("style")).toHaveAttribute(
+      "nonce",
+      "request-nonce",
+    );
+    expect(container.querySelector("header")).toHaveAttribute(
+      "data-puzzle-app-bar",
+    );
+  });
+
+  it("omits the offset initializer for a non-sticky server render", () => {
+    const markup = renderToString(<AppBar title="Puzzle" />);
+
+    expect(markup).not.toContain("<script");
+    expect(markup).not.toContain("<style");
+    expect(markup).not.toContain("data-puzzle-app-bar=");
+  });
+
   it("measures a sticky app bar inside the page header and restores the offset", () => {
     vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(
       new DOMRect(0, 0, 1000, 80),

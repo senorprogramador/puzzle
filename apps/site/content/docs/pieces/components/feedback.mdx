@@ -22,22 +22,69 @@ import {
 
 Use `NotificationList` for an empty state and a collection of items. `NotificationItem` can be used separately inside a list when custom collection rendering is needed.
 
-```tsx
+<Preview
+  code={`\
 <NotificationList
   items={[
     {
       id: "notice-1",
-      title: "Task assigned",
-      description: "You were assigned a task.",
-      timestamp: "Today",
-      dateTime: "2026-11-16",
-      href: "/tasks/one",
+      title: "Your launch plan is ready",
+      description: "Jordan added the final checklist and shared it with you.",
+      timestamp: "8 minutes ago",
+      dateTime: "2026-11-17T13:58:00",
+      href: "/projects/launch",
       unread: true,
+    },
+    {
+      id: "notice-2",
+      title: "A new comment on Website refresh",
+      description: "Riley mentioned you in the homepage review.",
+      timestamp: "1 hour ago",
+      dateTime: "2026-11-17T13:06:00",
+      href: "/projects/website",
+    },
+    {
+      id: "notice-3",
+      title: "Weekly summary",
+      description: "Your team completed 18 tasks this week.",
+      timestamp: "Yesterday",
+      dateTime: "2026-11-16T16:42:00",
     },
   ]}
   emptyState="No notifications."
 />
-```
+`}
+>
+  <NotificationList
+    items={[
+      {
+        id: "notice-1",
+        title: "Your launch plan is ready",
+        description: "Jordan added the final checklist and shared it with you.",
+        timestamp: "8 minutes ago",
+        dateTime: "2026-11-17T13:58:00",
+        href: "/projects/launch",
+        unread: true,
+      },
+      {
+        id: "notice-2",
+        title: "A new comment on Website refresh",
+        description: "Riley mentioned you in the homepage review.",
+        timestamp: "1 hour ago",
+        dateTime: "2026-11-17T13:06:00",
+        href: "/projects/website",
+      },
+      {
+        id: "notice-3",
+        title: "Weekly summary",
+        description: "Your team completed 18 tasks this week.",
+        timestamp: "Yesterday",
+        dateTime: "2026-11-16T16:42:00",
+      },
+    ]}
+    emptyState="No notifications."
+  />
+</Preview>
 
 ## Confirming an action
 
@@ -53,17 +100,45 @@ Use `NotificationList` for an empty state and a collection of items. `Notificati
 />
 ```
 
+<Preview
+  code={`\
+<ConfirmAction
+  triggerLabel="Archive project"
+  title="Archive Website refresh?"
+  description="The project will move out of your active workspace. You can restore it later."
+  confirmLabel="Archive project"
+  onConfirm={() => {}}
+/>
+`}
+>
+  <ConfirmAction
+    triggerLabel="Archive project"
+    title="Archive Website refresh?"
+    description="The project will move out of your active workspace. You can restore it later."
+    confirmLabel="Archive project"
+    onConfirm={() => {}}
+  />
+</Preview>
+
 ## Error recovery
 
 `ErrorStatePanel` composes Puzzle's error `Alert` with an optional recovery action.
 
-```tsx
+<Preview
+  code={`\
 <ErrorStatePanel
-  title="Unable to load projects"
-  description="Try again in a moment."
-  action={<Button onClick={reload}>Retry</Button>}
+  title="We couldn't load this view"
+  description="Your work is safe. Check your connection, then try again."
+  action={<Button>Try again</Button>}
 />
-```
+`}
+>
+  <ErrorStatePanel
+    title="We couldn't load this view"
+    description="Your work is safe. Check your connection, then try again."
+    action={<Button>Try again</Button>}
+  />
+</Preview>
 
 ## Accessibility and responsive behavior
 

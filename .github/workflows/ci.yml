@@ -65,6 +65,7 @@ jobs:
 
       - name: Install Playwright browser
         run: bunx playwright install --with-deps chromium
+        working-directory: packages/fullstack
 
       - name: Run all package tests
         run: bun run test:all

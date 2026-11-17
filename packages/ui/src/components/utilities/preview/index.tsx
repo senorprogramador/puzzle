@@ -38,6 +38,9 @@ type DeviceConfig = {
 };
 
 type PreviewAlign = "start" | "center" | "end" | "stretch";
+type PreviewCSSProperties = CSSProperties & {
+  [property: `--${string}`]: string | number | undefined;
+};
 type PreviewJustify =
   | "start"
   | "center"
@@ -69,6 +72,12 @@ const PREVIEW_DEVICES: Record<PreviewDevice, DeviceConfig> = {
   mobile: { label: "Mobile", width: 390, height: 844 },
   tablet: { label: "Tablet", width: 768, height: 1024 },
   desktop: { label: "Desktop", width: 1024, height: 768 },
+};
+
+const getPreviewDevice = (): PreviewDevice => {
+  if (window.innerWidth >= BREAKPOINTS.desktop) return "desktop";
+  if (window.innerWidth >= BREAKPOINTS.tablet) return "tablet";
+  return "mobile";
 };
 
 const PREVIEW_DEVICE_ITEMS = (
@@ -119,7 +128,7 @@ const PreviewBackground = (props: ComponentProps<"div">) => (
 const Preview = ({
   children,
   className,
-  defaultDevice = "mobile",
+  defaultDevice,
   code,
   fit = "content",
   height,
@@ -136,15 +145,19 @@ const Preview = ({
 
   const themeScope = useThemeScope();
 
-  const [device, setDevice] = useState<PreviewDevice>(defaultDevice);
+  const [device, setDevice] = useState<PreviewDevice>(defaultDevice ?? "mobile");
+  const [automaticDevice, setAutomaticDevice] = useState(
+    defaultDevice === undefined,
+  );
+  const [deviceResolved, setDeviceResolved] = useState(
+    defaultDevice !== undefined,
+  );
   const [activeTab, setActiveTab] = useState<PreviewTab>("preview");
   const [frameRoot, setFrameRoot] = useState<HTMLElement | null>(null);
-  const [scale, setScale] = useState(1);
   const [copied, setCopied] = useState(false);
   const [contentHeight, setContentHeight] = useState(PREVIEW_DEVICES.mobile.height);
   const [contentMeasured, setContentMeasured] = useState(false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -152,7 +165,7 @@ const Preview = ({
   const config = PREVIEW_DEVICES[device];
   const fitsContent = height === undefined && fit === "content";
   const frameHeight = height ?? (fitsContent ? contentHeight : config.height);
-  // Until the iframe content is measured, an inert inline copy sizes the viewport so SSR has no height jump.
+  // Keep the content's natural height in the server render until the iframe is measured.
   const showPlaceholder = fitsContent && !contentMeasured;
   const hasCode = code !== undefined;
   const [direction, setDirection] = useState<"ltr" | "rtl">("ltr");
@@ -195,6 +208,23 @@ const Preview = ({
     initialActiveId: device,
   });
 
+  useIsomorphicLayoutEffect(() => {
+    if (!automaticDevice) return;
+
+    const updateDevice = () => {
+      setDevice(getPreviewDevice());
+    };
+
+    updateDevice();
+    setDeviceResolved(true);
+    window.addEventListener("resize", updateDevice);
+    return () => window.removeEventListener("resize", updateDevice);
+  }, [automaticDevice]);
+
+  useIsomorphicLayoutEffect(() => {
+    deviceFocus.onItemFocus(device);
+  }, [device, deviceFocus.onItemFocus, desktopControlsVisible]);
+
   const handleTabKeyDown = (
     event: KeyboardEvent<HTMLButtonElement>,
     tab: PreviewTab,
@@ -214,6 +244,12 @@ const Preview = ({
     if (isKeyboardNavigation.current) {
       setActiveTab(tab);
     }
+  };
+
+  const handleDeviceSelect = (nextDevice: PreviewDevice) => {
+    setAutomaticDevice(false);
+    setDevice(nextDevice);
+    setDeviceResolved(true);
   };
 
   const syncStyles = useCallback(() => {
@@ -307,48 +343,6 @@ const Preview = ({
 
     frameHead.appendChild(scrollbarStyle);
   }, [frameRootId]);
-
-  const updateScale = useCallback(
-    (availableWidth: number) => {
-      if (availableWidth <= 0) return;
-
-      const nextScale = Math.min(1, Math.max(0, availableWidth) / config.width);
-
-      setScale((current) =>
-        Math.abs(current - nextScale) < 0.001 ? current : nextScale,
-      );
-    },
-    [config.width],
-  );
-
-  useIsomorphicLayoutEffect(() => {
-    const container = containerRef.current;
-
-    if (!container) return;
-
-    const measure = () => {
-      const styles = window.getComputedStyle(container);
-      const horizontalPadding =
-        (Number.parseFloat(styles.paddingLeft) || 0) +
-        (Number.parseFloat(styles.paddingRight) || 0);
-
-      updateScale(container.clientWidth - horizontalPadding);
-    };
-
-    measure();
-
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-
-      if (entry) {
-        updateScale(entry.contentRect.width);
-      }
-    });
-
-    observer.observe(container);
-
-    return () => observer.disconnect();
-  }, [updateScale]);
 
   useEffect(() => {
     const isStyleNode = (node: Node) =>
@@ -484,11 +478,8 @@ const Preview = ({
   }, [activeTab, hasCode]);
 
   const frameStyle: CSSProperties = {
-    width: config.width,
-    height: frameHeight,
-    transform: `scale(${scale})`,
-    transformOrigin: "top left",
-    visibility: showPlaceholder ? "hidden" : undefined,
+    height: fitsContent ? frameHeight : "var(--_puzzle-preview-device-height)",
+    visibility: showPlaceholder || !deviceResolved ? "hidden" : undefined,
   };
 
   const contentStyle: CSSProperties = {
@@ -501,17 +492,23 @@ const Preview = ({
   };
 
   const viewportStyle: CSSProperties = {
-    width: config.width * scale,
-    height: showPlaceholder ? undefined : frameHeight * scale,
-    maxHeight: showPlaceholder
-      ? PREVIEW_DEVICES.mobile.height * scale
+    height: fitsContent
+      ? showPlaceholder
+        ? undefined
+        : `calc(${frameHeight}px * var(--_puzzle-preview-scale))`
+      : "calc(var(--_puzzle-preview-device-height) * var(--_puzzle-preview-scale))",
+    maxHeight: fitsContent
+      ? `calc(${PREVIEW_DEVICES.mobile.height}px * var(--_puzzle-preview-scale))`
       : undefined,
   };
 
-  const placeholderStyle: CSSProperties = {
-    ...contentStyle,
-    width: config.width,
-    zoom: scale === 1 ? undefined : scale,
+  const sectionStyle: PreviewCSSProperties = {
+    "--_puzzle-preview-device-width": automaticDevice
+      ? undefined
+      : `${config.width}px`,
+    "--_puzzle-preview-device-height": height !== undefined
+      ? `${height}px`
+      : automaticDevice ? undefined : `${config.height}px`,
   };
 
   const panelProps = {
@@ -521,7 +518,12 @@ const Preview = ({
   };
 
   return (
-    <section ref={sectionRef} className={cn("puzzle-preview", className)}>
+    <section
+      ref={sectionRef}
+      className={cn("puzzle-preview", "not-prose", className)}
+      data-auto-device={automaticDevice ? "" : undefined}
+      style={sectionStyle}
+    >
       <div className="puzzle-preview__toolbar">
         <div
           className="puzzle-preview__tabs"
@@ -594,7 +596,7 @@ const Preview = ({
                       onKeyDown={(event) =>
                         deviceFocus.onItemKeyDown(event, item)
                       }
-                      onClick={() => setDevice(item)}
+                      onClick={() => handleDeviceSelect(item)}
                     >
                       {PREVIEW_DEVICES[item].label}
                     </button>
@@ -626,7 +628,6 @@ const Preview = ({
 
       <PreviewBackground {...panelProps} className="puzzle-preview__panel">
         <div
-          ref={containerRef}
           className="puzzle-preview__stage"
           hidden={activeTab !== "preview"}
         >
@@ -642,8 +643,8 @@ const Preview = ({
 
             {showPlaceholder && (
               <div
-                className="puzzle-preview__placeholder"
-                style={placeholderStyle}
+                className="puzzle-preview__content puzzle-preview__placeholder"
+                style={contentStyle}
                 aria-hidden="true"
                 inert
                 data-preview-placeholder=""
@@ -658,7 +659,13 @@ const Preview = ({
                   scopeId={themeScope?.scopeId ?? null}
                   theme={themeScope?.theme ?? "system"}
                 >
-                  <div ref={contentRef} style={contentStyle}>{children}</div>
+                  <div
+                    ref={contentRef}
+                    className="puzzle-preview__content"
+                    style={contentStyle}
+                  >
+                    {children}
+                  </div>
                 </ThemeScopeProvider>,
                 frameRoot,
               )}

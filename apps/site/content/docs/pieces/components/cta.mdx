@@ -1,0 +1,51 @@
+---
+title: CTASection
+description: Invite visitors to a consumer-defined next step with responsive call-to-action layouts and optional media.
+---
+
+`CTASection` composes a message, optional media, actions, and custom children. It does not implement a newsletter form, download, trial, contact flow, or application behavior; consumers provide those elements.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { CTASection } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Each preview shares the same typed content slots while applying its named composition. Theme and background behavior inherit from the shared UI section props.
+
+import { CTASectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<CTASectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `CTAVariant` | Selects one of sixteen call-to-action presentations; defaults to `centered`. |
+| `title` / `description` / `eyebrow` | `ReactNode` | Shared section heading content. |
+| `primaryAction` / `secondaryAction` | `ReactNode` | Consumer-provided next steps. |
+| `media` | `ReactNode` | Optional consumer-provided media. |
+| `children` | `ReactNode` | Additional composable content such as a form. |
+| Shared section props | `SectionRootProps` | Semantic root, theme, native attributes, width, and spacing. |
+
+## Usage
+
+```tsx
+<CTASection
+  variant="trial"
+  title="Ready to get started?"
+  description="Try the workflow with your team."
+  primaryAction={<a href="/signup">Start a trial</a>}
+  secondaryAction={<a href="/docs">Read the guide</a>}
+/>
+```
+
+The action slots are omitted when not supplied. Provide links, buttons, forms, and their loading/error behavior from the consuming application.
+
+## Accessibility
+
+Use descriptive action names and maintain a logical heading level. If a form is passed through `children`, provide its own labels, validation messages, and submission feedback.

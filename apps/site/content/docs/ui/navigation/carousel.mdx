@@ -147,8 +147,8 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
   <Carousel<(typeof items)[number]>
     getItemKey={(item) => item.id}
     renderItem={(item) => <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />}
-    backButton={<Button size="sm" aria-label="Previous slide">Back</Button>}
-    nextButton={<Button size="sm" aria-label="Next slide">Next</Button>}
+    backButton={<Button variant="primary" size="sm" aria-label="Previous slide"><Icon name="bx:caret-left" /></Button>}
+    nextButton={<Button variant="primary" size="sm" aria-label="Next slide"><Icon name="bx:caret-right" /></Button>}
     buttonAlignment="over"
     pagerAlignment="under"
     renderPager={(current, total) => <span role="status">Page {current + 1} of {total}</span>}
@@ -164,13 +164,13 @@ Use `itemWidth` instead of `panelsPerView` for explicit item widths; it takes pr
           <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />
         )}
         backButton={
-          <Button size="sm" aria-label="Previous slide">
-            Back
+          <Button variant="primary" size="sm" aria-label="Previous slide">
+            <Icon name="bx:caret-left" />
           </Button>
         }
         nextButton={
-          <Button size="sm" aria-label="Next slide">
-            Next
+          <Button variant="primary" size="sm" aria-label="Next slide">
+            <Icon name="bx:caret-right" />
           </Button>
         }
         buttonAlignment="over"
@@ -200,8 +200,8 @@ return (
       <Carousel<(typeof items)[number]>
         getItemKey={(item) => item.id}
         renderItem={(item) => <Image src={item.src} alt={item.alt} fill containerStyle={{ height: 300 }} loading="lazy" />}
-        backButton={<Button variant="outline">Previous</Button>}
-        nextButton={<Button variant="outline">Next</Button>}
+        backButton={<Button variant="primary" aria-label="Previous slide"><Icon name="bx:caret-left" /></Button>}
+        nextButton={<Button variant="primary" aria-label="Next slide"><Icon name="bx:caret-right" /></Button>}
         buttonAlignment="aside"
         renderPager={(current, total) => <span role="status">Page {current + 1} of {total}</span>}
       />

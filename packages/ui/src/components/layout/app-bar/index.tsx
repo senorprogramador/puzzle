@@ -18,6 +18,48 @@ import { Stack } from "../stack";
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
 
+const getStickyOffsetScope = (appBar: HTMLElement) => {
+  const pageLayout = appBar.closest<HTMLElement>("[data-puzzle-page-layout]");
+  const parent = appBar.parentElement;
+  const isPageHeader =
+    parent?.classList.contains("puzzle-page-layout__header") &&
+    parent.parentElement === pageLayout;
+
+  // AppBars inside previews must not overwrite the page offset.
+  if (pageLayout && parent !== pageLayout && !isPageHeader) return;
+
+  return pageLayout ?? appBar.ownerDocument.documentElement;
+};
+
+const initializeStickyOffset = (
+  script: HTMLScriptElement,
+  getScope: typeof getStickyOffsetScope,
+) => {
+  const appBar = script.parentElement;
+  const stylesheet = script.previousElementSibling;
+  if (!appBar || !(stylesheet instanceof HTMLStyleElement)) return;
+
+  const scope = getScope(appBar);
+  if (!scope || !stylesheet.sheet) return;
+
+  const barSelector = `[data-puzzle-app-bar="${CSS.escape(
+    appBar.getAttribute("data-puzzle-app-bar")!,
+  )}"]`;
+  const selector =
+    scope === appBar.ownerDocument.documentElement
+      ? ":root"
+      : scope === appBar.parentElement
+        ? `[data-puzzle-page-layout]:has(> ${barSelector})`
+        : `[data-puzzle-page-layout]:has(> .puzzle-page-layout__header > ${barSelector})`;
+
+  // CSSOM changes leave React's server-rendered attributes and text intact.
+  stylesheet.sheet.insertRule(
+    `${selector}{--puzzle-sticky-offset:${appBar.getBoundingClientRect().height}px}`,
+  );
+};
+
+const stickyOffsetScript = `(${initializeStickyOffset.toString()})(document.currentScript,${getStickyOffsetScope.toString()})`;
+
 type AppBarNavigationItem = {
   label: string;
   href: string;
@@ -36,6 +78,8 @@ type AppBarProps<T = never> = {
   sticky?: boolean;
   ariaLabel?: string;
   className?: string;
+  /** CSP nonce for the initial sticky-offset script and stylesheet. */
+  nonce?: string;
 };
 
 const AppBar = <T,>({
@@ -49,6 +93,7 @@ const AppBar = <T,>({
   sticky = false,
   ariaLabel = "Main navigation",
   className,
+  nonce,
 }: AppBarProps<T>) => {
   const [open, setOpen] = useState(false);
   const appBarRef = useRef<HTMLElement | null>(null);
@@ -70,17 +115,8 @@ const AppBar = <T,>({
     const appBar = appBarRef.current;
     if (!appBar) return;
 
-    const pageLayout = appBar.closest<HTMLElement>("[data-puzzle-page-layout]");
-
-    // AppBars inside previews must not overwrite the page offset.
-    const parent = appBar.parentElement;
-    const isPageHeader =
-      parent?.classList.contains("puzzle-page-layout__header") &&
-      parent.parentElement === pageLayout;
-
-    if (pageLayout && parent !== pageLayout && !isPageHeader) return;
-
-    const scope = pageLayout ?? appBar.ownerDocument.documentElement;
+    const scope = getStickyOffsetScope(appBar);
+    if (!scope) return;
     const property = "--puzzle-sticky-offset";
 
     const previousValue = scope.style.getPropertyValue(property);
@@ -144,6 +180,7 @@ const AppBar = <T,>({
       ref={appBarRef}
       className={cn("puzzle-app-bar", className)}
       style={style}
+      data-puzzle-app-bar={sticky ? navigationId : undefined}
     >
       <div className="puzzle-app-bar__inner">
         {hasBrand && (
@@ -234,6 +271,15 @@ const AppBar = <T,>({
             </nav>
           </Drawer>
         </div>
+      )}
+      {sticky && (
+        <>
+          <style nonce={nonce} />
+          <script
+            nonce={nonce}
+            dangerouslySetInnerHTML={{ __html: stickyOffsetScript }}
+          />
+        </>
       )}
     </header>
   );

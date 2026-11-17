@@ -50,6 +50,67 @@ const items = [
 
 The callback handles unmodified primary clicks. Modified clicks retain native browser behavior, including opening a link in a new tab.
 
+<Preview
+  code={`\
+<DashboardNavigation
+  items={items}
+  pathname="/workspace/projects"
+  orientation="vertical"
+  label="Workspace"
+/>
+`}
+>
+  <DashboardNavigation
+    items={[
+      { id: "overview", label: "Overview", href: "/workspace" },
+      {
+        id: "projects",
+        label: "Projects",
+        href: "/workspace/projects",
+        children: [
+          {
+            id: "website",
+            label: "Website refresh",
+            href: "/workspace/projects/website",
+          },
+        ],
+      },
+      { id: "insights", label: "Insights", href: "/workspace/insights" },
+    ]}
+    pathname="/workspace/projects"
+    orientation="vertical"
+    label="Workspace"
+  />
+</Preview>
+
+<Preview
+  code={`\
+const items = [
+  { id: "overview", label: "Overview", href: "/workspace" },
+  { id: "projects", label: "Projects", href: "/workspace/projects" },
+  { id: "insights", label: "Insights", href: "/workspace/insights" },
+  { id: "settings", label: "Settings", href: "/workspace/settings" },
+];
+
+<DashboardSidebar
+  items={items}
+  pathname="/workspace/projects"
+  label="Workspace"
+/>
+`}
+>
+  <DashboardSidebar
+    items={[
+      { id: "overview", label: "Overview", href: "/workspace" },
+      { id: "projects", label: "Projects", href: "/workspace/projects" },
+      { id: "insights", label: "Insights", href: "/workspace/insights" },
+      { id: "settings", label: "Settings", href: "/workspace/settings" },
+    ]}
+    pathname="/workspace/projects"
+    label="Workspace"
+  />
+</Preview>
+
 ## Sidebar and mobile navigation
 
 Use `DashboardSidebar` for vertical workspace navigation. `DashboardMobileNavigation` uses the browser's native `<details>` disclosure behavior and can be shown at mobile breakpoints by the application.
@@ -63,21 +124,78 @@ Use `DashboardSidebar` for vertical workspace navigation. `DashboardMobileNaviga
 />
 ```
 
+<Preview
+  defaultDevice="mobile"
+  height={300}
+  code={`\
+<DashboardMobileNavigation
+  items={[
+    { id: "overview", label: "Overview", href: "/workspace" },
+    { id: "projects", label: "Projects", href: "/workspace/projects" },
+    { id: "insights", label: "Insights", href: "/workspace/insights" },
+  ]}
+  pathname="/workspace/projects"
+  label="Workspace"
+/>
+`}
+>
+  <DashboardMobileNavigation
+    items={[
+      { id: "overview", label: "Overview", href: "/workspace" },
+      { id: "projects", label: "Projects", href: "/workspace/projects" },
+      { id: "insights", label: "Insights", href: "/workspace/insights" },
+    ]}
+    pathname="/workspace/projects"
+    label="Workspace"
+  />
+</Preview>
+
 ## Topbar and user menu
 
-```tsx
+<Preview
+  height={280}
+  code={`\
 <DashboardTopbar actions={<button type="button">Invite</button>}>
-  <span>Acme workspace</span>
+  <strong>Northstar Studio</strong>
 </DashboardTopbar>
 
+<DashboardBreadcrumbs
+  items={[
+    { id: "workspace", label: "Workspace", href: "/workspace" },
+    { id: "projects", label: "Projects", href: "/workspace/projects" },
+    { id: "website", label: "Website refresh" },
+  ]}
+/>
+
 <DashboardUserMenu
-  trigger={<span>Alex Morgan</span>}
+  trigger={<span>Jordan Lee</span>}
   label="Account actions"
 >
   <a href="/profile">Profile</a>
   <button type="button">Sign out</button>
 </DashboardUserMenu>
-```
+`}
+>
+  <DashboardTopbar
+    actions={<Button variant="secondary">Invite team</Button>}
+  >
+    <strong>Northstar Studio</strong>
+  </DashboardTopbar>
+  <DashboardBreadcrumbs
+    items={[
+      { id: "workspace", label: "Workspace", href: "/workspace" },
+      { id: "projects", label: "Projects", href: "/workspace/projects" },
+      { id: "website", label: "Website refresh" },
+    ]}
+  />
+  <DashboardUserMenu
+    trigger={<span>Jordan Lee</span>}
+    label="Account actions"
+  >
+    <a href="/profile">Profile</a>
+    <button type="button">Sign out</button>
+  </DashboardUserMenu>
+</Preview>
 
 The user menu is a native disclosure. Supply interactive items and their behavior from the consuming application.
 

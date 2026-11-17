@@ -41,12 +41,21 @@ With content fit, the server render includes an inline placeholder of the
 children at the device width. The placeholder sizes the preview before the
 iframe loads, so there is no full-height flash. It is `inert` and hidden from
 assistive technology. Once the iframe content is measured, the iframe replaces
-it before paint. The placeholder uses the page's styles and viewport, not the
+it. Both use the same device width, content typography, height cap, and CSS scaling,
+including before hydration. The placeholder uses the page's viewport, not the
 iframe's, so viewport media queries can render it differently. Examples whose
-initial layout depends on the device viewport should use `fit="device"` or an
+initial layout depends on viewport units or media queries should use `fit="device"` or an
 explicit `height`, which skip the placeholder.
 
-`defaultDevice` sets the initial viewport: `mobile` is 390px wide, `tablet` is 768px, and `desktop` is 1024px. The device selector changes the iframe viewport, so responsive styles can be tested without resizing the browser. The frame scales down to fit its container.
+`defaultDevice` sets the initial viewport: `mobile` is 390px wide, `tablet` is 768px, and `desktop` is 1024px. When omitted, the preview matches the browser width: mobile below 768px, tablet from 768px, and desktop from 1024px. This automatic choice follows browser resizing until a device is selected manually. An explicit `defaultDevice` takes precedence. The device selector changes the iframe viewport, so responsive styles can be tested without resizing the browser. The frame scales down to fit its container.
+CSS selects the automatic device dimensions and scales the whole viewport to its container before hydration. Fixed-height and device-fit previews reserve their final dimensions immediately; content-fit previews reserve their inline content height. Scaling does not depend on a client-side measurement.
+
+Use a reserved height for viewport-dependent examples when avoiding initial layout
+shifts is essential. For example, Pieces section variant demos use `fit="device"`
+because their spacing and responsive compositions depend on the iframe viewport.
+
+The site's `bun run --filter @puzzle-ui/site test:preview-layout` check validates
+the production build with hydration delayed at mobile, tablet, and desktop sizes.
 
 Use `fit="device"` for a full device viewport: mobile is 844px tall, tablet is
 1024px, and desktop is 768px. This is useful for overlays, fixed-position
@@ -127,7 +136,7 @@ At 1024px and wider all three are shown. This does not change the selected devic
 | --------------- | ------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------ |
 | `children`      | `ReactNode`                                                         | Required      | Live content rendered inside the iframe.                                 |
 | `code`          | `string`                                                            | -             | Source shown in the Code tab, with syntax highlighting and copy support. |
-| `defaultDevice` | `"mobile" \| "tablet" \| "desktop"`                                 | `"mobile"`    | Initial device viewport.                                                 |
+| `defaultDevice` | `"mobile" \| "tablet" \| "desktop"`                                 | Browser width | Initial device viewport. When omitted, matches the browser width.        |
 | `fit`           | `"content" \| "device"`                                             | `"content"`   | Fit natural content up to 844px, or use the selected device height.       |
 | `height`        | `number`                                                            | -             | Iframe height in pixels, before scaling. Overrides fit and its cap.      |
 | `padding`       | `number \| string`                                                  | `var(--puzzle-space-8, 2rem)` | Space inside the frame, around the content. Numbers are pixels; strings accept CSS padding. |

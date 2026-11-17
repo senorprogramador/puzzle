@@ -1,0 +1,66 @@
+---
+title: ComparisonSection
+description: Compare plans, products, or options with responsive cards or an accessible, keyboard-scrollable feature table.
+---
+
+`ComparisonSection` compares consumer-provided options and feature values. Each option has a stable ID and title; each feature has an ID, label, and values keyed by option ID.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  ComparisonSection,
+  type ComparisonFeature,
+  type ComparisonOption,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Table variants use semantic row/column headers and boolean values are labeled as included or not included. The interactive variant exposes a native radio group. On narrow screens the table scrolls within a labeled, keyboard-focusable viewport rather than widening the page.
+
+import { ComparisonSectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<ComparisonSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `ComparisonVariant` | Selects one of twelve comparison compositions; defaults to `table`. |
+| `options` | `readonly ComparisonOption[]` | Options with stable `id`, required `title`, and optional description/action. |
+| `features` | `readonly ComparisonFeature[]` | Rows with stable `id`, label, and a `values` record keyed by option ID. |
+| `highlightedOptionId` | `string` | Option emphasized in supported layouts. |
+| `comparisonLabel` | `string` | Accessible label for the table viewport and table caption. |
+| `selectedOptionId` | `string` | Controlled selection for `variant="interactive"`. |
+| `defaultSelectedOptionId` | `string` | Initial uncontrolled selection for `variant="interactive"`. |
+| `onSelectionChange` | `(optionId: string) => void` | Selection callback for `variant="interactive"`. |
+| Shared section props | `SectionRootProps` and heading props | Semantic root, theme, native attributes, heading, actions, and children. |
+
+Feature values may be booleans, strings, numbers, or React nodes. Undefined values render as `Not provided`. Selection state remains local unless controlled; no pricing or billing logic is included.
+
+## Usage
+
+```tsx
+<ComparisonSection
+  variant="interactive"
+  title="Choose a plan"
+  options={[
+    { id: "starter", title: "Starter" },
+    { id: "team", title: "Team", featured: true },
+  ]}
+  features={[
+    { id: "seats", label: "Team members", values: { starter: 3, team: 20 } },
+    { id: "support", label: "Priority support", values: { starter: false, team: true } },
+  ]}
+  defaultSelectedOptionId="starter"
+/>
+```
+
+An empty option collection omits the comparison structure. Use unique option and feature IDs, and ensure each feature's value keys match the option IDs.
+
+## Accessibility
+
+Tables include a caption, column headers, and row headers. Interactive table options use native radio controls. The scroll viewport is keyboard focusable and labeled so users can reach off-screen columns without page-level horizontal overflow.

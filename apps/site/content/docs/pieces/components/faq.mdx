@@ -1,0 +1,59 @@
+---
+title: FAQSection
+description: Answer common questions with accessible accordion layouts, optional categories, and local search.
+---
+
+`FAQSection` displays question and answer data using the UI Accordion primitive. Each item has a stable ID, question, and answer. Category grouping, searchable text, and an empty state are optional.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { FAQSection, type FAQItem } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Disclosures support keyboard activation and either single or multiple expansion. Search filters the current collection locally; it does not call an external search service.
+
+import { FAQSectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<FAQSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `FAQVariant` | Selects one of twelve FAQ presentations; defaults to `accordion`. |
+| `items` | `readonly FAQItem[]` | Questions with stable `id`, `question`, and `answer`. |
+| `FAQItem.category` | `string` | Category label for grouped/categorized variants. |
+| `FAQItem.searchText` | `string` | Optional text included in searchable filtering. |
+| `FAQItem.featured` | `boolean` | Adds a featured label to selected items in the `featured` variant. |
+| `expandMode` | `"single" \| "multiple"` | Accordion expansion mode; defaults to `single`. |
+| `searchLabel` / `searchPlaceholder` | `string` | Visible search label and placeholder. |
+| `emptyState` | `ReactNode` | Optional custom empty or no-results content. |
+| Shared section props | `SectionRootProps` and heading props | Semantic root, theme, native attributes, heading, actions, and children. |
+
+## Usage
+
+```tsx
+<FAQSection
+  variant="searchable"
+  title="Frequently asked questions"
+  items={[
+    {
+      id: "delivery",
+      question: "When will my order arrive?",
+      answer: "Delivery usually takes two business days.",
+      searchText: "shipping arrival",
+    },
+  ]}
+/>
+```
+
+An empty collection shows a default status message unless `emptyState` is provided. In categorized mode, category links target IDs generated for that section instance.
+
+## Accessibility
+
+Accordion triggers and panels use UI Accordion semantics and keyboard behavior. Search has a visible label, and empty results are announced with a status region. Keep item IDs unique and questions concise.

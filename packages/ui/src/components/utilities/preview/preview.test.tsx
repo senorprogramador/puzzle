@@ -88,7 +88,7 @@ describe("Preview", () => {
     );
 
     render(
-      <Preview code="<Button>Save</Button>">
+      <Preview defaultDevice="mobile" code="<Button>Save</Button>">
         <button type="button">Preview action</button>
       </Preview>,
     );
@@ -195,7 +195,7 @@ describe("Preview", () => {
     it("moves focus with the arrow keys without changing the selection", async () => {
       const user = userEvent.setup();
 
-      render(<Preview>Demo</Preview>);
+      render(<Preview defaultDevice="mobile">Demo</Preview>);
 
       getDevice("Mobile").focus();
       await user.keyboard("{ArrowRight}");
@@ -214,7 +214,7 @@ describe("Preview", () => {
     it("selects the focused device with Enter or Space", async () => {
       const user = userEvent.setup();
 
-      render(<Preview>Demo</Preview>);
+      render(<Preview defaultDevice="mobile">Demo</Preview>);
 
       getDevice("Mobile").focus();
       await user.keyboard("{ArrowRight}{Enter}");
@@ -230,7 +230,7 @@ describe("Preview", () => {
 
       render(
         <div dir="rtl">
-          <Preview>Demo</Preview>
+          <Preview defaultDevice="mobile">Demo</Preview>
         </div>,
       );
 

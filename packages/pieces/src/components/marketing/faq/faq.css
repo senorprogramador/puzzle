@@ -1,0 +1,78 @@
+.puzzle-faq__search {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+  max-width: var(--puzzle-content-width, 40rem);
+  margin-block-end: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-faq__search input {
+  min-width: 0;
+  padding: var(--puzzle-space-3, 0.75rem) var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface);
+  color: inherit;
+  font: inherit;
+}
+
+.puzzle-faq__search input:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-faq__groups {
+  display: grid;
+  gap: var(--puzzle-space-8, 2rem);
+}
+
+.puzzle-faq__group h3 {
+  margin: 0 0 var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-faq__groups nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-faq__empty {
+  padding-block: var(--puzzle-space-6, 1.5rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-faq__number {
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-faq__featured-label {
+  color: var(--puzzle-color-primary);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-faq[data-variant="two-column"] .puzzle-faq__accordion {
+  columns: 1;
+}
+
+.puzzle-faq[data-variant="grid"] .puzzle-faq__accordion,
+.puzzle-faq[data-variant="cards"] .puzzle-faq__accordion {
+  max-width: var(--puzzle-content-width, 64rem);
+}
+
+.puzzle-faq[data-variant="bordered"] .puzzle-faq__accordion {
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-faq[data-variant="minimal"] .puzzle-faq__accordion {
+  border: 0;
+}
+
+@media (min-width: 40rem) {
+  .puzzle-faq[data-variant="two-column"] .puzzle-faq__accordion {
+    columns: 2;
+  }
+}

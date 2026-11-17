@@ -1,0 +1,53 @@
+---
+title: BenefitsSection
+description: Communicate customer outcomes with responsive benefit lists, cards, icons, media, and featured content.
+---
+
+`BenefitsSection` focuses on outcomes rather than feature details. Each item has a stable ID and title, with optional description, icon, media, action, or featured emphasis.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { BenefitsSection, type BenefitItem } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The collection adapts from a single column on narrow screens to wider grid layouts when there is room.
+
+import { BenefitsSectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<BenefitsSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `BenefitsVariant` | Selects one of twelve benefit compositions; defaults to `grid`. |
+| `items` | `readonly BenefitItem[]` | Benefit content with stable `id`, required `title`, and optional slots. |
+| `BenefitItem.icon` | `ReactNode` | Optional consumer-provided icon. |
+| `BenefitItem.media` | `ReactNode` | Optional media node. |
+| `BenefitItem.action` | `ReactNode` | Consumer-provided action. |
+| `BenefitItem.featured` | `boolean` | Emphasizes the item in supported variants. |
+| Shared section props | `SectionRootProps` and heading props | Semantic root, theme, native attributes, heading, actions, and children. |
+
+## Usage
+
+```tsx
+<BenefitsSection
+  variant="checklist"
+  title="Benefits for your team"
+  items={[
+    { id: "time", title: "Save time", description: "Reduce repetitive tasks." },
+    { id: "clarity", title: "Gain clarity" },
+  ]}
+/>
+```
+
+The section does not imply product-specific claims or generate content. Empty collections omit the list while preserving optional heading content.
+
+## Accessibility
+
+Use descriptive titles and provide text alternatives through the consumer-provided media. Keep icon-only meaning in the item's text as well.

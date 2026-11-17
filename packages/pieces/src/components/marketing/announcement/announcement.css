@@ -1,0 +1,77 @@
+.puzzle-announcement {
+  --puzzle-announcement-gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-announcement__list {
+  display: grid;
+  gap: var(--puzzle-announcement-gap);
+}
+
+.puzzle-announcement__message {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--puzzle-announcement-gap);
+  padding: var(--puzzle-space-3, 0.75rem) var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface);
+  text-align: center;
+}
+
+.puzzle-announcement__copy {
+  flex: 1 1 auto;
+}
+
+.puzzle-announcement__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.puzzle-announcement__action {
+  display: inline-flex;
+}
+
+.puzzle-announcement[data-variant="bar"] .puzzle-announcement__message,
+.puzzle-announcement[data-variant="minimal"] .puzzle-announcement__message {
+  border: 0;
+  border-radius: 0;
+}
+
+.puzzle-announcement[data-variant="split"] .puzzle-announcement__message,
+.puzzle-announcement[data-variant="promotional"] .puzzle-announcement__message {
+  justify-content: space-between;
+  text-align: start;
+}
+
+.puzzle-announcement[data-variant="centered"] .puzzle-announcement__message,
+.puzzle-announcement[data-variant="floating"] .puzzle-announcement__message {
+  margin-inline: auto;
+}
+
+.puzzle-announcement[data-variant="floating"] .puzzle-announcement__message {
+  max-width: var(--puzzle-content-width, 64rem);
+}
+
+.puzzle-announcement[data-variant="ticker"] .puzzle-announcement__list {
+  overflow-x: auto;
+}
+
+.puzzle-announcement[data-variant="ticker"] .puzzle-announcement__message {
+  width: max-content;
+  min-width: 100%;
+  justify-content: flex-start;
+  white-space: nowrap;
+}
+
+.puzzle-announcement[data-variant="countdown"] .puzzle-announcement__countdown {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@media (min-width: 40rem) {
+  .puzzle-announcement__message {
+    align-items: center;
+  }
+}

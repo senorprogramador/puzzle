@@ -1,0 +1,52 @@
+---
+title: AnnouncementSection
+description: Present announcements, promotions, countdowns, and multiple dismissible notices with accessible controls.
+---
+
+`AnnouncementSection` displays a concise notice with optional icon and consumer-provided action. It supports a single message, a countdown, or independently dismissible messages. It does not own campaign routing, persistence, or scheduling.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { AnnouncementSection } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Every supported variant has an individual runnable preview. The dismiss control is keyboard operable; countdown mode requires a valid date string or `Date`.
+
+import { AnnouncementSectionVariantsExample } from "../../../../src/components/doc-examples";
+
+<AnnouncementSectionVariantsExample />
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `"bar" \| "dismissible" \| "centered" \| "split" \| "promotional" \| "countdown" \| "ticker" \| "multi-message" \| "floating" \| "minimal"` | Selects the presentation. Defaults to `bar`. |
+| `message` | `ReactNode` | Content for a single announcement. |
+| `icon` | `ReactNode` | Optional decorative icon for a single announcement. |
+| `action` | `ReactNode` | Consumer-provided action for a single announcement. |
+| `dismissible` | `boolean` | Enables the dismiss button. Defaults to true for the `dismissible` variant. |
+| `dismissLabel` | `string` | Accessible name for the dismiss button. |
+| `countdownTarget` | `Date \| string` | Required with `variant="countdown"`; invalid dates throw a `RangeError`. |
+| `announcements` | `readonly AnnouncementItem[]` | Required with `variant="multi-message"`; each item needs a stable `id` and `message`. |
+| Shared section props | `SectionRootProps` and heading props | Semantic root, theme, native attributes, optional heading, actions, and children. |
+
+## Usage
+
+```tsx
+<AnnouncementSection
+  variant="dismissible"
+  message="A new collection is available."
+  action={<a href="/collections">Explore the collection</a>}
+/>
+```
+
+`multi-message` accepts `icon`, `action`, and `dismissLabel` per announcement item. Dismissed messages are removed for the current mounted instance; persistence is the consumer's responsibility. The `ticker` layout is horizontally scrollable and does not animate automatically.
+
+## Accessibility
+
+Dismiss controls are real buttons with an accessible name and normal keyboard behavior. Use meaningful action text, keep notice content concise, and do not place essential information only in a decorative icon. A countdown is exposed as a `time` element; it is not announced every second.
