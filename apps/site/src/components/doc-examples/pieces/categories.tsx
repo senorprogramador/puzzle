@@ -18,7 +18,7 @@ const categories: CategoryItem[] = [
       src: sectionPreviewImages.workspace,
       alt: "Pendant lighting over a quiet dining space",
     },
-    href: "https://example.com/collections/lighting",
+    href: "/docs/pieces/components/categories",
     featured: true,
   },
   {
@@ -29,7 +29,7 @@ const categories: CategoryItem[] = [
       src: sectionPreviewImages.product,
       alt: "Neutral home textiles folded on a chair",
     },
-    href: "https://example.com/collections/textiles",
+    href: "/docs/pieces/components/categories",
   },
   {
     id: "tableware",
@@ -39,7 +39,7 @@ const categories: CategoryItem[] = [
       src: sectionPreviewImages.dashboard,
       alt: "Ceramic tableware arranged for a shared meal",
     },
-    href: "https://example.com/collections/tableware",
+    href: "/docs/pieces/components/categories",
   },
 ];
 

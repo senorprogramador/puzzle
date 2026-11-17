@@ -28,7 +28,7 @@ const useCaseItems: UseCaseItem[] = [
         alt="A product launch dashboard with milestone cards"
       />
     ),
-    action: <a href="https://example.com/product-launch">Explore the workflow</a>,
+    action: <a href="/docs/pieces/components/use-cases">Explore the workflow</a>,
     featured: true,
   },
   {

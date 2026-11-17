@@ -3,7 +3,8 @@ title: Marketing & Conversion Sections
 description: Compose responsive marketing sections for product discovery, customer proof, conversion, FAQs, and comparisons with Puzzle Pieces.
 ---
 
-import { Badge } from "@puzzle-ui/ui";
+import { CTASection } from "@puzzle-ui/pieces";
+import { Badge, Button, Preview } from "@puzzle-ui/ui";
 
 Puzzle Pieces provides focused section compositions for common marketing and conversion tasks. Each component renders semantic content from consumer-provided data, uses Puzzle UI section and interaction primitives, and leaves routing, forms, persistence, and product logic to the consuming application.
 
@@ -51,3 +52,23 @@ import {
 ```
 
 See each section reference below for its full variant preview gallery, API, and usage guidance.
+
+## Visual preview
+
+<Preview fit="device" code={`<CTASection variant="split" title="Make room for your next big idea." primaryAction={<Button href="/docs/pieces/components/cta">Explore the CTA API</Button>} />`}>
+  <CTASection
+    variant="split"
+    title="Make room for your next big idea."
+    description="Bring the right people and the right ideas together."
+    primaryAction={
+      <Button href="/docs/pieces/components/cta">Explore the CTA API</Button>
+    }
+  />
+</Preview>
+
+## Framework integration
+
+Marketing sections are router-independent. For server-loaded content, render
+the section with serializable data; use a client component when actions or
+controlled tabs require application state. See the
+[Next.js and TanStack Start guide](/docs/pieces/framework-integration).

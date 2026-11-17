@@ -12,7 +12,10 @@ import {
   SettingsSection,
 } from "@puzzle-ui/pieces";
 import { Accordion, Badge, Button, Preview, TextInput } from "@puzzle-ui/ui";
-import { SettingsTabsExample } from "../../../../src/components/doc-examples/pieces/settings";
+import {
+  SettingsSectionVariantsExample,
+  SettingsTabsExample,
+} from "../../../../src/components/doc-examples/pieces/settings";
 
 Settings compositions provide layout and semantic structure only. Data loading, validation, and mutations remain in the application.
 
@@ -67,8 +70,8 @@ Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organi
     />
   </SettingsGroup>
   <FormActions>
-    <Button>Save changes</Button>
-    <Button variant="outline">Cancel</Button>
+    <Button href="/docs/pieces/components/settings#interactive-tabs-and-preferences">Save changes</Button>
+    <Button variant="outline" href="/docs/pieces/components/settings#api">Cancel</Button>
   </FormActions>
 </SettingsSection>
 `}
@@ -115,8 +118,8 @@ Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organi
       />
     </SettingsGroup>
     <FormActions>
-      <Button>Save changes</Button>
-      <Button variant="outline">Cancel</Button>
+      <Button href="/docs/pieces/components/settings#interactive-tabs-and-preferences">Save changes</Button>
+      <Button variant="outline" href="/docs/pieces/components/settings#api">Cancel</Button>
     </FormActions>
   </SettingsSection>
 </Preview>
@@ -130,14 +133,14 @@ Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organi
   name="Jordan Lee"
   email="jordan@northstar.studio"
   avatar={<span aria-hidden="true">JL</span>}
-  actions={<Button variant="secondary">Edit profile</Button>}
+  actions={<Button variant="secondary" href="/docs/pieces/components/settings#interactive-tabs-and-preferences">Edit profile</Button>}
 />
 
 <SecurityMethodCard
   title="Two-step verification"
   description="An authenticator app is protecting your workspace access."
   status="Active"
-  action={<Button variant="secondary">Manage security</Button>}
+  action={<Button variant="secondary" href="/docs/pieces/components/settings#interactive-tabs-and-preferences">Manage security</Button>}
 />
 `}
 >
@@ -145,14 +148,14 @@ Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organi
     name="Jordan Lee"
     email="jordan@northstar.studio"
     avatar={<span aria-hidden="true">JL</span>}
-    actions={<Button variant="secondary">Edit profile</Button>}
+    actions={<Button variant="secondary" href="/docs/pieces/components/settings#interactive-tabs-and-preferences">Edit profile</Button>}
   />
   <SecurityMethodCard
     title="Two-step verification"
     description="An authenticator app is protecting your workspace access."
     status="Active"
     icon={<span aria-hidden="true">2FA</span>}
-    action={<Button variant="secondary">Manage security</Button>}
+    action={<Button variant="secondary" href="/docs/pieces/components/settings#interactive-tabs-and-preferences">Manage security</Button>}
   />
 </Preview>
 
@@ -178,6 +181,10 @@ The settings layout does not own application state. Compose it with UI `Tabs`, `
 </Preview>
 
 Supported variants: `list`, `grouped`, `cards`, `split`, `sidebar`, `tabs`, `accordion`, `profile`, `preferences`, `security`, `notifications`, and `compact`. Use the `navigation` slot for caller-owned navigation in sidebar layouts; use UI `Tabs` or `Accordion` when those interactions are needed.
+
+<Preview fit="device" code={`<SettingsSection variant="sidebar" navigation={<SettingsNavigation />} />`}>
+  <SettingsSectionVariantsExample />
+</Preview>
 
 <Preview
   fit="device"
@@ -230,3 +237,76 @@ Supported variants: `list`, `grouped`, `cards`, `split`, `sidebar`, `tabs`, `acc
 | `FormActions` | `children` (required), `className` |
 | `ProfileHeader` | `name` (required), `email`, `avatar`, `actions`, `className` |
 | `SecurityMethodCard` | `title` (required), `description`, `status`, `icon`, `action`, `className` |
+
+
+### Required and default values
+
+Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `title` | Yes | — |
+| `description` | No | — |
+| `actions` | No | — |
+| `navigation` | No | — |
+| `navigationLabel` | No | `"Settings navigation"` |
+| `variant` | No | `"grouped"` |
+| `children` | Yes | — |
+| `className` | No | — |
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { SettingsSection } from "@puzzle-ui/pieces";
+
+type SettingsSectionProps = ComponentProps<typeof SettingsSection>;
+
+export function CustomizedSection(props: SettingsSectionProps) {
+  return <SettingsSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { SettingsSection } from "@puzzle-ui/pieces";
+
+type SettingsSectionProps = ComponentProps<typeof SettingsSection>;
+
+export function SectionWrapper(props: SettingsSectionProps) {
+  return <SettingsSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [DashboardOverviewSection](/docs/pieces/components/dashboard)
+- [ActivitySection](/docs/pieces/components/activity)
+- [OnboardingSection](/docs/pieces/components/onboarding)
+- [Application & Dashboard overview](/docs/pieces/components/application-dashboard)
+- [Framework integration](/docs/pieces/framework-integration)

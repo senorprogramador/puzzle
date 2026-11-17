@@ -78,6 +78,10 @@ export const App = () => (
 Browse every component with live examples, props, and accessibility guidance
 in the [component documentation](https://puzzle-ui.com/docs/ui).
 
+Dialog headings accept React nodes and are associated with the dialog through
+an accessible heading relationship. Use a heading element when a dialog title
+needs richer markup.
+
 ## Framework integration
 
 Components do not depend on a router or framework. Use the `components`

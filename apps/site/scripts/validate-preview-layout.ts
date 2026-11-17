@@ -20,16 +20,35 @@ server.stderr.on("data", capture);
 
 const paths = [
   "/docs/ui/utilities/preview",
+  "/docs/pieces",
   ...[
     "hero",
     "features",
     "dashboard",
+    "activity",
+    "onboarding",
+    "empty-state",
     "data-display",
     "feedback",
     "navigation",
     "project",
     "settings",
     "product-showcase",
+    "product-grid",
+    "video-section",
+    "booking-section",
+    "location-section",
+    "waitlist-section",
+    "resource-section",
+    "event-section",
+    "footer-section",
+    "marketing",
+    "saas-product",
+    "commerce",
+    "content",
+    "business",
+    "application-dashboard",
+    "specialized-interactive",
   ].map((component) => `/docs/pieces/components/${component}`),
 ];
 
@@ -138,6 +157,24 @@ try {
           );
         });
         await page.waitForFunction(() => !document.querySelector("[data-preview-placeholder]"));
+        const overflowingPreviews = await page
+          .locator(".puzzle-preview__frame")
+          .evaluateAll((frames) =>
+            frames.flatMap((frame, index) => {
+              if (!(frame instanceof HTMLIFrameElement)) {
+                return [`preview ${index + 1}: frame is not an iframe`];
+              }
+              const document = frame.contentDocument;
+              if (!document) return [`preview ${index + 1}: no iframe document`];
+              const root = document.documentElement;
+              return root.scrollWidth > root.clientWidth + 1
+                ? [
+                    `preview ${index + 1}: ${root.scrollWidth}px content in ${root.clientWidth}px viewport`,
+                  ]
+                : [];
+            }),
+          );
+        assert.deepEqual(overflowingPreviews, [], `${width}px ${path}: no preview overflow`);
         await page.evaluate(async () => {
           const frames = [...document.querySelectorAll<HTMLIFrameElement>(".puzzle-preview__frame")];
           await Promise.all(frames.map((frame) => frame.contentDocument!.fonts.ready));

@@ -1,0 +1,69 @@
+---
+title: Content & Editorial Sections
+description: Arrange articles, galleries, timelines, changelogs, video, resources, and event content.
+---
+
+import { BlogSection } from "@puzzle-ui/pieces";
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { EventFilteringExample } from "../../../../src/components/doc-examples/pieces/event-section";
+
+Content sections render editorial and media data provided by the application. They do not fetch articles, infer permissions, host video, or manage event registration.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## Components
+
+| Component | Purpose | Reference |
+| --- | --- | --- |
+| Blog Section | Present article collections and featured stories. | [Blog Section](/docs/pieces/components/blog-section) |
+| Content Section | Arrange rich content and media. | [Content Section](/docs/pieces/components/content-section) |
+| Gallery Section | Present image collections. | [Gallery Section](/docs/pieces/components/gallery-section) |
+| Timeline Section | Show ordered milestones and stories. | [Timeline Section](/docs/pieces/components/timeline-section) |
+| Changelog Section | Communicate product releases. | [Changelog Section](/docs/pieces/components/changelog-section) |
+
+## Editorial previews
+
+<Preview fit="device" code={`<BlogSection variant="featured" items={articles} />`}>
+  <BlogSection
+    title="Notes for more considered days"
+    variant="featured"
+    items={[
+      {
+        id: "slow-mornings",
+        title: "The case for slower mornings",
+        excerpt: "Small rituals can change the pace of a working day.",
+        author: { name: "Mara Chen" },
+        date: "2026-11-12",
+        category: "Studio notes",
+        readingTime: 6,
+        href: "/docs/pieces/components/blog-section",
+        featured: true,
+      },
+      {
+        id: "lasting-materials",
+        title: "Choosing materials that age well",
+        excerpt: "A practical guide to objects designed for everyday use.",
+        author: { name: "Elliot Park" },
+        date: "2026-10-28",
+        category: "Field guides",
+        readingTime: 8,
+        href: "/docs/pieces/components/blog-section",
+      },
+    ]}
+  />
+</Preview>
+
+<Preview fit="device" code={`<EventSection variant="upcoming" events={events} referenceDate={referenceDate} />`}>
+  <EventFilteringExample />
+</Preview>
+
+## Media and data-driven composition
+
+Use the [Video Section](/docs/pieces/components/video-section) for controlled
+video collections, [Resource Section](/docs/pieces/components/resource-section)
+for searchable learning libraries, and [Event Section](/docs/pieces/components/event-section)
+for dated programs. Provide stable IDs, meaningful image alternatives, captions,
+and display dates appropriate to the user's locale.
+
+Layouts use Puzzle Theme tokens and reflow at small widths. Caller-provided
+media, filters, and actions should also remain responsive.

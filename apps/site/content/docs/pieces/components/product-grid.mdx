@@ -3,7 +3,7 @@ title: ProductGridSection
 description: Display structured ecommerce products with responsive layouts, localized prices, optional ratings, labels, links, and actions.
 ---
 
-import { Badge } from "@puzzle-ui/ui";
+import { Badge, Preview } from "@puzzle-ui/ui";
 
 `ProductGridSection` presents product data supplied by your application. Product cards have a structured API for names, images, prices, comparison prices, labels, ratings, categories, collections, links, and optional action slots.
 
@@ -22,7 +22,10 @@ import {
 
 Each of the fourteen layouts has a separate preview using a fictional outdoor retailer’s catalog.
 
-import { ProductGridSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/product-grid";
+import {
+  ProductGridFilteringExample,
+  ProductGridSectionVariantsExample,
+} from "../../../../src/components/doc-examples/pieces/product-grid";
 
 <ProductGridSectionVariantsExample />
 
@@ -45,6 +48,16 @@ import { ProductGridSectionVariantsExample } from "../../../../src/components/do
 
 Prices use locale-aware `Intl.NumberFormat` currency formatting. Comparison prices are shown as supplied; the component does not calculate savings, discounts, or totals. Unsupported currency codes, invalid locales, and non-finite amounts throw instead of rendering a fabricated value. Missing or failed images show a placeholder; image alternatives should describe the supplied image.
 
+
+### Required and default values
+
+Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `variant` | No | `"grid"` |
+| `items` | Yes | — |
+| `locale` | No | `"en-US"` |
 ## Usage
 
 ```tsx
@@ -74,6 +87,15 @@ const products: ProductGridItem[] = [
 />;
 ```
 
+## Product filters
+
+Filtering remains application-owned. This preview keeps the selected category
+in React state and passes only the matching products to `ProductGridSection`.
+
+<Preview fit="device" code={`<ProductGridSection items={filteredProducts} variant="grid" />`}>
+  <ProductGridFilteringExample />
+</Preview>
+
 ## Accessibility
 
 Product names remain headings, product destinations are native links, and carousel navigation uses labeled buttons with disabled boundary states. Ratings include a text equivalent; they are not conveyed by color alone. Product actions are consumer-provided so their labels and behavior remain under application control.
@@ -81,3 +103,65 @@ Product names remain headings, product destinations are native links, and carous
 ## Data and business logic
 
 The component does not fetch products, inventory, ratings, or prices. It has no cart, checkout, stock, or payment behavior; the application supplies every product field.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { ProductGridSection } from "@puzzle-ui/pieces";
+
+type ProductGridSectionProps = ComponentProps<typeof ProductGridSection>;
+
+export function CustomizedSection(props: ProductGridSectionProps) {
+  return <ProductGridSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Responsive behavior
+
+Use the preview device selector to review mobile, tablet, and desktop widths. The built-in variant controls section structure; ensure application-provided media, form controls, and children can shrink or wrap without horizontal overflow. Use the existing responsive breakpoints in scoped CSS when the consuming layout needs a product-specific adjustment.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { ProductGridSection } from "@puzzle-ui/pieces";
+
+type ProductGridSectionProps = ComponentProps<typeof ProductGridSection>;
+
+export function SectionWrapper(props: ProductGridSectionProps) {
+  return <ProductGridSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [CategoriesSection](/docs/pieces/components/categories)
+- [ProductGallerySection](/docs/pieces/components/product-gallery)
+- [CartSummarySection](/docs/pieces/components/cart-summary)
+- [Commerce overview](/docs/pieces/components/commerce)
+- [Framework integration](/docs/pieces/framework-integration)

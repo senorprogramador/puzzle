@@ -20,7 +20,7 @@ const cartItems: CartSummaryItem[] = [
       src: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?auto=format&fit=crop&w=800&q=85",
       alt: "Bag of roasted coffee beans",
     },
-    href: "https://example.com/products/house-blend",
+    href: "/docs/pieces/components/cart-summary",
   },
   {
     id: "filter",
@@ -72,7 +72,7 @@ export const CartSummarySectionVariantsExample = () => (
         description="Example cart data only. The component does not update quantities, calculate totals, place orders, or process payment."
         items={cartItems}
         totals={totals}
-        actions={<a href="https://example.com/checkout">Continue to checkout</a>}
+        actions={<a href="/docs/pieces/components/cart-summary">Review order details</a>}
       />
     )}
   />

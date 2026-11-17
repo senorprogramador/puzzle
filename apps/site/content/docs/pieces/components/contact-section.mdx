@@ -41,6 +41,24 @@ Every one of the thirteen layouts has an individual preview. The examples includ
 | `successSlot` | `ReactNode` | Optional consumer-owned success content announced politely. |
 | Shared section props | `MarketingSectionBaseProps` | Heading, CTA actions, root element, native section attributes, and children. |
 
+
+### Required and default values
+
+Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `variant` | No | `"split"` |
+| `address` | No | — |
+| `phone` | No | — |
+| `email` | No | — |
+| `openingHours` | No | — |
+| `details` | No | empty array |
+| `departments` | No | empty array |
+| `formSlot` | No | — |
+| `mapSlot` | No | — |
+| `mapLabel` | No | `"Map"` |
+| `successSlot` | No | — |
 ## Usage
 
 ```tsx
@@ -56,3 +74,55 @@ Every one of the thirteen layouts has an individual preview. The examples includ
 ```
 
 `ContactRequestForm` and `OfficeMap` above are application-owned components passed through the slots. Provide accessible names and labels in the supplied markup. Missing contact details are omitted, and the section never fabricates a contact endpoint or success response. Server rendering is supported.
+
+## Accessibility and responsive behavior
+
+Contact values are rendered as native `tel:` and `mailto:` links. Department
+groups have headings, the optional map region uses `mapLabel`, and a supplied
+success slot is announced politely. Labels, validation, and focus management
+for `formSlot` remain the application's responsibility.
+
+The split and multi-column variants stack on narrow viewports. Keep supplied
+maps and forms fluid, and test the section at mobile and desktop widths.
+
+## Theme support and composition
+
+The section inherits semantic colors, spacing, and typography from
+`@puzzle-ui/theme`. Compose it with UI `FormField`, `TextInput`, and `Button`
+inside `formSlot`, and use the `children` slot for explanatory content.
+
+## Related components
+
+- [Location Section](/docs/pieces/components/location-section) for selectable venues and opening hours.
+- [About Section](/docs/pieces/components/about-section) for organization context.
+- [Framework integration](/docs/pieces/framework-integration) for Next.js and TanStack Start.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { ContactSection } from "@puzzle-ui/pieces";
+
+type ContactSectionProps = ComponentProps<typeof ContactSection>;
+
+export function CustomizedSection(props: ContactSectionProps) {
+  return <ContactSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { ContactSection } from "@puzzle-ui/pieces";
+
+type ContactSectionProps = ComponentProps<typeof ContactSection>;
+
+export function SectionWrapper(props: ContactSectionProps) {
+  return <ContactSection {...props} />;
+}
+```

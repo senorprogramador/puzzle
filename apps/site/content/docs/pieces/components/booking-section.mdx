@@ -1,0 +1,179 @@
+---
+title: Booking Section
+description: Compose booking dates, availability, pricing, and form submission without a booking or payment backend.
+---
+
+import { BookingSection } from "@puzzle-ui/pieces";
+import { Badge, DatePicker, Preview } from "@puzzle-ui/ui";
+import { BookingSectionVariantsExample, InteractiveBookingExample } from "../../../../src/components/doc-examples/pieces/booking-section";
+
+`BookingSection` arranges caller-provided booking details, calendar, availability, form fields, and price summary. It does not calculate inventory, reserve a slot, charge a customer, or call a backend.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## Import
+
+```tsx
+import { BookingSection, type BookingStep } from "@puzzle-ui/pieces";
+```
+
+## Basic usage
+
+Use the existing UI `DatePicker` or another calendar in the `calendar` slot. The `formSlot` contains controls; the section wraps them in a form only when `onSubmit` is provided.
+
+<Preview
+  fit="device"
+  code={`\
+<BookingSection
+  title="Stay at Harbor House"
+  variant="accommodation"
+  bookingDetails={<p>Two nights · Harbor view room</p>}
+  calendar={
+    <DatePicker
+      name="arrival"
+      label="Check-in date"
+      defaultValue={new Date(2026, 10, 28)}
+    />
+  }
+  availability={<p>Four rooms are available for these dates.</p>}
+  formSlot={<GuestFields />}
+  priceSummary={<PriceSummary />}
+  onSubmit={(formData) => createBookingRequest(formData)}
+/>
+`}
+>
+  <BookingSection
+    title="Stay at Harbor House"
+    description="Choose dates for a relaxed weekend by the water."
+    variant="accommodation"
+    bookingDetails={<p>Two nights · Harbor view room</p>}
+    calendar={
+      <DatePicker
+        name="arrival"
+        label="Check-in date"
+        defaultValue={new Date(2026, 10, 28)}
+        locale="en-GB"
+      />
+    }
+    availability={<p>Four rooms are available for these dates.</p>}
+    formSlot={
+      <label>
+        Guests
+        <input name="guests" type="number" defaultValue="2" min="1" />
+      </label>
+    }
+    priceSummary={<p>Estimated total: €480</p>}
+  />
+</Preview>
+
+## Variants
+
+<Preview fit="device" code={`<BookingSection variant="multi-step" steps={steps} currentStepId={step} />`}>
+  <BookingSectionVariantsExample />
+</Preview>
+
+| Variant | Use case |
+| --- | --- |
+| `calendar` | Put a date picker first. |
+| `form` | Focus on a booking form. |
+| `split` | Divide form and supporting details. |
+| `availability` | Highlight application-provided availability. |
+| `appointment` | Request an appointment. |
+| `event` | Collect event reservations. |
+| `accommodation` | Present a stay with dates and price summary. |
+| `restaurant` | Collect a dining date and party size. |
+| `multi-step` | Show a caller-controlled booking flow. |
+| `sidebar` | Keep a price summary beside the main form. |
+| `compact` | Use a denser booking panel. |
+
+## Interactive booking flow
+
+The current step and availability remain app-owned. `BookingStep.completed` drives the displayed progress; `onStepChange` reports requested navigation without persisting or validating business state.
+
+<Preview fit="device" code={`<BookingSection onSubmit={(formData) => submitBookingRequest(formData)} />`}>
+  <InteractiveBookingExample />
+</Preview>
+
+`onSubmit` receives a native `FormData` object from the wrapped form. Async callbacks expose loading, success, and error states. The component shows the error message returned by a rejected `Error`, or a generic failure message for other thrown values.
+
+## Accessibility and responsive behavior
+
+- The calendar should have a visible label; UI `DatePicker` supports keyboard operation and native form integration.
+- Step state uses an ordered list, `aria-current="step"`, and a named progressbar.
+- Native form validation, labels, and keyboard submission are preserved.
+- Loading sets `aria-busy`, disables the submit action, and announces status/error updates.
+- Split and sidebar layouts collapse to one column on narrow screens.
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `BookingSectionVariant` | No | `form` | Layout variant. |
+| `bookingDetails` | `ReactNode` | No | — | Booking summary slot. |
+| `calendar` | `ReactNode` | No | — | Calendar/date-picker slot. |
+| `availability` | `ReactNode` | No | — | App-provided availability presentation. |
+| `formSlot` | `ReactNode` | No | — | Form controls; do not nest a second `<form>` when using `onSubmit`. |
+| `priceSummary` | `ReactNode` | No | — | Caller-provided price breakdown. |
+| `steps` | `readonly BookingStep[]` | No | `[]` | Optional visual multi-step flow. |
+| `currentStepId` | `string` | No | — | Current step. |
+| `onStepChange` | `(id: string) => void` | No | — | Called when a step is selected. |
+| `onSubmit` | `(formData: FormData) => void \| Promise<void>` | No | — | Submit callback; no network request is performed. |
+| `submitLabel` | `ReactNode` | No | `"Confirm booking"` | Submit button label. |
+| `loading` | `boolean` | No | `false` | External loading state. |
+| `success`, `error` | `ReactNode` | No | — | Optional caller-provided status content. |
+
+## Related components
+
+- [Settings](/docs/pieces/components/settings) for application-owned form settings.
+- [Date Picker](/docs/ui/forms/date-picker) for calendar selection.
+- [Price components](/docs/pieces/components/product-details) for commerce summaries.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { BookingSection } from "@puzzle-ui/pieces";
+
+type BookingSectionProps = ComponentProps<typeof BookingSection>;
+
+export function CustomizedSection(props: BookingSectionProps) {
+  return <BookingSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { BookingSection } from "@puzzle-ui/pieces";
+
+type BookingSectionProps = ComponentProps<typeof BookingSection>;
+
+export function SectionWrapper(props: BookingSectionProps) {
+  return <BookingSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.

@@ -1,0 +1,44 @@
+---
+title: Reduced Motion
+description: Read the browser's reduced-motion preference with an SSR-safe React hook.
+---
+
+`useReducedMotion` tracks the `(prefers-reduced-motion: reduce)` media query through `useSyncExternalStore`. It returns `true` when the preference is not available, so server-rendered and initial hydrated UI avoid starting non-essential motion.
+
+## Usage
+
+```tsx
+import { useReducedMotion } from "@puzzle-ui/hooks";
+
+function IntroVideo() {
+  const prefersReducedMotion = useReducedMotion();
+  const autoplay = !prefersReducedMotion;
+
+  return (
+    <video
+      controls
+      muted={autoplay}
+      autoPlay={autoplay}
+      playsInline
+      preload="none"
+    >
+      <source src="/intro.mp4" type="video/mp4" />
+    </video>
+  );
+}
+```
+
+Only combine autoplay with muted playback and a user preference that allows motion. Keep controls available so people can start or stop media themselves.
+
+## Behavior and SSR
+
+- The server snapshot is `true`, preventing animated content from starting before hydration.
+- After hydration, the hook reads the browser preference and subscribes to changes.
+- The hook removes its media-query listener when the component unmounts.
+- Browsers without `matchMedia` keep the conservative reduced-motion value.
+
+## API
+
+```ts
+useReducedMotion(): boolean
+```

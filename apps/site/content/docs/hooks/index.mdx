@@ -1,9 +1,9 @@
 ---
 title: Hooks
-description: Reusable React hooks for keyboard shortcuts and accessible roving focus.
+description: Reusable React hooks for accessible interaction, reduced motion, list filtering, and async actions.
 ---
 
-<code>@puzzle-ui/hooks</code> provides small, composable hooks for keyboard interactions and composite widgets. Its hooks manage browser listeners and focus state while leaving markup and visual styling to your application.
+<code>@puzzle-ui/hooks</code> provides small, composable hooks for keyboard interactions, composite widgets, user motion preferences, and async actions. Hooks manage shared interaction state while leaving markup and visual styling to your application.
 
 ## Install
 
@@ -63,11 +63,14 @@ function EscapeShortcut() {
 | --- | --- | --- |
 | `useKeyboardKeys` | Subscribe to selected `keydown` and `keyup` events on `window`. | [Keyboard Keys](/docs/hooks/use-keyboard-keys) |
 | `useRovingFocus` | Implement roving tab stops and arrow-key navigation for a group of focusable items. | [Roving Focus](/docs/hooks/use-roving-focus) |
+| `useListFilter` | Filter a typed collection by query and category. | [List Filter](/docs/hooks/use-list-filter) |
+| `useReducedMotion` | Track the browser's reduced-motion preference with an SSR-safe default. | [Reduced Motion](/docs/hooks/use-reduced-motion) |
+| `useAsyncAction` | Track pending, successful, and failed async actions and expose the error. | [Async Action](/docs/hooks/use-async-action) |
 
 ## Exports
 
-The package root, `@puzzle-ui/hooks`, exports `useKeyboardKeys`, `useRovingFocus`, and their public option, event, item, orientation, and return types. There are no documented subpath exports.
+The package root, `@puzzle-ui/hooks`, exports `useKeyboardKeys`, `useRovingFocus`, `useListFilter`, `useReducedMotion`, and `useAsyncAction`, along with their public option and return types. There are no documented subpath exports.
 
 ## SSR and production notes
 
-These are React hooks and must be called at the top level of a React component or custom hook. `useKeyboardKeys` attaches browser listeners in an effect, so it does not access `window` or `document` during server rendering. In frameworks that distinguish server and client modules, call either hook from a client component; `useRovingFocus` carries a client directive. Keep the rendered item order and initial active item consistent between server and client for predictable hydration.
+These are React hooks and must be called at the top level of a React component or custom hook. Browser APIs are accessed only from subscriptions or effects. `useReducedMotion` returns `true` during server rendering and hydration, avoiding motion until the user's browser preference is known. In frameworks that distinguish server and client modules, call interactive hooks from a client component.

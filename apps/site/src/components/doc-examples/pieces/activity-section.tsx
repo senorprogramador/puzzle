@@ -1,6 +1,14 @@
 import { useState } from "react";
-import { ActivitySection, type ActivityItem } from "@puzzle-ui/pieces";
+import {
+  ActivitySection,
+  type ActivityItem,
+  type ActivitySectionVariant,
+} from "@puzzle-ui/pieces";
 import { Avatar, Badge, Button, Tooltip } from "@puzzle-ui/ui";
+import {
+  SectionVariantPreviews,
+  type SectionVariantPreview,
+} from "../shared/section-variant-previews";
 
 const activities: ActivityItem[] = [
   {
@@ -42,6 +50,36 @@ const activities: ActivityItem[] = [
     groupLabel: "Yesterday",
   },
 ];
+
+const activityVariants: SectionVariantPreview<ActivitySectionVariant>[] = [
+  { variant: "timeline", useCase: "Connect changes along a vertical thread." },
+  { variant: "list", useCase: "Keep events compact and scannable." },
+  { variant: "feed", useCase: "Show a conversational activity stream." },
+  { variant: "grouped", useCase: "Separate records under date or topic headings." },
+  { variant: "cards", useCase: "Give each record a distinct card." },
+  { variant: "compact", useCase: "Fit recent updates into a dense dashboard." },
+  { variant: "avatars", useCase: "Give actor identities more visual weight." },
+  { variant: "audit", useCase: "Present a sequence of administrative changes." },
+  { variant: "split", useCase: "Lay events out in two responsive columns." },
+  { variant: "horizontal", useCase: "Scroll through a short event rail." },
+];
+
+export const ActivitySectionVariantsExample = () => (
+  <SectionVariantPreviews
+    componentName="ActivitySection"
+    variants={activityVariants}
+    buildCode={(variant) =>
+      `<ActivitySection variant="${variant}" items={activities} />`
+    }
+    renderVariant={(variant) => (
+      <ActivitySection
+        title="Northstar team activity"
+        variant={variant}
+        items={activities}
+      />
+    )}
+  />
+);
 
 export const ActivityFilteringExample = () => {
   const [filter, setFilter] = useState("all");

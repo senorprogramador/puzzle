@@ -3,7 +3,40 @@ title: React Page Sections
 description: Compose responsive marketing sections and introductory page heroes with @puzzle-ui/pieces.
 ---
 
+import { AnnouncementSection } from "@puzzle-ui/pieces";
+import { Button, Preview } from "@puzzle-ui/ui";
+
 <code>@puzzle-ui/pieces</code> provides composed interface sections built on Puzzle UI. Use the existing Hero layouts for page introductions and the Marketing & Conversion collection for product features, customer proof, FAQs, comparisons, and calls to action. Pieces is not a general-purpose page builder or a library of complete website templates.
+
+The package documents **48 section families** across seven categories. Use
+the overviews below to compare their use cases, then open a component
+reference for its full API and variant previews.
+
+## Browse by category
+
+| Category | Overview |
+| --- | --- |
+| Marketing & Conversion | [Explore marketing sections](/docs/pieces/components/marketing) |
+| SaaS & Product | [Explore product sections](/docs/pieces/components/saas-product) |
+| Commerce | [Explore commerce sections](/docs/pieces/components/commerce) |
+| Content & Editorial | [Explore editorial sections](/docs/pieces/components/content) |
+| Business & Corporate | [Explore business sections](/docs/pieces/components/business) |
+| Application & Dashboard | [Explore application sections](/docs/pieces/components/application-dashboard) |
+| Specialized & Interactive | [Explore specialized sections](/docs/pieces/components/specialized-interactive) |
+
+<Preview fit="device" code={`<AnnouncementSection variant="promotional" message="A calmer launch starts with a clear plan." action={<Button href="/docs/pieces/components/marketing">Explore the sections</Button>} />`}>
+  <AnnouncementSection
+    variant="promotional"
+    message="A calmer launch starts with a clear plan."
+    action={
+      <Button href="/docs/pieces/components/marketing">
+        Explore the sections
+      </Button>
+    }
+  />
+</Preview>
+
+See the [Next.js and TanStack Start integration guide](/docs/pieces/framework-integration) for framework boundaries, SSR, and client-side interactions.
 
 ## Start with a Hero
 

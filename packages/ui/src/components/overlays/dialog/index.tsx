@@ -25,6 +25,7 @@ type NativeDialogProps = Omit<
   | "onCancel"
   | "onClose"
   | "onClick"
+  | "title"
   | "aria-labelledby"
   | "aria-describedby"
   | "aria-label"

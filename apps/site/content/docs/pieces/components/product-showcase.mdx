@@ -26,7 +26,16 @@ import { ProductShowcaseSectionVariantsExample } from "../../../../src/component
 
 <ProductShowcaseSectionVariantsExample />
 
-## Data model
+## API reference
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `items` | `readonly ProductShowcaseItem[]` | Yes | — | Screens or recordings to display; IDs must be unique. |
+| `variant` | `ProductShowcaseVariant` | No | `split` | Presentation layout. |
+| Shared section props | `MarketingSectionBaseProps` | No | — | Header, root element, width/theme, native attributes, actions, and children. |
+
+`ProductShowcaseSectionProps<C>` combines the shared section props with
+`variant` and `items`. The item data model is:
 
 | Property | Type | Description |
 | --- | --- | --- |
@@ -82,3 +91,55 @@ const items: ProductShowcaseItem[] = [
 Provide meaningful alternative text for informative screenshots and captions where they add context. Decorative media should use an empty alternative. Tabs use the UI package's keyboard-operable `Tabs`; the carousel buttons have accessible names and disabled states. Annotation disclosures use native keyboard behavior.
 
 The component does not fetch, create, or infer screenshots. It is server-renderable and does not access browser APIs during render.
+
+## Responsive behavior and theme support
+
+Device frames remain within the section width, galleries and split layouts
+reflow on mobile, and the carousel uses its explicit previous/next controls.
+Use the Preview device selector to check each layout at mobile, tablet, and
+desktop widths.
+
+The section consumes semantic Puzzle Theme tokens. Wrap it in `Theme` or a
+scoped theme to inherit the application's palette and typography; use
+`className` for local customization instead of hard-coding theme colors.
+
+## Related components
+
+- [Video Section](/docs/pieces/components/video-section) for playable product films.
+- [Product Gallery](/docs/pieces/components/product-gallery) for retail imagery.
+- [Features Section](/docs/pieces/components/features) for capability descriptions.
+- [Framework integration](/docs/pieces/framework-integration) for Next.js and TanStack Start.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { ProductShowcaseSection } from "@puzzle-ui/pieces";
+
+type ProductShowcaseSectionProps = ComponentProps<typeof ProductShowcaseSection>;
+
+export function CustomizedSection(props: ProductShowcaseSectionProps) {
+  return <ProductShowcaseSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { ProductShowcaseSection } from "@puzzle-ui/pieces";
+
+type ProductShowcaseSectionProps = ComponentProps<typeof ProductShowcaseSection>;
+
+export function SectionWrapper(props: ProductShowcaseSectionProps) {
+  return <ProductShowcaseSection {...props} />;
+}
+```

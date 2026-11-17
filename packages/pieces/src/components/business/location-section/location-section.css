@@ -1,0 +1,141 @@
+.puzzle-location-section {
+  min-width: 0;
+}
+
+.puzzle-location-section__layout,
+.puzzle-location-section__selected,
+.puzzle-location-section__details {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-location-section__selected {
+  align-content: start;
+  padding: var(--puzzle-space-4, 1rem);
+  background: var(--puzzle-color-surface);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-location-section__selected h3,
+.puzzle-location-section__details p {
+  margin: 0;
+}
+
+.puzzle-location-section__selected h3 {
+  font-size: var(--puzzle-font-size-lg, 1.125rem);
+}
+
+.puzzle-location-section__details address {
+  color: var(--puzzle-color-text-muted);
+  font-style: normal;
+}
+
+.puzzle-location-section__details dl {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+  margin: 0;
+}
+
+.puzzle-location-section__details dl > div {
+  display: grid;
+  grid-template-columns: minmax(5rem, 0.5fr) minmax(0, 1fr);
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-location-section__details dt,
+.puzzle-location-section__details dd {
+  margin: 0;
+}
+
+.puzzle-location-section__details dt {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-location-section__list {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-2, 0.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-location-section__list button {
+  display: grid;
+  width: 100%;
+  gap: var(--puzzle-space-1, 0.25rem);
+  padding: var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text);
+  text-align: start;
+  background: var(--puzzle-color-surface);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  cursor: pointer;
+  font: inherit;
+}
+
+.puzzle-location-section__list button[aria-pressed="true"] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-location-section__list button:focus-visible,
+.puzzle-location-section__directions:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-location-section__list button span {
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-location-section__map {
+  min-width: 0;
+  overflow: hidden;
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-location-section__directions {
+  justify-self: start;
+}
+
+.puzzle-location-section[data-variant="cards"] .puzzle-location-section__layout,
+.puzzle-location-section[data-variant="offices"] .puzzle-location-section__layout,
+.puzzle-location-section[data-variant="gallery"] .puzzle-location-section__layout {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  align-items: start;
+}
+
+.puzzle-location-section[data-variant="single"] .puzzle-location-section__selected {
+  max-width: 42rem;
+}
+
+.puzzle-location-section[data-variant="hours"] .puzzle-location-section__selected {
+  border-inline-start: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-primary);
+}
+
+.puzzle-location-section[data-variant="directions"] .puzzle-location-section__details {
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+@media (min-width: 48rem) {
+  .puzzle-location-section[data-variant="split"] .puzzle-location-section__layout,
+  .puzzle-location-section[data-variant="map"] .puzzle-location-section__layout,
+  .puzzle-location-section[data-variant="interactive"] .puzzle-location-section__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .puzzle-location-section[data-variant="interactive"] .puzzle-location-section__map {
+    grid-row: span 2;
+  }
+}
+
+@media (max-width: 40rem) {
+  .puzzle-location-section__details dl > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

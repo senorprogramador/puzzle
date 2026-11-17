@@ -1,0 +1,67 @@
+---
+title: Async Action
+description: Track the pending, success, and error state of an asynchronous React action.
+---
+
+`useAsyncAction` runs a caller-provided async action and exposes its state and error. It prevents overlapping calls; it does not submit data to a service, persist results, or decide how errors are presented.
+
+## Usage
+
+```tsx
+import type { FormEvent } from "react";
+import { useAsyncAction } from "@puzzle-ui/hooks";
+
+const submitToYourApplication = async (email: string) => {
+  if (!email.includes("@")) {
+    throw new Error("Enter a valid email address.");
+  }
+};
+
+function JoinWaitlist() {
+  const action = useAsyncAction(async (email: string) => {
+    await submitToYourApplication(email);
+  });
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    void action.run(String(formData.get("email") ?? ""));
+  };
+
+  return (
+    <form onSubmit={handleSubmit} aria-busy={action.status === "loading"}>
+      <label>
+        Email
+        <input name="email" type="email" required />
+      </label>
+      <button type="submit" disabled={action.status === "loading"}>
+        {action.status === "loading" ? "Joining…" : "Join"}
+      </button>
+      {action.status === "success" ? (
+        <p role="status">Your request was received.</p>
+      ) : null}
+      {action.status === "error" ? (
+        <p role="alert">
+          {action.error instanceof Error
+            ? action.error.message
+            : "The request could not be completed."}
+        </p>
+      ) : null}
+    </form>
+  );
+}
+```
+
+## API
+
+```ts
+useAsyncAction<T>(
+  action: (input: T) => void | Promise<void>,
+): UseAsyncActionReturn<T>
+```
+
+`UseAsyncActionReturn<T>` provides `status` (`idle`, `loading`, `success`, or `error`), `error`, `run(input)`, and `reset()`. `run` resolves to `false` for overlapping or failed actions and to `true` after success. Always render the returned error in an accessible error state.
+
+## SSR and client components
+
+The hook does not access browser globals and is safe to render on the server. Call it from a client component when wiring it to interactive form controls.

@@ -1,0 +1,116 @@
+.puzzle-waitlist-section {
+  min-width: 0;
+}
+
+.puzzle-waitlist-section__layout,
+.puzzle-waitlist-section__form {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-waitlist-section__form {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.puzzle-waitlist-section__form label {
+  grid-column: 1 / -1;
+  color: var(--puzzle-color-text);
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-waitlist-section__signup,
+.puzzle-waitlist-section__social-proof,
+.puzzle-waitlist-section__referral,
+.puzzle-waitlist-section__progress,
+.puzzle-waitlist-section__countdown {
+  min-width: 0;
+}
+
+.puzzle-waitlist-section__countdown dl {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--puzzle-space-4, 1rem);
+  margin: 0;
+}
+
+.puzzle-waitlist-section__countdown dl > div {
+  display: grid;
+  min-width: 4rem;
+  gap: var(--puzzle-space-1, 0.25rem);
+  text-align: center;
+}
+
+.puzzle-waitlist-section__countdown dt {
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-waitlist-section__countdown dd {
+  margin: 0;
+  font-family: var(--puzzle-font-heading);
+  font-size: var(--puzzle-font-size-2xl, 1.5rem);
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-waitlist-section__progress {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-waitlist-section__progress p {
+  margin: 0;
+}
+
+.puzzle-waitlist-section__error {
+  margin: var(--puzzle-space-3, 0.75rem) 0 0;
+  color: var(--puzzle-color-danger);
+}
+
+.puzzle-waitlist-section__success {
+  margin: var(--puzzle-space-3, 0.75rem) 0 0;
+  color: var(--puzzle-color-success);
+}
+
+.puzzle-waitlist-section[data-variant="centered"] .puzzle-waitlist-section__layout,
+.puzzle-waitlist-section[data-variant="countdown"] .puzzle-waitlist-section__layout,
+.puzzle-waitlist-section[data-variant="launch"] .puzzle-waitlist-section__layout,
+.puzzle-waitlist-section[data-variant="social-proof"] .puzzle-waitlist-section__layout {
+  justify-items: center;
+  text-align: center;
+}
+
+.puzzle-waitlist-section[data-variant="card"] .puzzle-waitlist-section__layout,
+.puzzle-waitlist-section[data-variant="early-access"] .puzzle-waitlist-section__layout {
+  padding: var(--puzzle-space-5, 1.25rem);
+  background: var(--puzzle-color-surface);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-waitlist-section[data-variant="split"] .puzzle-waitlist-section__layout {
+  align-items: center;
+}
+
+.puzzle-waitlist-section[data-variant="multi-step"] .puzzle-waitlist-section__layout {
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 48rem) {
+  .puzzle-waitlist-section[data-variant="split"] .puzzle-waitlist-section__layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 40rem) {
+  .puzzle-waitlist-section__form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .puzzle-waitlist-section__form label {
+    grid-column: auto;
+  }
+}

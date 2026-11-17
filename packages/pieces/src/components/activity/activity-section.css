@@ -53,10 +53,15 @@
 .puzzle-activity-section__card-content {
   display: grid;
   min-width: 0;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   column-gap: var(--puzzle-space-3, 0.75rem);
   row-gap: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-activity-section__entry--has-icon,
+.puzzle-activity-section__card-content--has-icon {
+  grid-template-columns: auto minmax(0, 1fr);
 }
 
 .puzzle-activity-section__entry {
@@ -98,6 +103,11 @@
 }
 
 .puzzle-activity-section__time {
+  grid-column: 1;
+}
+
+.puzzle-activity-section__entry--has-icon .puzzle-activity-section__time,
+.puzzle-activity-section__card-content--has-icon .puzzle-activity-section__time {
   grid-column: 2;
 }
 
@@ -114,6 +124,11 @@
 }
 
 .puzzle-activity-section__metadata {
+  grid-column: 1;
+}
+
+.puzzle-activity-section__entry--has-icon .puzzle-activity-section__metadata,
+.puzzle-activity-section__card-content--has-icon .puzzle-activity-section__metadata {
   grid-column: 2;
 }
 

@@ -1,8 +1,10 @@
+import { useState } from "react";
 import {
   ProductGridSection,
   type ProductGridItem,
   type ProductGridVariant,
 } from "@puzzle-ui/pieces";
+import { Button } from "@puzzle-ui/ui";
 import { sectionPreviewImages } from "../shared/section-preview-media";
 import {
   SectionVariantPreviews,
@@ -23,7 +25,7 @@ const products: ProductGridItem[] = [
     rating: { value: 4.8, count: 36 },
     category: "Outerwear",
     collection: "Trail essentials",
-    href: "https://example.com/products/ridge-shell",
+    href: "/docs/pieces/components/product-grid",
     featured: true,
   },
   {
@@ -37,7 +39,7 @@ const products: ProductGridItem[] = [
     rating: { value: 4.6, count: 21 },
     category: "Packs",
     collection: "Trail essentials",
-    href: "https://example.com/products/day-pack",
+    href: "/docs/pieces/components/product-grid",
   },
   {
     id: "camp-mug",
@@ -49,7 +51,7 @@ const products: ProductGridItem[] = [
     price: { amount: 28, currency: "USD" },
     category: "Camp kitchen",
     collection: "Camp kitchen",
-    href: "https://example.com/products/camp-mug",
+    href: "/docs/pieces/components/product-grid",
   },
   {
     id: "merino-blanket",
@@ -63,7 +65,7 @@ const products: ProductGridItem[] = [
     labels: [{ id: "limited", content: "Small batch" }],
     category: "Camp comfort",
     collection: "Trail essentials",
-    href: "https://example.com/products/camp-blanket",
+    href: "/docs/pieces/components/product-grid",
   },
 ];
 
@@ -103,3 +105,41 @@ export const ProductGridSectionVariantsExample = () => (
     )}
   />
 );
+
+export const ProductGridFilteringExample = () => {
+  const [category, setCategory] = useState("All");
+  const categories = [
+    "All",
+    ...new Set(
+      products.flatMap((product) =>
+        product.category ? [product.category] : [],
+      ),
+    ),
+  ];
+  const filteredProducts =
+    category === "All"
+      ? products
+      : products.filter((product) => product.category === category);
+
+  return (
+    <>
+      <div role="group" aria-label="Filter products by category">
+        {categories.map((value) => (
+          <Button
+            key={value}
+            variant={category === value ? "primary" : "outline"}
+            aria-pressed={category === value}
+            onClick={() => setCategory(value)}
+          >
+            {value}
+          </Button>
+        ))}
+      </div>
+      <ProductGridSection
+        title="Shop trail essentials"
+        variant="grid"
+        items={filteredProducts}
+      />
+    </>
+  );
+};

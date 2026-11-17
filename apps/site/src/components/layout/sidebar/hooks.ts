@@ -26,5 +26,15 @@ export const hooks: TreeViewItem = {
       label: "List Filter",
       href: `${folder}/use-list-filter`,
     },
+    {
+      id: "hooks-use-reduced-motion",
+      label: "Reduced Motion",
+      href: `${folder}/use-reduced-motion`,
+    },
+    {
+      id: "hooks-use-async-action",
+      label: "Async Action",
+      href: `${folder}/use-async-action`,
+    },
   ],
 } as const;

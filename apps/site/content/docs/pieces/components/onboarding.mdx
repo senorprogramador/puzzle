@@ -5,7 +5,10 @@ description: Present accessible, application-controlled onboarding steps, progre
 
 import { OnboardingSection } from "@puzzle-ui/pieces";
 import { Button, Preview } from "@puzzle-ui/ui";
-import { OnboardingInteractiveExample } from "../../../../src/components/doc-examples/pieces/onboarding-section";
+import {
+  OnboardingInteractiveExample,
+  OnboardingSectionVariantsExample,
+} from "../../../../src/components/doc-examples/pieces/onboarding-section";
 
 `OnboardingSection` presents step state supplied by your application. It does not own business logic, persistence, or completion rules.
 
@@ -22,7 +25,7 @@ import { OnboardingInteractiveExample } from "../../../../src/components/doc-exa
     { id: "connect", title: "Connect a project", disabled: true },
   ]}
   onStepChange={setCurrentStep}
-  actions={<Button>Continue</Button>}
+  actions={<Button href="/docs/pieces/components/onboarding">Continue</Button>}
 >
   <p>Your workspace is ready for its first project.</p>
 </OnboardingSection>
@@ -51,10 +54,18 @@ import { OnboardingInteractiveExample } from "../../../../src/components/doc-exa
         disabled: true,
       },
     ]}
-    actions={<Button>Continue</Button>}
+    actions={<Button href="/docs/pieces/components/onboarding">Continue</Button>}
   >
     <p>Your workspace is ready for its first project.</p>
   </OnboardingSection>
+</Preview>
+
+## Variants
+
+Every layout uses the same caller-owned step list and completion values.
+
+<Preview fit="device" code={`<OnboardingSection variant="wizard" steps={steps} currentStep="invite" />`}>
+  <OnboardingSectionVariantsExample />
 </Preview>
 
 ## Interactive onboarding
@@ -65,11 +76,85 @@ The example controls its selected step and completion state in the consuming Rea
   <OnboardingInteractiveExample />
 </Preview>
 
-Supported variants: `steps`, `checklist`, `progress`, `wizard`, `cards`, `split`, `welcome`, `centered`, `horizontal`, `vertical`, and `compact`.
-
 ## Accessibility
 
 - The section is labelled by its heading; the progress indicator exposes a progressbar name and value.
 - Completion and progress are announced through a polite status message.
 - Provide stable step IDs. Disabled steps use native disabled buttons when step selection is enabled.
 - Steps remain application-controlled; update `currentStep` in `onStepChange` and move focus only through the provided keyboard navigation.
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `title` | `ReactNode` | Yes | — | Section heading. |
+| `steps` | `readonly OnboardingStep[]` | Yes | — | Caller-provided step records with unique IDs. |
+| `currentStep` | `string` | No | First incomplete enabled step | Selected step ID. |
+| `onStepChange` | `(id: string) => void` | No | — | Enables keyboard-operable step selection and reports changes. |
+| `variant` | `OnboardingSectionVariant` | No | `steps` | Layout variant. |
+| `description`, `actions`, `children` | `ReactNode` | No | — | Supporting content, actions, and custom current-step content. |
+| `className` | `string` | No | — | Additional root class. |
+
+`OnboardingStep` contains required `id` and `title`, plus optional `description`, `completed`, `disabled`, `media`, and `action`.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { OnboardingSection } from "@puzzle-ui/pieces";
+
+type OnboardingSectionProps = ComponentProps<typeof OnboardingSection>;
+
+export function CustomizedSection(props: OnboardingSectionProps) {
+  return <OnboardingSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Responsive behavior
+
+Use the preview device selector to review mobile, tablet, and desktop widths. The built-in variant controls section structure; ensure application-provided media, form controls, and children can shrink or wrap without horizontal overflow. Use the existing responsive breakpoints in scoped CSS when the consuming layout needs a product-specific adjustment.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { OnboardingSection } from "@puzzle-ui/pieces";
+
+type OnboardingSectionProps = ComponentProps<typeof OnboardingSection>;
+
+export function SectionWrapper(props: OnboardingSectionProps) {
+  return <OnboardingSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [DashboardOverviewSection](/docs/pieces/components/dashboard)
+- [ActivitySection](/docs/pieces/components/activity)
+- [EmptyStateSection](/docs/pieces/components/empty-state)
+- [Application & Dashboard overview](/docs/pieces/components/application-dashboard)
+- [Framework integration](/docs/pieces/framework-integration)

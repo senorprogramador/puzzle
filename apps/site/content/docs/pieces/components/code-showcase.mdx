@@ -43,6 +43,20 @@ import { CodeShowcaseSectionVariantsExample } from "../../../../src/components/d
 
 The `single` variant requires exactly one snippet and throws a `RangeError` if more are supplied.
 
+
+### Required and default values
+
+Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `variant` | No | `"single"` |
+| `items` | Yes | — |
+| `copyable` | No | `true` |
+| `showLineNumbers` | No | — |
+| `editable` | No | — |
+| `onCopy` | No | — |
+| `onCopyError` | No | — |
 ## Usage
 
 ```tsx
@@ -81,3 +95,65 @@ The component copies the current editor contents when editable. If the Clipboard
 Tabs use the keyboard-operable UI `Tabs` primitive. Copy buttons have accessible names and report success or failure through a live status. Line numbers are hidden from assistive technology while the code remains readable as text. The playground is a labeled native textarea and does not evaluate code.
 
 The component is server-renderable and does not access the clipboard until a user activates the copy button.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { CodeShowcaseSection } from "@puzzle-ui/pieces";
+
+type CodeShowcaseSectionProps = ComponentProps<typeof CodeShowcaseSection>;
+
+export function CustomizedSection(props: CodeShowcaseSectionProps) {
+  return <CodeShowcaseSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Responsive behavior
+
+Use the preview device selector to review mobile, tablet, and desktop widths. The built-in variant controls section structure; ensure application-provided media, form controls, and children can shrink or wrap without horizontal overflow. Use the existing responsive breakpoints in scoped CSS when the consuming layout needs a product-specific adjustment.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { CodeShowcaseSection } from "@puzzle-ui/pieces";
+
+type CodeShowcaseSectionProps = ComponentProps<typeof CodeShowcaseSection>;
+
+export function SectionWrapper(props: CodeShowcaseSectionProps) {
+  return <CodeShowcaseSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [ProductShowcaseSection](/docs/pieces/components/product-showcase)
+- [IntegrationsSection](/docs/pieces/components/integrations)
+- [UseCasesSection](/docs/pieces/components/use-cases)
+- [SaaS & Product overview](/docs/pieces/components/saas-product)
+- [Framework integration](/docs/pieces/framework-integration)

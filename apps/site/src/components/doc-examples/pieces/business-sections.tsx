@@ -39,7 +39,7 @@ const profiles = [
       {
         id: "linkedin",
         label: "LinkedIn",
-        href: "https://example.com/maya-patel",
+        href: "/docs/pieces/components/team-section",
         external: true,
       },
     ],
@@ -128,7 +128,7 @@ const caseStudies = [
       { id: "bookings", label: "Direct bookings", value: "+28%" },
       { id: "satisfaction", label: "Guest satisfaction", value: "94%" },
     ],
-    href: "https://example.com/work/cedar-house",
+    href: "/docs/pieces/components/case-studies-section",
     external: true,
     featured: true,
   },
@@ -546,7 +546,7 @@ export const PartnersSectionVariantsExample = () => (
             name: "Fieldwork Studio",
             description: "Independent brand and digital studio.",
             category: "Creative",
-            href: "https://example.com/fieldwork",
+            href: "/docs/pieces/components/partners-section",
             external: true,
             featured: true,
           },
@@ -592,7 +592,7 @@ export const AwardsSectionVariantsExample = () => (
             year: 2025,
             description:
               "Recognizing thoughtful work and a lasting contribution to the creative community.",
-            href: "https://example.com/awards/design-guild",
+            href: "/docs/pieces/components/awards-section",
             external: true,
             featured: true,
             logo: {

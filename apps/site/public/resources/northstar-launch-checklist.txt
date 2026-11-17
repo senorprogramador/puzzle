@@ -1,0 +1,6 @@
+Northstar Studio: launch checklist
+
+1. Confirm the audience and the problem the release solves.
+2. Review the product, support, and accessibility checks.
+3. Assign an owner to every launch task.
+4. Share the release notes with the team.

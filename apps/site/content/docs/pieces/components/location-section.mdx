@@ -1,0 +1,165 @@
+---
+title: Location Section
+description: Present offices, hotels, restaurants, contact details, opening hours, and app-provided map content.
+---
+
+import { LocationSection } from "@puzzle-ui/pieces";
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { LocationSectionVariantsExample, LocationSelectionExample } from "../../../../src/components/doc-examples/pieces/location-section";
+
+`LocationSection` presents one or more venues with contact information, coordinates, opening hours, direction links, and optional media. The map is a caller-provided slot; no map provider or API key is required.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## Basic usage
+
+Provide a stable ID for each location. When the section has multiple locations, its native buttons manage local selection unless `selectedLocationId` is supplied as a controlled value.
+
+<Preview
+  fit="device"
+  code={`\
+<LocationSection
+  title="Visit Harbor House"
+  variant="split"
+  locations={[
+    {
+      id: "harbor",
+      name: "Harbor House",
+      address: "18 Quay Street, Amsterdam",
+      phone: "+31 20 555 0180",
+      email: "hello@harbor.example",
+      coordinates: { latitude: 52.376, longitude: 4.9 },
+      openingHours: [{ day: "Monday–Friday", hours: "09:00–18:00" }],
+      directionsHref: "/directions/harbor-house",
+      mapSlot: <ApplicationMap />,
+    },
+  ]}
+/>
+`}
+>
+  <LocationSection
+    title="Visit Harbor House"
+    description="A welcoming city retreat close to the historic harbor."
+    variant="split"
+    locations={[
+      {
+        id: "harbor",
+        name: "Harbor House",
+        address: "18 Quay Street, Amsterdam",
+        phone: "+31 20 555 0180",
+        email: "hello@harbor.example",
+        coordinates: { latitude: 52.376, longitude: 4.9 },
+        openingHours: [
+          { day: "Monday–Friday", hours: "09:00–18:00" },
+          { day: "Saturday", hours: "10:00–16:00" },
+        ],
+        directionsHref: "https://maps.google.com/?q=52.376,4.9",
+        mapSlot: (
+          <div className="puzzle-location-example__map">
+            Map supplied by the application.
+          </div>
+        ),
+      },
+    ]}
+  />
+</Preview>
+
+## Variants and location selection
+
+<Preview fit="device" code={`<LocationSection variant="interactive" locations={locations} onLocationSelect={setLocationId} />`}>
+  <LocationSectionVariantsExample />
+</Preview>
+
+| Variant | Use case |
+| --- | --- |
+| `map` | Put an application map beside address details. |
+| `split` | Pair location information with a map or image. |
+| `cards` | Compare venues in a responsive card layout. |
+| `offices` | Present several branches or offices. |
+| `single` | Focus on one location. |
+| `directions` | Emphasize directions and coordinates. |
+| `image` | Use a caller-provided venue image. |
+| `gallery` | Show image-led locations. |
+| `hours` | Highlight weekly opening hours. |
+| `interactive` | Select a location and update its details. |
+
+<Preview fit="device" code={`<LocationSection selectedLocationId={selectedId} onLocationSelect={setSelectedId} />`}>
+  <LocationSelectionExample />
+</Preview>
+
+## Accessibility and responsive behavior
+
+- Location choices are native buttons with `aria-pressed` selection state.
+- Contact values become `tel:` and `mailto:` links; directions remain caller-provided.
+- The optional map is a labelled region. If embedding a map or iframe, give its own frame an accessible title and keep a text address available.
+- Layouts adapt from split columns to a single column on mobile.
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `locations` | `readonly LocationItem[]` | Yes | — | Location data; IDs must be unique. |
+| `variant` | `LocationSectionVariant` | No | `split` | Layout variant. |
+| `selectedLocationId` | `string` | No | — | Controlled selected location. |
+| `defaultSelectedLocationId` | `string` | No | First location | Initial uncontrolled selection. |
+| `onLocationSelect` | `(id: string) => void` | No | — | Called after selection. |
+| `mapSlot` | `ReactNode` | No | Per-item map slot | Caller-provided map content. |
+| `mapLabel` | `string` | No | `"Location map"` | Accessible map region name. |
+| `className` | `string` | No | — | Additional root class. |
+
+`LocationItem` supports `id`, `name`, `address`, `phone`, `email`, `coordinates` (`latitude`, `longitude`), `openingHours` (`day`, `hours`), `directionsHref`, `image`, `mapSlot`, and `description`.
+
+## Related components
+
+- [Contact Section](/docs/pieces/components/contact-section) for department and contact forms.
+- [About Section](/docs/pieces/components/about-section) for organization details.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { LocationSection } from "@puzzle-ui/pieces";
+
+type LocationSectionProps = ComponentProps<typeof LocationSection>;
+
+export function CustomizedSection(props: LocationSectionProps) {
+  return <LocationSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { LocationSection } from "@puzzle-ui/pieces";
+
+type LocationSectionProps = ComponentProps<typeof LocationSection>;
+
+export function SectionWrapper(props: LocationSectionProps) {
+  return <LocationSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.

@@ -6,6 +6,7 @@ description: Explain empty, search, success, and error states with accessible ac
 import { EmptyStateSection } from "@puzzle-ui/pieces";
 import { Button, Preview } from "@puzzle-ui/ui";
 import { Icon } from "@puzzle-ui/icons/icon";
+import { EmptyStateSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/empty-state-section";
 
 `EmptyStateSection` builds on Puzzle UI's existing EmptyState primitives. `EmptyStatePanel` remains available as a compact panel composition; both components share the same content and action slots.
 
@@ -17,8 +18,8 @@ import { Icon } from "@puzzle-ui/icons/icon";
   title="No projects found"
   description="Try another search or clear the current filters."
   icon={<SearchIcon aria-hidden="true" />}
-  primaryAction={<Button>Clear filters</Button>}
-  secondaryAction={<Button variant="outline">Create a project</Button>}
+  primaryAction={<Button href="/docs/pieces/components/resource-section">Clear filters</Button>}
+  secondaryAction={<Button variant="outline" href="/docs/pieces/components/project">Create a project</Button>}
 >
   <p>Searches include project names, descriptions, and owners.</p>
 </EmptyStateSection>
@@ -29,11 +30,19 @@ import { Icon } from "@puzzle-ui/icons/icon";
     title="No projects found"
     description="Try another search or clear the current filters."
     icon={<Icon name="lucide:search" aria-hidden="true" />}
-    primaryAction={<Button>Clear filters</Button>}
-    secondaryAction={<Button variant="outline">Create a project</Button>}
+    primaryAction={<Button href="/docs/pieces/components/resource-section">Clear filters</Button>}
+    secondaryAction={<Button variant="outline" href="/docs/pieces/components/project">Create a project</Button>}
   >
     <p>Searches include project names, descriptions, and owners.</p>
   </EmptyStateSection>
+</Preview>
+
+## Variants
+
+Choose a layout based on the state and the next step rather than the illustration alone.
+
+<Preview fit="device" code={`<EmptyStateSection variant="search" title="No projects found" />`}>
+  <EmptyStateSectionVariantsExample />
 </Preview>
 
 ## Error state
@@ -47,7 +56,7 @@ Error details are optional and use a native disclosure, so technical context sta
   title="Unable to load reports"
   description="Try again in a moment."
   errorDetails={requestId}
-  primaryAction={<Button onClick={retry}>Retry</Button>}
+  primaryAction={<Button href="/docs/pieces/components/feedback">Contact support</Button>}
 />
 `}
 >
@@ -56,7 +65,7 @@ Error details are optional and use a native disclosure, so technical context sta
     title="Unable to load reports"
     description="Try again in a moment."
     errorDetails="Request ID: rpt-2026-114"
-    primaryAction={<Button>Retry</Button>}
+    primaryAction={<Button href="/docs/pieces/components/feedback">Contact support</Button>}
   />
 </Preview>
 
@@ -70,13 +79,77 @@ Supported variants: `centered`, `illustration`, `minimal`, `card`, `split`, `sea
 
 ## API
 
-| Prop | Description |
-| --- | --- |
-| `title` | Required state heading. |
-| `description` | Supporting explanation. |
-| `illustration`, `icon`, `illustrationLabel` | Optional media or icon slot and its accessible name. |
-| `primaryAction`, `secondaryAction` | Caller-provided actions. Legacy `action` is supported. |
-| `children` | Additional state-specific content. |
-| `errorDetails` | Optional details disclosure. |
-| `variant` | One of the supported visual variants. |
-| `status` | Optional `status` or `alert` announcement; `off` disables it. |
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `title` | `ReactNode` | Yes | — | State heading. |
+| `description` | `ReactNode` | No | — | Supporting explanation. |
+| `illustration`, `icon` | `ReactNode` | No | — | Decorative media or icon slot. |
+| `illustrationLabel` | `string` | No | — | Accessible name for informative media. |
+| `primaryAction`, `secondaryAction`, `action` | `ReactNode` | No | — | Caller-provided actions; `action` is the legacy primary slot. |
+| `children` | `ReactNode` | No | — | Additional state-specific content. |
+| `errorDetails` | `ReactNode` | No | — | Optional native details disclosure. |
+| `variant` | `EmptyStateSectionVariant` | No | `card` | Visual layout. |
+| `status` | `"status" \| "alert" \| "off"` | No | `alert` for errors, otherwise off | Live announcement behavior. |
+| `className` | `string` | No | — | Additional root class. |
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { EmptyStateSection } from "@puzzle-ui/pieces";
+
+type EmptyStateSectionProps = ComponentProps<typeof EmptyStateSection>;
+
+export function CustomizedSection(props: EmptyStateSectionProps) {
+  return <EmptyStateSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Responsive behavior
+
+Use the preview device selector to review mobile, tablet, and desktop widths. The built-in variant controls section structure; ensure application-provided media, form controls, and children can shrink or wrap without horizontal overflow. Use the existing responsive breakpoints in scoped CSS when the consuming layout needs a product-specific adjustment.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { EmptyStateSection } from "@puzzle-ui/pieces";
+
+type EmptyStateSectionProps = ComponentProps<typeof EmptyStateSection>;
+
+export function SectionWrapper(props: EmptyStateSectionProps) {
+  return <EmptyStateSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [DashboardOverviewSection](/docs/pieces/components/dashboard)
+- [ActivitySection](/docs/pieces/components/activity)
+- [OnboardingSection](/docs/pieces/components/onboarding)
+- [Application & Dashboard overview](/docs/pieces/components/application-dashboard)
+- [Framework integration](/docs/pieces/framework-integration)

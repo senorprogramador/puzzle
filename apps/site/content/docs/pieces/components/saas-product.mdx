@@ -1,0 +1,82 @@
+---
+title: SaaS & Product Sections
+description: Explore product showcases, integrations, use cases, pricing, security, code, and roadmap sections.
+---
+
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { PricingSection, ProductShowcaseSection } from "@puzzle-ui/pieces";
+import { Button } from "@puzzle-ui/ui";
+
+Puzzle Pieces provides section compositions for SaaS teams explaining product value, integrations, use cases, trust, pricing, code, and product direction. The application supplies the claims, data, routes, billing rules, and media.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** See each reference for exact props, item types, variant behavior, and accessibility requirements.
+
+## Components
+
+| Component | Purpose | Reference |
+| --- | --- | --- |
+| Product Showcase | Demonstrate product screens, annotations, tabs, or a controlled carousel. | [Product Showcase](/docs/pieces/components/product-showcase) |
+| Integrations | Present supported services and integration categories. | [Integrations](/docs/pieces/components/integrations) |
+| Use Cases | Explain audience-specific scenarios and outcomes. | [Use Cases](/docs/pieces/components/use-cases) |
+| Security | Communicate controls, policies, and trust information. | [Security](/docs/pieces/components/security) |
+| Pricing | Present plans, feature comparisons, and billing options. | [Pricing](/docs/pieces/components/pricing) |
+| Code Showcase | Compose source examples with caller-provided syntax or actions. | [Code Showcase](/docs/pieces/components/code-showcase) |
+| Roadmap | Present milestones, progress, and planned releases. | [Roadmap](/docs/pieces/components/roadmap) |
+
+## Product and pricing previews
+
+Use the product showcase for app screenshots and the pricing family for
+application-owned plan data. The previews demonstrate distinct layouts and
+interactions.
+
+<Preview fit="device" code={`<ProductShowcaseSection variant="split" items={screenshots} />`}>
+  <ProductShowcaseSection
+    title="A clear view from brief to launch"
+    variant="split"
+    items={[
+      {
+        id: "workspace",
+        title: "Keep launches in view",
+        description: "See owners, milestones, and decisions together.",
+        media: (
+          <img
+            src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=960&q=80"
+            alt="Product team reviewing a project plan"
+            loading="lazy"
+          />
+        ),
+      },
+    ]}
+  />
+</Preview>
+
+<Preview fit="device" code={`<PricingSection variant="comparison" plans={plans} />`}>
+  <PricingSection
+    title="Plans for growing teams"
+    variant="cards"
+    plans={[
+      {
+        id: "team",
+        name: "Team",
+        description: "For teams coordinating several projects.",
+        prices: [{ amount: "$49", interval: "per month" }],
+        features: [
+          { id: "projects", label: "Projects", value: "Unlimited" },
+          { id: "support", label: "Email support", included: true },
+        ],
+        cta: <Button href="/docs/pieces/components/pricing">Compare plans</Button>,
+      },
+    ]}
+  />
+</Preview>
+
+## Composition and customization
+
+Compose a product story from a showcase, feature, and pricing section rather
+than treating Pieces as a complete landing-page template. Use UI `Tabs`,
+`Accordion`, `Card`, and `Button` where their behavior fits; supply screenshots
+with meaningful alternative text. The sections consume Puzzle Theme tokens and
+adapt to the preview's mobile/tablet/desktop widths.
+
+For framework boundaries and server/client examples, see
+[Next.js and TanStack Start integration](/docs/pieces/framework-integration).

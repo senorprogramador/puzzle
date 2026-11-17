@@ -1,0 +1,69 @@
+---
+title: Commerce Sections
+description: Compose product catalogs, category navigation, product details, cart summaries, and commerce benefits.
+---
+
+import { ProductGridSection } from "@puzzle-ui/pieces";
+import { Badge, Preview } from "@puzzle-ui/ui";
+
+Commerce sections arrange data supplied by the store application. Product availability, pricing calculations, cart state, checkout, inventory, and payment remain outside Pieces.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## Components
+
+| Component | Use case | Reference |
+| --- | --- | --- |
+| Product Grid | Browse product collections. | [Product Grid](/docs/pieces/components/product-grid) |
+| Categories | Navigate product categories. | [Categories](/docs/pieces/components/categories) |
+| Product Gallery | Present product media. | [Product Gallery](/docs/pieces/components/product-gallery) |
+| Product Details | Compose product facts, options, and actions. | [Product Details](/docs/pieces/components/product-details) |
+| Cart Summary | Review caller-calculated items and totals. | [Cart Summary](/docs/pieces/components/cart-summary) |
+| Commerce Benefits | Explain shipping, returns, and store policies. | [Commerce Benefits](/docs/pieces/components/commerce-benefits) |
+
+## Catalog and booking previews
+
+<Preview fit="device" code={`<ProductGridSection variant="featured" items={products} />`}>
+  <ProductGridSection
+    title="Trail essentials"
+    description="Field-tested equipment for weekends outside."
+    variant="featured"
+    locale="en-US"
+    items={[
+      {
+        id: "ridge-shell",
+        name: "Ridge Shell Jacket",
+        image: {
+          src: "https://images.unsplash.com/photo-1544923246-77307dd654cb?auto=format&fit=crop&w=960&q=80",
+          alt: "Olive weatherproof shell jacket",
+        },
+        price: { amount: 148, currency: "USD" },
+        category: "Outerwear",
+        collection: "Trail essentials",
+        href: "/docs/pieces/components/product-grid",
+        featured: true,
+      },
+      {
+        id: "field-pack",
+        name: "Field Daypack",
+        price: { amount: 86, currency: "USD" },
+        category: "Packs",
+        collection: "Trail essentials",
+        href: "/docs/pieces/components/product-grid",
+      },
+    ]}
+  />
+</Preview>
+
+## Responsive behavior and theme
+
+Product grids and details adapt to available space. Use the Preview device
+control to inspect mobile and desktop layouts; keep product images sized and
+described by the application. Commerce sections consume semantic Puzzle Theme
+tokens and work inside scoped themes.
+
+## Related components
+
+- [SaaS & Product](/docs/pieces/components/saas-product) for pricing and product demonstrations.
+- [Specialized & Interactive](/docs/pieces/components/specialized-interactive) for bookings and venue details.
+- [UI Card](/docs/ui/data-display/card) and [UI Button](/docs/ui/actions/button) for composed product actions.

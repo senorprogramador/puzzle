@@ -985,9 +985,13 @@ application.
 
 ## Compatibility
 
-The package targets React and React DOM 19. Hero does not depend on a router;
-framework-specific and server-rendering compatibility are not guaranteed and
-should be verified in the target application.
+Hero and its presets target React and React DOM 19, do not depend on a router,
+and support server rendering. Background video playback begins in an effect,
+respects reduced-motion preferences, and may be blocked by browser policy.
+Verify media and framework behavior in the target application.
+
+See the [Next.js and TanStack Start integration guide](/docs/pieces/framework-integration)
+for client boundaries, server-loaded data, and framework examples.
 
 ## API reference
 
@@ -1093,6 +1097,9 @@ type HeroVideoSource = {
 };
 ```
 
-Related packages: [UI components](/docs/ui),
-[theme tokens](/docs/theme/tokens), and
-[Getting Started](/docs/getting-started).
+## Related components and packages
+
+- [Video Section](/docs/pieces/components/video-section) for controlled video with native playback controls.
+- [CTA Section](/docs/pieces/components/cta) for page-level conversion actions.
+- [UI components](/docs/ui) and [theme tokens](/docs/theme/tokens).
+- [Getting Started](/docs/getting-started).

@@ -23,7 +23,7 @@ const securityItems: SecurityItem[] = [
     description: "Link the current materials your team has reviewed.",
     category: "Documentation",
     label: "Example record",
-    href: "https://example.com/security",
+    href: "/docs/pieces/components/security",
   },
   {
     id: "incident",
@@ -63,7 +63,7 @@ export const SecuritySectionVariantsExample = () => (
         description="These fictional records are supplied as examples; the component does not verify or imply certifications."
         items={securityItems}
         auditInfo={<p>Add the audit period and documentation link maintained by your organization.</p>}
-        actions={<a href="https://example.com/trust">Example trust-center link</a>}
+        actions={<a href="/docs/pieces/components/security">Trust and policy details</a>}
       />
     )}
   />

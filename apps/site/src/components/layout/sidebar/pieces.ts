@@ -63,6 +63,11 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/roadmap`,
         },
         {
+          id: "pieces-waitlist-section",
+          label: "Waitlist Section",
+          href: `${componentsFolder}/waitlist-section`,
+        },
+        {
           id: "pieces-benefits",
           label: "Benefits",
           href: `${componentsFolder}/benefits`,
@@ -102,6 +107,7 @@ const components: TreeViewItem = {
     {
       id: "pieces-commerce",
       label: "Commerce & Retail",
+      href: `${componentsFolder}/commerce`,
       children: [
         {
           id: "pieces-product-grid",
@@ -129,6 +135,11 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/product-details`,
         },
         {
+          id: "pieces-booking-section",
+          label: "Booking Section",
+          href: `${componentsFolder}/booking-section`,
+        },
+        {
           id: "pieces-commerce-benefits",
           label: "Commerce Benefits",
           href: `${componentsFolder}/commerce-benefits`,
@@ -138,6 +149,7 @@ const components: TreeViewItem = {
     {
       id: "pieces-content",
       label: "Content & Editorial",
+      href: `${componentsFolder}/content`,
       children: [
         {
           id: "pieces-blog-section",
@@ -164,11 +176,27 @@ const components: TreeViewItem = {
           label: "Changelog Section",
           href: `${componentsFolder}/changelog-section`,
         },
+        {
+          id: "pieces-video-section",
+          label: "Video Section",
+          href: `${componentsFolder}/video-section`,
+        },
+        {
+          id: "pieces-resource-section",
+          label: "Resource Section",
+          href: `${componentsFolder}/resource-section`,
+        },
+        {
+          id: "pieces-event-section",
+          label: "Event Section",
+          href: `${componentsFolder}/event-section`,
+        },
       ],
     },
     {
       id: "pieces-business",
       label: "Business & Corporate",
+      href: `${componentsFolder}/business`,
       children: [
         {
           id: "pieces-about-section",
@@ -196,6 +224,11 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/contact-section`,
         },
         {
+          id: "pieces-location-section",
+          label: "Location Section",
+          href: `${componentsFolder}/location-section`,
+        },
+        {
           id: "pieces-careers-section",
           label: "Careers Section",
           href: `${componentsFolder}/careers-section`,
@@ -213,9 +246,34 @@ const components: TreeViewItem = {
       ],
     },
     {
+      id: "pieces-saas-product",
+      label: "SaaS & Product",
+      href: `${componentsFolder}/saas-product`,
+    },
+    {
+      id: "pieces-application-dashboard",
+      label: "Application & Dashboard",
+      href: `${componentsFolder}/application-dashboard`,
+    },
+    {
+      id: "pieces-specialized-interactive",
+      label: "Specialized & Interactive",
+      href: `${componentsFolder}/specialized-interactive`,
+    },
+    {
+      id: "pieces-framework-integration",
+      label: "Framework Integration",
+      href: `${folder}/framework-integration`,
+    },
+    {
       id: "pieces-hero",
       label: "Hero",
       href: `${componentsFolder}/hero`,
+    },
+    {
+      id: "pieces-footer-section",
+      label: "Footer Section",
+      href: `${componentsFolder}/footer-section`,
     },
     {
       id: "pieces-dashboard",

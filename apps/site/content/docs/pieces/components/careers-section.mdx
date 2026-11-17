@@ -38,6 +38,19 @@ Each of the twelve variants has its own preview, using fictional consultancy rol
 | `featuredPosition` | `BusinessCareerPosition \| string` | Optional position object or ID promoted in the featured layouts. |
 | Shared section props | `MarketingSectionBaseProps` | Heading, actions, root element, native section attributes, and children. |
 
+
+### Required and default values
+
+Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `variant` | No | `"list"` |
+| `positions` | Yes | — |
+| `benefits` | No | empty array |
+| `culture` | No | — |
+| `emptyState` | No | `"There are no open positions right now."` |
+| `featuredPosition` | No | — |
 ## Usage
 
 ```tsx
@@ -65,3 +78,65 @@ Each of the twelve variants has its own preview, using fictional consultancy rol
 ## Accessibility and rendering
 
 Position titles and application links are semantic headings and native anchors. Department and location groupings retain their heading structure. The default empty state remains visible when `positions` is empty, including grouped layouts. Keep IDs unique and stable; the component validates supplied positions and benefits. There is no application workflow or backend, and rendering is server compatible.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { CareersSection } from "@puzzle-ui/pieces";
+
+type CareersSectionProps = ComponentProps<typeof CareersSection>;
+
+export function CustomizedSection(props: CareersSectionProps) {
+  return <CareersSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Responsive behavior
+
+Use the preview device selector to review mobile, tablet, and desktop widths. The built-in variant controls section structure; ensure application-provided media, form controls, and children can shrink or wrap without horizontal overflow. Use the existing responsive breakpoints in scoped CSS when the consuming layout needs a product-specific adjustment.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { CareersSection } from "@puzzle-ui/pieces";
+
+type CareersSectionProps = ComponentProps<typeof CareersSection>;
+
+export function SectionWrapper(props: CareersSectionProps) {
+  return <CareersSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [AboutSection](/docs/pieces/components/about-section)
+- [TeamSection](/docs/pieces/components/team-section)
+- [ServicesSection](/docs/pieces/components/services-section)
+- [Business & Corporate overview](/docs/pieces/components/business)
+- [Framework integration](/docs/pieces/framework-integration)

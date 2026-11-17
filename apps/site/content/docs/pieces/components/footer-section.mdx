@@ -1,0 +1,149 @@
+---
+title: Footer Section
+description: Compose semantic, responsive site footers with navigation groups, social links, newsletter content, and legal links.
+---
+
+import { FooterSection } from "@puzzle-ui/pieces";
+import { Preview } from "@puzzle-ui/ui";
+import { FooterNewsletterExample, FooterSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/footer-section";
+
+`FooterSection` renders the site-wide semantic `<footer>` landmark and caller-provided navigation and content. Routing, newsletter delivery, and legal destinations remain application-owned.
+
+## Basic usage
+
+Group links by destination. Give each group and link a stable ID; labels and URLs are plain caller data.
+
+<Preview
+  fit="device"
+  code={`\
+<FooterSection
+  variant="multi-column"
+  logo={<NorthstarLogo />}
+  description="Tools for teams building better work."
+  navigationGroups={[
+    {
+      id: "company",
+      label: "Company",
+      links: [
+        { id: "about", label: "About", href: "/docs/pieces/components/about-section" },
+        { id: "careers", label: "Careers", href: "/docs/pieces/components/careers-section" },
+      ],
+    },
+  ]}
+  socialLinks={socialLinks}
+  legalLinks={legalLinks}
+  copyright="© 2026 Northstar Studio"
+>
+  <AdditionalFooterContent />
+</FooterSection>
+`}
+>
+  <FooterSectionVariantsExample />
+</Preview>
+
+## Variants
+
+Each variant changes column layout and emphasis without changing the navigation semantics.
+
+| Variant | Use case |
+| --- | --- |
+| `multi-column` | Standard site navigation groups. |
+| `minimal` | Short legal or brand sign-off. |
+| `centered` | Centered identity and links. |
+| `large` | Larger brand description area. |
+| `newsletter` | Pair links with a signup slot. |
+| `social` | Emphasize social destinations. |
+| `mega` | Broad navigation collections. |
+| `editorial` | Restrained editorial footer. |
+| `dark` | Inverse surface presentation using theme roles. |
+| `split` | Separate identity from navigation. |
+| `cta` | Reserve space for a final action. |
+| `portfolio` | Studio or agency portfolio navigation. |
+| `ecommerce` | Shop, support, and policy links. |
+| `legal` | Focus on copyright and legal destinations. |
+
+<Preview fit="device" code={`<FooterSection variant="newsletter" newsletter={<NewsletterForm />} />`}>
+  <FooterNewsletterExample />
+</Preview>
+
+## Accessibility and responsive behavior
+
+- The root is a native footer/contentinfo landmark.
+- Navigation, social, and legal links use separately labelled `<nav>` landmarks.
+- Social links with icon-only content use the link label as their accessible name; visible labels are also rendered.
+- Links retain visible `:focus-visible` styles and native keyboard/touch behavior.
+- Navigation groups reflow to one column on smaller screens without hiding links.
+- The dark variant uses semantic text/background roles and adapts to the active theme.
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `FooterSectionVariant` | No | `multi-column` | Layout variant. |
+| `logo` | `ReactNode` | No | — | Brand mark or name. |
+| `description` | `ReactNode` | No | — | Supporting brand description. |
+| `navigationGroups` | `readonly FooterNavigationGroup[]` | No | `[]` | Primary navigation groups. |
+| `socialLinks` | `readonly FooterSocialLink[]` | No | `[]` | Social destinations with optional icons. |
+| `legalLinks` | `readonly FooterLink[]` | No | `[]` | Privacy, terms, and related links. |
+| `newsletter` | `ReactNode` | No | — | Caller-owned signup form. |
+| `copyright` | `ReactNode` | No | — | Copyright line. |
+| `children` | `ReactNode` | No | — | Additional content. |
+| `navigationLabel`, `socialLabel`, `legalLabel` | `string` | No | `"Footer navigation"`, `"Social media"`, `"Legal"` | Accessible names for navigation landmarks. |
+| `className` | `string` | No | — | Additional footer class. |
+
+`FooterLink` contains `id`, `label`, and `href`; `FooterSocialLink` adds optional `icon`. Each `FooterNavigationGroup` contains `id`, `label`, and a readonly `links` array.
+
+## Related components
+
+- [Navigation Section](/docs/pieces/components/navigation) for application navigation.
+- [CTA Section](/docs/pieces/components/cta) for a final page action.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { FooterSection } from "@puzzle-ui/pieces";
+
+type FooterSectionProps = ComponentProps<typeof FooterSection>;
+
+export function CustomizedSection(props: FooterSectionProps) {
+  return <FooterSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { FooterSection } from "@puzzle-ui/pieces";
+
+type FooterSectionProps = ComponentProps<typeof FooterSection>;
+
+export function SectionWrapper(props: FooterSectionProps) {
+  return <FooterSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.

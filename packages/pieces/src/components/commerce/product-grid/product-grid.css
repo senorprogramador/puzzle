@@ -187,8 +187,8 @@
 }
 
 .puzzle-product-grid[data-variant="bento"] .puzzle-product-grid__list > li[data-featured="true"] {
-  grid-column: span 2;
-  grid-row: span 2;
+  grid-column: span 1;
+  grid-row: auto;
 }
 
 .puzzle-product-grid[data-variant="featured"] .puzzle-product-grid__list:first-child .puzzle-product-grid__card,
@@ -211,6 +211,13 @@
   border: 0;
   border-radius: 0;
   background: transparent;
+}
+
+@media (min-width: 48rem) {
+  .puzzle-product-grid[data-variant="bento"] .puzzle-product-grid__list > li[data-featured="true"] {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
 }
 
 @media (min-width: 36rem) {

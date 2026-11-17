@@ -40,6 +40,15 @@ import { TimelineSectionVariantsExample } from "../../../../src/components/doc-e
 | `TimelineEvent.action` | `ReactNode` | Optional consumer-provided link or action. |
 | Shared section props | `MarketingSectionBaseProps` | Header, root element, section attributes, actions, and children. |
 
+
+### Required and default values
+
+Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `variant` | No | `"vertical"` |
+| `items` | Yes | — |
 ## Usage
 
 ```tsx
@@ -72,3 +81,61 @@ Dates are display metadata and do not reorder the array. Use the `numbered` vari
 ## Accessibility and responsive behavior
 
 Events render as an ordered list (`<ol>`) with each event in an `<article>`. Dates use `<time>`, icons are decorative, and caller-supplied actions retain their native semantics. The horizontal variant is a scrollable list; vertical connectors and alternating layouts adapt to the available viewport. The component does not access browser APIs and can render on the server.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { TimelineSection } from "@puzzle-ui/pieces";
+
+type TimelineSectionProps = ComponentProps<typeof TimelineSection>;
+
+export function CustomizedSection(props: TimelineSectionProps) {
+  return <TimelineSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { TimelineSection } from "@puzzle-ui/pieces";
+
+type TimelineSectionProps = ComponentProps<typeof TimelineSection>;
+
+export function SectionWrapper(props: TimelineSectionProps) {
+  return <TimelineSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [BlogSection](/docs/pieces/components/blog-section)
+- [ContentSection](/docs/pieces/components/content-section)
+- [GallerySection](/docs/pieces/components/gallery-section)
+- [Content & Editorial overview](/docs/pieces/components/content)
+- [Framework integration](/docs/pieces/framework-integration)

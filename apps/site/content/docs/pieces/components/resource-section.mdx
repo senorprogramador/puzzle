@@ -1,0 +1,173 @@
+---
+title: Resource Section
+description: Build searchable libraries of guides, downloads, templates, and webinars with caller-provided resources.
+---
+
+import { ResourceSection } from "@puzzle-ui/pieces";
+import { Preview } from "@puzzle-ui/ui";
+import { ResourceLibraryExample, ResourceSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/resource-section";
+
+`ResourceSection` presents an application-provided collection with search, category filtering, download links, and a featured item. It does not host files or fetch a catalog.
+
+## Basic usage
+
+Each resource has a stable ID, title, and link. Add `download` for browser downloads, a category for filtering, and a type label for the kind of resource.
+
+<Preview
+  fit="device"
+  code={`\
+const resources = [
+  {
+    id: "launch-kit",
+    title: "SaaS launch kit",
+    description: "A practical checklist for a thoughtful product launch.",
+    category: "Launch planning",
+    type: "Download",
+    href: "/resources/northstar-launch-checklist.txt",
+    download: true,
+    featured: true,
+  },
+  {
+    id: "research-guide",
+    title: "Customer research field guide",
+    category: "Research",
+    type: "Guide",
+    href: "/docs/pieces/components/resource-section",
+  },
+];
+
+<ResourceSection
+  title="Northstar resource library"
+  items={resources}
+  variant="featured"
+  searchable
+  filterable
+/>
+`}
+>
+  <ResourceSection
+    title="Northstar resource library"
+    description="Guides and sessions for teams building better products."
+    variant="featured"
+    items={[
+      {
+        id: "launch-kit",
+        title: "SaaS launch kit",
+        description: "A practical checklist for a thoughtful product launch.",
+        category: "Launch planning",
+        type: "Download",
+        href: "/resources/northstar-launch-checklist.txt",
+        download: true,
+        featured: true,
+      },
+      {
+        id: "research-guide",
+        title: "Customer research field guide",
+        description: "A guide to interviews and shared product decisions.",
+        category: "Research",
+        type: "Guide",
+        href: "/docs/pieces/components/resource-section",
+      },
+      {
+        id: "webinar",
+        title: "Designing a clearer onboarding flow",
+        description: "A recording from our product education series.",
+        category: "Education",
+        type: "Webinar",
+        href: "/docs/pieces/components/resource-section",
+      },
+    ]}
+  />
+</Preview>
+
+## Variants and filters
+
+Search is a trimmed, case-insensitive substring match over title, text description, category, and type. Categories are derived from supplied items. Use `searchable={false}` or `filterable={false}` to remove either control.
+
+<Preview fit="device" code={`<ResourceSection variant="filterable" items={resources} />`}>
+  <ResourceSectionVariantsExample />
+</Preview>
+
+| Variant | Use case |
+| --- | --- |
+| `grid` | General resource collection. |
+| `featured` | Lead with one featured resource. |
+| `downloads` | Present downloadable guides and files. |
+| `categories` | Browse subject-specific resources. |
+| `list` | Show longer descriptions in a vertical list. |
+| `cards` | Separate resources into cards. |
+| `library` | Create a larger learning library. |
+| `split` | Pair a featured item and supporting links. |
+| `filterable` | Highlight the search and category controls. |
+| `webinars` | Present recorded or upcoming sessions. |
+
+<Preview fit="device" code={`<ResourceSection items={resources} searchable filterable />`}>
+  <ResourceLibraryExample />
+</Preview>
+
+## Accessibility and customization
+
+- Search and category controls have visible labels and native keyboard behavior.
+- Resource titles are links, downloads use the browser `download` attribute, and media is supplied through the optional thumbnail slot.
+- Empty results use the shared `EmptyStatePanel` composition; pass `emptyState` to add context.
+- Theme colors, borders, spacing, and card surfaces come from Puzzle tokens and UI `Card`/`Badge`.
+- The `children` slot can add a call to action or resource-specific explanatory content.
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `items` | `readonly ResourceItem[]` | Yes | — | Resource records; IDs must be unique. |
+| `variant` | `ResourceSectionVariant` | No | `grid` | Layout variant. |
+| `featuredResourceId` | `string` | No | First `featured` item | Explicit featured item ID. |
+| `searchable` | `boolean` | No | `true` | Render the search field. |
+| `filterable` | `boolean` | No | `true` | Render the category selector when categories exist. |
+| `emptyState` | `ReactNode` | No | — | Additional no-results content. |
+| `children` | `ReactNode` | No | — | Additional content after the resources. |
+
+`ResourceItem` supports `id`, `title`, `href`, `description`, `category`, `type`, `download`, `featured`, `thumbnail`, and `updatedAt`.
+
+## Related components
+
+- [Blog Section](/docs/pieces/components/blog-section) for editorial articles.
+- [Event Section](/docs/pieces/components/event-section) for dated programs and sessions.
+- [Card](/docs/ui/data-display/card) and [Badge](/docs/ui/data-display/badge) provide the resource surfaces and type labels.
+
+## Responsive behavior
+
+Use the preview device selector to review mobile, tablet, and desktop widths. The built-in variant controls section structure; ensure application-provided media, form controls, and children can shrink or wrap without horizontal overflow. Use the existing responsive breakpoints in scoped CSS when the consuming layout needs a product-specific adjustment.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { ResourceSection } from "@puzzle-ui/pieces";
+
+type ResourceSectionProps = ComponentProps<typeof ResourceSection>;
+
+export function SectionWrapper(props: ResourceSectionProps) {
+  return <ResourceSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.

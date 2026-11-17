@@ -36,7 +36,7 @@ const pricingPlans: PricingPlan[] = [
       { id: "seats", label: "Team members", value: "3" },
       { id: "support", label: "Email support", included: true },
     ],
-    cta: <a href="https://example.com/start">Choose Starter</a>,
+    cta: <a href="/docs/pieces/components/pricing">Choose Starter</a>,
   },
   {
     id: "team",
@@ -53,13 +53,13 @@ const pricingPlans: PricingPlan[] = [
     ],
     badge: "Popular example",
     highlighted: true,
-    cta: <a href="https://example.com/team">Choose Team</a>,
+    cta: <a href="/docs/pieces/components/pricing">Choose Team</a>,
   },
   {
     id: "enterprise",
     name: "Enterprise",
     description: "For organizations that need a tailored agreement.",
-    customPricing: <a href="https://example.com/sales">Talk to sales</a>,
+    customPricing: <a href="mailto:sales@northstar.studio">Talk to sales</a>,
     usage: "Usage terms are defined by the customer agreement.",
     features: [
       { id: "projects", label: "Projects", value: "Configured per agreement" },

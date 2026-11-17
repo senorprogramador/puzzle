@@ -66,6 +66,17 @@ const ActivityList = ({
   <ol className="puzzle-activity-section__list">
     {items.map((item) => {
       const content = renderItem ? renderItem(item) : <ActivityItemContent item={item} />;
+      const contentClassName = [
+        variant === "cards"
+          ? "puzzle-activity-section__card-content"
+          : "puzzle-activity-section__entry",
+        item.icon &&
+          (variant === "cards"
+            ? "puzzle-activity-section__card-content--has-icon"
+            : "puzzle-activity-section__entry--has-icon"),
+      ]
+        .filter(Boolean)
+        .join(" ");
 
       return (
         <li
@@ -75,12 +86,12 @@ const ActivityList = ({
         >
           {variant === "cards" ? (
             <Card as="article" className="puzzle-activity-section__card">
-              <CardContent className="puzzle-activity-section__card-content">
+              <CardContent className={contentClassName}>
                 {content}
               </CardContent>
             </Card>
           ) : (
-            <article className="puzzle-activity-section__entry">
+            <article className={contentClassName}>
               {content}
             </article>
           )}

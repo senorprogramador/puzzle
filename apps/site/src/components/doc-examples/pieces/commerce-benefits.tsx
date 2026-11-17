@@ -16,7 +16,7 @@ const benefits: CommerceBenefitItem[] = [
     icon: <span aria-hidden="true">D</span>,
     kind: "shipping",
     label: "Store-provided",
-    href: "https://example.com/delivery",
+    href: "/docs/pieces/components/commerce-benefits",
   },
   {
     id: "returns",
@@ -24,7 +24,7 @@ const benefits: CommerceBenefitItem[] = [
     description: "Describe the return policy published by your retailer.",
     icon: <span aria-hidden="true">R</span>,
     kind: "returns",
-    action: <a href="https://example.com/returns">Read return details</a>,
+    action: <a href="/docs/pieces/components/commerce-benefits">Read return details</a>,
   },
   {
     id: "care",

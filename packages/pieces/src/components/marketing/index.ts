@@ -14,4 +14,5 @@ export * from "./testimonials";
 export * from "./cta";
 export * from "./faq";
 export * from "./how-it-works";
+export * from "./waitlist-section";
 export * from "./comparison";

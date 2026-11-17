@@ -47,6 +47,14 @@ describe("Dialog", () => {
     expect(screen.getByText("Dialog description")).toBeInTheDocument();
   });
 
+  it("supports a React node as the dialog heading", async () => {
+    renderDialog({ title: <span>Workspace report</span> });
+
+    expect(
+      await screen.findByRole("dialog", { name: "Workspace report" }),
+    ).toBeInTheDocument();
+  });
+
   it("does not render its content when closed", () => {
     renderDialog({ open: false });
 

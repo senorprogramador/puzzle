@@ -1,0 +1,91 @@
+---
+title: Framework Integration
+description: Use Puzzle Pieces sections with Next.js App Router and TanStack Start while keeping server data and client interactions in the right boundary.
+---
+
+`@puzzle-ui/pieces` is framework- and router-independent. Render static sections in server components when their data is serializable; place callbacks and client-owned interaction state in client components.
+
+## Next.js App Router
+
+Use a client component for sections with event callbacks, local filters, or form submission. Load serializable data in the server route and pass it to the client boundary.
+
+```tsx
+// app/launch/waitlist-client.tsx
+"use client";
+
+import { useState } from "react";
+import { WaitlistSection } from "@puzzle-ui/pieces";
+
+export function WaitlistClient() {
+  const [submitted, setSubmitted] = useState(false);
+
+  return (
+    <WaitlistSection
+      title="Join the Northstar early-access list"
+      success={submitted ? "Your local preview request was received." : undefined}
+      onSubmit={async (email) => {
+        await Promise.resolve(email);
+        setSubmitted(true);
+      }}
+    />
+  );
+}
+```
+
+```tsx
+// app/launch/page.tsx
+import { WaitlistClient } from "./waitlist-client";
+
+export default function LaunchPage() {
+  return <WaitlistClient />;
+}
+```
+
+Static compositions such as a footer or editorial section can remain in a
+server component. Add `Theme` at the application root so the section receives
+Puzzle's CSS variables.
+
+## TanStack Start
+
+Use the route loader for serializable event data and let the section handle only presentation and filtering.
+
+```tsx
+import { createFileRoute } from "@tanstack/react-router";
+import { EventSection, type EventItem } from "@puzzle-ui/pieces";
+
+const events: EventItem[] = [
+  {
+    id: "product-summit",
+    title: "Northstar product summit",
+    startDate: "2027-01-18T09:00:00Z",
+    dateLabel: "January 18, 2027",
+    category: "Conference",
+    location: "Amsterdam",
+    href: "/events/product-summit",
+  },
+];
+
+export const Route = createFileRoute("/events")({
+  loader: () => ({ events, referenceDate: "2026-11-17T00:00:00Z" }),
+  component: EventsPage,
+});
+
+function EventsPage() {
+  const { events, referenceDate } = Route.useLoaderData();
+  return (
+    <EventSection
+      title="Northstar events"
+      events={events}
+      referenceDate={referenceDate}
+    />
+  );
+}
+```
+
+## Compatibility notes
+
+- Pieces components are router-agnostic and import from the public package root.
+- The package supports React 19 and server rendering; interactive features use client-side React state and effects only where needed.
+- Keep callbacks, browser APIs, and non-serializable values inside the client boundary.
+- The application owns server actions, API calls, authentication, payment, availability, and persistence.
+- Import `Theme` from `@puzzle-ui/theme`; see [Theme setup](/docs/theme) for provider and scoped-theme options.

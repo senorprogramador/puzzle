@@ -1,0 +1,143 @@
+---
+title: Waitlist Section
+description: Collect early-access interest with accessible signup, progress, countdown, and referral content.
+---
+
+import { WaitlistSection } from "@puzzle-ui/pieces";
+import { Badge, Button, Preview } from "@puzzle-ui/ui";
+import { InteractiveWaitlistExample, WaitlistSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/waitlist-section";
+
+`WaitlistSection` presents a local email signup or a caller-provided `signup` slot. Its submit callback delegates work to the application; the component does not persist addresses or contact a service.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## Basic usage
+
+The built-in form uses a labelled native email field and reports pending, success, and error states. A custom `signup` slot takes precedence when the application needs another form or identity provider.
+
+<Preview
+  fit="device"
+  code={`\
+<WaitlistSection
+  title="Get early access to Northstar"
+  description="A calmer way to plan what comes next."
+  variant="early-access"
+  progress={{ value: 240, max: 500, label: "240 founders already joined" }}
+  actions={<Button variant="outline" href="/docs/pieces/components/roadmap">Read launch notes</Button>}
+  onSubmit={(email) => submitWaitlistRequest(email)}
+/>
+`}
+>
+  <WaitlistSection
+    title="Get early access to Northstar"
+    description="A calmer way to plan what comes next."
+    variant="early-access"
+    progress={{ value: 240, max: 500, label: "240 founders already joined" }}
+    actions={<Button variant="outline" href="/docs/pieces/components/roadmap">Read launch notes</Button>}
+    onSubmit={() => {}}
+  />
+</Preview>
+
+## Variants and interactive signup
+
+<Preview fit="device" code={`<WaitlistSection variant="countdown" countdown={countdown} progress={progress} />`}>
+  <WaitlistSectionVariantsExample />
+</Preview>
+
+| Variant | Use case |
+| --- | --- |
+| `centered` | A compact signup message. |
+| `split` | Signup beside launch information or media. |
+| `countdown` | Present an app-updated countdown. |
+| `progress` | Communicate current signup progress. |
+| `referral` | Explain an application-managed referral offer. |
+| `launch` | Announce a product launch. |
+| `early-access` | Invite people to an early-access program. |
+| `card` | Contain the signup in a card surface. |
+| `social-proof` | Pair signup with community proof. |
+| `multi-step` | Compose a staged, caller-owned signup experience. |
+
+<Preview fit="device" code={`<WaitlistSection onSubmit={async (email) => requestAccess(email)} />`}>
+  <InteractiveWaitlistExample />
+</Preview>
+
+`countdown` is a data presentation slot (`days`, `hours`, `minutes`, optional `seconds`); update those values in your application. `progress` accepts a non-negative `value`, a positive `max`, and an optional label. Invalid progress ranges throw rather than silently displaying a misleading value.
+
+## Accessibility and API
+
+- The email control has a visible label, `type="email"`, and native required-field validation.
+- Loading uses `aria-busy`; success is announced with `role="status"` and failures with `role="alert"`.
+- Native form submission supports pointer, touch, and keyboard submission.
+- The signup, countdown, progress, social proof, and referral content remain composable slots.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `WaitlistSectionVariant` | No | `centered` | Layout variant. |
+| `signup` | `ReactNode` | No | — | Custom signup UI; replaces the built-in email form. |
+| `onSubmit` | `(email: string) => void \| Promise<void>` | No | — | Built-in form callback. No persistence is performed. |
+| `submitLabel` | `ReactNode` | No | `"Join the waitlist"` | Submit button label. |
+| `emailLabel`, `emailPlaceholder` | `string` | No | `"Email address"`, `"you@example.com"` | Built-in form field text. |
+| `loading` | `boolean` | No | `false` | External pending state. |
+| `success`, `error` | `ReactNode` | No | — | Optional application-provided status content. |
+| `countdown` | `WaitlistCountdown` | No | — | Days, hours, minutes, and optional seconds. |
+| `progress` | `WaitlistProgress` | No | — | Numeric progress, maximum, and label. |
+| `socialProof`, `referralInfo` | `ReactNode` | No | — | Supporting content slots. |
+
+## Related components
+
+- [CTA Section](/docs/pieces/components/cta) for a general conversion block.
+- [Async Action hook](/docs/hooks/use-async-action) for shared submission state.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { WaitlistSection } from "@puzzle-ui/pieces";
+
+type WaitlistSectionProps = ComponentProps<typeof WaitlistSection>;
+
+export function CustomizedSection(props: WaitlistSectionProps) {
+  return <WaitlistSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Responsive behavior
+
+Use the preview device selector to review mobile, tablet, and desktop widths. The built-in variant controls section structure; ensure application-provided media, form controls, and children can shrink or wrap without horizontal overflow. Use the existing responsive breakpoints in scoped CSS when the consuming layout needs a product-specific adjustment.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { WaitlistSection } from "@puzzle-ui/pieces";
+
+type WaitlistSectionProps = ComponentProps<typeof WaitlistSection>;
+
+export function SectionWrapper(props: WaitlistSectionProps) {
+  return <WaitlistSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.

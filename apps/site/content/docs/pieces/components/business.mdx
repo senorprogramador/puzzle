@@ -1,0 +1,102 @@
+---
+title: Business & Corporate Sections
+description: Present organizational profiles, teams, services, case studies, careers, contact details, and partners.
+---
+
+import {
+  AboutSection,
+  LocationSection,
+  ServicesSection,
+} from "@puzzle-ui/pieces";
+import { Badge, Preview } from "@puzzle-ui/ui";
+
+Business sections give organizations reusable ways to present people, work, services, and contact details. All records, claims, contact endpoints, and media are provided by the application.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## Components
+
+| Component | Purpose | Reference |
+| --- | --- | --- |
+| About Section | Explain organization purpose and history. | [About Section](/docs/pieces/components/about-section) |
+| Team Section | Introduce people and roles. | [Team Section](/docs/pieces/components/team-section) |
+| Services Section | Describe services and outcomes. | [Services Section](/docs/pieces/components/services-section) |
+| Case Studies Section | Share customer work and results. | [Case Studies](/docs/pieces/components/case-studies-section) |
+| Contact Section | Combine contact methods, department contacts, and form/map slots. | [Contact Section](/docs/pieces/components/contact-section) |
+| Careers Section | Present open roles and workplace information. | [Careers Section](/docs/pieces/components/careers-section) |
+| Partners Section | Show partner organizations. | [Partners Section](/docs/pieces/components/partners-section) |
+| Awards Section | Present awards and recognition. | [Awards Section](/docs/pieces/components/awards-section) |
+
+## About, services, and locations
+
+<Preview fit="device" code={`<AboutSection variant="split" profile={organization} />`}>
+  <AboutSection
+    title="Northstar Advisory"
+    description="An independent partner for complex change."
+    variant="mission"
+    mission="Make complex change manageable for every team."
+    vision="Build a more resilient, thoughtful future."
+    values={[
+      { id: "care", title: "Care", description: "Start with people." },
+      { id: "clarity", title: "Clarity", description: "Make the complex useful." },
+    ]}
+  />
+</Preview>
+
+<Preview fit="device" code={`<ServicesSection variant="cards" services={services} />`}>
+  <ServicesSection
+    title="How Northstar helps"
+    variant="categorized"
+    items={[
+      {
+        id: "strategy",
+        title: "Business strategy",
+        description: "Find a clear direction for your next stage.",
+        category: "Consulting",
+        pricing: "Engagements from $8,000",
+        href: "/docs/pieces/components/services-section",
+      },
+      {
+        id: "identity",
+        title: "Brand identity",
+        description: "Build a visual system that grows with your business.",
+        category: "Creative",
+        href: "/docs/pieces/components/services-section",
+      },
+    ]}
+  />
+</Preview>
+
+<Preview fit="device" code={`<LocationSection variant="interactive" locations={locations} />`}>
+  <LocationSection
+    title="Visit Northstar"
+    variant="interactive"
+    locations={[
+      {
+        id: "amsterdam",
+        name: "Amsterdam studio",
+        address: "18 Quay Street, Amsterdam",
+        phone: "+31 20 555 0180",
+        email: "hello@northstar.example",
+        directionsHref: "https://maps.google.com/?q=18+Quay+Street+Amsterdam",
+      },
+      {
+        id: "utrecht",
+        name: "Utrecht office",
+        address: "4 Park Lane, Utrecht",
+        directionsHref: "https://maps.google.com/?q=4+Park+Lane+Utrecht",
+      },
+    ]}
+  />
+</Preview>
+
+## Composition and accessibility
+
+Compose a profile, services, team, and contact section to tell one coherent
+organization story. Keep heading levels logical, identify informative images,
+label maps and forms supplied through slots, and use real `mailto:`/`tel:` or
+application routes. Sections use semantic markup, responsive layouts, and
+Puzzle Theme tokens.
+
+See [Specialized & Interactive](/docs/pieces/components/specialized-interactive)
+for venue and booking layouts.

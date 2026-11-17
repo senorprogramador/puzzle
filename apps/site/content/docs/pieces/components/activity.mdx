@@ -5,7 +5,10 @@ description: Display searchable, grouped, and linked activity records in product
 
 import { ActivitySection } from "@puzzle-ui/pieces";
 import { Badge, Button, Preview } from "@puzzle-ui/ui";
-import { ActivityFilteringExample } from "../../../../src/components/doc-examples/pieces/activity-section";
+import {
+  ActivityFilteringExample,
+  ActivitySectionVariantsExample,
+} from "../../../../src/components/doc-examples/pieces/activity-section";
 
 `ActivitySection` presents records supplied by the application. It does not fetch events, apply permissions, or decide which activity is visible.
 
@@ -68,6 +71,14 @@ const items: ActivityItem[] = [
   />
 </Preview>
 
+## Variants
+
+Use the variant gallery to compare timeline, list, cards, and audit-oriented presentations with the same realistic events.
+
+<Preview fit="device" code={`<ActivitySection variant="grouped" items={items} />`}>
+  <ActivitySectionVariantsExample />
+</Preview>
+
 ## Filtering
 
 Filter the source data in your application and pass the result as `items`. The example filters by category and keeps the selected filter in caller-owned state.
@@ -78,7 +89,7 @@ Filter the source data in your application and pass the result as `items`. The e
 
 Supported variants: `timeline`, `list`, `feed`, `grouped`, `cards`, `compact`, `avatars`, `audit`, `split`, and `horizontal`.
 
-## Accessibility and API
+## Accessibility
 
 - Each section is labelled by its heading. Events use ordered lists, semantic `<time>` elements, and native links when `href` is provided.
 - Supply stable unique item IDs. `group` controls grouping and `groupLabel` supplies the displayed heading.
@@ -86,4 +97,78 @@ Supported variants: `timeline`, `list`, `feed`, `grouped`, `cards`, `compact`, `
 - Empty data uses the shared `EmptyStatePanel` composition. Supply a custom `emptyState` message when the default is not appropriate.
 - Use `renderItem` only when the default actor/action/time/metadata presentation does not meet the product's needs.
 
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `items` | `readonly ActivityItem[]` | Yes | — | Activity records; IDs must be unique. |
+| `title` | `ReactNode` | No | `"Recent activity"` | Section heading. |
+| `emptyState` | `ReactNode` | No | Informational message | Additional empty-state content. |
+| `actions` | `ReactNode` | No | — | Caller-provided section actions. |
+| `variant` | `ActivitySectionVariant` | No | `feed` | Activity layout. |
+| `renderItem` | `(item: ActivityItem) => ReactNode` | No | Default record layout | Custom event renderer. |
+| `className` | `string` | No | — | Additional root class. |
+
 `ActivityItem` supports `id`, `actor`, `action`, `timestamp`, `dateTime`, `icon`, `description`, `metadata`, `group`, `groupLabel`, `category`, and `href`.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { ActivitySection } from "@puzzle-ui/pieces";
+
+type ActivitySectionProps = ComponentProps<typeof ActivitySection>;
+
+export function CustomizedSection(props: ActivitySectionProps) {
+  return <ActivitySection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Responsive behavior
+
+Use the preview device selector to review mobile, tablet, and desktop widths. The built-in variant controls section structure; ensure application-provided media, form controls, and children can shrink or wrap without horizontal overflow. Use the existing responsive breakpoints in scoped CSS when the consuming layout needs a product-specific adjustment.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { ActivitySection } from "@puzzle-ui/pieces";
+
+type ActivitySectionProps = ComponentProps<typeof ActivitySection>;
+
+export function SectionWrapper(props: ActivitySectionProps) {
+  return <ActivitySection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [DashboardOverviewSection](/docs/pieces/components/dashboard)
+- [OnboardingSection](/docs/pieces/components/onboarding)
+- [EmptyStateSection](/docs/pieces/components/empty-state)
+- [Application & Dashboard overview](/docs/pieces/components/application-dashboard)
+- [Framework integration](/docs/pieces/framework-integration)

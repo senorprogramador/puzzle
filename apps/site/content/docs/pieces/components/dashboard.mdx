@@ -15,7 +15,10 @@ import {
   DashboardTopbar,
 } from "@puzzle-ui/pieces";
 import { Badge, Button, Preview } from "@puzzle-ui/ui";
-import { DashboardOverviewStatesExample } from "../../../../src/components/doc-examples/pieces/dashboard-overview-section";
+import {
+  DashboardOverviewSectionVariantsExample,
+  DashboardOverviewStatesExample,
+} from "../../../../src/components/doc-examples/pieces/dashboard-overview-section";
 
 Dashboard compositions provide reusable structure for product and admin interfaces without coupling presentation to a router, data model, or framework.
 
@@ -47,8 +50,8 @@ import {
   title="Workspace overview"
   description="A clear view of this month's work."
   variant="analytics"
-  dateRange={<Button variant="outline">Last 30 days</Button>}
-  actions={<Button>Create a project</Button>}
+  dateRange={<span>Last 30 days</span>}
+  actions={<Button href="/docs/pieces/components/project">Create a project</Button>}
   summary={<p>12 active projects across 3 teams.</p>}
   metrics={
     <DashboardStatGroup label="Workspace metrics" columns={3}>
@@ -68,8 +71,8 @@ import {
     description="A clear view of this month's work."
     variant="analytics"
     eyebrow="Northstar Studio"
-    dateRange={<Button variant="outline">Last 30 days</Button>}
-    actions={<Button>Create a project</Button>}
+    dateRange={<span>Last 30 days</span>}
+    actions={<Button href="/docs/pieces/components/project">Create a project</Button>}
     summary={<p>12 active projects across design, product, and marketing.</p>}
     metrics={
       <DashboardStatGroup label="Workspace metrics" columns={3}>
@@ -96,6 +99,14 @@ import {
   </DashboardOverviewSection>
 </Preview>
 
+### Dashboard overview variants
+
+The overview layout is intentionally independent from the chart implementation. Each of the ten variants composes the same caller-owned metric, summary, chart, and widget slots.
+
+<Preview fit="device" code={`<DashboardOverviewSection variant="split" metrics={metrics} charts={appChart} />`}>
+  <DashboardOverviewSectionVariantsExample />
+</Preview>
+
 The interactive preview lets you switch between ready, loading, and error states. Loading uses the existing UI `Skeleton`; errors are announced as alerts.
 
 <Preview fit="device" code={`<DashboardOverviewSection loading={isLoading} error={error} ... />`}>
@@ -115,7 +126,7 @@ Use the header for the page title, supporting text, and caller-provided actions.
   eyebrow="Workspace"
   title="Good morning, Jordan"
   description="A clear view of the projects your team is moving forward today."
-  actions={<Button>Create a project</Button>}
+  actions={<Button href="/docs/pieces/components/project">Create a project</Button>}
 />
 `}
 >
@@ -123,7 +134,7 @@ Use the header for the page title, supporting text, and caller-provided actions.
     eyebrow="Workspace"
     title="Good morning, Jordan"
     description="A clear view of the projects your team is moving forward today."
-    actions={<Button>Create a project</Button>}
+    actions={<Button href="/docs/pieces/components/project">Create a project</Button>}
   />
 </Preview>
 
@@ -245,7 +256,7 @@ Use a native progress element with a title-derived accessible label.
   description="Brand, design, and content are coming together."
   value={78}
   status="On track for Nov 30"
-  action={<Button variant="secondary">View project</Button>}
+  action={<Button variant="secondary" href="/docs/pieces/components/project">View project</Button>}
 />
 `}
 >
@@ -254,7 +265,7 @@ Use a native progress element with a title-derived accessible label.
     description="Brand, design, and content are coming together."
     value={78}
     status="On track for Nov 30"
-    action={<Button variant="secondary">View project</Button>}
+    action={<Button variant="secondary" href="/docs/pieces/components/project">View project</Button>}
   />
 </Preview>
 
@@ -291,7 +302,7 @@ const items = [
     eyebrow="Tuesday, November 17"
     title="Good morning, Jordan"
     description="Three projects are moving forward today."
-    actions={<Button>Create a project</Button>}
+    actions={<Button href="/docs/pieces/components/project">Create a project</Button>}
   />
   <DashboardStatGroup label="Workspace metrics" columns={3}>
     <DashboardStatCard label="Active projects" value="12" description="Across 3 teams" />
@@ -324,7 +335,7 @@ const items = [
       eyebrow="Tuesday, November 17"
       title="Good morning, Jordan"
       description="Three projects are moving forward today."
-      actions={<Button>Create a project</Button>}
+      actions={<Button href="/docs/pieces/components/project">Create a project</Button>}
     />
     <DashboardStatGroup label="Workspace metrics" columns={3}>
       <DashboardStatCard
@@ -360,6 +371,7 @@ const items = [
 
 | Component | Props |
 | --- | --- |
+| `DashboardOverviewSection` | `title` (required), `description`, `eyebrow`, `variant` (defaults to `grid`), `summary`, `metrics`, `charts` (caller-provided; no chart engine), `dateRange`, `actions`, `children`, `loading`, `error`, `className` |
 | `DashboardHeader` | `title` (required), `eyebrow`, `description`, `actions`, `className` |
 | `DashboardStatCard` | `label` (required), `value`, `description`, `icon`, `trend` (`value`, `label`, optional `direction`), `action`, `loading`, `className` |
 | `DashboardStatGroup` | `children` (required), `label`, `columns` (`2`, `3`, or `4`), `className` |
@@ -368,3 +380,81 @@ const items = [
 | `DashboardShell` | `children` (required), `sidebar`, `topbar`, `sidebarLabel`, `className` |
 
 All content and action slots accept React nodes. Callbacks and data retrieval belong to the application.
+
+
+### Required and default values
+
+Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `title` | Yes | — |
+| `description` | No | — |
+| `eyebrow` | No | — |
+| `variant` | No | `"grid"` |
+| `summary` | No | — |
+| `metrics` | No | — |
+| `charts` | No | — |
+| `dateRange` | No | — |
+| `actions` | No | — |
+| `children` | No | — |
+| `loading` | No | `false` |
+| `error` | No | — |
+| `className` | No | — |
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { DashboardOverviewSection } from "@puzzle-ui/pieces";
+
+type DashboardOverviewSectionProps = ComponentProps<typeof DashboardOverviewSection>;
+
+export function CustomizedSection(props: DashboardOverviewSectionProps) {
+  return <DashboardOverviewSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { DashboardOverviewSection } from "@puzzle-ui/pieces";
+
+type DashboardOverviewSectionProps = ComponentProps<typeof DashboardOverviewSection>;
+
+export function SectionWrapper(props: DashboardOverviewSectionProps) {
+  return <DashboardOverviewSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [ActivitySection](/docs/pieces/components/activity)
+- [OnboardingSection](/docs/pieces/components/onboarding)
+- [EmptyStateSection](/docs/pieces/components/empty-state)
+- [Application & Dashboard overview](/docs/pieces/components/application-dashboard)
+- [Framework integration](/docs/pieces/framework-integration)

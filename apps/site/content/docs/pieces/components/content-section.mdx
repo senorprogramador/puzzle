@@ -39,6 +39,19 @@ import { ContentSectionVariantsExample } from "../../../../src/components/doc-ex
 | `attribution` | `string` | Optional citation displayed in the `quote` variant. |
 | Shared section props | `MarketingSectionBaseProps` | Header, root element, section attributes, actions, and children. |
 
+
+### Required and default values
+
+Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `variant` | No | `"single-column"` |
+| `image` | No | — |
+| `media` | No | — |
+| `columns` | No | — |
+| `sidebar` | No | — |
+| `attribution` | No | — |
 ## Usage
 
 ```tsx
@@ -68,3 +81,61 @@ For custom media, provide `media={<video ... />}` instead of `image`. Column slo
 ## Accessibility and responsive behavior
 
 The section uses semantic `<section>`, `<figure>`, `<figcaption>`, `<blockquote>`, `<cite>`, and `<aside>` elements where appropriate. Set meaningful image alternatives and keep heading levels in sequence with the surrounding page. Two- and three-column layouts collapse at narrow widths; the sidebar and custom media stay in normal document flow. Content is supplied by the application and is server-renderable.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { ContentSection } from "@puzzle-ui/pieces";
+
+type ContentSectionProps = ComponentProps<typeof ContentSection>;
+
+export function CustomizedSection(props: ContentSectionProps) {
+  return <ContentSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { ContentSection } from "@puzzle-ui/pieces";
+
+type ContentSectionProps = ComponentProps<typeof ContentSection>;
+
+export function SectionWrapper(props: ContentSectionProps) {
+  return <ContentSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [BlogSection](/docs/pieces/components/blog-section)
+- [GallerySection](/docs/pieces/components/gallery-section)
+- [TimelineSection](/docs/pieces/components/timeline-section)
+- [Content & Editorial overview](/docs/pieces/components/content)
+- [Framework integration](/docs/pieces/framework-integration)

@@ -1,0 +1,204 @@
+---
+title: Video Section
+description: Present accessible video stories, tutorials, playlists, and lightboxes with native browser controls.
+---
+
+import { VideoSection } from "@puzzle-ui/pieces";
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { VideoSectionControlsExample, VideoSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/video-section";
+
+`VideoSection` composes native HTML video with section layouts for product films, agency reels, testimonials, and tutorials. It does not host, transcode, or download media for you.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** Media formats, captions, and licensing remain the application's responsibility.
+
+## Import
+
+```tsx
+import { VideoSection, type VideoItem } from "@puzzle-ui/pieces";
+```
+
+## Basic usage
+
+Supply one or more sources for each video. `preload` defaults to `none`, so a poster or thumbnail is shown without fetching the video file before the viewer chooses to play it.
+
+<Preview
+  fit="device"
+  code={`\
+const launchFilm: VideoItem = {
+  id: "launch-film",
+  title: "Meet Northstar",
+  sources: [
+    { src: "/media/northstar-launch.mp4", type: "video/mp4" },
+    { src: "/media/northstar-launch.webm", type: "video/webm" },
+  ],
+  poster: "/media/northstar-launch-poster.jpg",
+  duration: "02:18",
+  captions: [
+    { src: "/media/northstar-launch.en.vtt", srclang: "en", label: "English", default: true },
+  ],
+};
+
+<VideoSection
+  title="A calmer way to plan"
+  description="See how Northstar helps teams move their work forward."
+  videos={[launchFilm]}
+  controls
+  aspectRatio="16 / 9"
+/>
+`}
+>
+  <VideoSection
+    title="Stories from Northstar Studio"
+    description="A short sample film with native controls and captions."
+    videos={[
+      {
+        id: "studio-film",
+        title: "A film about thoughtful spaces",
+        sources: [
+          {
+            src: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+            type: "video/mp4",
+          },
+        ],
+        thumbnail: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=960&q=80",
+        captions: [
+          {
+            src: "/captions/flower.en.vtt",
+            srclang: "en",
+            label: "English",
+            default: true,
+          },
+        ],
+        duration: "00:05",
+      },
+    ]}
+    controls
+    preload="none"
+  />
+</Preview>
+
+## Variants
+
+Each variant changes the presentation while preserving native playback, keyboard controls, captions, and app-owned video sources.
+
+<Preview fit="device" code={`<VideoSection variant="playlist" videos={videos} controls />`}>
+  <VideoSectionVariantsExample />
+</Preview>
+
+| Variant | Use case |
+| --- | --- |
+| `featured` | A single lead film. |
+| `split` | Video alongside supporting content. |
+| `background` | Muted inline footage behind a section. |
+| `carousel` | A browsable video collection using the UI Carousel. |
+| `grid` | Several independent video cards. |
+| `playlist` | One player with selectable items. |
+| `cinematic` | Wide-format footage. |
+| `browser` | Product demonstrations in a framed player. |
+| `phone` | Vertical mobile video. |
+| `testimonials` | Customer footage with quote and speaker. |
+| `tutorial` | Instructional video with captions. |
+| `lightbox` | A thumbnail opens an accessible UI Dialog. |
+
+## Controls, autoplay, and captions
+
+Native video controls are enabled by default. To enable autoplay, set both `autoplay` and `muted`; playback is still disabled when the browser requests reduced motion. The section always uses `playsInline`. Use `loop` only for content where repetition is appropriate.
+
+Captions are supplied as WebVTT tracks:
+
+```tsx
+captions={[
+  {
+    src: "/media/demo.en.vtt",
+    srclang: "en",
+    label: "English",
+    default: true,
+  },
+]}
+```
+
+Set `preload="metadata"` only when metadata is needed before playback. The default `preload="none"` prevents unnecessary downloads. Use a responsive `aspectRatio` (`16 / 9`, `4 / 3`, `1 / 1`, or `9 / 16`) and provide an appropriately cropped poster.
+
+<Preview fit="device" code={`<VideoSection videos={videos} controls autoplay muted />`}>
+  <VideoSectionControlsExample />
+</Preview>
+
+## Composition and customization
+
+`VideoSection` accepts the same section heading and action props as other Pieces sections. Use the `children` slot for transcripts, speaker bios, attribution, or links to a full recording. Keep media hosting and analytics in the application.
+
+```tsx
+<VideoSection
+  title="How the agency works"
+  eyebrow="Field notes"
+  variant="testimonials"
+  videos={customerStories}
+  actions={<Button variant="outline">Meet the team</Button>}
+>
+  <a href="/stories">Read all customer stories</a>
+</VideoSection>
+```
+
+## Accessibility and responsive behavior
+
+- Every player has a descriptive accessible name; `accessibleLabel` overrides the generated label for non-text titles.
+- Native controls support keyboard and touch input. The carousel uses the UI Carousel's navigation controls; the lightbox uses the UI Dialog's focus and Escape behavior.
+- Supply captions for spoken content and meaningful poster alternatives where the thumbnail communicates information.
+- Autoplay requires muted playback and is suppressed for reduced-motion preferences. There is no automatic video preload by default.
+- Players preserve the requested aspect ratio and adapt to the available width.
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `videos` | `readonly VideoItem[]` | Yes | — | Video records to present. IDs must be unique. |
+| `variant` | `VideoSectionVariant` | No | `featured` | Layout variant. |
+| `featuredVideoId` | `string` | No | First item | Initial featured/selected video ID. |
+| `selectedVideoId` | `string` | No | Uncontrolled | Controlled playlist selection. |
+| `onVideoSelect` | `(id: string) => void` | No | — | Called when the selected video changes. |
+| `controls` | `boolean` | No | `true` | Show browser-native playback controls. |
+| `autoplay` | `boolean` | No | `false` | Request autoplay; it is applied only with `muted` and without reduced motion. |
+| `muted` | `boolean` | No | `false` | Mute audio. Required for autoplay. |
+| `loop` | `boolean` | No | `false` | Loop playback. |
+| `preload` | `"none" \| "metadata"` | No | `"none"` | Browser preload hint; `auto` is intentionally unavailable. |
+| `aspectRatio` | `"16 / 9" \| "4 / 3" \| "1 / 1" \| "9 / 16"` | No | `"16 / 9"` | Responsive media ratio. |
+| `children` | `ReactNode` | No | — | Additional transcript, attribution, or related content. |
+
+`VideoItem` contains `id`, `title`, `sources`, optional `accessibleLabel`, `poster`, `thumbnail`, `duration`, `description`, `quote`, `actor`, and `captions`. Each `VideoSource` has `src` and optional `type`; each `VideoCaption` has `src`, `srclang`, `label`, and optional `default`.
+
+## Related components
+
+- [Hero](/docs/pieces/components/hero) for a decorative background video behind hero content.
+- [Gallery Section](/docs/pieces/components/gallery-section) for image collections.
+- [Carousel](/docs/ui/navigation/carousel) and [Dialog](/docs/ui/overlays/dialog) are reused for the corresponding variants.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { VideoSection } from "@puzzle-ui/pieces";
+
+type VideoSectionProps = ComponentProps<typeof VideoSection>;
+
+export function SectionWrapper(props: VideoSectionProps) {
+  return <VideoSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.

@@ -1,0 +1,52 @@
+---
+title: Specialized & Interactive Sections
+description: Explore video, booking, location, waitlist, resource, event, and footer sections with app-owned interactions.
+---
+
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { InteractiveBookingExample } from "../../../../src/components/doc-examples/pieces/booking-section";
+import { FooterNewsletterExample } from "../../../../src/components/doc-examples/pieces/footer-section";
+import { InteractiveWaitlistExample } from "../../../../src/components/doc-examples/pieces/waitlist-section";
+import { VideoSectionControlsExample } from "../../../../src/components/doc-examples/pieces/video-section";
+
+These families combine focused layouts with browser or application interactions. They do not add a backend, availability engine, payment integration, map SDK, media host, or newsletter service.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## Components
+
+| Component | Purpose | Reference |
+| --- | --- | --- |
+| Video Section | Present native video, captions, playlists, carousels, and lightboxes. | [Video Section](/docs/pieces/components/video-section) |
+| Booking Section | Compose calendar, availability, form, steps, and price slots. | [Booking Section](/docs/pieces/components/booking-section) |
+| Location Section | Present addresses, contacts, locations, and an optional map slot. | [Location Section](/docs/pieces/components/location-section) |
+| Waitlist Section | Collect early-access interest through an app callback. | [Waitlist Section](/docs/pieces/components/waitlist-section) |
+| Resource Section | Search, filter, and link to a resource library. | [Resource Section](/docs/pieces/components/resource-section) |
+| Event Section | Present caller-provided dated events with past/upcoming filters. | [Event Section](/docs/pieces/components/event-section) |
+| Footer Section | Render semantic site navigation, social, legal, and newsletter slots. | [Footer Section](/docs/pieces/components/footer-section) |
+
+## Working previews
+
+<Preview fit="device" code={`<VideoSection videos={videos} controls captions={captions} />`}>
+  <VideoSectionControlsExample />
+</Preview>
+
+<Preview fit="device" code={`<BookingSection calendar={calendar} onSubmit={submitBooking} />`}>
+  <InteractiveBookingExample />
+</Preview>
+
+<Preview fit="device" code={`<WaitlistSection onSubmit={submitEmail} />`}>
+  <InteractiveWaitlistExample />
+</Preview>
+
+<Preview fit="device" code={`<FooterSection newsletter={<SignupForm />} navigationGroups={groups} />`}>
+  <FooterNewsletterExample />
+</Preview>
+
+## Integration boundaries
+
+Use existing UI `Dialog`, `Carousel`, `DatePicker`, `TextInput`, and `Button`
+primitives where they fit. Video autoplay respects muted playback and reduced
+motion; locations use caller-provided map content; booking, waitlist, and
+newsletter actions call application callbacks. Resource and event filtering
+operate only on the supplied data.

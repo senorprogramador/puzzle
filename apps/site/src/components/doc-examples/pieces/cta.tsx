@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { CTASection } from "@puzzle-ui/pieces";
 import type { CTAVariant } from "@puzzle-ui/pieces";
 import { Button } from "@puzzle-ui/ui";
@@ -168,13 +169,34 @@ const ctaCopy: Record<
   },
 };
 
+const NewsletterSignupExample = () => {
+  const [submitted, setSubmitted] = useState(false);
+
+  return submitted ? (
+    <p role="status">Thanks — the studio notes are on their way.</p>
+  ) : (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        setSubmitted(true);
+      }}
+    >
+      <label>
+        Email address
+        <input name="email" type="email" autoComplete="email" required />
+      </label>
+      <Button type="submit">Subscribe</Button>
+    </form>
+  );
+};
+
 export const CTASectionVariantsExample = () => (
   <SectionVariantPreviews
     componentName="CTASection"
     variants={ctaVariants}
     buildCode={(variant) =>
       variant === "newsletter"
-        ? `<CTASection variant="newsletter" title="A little inspiration for your inbox."><div role="group"><input type="email" aria-label="Email address" placeholder="you@example.com" /><Button type="button">Subscribe</Button></div></CTASection>`
+        ? `<CTASection variant="newsletter" title="A little inspiration for your inbox."><NewsletterSignupExample /></CTASection>`
         : ["split", "image", "background"].includes(variant)
         ? `<CTASection variant="${variant}" title="Make good work feel effortless." media={<img src="${sectionPreviewImages.workspace}" alt="A welcoming studio" />} primaryAction={<Button>Explore Puzzle</Button>} />`
         : variant === "app"
@@ -221,33 +243,21 @@ export const CTASectionVariantsExample = () => (
           description={description}
           media={media}
           primaryAction={
-            variant === "newsletter" ? undefined : <Button>{primary}</Button>
+            variant === "newsletter" ? undefined : (
+              <Button href="/docs/pieces/components/cta">{primary}</Button>
+            )
           }
-          secondaryAction={<Button variant="outline">{secondary}</Button>}
+          secondaryAction={
+            <Button
+              variant="outline"
+              href="/docs/pieces/components/cta"
+            >
+              {secondary}
+            </Button>
+          }
         >
           {variant === "newsletter" ? (
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "var(--puzzle-space-2, 0.5rem)",
-              }}
-            >
-              <input
-                type="email"
-                aria-label="Email address"
-                placeholder="you@example.com"
-                style={{
-                  minWidth: "14rem",
-                  padding: "var(--puzzle-space-3, 0.75rem)",
-                  border: "var(--puzzle-border-width, 1px) solid var(--puzzle-color-border)",
-                  borderRadius: "var(--puzzle-radius-md, 0.5rem)",
-                  background: "var(--puzzle-color-background)",
-                  color: "var(--puzzle-color-text)",
-                }}
-              />
-              <Button type="button">{primary}</Button>
-            </div>
+            <NewsletterSignupExample />
           ) : null}
         </CTASection>
       );

@@ -37,6 +37,16 @@ Each of the thirteen variants has a separate preview, including a hospitality be
 | `BusinessCaseStudy.external` | `boolean` | Opens the case link in a new browsing context with `noopener noreferrer`. |
 | Shared section props | `MarketingSectionBaseProps` | Heading, actions, root element, native section attributes, and children. |
 
+
+### Required and default values
+
+Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `variant` | No | `"grid"` |
+| `items` | Yes | — |
+| `featuredCase` | No | — |
 ## Usage
 
 ```tsx
@@ -63,3 +73,65 @@ Each of the thirteen variants has a separate preview, including a hospitality be
 ## Images, accessibility, and rendering
 
 Use descriptive alt text for project images. Missing image sources render an accessible placeholder rather than a broken image. Case studies are semantic articles in a list; challenge, solution, and results use labeled sections, and metrics use a description list. Rails remain keyboard-scrollable and images are lazy-loaded. The component does not fetch case data and renders on the server.
+
+## Customization
+
+Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
+
+```tsx
+import type { ComponentProps } from "react";
+import { CaseStudiesSection } from "@puzzle-ui/pieces";
+
+type CaseStudiesSectionProps = ComponentProps<typeof CaseStudiesSection>;
+
+export function CustomizedSection(props: CaseStudiesSectionProps) {
+  return <CaseStudiesSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+}
+```
+
+## Responsive behavior
+
+Use the preview device selector to review mobile, tablet, and desktop widths. The built-in variant controls section structure; ensure application-provided media, form controls, and children can shrink or wrap without horizontal overflow. Use the existing responsive breakpoints in scoped CSS when the consuming layout needs a product-specific adjustment.
+
+## Theme support
+
+The section consumes semantic variables from `@puzzle-ui/theme` and inherits active or scoped themes. Wrap the application with `Theme`, and use semantic roles such as text, surface, border, and primary for local overrides. Avoid hard-coded colors, spacing, radii, and shadows.
+
+```css
+.brand-section {
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border-color: var(--puzzle-color-border);
+}
+```
+
+## Composition
+
+Compose this section with the UI primitives named in its API and use the documented slots for consumer-owned controls or media. Keep data fetching, routing, validation, permissions, and persistence in the application. The `children` slot is intended for additional content that belongs with this section, not as a substitute for its typed data model.
+
+## TypeScript example
+
+The package exports this component from its root. Derive a wrapper's exact prop type from the public component rather than widening it:
+
+```tsx
+import type { ComponentProps } from "react";
+import { CaseStudiesSection } from "@puzzle-ui/pieces";
+
+type CaseStudiesSectionProps = ComponentProps<typeof CaseStudiesSection>;
+
+export function SectionWrapper(props: CaseStudiesSectionProps) {
+  return <CaseStudiesSection {...props} />;
+}
+```
+
+## Framework compatibility
+
+The section is router-independent. Static compositions can be server-rendered; place callback-driven interactions in the framework's client boundary. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration) for runnable framework examples and SSR guidance.
+
+## Related components
+
+- [AboutSection](/docs/pieces/components/about-section)
+- [TeamSection](/docs/pieces/components/team-section)
+- [ServicesSection](/docs/pieces/components/services-section)
+- [Business & Corporate overview](/docs/pieces/components/business)
+- [Framework integration](/docs/pieces/framework-integration)

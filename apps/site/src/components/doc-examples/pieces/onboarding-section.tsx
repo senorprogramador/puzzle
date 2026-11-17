@@ -1,6 +1,66 @@
 import { useState } from "react";
-import { OnboardingSection } from "@puzzle-ui/pieces";
+import {
+  OnboardingSection,
+  type OnboardingSectionVariant,
+  type OnboardingStep,
+} from "@puzzle-ui/pieces";
 import { Button } from "@puzzle-ui/ui";
+import {
+  SectionVariantPreviews,
+  type SectionVariantPreview,
+} from "../shared/section-variant-previews";
+
+const onboardingVariants: SectionVariantPreview<OnboardingSectionVariant>[] = [
+  { variant: "steps", useCase: "Present a straightforward sequence." },
+  { variant: "checklist", useCase: "Show completion state beside each task." },
+  { variant: "progress", useCase: "Emphasize overall completion." },
+  { variant: "wizard", useCase: "Focus the current step and its content." },
+  { variant: "cards", useCase: "Give each step a distinct surface." },
+  { variant: "split", useCase: "Pair the step list with current-step details." },
+  { variant: "welcome", useCase: "Introduce first-run setup." },
+  { variant: "centered", useCase: "Center a short guided flow." },
+  { variant: "horizontal", useCase: "Scroll through a compact horizontal step rail." },
+  { variant: "vertical", useCase: "Keep longer step descriptions in a vertical list." },
+  { variant: "compact", useCase: "Use a denser setup checklist." },
+];
+
+const previewSteps: OnboardingStep[] = [
+  {
+    id: "workspace",
+    title: "Set up your workspace",
+    description: "Choose a name and a home for the work.",
+    completed: true,
+  },
+  {
+    id: "invite",
+    title: "Invite your team",
+    description: "Bring the right people into the project.",
+  },
+  {
+    id: "plan",
+    title: "Create a first plan",
+    description: "Turn a goal into a few practical steps.",
+  },
+];
+
+export const OnboardingSectionVariantsExample = () => (
+  <SectionVariantPreviews
+    componentName="OnboardingSection"
+    variants={onboardingVariants}
+    buildCode={(variant) =>
+      `<OnboardingSection variant="${variant}" steps={steps} currentStep="invite" />`
+    }
+    renderVariant={(variant) => (
+      <OnboardingSection
+        title="Get Northstar ready"
+        description="Three small steps to get your team moving."
+        variant={variant}
+        steps={previewSteps}
+        currentStep="invite"
+      />
+    )}
+  />
+);
 
 const initialSteps = [
   {

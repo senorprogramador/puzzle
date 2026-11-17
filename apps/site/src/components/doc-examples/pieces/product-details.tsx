@@ -51,7 +51,7 @@ const product: ProductDetailsData = {
       { id: "filter", label: "Filter", productValue: "Reusable steel", comparisonValue: "Paper" },
     ],
   },
-  actions: <a href="https://example.com/products/pour-over">View retailer details</a>,
+  actions: <a href="/docs/pieces/components/product-details">View product details</a>,
 };
 
 const variants: SectionVariantPreview<ProductDetailsVariant>[] = [
