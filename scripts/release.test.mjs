@@ -32,9 +32,10 @@ const createFixture = async (directory) => {
     await mkdir(join(directory, "packages", entry.name), { recursive: true });
     originals[path] = JSON.stringify({
       name: manifest.name,
-      version: "0.4.0",
+      private: manifest.private,
+      version: manifest.private ? "0.5.0" : "0.4.0",
       publishConfig: { access: "public" },
-      dependencies: entry.name === "core" ? {} : { "@puzzle-ui/core": "^0.4.0" },
+      dependencies: entry.name === "core" || manifest.private ? {} : { "@puzzle-ui/core": "^0.4.0" },
       scripts: { build: "unused", ...(entry.name === "core" ? { test: "unused" } : {}) },
     });
     await writeFile(join(directory, path), originals[path]);
@@ -183,7 +184,8 @@ test("root changelog includes changed package release entries only", async () =>
   for (const entry of await readdir(join(root, "packages"), { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
     const dir = join(root, "packages", entry.name);
-    const { name } = JSON.parse(await readFile(join(dir, "package.json"), "utf8"));
+    const { name, private: isPrivate } = JSON.parse(await readFile(join(dir, "package.json"), "utf8"));
+    if (isPrivate) continue;
     const content = await readFile(join(dir, "CHANGELOG.md"), "utf8");
     const headings = [...content.matchAll(/^## (\d+\.\d+\.\d+) - (\d{4}-\d{2}-\d{2})$/gm)];
     for (const [index, heading] of headings.entries()) {
@@ -225,6 +227,14 @@ test("release retains a root version heading when no packages have changes", asy
       },
     });
     assert.equal(result.status, 0, result.stdout + result.stderr);
+    const commands = (await readFile(join(directory, "commands.jsonl"), "utf8"))
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line));
+    const published = commands.filter(({ command, args }) => command === "npm" && args[0] === "publish");
+    for (const name of ["workspace", "workspace-ui"]) {
+      assert.equal(published.some(({ cwd }) => cwd === join(directory, "packages", name)), false);
+    }
     const rootChangelog = await readFile(join(directory, "CHANGELOG.md"), "utf8");
     assert.match(rootChangelog, /## 0\.5\.0 - \d{4}-\d{2}-\d{2}\n\n## 0\.4\.0/);
     assert.doesNotMatch(rootChangelog, /### `@puzzle-ui\//);
@@ -495,7 +505,11 @@ for (const failure of [
       }
       if (!failure || failure === "tag") {
         const publishes = commands.filter(({ command, args }) => command === "npm" && args[0] === "publish");
-        assert.equal(publishes.length, Object.keys(originals).filter((path) => path.endsWith("package.json")).length);
+        const releasePackageCount = Object.keys(originals)
+          .filter((path) => path.endsWith("package.json"))
+          .filter((path) => JSON.parse(originals[path]).private !== true)
+          .length;
+        assert.equal(publishes.length, releasePackageCount);
         assert.ok(index("git", "tag") > commands.findLastIndex(({ command }) => command === "npm"));
       } else {
         assert.equal(index("git", "tag"), -1);

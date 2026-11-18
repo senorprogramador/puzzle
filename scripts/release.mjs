@@ -121,10 +121,15 @@ const bumpVersion = (version, type) => {
 };
 
 const validateReleasePackageCoverage = () => {
-  const directories = readdirSync(join(root, "packages"), {
+  const packageRoot = join(root, "packages");
+  const directories = readdirSync(packageRoot, {
     withFileTypes: true,
   })
     .filter((entry) => entry.isDirectory())
+    .filter(({ name }) => {
+      const manifestPath = join(packageRoot, name, "package.json");
+      return !existsSync(manifestPath) || readManifest(manifestPath).private !== true;
+    })
     .map((entry) => entry.name);
 
   const omitted = directories.filter((name) => !releaseOrder.includes(name));
