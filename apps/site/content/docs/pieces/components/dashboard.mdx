@@ -22,7 +22,8 @@ import {
 
 Dashboard compositions provide reusable structure for product and admin interfaces without coupling presentation to a router, data model, or framework.
 
-<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions are new and may evolve based on feedback.
+<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions
+are new and may evolve based on feedback.
 
 ## Installation
 
@@ -72,7 +73,9 @@ import {
     variant="analytics"
     eyebrow="Northstar Studio"
     dateRange={<span>Last 30 days</span>}
-    actions={<Button href="/docs/pieces/components/project">Create a project</Button>}
+    actions={
+      <Button href="/docs/pieces/components/project">Create a project</Button>
+    }
     summary={<p>12 active projects across design, product, and marketing.</p>}
     metrics={
       <DashboardStatGroup label="Workspace metrics" columns={3}>
@@ -103,13 +106,14 @@ import {
 
 The overview layout is intentionally independent from the chart implementation. Each of the ten variants composes the same caller-owned metric, summary, chart, and widget slots.
 
-<Preview fit="device" code={`<DashboardOverviewSection variant="split" metrics={metrics} charts={appChart} />`}>
-  <DashboardOverviewSectionVariantsExample />
-</Preview>
+<DashboardOverviewSectionVariantsExample />
 
 The interactive preview lets you switch between ready, loading, and error states. Loading uses the existing UI `Skeleton`; errors are announced as alerts.
 
-<Preview fit="device" code={`<DashboardOverviewSection loading={isLoading} error={error} ... />`}>
+<Preview
+  fit="device"
+  code={`<DashboardOverviewSection loading={isLoading} error={error} ... />`}
+>
   <DashboardOverviewStatesExample />
 </Preview>
 
@@ -134,7 +138,9 @@ Use the header for the page title, supporting text, and caller-provided actions.
     eyebrow="Workspace"
     title="Good morning, Jordan"
     description="A clear view of the projects your team is moving forward today."
-    actions={<Button href="/docs/pieces/components/project">Create a project</Button>}
+    actions={
+      <Button href="/docs/pieces/components/project">Create a project</Button>
+    }
   />
 </Preview>
 
@@ -265,7 +271,11 @@ Use a native progress element with a title-derived accessible label.
     description="Brand, design, and content are coming together."
     value={78}
     status="On track for Nov 30"
-    action={<Button variant="secondary" href="/docs/pieces/components/project">View project</Button>}
+    action={
+      <Button variant="secondary" href="/docs/pieces/components/project">
+        View project
+      </Button>
+    }
   />
 </Preview>
 
@@ -369,38 +379,38 @@ const items = [
 
 ## API
 
-| Component | Props |
-| --- | --- |
+| Component                  | Props                                                                                                                                                                                                                |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `DashboardOverviewSection` | `title` (required), `description`, `eyebrow`, `variant` (defaults to `grid`), `summary`, `metrics`, `charts` (caller-provided; no chart engine), `dateRange`, `actions`, `children`, `loading`, `error`, `className` |
-| `DashboardHeader` | `title` (required), `eyebrow`, `description`, `actions`, `className` |
-| `DashboardStatCard` | `label` (required), `value`, `description`, `icon`, `trend` (`value`, `label`, optional `direction`), `action`, `loading`, `className` |
-| `DashboardStatGroup` | `children` (required), `label`, `columns` (`2`, `3`, or `4`), `className` |
-| `DashboardActivityFeed` | `items` (required; each has `id`, `description`, `timestamp`, optional `dateTime`, `avatar`, `href`), `title`, `emptyState`, `renderItem`, `className` |
-| `DashboardProgressCard` | `title` (required), `value` (required, from `0` to `100`), `description`, `status`, `action`, `className` |
-| `DashboardShell` | `children` (required), `sidebar`, `topbar`, `sidebarLabel`, `className` |
+| `DashboardHeader`          | `title` (required), `eyebrow`, `description`, `actions`, `className`                                                                                                                                                 |
+| `DashboardStatCard`        | `label` (required), `value`, `description`, `icon`, `trend` (`value`, `label`, optional `direction`), `action`, `loading`, `className`                                                                               |
+| `DashboardStatGroup`       | `children` (required), `label`, `columns` (`2`, `3`, or `4`), `className`                                                                                                                                            |
+| `DashboardActivityFeed`    | `items` (required; each has `id`, `description`, `timestamp`, optional `dateTime`, `avatar`, `href`), `title`, `emptyState`, `renderItem`, `className`                                                               |
+| `DashboardProgressCard`    | `title` (required), `value` (required, from `0` to `100`), `description`, `status`, `action`, `className`                                                                                                            |
+| `DashboardShell`           | `children` (required), `sidebar`, `topbar`, `sidebarLabel`, `className`                                                                                                                                              |
 
 All content and action slots accept React nodes. Callbacks and data retrieval belong to the application.
-
 
 ### Required and default values
 
 Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
 
-| Prop | Required | Default |
-| --- | --- | --- |
-| `title` | Yes | — |
-| `description` | No | — |
-| `eyebrow` | No | — |
-| `variant` | No | `"grid"` |
-| `summary` | No | — |
-| `metrics` | No | — |
-| `charts` | No | — |
-| `dateRange` | No | — |
-| `actions` | No | — |
-| `children` | No | — |
-| `loading` | No | `false` |
-| `error` | No | — |
-| `className` | No | — |
+| Prop          | Required | Default  |
+| ------------- | -------- | -------- |
+| `title`       | Yes      | —        |
+| `description` | No       | —        |
+| `eyebrow`     | No       | —        |
+| `variant`     | No       | `"grid"` |
+| `summary`     | No       | —        |
+| `metrics`     | No       | —        |
+| `charts`      | No       | —        |
+| `dateRange`   | No       | —        |
+| `actions`     | No       | —        |
+| `children`    | No       | —        |
+| `loading`     | No       | `false`  |
+| `error`       | No       | —        |
+| `className`   | No       | —        |
+
 ## Customization
 
 Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
@@ -409,10 +419,17 @@ Use the component's `className` and documented slots to adapt the composition. P
 import type { ComponentProps } from "react";
 import { DashboardOverviewSection } from "@puzzle-ui/pieces";
 
-type DashboardOverviewSectionProps = ComponentProps<typeof DashboardOverviewSection>;
+type DashboardOverviewSectionProps = ComponentProps<
+  typeof DashboardOverviewSection
+>;
 
 export function CustomizedSection(props: DashboardOverviewSectionProps) {
-  return <DashboardOverviewSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+  return (
+    <DashboardOverviewSection
+      {...props}
+      className={[props.className, "brand-section"].filter(Boolean).join(" ")}
+    />
+  );
 }
 ```
 
@@ -440,7 +457,9 @@ The package exports this component from its root. Derive a wrapper's exact prop 
 import type { ComponentProps } from "react";
 import { DashboardOverviewSection } from "@puzzle-ui/pieces";
 
-type DashboardOverviewSectionProps = ComponentProps<typeof DashboardOverviewSection>;
+type DashboardOverviewSectionProps = ComponentProps<
+  typeof DashboardOverviewSection
+>;
 
 export function SectionWrapper(props: DashboardOverviewSectionProps) {
   return <DashboardOverviewSection {...props} />;

@@ -172,6 +172,11 @@ export const LogoCloudSectionVariantsExample = () => (
                 <BrandWordmark
                   name={name.toLowerCase()}
                   mark={name.slice(0, 1).toUpperCase()}
+                  markForeground={
+                    variant === "dark"
+                      ? "var(--puzzle-color-text)"
+                      : undefined
+                  }
                   color={
                     variant === "dark"
                       ? "var(--puzzle-color-background)"

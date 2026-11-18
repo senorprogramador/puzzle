@@ -5,11 +5,15 @@ description: Present accessible video stories, tutorials, playlists, and lightbo
 
 import { VideoSection } from "@puzzle-ui/pieces";
 import { Badge, Preview } from "@puzzle-ui/ui";
-import { VideoSectionControlsExample, VideoSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/video-section";
+import {
+  VideoSectionControlsExample,
+  VideoSectionVariantsExample,
+} from "../../../../src/components/doc-examples/pieces/video-section";
 
 `VideoSection` composes native HTML video with section layouts for product films, agency reels, testimonials, and tutorials. It does not host, transcode, or download media for you.
 
-<Badge content="Beta" color="info" /> **API maturity: Beta.** Media formats, captions, and licensing remain the application's responsibility.
+<Badge content="Beta" color="info" /> **API maturity: Beta.** Media formats,
+captions, and licensing remain the application's responsibility.
 
 ## Import
 
@@ -81,24 +85,22 @@ const launchFilm: VideoItem = {
 
 Each variant changes the presentation while preserving native playback, keyboard controls, captions, and app-owned video sources.
 
-<Preview fit="device" code={`<VideoSection variant="playlist" videos={videos} controls />`}>
-  <VideoSectionVariantsExample />
-</Preview>
+<VideoSectionVariantsExample />
 
-| Variant | Use case |
-| --- | --- |
-| `featured` | A single lead film. |
-| `split` | Video alongside supporting content. |
-| `background` | Muted inline footage behind a section. |
-| `carousel` | A browsable video collection using the UI Carousel. |
-| `grid` | Several independent video cards. |
-| `playlist` | One player with selectable items. |
-| `cinematic` | Wide-format footage. |
-| `browser` | Product demonstrations in a framed player. |
-| `phone` | Vertical mobile video. |
-| `testimonials` | Customer footage with quote and speaker. |
-| `tutorial` | Instructional video with captions. |
-| `lightbox` | A thumbnail opens an accessible UI Dialog. |
+| Variant        | Use case                                            |
+| -------------- | --------------------------------------------------- |
+| `featured`     | A single lead film.                                 |
+| `split`        | Video alongside supporting content.                 |
+| `background`   | Muted inline footage behind a section.              |
+| `carousel`     | A browsable video collection using the UI Carousel. |
+| `grid`         | Several independent video cards.                    |
+| `playlist`     | One player with selectable items.                   |
+| `cinematic`    | Wide-format footage.                                |
+| `browser`      | Product demonstrations in a framed player.          |
+| `phone`        | Vertical mobile video.                              |
+| `testimonials` | Customer footage with quote and speaker.            |
+| `tutorial`     | Instructional video with captions.                  |
+| `lightbox`     | A thumbnail opens an accessible UI Dialog.          |
 
 ## Controls, autoplay, and captions
 
@@ -119,7 +121,10 @@ captions={[
 
 Set `preload="metadata"` only when metadata is needed before playback. The default `preload="none"` prevents unnecessary downloads. Use a responsive `aspectRatio` (`16 / 9`, `4 / 3`, `1 / 1`, or `9 / 16`) and provide an appropriately cropped poster.
 
-<Preview fit="device" code={`<VideoSection videos={videos} controls autoplay muted />`}>
+<Preview
+  fit="device"
+  code={`<VideoSection videos={videos} controls autoplay muted />`}
+>
   <VideoSectionControlsExample />
 </Preview>
 
@@ -149,20 +154,20 @@ Set `preload="metadata"` only when metadata is needed before playback. The defau
 
 ## API
 
-| Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `videos` | `readonly VideoItem[]` | Yes | — | Video records to present. IDs must be unique. |
-| `variant` | `VideoSectionVariant` | No | `featured` | Layout variant. |
-| `featuredVideoId` | `string` | No | First item | Initial featured/selected video ID. |
-| `selectedVideoId` | `string` | No | Uncontrolled | Controlled playlist selection. |
-| `onVideoSelect` | `(id: string) => void` | No | — | Called when the selected video changes. |
-| `controls` | `boolean` | No | `true` | Show browser-native playback controls. |
-| `autoplay` | `boolean` | No | `false` | Request autoplay; it is applied only with `muted` and without reduced motion. |
-| `muted` | `boolean` | No | `false` | Mute audio. Required for autoplay. |
-| `loop` | `boolean` | No | `false` | Loop playback. |
-| `preload` | `"none" \| "metadata"` | No | `"none"` | Browser preload hint; `auto` is intentionally unavailable. |
-| `aspectRatio` | `"16 / 9" \| "4 / 3" \| "1 / 1" \| "9 / 16"` | No | `"16 / 9"` | Responsive media ratio. |
-| `children` | `ReactNode` | No | — | Additional transcript, attribution, or related content. |
+| Prop              | Type                                         | Required | Default      | Description                                                                   |
+| ----------------- | -------------------------------------------- | -------- | ------------ | ----------------------------------------------------------------------------- |
+| `videos`          | `readonly VideoItem[]`                       | Yes      | —            | Video records to present. IDs must be unique.                                 |
+| `variant`         | `VideoSectionVariant`                        | No       | `featured`   | Layout variant.                                                               |
+| `featuredVideoId` | `string`                                     | No       | First item   | Initial featured/selected video ID.                                           |
+| `selectedVideoId` | `string`                                     | No       | Uncontrolled | Controlled playlist selection.                                                |
+| `onVideoSelect`   | `(id: string) => void`                       | No       | —            | Called when the selected video changes.                                       |
+| `controls`        | `boolean`                                    | No       | `true`       | Show browser-native playback controls.                                        |
+| `autoplay`        | `boolean`                                    | No       | `false`      | Request autoplay; it is applied only with `muted` and without reduced motion. |
+| `muted`           | `boolean`                                    | No       | `false`      | Mute audio. Required for autoplay.                                            |
+| `loop`            | `boolean`                                    | No       | `false`      | Loop playback.                                                                |
+| `preload`         | `"none" \| "metadata"`                       | No       | `"none"`     | Browser preload hint; `auto` is intentionally unavailable.                    |
+| `aspectRatio`     | `"16 / 9" \| "4 / 3" \| "1 / 1" \| "9 / 16"` | No       | `"16 / 9"`   | Responsive media ratio.                                                       |
+| `children`        | `ReactNode`                                  | No       | —            | Additional transcript, attribution, or related content.                       |
 
 `VideoItem` contains `id`, `title`, `sources`, optional `accessibleLabel`, `poster`, `thumbnail`, `duration`, `description`, `quote`, `actor`, and `captions`. Each `VideoSource` has `src` and optional `type`; each `VideoCaption` has `src`, `srclang`, `label`, and optional `default`.
 

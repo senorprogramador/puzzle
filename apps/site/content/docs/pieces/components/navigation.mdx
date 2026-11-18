@@ -165,32 +165,18 @@ Use `DashboardSidebar` for vertical workspace navigation. `DashboardMobileNaviga
 <Preview
   height={280}
   code={`\
-<DashboardTopbar actions={<button type="button">Invite</button>}>
+<DashboardTopbar
+  actions={
+    <>
+      <Button variant="secondary">Invite team</Button>
+      <DashboardUserMenu trigger={<span>Jordan Lee</span>} label="Account actions">
+        <a href="/profile">Profile</a>
+        <button type="button">Sign out</button>
+      </DashboardUserMenu>
+    </>
+  }
+>
   <strong>Northstar Studio</strong>
-</DashboardTopbar>
-
-<DashboardBreadcrumbs
-  items={[
-    { id: "workspace", label: "Workspace", href: "/workspace" },
-    { id: "projects", label: "Projects", href: "/workspace/projects" },
-    { id: "website", label: "Website refresh" },
-  ]}
-/>
-
-<DashboardUserMenu
-  trigger={<span>Jordan Lee</span>}
-  label="Account actions"
->
-  <a href="/profile">Profile</a>
-  <button type="button">Sign out</button>
-</DashboardUserMenu>
-`}
->
-  <DashboardTopbar
-    actions={<Button variant="secondary">Invite team</Button>}
-  >
-    <strong>Northstar Studio</strong>
-  </DashboardTopbar>
   <DashboardBreadcrumbs
     items={[
       { id: "workspace", label: "Workspace", href: "/workspace" },
@@ -198,13 +184,29 @@ Use `DashboardSidebar` for vertical workspace navigation. `DashboardMobileNaviga
       { id: "website", label: "Website refresh" },
     ]}
   />
-  <DashboardUserMenu
-    trigger={<span>Jordan Lee</span>}
-    label="Account actions"
+</DashboardTopbar>
+`}
+>
+  <DashboardTopbar
+    actions={
+      <>
+        <Button variant="secondary">Invite team</Button>
+        <DashboardUserMenu trigger={<span>Jordan Lee</span>} label="Account actions">
+          <a href="/profile">Profile</a>
+          <button type="button">Sign out</button>
+        </DashboardUserMenu>
+      </>
+    }
   >
-    <a href="/profile">Profile</a>
-    <button type="button">Sign out</button>
-  </DashboardUserMenu>
+    <strong>Northstar Studio</strong>
+    <DashboardBreadcrumbs
+      items={[
+        { id: "workspace", label: "Workspace", href: "/workspace" },
+        { id: "projects", label: "Projects", href: "/workspace/projects" },
+        { id: "website", label: "Website refresh" },
+      ]}
+    />
+  </DashboardTopbar>
 </Preview>
 
 The user menu is a native disclosure. Supply interactive items and their behavior from the consuming application.

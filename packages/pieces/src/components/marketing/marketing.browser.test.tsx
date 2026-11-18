@@ -3,12 +3,14 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";
 import { AnnouncementSection } from "./announcement";
+import { CodeShowcaseSection } from "./code-showcase";
 import { ComparisonSection } from "./comparison";
 import { FAQSection } from "./faq";
 import { FeaturesSection } from "./features";
 import { LogoCloudSection } from "./logo-cloud";
 import { StatsSection } from "./stats";
 import { TestimonialsSection } from "./testimonials";
+import { UseCasesSection } from "./use-cases";
 
 afterEach(() => {
   cleanup();
@@ -204,6 +206,89 @@ describe("marketing section browser interactions", () => {
       listBounds.left + listBounds.width / 2,
       0,
     );
+  });
+
+  it("keeps marquee logos scrollable without overflowing the page", async () => {
+    await page.viewport(320, 800);
+    const logos = Array.from({ length: 8 }, (_, index) => ({
+      id: `partner-${index}`,
+      name: `Partner ${index}`,
+      alt: `Partner ${index} logo`,
+      logo: <span>{`PartnerCompany${index}`}</span>,
+    }));
+    const { container } = render(
+      <LogoCloudSection variant="marquee" logos={logos} />,
+    );
+    const root = container.querySelector(".puzzle-logo-cloud")!;
+    const list = root.querySelector(".puzzle-logo-cloud__list")!;
+
+    expect(list.scrollWidth).toBeGreaterThan(list.clientWidth);
+    expect(list).toHaveAttribute("aria-label", "Partner logos");
+    expect(list).toHaveAttribute("tabindex", "0");
+    expect(root.scrollWidth).toBeLessThanOrEqual(root.clientWidth);
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
+      document.documentElement.clientWidth,
+    );
+  });
+
+  it("stacks list use-case media on mobile and splits it on desktop", async () => {
+    await page.viewport(320, 800);
+    const { container } = render(
+      <UseCasesSection
+        variant="list"
+        items={[
+          {
+            id: "launch",
+            title: "Plan a product launch",
+            media: (
+              <img
+                src="/wide-preview.png"
+                alt="Product launch dashboard"
+                width="640"
+                height="360"
+              />
+            ),
+          },
+        ]}
+      />,
+    );
+    const item = container.querySelector(".puzzle-use-cases__item")!;
+
+    expect(getComputedStyle(item).gridTemplateColumns.trim().split(/\s+/)).toHaveLength(1);
+    expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
+      document.documentElement.clientWidth,
+    );
+
+    await page.viewport(1280, 800);
+    expect(getComputedStyle(item).gridTemplateColumns.trim().split(/\s+/)).toHaveLength(2);
+  });
+
+  it("contains long code lines inside installation and featured layouts", async () => {
+    await page.viewport(320, 800);
+    const code = `const endpoint = "${"https://api.example.com/".repeat(8)}";`;
+    const items = [
+      { id: "install", title: "Install", language: "bash", code },
+      { id: "configure", title: "Configure", language: "typescript", code },
+    ];
+
+    for (const variant of ["installation", "featured"] as const) {
+      const { container, unmount } = render(
+        <CodeShowcaseSection
+          variant={variant}
+          items={items}
+          copyable={false}
+        />,
+      );
+      const section = container.querySelector(".puzzle-code-showcase")!;
+      const pre = container.querySelector(".puzzle-code-showcase__pre")!;
+
+      expect(pre.scrollWidth).toBeGreaterThan(pre.clientWidth);
+      expect(section.scrollWidth).toBeLessThanOrEqual(section.clientWidth);
+      expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
+        document.documentElement.clientWidth,
+      );
+      unmount();
+    }
   });
 
   it("contains comparison table overflow within its labeled viewport on mobile", async () => {

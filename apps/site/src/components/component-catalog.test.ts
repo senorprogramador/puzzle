@@ -56,12 +56,23 @@ describe("component catalog", () => {
       "utf8",
     );
     const families = new Set(
-      [...exports.matchAll(/from "\.\/components\/([^/]+)\/([^/"]+)/g)]
-        .flatMap((match) =>
-          match[2] === "input"
-            ? ["forms/number-input", "forms/text-area-input", "forms/text-input"]
-            : [`${match[1]}/${match[2]}`],
-        ),
+      [...exports.matchAll(/from "\.\/components\/([^"]+)"/g)].flatMap(
+        ([, modulePath]) => {
+          const [category, component] = (modulePath ?? "").split("/");
+
+          if (!component) {
+            return [];
+          }
+
+          return category === "forms" && component === "input"
+            ? [
+                "forms/number-input",
+                "forms/text-area-input",
+                "forms/text-input",
+              ]
+            : [`${category}/${component}`];
+        },
+      ),
     );
 
     expect(components.map((component) => component.href.slice("/docs/ui/".length)).sort())

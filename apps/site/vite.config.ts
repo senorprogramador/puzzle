@@ -98,50 +98,44 @@ export default defineConfig({
 
     rolldownOptions: {
       output: {
-        // Keep shared source bounded without pulling component CSS out of page assets.
-        groups: [
-          {
-            name: "schemaorg",
-            test: /schemaorg-chunks[\\/]/,
-            maxSize: 400 * 1024,
-          },
-          {
-            name: "puzzle-pieces",
-            test: (id) =>
-              /packages[\\/]pieces[\\/]src[\\/]/.test(id) &&
-              !/\.css(?:\?.*)?$/.test(id),
-            entriesAware: true,
-            includeDependenciesRecursively: false,
-            maxSize: 350 * 1024,
-          },
-          {
-            name: "puzzle-ui",
-            test: (id) =>
-              /packages[\\/]ui[\\/]src[\\/]/.test(id) &&
-              !/\.css(?:\?.*)?$/.test(id),
-            entriesAware: true,
-            includeDependenciesRecursively: false,
-            maxSize: 350 * 1024,
-          },
-          {
-            name: "puzzle-icons",
-            test: (id) =>
-              /packages[\\/]icons[\\/]src[\\/]/.test(id) &&
-              !/\.css(?:\?.*)?$/.test(id),
-            entriesAware: true,
-            maxSize: 350 * 1024,
-          },
-          {
-            name: "site-doc-examples",
-            test: (id) =>
-              /apps[\\/]site[\\/]src[\\/]components[\\/]doc-examples[\\/]/.test(
-                id,
-              ) && !/\.css(?:\?.*)?$/.test(id),
-            entriesAware: true,
-            includeDependenciesRecursively: false,
-            maxSize: 350 * 1024,
-          },
-        ],
+        codeSplitting: {
+          // Keep shared source bounded without pulling component CSS out of page assets.
+          groups: [
+            {
+              name: "schemaorg",
+              test: /schemaorg-chunks[\\/]/,
+              maxSize: 400 * 1024,
+            },
+            {
+              name: "puzzle-pieces",
+              test: (id) =>
+                /packages[\\/]pieces[\\/]src[\\/]/.test(id) &&
+                !/\.css(?:\?.*)?$/.test(id),
+              entriesAware: true,
+              includeDependenciesRecursively: false,
+              maxSize: 350 * 1024,
+            },
+            {
+              name: "puzzle-ui",
+              test: (id) =>
+                /packages[\\/]ui[\\/]src[\\/]/.test(id) &&
+                !/\.css(?:\?.*)?$/.test(id),
+              entriesAware: true,
+              includeDependenciesRecursively: false,
+              maxSize: 350 * 1024,
+            },
+            {
+              name: "site-doc-examples",
+              test: (id) =>
+                /apps[\\/]site[\\/]src[\\/]components[\\/]doc-examples[\\/]/.test(
+                  id,
+                ) && !/\.css(?:\?.*)?$/.test(id),
+              entriesAware: true,
+              includeDependenciesRecursively: false,
+              maxSize: 350 * 1024,
+            },
+          ],
+        },
       },
     },
   },

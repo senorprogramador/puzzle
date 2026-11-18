@@ -1,6 +1,6 @@
 import { HowItWorksSection } from "@puzzle-ui/pieces";
 import type { HowItWorksItem, HowItWorksVariant } from "@puzzle-ui/pieces";
-import { Icon } from "@puzzle-ui/icons/icon";
+import { Icon } from "@puzzle-ui/icons";
 import { sectionPreviewImages, SectionPreviewImage, SectionPreviewVideo } from "../shared/section-preview-media";
 import { SectionVariantPreviews } from "../shared/section-variant-previews";
 import type { SectionVariantPreview } from "../shared/section-variant-previews";

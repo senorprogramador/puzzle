@@ -5,7 +5,10 @@ description: Compose semantic, responsive site footers with navigation groups, s
 
 import { FooterSection } from "@puzzle-ui/pieces";
 import { Preview } from "@puzzle-ui/ui";
-import { FooterNewsletterExample, FooterSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/footer-section";
+import {
+  FooterNewsletterExample,
+  FooterSectionVariantsExample,
+} from "../../../../src/components/doc-examples/pieces/footer-section";
 
 `FooterSection` renders the site-wide semantic `<footer>` landmark and caller-provided navigation and content. Routing, newsletter delivery, and legal destinations remain application-owned.
 
@@ -13,56 +16,33 @@ import { FooterNewsletterExample, FooterSectionVariantsExample } from "../../../
 
 Group links by destination. Give each group and link a stable ID; labels and URLs are plain caller data.
 
-<Preview
-  fit="device"
-  code={`\
-<FooterSection
-  variant="multi-column"
-  logo={<NorthstarLogo />}
-  description="Tools for teams building better work."
-  navigationGroups={[
-    {
-      id: "company",
-      label: "Company",
-      links: [
-        { id: "about", label: "About", href: "/docs/pieces/components/about-section" },
-        { id: "careers", label: "Careers", href: "/docs/pieces/components/careers-section" },
-      ],
-    },
-  ]}
-  socialLinks={socialLinks}
-  legalLinks={legalLinks}
-  copyright="© 2026 Northstar Studio"
->
-  <AdditionalFooterContent />
-</FooterSection>
-`}
->
-  <FooterSectionVariantsExample />
-</Preview>
+<FooterSectionVariantsExample />
 
 ## Variants
 
 Each variant changes column layout and emphasis without changing the navigation semantics.
 
-| Variant | Use case |
-| --- | --- |
-| `multi-column` | Standard site navigation groups. |
-| `minimal` | Short legal or brand sign-off. |
-| `centered` | Centered identity and links. |
-| `large` | Larger brand description area. |
-| `newsletter` | Pair links with a signup slot. |
-| `social` | Emphasize social destinations. |
-| `mega` | Broad navigation collections. |
-| `editorial` | Restrained editorial footer. |
-| `dark` | Inverse surface presentation using theme roles. |
-| `split` | Separate identity from navigation. |
-| `cta` | Reserve space for a final action. |
-| `portfolio` | Studio or agency portfolio navigation. |
-| `ecommerce` | Shop, support, and policy links. |
-| `legal` | Focus on copyright and legal destinations. |
+| Variant        | Use case                                        |
+| -------------- | ----------------------------------------------- |
+| `multi-column` | Standard site navigation groups.                |
+| `minimal`      | Short legal or brand sign-off.                  |
+| `centered`     | Centered identity and links.                    |
+| `large`        | Larger brand description area.                  |
+| `newsletter`   | Pair links with a signup slot.                  |
+| `social`       | Emphasize social destinations.                  |
+| `mega`         | Broad navigation collections.                   |
+| `editorial`    | Restrained editorial footer.                    |
+| `dark`         | Inverse surface presentation using theme roles. |
+| `split`        | Separate identity from navigation.              |
+| `cta`          | Reserve space for a final action.               |
+| `portfolio`    | Studio or agency portfolio navigation.          |
+| `ecommerce`    | Shop, support, and policy links.                |
+| `legal`        | Focus on copyright and legal destinations.      |
 
-<Preview fit="device" code={`<FooterSection variant="newsletter" newsletter={<NewsletterForm />} />`}>
+<Preview
+  fit="device"
+  code={`<FooterSection variant="newsletter" newsletter={<NewsletterForm />} />`}
+>
   <FooterNewsletterExample />
 </Preview>
 
@@ -72,24 +52,24 @@ Each variant changes column layout and emphasis without changing the navigation 
 - Navigation, social, and legal links use separately labelled `<nav>` landmarks.
 - Social links with icon-only content use the link label as their accessible name; visible labels are also rendered.
 - Links retain visible `:focus-visible` styles and native keyboard/touch behavior.
-- Navigation groups reflow to one column on smaller screens without hiding links.
+- Phone layouts stack footer sections, navigation groups, social/legal links, and newsletter controls vertically with token-based spacing. Tablet layouts use two columns; wider desktop layouts expand to four columns where appropriate.
 - The dark variant uses semantic text/background roles and adapts to the active theme.
 
 ## API
 
-| Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `variant` | `FooterSectionVariant` | No | `multi-column` | Layout variant. |
-| `logo` | `ReactNode` | No | — | Brand mark or name. |
-| `description` | `ReactNode` | No | — | Supporting brand description. |
-| `navigationGroups` | `readonly FooterNavigationGroup[]` | No | `[]` | Primary navigation groups. |
-| `socialLinks` | `readonly FooterSocialLink[]` | No | `[]` | Social destinations with optional icons. |
-| `legalLinks` | `readonly FooterLink[]` | No | `[]` | Privacy, terms, and related links. |
-| `newsletter` | `ReactNode` | No | — | Caller-owned signup form. |
-| `copyright` | `ReactNode` | No | — | Copyright line. |
-| `children` | `ReactNode` | No | — | Additional content. |
-| `navigationLabel`, `socialLabel`, `legalLabel` | `string` | No | `"Footer navigation"`, `"Social media"`, `"Legal"` | Accessible names for navigation landmarks. |
-| `className` | `string` | No | — | Additional footer class. |
+| Prop                                           | Type                               | Required | Default                                            | Description                                |
+| ---------------------------------------------- | ---------------------------------- | -------- | -------------------------------------------------- | ------------------------------------------ |
+| `variant`                                      | `FooterSectionVariant`             | No       | `multi-column`                                     | Layout variant.                            |
+| `logo`                                         | `ReactNode`                        | No       | —                                                  | Brand mark or name.                        |
+| `description`                                  | `ReactNode`                        | No       | —                                                  | Supporting brand description.              |
+| `navigationGroups`                             | `readonly FooterNavigationGroup[]` | No       | `[]`                                               | Primary navigation groups.                 |
+| `socialLinks`                                  | `readonly FooterSocialLink[]`      | No       | `[]`                                               | Social destinations with optional icons.   |
+| `legalLinks`                                   | `readonly FooterLink[]`            | No       | `[]`                                               | Privacy, terms, and related links.         |
+| `newsletter`                                   | `ReactNode`                        | No       | —                                                  | Caller-owned signup form.                  |
+| `copyright`                                    | `ReactNode`                        | No       | —                                                  | Copyright line.                            |
+| `children`                                     | `ReactNode`                        | No       | —                                                  | Additional content.                        |
+| `navigationLabel`, `socialLabel`, `legalLabel` | `string`                           | No       | `"Footer navigation"`, `"Social media"`, `"Legal"` | Accessible names for navigation landmarks. |
+| `className`                                    | `string`                           | No       | —                                                  | Additional footer class.                   |
 
 `FooterLink` contains `id`, `label`, and `href`; `FooterSocialLink` adds optional `icon`. Each `FooterNavigationGroup` contains `id`, `label`, and a readonly `links` array.
 
@@ -109,7 +89,12 @@ import { FooterSection } from "@puzzle-ui/pieces";
 type FooterSectionProps = ComponentProps<typeof FooterSection>;
 
 export function CustomizedSection(props: FooterSectionProps) {
-  return <FooterSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+  return (
+    <FooterSection
+      {...props}
+      className={[props.className, "brand-section"].filter(Boolean).join(" ")}
+    />
+  );
 }
 ```
 

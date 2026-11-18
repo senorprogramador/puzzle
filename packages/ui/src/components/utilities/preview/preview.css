@@ -206,11 +206,20 @@
 }
 
 .puzzle-preview__content {
+  padding: var(--puzzle-space-2, 0.5rem);
   font-family: var(--puzzle-font-family-body1, system-ui, sans-serif);
   font-size: var(--puzzle-font-size-body1, 1rem);
   font-weight: var(--puzzle-font-weight-body1, 400);
   line-height: var(--puzzle-font-line-height-body1, 1.5);
   letter-spacing: var(--puzzle-font-letter-spacing-body1, 0);
+}
+
+.puzzle-preview__content[data-device="tablet"] {
+  padding: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-preview__content[data-device="desktop"] {
+  padding: var(--puzzle-space-8, 2rem);
 }
 
 /* Server-rendered stand-in shown until the iframe content has been measured. */
@@ -229,12 +238,20 @@
     --_puzzle-preview-device-width: 768px;
     --_puzzle-preview-device-height: 1024px;
   }
+
+  .puzzle-preview__placeholder:not([data-device]) {
+    padding: var(--puzzle-space-4, 1rem);
+  }
 }
 
 @media (min-width: 1024px) {
   .puzzle-preview[data-auto-device] {
     --_puzzle-preview-device-width: 1024px;
     --_puzzle-preview-device-height: 768px;
+  }
+
+  .puzzle-preview__placeholder:not([data-device]) {
+    padding: var(--puzzle-space-8, 2rem);
   }
 }
 

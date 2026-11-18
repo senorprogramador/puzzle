@@ -88,7 +88,7 @@
 
 .puzzle-logo-cloud[data-variant="marquee"] .puzzle-logo-cloud__list {
   display: flex;
-  width: max-content;
+  width: 100%;
   min-width: 100%;
   overflow-x: auto;
   scroll-snap-type: x proximity;

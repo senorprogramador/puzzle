@@ -146,6 +146,7 @@ describe("CodeShowcaseSection", () => {
     const { container } = render(
       <CodeShowcaseSection variant="multi-language" items={snippets} />,
     );
+    expect(container.querySelector("code")).not.toHaveAttribute("lang");
     const firstTab = screen.getByRole("tab", { name: "typescript" });
     firstTab.focus();
     await user.keyboard("{ArrowRight}");

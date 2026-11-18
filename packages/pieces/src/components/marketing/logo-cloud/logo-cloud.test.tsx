@@ -53,6 +53,47 @@ describe("LogoCloudSection", () => {
     expect(screen.getByRole("img", { name: "Acme logo" })).toBeVisible();
   });
 
+  it("groups logos in input order and collects ungrouped logos under Partners", () => {
+    render(
+      <LogoCloudSection
+        variant="grouped"
+        logos={[
+          {
+            id: "acme",
+            name: "Acme",
+            alt: "Acme logo",
+            logo: <span>ACME</span>,
+            group: "Partners",
+          },
+          {
+            id: "globex",
+            name: "Globex",
+            alt: "Globex logo",
+            logo: <span>GLOBEX</span>,
+            group: "Customers",
+          },
+          {
+            id: "initech",
+            name: "Initech",
+            alt: "Initech logo",
+            logo: <span>INITECH</span>,
+          },
+        ]}
+      />,
+    );
+
+    const headings = screen.getAllByRole("heading", { level: 3 });
+    expect(headings.map((heading) => heading.textContent)).toEqual([
+      "Partners",
+      "Customers",
+    ]);
+
+    const partners = screen
+      .getByRole("heading", { name: "Partners" })
+      .closest(".puzzle-logo-cloud__group");
+    expect(partners?.querySelectorAll("li")).toHaveLength(2);
+  });
+
   it("omits an empty logo list", () => {
     const { container } = render(<LogoCloudSection logos={[]} />);
     expect(container.querySelector(".puzzle-logo-cloud__list")).toBeNull();

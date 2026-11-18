@@ -130,6 +130,10 @@
   margin: 0;
 }
 
+.puzzle-business-contact-details dd {
+  overflow-wrap: anywhere;
+}
+
 .puzzle-business-metrics dd {
   font-size: var(--puzzle-font-size-headline3, 1.5rem);
   font-weight: var(--puzzle-font-weight-semibold, 600);
@@ -211,11 +215,20 @@
   font-variant-numeric: tabular-nums;
 }
 
+.puzzle-business-service__media {
+  width: 100%;
+  min-width: 0;
+}
+
 .puzzle-business-service__media > * {
   display: block;
   width: 100%;
-  max-height: 14rem;
   border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-business-service .puzzle-business-service__media img,
+.puzzle-business-service .puzzle-business-service__media video {
+  max-height: 14rem;
   object-fit: cover;
 }
 

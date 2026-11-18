@@ -1,5 +1,5 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { act, lazy, useState } from "react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { lazy, useState } from "react";
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -36,6 +36,20 @@ const expectNoOverflow = () => {
 };
 
 describe("Preview sizing", () => {
+  it("titles the frame document and makes its scroll root keyboard focusable", async () => {
+    render(
+      <Preview defaultDevice="mobile" height={80}>
+        <div data-content style={{ height: 240 }}>Preview content</div>
+      </Preview>,
+    );
+
+    await expectHeight(80);
+    const frameDocument = getFrame().contentDocument!;
+
+    expect(frameDocument.title).toBe("Mobile component preview");
+    expect(frameDocument.documentElement).toHaveAttribute("tabindex", "0");
+  });
+
   it("keeps lazy previews stable while loading styles and suspended content", async () => {
     let resolveExample: (value: { default: () => React.ReactNode }) => void = () => {};
     const Example = lazy(() => new Promise<{ default: () => React.ReactNode }>((resolve) => {
@@ -101,6 +115,25 @@ describe("Preview sizing", () => {
     });
     expect(viewport.getBoundingClientRect().height).toBe(120);
     expectNoOverflow();
+  });
+
+  it("uses smaller default padding on mobile and tablet previews", async () => {
+    render(
+      <Preview defaultDevice="mobile">
+        <div data-content style={{ height: 64 }}>Content</div>
+      </Preview>,
+    );
+    expect(getComputedStyle(document.querySelector(".puzzle-preview__placeholder")!).padding).toBe("8px");
+    const expectPadding = async (padding: number) => {
+      await expectHeight(64 + 2 * padding);
+      const content = getFrame().contentDocument!.querySelector("[data-content]")!.parentElement!;
+      expect(getComputedStyle(content).padding).toBe(`${padding}px`);
+    };
+    await expectPadding(8);
+    fireEvent.click(screen.getByRole("button", { name: "Tablet" }));
+    await expectPadding(16);
+    fireEvent.click(screen.getByRole("button", { name: "Desktop" }));
+    await expectPadding(32);
   });
 
   it("applies padding inside the frame and includes it in the content height", async () => {

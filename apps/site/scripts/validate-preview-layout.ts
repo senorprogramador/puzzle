@@ -5,54 +5,18 @@ import { fileURLToPath } from "node:url";
 import { chromium, type Browser } from "playwright";
 
 const site = fileURLToPath(new URL("..", import.meta.url));
-const server = spawn("node", [`${site}/.output/server/index.mjs`], {
-  cwd: site,
-  env: { ...process.env, HOST: "127.0.0.1", PORT: "0", NODE_ENV: "production" },
-  stdio: ["ignore", "pipe", "pipe"],
-});
-let browser: Browser | undefined;
-let output = "";
-const capture = (chunk: Buffer) => {
-  output = (output + chunk.toString()).slice(-4000);
-};
-server.stdout.on("data", capture);
-server.stderr.on("data", capture);
-
-const paths = [
-  "/docs/ui/utilities/preview",
-  "/docs/pieces",
-  ...[
-    "hero",
-    "features",
-    "dashboard",
-    "activity",
-    "onboarding",
-    "empty-state",
-    "data-display",
-    "feedback",
-    "navigation",
-    "project",
-    "settings",
-    "product-showcase",
-    "product-grid",
-    "video-section",
-    "booking-section",
-    "location-section",
-    "waitlist-section",
-    "resource-section",
-    "event-section",
-    "footer-section",
-    "marketing",
-    "saas-product",
-    "commerce",
-    "content",
-    "business",
-    "application-dashboard",
-    "specialized-interactive",
-  ].map((component) => `/docs/pieces/components/${component}`),
-];
-
-try {
+const startSite = async () => {
+  const server = spawn("node", [`${site}/.output/server/index.mjs`], {
+    cwd: site,
+    env: { ...process.env, HOST: "127.0.0.1", PORT: "0", NODE_ENV: "production" },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let output = "";
+  const capture = (chunk: Buffer) => {
+    output = (output + chunk.toString()).slice(-4000);
+  };
+  server.stdout.on("data", capture);
+  server.stderr.on("data", capture);
   const origin = await new Promise<string>((resolve, reject) => {
     const timer = setTimeout(() => {
       reject(new Error(`Site did not start:\n${output}`));
@@ -73,12 +37,102 @@ try {
       }
     });
   });
-  assert.equal((await fetch(origin)).status, 200);
-  browser = await chromium.launch();
+  return { origin, server };
+};
 
-  for (const width of [390, 800, 1440]) {
-    for (const path of paths) {
-      const page = await browser.newPage({ viewport: { width, height: 1000 } });
+const stopSite = async (server: ReturnType<typeof spawn>) => {
+  if (server.exitCode !== null || server.signalCode !== null) return;
+  const exited = once(server, "exit");
+  server.kill("SIGTERM");
+  const timer = setTimeout(() => server.kill("SIGKILL"), 5000);
+  timer.unref();
+  await exited;
+  clearTimeout(timer);
+};
+
+let browser: Browser | undefined;
+let activeServer: ReturnType<typeof spawn> | undefined;
+
+const paths = [
+  "/docs/ui/utilities/preview",
+  "/docs/pieces",
+  ...[
+    "hero",
+    "announcement",
+    "logo-cloud",
+    "features",
+    "benefits",
+    "stats",
+    "testimonials",
+    "cta",
+    "faq",
+    "how-it-works",
+    "comparison",
+    "product-showcase",
+    "integrations",
+    "use-cases",
+    "security",
+    "pricing",
+    "code-showcase",
+    "roadmap",
+    "product-grid",
+    "categories",
+    "product-gallery",
+    "cart-summary",
+    "product-details",
+    "commerce-benefits",
+    "blog-section",
+    "content-section",
+    "gallery-section",
+    "timeline-section",
+    "changelog-section",
+    "about-section",
+    "team-section",
+    "services-section",
+    "case-studies-section",
+    "contact-section",
+    "careers-section",
+    "partners-section",
+    "awards-section",
+    "dashboard",
+    "activity",
+    "onboarding",
+    "empty-state",
+    "settings",
+    "video-section",
+    "booking-section",
+    "location-section",
+    "waitlist-section",
+    "resource-section",
+    "event-section",
+    "footer-section",
+    "data-display",
+    "feedback",
+    "navigation",
+    "project",
+    "marketing",
+    "saas-product",
+    "commerce",
+    "content",
+    "business",
+    "application-dashboard",
+    "specialized-interactive",
+  ].map((component) => `/docs/pieces/components/${component}`),
+];
+
+try {
+  for (const width of [320, 390, 768, 1280, 1920]) {
+    for (let batchStart = 0; batchStart < paths.length; batchStart += 10) {
+      const { origin, server } = await startSite();
+      activeServer = server;
+      try {
+        assert.equal((await fetch(origin)).status, 200);
+        const viewportBrowser = await chromium.launch();
+        browser = viewportBrowser;
+      for (const path of paths.slice(batchStart, batchStart + 10)) {
+        const page = await viewportBrowser.newPage({
+          viewport: { width, height: 1000 },
+        });
       const errors: string[] = [];
       page.on("pageerror", (error) => errors.push(error.message));
       page.on("console", (message) => {
@@ -157,6 +211,41 @@ try {
           );
         });
         await page.waitForFunction(() => !document.querySelector("[data-preview-placeholder]"));
+        if (path === "/docs/pieces/components/footer-section") {
+          const footerColumnCounts = await page
+            .locator(".puzzle-preview__frame")
+            .evaluateAll((frames) =>
+              frames.flatMap((frame) => {
+                if (!(frame instanceof HTMLIFrameElement)) return [];
+                const footer = frame.contentDocument?.querySelector(
+                  ".puzzle-footer-section",
+                );
+                const content = footer?.querySelector(
+                  ".puzzle-footer-section__content",
+                );
+                return content
+                  ? [
+                      getComputedStyle(content)
+                        .gridTemplateColumns.trim()
+                        .split(/\s+/).length,
+                    ]
+                  : [];
+              }),
+            );
+          const minimumColumns = width < 768 ? 1 : 2;
+          assert.ok(
+            footerColumnCounts.length >= 14 &&
+              footerColumnCounts.every((columns) => columns >= minimumColumns),
+            `${width}px footer variants use ${minimumColumns} or more columns`,
+          );
+        }
+        await page.evaluate(async () => {
+          const frames = [...document.querySelectorAll<HTMLIFrameElement>(".puzzle-preview__frame")];
+          await Promise.all(frames.map((frame) => frame.contentDocument!.fonts.ready));
+          await new Promise<void>((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+          });
+        });
         const overflowingPreviews = await page
           .locator(".puzzle-preview__frame")
           .evaluateAll((frames) =>
@@ -175,13 +264,6 @@ try {
             }),
           );
         assert.deepEqual(overflowingPreviews, [], `${width}px ${path}: no preview overflow`);
-        await page.evaluate(async () => {
-          const frames = [...document.querySelectorAll<HTMLIFrameElement>(".puzzle-preview__frame")];
-          await Promise.all(frames.map((frame) => frame.contentDocument!.fonts.ready));
-          await new Promise<void>((resolve) => {
-            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-          });
-        });
 
         const result = await geometry.evaluate(({ state, observer }) => {
           observer.disconnect();
@@ -197,21 +279,21 @@ try {
           `${width}px ${path}: preview height shifted by ${result.maxShift}px`,
         );
         console.log(`${width}px ${path}: ${result.previews} previews, ${result.maxShift}px maximum shift`);
-      } finally {
-        releaseScripts();
-        await page.close();
+        } finally {
+          releaseScripts();
+          await page.close();
+        }
       }
-    }
+        } finally {
+          await browser?.close();
+          browser = undefined;
+          await stopSite(server);
+          activeServer = undefined;
+        }
+  }
   }
   console.log("Preview SSR, delayed hydration and iframe layout checks passed.");
 } finally {
   await browser?.close();
-  if (server.exitCode === null && server.signalCode === null) {
-    const exited = once(server, "exit");
-    server.kill("SIGTERM");
-    const timer = setTimeout(() => server.kill("SIGKILL"), 5000);
-    timer.unref();
-    await exited;
-    clearTimeout(timer);
-  }
+  if (activeServer) await stopSite(activeServer);
 }

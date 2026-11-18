@@ -5,7 +5,10 @@ description: Present upcoming and past events with date-aware filtering, venue d
 
 import { EventSection } from "@puzzle-ui/pieces";
 import { Preview } from "@puzzle-ui/ui";
-import { EventFilteringExample, EventSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/event-section";
+import {
+  EventFilteringExample,
+  EventSectionVariantsExample,
+} from "../../../../src/components/doc-examples/pieces/event-section";
 
 `EventSection` renders event data supplied by the application. It does not create events, manage registrations, or reserve tickets.
 
@@ -84,24 +87,25 @@ const events = [
 
 The `upcoming` and `past` variants initialize the date filter accordingly. Other variants start with all events. The user can switch between all, upcoming, and past, and filter by category.
 
-<Preview fit="device" code={`<EventSection variant="calendar" events={events} referenceDate={asOf} />`}>
-  <EventSectionVariantsExample />
-</Preview>
+<EventSectionVariantsExample />
 
-| Variant | Use case |
-| --- | --- |
-| `grid` | Browse an event collection. |
-| `list` | Scan a compact chronological list. |
-| `featured` | Promote one event above the rest. |
-| `calendar` | Present a date-oriented list. |
-| `timeline` | Show events along a chronological sequence. |
-| `upcoming` | Start with events that have not ended. |
-| `past` | Start with completed events. |
-| `cards` | Give each event its own card surface. |
-| `split` | Separate featured and supporting events. |
+| Variant    | Use case                                     |
+| ---------- | -------------------------------------------- |
+| `grid`     | Browse an event collection.                  |
+| `list`     | Scan a compact chronological list.           |
+| `featured` | Promote one event above the rest.            |
+| `calendar` | Present a date-oriented list.                |
+| `timeline` | Show events along a chronological sequence.  |
+| `upcoming` | Start with events that have not ended.       |
+| `past`     | Start with completed events.                 |
+| `cards`    | Give each event its own card surface.        |
+| `split`    | Separate featured and supporting events.     |
 | `carousel` | Browse events with the UI Carousel controls. |
 
-<Preview fit="device" code={`<EventSection variant="upcoming" events={events} referenceDate={referenceDate} />`}>
+<Preview
+  fit="device"
+  code={`<EventSection variant="upcoming" events={events} referenceDate={referenceDate} />`}
+>
   <EventFilteringExample />
 </Preview>
 
@@ -119,14 +123,14 @@ The `upcoming` and `past` variants initialize the date filter accordingly. Other
 - Category labels and prices are caller data; use currency values appropriate to the event's locale.
 - Responsive layouts collapse to one column on mobile; carousels reuse the UI Carousel.
 
-| Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `events` | `readonly EventItem[]` | Yes | — | Caller-provided events; IDs must be unique. |
-| `variant` | `EventSectionVariant` | No | `grid` | Layout variant. |
-| `featuredEventId` | `string` | No | First `featured` item | Explicit featured event. |
-| `filterable` | `boolean` | No | `true` | Show date and category filters. |
-| `referenceDate` | `string \| Date` | No | Current time | Date boundary for past/upcoming classification. |
-| `emptyState` | `ReactNode` | No | — | Additional no-results content. |
+| Prop              | Type                   | Required | Default               | Description                                     |
+| ----------------- | ---------------------- | -------- | --------------------- | ----------------------------------------------- |
+| `events`          | `readonly EventItem[]` | Yes      | —                     | Caller-provided events; IDs must be unique.     |
+| `variant`         | `EventSectionVariant`  | No       | `grid`                | Layout variant.                                 |
+| `featuredEventId` | `string`               | No       | First `featured` item | Explicit featured event.                        |
+| `filterable`      | `boolean`              | No       | `true`                | Show date and category filters.                 |
+| `referenceDate`   | `string \| Date`       | No       | Current time          | Date boundary for past/upcoming classification. |
+| `emptyState`      | `ReactNode`            | No       | —                     | Additional no-results content.                  |
 
 `EventItem` supports `id`, `title`, `startDate`, `endDate`, `dateLabel`, `endLabel`, `description`, `location`, `category`, `price`, `href`, `image`, and `featured`.
 
@@ -147,7 +151,12 @@ import { EventSection } from "@puzzle-ui/pieces";
 type EventSectionProps = ComponentProps<typeof EventSection>;
 
 export function CustomizedSection(props: EventSectionProps) {
-  return <EventSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+  return (
+    <EventSection
+      {...props}
+      className={[props.className, "brand-section"].filter(Boolean).join(" ")}
+    />
+  );
 }
 ```
 

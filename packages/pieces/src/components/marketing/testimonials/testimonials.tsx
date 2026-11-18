@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Carousel, CarouselController, Rating } from "@puzzle-ui/ui";
-import { Icon } from "@puzzle-ui/icons/icon";
+import { Icon } from "@puzzle-ui/icons";
 import {
   useState,
   type ElementType,

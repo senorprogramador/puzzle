@@ -32,6 +32,19 @@ describe("createThemeVariables", () => {
 
     expect(variables["--puzzle-font-family-body"]).toContain('"Inter"');
   });
+
+  it("provides dark-mode shadows for every elevation level", () => {
+    const variables = createThemeVariables();
+    const elevationLevels = [1, 2, 3, 4, 6, 8, 12, 16, 24];
+
+    for (const level of elevationLevels) {
+      const elevation = variables[`--puzzle-elevation-${level}`];
+
+      expect(elevation).toContain("light-dark(");
+      expect(elevation).toContain("rgb(255 255 255 /");
+    }
+  });
+
   it("uses typography scale overrides in named roles", () => {
     const variables = createThemeVariables(undefined, {
       typography: {

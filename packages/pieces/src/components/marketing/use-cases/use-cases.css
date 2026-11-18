@@ -173,7 +173,7 @@
 }
 
 .puzzle-use-cases[data-variant="list"] .puzzle-use-cases__item {
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   padding-block: var(--puzzle-space-4, 1rem);
 }
@@ -202,6 +202,10 @@
   .puzzle-use-cases[data-variant="alternating"] .puzzle-use-cases__item,
   .puzzle-use-cases[data-variant="editorial"] .puzzle-use-cases__item {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .puzzle-use-cases[data-variant="list"] .puzzle-use-cases__item {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   }
 
   .puzzle-use-cases[data-variant="alternating"] li:nth-child(even) .puzzle-use-cases__media {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Carousel, CarouselController, Image, Stack } from "@puzzle-ui/ui";
-import { Icon } from "@puzzle-ui/icons/icon";
+import { Icon } from "@puzzle-ui/icons";
 import { imageBoxPhotos } from "../shared/image-box-images";
 
 export const carouselItems = [

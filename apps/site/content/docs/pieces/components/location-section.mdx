@@ -5,7 +5,10 @@ description: Present offices, hotels, restaurants, contact details, opening hour
 
 import { LocationSection } from "@puzzle-ui/pieces";
 import { Badge, Preview } from "@puzzle-ui/ui";
-import { LocationSectionVariantsExample, LocationSelectionExample } from "../../../../src/components/doc-examples/pieces/location-section";
+import {
+  LocationSectionVariantsExample,
+  LocationSelectionExample,
+} from "../../../../src/components/doc-examples/pieces/location-section";
 
 `LocationSection` presents one or more venues with contact information, coordinates, opening hours, direction links, and optional media. The map is a caller-provided slot; no map provider or API key is required.
 
@@ -66,24 +69,25 @@ Provide a stable ID for each location. When the section has multiple locations, 
 
 ## Variants and location selection
 
-<Preview fit="device" code={`<LocationSection variant="interactive" locations={locations} onLocationSelect={setLocationId} />`}>
-  <LocationSectionVariantsExample />
-</Preview>
+<LocationSectionVariantsExample />
 
-| Variant | Use case |
-| --- | --- |
-| `map` | Put an application map beside address details. |
-| `split` | Pair location information with a map or image. |
-| `cards` | Compare venues in a responsive card layout. |
-| `offices` | Present several branches or offices. |
-| `single` | Focus on one location. |
-| `directions` | Emphasize directions and coordinates. |
-| `image` | Use a caller-provided venue image. |
-| `gallery` | Show image-led locations. |
-| `hours` | Highlight weekly opening hours. |
-| `interactive` | Select a location and update its details. |
+| Variant       | Use case                                       |
+| ------------- | ---------------------------------------------- |
+| `map`         | Put an application map beside address details. |
+| `split`       | Pair location information with a map or image. |
+| `cards`       | Compare venues in a responsive card layout.    |
+| `offices`     | Present several branches or offices.           |
+| `single`      | Focus on one location.                         |
+| `directions`  | Emphasize directions and coordinates.          |
+| `image`       | Use a caller-provided venue image.             |
+| `gallery`     | Show image-led locations.                      |
+| `hours`       | Highlight weekly opening hours.                |
+| `interactive` | Select a location and update its details.      |
 
-<Preview fit="device" code={`<LocationSection selectedLocationId={selectedId} onLocationSelect={setSelectedId} />`}>
+<Preview
+  fit="device"
+  code={`<LocationSection selectedLocationId={selectedId} onLocationSelect={setSelectedId} />`}
+>
   <LocationSelectionExample />
 </Preview>
 
@@ -96,16 +100,16 @@ Provide a stable ID for each location. When the section has multiple locations, 
 
 ## API
 
-| Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `locations` | `readonly LocationItem[]` | Yes | — | Location data; IDs must be unique. |
-| `variant` | `LocationSectionVariant` | No | `split` | Layout variant. |
-| `selectedLocationId` | `string` | No | — | Controlled selected location. |
-| `defaultSelectedLocationId` | `string` | No | First location | Initial uncontrolled selection. |
-| `onLocationSelect` | `(id: string) => void` | No | — | Called after selection. |
-| `mapSlot` | `ReactNode` | No | Per-item map slot | Caller-provided map content. |
-| `mapLabel` | `string` | No | `"Location map"` | Accessible map region name. |
-| `className` | `string` | No | — | Additional root class. |
+| Prop                        | Type                      | Required | Default           | Description                        |
+| --------------------------- | ------------------------- | -------- | ----------------- | ---------------------------------- |
+| `locations`                 | `readonly LocationItem[]` | Yes      | —                 | Location data; IDs must be unique. |
+| `variant`                   | `LocationSectionVariant`  | No       | `split`           | Layout variant.                    |
+| `selectedLocationId`        | `string`                  | No       | —                 | Controlled selected location.      |
+| `defaultSelectedLocationId` | `string`                  | No       | First location    | Initial uncontrolled selection.    |
+| `onLocationSelect`          | `(id: string) => void`    | No       | —                 | Called after selection.            |
+| `mapSlot`                   | `ReactNode`               | No       | Per-item map slot | Caller-provided map content.       |
+| `mapLabel`                  | `string`                  | No       | `"Location map"`  | Accessible map region name.        |
+| `className`                 | `string`                  | No       | —                 | Additional root class.             |
 
 `LocationItem` supports `id`, `name`, `address`, `phone`, `email`, `coordinates` (`latitude`, `longitude`), `openingHours` (`day`, `hours`), `directionsHref`, `image`, `mapSlot`, and `description`.
 
@@ -125,7 +129,12 @@ import { LocationSection } from "@puzzle-ui/pieces";
 type LocationSectionProps = ComponentProps<typeof LocationSection>;
 
 export function CustomizedSection(props: LocationSectionProps) {
-  return <LocationSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+  return (
+    <LocationSection
+      {...props}
+      className={[props.className, "brand-section"].filter(Boolean).join(" ")}
+    />
+  );
 }
 ```
 

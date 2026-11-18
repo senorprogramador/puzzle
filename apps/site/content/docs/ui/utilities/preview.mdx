@@ -114,8 +114,9 @@ Changing tabs does not unmount an initialized example.
 
 ## Padding
 
-`padding` sets the space inside the preview frame, around the content. It defaults to
-`var(--puzzle-space-8, 2rem)`. Numbers are pixels; strings accept CSS padding
+`padding` sets the space inside the preview frame, around the content. The default is
+`var(--puzzle-space-2, 0.5rem)` on mobile, `var(--puzzle-space-4, 1rem)` on tablet,
+and `var(--puzzle-space-8, 2rem)` on desktop. Numbers are pixels; strings accept CSS padding
 values, including theme tokens and shorthand such as `"1rem 2rem"`.
 It is included in the measured content height. Use `padding={0}` to render content edge to edge.
 
@@ -171,7 +172,7 @@ At 1024px and wider all three are shown. This does not change the selected devic
 | `defaultDevice` | `"mobile" \| "tablet" \| "desktop"`                                 | Browser width | Initial device viewport. When omitted, matches the browser width.        |
 | `fit`           | `"content" \| "device"`                                             | `"content"`   | Fit natural content up to 844px, or use the selected device height.       |
 | `height`        | `number`                                                            | -             | Iframe height in pixels, before scaling. Overrides fit and its cap.      |
-| `padding`       | `number \| string`                                                  | `var(--puzzle-space-8, 2rem)` | Space inside the frame, around the content. Numbers are pixels; strings accept CSS padding. |
+| `padding`       | `number \| string`                                                  | Device-dependent | Space inside the frame, around the content. Numbers are pixels; strings accept CSS padding. |
 | `align`         | `"start" \| "center" \| "end" \| "stretch"`                         | `"center"`    | Vertical alignment of frame content.                                     |
 | `justify`       | `"start" \| "center" \| "end" \| "between" \| "around" \| "evenly"` | `"center"`    | Horizontal distribution of frame content.                                |
 | `hideDevices`   | `boolean`                                                           | `false`       | Hides the device selector.                                               |

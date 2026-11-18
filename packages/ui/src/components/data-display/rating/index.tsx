@@ -127,7 +127,6 @@ const Rating = ({
         readOnly ? undefined : `${currentValue} out of ${max} stars`
       }
       aria-disabled={disabled || undefined}
-      aria-readonly={readOnly || undefined}
       onKeyDown={handleKeyDown}
       data-size={size}
       data-disabled={disabled || undefined}

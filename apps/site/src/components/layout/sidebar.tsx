@@ -7,7 +7,7 @@ import {
 } from "@puzzle-ui/ui/components/navigation/tree-view";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { Autocomplete, Button, Stack, Transition } from "@puzzle-ui/ui";
-import { Icon } from "@puzzle-ui/icons/icon";
+import { Icon } from "@puzzle-ui/icons";
 import { BREAKPOINTS } from "@puzzle-ui/theme";
 
 import { items } from "./constants";

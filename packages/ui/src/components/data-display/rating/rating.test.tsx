@@ -55,11 +55,11 @@ describe("Rating", () => {
     it("supports read-only rendering", () => {
       render(<Rating value={4} readOnly aria-label="Product rating" />);
 
-      expect(
-        screen.getByRole("img", {
-          name: "Product rating: 4 out of 5 stars",
-        }),
-      ).toBeInTheDocument();
+      const rating = screen.getByRole("img", {
+        name: "Product rating: 4 out of 5 stars",
+      });
+      expect(rating).toBeInTheDocument();
+      expect(rating).not.toHaveAttribute("aria-readonly");
 
       expect(screen.queryByRole("slider")).not.toBeInTheDocument();
     });

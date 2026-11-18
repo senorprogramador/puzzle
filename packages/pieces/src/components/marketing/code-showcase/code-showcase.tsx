@@ -129,7 +129,7 @@ const CodePanel = ({
         </>
       ) : (
         <pre className="puzzle-code-showcase__pre">
-          <code lang={snippet.language}>
+          <code>
             {lines.map((line, index) => (
               <span
                 key={`${snippet.id}-line-${index}`}

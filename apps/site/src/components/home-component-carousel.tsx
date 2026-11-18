@@ -8,7 +8,7 @@ import {
   CarouselController,
   Stack,
 } from "@puzzle-ui/ui";
-import { Icon } from "@puzzle-ui/icons/icon";
+import { Icon } from "@puzzle-ui/icons";
 import type { componentPanels } from "./component-catalog";
 
 type HomeComponentCarouselProps = {

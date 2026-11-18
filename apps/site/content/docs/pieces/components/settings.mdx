@@ -19,7 +19,8 @@ import {
 
 Settings compositions provide layout and semantic structure only. Data loading, validation, and mutations remain in the application.
 
-<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions are new and may evolve based on feedback.
+<Badge content="Beta" color="info" /> **API maturity: Beta.** These compositions
+are new and may evolve based on feedback.
 
 ## Installation
 
@@ -118,8 +119,12 @@ Use `SettingsSection` for a labelled settings area and `SettingsGroup` to organi
       />
     </SettingsGroup>
     <FormActions>
-      <Button href="/docs/pieces/components/settings#interactive-tabs-and-preferences">Save changes</Button>
-      <Button variant="outline" href="/docs/pieces/components/settings#api">Cancel</Button>
+      <Button href="/docs/pieces/components/settings#interactive-tabs-and-preferences">
+        Save changes
+      </Button>
+      <Button variant="outline" href="/docs/pieces/components/settings#api">
+        Cancel
+      </Button>
     </FormActions>
   </SettingsSection>
 </Preview>
@@ -182,9 +187,7 @@ The settings layout does not own application state. Compose it with UI `Tabs`, `
 
 Supported variants: `list`, `grouped`, `cards`, `split`, `sidebar`, `tabs`, `accordion`, `profile`, `preferences`, `security`, `notifications`, and `compact`. Use the `navigation` slot for caller-owned navigation in sidebar layouts; use UI `Tabs` or `Accordion` when those interactions are needed.
 
-<Preview fit="device" code={`<SettingsSection variant="sidebar" navigation={<SettingsNavigation />} />`}>
-  <SettingsSectionVariantsExample />
-</Preview>
+<SettingsSectionVariantsExample />
 
 <Preview
   fit="device"
@@ -229,30 +232,30 @@ Supported variants: `list`, `grouped`, `cards`, `split`, `sidebar`, `tabs`, `acc
 
 ## API
 
-| Component | Props |
-| --- | --- |
-| `SettingsSection` | `title` and `children` (required), `description`, `actions`, `navigation`, `navigationLabel`, `variant`, `className` |
-| `SettingsGroup` | `children` (required), `title`, `className` |
-| `SettingsRow` | `label`, `control` (required), `description`, `error`, `htmlFor`, `className` |
-| `FormActions` | `children` (required), `className` |
-| `ProfileHeader` | `name` (required), `email`, `avatar`, `actions`, `className` |
-| `SecurityMethodCard` | `title` (required), `description`, `status`, `icon`, `action`, `className` |
-
+| Component            | Props                                                                                                                |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `SettingsSection`    | `title` and `children` (required), `description`, `actions`, `navigation`, `navigationLabel`, `variant`, `className` |
+| `SettingsGroup`      | `children` (required), `title`, `className`                                                                          |
+| `SettingsRow`        | `label`, `control` (required), `description`, `error`, `htmlFor`, `className`                                        |
+| `FormActions`        | `children` (required), `className`                                                                                   |
+| `ProfileHeader`      | `name` (required), `email`, `avatar`, `actions`, `className`                                                         |
+| `SecurityMethodCard` | `title` (required), `description`, `status`, `icon`, `action`, `className`                                           |
 
 ### Required and default values
 
 Requiredness follows the exported TypeScript type. A dash means no component-level default is applied; variant-specific requirements are described in the API table above.
 
-| Prop | Required | Default |
-| --- | --- | --- |
-| `title` | Yes | — |
-| `description` | No | — |
-| `actions` | No | — |
-| `navigation` | No | — |
-| `navigationLabel` | No | `"Settings navigation"` |
-| `variant` | No | `"grouped"` |
-| `children` | Yes | — |
-| `className` | No | — |
+| Prop              | Required | Default                 |
+| ----------------- | -------- | ----------------------- |
+| `title`           | Yes      | —                       |
+| `description`     | No       | —                       |
+| `actions`         | No       | —                       |
+| `navigation`      | No       | —                       |
+| `navigationLabel` | No       | `"Settings navigation"` |
+| `variant`         | No       | `"grouped"`             |
+| `children`        | Yes      | —                       |
+| `className`       | No       | —                       |
+
 ## Customization
 
 Use the component's `className` and documented slots to adapt the composition. Prefer a caller-provided `ReactNode` for media, actions, or controls rather than adding domain behavior to the section.
@@ -264,7 +267,12 @@ import { SettingsSection } from "@puzzle-ui/pieces";
 type SettingsSectionProps = ComponentProps<typeof SettingsSection>;
 
 export function CustomizedSection(props: SettingsSectionProps) {
-  return <SettingsSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+  return (
+    <SettingsSection
+      {...props}
+      className={[props.className, "brand-section"].filter(Boolean).join(" ")}
+    />
+  );
 }
 ```
 

@@ -75,7 +75,7 @@ type PreviewProps = {
   fit?: "content" | "device";
   /** Frame height in pixels. Overrides fit. */
   height?: number;
-  /** Space inside the preview frame, around the content. Numbers are pixels. */
+  /** Space inside the preview frame, around the content. Numbers are pixels; the default varies by device. */
   padding?: number | string;
   /** Vertical alignment of the content within the frame. */
   align?: PreviewAlign;
@@ -151,7 +151,7 @@ const Preview = ({
   code,
   fit = "content",
   height,
-  padding = "var(--puzzle-space-8, 2rem)",
+  padding,
   align = "center",
   justify = "center",
   hideDevices = false,
@@ -189,6 +189,7 @@ const Preview = ({
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const config = PREVIEW_DEVICES[device];
+  const frameTitle = `${config.label} component preview`;
   const fitsContent = height === undefined && fit === "content" && loading !== "lazy";
   const frameHeight = height ?? (fitsContent ? contentHeight : config.height);
   // Keep the content's natural height in the server render until the iframe is measured.
@@ -499,11 +500,13 @@ const Preview = ({
     const frameDocument = iframeRef.current?.contentDocument;
     const root = frameDocument?.getElementById(frameRootId);
 
-    if (!root) return;
+    if (!frameDocument || !root) return;
 
+    frameDocument.title = frameTitle;
+    frameDocument.documentElement.tabIndex = 0;
     syncStyles();
     setFrameRoot(root);
-  }, [frameRootId, syncStyles]);
+  }, [frameRootId, frameTitle, syncStyles]);
 
   useEffect(() => {
     if (shouldRender) initializeFrame();
@@ -786,7 +789,7 @@ const Preview = ({
               ref={iframeRef}
               className="puzzle-preview__frame"
               srcDoc={createPreviewDocument(frameRootId)}
-              title={`${config.label} component preview`}
+              title={frameTitle}
               onLoad={initializeFrame}
               style={frameStyle}
               loading={loading}
@@ -795,6 +798,7 @@ const Preview = ({
             {showPlaceholder && (
               <div
                 className="puzzle-preview__content puzzle-preview__placeholder"
+                data-device={automaticDevice ? undefined : device}
                 style={contentStyle}
                 aria-hidden="true"
                 inert
@@ -824,6 +828,7 @@ const Preview = ({
                     <div
                       ref={setContent}
                       className="puzzle-preview__content"
+                      data-device={device}
                       style={contentStyle}
                     >
                       {children}

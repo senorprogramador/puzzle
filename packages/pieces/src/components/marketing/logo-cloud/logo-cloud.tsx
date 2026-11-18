@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Carousel, CarouselController } from "@puzzle-ui/ui";
-import { Icon } from "@puzzle-ui/icons/icon";
+import { Icon } from "@puzzle-ui/icons";
 import {
   useState,
   type ElementType,
@@ -13,6 +13,23 @@ import {
 } from "../shared";
 import type { LogoCloudItem, LogoCloudSectionProps } from "./logo-cloud.types";
 import "./logo-cloud.css";
+
+const groupLogos = (logos: readonly LogoCloudItem[]) => {
+  const groups = new Map<string, LogoCloudItem[]>();
+
+  logos.forEach((logo) => {
+    const group = logo.group ?? "Partners";
+    const groupLogos = groups.get(group);
+
+    if (groupLogos) {
+      groupLogos.push(logo);
+    } else {
+      groups.set(group, [logo]);
+    }
+  });
+
+  return [...groups.entries()];
+};
 
 const LogoMark = ({ logo }: { logo: LogoCloudItem }) => {
   const mark = "src" in logo && logo.src ? (
@@ -54,7 +71,7 @@ const LogoCloudSection = <C extends ElementType = "section">(
   };
   const groups =
     variant === "grouped"
-      ? [...new Set(logos.map((logo) => logo.group ?? "Partners"))]
+      ? groupLogos(logos)
       : [];
 
   return (
@@ -103,23 +120,25 @@ const LogoCloudSection = <C extends ElementType = "section">(
         </div>
       ) : variant === "grouped" && logos.length ? (
         <div className="puzzle-logo-cloud__groups">
-          {groups.map((group) => (
+          {groups.map(([group, groupLogos]) => (
             <div className="puzzle-logo-cloud__group" key={group}>
               <h3>{group}</h3>
               <ul className="puzzle-logo-cloud__list">
-                {logos
-                  .filter((logo) => (logo.group ?? "Partners") === group)
-                  .map((logo) => (
-                    <li key={logo.id} data-featured={logo.featured || undefined}>
-                      <LogoMark logo={logo} />
-                    </li>
-                  ))}
+                {groupLogos.map((logo) => (
+                  <li key={logo.id} data-featured={logo.featured || undefined}>
+                    <LogoMark logo={logo} />
+                  </li>
+                ))}
               </ul>
             </div>
           ))}
         </div>
       ) : logos.length ? (
-        <ul className="puzzle-logo-cloud__list">
+        <ul
+          className="puzzle-logo-cloud__list"
+          aria-label={variant === "marquee" ? "Partner logos" : undefined}
+          tabIndex={variant === "marquee" ? 0 : undefined}
+        >
           {logos.map((logo) => (
             <li
               key={logo.id}

@@ -54,7 +54,9 @@ import {
         disabled: true,
       },
     ]}
-    actions={<Button href="/docs/pieces/components/onboarding">Continue</Button>}
+    actions={
+      <Button href="/docs/pieces/components/onboarding">Continue</Button>
+    }
   >
     <p>Your workspace is ready for its first project.</p>
   </OnboardingSection>
@@ -64,15 +66,16 @@ import {
 
 Every layout uses the same caller-owned step list and completion values.
 
-<Preview fit="device" code={`<OnboardingSection variant="wizard" steps={steps} currentStep="invite" />`}>
-  <OnboardingSectionVariantsExample />
-</Preview>
+<OnboardingSectionVariantsExample />
 
 ## Interactive onboarding
 
 The example controls its selected step and completion state in the consuming React component. Use the arrow keys, Home, and End to move through enabled steps; disabled steps are skipped and focus follows keyboard selection.
 
-<Preview fit="device" code={`<OnboardingSection steps={steps} currentStep={currentStep} onStepChange={setCurrentStep} />`}>
+<Preview
+  fit="device"
+  code={`<OnboardingSection steps={steps} currentStep={currentStep} onStepChange={setCurrentStep} />`}
+>
   <OnboardingInteractiveExample />
 </Preview>
 
@@ -85,15 +88,15 @@ The example controls its selected step and completion state in the consuming Rea
 
 ## API
 
-| Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `title` | `ReactNode` | Yes | — | Section heading. |
-| `steps` | `readonly OnboardingStep[]` | Yes | — | Caller-provided step records with unique IDs. |
-| `currentStep` | `string` | No | First incomplete enabled step | Selected step ID. |
-| `onStepChange` | `(id: string) => void` | No | — | Enables keyboard-operable step selection and reports changes. |
-| `variant` | `OnboardingSectionVariant` | No | `steps` | Layout variant. |
-| `description`, `actions`, `children` | `ReactNode` | No | — | Supporting content, actions, and custom current-step content. |
-| `className` | `string` | No | — | Additional root class. |
+| Prop                                 | Type                        | Required | Default                       | Description                                                   |
+| ------------------------------------ | --------------------------- | -------- | ----------------------------- | ------------------------------------------------------------- |
+| `title`                              | `ReactNode`                 | Yes      | —                             | Section heading.                                              |
+| `steps`                              | `readonly OnboardingStep[]` | Yes      | —                             | Caller-provided step records with unique IDs.                 |
+| `currentStep`                        | `string`                    | No       | First incomplete enabled step | Selected step ID.                                             |
+| `onStepChange`                       | `(id: string) => void`      | No       | —                             | Enables keyboard-operable step selection and reports changes. |
+| `variant`                            | `OnboardingSectionVariant`  | No       | `steps`                       | Layout variant.                                               |
+| `description`, `actions`, `children` | `ReactNode`                 | No       | —                             | Supporting content, actions, and custom current-step content. |
+| `className`                          | `string`                    | No       | —                             | Additional root class.                                        |
 
 `OnboardingStep` contains required `id` and `title`, plus optional `description`, `completed`, `disabled`, `media`, and `action`.
 
@@ -108,7 +111,12 @@ import { OnboardingSection } from "@puzzle-ui/pieces";
 type OnboardingSectionProps = ComponentProps<typeof OnboardingSection>;
 
 export function CustomizedSection(props: OnboardingSectionProps) {
-  return <OnboardingSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+  return (
+    <OnboardingSection
+      {...props}
+      className={[props.className, "brand-section"].filter(Boolean).join(" ")}
+    />
+  );
 }
 ```
 

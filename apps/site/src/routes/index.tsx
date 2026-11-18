@@ -258,7 +258,7 @@ type ComponentPanels = typeof componentPanels;
 
 const FeatureCards = () => {
   const firstIconRef = useRef<HTMLDivElement>(null);
-  const [Icon, setIcon] = useState<typeof import("@puzzle-ui/icons/icon").Icon | null>(null);
+  const [Icon, setIcon] = useState<typeof import("@puzzle-ui/icons").Icon | null>(null);
 
   useEffect(() => {
     const target = firstIconRef.current;
@@ -266,7 +266,7 @@ const FeatureCards = () => {
 
     let active = true;
     const load = () => {
-      void import("@puzzle-ui/icons/icon")
+      void import("@puzzle-ui/icons")
         .then((module) => {
           if (active) setIcon(() => module.Icon);
         })

@@ -75,6 +75,12 @@ export const components = [
     description: "Arrange photos in a responsive image collage.",
   },
   {
+    name: "Media Frame",
+    href: "/docs/ui/data-display/media-frame",
+    icon: "lucide:frame",
+    description: "Frame images and product media in browser or device mockups.",
+  },
+  {
     name: "Paper",
     href: "/docs/ui/data-display/paper",
     icon: "lucide:sticky-note",

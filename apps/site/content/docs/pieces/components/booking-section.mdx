@@ -5,7 +5,10 @@ description: Compose booking dates, availability, pricing, and form submission w
 
 import { BookingSection } from "@puzzle-ui/pieces";
 import { Badge, DatePicker, Preview } from "@puzzle-ui/ui";
-import { BookingSectionVariantsExample, InteractiveBookingExample } from "../../../../src/components/doc-examples/pieces/booking-section";
+import {
+  BookingSectionVariantsExample,
+  InteractiveBookingExample,
+} from "../../../../src/components/doc-examples/pieces/booking-section";
 
 `BookingSection` arranges caller-provided booking details, calendar, availability, form fields, and price summary. It does not calculate inventory, reserve a slot, charge a customer, or call a backend.
 
@@ -68,29 +71,30 @@ Use the existing UI `DatePicker` or another calendar in the `calendar` slot. The
 
 ## Variants
 
-<Preview fit="device" code={`<BookingSection variant="multi-step" steps={steps} currentStepId={step} />`}>
-  <BookingSectionVariantsExample />
-</Preview>
+<BookingSectionVariantsExample />
 
-| Variant | Use case |
-| --- | --- |
-| `calendar` | Put a date picker first. |
-| `form` | Focus on a booking form. |
-| `split` | Divide form and supporting details. |
-| `availability` | Highlight application-provided availability. |
-| `appointment` | Request an appointment. |
-| `event` | Collect event reservations. |
+| Variant         | Use case                                     |
+| --------------- | -------------------------------------------- |
+| `calendar`      | Put a date picker first.                     |
+| `form`          | Focus on a booking form.                     |
+| `split`         | Divide form and supporting details.          |
+| `availability`  | Highlight application-provided availability. |
+| `appointment`   | Request an appointment.                      |
+| `event`         | Collect event reservations.                  |
 | `accommodation` | Present a stay with dates and price summary. |
-| `restaurant` | Collect a dining date and party size. |
-| `multi-step` | Show a caller-controlled booking flow. |
-| `sidebar` | Keep a price summary beside the main form. |
-| `compact` | Use a denser booking panel. |
+| `restaurant`    | Collect a dining date and party size.        |
+| `multi-step`    | Show a caller-controlled booking flow.       |
+| `sidebar`       | Keep a price summary beside the main form.   |
+| `compact`       | Use a denser booking panel.                  |
 
 ## Interactive booking flow
 
 The current step and availability remain app-owned. `BookingStep.completed` drives the displayed progress; `onStepChange` reports requested navigation without persisting or validating business state.
 
-<Preview fit="device" code={`<BookingSection onSubmit={(formData) => submitBookingRequest(formData)} />`}>
+<Preview
+  fit="device"
+  code={`<BookingSection onSubmit={(formData) => submitBookingRequest(formData)} />`}
+>
   <InteractiveBookingExample />
 </Preview>
 
@@ -106,21 +110,21 @@ The current step and availability remain app-owned. `BookingStep.completed` driv
 
 ## API
 
-| Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `variant` | `BookingSectionVariant` | No | `form` | Layout variant. |
-| `bookingDetails` | `ReactNode` | No | — | Booking summary slot. |
-| `calendar` | `ReactNode` | No | — | Calendar/date-picker slot. |
-| `availability` | `ReactNode` | No | — | App-provided availability presentation. |
-| `formSlot` | `ReactNode` | No | — | Form controls; do not nest a second `<form>` when using `onSubmit`. |
-| `priceSummary` | `ReactNode` | No | — | Caller-provided price breakdown. |
-| `steps` | `readonly BookingStep[]` | No | `[]` | Optional visual multi-step flow. |
-| `currentStepId` | `string` | No | — | Current step. |
-| `onStepChange` | `(id: string) => void` | No | — | Called when a step is selected. |
-| `onSubmit` | `(formData: FormData) => void \| Promise<void>` | No | — | Submit callback; no network request is performed. |
-| `submitLabel` | `ReactNode` | No | `"Confirm booking"` | Submit button label. |
-| `loading` | `boolean` | No | `false` | External loading state. |
-| `success`, `error` | `ReactNode` | No | — | Optional caller-provided status content. |
+| Prop               | Type                                            | Required | Default             | Description                                                         |
+| ------------------ | ----------------------------------------------- | -------- | ------------------- | ------------------------------------------------------------------- |
+| `variant`          | `BookingSectionVariant`                         | No       | `form`              | Layout variant.                                                     |
+| `bookingDetails`   | `ReactNode`                                     | No       | —                   | Booking summary slot.                                               |
+| `calendar`         | `ReactNode`                                     | No       | —                   | Calendar/date-picker slot.                                          |
+| `availability`     | `ReactNode`                                     | No       | —                   | App-provided availability presentation.                             |
+| `formSlot`         | `ReactNode`                                     | No       | —                   | Form controls; do not nest a second `<form>` when using `onSubmit`. |
+| `priceSummary`     | `ReactNode`                                     | No       | —                   | Caller-provided price breakdown.                                    |
+| `steps`            | `readonly BookingStep[]`                        | No       | `[]`                | Optional visual multi-step flow.                                    |
+| `currentStepId`    | `string`                                        | No       | —                   | Current step.                                                       |
+| `onStepChange`     | `(id: string) => void`                          | No       | —                   | Called when a step is selected.                                     |
+| `onSubmit`         | `(formData: FormData) => void \| Promise<void>` | No       | —                   | Submit callback; no network request is performed.                   |
+| `submitLabel`      | `ReactNode`                                     | No       | `"Confirm booking"` | Submit button label.                                                |
+| `loading`          | `boolean`                                       | No       | `false`             | External loading state.                                             |
+| `success`, `error` | `ReactNode`                                     | No       | —                   | Optional caller-provided status content.                            |
 
 ## Related components
 
@@ -139,7 +143,12 @@ import { BookingSection } from "@puzzle-ui/pieces";
 type BookingSectionProps = ComponentProps<typeof BookingSection>;
 
 export function CustomizedSection(props: BookingSectionProps) {
-  return <BookingSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+  return (
+    <BookingSection
+      {...props}
+      className={[props.className, "brand-section"].filter(Boolean).join(" ")}
+    />
+  );
 }
 ```
 

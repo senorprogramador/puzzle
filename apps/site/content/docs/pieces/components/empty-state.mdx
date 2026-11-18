@@ -5,7 +5,7 @@ description: Explain empty, search, success, and error states with accessible ac
 
 import { EmptyStateSection } from "@puzzle-ui/pieces";
 import { Button, Preview } from "@puzzle-ui/ui";
-import { Icon } from "@puzzle-ui/icons/icon";
+import { Icon } from "@puzzle-ui/icons";
 import { EmptyStateSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/empty-state-section";
 
 `EmptyStateSection` builds on Puzzle UI's existing EmptyState primitives. `EmptyStatePanel` remains available as a compact panel composition; both components share the same content and action slots.
@@ -30,8 +30,16 @@ import { EmptyStateSectionVariantsExample } from "../../../../src/components/doc
     title="No projects found"
     description="Try another search or clear the current filters."
     icon={<Icon name="lucide:search" aria-hidden="true" />}
-    primaryAction={<Button href="/docs/pieces/components/resource-section">Clear filters</Button>}
-    secondaryAction={<Button variant="outline" href="/docs/pieces/components/project">Create a project</Button>}
+    primaryAction={
+      <Button href="/docs/pieces/components/resource-section">
+        Clear filters
+      </Button>
+    }
+    secondaryAction={
+      <Button variant="outline" href="/docs/pieces/components/project">
+        Create a project
+      </Button>
+    }
   >
     <p>Searches include project names, descriptions, and owners.</p>
   </EmptyStateSection>
@@ -41,9 +49,7 @@ import { EmptyStateSectionVariantsExample } from "../../../../src/components/doc
 
 Choose a layout based on the state and the next step rather than the illustration alone.
 
-<Preview fit="device" code={`<EmptyStateSection variant="search" title="No projects found" />`}>
-  <EmptyStateSectionVariantsExample />
-</Preview>
+<EmptyStateSectionVariantsExample />
 
 ## Error state
 
@@ -65,7 +71,9 @@ Error details are optional and use a native disclosure, so technical context sta
     title="Unable to load reports"
     description="Try again in a moment."
     errorDetails="Request ID: rpt-2026-114"
-    primaryAction={<Button href="/docs/pieces/components/feedback">Contact support</Button>}
+    primaryAction={
+      <Button href="/docs/pieces/components/feedback">Contact support</Button>
+    }
   />
 </Preview>
 
@@ -79,18 +87,18 @@ Supported variants: `centered`, `illustration`, `minimal`, `card`, `split`, `sea
 
 ## API
 
-| Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `title` | `ReactNode` | Yes | — | State heading. |
-| `description` | `ReactNode` | No | — | Supporting explanation. |
-| `illustration`, `icon` | `ReactNode` | No | — | Decorative media or icon slot. |
-| `illustrationLabel` | `string` | No | — | Accessible name for informative media. |
-| `primaryAction`, `secondaryAction`, `action` | `ReactNode` | No | — | Caller-provided actions; `action` is the legacy primary slot. |
-| `children` | `ReactNode` | No | — | Additional state-specific content. |
-| `errorDetails` | `ReactNode` | No | — | Optional native details disclosure. |
-| `variant` | `EmptyStateSectionVariant` | No | `card` | Visual layout. |
-| `status` | `"status" \| "alert" \| "off"` | No | `alert` for errors, otherwise off | Live announcement behavior. |
-| `className` | `string` | No | — | Additional root class. |
+| Prop                                         | Type                           | Required | Default                           | Description                                                   |
+| -------------------------------------------- | ------------------------------ | -------- | --------------------------------- | ------------------------------------------------------------- |
+| `title`                                      | `ReactNode`                    | Yes      | —                                 | State heading.                                                |
+| `description`                                | `ReactNode`                    | No       | —                                 | Supporting explanation.                                       |
+| `illustration`, `icon`                       | `ReactNode`                    | No       | —                                 | Decorative media or icon slot.                                |
+| `illustrationLabel`                          | `string`                       | No       | —                                 | Accessible name for informative media.                        |
+| `primaryAction`, `secondaryAction`, `action` | `ReactNode`                    | No       | —                                 | Caller-provided actions; `action` is the legacy primary slot. |
+| `children`                                   | `ReactNode`                    | No       | —                                 | Additional state-specific content.                            |
+| `errorDetails`                               | `ReactNode`                    | No       | —                                 | Optional native details disclosure.                           |
+| `variant`                                    | `EmptyStateSectionVariant`     | No       | `card`                            | Visual layout.                                                |
+| `status`                                     | `"status" \| "alert" \| "off"` | No       | `alert` for errors, otherwise off | Live announcement behavior.                                   |
+| `className`                                  | `string`                       | No       | —                                 | Additional root class.                                        |
 
 ## Customization
 
@@ -103,7 +111,12 @@ import { EmptyStateSection } from "@puzzle-ui/pieces";
 type EmptyStateSectionProps = ComponentProps<typeof EmptyStateSection>;
 
 export function CustomizedSection(props: EmptyStateSectionProps) {
-  return <EmptyStateSection {...props} className={[props.className, "brand-section"].filter(Boolean).join(" ")} />;
+  return (
+    <EmptyStateSection
+      {...props}
+      className={[props.className, "brand-section"].filter(Boolean).join(" ")}
+    />
+  );
 }
 ```
 

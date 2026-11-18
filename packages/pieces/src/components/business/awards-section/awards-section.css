@@ -58,7 +58,7 @@
 }
 
 .puzzle-awards-section[data-variant="compact"] .puzzle-awards-section__award {
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: var(--puzzle-space-3, 0.75rem);
   padding: var(--puzzle-space-3, 0.75rem);
@@ -105,6 +105,10 @@
 }
 
 @media (min-width: 48rem) {
+  .puzzle-awards-section[data-variant="compact"] .puzzle-awards-section__award {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+
   .puzzle-awards-section[data-variant="featured"] .puzzle-awards-section__items {
     grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
   }

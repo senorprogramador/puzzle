@@ -1,5 +1,6 @@
 .puzzle-code-showcase__list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--puzzle-space-4, 1rem);
 }
 
@@ -103,6 +104,7 @@
 .puzzle-code-showcase__comparison,
 .puzzle-code-showcase__featured {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--puzzle-space-4, 1rem);
 }
 
@@ -112,6 +114,7 @@
 
 .puzzle-code-showcase__installation {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--puzzle-space-5, 1.25rem);
   margin: 0;
   padding-inline-start: var(--puzzle-space-6, 1.5rem);
@@ -123,6 +126,8 @@
 
 .puzzle-code-showcase__supporting {
   display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--puzzle-space-3, 0.75rem);
   margin: 0;
   padding: 0;

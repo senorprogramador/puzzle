@@ -5,7 +5,10 @@ description: Build searchable libraries of guides, downloads, templates, and web
 
 import { ResourceSection } from "@puzzle-ui/pieces";
 import { Preview } from "@puzzle-ui/ui";
-import { ResourceLibraryExample, ResourceSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/resource-section";
+import {
+  ResourceLibraryExample,
+  ResourceSectionVariantsExample,
+} from "../../../../src/components/doc-examples/pieces/resource-section";
 
 `ResourceSection` presents an application-provided collection with search, category filtering, download links, and a featured item. It does not host files or fetch a catalog.
 
@@ -84,24 +87,25 @@ const resources = [
 
 Search is a trimmed, case-insensitive substring match over title, text description, category, and type. Categories are derived from supplied items. Use `searchable={false}` or `filterable={false}` to remove either control.
 
-<Preview fit="device" code={`<ResourceSection variant="filterable" items={resources} />`}>
-  <ResourceSectionVariantsExample />
-</Preview>
+<ResourceSectionVariantsExample />
 
-| Variant | Use case |
-| --- | --- |
-| `grid` | General resource collection. |
-| `featured` | Lead with one featured resource. |
-| `downloads` | Present downloadable guides and files. |
-| `categories` | Browse subject-specific resources. |
-| `list` | Show longer descriptions in a vertical list. |
-| `cards` | Separate resources into cards. |
-| `library` | Create a larger learning library. |
-| `split` | Pair a featured item and supporting links. |
-| `filterable` | Highlight the search and category controls. |
-| `webinars` | Present recorded or upcoming sessions. |
+| Variant      | Use case                                     |
+| ------------ | -------------------------------------------- |
+| `grid`       | General resource collection.                 |
+| `featured`   | Lead with one featured resource.             |
+| `downloads`  | Present downloadable guides and files.       |
+| `categories` | Browse subject-specific resources.           |
+| `list`       | Show longer descriptions in a vertical list. |
+| `cards`      | Separate resources into cards.               |
+| `library`    | Create a larger learning library.            |
+| `split`      | Pair a featured item and supporting links.   |
+| `filterable` | Highlight the search and category controls.  |
+| `webinars`   | Present recorded or upcoming sessions.       |
 
-<Preview fit="device" code={`<ResourceSection items={resources} searchable filterable />`}>
+<Preview
+  fit="device"
+  code={`<ResourceSection items={resources} searchable filterable />`}
+>
   <ResourceLibraryExample />
 </Preview>
 
@@ -115,15 +119,15 @@ Search is a trimmed, case-insensitive substring match over title, text descripti
 
 ## API
 
-| Prop | Type | Required | Default | Description |
-| --- | --- | --- | --- | --- |
-| `items` | `readonly ResourceItem[]` | Yes | — | Resource records; IDs must be unique. |
-| `variant` | `ResourceSectionVariant` | No | `grid` | Layout variant. |
-| `featuredResourceId` | `string` | No | First `featured` item | Explicit featured item ID. |
-| `searchable` | `boolean` | No | `true` | Render the search field. |
-| `filterable` | `boolean` | No | `true` | Render the category selector when categories exist. |
-| `emptyState` | `ReactNode` | No | — | Additional no-results content. |
-| `children` | `ReactNode` | No | — | Additional content after the resources. |
+| Prop                 | Type                      | Required | Default               | Description                                         |
+| -------------------- | ------------------------- | -------- | --------------------- | --------------------------------------------------- |
+| `items`              | `readonly ResourceItem[]` | Yes      | —                     | Resource records; IDs must be unique.               |
+| `variant`            | `ResourceSectionVariant`  | No       | `grid`                | Layout variant.                                     |
+| `featuredResourceId` | `string`                  | No       | First `featured` item | Explicit featured item ID.                          |
+| `searchable`         | `boolean`                 | No       | `true`                | Render the search field.                            |
+| `filterable`         | `boolean`                 | No       | `true`                | Render the category selector when categories exist. |
+| `emptyState`         | `ReactNode`               | No       | —                     | Additional no-results content.                      |
+| `children`           | `ReactNode`               | No       | —                     | Additional content after the resources.             |
 
 `ResourceItem` supports `id`, `title`, `href`, `description`, `category`, `type`, `download`, `featured`, `thumbnail`, and `updatedAt`.
 

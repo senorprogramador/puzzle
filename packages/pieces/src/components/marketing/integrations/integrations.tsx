@@ -206,7 +206,14 @@ const IntegrationsSection = <C extends ElementType = "section">({
         </div>
       ) : filteredItems.length &&
         ["ecosystem", "orbit", "network", "connected"].includes(variant) ? (
-        <div className="puzzle-integrations__relationship">
+        <div
+          className="puzzle-integrations__relationship"
+          data-orbit-layout={
+            variant === "orbit" && filteredItems.length === 4
+              ? "quadrants"
+              : undefined
+          }
+        >
           <div className="puzzle-integrations__center">{centerLabel}</div>
           <IntegrationList items={filteredItems} variant={variant} />
         </div>

@@ -217,12 +217,12 @@
 }
 
 .puzzle-product-gallery[data-variant="vertical"] .puzzle-product-gallery__layout {
-  grid-template-columns: minmax(0, 1fr) minmax(4rem, 0.2fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
 }
 
 .puzzle-product-gallery[data-variant="vertical"] .puzzle-product-gallery__thumbnails {
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 @media (min-width: 36rem) {
@@ -232,6 +232,14 @@
 }
 
 @media (min-width: 48rem) {
+  .puzzle-product-gallery[data-variant="vertical"] .puzzle-product-gallery__layout {
+    grid-template-columns: minmax(0, 1fr) minmax(4rem, 0.2fr);
+  }
+
+  .puzzle-product-gallery[data-variant="vertical"] .puzzle-product-gallery__thumbnails {
+    grid-template-columns: 1fr;
+  }
+
   .puzzle-product-gallery[data-variant="split"] .puzzle-product-gallery__layout,
   .puzzle-product-gallery[data-variant="editorial"] .puzzle-product-gallery__layout {
     grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);

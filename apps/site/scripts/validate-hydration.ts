@@ -228,13 +228,13 @@ try {
 
   const lazyPage = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   const carouselRequests: string[] = [];
-  const iconRequests: string[] = [];
+  const scriptRequests: string[] = [];
   lazyPage.on("request", (request) => {
+    if (request.resourceType() === "script") {
+      scriptRequests.push(request.url());
+    }
     if (/\/(?:home-component-carousel|carousel)-[^/]+\.(?:js|css)(?:\?|$)/.test(request.url())) {
       carouselRequests.push(request.url());
-    }
-    if (/\/icon-[^/]+\.js(?:\?|$)/.test(request.url())) {
-      iconRequests.push(request.url());
     }
   });
   const homeResponse = await lazyPage.goto(origin);
@@ -243,12 +243,14 @@ try {
   await lazyPage.waitForLoadState("networkidle");
   assert.deepEqual(carouselRequests, [], "carousel assets are not requested initially");
   assert.equal(await lazyPage.locator(".home-component-fallback a").count(), 16);
-  const initialIconRequests = [...iconRequests];
+  const firstFeatureIcon = lazyPage.locator(".home-feature-card__icon").first();
+  const initialScriptRequests = new Set(scriptRequests);
   const featureIconRequest = lazyPage.waitForRequest((request) =>
-    /\/icon-[^/]+\.js(?:\?|$)/.test(request.url()) &&
-    !initialIconRequests.includes(request.url()),
+    request.resourceType() === "script" &&
+    !initialScriptRequests.has(request.url()) &&
+    !/\/(?:home-component-carousel|carousel)-[^/]+\.js(?:\?|$)/.test(request.url()),
   );
-  await lazyPage.locator(".home-feature-card__icon").first().scrollIntoViewIfNeeded();
+  await firstFeatureIcon.scrollIntoViewIfNeeded();
   await featureIconRequest;
   await lazyPage.locator(".home-component-carousel-container").scrollIntoViewIfNeeded();
   await lazyPage.getByRole("button", { name: "Next component panels" }).waitFor();
