@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/storage-mongodb` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.12.0 - 2026-11-18
+
+- No changes; version bumped in lockstep.
+
 ## 0.11.0 - 2026-11-16
 
 - No changes; version bumped in lockstep.

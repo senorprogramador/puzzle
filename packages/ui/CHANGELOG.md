@@ -3,6 +3,19 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.12.0 - 2026-11-18
+
+- Added `SectionHeader` layout component for consistent eyebrow, title, description and actions headers with alignment options.
+- Added `MediaFrame` data-display component for framing images, video and other media.
+- Added business building blocks: `ProfileCard`, `CompanyInfo`, `ContactDetails`, `LogoCollection`, `MetricList`, `ServiceCard`, `CaseStudyCard`, `SocialLinks` and `BusinessImageView`.
+- Improved `Preview`: the device frame is now sized by CSS rather than scaled, the default device follows the viewport, and previews show a loading indicator and an error state.
+- Added `Preview` `loading="lazy"` mode that mounts frames near the viewport after page load, plus a `PreviewProvider` to set the loading mode for a whole tree.
+- Improved `Preview` performance and stability by reusing cloned stylesheets, batching style syncs, waiting for stylesheets and fonts before revealing the frame, and giving the frame a meaningful document title.
+- Improved `AppBar` sticky offset so it is set during server render through an inline script and stylesheet (new `nonce` prop for CSP), avoiding layout shift before hydration.
+- Changed `Section` to be polymorphic, forwarding additional props and typings of the element given in `as`.
+- Fixed `Dialog` to omit the native `title` attribute from its accepted props.
+- Fixed `Rating` to no longer set `aria-readonly` on its `role` element, where the attribute is not valid.
+
 ## 0.11.0 - 2026-11-16
 
 - Added a `barWidth` prop to `LinearProgress` and `CircularProgress` to customize bar thickness; circular progress rescales its radius and dash length to match.

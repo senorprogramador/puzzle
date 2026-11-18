@@ -3,6 +3,12 @@
 All notable changes to `@puzzle-ui/hooks` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.12.0 - 2026-11-18
+
+- Added `useAsyncAction` for tracking idle, loading, success and error state of an async action, with duplicate-run protection and `reset`.
+- Added `useListFilter` for text search and category filtering of lists, with derived categories and an `enabled` switch.
+- Added `useReducedMotion`, an SSR-safe hook that follows the `prefers-reduced-motion` media query and defaults to reduced motion on the server.
+
 ## 0.11.0 - 2026-11-16
 
 - No changes; version bumped in lockstep.

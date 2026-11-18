@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/seo` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.12.0 - 2026-11-18
+
+- Changed generated Schema.org definitions to be split into smaller chunk modules, and the generator now checks for and removes stale chunks.
+
 ## 0.11.0 - 2026-11-16
 
 - No changes; version bumped in lockstep.

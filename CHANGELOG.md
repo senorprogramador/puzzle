@@ -18,6 +18,59 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.12.0 - 2026-11-18
+
+### `@puzzle-ui/theme`
+
+- Changed default elevation shadow tokens to use `light-dark()` so shadows stay visible in dark mode with subtle light-toned highlights instead of heavy black shadows.
+
+### `@puzzle-ui/hooks`
+
+- Added `useAsyncAction` for tracking idle, loading, success and error state of an async action, with duplicate-run protection and `reset`.
+- Added `useListFilter` for text search and category filtering of lists, with derived categories and an `enabled` switch.
+- Added `useReducedMotion`, an SSR-safe hook that follows the `prefers-reduced-motion` media query and defaults to reduced motion on the server.
+
+### `@puzzle-ui/ui`
+
+- Added `SectionHeader` layout component for consistent eyebrow, title, description and actions headers with alignment options.
+- Added `MediaFrame` data-display component for framing images, video and other media.
+- Added business building blocks: `ProfileCard`, `CompanyInfo`, `ContactDetails`, `LogoCollection`, `MetricList`, `ServiceCard`, `CaseStudyCard`, `SocialLinks` and `BusinessImageView`.
+- Improved `Preview`: the device frame is now sized by CSS rather than scaled, the default device follows the viewport, and previews show a loading indicator and an error state.
+- Added `Preview` `loading="lazy"` mode that mounts frames near the viewport after page load, plus a `PreviewProvider` to set the loading mode for a whole tree.
+- Improved `Preview` performance and stability by reusing cloned stylesheets, batching style syncs, waiting for stylesheets and fonts before revealing the frame, and giving the frame a meaningful document title.
+- Improved `AppBar` sticky offset so it is set during server render through an inline script and stylesheet (new `nonce` prop for CSP), avoiding layout shift before hydration.
+- Changed `Section` to be polymorphic, forwarding additional props and typings of the element given in `as`.
+- Fixed `Dialog` to omit the native `title` attribute from its accepted props.
+- Fixed `Rating` to no longer set `aria-readonly` on its `role` element, where the attribute is not valid.
+
+### `@puzzle-ui/pieces`
+
+- Added marketing sections: `Announcement`, `Benefits`, `CodeShowcase`, `Comparison`, `CTA`, `FAQ`, `Features`, `HowItWorks`, `Integrations`, `LogoCloud`, `Pricing`, `ProductShowcase`, `Roadmap`, `Security`, `Stats`, `Testimonials`, `UseCases` and `WaitlistSection`.
+- Added business sections: `AboutSection`, `AwardsSection`, `CareersSection`, `CaseStudiesSection`, `ContactSection`, `LocationSection`, `PartnersSection`, `ServicesSection` and `TeamSection`.
+- Added commerce sections: `ProductGrid`, `ProductGallery`, `ProductDetails`, `CartSummary`, `Categories`, `CommerceBenefits` and `BookingSection`.
+- Added content sections: `BlogSection`, `ChangelogSection`, `ContentSection`, `EventSection`, `GallerySection`, `ResourceSection`, `TimelineSection` and `VideoSection`.
+- Added application pieces: dashboard shell, header, stat cards, progress card and activity feed with `DashboardOverviewSection`, dashboard navigation (sidebar, topbar, mobile navigation, breadcrumbs, user menu), `ActivitySection`, `OnboardingSection`, `ProjectSection`, settings, feedback and confirm-action pieces, and data-display pieces such as the empty-state panel and metric comparison.
+- Added `FooterSection` and a shared section types module.
+- Added `AsymmetricHero` preset.
+- Improved hero layouts: media now fills its frame, tablet and mobile spacing and aspect ratios are refined, stacked layout rules apply only when a media position is set, and `SplitHero` now defaults to large height.
+- Fixed hero and section rendering during server-side rendering.
+- Updated the package description to cover page sections and dashboard components, and added a README and architecture guide.
+
+### `@puzzle-ui/auth`
+
+- Added an optional `demoTotpBypass` MFA manager option that accepts a fixed TOTP code for a single demo account; invalid configuration throws an `AuthConfigurationError`.
+
+### `@puzzle-ui/fullstack`
+
+- Added auth lifecycle routes and handlers for requesting and verifying an email change, updating the profile name and image, listing sessions and revoking other sessions.
+- Added an `allowPasswordChange` lifecycle option to disable password changes with a `PASSWORD_CHANGE_DISABLED` response, and an `emailChangeUrl` option for email-change links.
+- Added client auth components `PasswordResetRequestForm`, `PasswordResetForm`, `EmailVerificationNotice`, `EmailVerificationForm`, `ChangePasswordForm` and `RequiredMfaEnrollment`, with their prop types.
+- Added a `demoTotpCode` option on `AuthProvider` that shows the demo authentication code on the sign-in MFA challenge.
+
+### `@puzzle-ui/seo`
+
+- Changed generated Schema.org definitions to be split into smaller chunk modules, and the generator now checks for and removes stale chunks.
+
 ## 0.11.0 - 2026-11-16
 
 ### `@puzzle-ui/ui`

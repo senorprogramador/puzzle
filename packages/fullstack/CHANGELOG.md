@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/fullstack` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.12.0 - 2026-11-18
+
+- Added auth lifecycle routes and handlers for requesting and verifying an email change, updating the profile name and image, listing sessions and revoking other sessions.
+- Added an `allowPasswordChange` lifecycle option to disable password changes with a `PASSWORD_CHANGE_DISABLED` response, and an `emailChangeUrl` option for email-change links.
+- Added client auth components `PasswordResetRequestForm`, `PasswordResetForm`, `EmailVerificationNotice`, `EmailVerificationForm`, `ChangePasswordForm` and `RequiredMfaEnrollment`, with their prop types.
+- Added a `demoTotpCode` option on `AuthProvider` that shows the demo authentication code on the sign-in MFA challenge.
+
 ## 0.11.0 - 2026-11-16
 
 - Added an `offerPasskeyAfterSignIn` option to `AuthExperience`. After sign-in, users without a passkey can add one (the current password is required) and see their recovery codes, or skip the step.
