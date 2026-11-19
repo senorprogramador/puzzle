@@ -1,7 +1,7 @@
 import * as p from "@clack/prompts";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getProjectOptions } from "./prompts";
+import { getProjectConfiguration } from "./prompts";
 import { detectPackageManager } from "./utils/detect-package-manager";
 
 vi.mock("@clack/prompts", () => ({
@@ -17,7 +17,7 @@ vi.mock("./utils/detect-package-manager", () => ({
   detectPackageManager: vi.fn(() => "bun"),
 }));
 
-describe("getProjectOptions", () => {
+describe("getProjectConfiguration", () => {
   beforeEach(() => {
     vi.mocked(p.isCancel).mockReturnValue(false);
     vi.mocked(p.text).mockResolvedValue("My Awesome App");
@@ -28,13 +28,12 @@ describe("getProjectOptions", () => {
     vi.mocked(detectPackageManager).mockReturnValue("bun");
   });
 
-  it("applies the project-name defaulting, framework, and package-manager choices", async () => {
-    expect(await getProjectOptions()).toEqual({
-      name: "my-awesome-app",
-      directory: "my-awesome-app",
+  it("creates a configuration from the project-name, framework, and styling choices", async () => {
+    expect(await getProjectConfiguration()).toEqual({
+      projectName: "My Awesome App",
       framework: "next",
       packageManager: "bun",
-      tailwind: true,
+      styling: "tailwind",
       auth: false,
     });
     expect(p.text).toHaveBeenCalledWith(
@@ -57,9 +56,10 @@ describe("getProjectOptions", () => {
       .mockResolvedValueOnce(false)
       .mockResolvedValueOnce(true);
 
-    expect(await getProjectOptions()).toMatchObject({
+    expect(await getProjectConfiguration()).toMatchObject({
+      projectName: "My Awesome App",
       framework: "react-router",
-      tailwind: false,
+      styling: "none",
       auth: true,
       database: "d1",
     });
@@ -73,11 +73,13 @@ describe("getProjectOptions", () => {
       .mockResolvedValueOnce(false)
       .mockResolvedValueOnce(true);
 
-    expect(await getProjectOptions()).toMatchObject({
+    const configuration = await getProjectConfiguration();
+
+    expect(configuration).toMatchObject({
       framework: "react",
       auth: true,
     });
-    expect(await getProjectOptions()).not.toHaveProperty("database");
+    expect(configuration).not.toHaveProperty("database");
   });
 
   it.each(["name", "framework", "tailwind", "auth", "database"] as const)(
@@ -103,7 +105,7 @@ describe("getProjectOptions", () => {
         vi.mocked(p.confirm).mockReset().mockResolvedValueOnce(true).mockResolvedValueOnce(true);
       }
 
-      expect(await getProjectOptions()).toBeNull();
+      expect(await getProjectConfiguration()).toBeNull();
     },
   );
 });

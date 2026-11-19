@@ -1,0 +1,1054 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "AgencyHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/agency-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "AsymmetricHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/asymmetric-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": [
+        {
+          "name": "EditorialHero",
+          "canonicalExport": "AsymmetricHero",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/hero/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/hero.mdx"
+        },
+        {
+          "name": "SaaSHero",
+          "canonicalExport": "AsymmetricHero",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/hero/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/hero.mdx"
+        }
+      ]
+    },
+    {
+      "name": "CampaignHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/campaign-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "CenteredHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/centered-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ComingSoonHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/coming-soon-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DashboardWelcomeHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/dashboard-welcome-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "FullScreenHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/full-screen-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": [
+        {
+          "name": "AccommodationHero",
+          "canonicalExport": "FullScreenHero",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/hero/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/hero.mdx"
+        }
+      ]
+    },
+    {
+      "name": "Hero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ImageHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/image-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "MinimalHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/minimal-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "RestaurantHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/restaurant-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SearchHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/search-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SplitHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/split-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": [
+        {
+          "name": "AppHero",
+          "canonicalExport": "SplitHero",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/hero/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/hero.mdx"
+        },
+        {
+          "name": "PrintShopHero",
+          "canonicalExport": "SplitHero",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/hero/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/hero.mdx"
+        },
+        {
+          "name": "ProductHero",
+          "canonicalExport": "SplitHero",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/hero/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/hero.mdx"
+        },
+        {
+          "name": "StoreHero",
+          "canonicalExport": "SplitHero",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/hero/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/hero.mdx"
+        }
+      ]
+    },
+    {
+      "name": "VideoHero",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "hero",
+      "subcategory": "hero",
+      "description": "Build responsive React hero sections with flexible layouts, media, video and reusable presets from Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/hero.mdx",
+      "source": "packages/pieces/src/components/hero/video-hero.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "hero"
+      },
+      "contentRequirements": [
+        "contentClassName (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "description (optional)",
+        "children (optional)",
+        "ariaLabel (optional)",
+        "ariaLabelledBy (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaClassName (optional)",
+        "mediaPosition (optional)",
+        "media (optional)",
+        "backgroundImage (optional)",
+        "backgroundVideo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        },
+        {
+          "name": "asymmetric",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/hero/hero.types.ts",
+          "prop": "layout",
+          "typeName": "HeroLayout"
+        }
+      ],
+      "aliases": []
+    }
+  ]
+}

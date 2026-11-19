@@ -34,7 +34,7 @@
 .puzzle-token-input__slot {
     box-sizing: border-box;
     display: block;
-    flex: 0 0 auto;
+    flex: 0 1 auto;
 
     width: 2.5rem;
     height: 2.75rem;

@@ -52,8 +52,8 @@ package or component level. The UI packages target React 19.
 - **Storage** — storage contracts with Cloudflare D1 and MongoDB adapters.
 - **Full-stack utilities** — framework-specific integration packages for
   authentication and SEO workflows.
-- **CLI** — an interactive generator for React, Next.js App Router, and TanStack
-  Start projects.
+- **CLI** — an interactive generator for Next.js App Router, TanStack Start,
+  React Router, and Basic React/Vite projects.
 
 These are package capabilities, not a claim that every feature or framework
 combination has the same maturity or support guarantees. Check individual
@@ -84,8 +84,9 @@ They are pre-1.0; check each package's documentation before adopting it.
 
 The repository also contains the [documentation site](apps/site) and a
 [Storybook playground](apps/playground). See the
-[API stability audit](docs/api-stability-audit.md) for current component and
-package API maturity classifications.
+[API stability audit](docs/api-stability-audit.md) for audited component and
+package API classifications; verify a component's maturity in its current
+documentation before depending on it.
 
 ## Puzzle Workspace
 
@@ -95,32 +96,26 @@ The repository includes two sample applications backed by the shared private
 - `apps/workspace-next` — Next.js App Router.
 - `apps/workspace-tanstack` — TanStack Start.
 
-Both use Puzzle Auth and a MongoDB replica set. For local development, start
-the app's MongoDB service and initialize it before starting the app:
+Both use Puzzle Auth and a local MongoDB replica set. From the repository root,
+start either app with:
 
 ```bash
 bun install
-cd apps/workspace-next
-docker compose up -d
-bun run db:setup
-cd ../..
 bun run workspace:next
 ```
 
-For TanStack Start, use `apps/workspace-tanstack` for the database setup and
-`bun run workspace:tanstack` from the repository root. Both apps use port
-3000, so run one at a time unless you change the app origin and port together.
+Use `bun run workspace:tanstack` to start the TanStack app. Each app's `dev`
+script runs its local `db:setup` and `db:seed` steps before starting the
+server. These development scripts reset only the app's local Workspace
+collections; see the [Workspace app guide](docs/workspace/apps.md). Both apps
+use port 3000, so run one at a time unless you change the app origin and port
+together.
 App checks are available with
 `bun run --filter workspace-next typecheck` /
 `bun run --filter workspace-next build` and the equivalent
 `workspace-tanstack` commands. The repository-wide `bun run build`,
 `bun run typecheck`, and `bun run test:all` commands are also documented in
 [Contributing](#contributing).
-
-There is not yet a database seed script. The intended commands are
-`bun run --filter workspace-next db:seed` and
-`bun run --filter workspace-tanstack db:seed`; they are not available until
-implemented in the corresponding app.
 
 For production Docker images, the private shared MongoDB replica set,
 reverse-proxy integration, SHA-tagged deploys, rollback, and troubleshooting,

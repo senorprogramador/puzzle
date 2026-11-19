@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "ActivitySection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "activity",
+      "subcategory": "activity",
+      "description": "Display searchable, grouped, and linked activity records in product and admin interfaces.",
+      "documentation": "apps/site/content/docs/pieces/components/activity.mdx",
+      "source": "packages/pieces/src/components/activity/activity-section.tsx",
+      "useCases": [
+        "dashboard"
+      ],
+      "pageTypes": [
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "activity"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "title (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "variants": [
+        {
+          "name": "timeline",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        },
+        {
+          "name": "list",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        },
+        {
+          "name": "feed",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        },
+        {
+          "name": "grouped",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        },
+        {
+          "name": "cards",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        },
+        {
+          "name": "compact",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        },
+        {
+          "name": "avatars",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        },
+        {
+          "name": "audit",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        },
+        {
+          "name": "horizontal",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/activity/activity-section.types.ts",
+          "prop": "variant",
+          "typeName": "ActivitySectionVariant"
+        }
+      ],
+      "aliases": []
+    }
+  ]
+}

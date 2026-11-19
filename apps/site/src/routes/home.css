@@ -60,6 +60,14 @@
     }
 }
 
+.puzzle-hero.home-hero {
+    overflow: visible;
+}
+
+.puzzle-hero.home-hero .puzzle-hero__media {
+    overflow: visible;
+}
+
 .home-hero__background {
     position: absolute;
     top: -100px;
@@ -170,7 +178,7 @@
     border-radius: 15px;
     overflow: hidden;
     box-shadow:
-        0 35px 100px rgba(0, 0, 0, 0.4),
+        0 28px 80px rgba(0, 0, 0, 0.24),
         0 0 0 8px rgba(255, 255, 255, 0.015);
     transform: perspective(1400px) rotateY(-4deg) rotateX(2deg);
 }
@@ -726,7 +734,11 @@
     }
 
     .home-hero h1 {
-        font-size: 53px;
+        font-size: clamp(
+            var(--puzzle-font-size-3xl),
+            9.5vw,
+            var(--puzzle-font-size-5xl)
+        );
     }
 
     .home-hero__description {

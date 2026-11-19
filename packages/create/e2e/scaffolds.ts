@@ -1,11 +1,12 @@
 import { access, readFile, rm, writeFile } from "node:fs/promises";
+import { Readable } from "node:stream";
 import path from "node:path";
 
 import { afterAll, describe, expect, inject, it, vi } from "vitest";
 import { chromium } from "playwright";
 
 import { createWebAuthnCredentialFixture } from "../../auth/tests/fixtures/webauthn-cryptographic-fixture.mjs";
-import { createProject } from "../src/create-project";
+import { runCli } from "../src/cli";
 import { prepareMongoDB } from "../src/auth/prepare-mongodb";
 import { fontConfigPaths } from "../src/theme/templates";
 import type { Framework } from "../src/types";
@@ -13,7 +14,7 @@ import { HttpClient } from "./http";
 import {
   getScaffolds,
   selectScaffolds,
-  toProjectOptions,
+  toProjectConfiguration,
   type Scaffold,
 } from "./matrix";
 import type { Server } from "./process";
@@ -105,6 +106,7 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
   describe(scaffold.id, () => {
     const root = inject("e2eRoot");
     const directory = path.join(root, scaffold.id);
+    const configPath = path.join(root, `${scaffold.id}.config.json`);
     let packageJson: PackageJson;
     let server: Server | undefined;
     let mongoStarted = false;
@@ -133,14 +135,25 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
       if (process.env.PUZZLE_E2E_KEEP !== "1") {
         await rm(directory, { recursive: true, force: true });
       }
+      await rm(configPath, { force: true });
     });
 
     it("creates and installs the project", async () => {
       const localRunner = createLocalPackageRunner(inject("puzzlePackages"));
 
-      await createProject(toProjectOptions(scaffold), {
+      await writeFile(
+        configPath,
+        JSON.stringify(toProjectConfiguration(scaffold), null, 2),
+      );
+      await runCli(
+        [
+          "--config",
+          configPath,
+          ...(runsAuth ? ["--credentials-stdin"] : []),
+        ],
+        {
         cwd: root,
-        requestInitialUser: async () => initialUser,
+        stdin: Readable.from([JSON.stringify(initialUser)]),
         runner: async (command, args, options) => {
           if (scaffold.database === "mongodb" && args.join(" ") === "run db:setup" && !mongoStarted) {
             await useMongoPort(directory, port + MONGO_PORT_OFFSET);
@@ -148,7 +161,8 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
           }
           await localRunner(command, args, options);
         },
-      });
+        },
+      );
 
       packageJson = JSON.parse(
         await readFile(path.join(directory, "package.json"), "utf8"),

@@ -1,7 +1,7 @@
 {
   "name": "@puzzle-ui/create",
   "version": "0.12.0",
-  "description": "CLI for scaffolding Puzzle React applications with Next.js, TanStack Start, or Vite.",
+  "description": "CLI for scaffolding Puzzle React applications with Next.js, TanStack Start, React Router, or Vite.",
   "homepage": "https://puzzle-ui.com/docs/create",
   "repository": {
     "type": "git",
@@ -14,7 +14,9 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "CONFIGURATION.md",
+    "config.schema.json"
   ],
   "keywords": [
     "puzzle-ui",

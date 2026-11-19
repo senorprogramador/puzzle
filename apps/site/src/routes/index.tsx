@@ -437,6 +437,7 @@ const Home = () => {
             height="large"
             theme="light"
             contentWidth="wide"
+            reverseOnMobile={false}
             eyebrow="A modern React design system"
             title={
               <>

@@ -13,7 +13,7 @@ Generate a new React application with Puzzle UI and Theme configured. Choose Nex
 
 ## Create a project
 
-Run the interactive generator; it prompts for a project name, framework, Tailwind, Puzzle Auth, and (for full-stack Auth) a database. The name is converted to kebab-case. The CLI does not overwrite an existing directory and has no command-line flags.
+Run the interactive generator; it prompts for a project name, framework, Tailwind, Puzzle Auth, and (for full-stack Auth) a database. The name is converted to kebab-case. The CLI does not overwrite an existing directory. For automation, it also supports a validated JSON configuration; see [CONFIGURATION.md](./CONFIGURATION.md).
 
 Selecting MongoDB or D1 also prompts for the first application user's email, a masked password (12–1024 characters), and password confirmation. After installing dependencies, the CLI automatically initializes the local database and registers that account using Puzzle Auth's password hashing. MongoDB starts through Docker Compose; D1 uses the same local persisted database as development. Credentials go to the seed process over stdin, not command-line arguments or project files. Puzzle Auth currently has no administrator roles, so this is a normal sign-in account, not a privileged application administrator. MongoDB's database administrator credentials remain separate and randomly generated. Custom databases and Basic React do not prompt for an account.
 
@@ -26,6 +26,18 @@ npx @puzzle-ui/create
 ```
 
 Alternatives: `bunx @puzzle-ui/create`, `pnpm dlx @puzzle-ui/create`, or `yarn dlx @puzzle-ui/create` (Yarn 2+; Yarn Classic users can use `npx`).
+
+## Automated configuration
+
+Create a JSON file matching the published [`config.schema.json`](./config.schema.json), then run:
+
+```bash
+create-puzzle --config puzzle.config.json --validate
+create-puzzle --config puzzle.config.json --dry-run
+create-puzzle --config puzzle.config.json
+```
+
+MongoDB and D1 Auth configurations require initial-user credentials on stdin with `--credentials-stdin`. The password is not accepted in the configuration file or command-line arguments. Supply the JSON from a trusted secret source; do not put credentials in shell history or generated files. Configuration mode never automatically resets MongoDB volumes. See [CONFIGURATION.md](./CONFIGURATION.md) for the schema, supported combinations, and security details.
 
 The generator installs `@puzzle-ui/ui` and `@puzzle-ui/theme`, maps Puzzle `Link` (and `Image` on Next.js) to the framework's components in the theme, adds a starter page that links to the package docs, and uses the detected package manager for framework generation and dependency installation. Tailwind is enabled by default; Puzzle Auth is optional and disabled by default.
 
@@ -50,7 +62,7 @@ Contributors can verify every project shape the CLI generates with the end-to-en
 bun run test:e2e
 ```
 
-The suite builds the workspace and packs the local `@puzzle-ui/*` packages. It then creates 28 projects in a temporary directory: each framework, with and without Tailwind, and each Auth and database option. Every project is installed with Bun, using the packed packages instead of published versions. Each project then:
+The suite builds the workspace and packs the local `@puzzle-ui/*` packages. It then creates 28 projects in a temporary directory through the non-interactive configuration path: each framework, with and without Tailwind, and each Auth and database option. Every project is installed with Bun, using the packed packages instead of published versions. Each project then:
 
 - downloads its local fonts
 - checks the generated `.env`, Docker Compose and Wrangler files
