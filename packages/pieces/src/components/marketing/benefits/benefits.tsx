@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import {
   MarketingSection,
   type MarketingSectionBaseProps,
@@ -19,8 +20,8 @@ const BenefitContent = ({
     {item.media ? <div className="puzzle-benefits__media">{item.media}</div> : null}
     {item.icon ? <div className="puzzle-benefits__icon">{item.icon}</div> : null}
     <div className="puzzle-benefits__copy">
-      <h3>{numbered ? `${index + 1}. ` : null}{item.title}</h3>
-      {item.description ? <p>{item.description}</p> : null}
+      <Heading level="headline3" as="h3">{numbered ? `${index + 1}. ` : null}{item.title}</Heading>
+      {item.description ? <Text as="p">{item.description}</Text> : null}
       {item.action ? <div className="puzzle-benefits__action">{item.action}</div> : null}
     </div>
   </article>

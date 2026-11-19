@@ -1,9 +1,11 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentPropsWithRef, CSSProperties } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Theme } from "@puzzle-ui/theme";
+import { FoldProvider } from "@puzzle-ui/hooks";
+import { createResourceScheduler } from "@puzzle-ui/core/resources";
 import { AppBar } from "./index";
 import { PageLayout } from "../page-layout";
 
@@ -194,6 +196,58 @@ describe("AppBar", () => {
     await user.click(button);
 
     expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(
+      await screen.findByRole("dialog", { name: "Main navigation" }),
+    ).toBeTruthy();
+  });
+
+  it("prefetches the drawer on idle without mounting it", async () => {
+    const idleCallbacks: Array<() => void> = [];
+    const scheduler = createResourceScheduler();
+    const registerResource = vi.spyOn(scheduler, "register");
+    vi.stubGlobal(
+      "requestIdleCallback",
+      (callback: () => void) => {
+        idleCallbacks.push(callback);
+        return idleCallbacks.length;
+      },
+    );
+    vi.stubGlobal("cancelIdleCallback", vi.fn());
+
+    render(
+      <FoldProvider scheduler={scheduler}>
+        <AppBar title="Puzzle" navigationItems={navigationItems} />
+      </FoldProvider>,
+    );
+
+    expect(registerResource).toHaveBeenCalledWith(
+      expect.objectContaining({
+        resource: expect.objectContaining({
+          type: "component-chunk",
+          priority: "low",
+        }),
+      }),
+    );
+    expect(idleCallbacks).toHaveLength(1);
+    expect(
+      screen.queryByRole("dialog", { name: "Main navigation" }),
+    ).toBeNull();
+
+    await act(async () => {
+      idleCallbacks[0]!();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    expect(
+      screen.queryByRole("dialog", { name: "Main navigation" }),
+    ).toBeNull();
+
+    await userEvent.setup().click(
+      screen.getByRole("button", { name: "Open navigation" }),
+    );
+    expect(
+      await screen.findByRole("dialog", { name: "Main navigation" }),
+    ).toBeTruthy();
   });
 
   it("renders custom navigation items and trailing components", () => {

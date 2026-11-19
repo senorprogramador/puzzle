@@ -1,0 +1,130 @@
+---
+title: Resource Prefetch
+description: Schedule reusable module or data loading from visibility, proximity, idle, or explicit triggers.
+---
+
+`useResourcePrefetch` uses the resource scheduler supplied by `FoldProvider` to
+load a resource without mounting a component. It accepts a caller-owned loader,
+so dynamic imports and existing data caches keep their normal bundler or
+framework behavior.
+
+## Quick start
+
+```tsx
+"use client";
+
+import { useResourcePrefetch } from "@puzzle-ui/hooks";
+import type { IdentifiedResourceDescriptor } from "@puzzle-ui/core/resources";
+
+const chartResource = {
+  id: "dashboard-chart",
+  type: "component-chunk",
+  priority: "low",
+} satisfies IdentifiedResourceDescriptor<"component-chunk">;
+
+const loadChart = (signal: AbortSignal) => {
+  if (signal.aborted) throw new Error("Chart loading was cancelled.");
+  return import("./chart");
+};
+
+function ChartPrefetchRegion() {
+  const { ref, state, error, retry } = useResourcePrefetch({
+    resource: chartResource,
+    load: loadChart,
+    strategy: "proximity",
+  });
+
+  return (
+    <section ref={ref} data-resource-state={state}>
+      {error ? (
+        <button type="button" onClick={() => void retry()}>
+          Retry chart prefetch
+        </button>
+      ) : (
+        "Chart loads when this section approaches the viewport."
+      )}
+    </section>
+  );
+}
+```
+
+Prefetching an imported module may download and evaluate that module, but it
+does not render or mount its exported component. A later `import()` of the same
+chunk can reuse the bundler and browser module cache.
+
+## Provider and scheduler
+
+Use the hook inside `FoldProvider`. Each root provider creates one
+SSR-safe, framework-neutral scheduler; nested providers inherit it. Passing
+`scheduler={null}` disables scheduling for that subtree, while a custom
+scheduler can be injected:
+
+```tsx
+import { createResourceScheduler } from "@puzzle-ui/core/resources";
+import { FoldProvider } from "@puzzle-ui/hooks";
+
+<FoldProvider
+  scheduler={createResourceScheduler({
+    maxConcurrent: 3,
+    maxPrefetchResources: 12,
+  })}
+>
+  <Application />
+</FoldProvider>;
+```
+
+The default scheduler permits four concurrent tasks, caps background prefetch
+work at three concurrent tasks to leave capacity for demand loads, queues up to
+100 resources, and caps the prefetch budget at 20 unique resources. It retries
+only when requested (once by default) and retains up to 100 completed resource
+results. Critical, high, normal, and low resources are ordered in that order;
+per-priority queue limits can be configured with `maxQueuedByPriority`.
+
+Without a provider, the hook is safe to render and reports `available: false`.
+Calling `prefetch` or `retry` without a scheduler rejects with a clear error.
+
+## Triggers and lifecycle
+
+| Strategy | Behavior |
+| --- | --- |
+| `proximity` | Prefetch when the attached target is near or inside its observer root. |
+| `visibility` | Prefetch when the target intersects its observer root. |
+| `idle` | Use `requestIdleCallback` with a deadline, then a frame/timer fallback. |
+| `explicit` | Do not start automatically; call the returned `prefetch()` method. |
+| `none` | Disable automatic prefetching; explicit calls remain available. |
+
+Automatic scheduling is opt-in through `proximity`, `visibility`, or `idle`;
+the default is `explicit`. Page-hidden or suspended documents pause pending
+automatic work and resume it when restored. One shared set of page and network
+listeners serves all active hook instances. When available, the Network
+Information API, Save-Data, and device-memory hints suppress lower-priority
+automatic work on constrained devices or connections. Explicit developer calls
+still pass through scheduler queue and prefetch budgets.
+
+The returned `state` is `registered`, `queued`, `loading`, `loaded`, `failed`,
+or `cancelled`. Failed work exposes `error` and can be retried with `retry()`.
+`cancel()` cancels the current request; shared work continues while another
+consumer still needs it. Unmounting releases the registration and cancels work
+with no remaining consumers.
+
+## Resource descriptors and data
+
+Import `ResourceDescriptor`, `ResourceLoader`, `ResourcePriority`, and
+`createResourceScheduler` from `@puzzle-ui/core/resources`. Resource types
+include JavaScript modules, component chunks, data, images, scripts, stylesheets,
+fonts, and extensible custom types. Every registered resource needs a stable
+`id`, `type`, and `priority`; an optional `cacheKey`, URL, metadata, or
+`cachePolicy: "no-store"` can refine its behavior.
+
+`loadingStrategy: "immediate"` starts work when the resource is registered;
+`"scheduled"` waits for a scheduler request; and `"on-demand"` defaults this
+hook to explicit-only prefetching. A hook-level `strategy` can intentionally
+override that automatic trigger choice.
+
+The loader receives an `AbortSignal` and may report `"download"` and
+`"prepare"` stages. For deferred data, wrap an existing framework loader or
+cache-aware request and pass the signal through; Puzzle does not introduce a
+second data-fetching cache or replace SSR data and route loaders.
+
+Import the hook and its options from `@puzzle-ui/hooks`. Use it in a client
+component when a framework separates server and client modules.

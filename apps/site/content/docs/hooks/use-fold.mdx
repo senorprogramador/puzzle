@@ -1,0 +1,185 @@
+---
+title: Fold and Visibility
+description: Track shared viewport and proximity state with SSR-safe React hooks.
+---
+
+`useFold` and `useVisibility` observe targets through shared
+`IntersectionObserver` instances. They can be used without a provider, preserve
+separate visibility and activation state, and use safe server snapshots.
+`FoldProvider` supplies inherited defaults to `useFold` and Puzzle UI fold
+boundaries without adding DOM.
+
+## Quick start
+
+```tsx
+import { useFold } from "@puzzle-ui/hooks";
+
+function DeferredChart() {
+  const fold = useFold({
+    configuration: { strategy: "visible" },
+  });
+
+  return (
+    <section ref={fold.ref} data-fold-state={fold.state}>
+      {fold.isActivated ? <Chart /> : <ChartPlaceholder />}
+    </section>
+  );
+}
+```
+
+Without a provider, `useFold` uses the balanced profile; unknown components
+still resolve to the safe eager, SSR-preserving decision. Set
+`configuration.strategy` to `visible`, `nearby`, or `idle` to activate at the
+matching point. Keep meaningful content available in the server-rendered or
+placeholder state when deferring expensive content.
+
+Use `FoldProvider` to apply a configuration to a subtree:
+
+```tsx
+import { FoldProvider } from "@puzzle-ui/hooks";
+
+<FoldProvider
+  config={{
+    profile: "balanced",
+    route: { rootMargin: "500px 0px" },
+  }}
+>
+  <Application />
+</FoldProvider>;
+```
+
+Nested providers inherit parent configuration and override only fields they
+specify. `conservative`, `balanced`, `aggressive`, and `custom` configure the
+same fold, visibility, scheduler, prefetch, adaptive-scheduling, and browser
+rendering engines. The balanced profile is recommended; custom starts from
+conservative SSR-first defaults. Generic route settings can be supplied through
+`config.route` without coupling the core to a router. Providers share the
+visibility registry and application-wide scheduler, so nested providers inherit
+the root scheduler's resource budgets; route overrides affect rendering and
+visibility policy without changing those shared limits. An injected scheduler
+retains its own budgets. Configuration normalization does not access browser
+globals.
+
+Use [`useResourcePrefetch`](/docs/hooks/use-resource-prefetch) to schedule
+dynamic imports or caller-managed data loading from visibility, proximity,
+idle, or explicit triggers. Prefetching does not mount a component.
+
+Use `useVisibility` when you only need observation:
+
+```tsx
+import { useVisibility } from "@puzzle-ui/hooks";
+
+function IntegrationCard() {
+  const visibility = useVisibility({ priority: "high" });
+
+  return (
+    <article ref={visibility.ref} data-visibility={visibility.state}>
+      Integration details
+    </article>
+  );
+}
+```
+
+## API
+
+### `useFold(options?)`
+
+Returns an `id`, callback `ref`, `state`, physical `visibility`, `isVisible`,
+`isNearby`, `isActivated`, `activate`, `deactivate`, the resolved
+`OptimizationDecision`, normalized `optimization` settings, and the optional
+provider-injected `scheduler`. When provider diagnostics are enabled,
+`reportDiagnosticEvent` is available for related resource and mount lifecycle
+events; boundary registration, visibility, and activation events are emitted
+by the hook itself.
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | Generated with React `useId` | Stable boundary ID. |
+| `parentId` | `string` | `undefined` | Optional parent boundary ID for nested boundaries. |
+| `configuration` | `FoldConfigurationInput` | Core defaults | Boundary rendering configuration. |
+| `global` | `GlobalRenderingConfiguration` | Core defaults | Normalized global rendering configuration. |
+| `component` | `ComponentRenderingMetadata` | `undefined` | Component metadata used by policy resolution. |
+| `override` | `FoldConfigurationInput` | `undefined` | Explicit developer configuration override. |
+| `constraints` | `RenderingConstraints` | `undefined` | Accessibility or functionality requirements. |
+| `root` | `Element \| Document \| null` | Viewport | Optional scroll root. |
+| `rootMargin` | `string` | Priority-based margin | Explicit proximity margin, overriding the priority default. |
+| `threshold` | `number \| readonly number[]` | `0` | Intersection thresholds from `0` to `1`. |
+| `activationMode` | `"one-shot" \| "persistent"` | `"one-shot"` | Whether activation stays active after the trigger or follows it. |
+| `activationTrigger` | `"manual" \| "visible" \| "nearby"` | Derived from strategy | Point at which automatic activation occurs. |
+| `observe` | `boolean` | Strategy-dependent | Set to `false` to disable visibility and idle activation scheduling for this hook. |
+
+The React adapter supports visibility observation, idle scheduling, and the
+rendering modes implemented by Puzzle UI. A provider can supply narrower
+`capabilities` for a host integration. Unsupported explicit choices resolve
+to eager behavior, are reported in the returned decision, and produce a
+development warning.
+
+### `useFoldOptimization()`
+
+Returns the provider's immutable, normalized engine settings, including
+visibility margins, scheduler and prefetch budgets, adaptive scheduling,
+content visibility, intrinsic sizing, and the default deferred-loading
+behavior. Use `useFold().decision.diagnostics` when `diagnostics` is enabled on
+the provider to inspect the selected profile, effective decision, applied
+overrides, disabled optimizations, and framework restrictions.
+
+### Provider diagnostics
+
+`FoldProvider` diagnostics are off by default. Set `diagnostics` to include
+decision details in `useFold().decision.diagnostics`, or pass
+`onDiagnosticEvent` to receive lifecycle events. The callback also explicitly
+enables diagnostics; no telemetry is sent by Puzzle. Set `diagnostics={false}`
+to disable inherited diagnostics and events within a subtree. Import the event
+type from `@puzzle-ui/hooks` or `@puzzle-ui/core/rendering`.
+
+The discriminated `RenderingDiagnosticEvent` union includes boundary
+registration and visibility changes, component activation/mounting, resource
+scheduling/loading/cancellation, prefetch starts and skip reasons, and load
+failures. Boundary contexts include the effective profile, policy, prediction,
+visibility, priority, overrides, and adapter restrictions. Resource-prefetch
+contexts include the chosen trigger and current resource state.
+
+### `useVisibility(options?)`
+
+Returns `id`, callback `ref`, physical `state`, `isVisible`, and `isNearby`.
+Its options are `id`, `parentId`, `root`, `rootMargin`, `threshold`, and
+`priority`. `isNearby` is true both near the viewport and while visible.
+
+Priority defaults are `critical: "800px 0px"`, `high: "600px 0px"`,
+`normal: "400px 0px"`, and `low: "200px 0px"`. A boundary-specific
+`rootMargin` takes precedence. Root margins accept one to four CSS pixel or
+percentage lengths.
+
+### State subscriptions
+
+`useFoldState(id)` returns the boundary snapshot:
+
+| Member | Description |
+| --- | --- |
+| `state` | `unknown`, `outside`, `nearby`, `visible`, or `activated`. |
+| `visibility` | Physical visibility state, independent of activation. |
+| `isVisible` | Whether the target currently intersects the viewport. |
+| `isNearby` | Whether the target is nearby or visible. |
+| `isActivated` | Whether activation has occurred or is currently active. |
+
+`useIsVisible(id)` and `useIsNearby(id)` are focused subscriptions to their
+corresponding booleans. Each boundary has isolated subscribers, so unrelated
+boundaries do not re-render when its state changes.
+
+## Activation and SSR
+
+- One-shot activation occurs at most once and remains activated after the
+  target leaves the viewport.
+- Persistent activation follows its configured visibility trigger and can
+  deactivate on exit, then activate again on re-entry.
+- Visibility hooks start at `unknown` on the server and during hydration.
+  Eager `useFold` configuration starts activated on both.
+- Browser APIs are accessed only when a target is registered. Without
+  `IntersectionObserver`, observation safely falls back to visible.
+- The browser's native observer responds to viewport and scroll-root geometry
+  changes, including resize and orientation changes.
+- The hooks do not hide or remove content themselves; preserve meaningful
+  fallbacks and accessible content when using activation to defer rendering.
+
+Import hooks and their option types from `@puzzle-ui/hooks`. Rendering
+configuration types are exported from `@puzzle-ui/core/rendering`.

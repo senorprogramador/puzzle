@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { getPiecesCatalogEntries } from "../components/doc-examples/pieces/component-catalog";
 
 const docsDirectory = fileURLToPath(
   new URL("../../content/docs/pieces/components/", import.meta.url),
@@ -294,6 +295,22 @@ describe("Pieces documentation coverage", () => {
     expect(integrationPage).toContain("Next.js App Router");
     expect(integrationPage).toContain("TanStack Start");
     expect(integrationPage).toContain('from "@puzzle-ui/pieces"');
+  });
+
+  it("lists every documented section family on the Pieces overview", () => {
+    const entries = getPiecesCatalogEntries();
+    const overview = readFileSync(join(piecesContentDirectory, "index.mdx"), "utf8");
+
+    expect(entries).toHaveLength(componentDocs.length);
+    expect(new Set(entries.map((entry) => entry.href)).size).toBe(
+      componentDocs.length,
+    );
+    expect(entries.map((entry) => entry.href).sort()).toEqual(
+      componentDocs
+        .map(([slug]) => `/docs/pieces/components/${slug}`)
+        .sort(),
+    );
+    expect(overview).toContain("<PiecesComponentCatalog />");
   });
 
   it("resolves internal Pieces documentation links", () => {

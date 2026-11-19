@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { LinearProgress } from "@puzzle-ui/ui";
+import { LinearProgress, Heading, Text } from "@puzzle-ui/ui";
 
 import "./project.css";
 
@@ -98,15 +98,15 @@ export const ProjectCard = ({
       aria-labelledby={titleId}
     >
       <div className="puzzle-project-card__header">
-        <h3 id={titleId} className="puzzle-project-card__title">
+        <Heading level="headline3" as="h3" id={titleId} className="puzzle-project-card__title">
           {heading}
-        </h3>
+        </Heading>
         {status && (
           <div className="puzzle-project-card__status">{status}</div>
         )}
       </div>
       {description && (
-        <p className="puzzle-project-card__description">{description}</p>
+        <Text as="p" className="puzzle-project-card__description">{description}</Text>
       )}
       {progress !== undefined && (
         <ProjectProgress label="Progress" value={progress} />
@@ -160,11 +160,11 @@ export const ProjectHeader = ({
   >
     <div className="puzzle-project-header__content">
       <div className="puzzle-project-header__title-row">
-        <h1 className="puzzle-project-header__title">{title}</h1>
+        <Heading level="headline1" as="h1" className="puzzle-project-header__title">{title}</Heading>
         {status}
       </div>
       {description && (
-        <p className="puzzle-project-header__description">{description}</p>
+        <Text as="p" className="puzzle-project-header__description">{description}</Text>
       )}
       {meta && <div className="puzzle-project-header__meta">{meta}</div>}
     </div>

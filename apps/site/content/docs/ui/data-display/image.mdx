@@ -40,7 +40,7 @@ Provide a source and alternative text. Set the intrinsic dimensions to reserve s
   />
 </Preview>
 
-The `width` and `height` props describe the image's intrinsic dimensions in pixels. They can be inferred when `src` is a static image import with `src`, `width`, and `height` fields.
+The `width` and `height` props describe the image's intrinsic dimensions in pixels. They can be inferred when `src` is a static image import with `src`, `width`, and `height` fields. When both are known, the container reserves their aspect ratio before loading and keeps it if the image fallback is shown.
 
 ## Fitting and positioning
 
@@ -184,7 +184,7 @@ By default, Image renders a native `<img>`. You can provide a framework-specific
 />
 ```
 
-Framework-specific options such as `quality`, `unoptimized`, and `componentProps` are forwarded to a custom image component. `preload` uses React DOM image preloading for a native `<img>` and is forwarded to a configured image component.
+Framework-specific options such as `quality`, `unoptimized`, and `componentProps` are forwarded to a custom image component. `preload` uses React DOM image preloading for a native `<img>` and is forwarded to a configured image component. Unless explicitly overridden, a preloaded image uses `loading="eager"` and `fetchPriority="high"`; do not combine an LCP image with `loading="lazy"`. Without `preload`, the component does not add lazy loading automatically, so choose native `loading="lazy"` only for non-critical images.
 
 ## API
 
@@ -210,7 +210,7 @@ Framework-specific options such as `quality`, `unoptimized`, and `componentProps
 | `component`          | `ElementType`                     | —          | Framework-specific image component for this instance.                                        |
 | `componentProps`     | `Record<string, unknown>`         | —          | Additional props forwarded to the configured image component.                                |
 | `quality`            | `number`                          | —          | Image optimization quality forwarded to a custom image component.                            |
-| `preload`            | `boolean`                         | `false`    | Preloads a native image or is forwarded to a custom image component.                         |
+| `preload`            | `boolean`                         | `false`    | Preloads a native image or is forwarded to a custom image component; defaults to eager/high priority unless explicitly overridden. |
 | `unoptimized`        | `boolean`                         | —          | Disables optimization in a compatible custom image component.                                |
 | `className`          | `string`                          | —          | Additional class name applied to the image element.                                          |
 | `style`              | `CSSProperties`                   | —          | Styles applied to the image element.                                                         |

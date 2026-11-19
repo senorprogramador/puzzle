@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   EditorialDate,
@@ -31,11 +32,11 @@ const TimelineEventCard = ({
       </span>
       <div className="puzzle-timeline-section__content">
         {item.date ? (
-          <p className="puzzle-timeline-section__date">
+          <Text as="p" className="puzzle-timeline-section__date">
             <EditorialDate date={item.date} />
-          </p>
+          </Text>
         ) : null}
-        <h3>{item.title}</h3>
+        <Heading level="headline3" as="h3">{item.title}</Heading>
         {item.description ? <div>{item.description}</div> : null}
         {item.image ? (
           <EditorialFigure

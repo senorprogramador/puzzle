@@ -32,6 +32,26 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
+    },
+    "./rendering": {
+      "import": {
+        "types": "./dist/rendering/index.d.ts",
+        "default": "./dist/rendering/index.js"
+      },
+      "require": {
+        "types": "./dist/rendering/index.d.cts",
+        "default": "./dist/rendering/index.cjs"
+      }
+    },
+    "./resources": {
+      "import": {
+        "types": "./dist/resources/index.d.ts",
+        "default": "./dist/resources/index.js"
+      },
+      "require": {
+        "types": "./dist/resources/index.d.cts",
+        "default": "./dist/resources/index.cjs"
+      }
     }
   },
   "files": [

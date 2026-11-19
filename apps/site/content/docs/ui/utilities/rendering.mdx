@@ -1,0 +1,490 @@
+---
+title: React Rendering Strategies
+description: Preserve server-rendered content, defer client component loading, or render static content with explicit Puzzle UI boundaries.
+---
+
+import {
+  Badge,
+  FoldBoundary,
+  FoldProvider,
+  Preview,
+  Section,
+  SsrBoundary,
+  StaticBoundary,
+} from "@puzzle-ui/ui";
+
+Choose a rendering boundary based on the content contract. SSR boundaries preserve normal framework rendering, deferred boundaries render a fallback until client activation, and static boundaries add no client runtime.
+
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** These public boundaries are covered by tests. Deferred boundaries must be used inside a client component because their loader is a function and cannot cross a React Server Component boundary.
+
+## Import
+
+```tsx
+import { DeferredBoundary, FoldBoundary, FoldProvider, SsrBoundary } from "@puzzle-ui/ui";
+import { StaticBoundary } from "@puzzle-ui/ui/rendering/static";
+```
+
+## SSR-preserving content
+
+`SsrBoundary` returns its children unchanged, so server HTML and normal hydration are preserved. Optional resource descriptors emit React DOM preload hints; priority maps to the browser fetch priority.
+
+<Preview
+  hideDevices
+  code={`\
+<SsrBoundary resources={[
+  { type: "image", url: "/hero.webp", priority: "critical" },
+]}>
+  <article>Searchable server-rendered content</article>
+</SsrBoundary>
+`}
+>
+  <Section>
+    <SsrBoundary>
+      <article>Searchable server-rendered content</article>
+    </SsrBoundary>
+  </Section>
+</Preview>
+
+The boundary does not implement selective hydration. Next.js, TanStack Start, and other React frameworks retain their normal hydration and streaming behavior.
+
+## Fold provider and boundary
+
+`FoldProvider` adds no DOM. It supplies one normalized optimization profile,
+observer options, framework capabilities, and a provider-scoped resource
+scheduler. `balanced` is the recommended default; `conservative` is the safe
+fallback. A root provider creates an SSR-safe scheduler using the selected
+profile's concurrency, queue, retry, and prefetch budgets; nested providers
+inherit the central scheduler. Pass `scheduler={null}` to disable scheduling in
+a subtree or inject a `createResourceScheduler()` instance to own its budgets.
+
+```tsx
+<FoldProvider config={{ profile: "balanced" }}>
+  {children}
+</FoldProvider>
+```
+
+The four profiles configure rendering, visibility, prefetching, scheduling, and
+browser rendering together:
+
+- `conservative` uses eager SSR, disables automatic prefetch and adaptive
+  scheduling, and keeps content visibility off.
+- `balanced` uses automatic classification, proximity prefetch, bounded
+  concurrency, conservative adaptive checks, and content visibility when a
+  boundary has explicit or metadata-backed size information.
+- `aggressive` increases proximity and prefetch budgets and allows deferred
+  rendering for suitable known components. Critical, hero, navigation, main,
+  SEO, and unknown content stays SSR-preserving; critical content remains eager.
+- `custom` starts from conservative defaults and accepts overrides for every
+  profile setting.
+
+`deferredLoadingBehavior` selects the default trigger for `DeferredBoundary`
+and for resources without an explicit prefetch strategy: `on-activation` waits
+for visibility, `proximity` prepares nearby resources, and `idle` schedules
+work during idle time. `on-demand` resources and explicit hook settings retain
+their own behavior.
+
+Application and generic route-level policies use the same framework-neutral
+contract:
+
+```tsx
+<FoldProvider
+  config={{
+    profile: "custom",
+    optimization: {
+      prefetch: true,
+      contentVisibility: true,
+      adaptiveScheduling: false,
+      resourceConcurrency: 2,
+    },
+    route: { prefetchBudget: 6 },
+  }}
+>
+  {children}
+</FoldProvider>
+```
+
+Framework route layouts can nest a provider with `config.route`; no router API
+is imported into the core. The legacy `configuration` prop remains supported.
+`useFold().optimization` exposes the normalized engine settings, while
+`diagnostics` adds the selected profile, effective decision, applied overrides,
+disabled optimizations, and framework restrictions to `useFold().decision`.
+
+`FoldBoundary` uses the resolved strategy to choose when to mount its children.
+Without an explicit provider, it uses the balanced profile; unknown components
+still resolve to eager, SSR-preserving output. A deferred boundary
+renders its fallback on the server and mounts children after activation. It
+uses Puzzle's `Skeleton` when no fallback is supplied, marks the boundary
+`aria-busy` while waiting, and preserves focused fallback or child content
+until focus leaves.
+
+<Preview
+  hideDevices
+  code={`\
+<FoldProvider
+  defaultStrategy="visible"
+  defaultMode="deferred"
+  defaultPriority="high"
+>
+  <FoldBoundary
+    aspectRatio="16 / 9"
+    fallback={<div role="status">Loading recommendations…</div>}
+  >
+    <article>Recommendations loaded near the viewport</article>
+  </FoldBoundary>
+</FoldProvider>
+`}
+>
+  <Section>
+    <FoldProvider
+      defaultStrategy="visible"
+      defaultMode="deferred"
+      defaultPriority="high"
+    >
+      <FoldBoundary
+        aspectRatio="16 / 9"
+        fallback={<div role="status">Loading recommendations…</div>}
+      >
+        <article>Recommendations loaded near the viewport</article>
+      </FoldBoundary>
+    </FoldProvider>
+  </Section>
+</Preview>
+
+Configuration precedence is hard technical, accessibility, and SSR-content
+constraints; explicit boundary overrides; component overrides; route and
+application overrides; custom profile settings; selected profile defaults; and
+safe framework defaults. Profile precedence does not turn an explicit eager
+choice into deferred work. Unsupported choices fall back safely and are
+reported in development diagnostics. `disabled` requires immediate SSR
+rendering.
+Component hints can be supplied through `componentHints`, for example
+`{ role: "gallery", expectedWeightBytes: 180_000 }`; explicit boundary props
+override those hints.
+
+Use the optional `scheduledResource` prop with a scheduler injected into
+`FoldProvider` to delay mounting until that scheduler runs the task. The
+scheduler receives the boundary's resolved priority. Pending tasks are
+cancelled on unmount or deactivation, while completed resources are reused on
+re-entry.
+
+The framework-neutral engine is exported from `@puzzle-ui/core/resources`.
+It orders critical, high, normal, and low work, deduplicates registrations by
+stable resource ID, limits concurrency and prefetch budgets, supports
+cancellation and explicit retries, and reuses completed results. Loaders own
+the actual work: use dynamic `import()` for modules, and wrap existing cache-aware
+fetchers or framework loaders for data.
+
+`useResourcePrefetch` adds proximity, visibility, idle, and explicit prefetch
+triggers through the shared visibility engine. It resolves a module or data
+loader without mounting a component. Native dynamic imports may evaluate the
+module, but activation and React mounting remain separate. The hook respects
+page visibility and optional network/device hints; explicit calls still obey
+the scheduler's budgets. See [Resource Prefetch](/docs/hooks/use-resource-prefetch)
+for the hook contract and examples.
+
+## Diagnostics and lifecycle events
+
+Diagnostics are off by default. Set `diagnostics` to expose decision details
+from `useFold`, or provide `onDiagnosticEvent` to `FoldProvider` to receive
+typed lifecycle events. Either option is explicit and can be enabled in
+production; `diagnostics={false}` disables diagnostic events for that provider
+and its subtree. The callback runs locally and Puzzle does not send telemetry
+or retain event data.
+
+```tsx
+import type { RenderingDiagnosticEvent } from "@puzzle-ui/core/rendering";
+
+const handleRenderingEvent = (event: RenderingDiagnosticEvent) => {
+  if (event.type === "component-activated") {
+    console.debug(event.context.boundaryId, event.activationLatencyMs);
+  }
+};
+
+<FoldProvider onDiagnosticEvent={handleRenderingEvent}>
+  {children}
+</FoldProvider>;
+```
+
+Boundary events include the selected profile, effective configuration,
+predicted position, actual visibility, selected strategy and rendering mode,
+priority, applied overrides, and framework restrictions. Resource-prefetch
+events report the effective trigger and whether work started or was skipped.
+The lifecycle also reports resource scheduling/loading/cancellation, activation
+and mount timing, and loading failures. Events are emitted without storing
+React state; a diagnostics callback may still perform its own work or render
+updates.
+
+## Automatic classification and fold prediction
+
+Supply semantic metadata rather than relying on component names. Built-in role
+defaults classify navigation and heroes as critical, main content as high,
+galleries as normal, and testimonials, interactive maps, and footers as low.
+These defaults can be customized through `FoldProvider.classification`.
+Metadata can also declare static or dynamic behavior, expected interaction
+cost, known weight in bytes, default strategy and rendering mode, critical
+resource hints, known dimensions, and `seo: true` when content must remain
+server-rendered.
+
+```tsx
+<FoldProvider
+  pageStructure={{ region: "content", documentOrder: 2 }}
+  classification={{
+    roleDefaults: { gallery: { priority: "high" } },
+  }}
+  diagnostics
+>
+  <FoldBoundary
+    componentHints={{
+      role: "gallery",
+      componentKind: "dynamic",
+      expectedInteractionCost: "medium",
+      expectedWeightBytes: 180_000,
+    }}
+    prediction={{
+      positionHint: "below-fold",
+      dimensions: { width: 960, height: 540 },
+      parentLayout: { documentOffset: 120, precedingContentHeight: 640 },
+    }}
+  >
+    <article>Gallery content</article>
+  </FoldBoundary>
+</FoldProvider>
+```
+
+Server predictions are framework-neutral and never infer a viewport height.
+Critical metadata can be known; placement hints, page regions, and document
+order produce only above/below predictions with confidence below certainty.
+Dimensions and parent layout provide an estimated document offset, not proof
+that content is outside a user's viewport. With insufficient evidence, the
+engine keeps the SSR-preserving mode and an eager strategy; it does not remove
+content or postpone normal React hydration.
+
+On the client, the shared visibility engine confirms proximity and visibility
+using `IntersectionObserver` entry geometry. Its measurements expose the
+element and observer-root rectangles without synchronous layout reads.
+Observer updates keep confirmation current as the viewport, responsive layout,
+or document position changes. Client confirmation may refine an automatic
+strategy, but it does not replace server HTML.
+
+Unknown components default to normal priority, eager activation, and SSR.
+Automatic strategies may choose eager, nearby, visible, or idle based on
+metadata, prediction confidence, client confirmation, resource cost, and
+adapter capabilities. Rendering mode remains SSR unless a safe, supported
+component default or developer choice says otherwise. Static mode is rejected
+for metadata declaring interactive descendants; the boundary preserves its
+children and reports the incompatible request in development.
+
+When `diagnostics` is enabled on `FoldProvider`, `useFold().decision.diagnostics`
+exposes the classification, prediction, selected priority and strategy, and
+decision reason. Diagnostics are omitted by default.
+
+`FoldBoundary mode="static"` renders its children immediately but still uses
+the client boundary module. Use `StaticBoundary` when output must not require
+client JavaScript.
+
+## Deferred client component
+
+`DeferredBoundary` renders only its fallback in server HTML. It calls the dynamic loader after the selected activation trigger, then mounts the component after loading. The passed `AbortSignal` lets custom loaders cancel work; native `import()` itself may not be cancellable, so late results are ignored.
+
+```tsx
+"use client";
+
+const loadPanel = async (signal: AbortSignal) => {
+  if (signal.aborted) throw new Error("Loading was cancelled.");
+  return { default: (await import("./panel")).Panel };
+};
+
+<DeferredBoundary
+  strategy="nearby"
+  load={loadPanel}
+  componentProps={{ title: "Details" }}
+  fallback={<div className="panel-placeholder" />}
+  loadingFallback={<div role="status">Loading details…</div>}
+  errorFallback={(_error, retry) => (
+    <button type="button" onClick={retry}>Try again</button>
+  )}
+  aspectRatio="16 / 9"
+/>;
+```
+
+Define the loader in a client component; do not pass it from a Server Component. Use `strategy="manual"` with `active` for interaction-driven activation. `suspenseFallback` is optional and only wraps the loaded component when provided, so existing or nested Suspense boundaries are not duplicated by default. Failed loads can be retried, pending work is aborted on cancellation or unmount, and loaded modules are retained for re-entry.
+
+## Static content
+
+`StaticBoundary` returns server-renderable children without a client directive, wrapper, or runtime dependency. Its required `interactiveChildren="none"` prop makes the no-interactivity contract explicit; use regular framework client boundaries for interactive descendants instead.
+
+<Preview
+  hideDevices
+  code={`\
+<StaticBoundary interactiveChildren="none">
+  <article>Static, non-interactive content</article>
+</StaticBoundary>
+`}
+>
+  <Section>
+    <StaticBoundary interactiveChildren="none">
+      <article>Static, non-interactive content</article>
+    </StaticBoundary>
+  </Section>
+</Preview>
+
+For code that must not pull the UI package client barrel into a server module, import `StaticBoundary` from `@puzzle-ui/ui/rendering/static`. Eager interactive components should be imported and rendered normally rather than wrapped in a deferred boundary.
+
+## Architecture and limitations
+
+- **Core:** framework-neutral configuration normalization, profile resolution,
+  classification, priority policy, fold prediction, and typed diagnostic
+  contracts. It has no React or browser dependency and keeps no request-specific
+  mutable configuration.
+- **Visibility:** the hooks package shares viewport and proximity observers,
+  tracks actual client visibility, and exposes subscriptions without reading
+  layout synchronously.
+- **Scheduler:** the core resource scheduler orders bounded, deduplicated work
+  and supports cancellation, retries, and cache policy. Loaders remain owned by
+  the application or framework integration.
+- **Rendering:** the UI package composes the resolved policy with SSR-preserving,
+  deferred, and static boundaries. `FoldProvider` scopes profile settings and
+  resource budgets; nested providers inherit the root scheduler.
+- **Adapters:** Next.js and TanStack Start have separate server/client entry
+  points. Server entry points preserve framework output without importing the
+  client observer engine.
+
+Server-side prediction cannot know a user's viewport and is only a heuristic;
+client visibility refines policy after hydration, never the server HTML.
+Deferred boundaries postpone client component loading/mounting, not Server
+Component execution or data fetching. They do not provide selective hydration
+or independent hydration islands. Streaming and nested Suspense remain under
+the framework and React's normal behavior. `StaticBoundary` is only suitable
+for non-interactive children, while deferred loaders and browser observers must
+run in client components. TanStack Start's isomorphic routes are not React
+Server Components unless a separate supported RSC integration is configured.
+
+## API
+
+| Boundary | Server output | Client behavior |
+| -------- | ------------- | --------------- |
+| `SsrBoundary` | Full children | Normal framework hydration; optional resource preload hints |
+| `FoldBoundary` | Full children for `ssr`/`static`; fallback for `deferred` | Applies provider and boundary policy, visibility/idle activation, focus retention, and optional resource scheduling |
+| `DeferredBoundary` | Fallback only | Loads on activation, then mounts; supports retry, cancellation, optional Suspense fallback, and stable dimensions |
+| `StaticBoundary` | Full children | No boundary hydration or client runtime; interactive children are not supported |
+
+`FoldBoundary` accepts `strategy`, `mode`, `priority`, `root`, `rootMargin`,
+`threshold`, `fallback`, `once`, `disabled`, `contentVisibility`,
+`intrinsicSize`, `aspectRatio`, `componentHints`, `prediction`, `override`,
+`scheduledResource`, `className`, and standard `div` attributes. `FoldProvider`
+accepts `config` (`configuration` remains a compatibility alias),
+`defaultStrategy`, `defaultMode`, `defaultPriority`, `visibility`,
+`capabilities`, `classification`, `pageStructure`, `diagnostics`,
+`onDiagnosticEvent`, and `scheduler`.
+
+`contentVisibility="auto"` enables browser-native offscreen rendering
+skipping independently of the fold strategy; `"visible"` disables it for a
+boundary. `intrinsicSize` accepts the CSS `contain-intrinsic-size` value,
+including `auto <length>` so the browser can reuse the last rendered size while
+using the supplied fallback before its first render. Choose a fallback close to
+the section's measured size; an undersized value can shift later content when
+the browser renders the section. Responsive values can be supplied through
+`className` or `style`, including project CSS modules and utility classes.
+Content visibility applies containment, so verify sticky/fixed descendants and
+overflow-dependent layouts before opting them in. It does not activate or
+unmount React children. Avoid combining a deferred boundary and native
+`loading="lazy"` for the same image resource; use the browser's image loading
+behavior for images and fold scheduling for component code.
+
+`DeferredBoundary` accepts `load`, `componentProps`, `strategy`, `active`, `activationMode`, observer options (`root`, `rootMargin`, `threshold`), `priority`, `fallback`, `loadingFallback`, `errorFallback`, `suspenseFallback`, `aspectRatio`, `minBlockSize`, `id`, `parentId`, `className`, and `style`.
+
+## Accessibility and framework behavior
+
+Provide a meaningful loading status and actionable error fallback when deferred
+content matters to the user; use status and alert semantics for updates.
+Focused content remains mounted until focus leaves its boundary, and keyboard
+focus is not trapped. Hidden or not-yet-mounted controls are not keyboard
+reachable. Static content must contain no interactive descendants. The UI
+package declares React and React DOM 19 as peers; no router-specific APIs are
+required.
+
+## Next.js App Router
+
+The Next.js entrypoints keep server-safe boundaries separate from client runtime:
+
+```tsx
+import {
+  NextSsrBoundary,
+  NextStaticBoundary,
+} from "@puzzle-ui/ui/next/server";
+import {
+  NextDeferredBoundary,
+  NextFoldBoundary,
+  NextFoldProvider,
+} from "@puzzle-ui/ui/next/client";
+```
+
+Use the `/next/server` entrypoint from Server Components for SSR-preserving and static output. `NextStaticBoundary` requires `interactiveChildren="none"` and does not add a client runtime. Use `/next/client` for interactive boundaries, providers, deferred loaders, and hooks.
+
+Server Components can be passed as `children` to a client boundary; Next.js renders those components on the server and sends their rendered output in the RSC payload. This is a composition slot, not deferred server execution. A deferred `NextFoldBoundary` can delay mounting a Client Component, but it does not postpone Server Component work or data fetching. Use a nearby React `<Suspense>` boundary for streaming asynchronous Server Component content.
+
+For code splitting a Client Component, declare `next/dynamic` at module scope in a Client Component and use a literal import path:
+
+```tsx
+"use client";
+
+import dynamic from "next/dynamic";
+import { NextFoldBoundary } from "@puzzle-ui/ui/next/client";
+
+const Gallery = dynamic(() => import("./gallery"), {
+  loading: () => <p role="status">Loading gallery…</p>,
+});
+
+export const DeferredGallery = () => (
+  <NextFoldBoundary mode="deferred" strategy="visible">
+    <Gallery />
+  </NextFoldBoundary>
+);
+```
+
+`next/dynamic` prerenders Client Components by default; do not set `ssr: false` unless the component explicitly requires client-only rendering. Do not dynamically import a Server Component expecting to defer its server work—Next.js only lazy-loads Client Component descendants in that case. Keep Next.js `error.tsx` boundaries for route-level errors, and use `NextDeferredBoundary` error fallbacks for its own loader failures. The adapter does not add a Suspense boundary unless the selected boundary API requires one.
+
+## TanStack Start
+
+The TanStack entrypoints mirror the Next adapter while respecting Start's
+isomorphic route model:
+
+```tsx
+import {
+  TanStackDeferredBoundary,
+  TanStackFoldBoundary,
+  TanStackFoldProvider,
+} from "@puzzle-ui/ui/tanstack/client";
+import {
+  TanStackSsrBoundary,
+  TanStackStaticBoundary,
+} from "@puzzle-ui/ui/tanstack/server";
+import type {
+  TanStackFoldBoundaryProps,
+  TanStackSsrBoundaryProps,
+} from "@puzzle-ui/ui/tanstack/shared";
+```
+
+Use `/tanstack/client` for deferred and visibility APIs, `/tanstack/server`
+for SSR-preserving and static boundaries, and `/tanstack/shared` for
+type-only contracts. The server entrypoint contains no client runtime, and
+the client entrypoint contains no server-only logic. Both are safe to use in
+Start's isomorphic route modules; route loaders and components run on both
+server and client unless the route opts into a separate framework boundary.
+
+`TanStackSsrBoundary` preserves normal SSR, hydration, and streaming while
+emitting React DOM preload hints. `TanStackStaticBoundary` returns its
+non-interactive children without a wrapper. Standard Start routes still
+hydrate as a whole; the boundary does not create an independent hydration
+island or enable experimental React Server Components. Start's installed
+default stream handler flushes Suspense fallbacks for browser requests and
+waits for the complete stream for bot user agents. Keep server-only data
+access inside `createServerFn` and use the route loader to provide its result.
+Visibility activation, dynamic imports, loading/error fallbacks, and retry use
+the same hooks and lifecycle as the framework-neutral and Next adapters.
+
+## Related documentation
+
+- [Preview](/docs/ui/utilities/preview)
+- [Transition](/docs/ui/utilities/transition)
+- [UI component index](/docs/ui)

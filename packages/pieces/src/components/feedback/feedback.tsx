@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Alert } from "@puzzle-ui/ui";
+import { Alert, Text } from "@puzzle-ui/ui";
 
 import "./feedback.css";
 
@@ -53,7 +53,7 @@ export const NotificationItem = ({
         {href ? <a href={href}>{title}</a> : title}
       </div>
       {description && (
-        <p className="puzzle-notification-item__description">{description}</p>
+        <Text as="p" className="puzzle-notification-item__description">{description}</Text>
       )}
       {timestamp && (
         <time

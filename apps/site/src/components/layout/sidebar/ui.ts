@@ -438,6 +438,11 @@ const utilities: TreeViewItem = {
       href: `${folder}/utilities/preview`,
     },
     {
+      id: "ui-rendering-strategies",
+      label: "Rendering Strategies",
+      href: `${folder}/utilities/rendering`,
+    },
+    {
       id: "ui-scroll-lock",
       label: "Scroll Lock",
       href: `${folder}/utilities/scroll-lock`,

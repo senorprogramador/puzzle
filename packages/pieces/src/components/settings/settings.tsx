@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import {
   cloneElement,
   isValidElement,
@@ -91,13 +92,13 @@ export const SettingsSection = ({
     >
       <header className="puzzle-settings-section__header">
         <div>
-          <h2 id={titleId} className="puzzle-settings-section__title">
+          <Heading level="headline2" as="h2" id={titleId} className="puzzle-settings-section__title">
             {title}
-          </h2>
+          </Heading>
           {description && (
-            <p className="puzzle-settings-section__description">
+            <Text as="p" className="puzzle-settings-section__description">
               {description}
-            </p>
+            </Text>
           )}
         </div>
         {actions}
@@ -132,9 +133,9 @@ export const SettingsGroup = ({
       aria-labelledby={title ? titleId : undefined}
     >
       {title && (
-        <h3 id={titleId} className="puzzle-settings-group__title">
+        <Heading level="headline3" as="h3" id={titleId} className="puzzle-settings-group__title">
           {title}
-        </h3>
+        </Heading>
       )}
       <div className="puzzle-settings-group__content">{children}</div>
     </section>
@@ -226,8 +227,8 @@ export const ProfileHeader = ({
       <div className="puzzle-profile-header__avatar">{avatar}</div>
     )}
     <div className="puzzle-profile-header__identity">
-      <h2 className="puzzle-profile-header__name">{name}</h2>
-      {email && <p className="puzzle-profile-header__email">{email}</p>}
+      <Heading level="headline2" as="h2" className="puzzle-profile-header__name">{name}</Heading>
+      {email && <Text as="p" className="puzzle-profile-header__email">{email}</Text>}
     </div>
     {actions && (
       <div className="puzzle-profile-header__actions">{actions}</div>
@@ -254,11 +255,11 @@ export const SecurityMethodCard = ({
       </div>
     )}
     <div className="puzzle-security-method-card__content">
-      <h3 className="puzzle-security-method-card__title">{title}</h3>
+      <Heading level="headline3" as="h3" className="puzzle-security-method-card__title">{title}</Heading>
       {description && (
-        <p className="puzzle-security-method-card__description">
+        <Text as="p" className="puzzle-security-method-card__description">
           {description}
-        </p>
+        </Text>
       )}
       {status && (
         <div className="puzzle-security-method-card__status">{status}</div>

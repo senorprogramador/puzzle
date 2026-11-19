@@ -1,3 +1,4 @@
+import { Heading } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   EditorialCategory,
@@ -124,7 +125,7 @@ const renderGrouped = (items: readonly ChangelogRelease[]) => (
     {groupBy(items, (release) => release.group ?? getYear(release.date)).map(
       ([group, releases]) => (
         <section key={group} className="puzzle-changelog-section__group">
-          <h3>{group}</h3>
+          <Heading level="headline3" as="h3">{group}</Heading>
           <ol>
             {releases.map((release) => (
               <li key={release.id}>
@@ -147,7 +148,7 @@ const renderByCategory = (items: readonly ChangelogRelease[]) => {
     <div className="puzzle-changelog-section__groups">
       {categorized.map(([category, releases]) => (
         <section key={category} className="puzzle-changelog-section__group">
-          <h3>{category}</h3>
+          <Heading level="headline3" as="h3">{category}</Heading>
           <ol>
             {releases.map((release) => (
               <li key={release.id}>

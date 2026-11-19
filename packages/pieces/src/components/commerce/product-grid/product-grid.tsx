@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Card } from "@puzzle-ui/ui";
+import { Badge, Card, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import { useState } from "react";
 import {
@@ -53,12 +53,12 @@ const ProductCard = ({
         </div>
       ) : null}
       <div className="puzzle-product-grid__copy">
-        <h3>
+        <Heading level="headline3" as="h3">
           {item.href ? <a href={item.href}>{item.name}</a> : item.name}
-        </h3>
-        {item.description ? <p>{item.description}</p> : null}
+        </Heading>
+        {item.description ? <Text as="p">{item.description}</Text> : null}
         {item.rating && ratingValue ? (
-          <p className="puzzle-product-grid__rating">
+          <Text as="p" className="puzzle-product-grid__rating">
             <span
               aria-label={`Rated ${ratingValue} out of ${ratingMax}${
                 item.rating.count === undefined
@@ -68,7 +68,7 @@ const ProductCard = ({
             >
               {ratingValue} / {ratingMax}
             </span>
-          </p>
+          </Text>
         ) : null}
         <CommercePrice
           price={item.price}
@@ -141,9 +141,9 @@ const ProductCarousel = ({
     >
       <div aria-live="polite" aria-atomic="true">
         <ProductCard item={item} locale={locale} variant={variant} />
-        <p className="puzzle-product-grid__position">
+        <Text as="p" className="puzzle-product-grid__position">
           {activeIndex + 1} of {items.length}
-        </p>
+        </Text>
       </div>
       <div className="puzzle-product-grid__carousel-controls">
         <button
@@ -204,7 +204,7 @@ const ProductGridSection = <C extends ElementType = "section">({
         <div className="puzzle-product-grid__groups">
           {groups.map(([group, groupItems]) => (
             <section key={group}>
-              <h3>{group}</h3>
+              <Heading level="headline3" as="h3">{group}</Heading>
               <ProductList
                 items={groupItems}
                 locale={locale}

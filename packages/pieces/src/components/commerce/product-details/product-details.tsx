@@ -1,4 +1,4 @@
-import { Accordion, Badge, Tabs } from "@puzzle-ui/ui";
+import { Accordion, Badge, Tabs, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   MarketingSection,
@@ -170,14 +170,14 @@ const ProductDetailsContent = ({
           ))}
         </div>
       ) : null}
-      <h3>{product.name}</h3>
+      <Heading level="headline3" as="h3">{product.name}</Heading>
       {product.rating ? (
-        <p className="puzzle-product-details__rating">
+        <Text as="p" className="puzzle-product-details__rating">
           Rated {formatRating(product.rating, locale)} out of {product.rating.max ?? 5}
           {product.rating.count === undefined
             ? ""
             : ` by ${product.rating.count} reviews`}
-        </p>
+        </Text>
       ) : null}
       {product.availability != null ? (
         <div className="puzzle-product-details__availability">

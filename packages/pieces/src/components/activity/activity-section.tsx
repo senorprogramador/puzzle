@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { Card, CardContent } from "@puzzle-ui/ui";
+import { Card, CardContent, Heading, Text } from "@puzzle-ui/ui";
 import { EmptyStatePanel } from "../data-display/empty-state-panel";
 
 import "./activity-section.css";
@@ -27,19 +27,19 @@ const ActivityItemContent = ({ item }: { item: ActivityItem }) => {
         </span>
       ) : null}
       {item.actor || action ? (
-        <p className="puzzle-activity-section__summary">
+        <Text as="p" className="puzzle-activity-section__summary">
           {item.actor ? (
             <span className="puzzle-activity-section__actor">{item.actor}</span>
           ) : null}
           {action ? (
             <span className="puzzle-activity-section__action">{action}</span>
           ) : null}
-        </p>
+        </Text>
       ) : null}
       {item.description && item.action ? (
-        <p className="puzzle-activity-section__description">
+        <Text as="p" className="puzzle-activity-section__description">
           {item.description}
-        </p>
+        </Text>
       ) : null}
       <time
         className="puzzle-activity-section__time"
@@ -140,9 +140,9 @@ export const ActivitySection = ({
       aria-labelledby={titleId}
     >
       <header className="puzzle-activity-section__header">
-        <h2 id={titleId} className="puzzle-activity-section__title">
+        <Heading level="headline2" as="h2" id={titleId} className="puzzle-activity-section__title">
           {title}
-        </h2>
+        </Heading>
         {actions ? (
           <div className="puzzle-activity-section__actions">{actions}</div>
         ) : null}
@@ -157,9 +157,9 @@ export const ActivitySection = ({
                 key={groupId}
                 aria-label={typeof group.label === "string" ? group.label : undefined}
               >
-                <h3 className="puzzle-activity-section__group-title">
+                <Heading level="headline3" as="h3" className="puzzle-activity-section__group-title">
                   {group.label}
-                </h3>
+                </Heading>
                 <ActivityList
                   items={group.items}
                   variant={variant}

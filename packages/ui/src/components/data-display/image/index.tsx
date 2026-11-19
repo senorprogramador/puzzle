@@ -83,6 +83,18 @@ const Image = ({
 
   const resolvedWidth = width ?? sourceDimensions?.width;
   const resolvedHeight = height ?? sourceDimensions?.height;
+  const resolvedAspectRatio =
+    aspectRatio ??
+    (!fill &&
+    resolvedWidth !== undefined &&
+    resolvedHeight !== undefined &&
+    resolvedWidth > 0 &&
+    resolvedHeight > 0
+      ? `${resolvedWidth} / ${resolvedHeight}`
+      : undefined);
+  const resolvedLoading = loading ?? (preload ? "eager" : undefined);
+  const resolvedFetchPriority =
+    fetchPriority ?? (preload ? "high" : undefined);
 
   const resolvedBlurDataURL = blurDataURL ?? getImageBlurDataURL(activeSource);
 
@@ -152,7 +164,7 @@ const Image = ({
     preloadImage(sourceUrl, {
       as: "image",
       crossOrigin,
-      fetchPriority: fetchPriority ?? "high",
+      fetchPriority: resolvedFetchPriority ?? "high",
       imageSrcSet: srcSet,
       imageSizes: sizes,
       referrerPolicy,
@@ -178,10 +190,10 @@ const Image = ({
   };
 
   const wrapperStyle: CSSProperties = {
-    ...(aspectRatio
+    ...(resolvedAspectRatio
       ? {
-          aspectRatio,
-          width: "100%",
+          aspectRatio: resolvedAspectRatio,
+          width: aspectRatio ? "100%" : resolvedWidth,
         }
       : {}),
     ...(fill
@@ -224,8 +236,8 @@ const Image = ({
     alt,
     width: resolvedWidth,
     height: resolvedHeight,
-    loading,
-    fetchPriority,
+    loading: resolvedLoading,
+    fetchPriority: resolvedFetchPriority,
     decoding,
     crossOrigin,
     referrerPolicy,

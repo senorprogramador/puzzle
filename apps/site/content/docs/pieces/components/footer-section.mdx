@@ -12,6 +12,10 @@ import {
 
 `FooterSection` renders the site-wide semantic `<footer>` landmark and caller-provided navigation and content. Routing, newsletter delivery, and legal destinations remain application-owned.
 
+The footer background fills the available width while its content stays centered
+within the configured container width. Default variants use the active theme's
+background token; the `dark` variant keeps its inverse semantic colors.
+
 ## Basic usage
 
 Group links by destination. Give each group and link a stable ID; labels and URLs are plain caller data.

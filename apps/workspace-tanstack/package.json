@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "start": "node .output/server/index.mjs",
     "typecheck": "tsc --noEmit -p .",
+    "test:rendering": "node --test tests/rendering.test.mjs",
     "fonts:download": "puzzle-theme fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
     "db:setup": "node scripts/setup-mongodb.mjs",
     "db:seed": "WORKSPACE_DEMO_RESET=yes bun ../../packages/workspace/scripts/seed.ts"

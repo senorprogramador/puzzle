@@ -21,6 +21,8 @@
     "test:all": "bun run build && bun run --filter '!@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser && bun run --filter '@puzzle-ui/pieces' test:browser && bun run --filter '@puzzle-ui/storage-mongodb' vitest",
     "benchmark:auth": "bun run build && node scripts/benchmark-auth.mjs",
     "benchmark:seo": "bun run build && bun run packages/seo/scripts/benchmark.ts",
+    "benchmark:rendering": "bun run build && bun run --filter workspace-next build && bun run --filter workspace-tanstack build && node scripts/benchmark-rendering.mjs",
+    "benchmark:rendering:smoke": "bun run build && bun run --filter workspace-next build && bun run --filter workspace-tanstack build && node scripts/benchmark-rendering.mjs --smoke",
     "storybook": "bun run --filter './apps/playground' storybook",
     "release": "node scripts/release.mjs",
     "release:dry-run": "node scripts/release.mjs --dry-run",

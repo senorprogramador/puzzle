@@ -1,4 +1,4 @@
-import { ProfileCard } from "@puzzle-ui/ui";
+import { ProfileCard, Heading } from "@puzzle-ui/ui";
 import { useId, type ElementType } from "react";
 import {
   MarketingSection,
@@ -60,7 +60,7 @@ const renderDepartments = (
           key={department.id}
           aria-labelledby={`${idPrefix}-department-${index}`}
         >
-          <h3 id={`${idPrefix}-department-${index}`}>{department.name}</h3>
+          <Heading level="headline3" as="h3" id={`${idPrefix}-department-${index}`}>{department.name}</Heading>
           {renderMemberList(
             department.members,
             "puzzle-team-section__members",

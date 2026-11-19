@@ -1,4 +1,13 @@
-import { Badge, Card } from "@puzzle-ui/ui";
+import {
+  Badge,
+  Card,
+  Heading,
+  Text,
+  Slider,
+  RadioGroup,
+  Radio,
+  Label,
+} from "@puzzle-ui/ui";
 import type { ElementType, ReactNode } from "react";
 import { useId, useState } from "react";
 import {
@@ -151,13 +160,13 @@ const PriceDisplay = ({
             {price.originalAmount}
           </del>
         ) : null}
-        <p className="puzzle-pricing__amount">
+        <Text as="p" className="puzzle-pricing__amount">
           {price.currency}
           <strong>{price.amount}</strong>
           {price.interval ? (
             <span className="puzzle-pricing__interval">{price.interval}</span>
           ) : null}
-        </p>
+        </Text>
         {price.discount != null ? (
           <Badge content={price.discount} className="puzzle-pricing__discount" />
         ) : null}
@@ -185,9 +194,9 @@ const PricingPlanCard = ({
     {plan.badge != null ? (
       <Badge content={plan.badge} className="puzzle-pricing__badge" />
     ) : null}
-    <h3>{plan.name}</h3>
+    <Heading level="headline3" as="h3">{plan.name}</Heading>
     {plan.description ? (
-      <p className="puzzle-pricing__description">{plan.description}</p>
+      <Text as="p" className="puzzle-pricing__description">{plan.description}</Text>
     ) : null}
     <PriceDisplay plan={plan} price={price} />
     {plan.usage != null ? (
@@ -311,15 +320,14 @@ const PricingCalculatorControl = ({
       className="puzzle-pricing__calculator"
       data-layout={variant}
     >
-      <label htmlFor={inputId}>{calculator.label}</label>
-      <input
+      <Label htmlFor={inputId}>{calculator.label}</Label>
+      <Slider
         id={inputId}
-        type="range"
         min={calculator.min}
         max={calculator.max}
         step={calculator.step ?? 1}
         value={value}
-        onChange={(event) => onChange(Number(event.currentTarget.value))}
+        onChange={onChange}
       />
       <output htmlFor={inputId}>
         {formattedValue}
@@ -400,31 +408,30 @@ const PricingSection = <C extends ElementType = "section">({
       variant={variant}
     >
       {billingIntervals.length > 1 ? (
-        <fieldset className="puzzle-pricing__billing">
-          <legend>Billing interval</legend>
+        <RadioGroup
+          className="puzzle-pricing__billing"
+          label="Billing interval"
+          name={billingGroupId}
+          orientation="horizontal"
+          value={selectedInterval}
+          onValueChange={(intervalId) => {
+            if (billingInterval === undefined) {
+              setUncontrolledInterval(intervalId);
+            }
+            onBillingIntervalChange?.(intervalId);
+          }}
+        >
           {billingIntervals.map((interval) => (
-            <label key={interval.id}>
-              <input
-                type="radio"
-                name={billingGroupId}
-                value={interval.id}
-                checked={selectedInterval === interval.id}
-                onChange={() => {
-                  if (billingInterval === undefined) {
-                    setUncontrolledInterval(interval.id);
-                  }
-                  onBillingIntervalChange?.(interval.id);
-                }}
-              />
+            <Radio key={interval.id} value={interval.id}>
               {interval.label}
-            </label>
+            </Radio>
           ))}
-        </fieldset>
+        </RadioGroup>
       ) : null}
       {billingIntervals.length === 1 ? (
-        <p className="puzzle-pricing__single-interval">
+        <Text as="p" className="puzzle-pricing__single-interval">
           {billingIntervals[0]?.label}
-        </p>
+        </Text>
       ) : null}
       {calculator && (variant === "slider" || variant === "calculator") ? (
         <PricingCalculatorControl
@@ -443,7 +450,7 @@ const PricingSection = <C extends ElementType = "section">({
         <div className="puzzle-pricing__comparison">
           {plans.map((plan) => (
             <section key={plan.id}>
-              <h3>{plan.name}</h3>
+              <Heading level="headline3" as="h3">{plan.name}</Heading>
               <PriceDisplay plan={plan} price={getPrice(plan)} />
               {plan.features?.length ? (
                 <ul className="puzzle-pricing__features">

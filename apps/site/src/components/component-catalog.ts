@@ -447,6 +447,12 @@ export const components = [
     description: "Present runnable component examples alongside their code.",
   },
   {
+    name: "Rendering Strategies",
+    href: "/docs/ui/utilities/rendering",
+    icon: "lucide:layers",
+    description: "Preserve SSR, defer client loading, or render static content.",
+  },
+  {
     name: "Scroll Lock",
     href: "/docs/ui/utilities/scroll-lock",
     icon: "lucide:lock",

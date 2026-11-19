@@ -20,7 +20,7 @@ export const Section = <C extends ElementType = "section">({
   ...props
 }: SectionProps<C>) => {
   const Component = as ?? "section";
-  const constrainContent = theme !== "default" && !fullWidth;
+  const constrainContent = !fullWidth;
   const content = (
     <>
       {children}
@@ -33,11 +33,6 @@ export const Section = <C extends ElementType = "section">({
       {...props}
       className={cn(
         "puzzle-section",
-        !fullWidth &&
-          !constrainContent && [
-            "puzzle-container",
-            getContainerPresetClass("container"),
-          ],
         compactTop && "puzzle-section--compact-top",
         compactBottom && "puzzle-section--compact-bottom",
         noPadding && "puzzle-section--no-padding",

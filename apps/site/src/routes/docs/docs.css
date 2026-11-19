@@ -25,3 +25,10 @@
     --color-fd-ring: var(--puzzle-color-ring);
     --font-sans: var(--puzzle-font-family-body);
 }
+
+.prose > .puzzle-button,
+.prose > .puzzle-link,
+.prose > .puzzle-stack {
+    margin-top: var(--puzzle-space-4, 1rem);
+    margin-bottom: var(--puzzle-space-4, 1rem);
+}

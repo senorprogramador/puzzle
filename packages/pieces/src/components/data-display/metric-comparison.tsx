@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import { useId, type ReactNode } from "react";
 
 import "./data-display.css";
@@ -30,11 +31,11 @@ export const MetricComparison = ({
         .join(" ")}
       aria-labelledby={titleId}
     >
-      <h2 id={titleId} className="puzzle-metric-comparison__title">
+      <Heading level="headline2" as="h2" id={titleId} className="puzzle-metric-comparison__title">
         {title}
-      </h2>
+      </Heading>
       {description && (
-        <p className="puzzle-metric-comparison__description">{description}</p>
+        <Text as="p" className="puzzle-metric-comparison__description">{description}</Text>
       )}
       <dl className="puzzle-metric-comparison__values">
         <div className="puzzle-metric-comparison__value" data-primary="true">

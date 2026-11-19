@@ -275,7 +275,7 @@
   grid-column: 1;
 }
 
-.puzzle-pricing[data-variant="slider"] .puzzle-pricing__calculator input {
+.puzzle-pricing[data-variant="slider"] .puzzle-pricing__calculator .puzzle-slider {
   grid-column: 2;
   grid-row: 1;
 }

@@ -26,6 +26,7 @@ export type {
   ThemeTypographyRoleTokens,
   ThemeTypographyFontRole,
   ColorTheme,
+  ColorThemes,
 } from "./types";
 
 export type {

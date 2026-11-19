@@ -9,66 +9,64 @@ import {
   getCanonicalUrl,
 } from "@/lib/seo";
 import { ecosystem } from "@/lib/homepage";
-import { Theme, ThemeMode } from "@puzzle-ui/theme";
+import { Theme, type ThemeMode } from "@puzzle-ui/theme";
 import {
-  Button,
   Badge,
+  Button,
   Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  Switch,
   Checkbox,
-  TextInput,
-  PageLayout,
-  SectionStack,
-  Section,
+  Heading,
   Link,
   Stack,
+  Switch,
   Text,
-  Heading,
-  Grid,
+  TextInput,
 } from "@puzzle-ui/ui";
-import "./home.css";
-import { Header } from "@/components/layout/header";
+import {
+  BenefitsSection,
+  CodeShowcaseSection,
+  CTASection,
+  FeaturesSection,
+  FooterSection,
+  Hero,
+  HowItWorksSection,
+  IntegrationsSection,
+  ProductShowcaseSection,
+  StatsSection,
+  UseCasesSection,
+  FAQSection,
+} from "@puzzle-ui/pieces";
+import { Schema } from "@puzzle-ui/seo";
 import { useEffect, useRef, useState, type ComponentType } from "react";
+
 import {
   type componentPanels,
   randomComponentsOfLength,
 } from "@/components/component-catalog";
-import { Schema } from "@puzzle-ui/seo";
 
-const features = [
-  {
-    number: "01",
-    title: "Designed to compose",
-    icon: "hugeicons:infinity-circle",
-    description:
-      "Build interfaces from small, predictable building blocks. Compose complex experiences without fighting the framework.",
-  },
-  {
-    number: "02",
-    title: "Accessibility informed",
-    icon: "hugeicons:universal-access-circle",
-    description:
-      "Semantic markup, keyboard navigation, focus management, and screen reader behavior are considered in the component design.",
-  },
-  {
-    number: "03",
-    title: "Developer experience",
-    icon: "griddy-icons:code-circle",
-    description:
-      "TypeScript-first APIs, predictable behavior and a consistent design system make development enjoyable.",
-  },
-];
+import { Header } from "@/components/layout/header";
+import "./home.css";
 
-const codeExample = `import { Button, Card, Heading, Text } from "@puzzle-ui/ui";
+type ComponentPanels = typeof componentPanels;
+
+const codeExample = `import {
+  Button,
+  Card,
+  Heading,
+  Text,
+} from "@puzzle-ui/ui";
 
 export function Welcome() {
   return (
     <Card>
-      <Heading level="headline2">Welcome to Puzzle</Heading>
-      <Text>Build something wonderful.</Text>
+      <Heading level="headline2">
+        Welcome to Puzzle
+      </Heading>
+
+      <Text>
+        Build something wonderful.
+      </Text>
+
       <Button variant="primary">
         Get started
       </Button>
@@ -108,11 +106,29 @@ const CodeIcon = () => (
   </svg>
 );
 
-type ComponentPreviewProps = {
-  onToggleTheme: () => void;
-};
+const PuzzleLogo = ({
+  size = 36,
+  className,
+}: {
+  size?: number;
+  className?: string;
+}) => (
+  <img
+    src="/favicon.svg"
+    width={size}
+    height={size}
+    alt="Puzzle UI"
+    className={className}
+  />
+);
 
-const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
+/**
+ * A small interactive showcase of actual Puzzle UI components.
+ *
+ * This remains a custom component because the interactive behavior is
+ * specific to the Puzzle homepage rather than a generic marketing section.
+ */
+const ComponentPreview = ({ onToggleTheme }: { onToggleTheme: () => void }) => (
   <div className="home-preview">
     <div className="home-preview__topbar">
       <div className="home-preview__dots">
@@ -120,15 +136,19 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
         <span />
         <span />
       </div>
+
       <span>puzzle / playground</span>
+
       <Badge color="secondary" content="Interactive" />
     </div>
 
     <div className="home-preview__content">
       <Stack direction="col" alignH="start" gap="sm">
         <Badge color="secondary" content="Component showcase" />
+
         <Stack direction="col" alignH="start" gap="0">
           <Heading level="headline3">Everything in its place.</Heading>
+
           <Text>A glimpse into what you can build.</Text>
         </Stack>
       </Stack>
@@ -148,9 +168,11 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
           <Button variant="primary" href="/docs/getting-started">
             Get started
           </Button>
+
           <Button variant="secondary" href="/docs/ui">
             Explore
           </Button>
+
           <Button variant="outline" href="/docs/getting-started">
             Documentation
           </Button>
@@ -171,6 +193,7 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
               </strong>
               <span>Use dark appearance</span>
             </div>
+
             <Switch
               id="home-dark-mode"
               defaultChecked
@@ -185,6 +208,7 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
               </strong>
               <span>Receive updates</span>
             </div>
+
             <Switch id="home-notifications" />
           </div>
         </Card>
@@ -199,9 +223,11 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
             <Checkbox defaultChecked>
               <span>Build components</span>
             </Checkbox>
+
             <Checkbox defaultChecked>
               <span>Write documentation</span>
             </Checkbox>
+
             <Checkbox defaultChecked>
               <span>Ship your product</span>
             </Checkbox>
@@ -214,12 +240,14 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
           <span>Project settings</span>
           <Badge color="secondary" content="Input" />
         </div>
+
         <label
           className="home-preview__input-label"
           htmlFor="home-project-name"
         >
           Project name
         </label>
+
         <TextInput
           id="home-project-name"
           placeholder="My awesome project"
@@ -232,106 +260,45 @@ const ComponentPreview = ({ onToggleTheme }: ComponentPreviewProps) => (
           <span className="home-preview__status" />
           Interactive example
         </span>
+
         <span>Built with Puzzle</span>
       </div>
     </div>
   </div>
 );
 
-const PuzzleLogo = ({
-  size = 36,
-  className = "",
-}: {
-  size?: number;
-  className?: string;
-}) => (
-  <img
-    src="/favicon.svg"
-    width={size}
-    height={size}
-    alt="Logo"
-    className={className}
-  />
-);
-
-type ComponentPanels = typeof componentPanels;
-
-const FeatureCards = () => {
-  const firstIconRef = useRef<HTMLDivElement>(null);
-  const [Icon, setIcon] = useState<typeof import("@puzzle-ui/icons").Icon | null>(null);
-
-  useEffect(() => {
-    const target = firstIconRef.current;
-    if (!target) return;
-
-    let active = true;
-    const load = () => {
-      void import("@puzzle-ui/icons")
-        .then((module) => {
-          if (active) setIcon(() => module.Icon);
-        })
-        .catch((error: unknown) => {
-          console.error("Failed to load the home feature icons:", error);
-        });
-    };
-
-    if (!("IntersectionObserver" in window)) {
-      load();
-      return () => { active = false; };
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        observer.disconnect();
-        load();
-      }
-    }, { rootMargin: "600px" });
-    observer.observe(target);
-    return () => {
-      active = false;
-      observer.disconnect();
-    };
-  }, []);
-
-  return (
-    <Stack direction={{ mobile: "col", tablet: "row" }} wrap="nowrap" gap="md">
-      {features.map((feature, index) => (
-        <Card key={feature.number}>
-          <div
-            ref={index === 0 ? firstIconRef : undefined}
-            className="home-feature-card__icon"
-          >
-            {Icon ? (
-              <Icon name={feature.icon} size={32} aria-hidden="true" />
-            ) : (
-              <svg width="32" height="32" aria-hidden="true" />
-            )}
-          </div>
-          <Heading level="headline3" as="h3">
-            {feature.title}
-          </Heading>
-          <Text>{feature.description}</Text>
-        </Card>
-      ))}
-    </Stack>
-  );
-};
-
+/**
+ * The carousel is loaded only when it approaches the viewport.
+ *
+ * The static fallback is intentionally kept in the initial render:
+ * users and search engines can see useful component links without
+ * waiting for the interactive carousel bundle.
+ */
 const DeferredComponentCarousel = ({ panels }: { panels: ComponentPanels }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const loadedRef = useRef<ComponentType<{ panels: ComponentPanels }> | null>(null);
-  const [Carousel, setCarousel] = useState<ComponentType<{ panels: ComponentPanels }> | null>(null);
+
+  const loadedRef = useRef<ComponentType<{ panels: ComponentPanels }> | null>(
+    null,
+  );
+
+  const [Carousel, setCarousel] = useState<ComponentType<{
+    panels: ComponentPanels;
+  }> | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
+
     if (!container) return;
 
     let active = true;
+
     const load = () => {
       void import("@/components/home-component-carousel")
         .then(({ HomeComponentCarousel }) => {
           if (!active) return;
+
           loadedRef.current = HomeComponentCarousel;
+
           if (!container.contains(document.activeElement)) {
             setCarousel(() => HomeComponentCarousel);
           }
@@ -343,15 +310,22 @@ const DeferredComponentCarousel = ({ panels }: { panels: ComponentPanels }) => {
 
     if (!("IntersectionObserver" in window)) {
       load();
-      return () => { active = false; };
+
+      return () => {
+        active = false;
+      };
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        observer.disconnect();
-        load();
-      }
-    }, { rootMargin: "600px" });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          observer.disconnect();
+          load();
+        }
+      },
+      { rootMargin: "600px" },
+    );
+
     observer.observe(container);
 
     return () => {
@@ -365,7 +339,10 @@ const DeferredComponentCarousel = ({ panels }: { panels: ComponentPanels }) => {
       ref={containerRef}
       className="home-component-carousel-container"
       onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget) && loadedRef.current) {
+        if (
+          !event.currentTarget.contains(event.relatedTarget) &&
+          loadedRef.current
+        ) {
           setCarousel(() => loadedRef.current);
         }
       }}
@@ -390,13 +367,20 @@ const DeferredComponentCarousel = ({ panels }: { panels: ComponentPanels }) => {
                   href={component.href}
                   key={component.href}
                 >
-                  <span className="home-component-card__icon" aria-hidden="true">
+                  <span
+                    className="home-component-card__icon"
+                    aria-hidden="true"
+                  >
                     <svg />
                   </span>
-                  <CardHeader>
-                    <CardTitle>{component.name}</CardTitle>
-                    <CardDescription>{component.description}</CardDescription>
-                  </CardHeader>
+
+                  <div>
+                    <Heading level="headline3" as="h3">
+                      {component.name}
+                    </Heading>
+
+                    <Text>{component.description}</Text>
+                  </div>
                 </Card>
               ))}
             </Stack>
@@ -409,7 +393,13 @@ const DeferredComponentCarousel = ({ panels }: { panels: ComponentPanels }) => {
 
 const Home = () => {
   const panels = Route.useLoaderData();
+
   const [theme, setTheme] = useState<ThemeMode>("dark");
+
+  const toggleTheme = () => {
+    setTheme((current) => (current === "dark" ? "light" : "dark"));
+  };
+
   return (
     <Theme theme={theme} scope="local">
       <Schema
@@ -431,323 +421,578 @@ const Home = () => {
           },
         }}
       />
-      <PageLayout>
-        <PageLayout.Header className="puzzle-site-header">
-          <Header />
-        </PageLayout.Header>
-        <PageLayout.Main>
-          <SectionStack>
-            <Section>
-              <div className="home-hero__background" />
+
+      <div className="home-page">
+        <Header />
+
+        <main>
+          {/* 1. HERO */}
+
+          <Hero
+            id="home"
+            className="home-hero"
+            layout="split"
+            mediaPosition="right"
+            alignment="start"
+            height="large"
+            theme="light"
+            contentWidth="wide"
+            eyebrow="A modern React design system"
+            title={
+              <>
+                A TypeScript-first
+                <br />
+                <span>React design system.</span>
+              </>
+            }
+            description="Build accessible React interfaces with a carefully designed component system. Compose predictable building blocks, establish a consistent visual language and focus on creating great products."
+            actions={
+              <>
+                <Button variant="primary" href="/docs/getting-started">
+                  Start building <ArrowIcon />
+                </Button>
+
+                <Button variant="outline" href="/docs/ui">
+                  <CodeIcon />
+                  Explore components
+                </Button>
+              </>
+            }
+            media={
+              <div className="home-hero__visual">
+                <ComponentPreview onToggleTheme={toggleTheme} />
+              </div>
+            }
+            meta={
               <Stack
-                className="home-hero__stack"
-                direction={{ mobile: "col", desktop: "row" }}
-                alignV="center"
-                alignH={{ mobile: "stretch", desktop: "evenly" }}
-                gap="xl"
-              >
-                <Stack
-                  className="home-hero__content"
-                  direction="col"
-                  alignH="start"
-                  alignV="center"
-                >
-                  <Stack direction="col" alignV="center" alignH="start">
-                    <Heading level="headline1" as="h1">
-                      A TypeScript-first
-                      <br />
-                      <span>React design system.</span>
-                    </Heading>
-
-                    <Text className="home-hero__description">
-                      Build accessible React interfaces with a TypeScript-first
-                      component system, or explore a broader ecosystem of
-                      developer packages designed to work together where useful.
-                    </Text>
-                  </Stack>
-                  <Stack
-                    className="home-hero__actions"
-                    direction="row"
-                    alignH="center"
-                    wrap="wrap"
-                  >
-                    <Button variant="primary" href="/docs/getting-started">
-                      Start building <ArrowIcon />
-                    </Button>
-
-                    <Button variant="outline" href="/docs/ui">
-                      <CodeIcon /> Explore components
-                    </Button>
-                  </Stack>
-
-                  <Stack
-                    className="home-hero__meta"
-                    direction="row"
-                    alignH="center"
-                    wrap="wrap"
-                  >
-                    <span>
-                      <span className="home-hero__check">✓</span>
-                      TypeScript first
-                    </span>
-                    <span>
-                      <span className="home-hero__check">✓</span>
-                      Accessibility informed
-                    </span>
-                    <span>
-                      <span className="home-hero__check">✓</span>
-                      Open source
-                    </span>
-                  </Stack>
-                </Stack>
-
-                <div className="home-hero__visual">
-                  <div className="home-hero__visual-glow" />
-                  <ComponentPreview
-                    onToggleTheme={() =>
-                      setTheme(theme === "dark" ? "light" : "dark")
-                    }
-                  />
-                  <div className="home-hero__floating home-hero__floating--top">
-                    <span className="home-floating-icon">✳</span>
-                    <div>
-                      <strong>Thoughtful by design</strong>
-                      <span>Every detail matters.</span>
-                    </div>
-                  </div>
-                  <div className="home-hero__floating home-hero__floating--bottom">
-                    <span className="home-floating-check">✓</span>
-                    <div>
-                      <strong>Accessibility in focus</strong>
-                      <span>Semantics, labels, focus, and keyboard use.</span>
-                    </div>
-                  </div>
-                </div>
-              </Stack>
-            </Section>
-
-            <Section theme="dark">
-              <Stack
-                direction={{ mobile: "col", tablet: "row" }}
-                alignH="center"
+                direction="row"
                 alignV="center"
                 wrap="wrap"
                 gap="md"
+                className="home-hero__meta"
               >
-                <span>ONE DESIGN SYSTEM</span>
-                <span className="home-strip__line" />
-                <span>ENDLESS POSSIBILITIES</span>
-                <span className="home-strip__line" />
                 <span>
-                  REACT DESIGN SYSTEM | SHARED TOKENS | DEVELOPER TOOLS
+                  <span className="home-hero__check">✓</span>
+                  TypeScript first
+                </span>
+
+                <span>
+                  <span className="home-hero__check">✓</span>
+                  Accessibility informed
+                </span>
+
+                <span>
+                  <span className="home-hero__check">✓</span>
+                  Open source
                 </span>
               </Stack>
-            </Section>
+            }
+          />
 
-            <Section id="features" className="home-below-fold">
-              <Stack direction="col" alignH="center" alignV="center" gap="xl">
-                <Stack direction="col" alignH="start" alignV="center">
-                  <Badge color="secondary" content="Why Puzzle" />
-                  <Heading level="headline1" as="h2">
-                    Less boilerplate.
-                    <br />
-                    <span>More building.</span>
-                  </Heading>
-                  <Text className="home-hero__description">
-                    The foundations of a great interface, thoughtfully
-                    implemented so you can focus on creating great products.
-                  </Text>
-                </Stack>
+          {/* 2. PROJECT CHARACTERISTICS */}
 
-                <FeatureCards />
-              </Stack>
-            </Section>
+          <StatsSection
+            id="highlights"
+            className="home-below-fold"
+            variant="inline"
+            theme="dark"
+            items={[
+              {
+                id: "react",
+                value: "React",
+                label: "Built for",
+                description: "Modern React applications",
+              },
+              {
+                id: "typescript",
+                value: "TypeScript",
+                label: "Designed with",
+                description: "Typed, predictable APIs",
+              },
+              {
+                id: "opensource",
+                value: "MIT",
+                label: "Licensed under",
+                description: "Open-source ecosystem",
+              },
+              {
+                id: "composable",
+                value: "Composable",
+                label: "Built around",
+                description: "Reusable building blocks",
+              },
+            ]}
+          />
 
-            <Section theme="dark" id="components" className="home-below-fold">
-              <Stack
-                direction="col"
-                alignH="center"
-                alignV={{ mobile: "center", desktop: "center" }}
-                gap="xl"
-              >
-                <Stack direction="col" alignH="start" alignV="start">
-                  <Badge color="secondary" content="The building blocks" />
-                  <Heading level="headline1" as="h2">
-                    Everything you need.
-                    <br />
-                    <span>Nothing you don't.</span>
-                  </Heading>
-                  <Text className="home-hero__description">
-                    A growing collection of carefully designed components. Each
-                    one built to work together as part of a consistent design
-                    system.
-                  </Text>
-                  <Button
-                    variant="outline"
-                    href="/docs/ui"
-                    className="home-text-link"
-                  >
-                    Explore all components <ArrowIcon />
+          {/* 3. FEATURES */}
+
+          <FeaturesSection
+            id="features"
+            className="home-below-fold"
+            variant="bento"
+            eyebrow="Why Puzzle"
+            title={
+              <>
+                Less boilerplate.
+                <br />
+                <span>More building.</span>
+              </>
+            }
+            description="The foundations of a great interface, thoughtfully implemented so you can focus on creating great products."
+            items={[
+              {
+                id: "composition",
+                title: "Designed to compose",
+                description:
+                  "Build interfaces from small, predictable building blocks. Compose complex experiences without fighting the framework.",
+                featured: true,
+              },
+              {
+                id: "accessibility",
+                title: "Accessibility informed",
+                description:
+                  "Semantic markup, keyboard navigation, focus management and screen reader behavior are considered in the component design.",
+              },
+              {
+                id: "developer-experience",
+                title: "Developer experience",
+                description:
+                  "TypeScript-first APIs, predictable behavior and a consistent design system make development enjoyable.",
+              },
+              {
+                id: "customizable",
+                title: "Flexible by design",
+                description:
+                  "Use the pieces you need, customize the visual language and compose components around your own product requirements.",
+              },
+            ]}
+          />
+
+          {/* 4. COMPONENT LIBRARY SHOWCASE */}
+
+          <ProductShowcaseSection
+            id="components"
+            className="home-below-fold"
+            theme="dark"
+            variant="split"
+            eyebrow="The building blocks"
+            title={
+              <>
+                Everything you need.
+                <br />
+                <span>Nothing you don't.</span>
+              </>
+            }
+            description="Explore a growing collection of carefully designed components. Each one is built to work together as part of a consistent design system."
+            alignment="start"
+            actions={
+              <Button variant="outline" href="/docs/ui">
+                Explore all components <ArrowIcon />
+              </Button>
+            }
+            items={[
+              {
+                id: "component-library",
+                title: "A component for every interaction",
+                description:
+                  "From buttons and forms to navigation, overlays, layout and typography. Discover reusable components with a consistent API.",
+                media: <DeferredComponentCarousel panels={panels} />,
+                caption: "Explore the Puzzle UI component library",
+              },
+            ]}
+          />
+
+          {/* 5. REUSABLE PAGE SECTIONS */}
+
+          <FeaturesSection
+            id="pieces-showcase"
+            className="home-below-fold"
+            variant="bento"
+            eyebrow="Reusable page sections"
+            title={
+              <>
+                Go beyond components.
+                <br />
+                <span>Compose the whole page.</span>
+              </>
+            }
+            description="Pieces brings responsive, theme-aware sections together into complete marketing pages, product experiences, and application layouts."
+            items={[
+              {
+                id: "marketing-pages",
+                title: "Marketing pages",
+                description:
+                  "Compose heroes, feature grids, social proof, FAQs, and calls to action into a cohesive landing page.",
+                featured: true,
+                action: (
+                  <Button variant="outline" href="/docs/pieces">
+                    Explore Pieces <ArrowIcon />
                   </Button>
-                </Stack>
+                ),
+              },
+              {
+                id: "product-experiences",
+                title: "Product experiences",
+                description:
+                  "Bring product showcases, pricing, comparisons, and customer stories into a consistent visual system.",
+              },
+              {
+                id: "application-layouts",
+                title: "Application layouts",
+                description:
+                  "Use reusable sections across content, commerce, business, and dashboard experiences.",
+              },
+            ]}
+          />
 
-                <DeferredComponentCarousel panels={panels} />
-              </Stack>
-            </Section>
+          {/* 6. HOW IT WORKS */}
 
-            <Section id="ecosystem" className="home-below-fold">
-              <Stack direction="col" alignH="center" gap="xl">
-                <Stack direction="col" alignH="start" alignV="center">
-                  <Badge color="secondary" content="The Puzzle ecosystem" />
-                  <Heading level="headline1" as="h2">
-                    More than components.
-                  </Heading>
-                  <Text className="home-hero__description">
-                    Puzzle is more than a component library. Its packages can
-                    be used independently where supported and composed as your
-                    application grows, with accessibility and developer
-                    experience at the center.
-                  </Text>
-                </Stack>
+          <HowItWorksSection
+            id="how-it-works"
+            className="home-below-fold"
+            variant="connected"
+            eyebrow="Getting started"
+            title="From installation to implementation."
+            description="Start with the foundation you need. Add more of the Puzzle ecosystem whenever your application calls for it."
+            steps={[
+              {
+                id: "install",
+                title: "Install the packages",
+                description:
+                  "Add the UI and theme packages to an existing React application, or generate a new project with the Puzzle CLI.",
+              },
+              {
+                id: "configure",
+                title: "Set up your design system",
+                description:
+                  "Configure your theme, design tokens and application-wide styling to establish a consistent foundation.",
+              },
+              {
+                id: "compose",
+                title: "Compose your interface",
+                description:
+                  "Combine accessible components and reusable pieces to build the experiences your product needs.",
+              },
+              {
+                id: "grow",
+                title: "Expand when you need to",
+                description:
+                  "Explore additional packages for icons, hooks, SEO, authentication, storage and more.",
+              },
+            ]}
+          />
 
-                <Grid columns={{ mobile: 1, tablet: 2, desktop: 2 }}>
-                  {ecosystem.map((item) => (
-                    <Card as="a" interactive href={item.href} key={item.href}>
-                      <CardHeader>
-                        <CardTitle>{item.name}</CardTitle>
-                        <CardDescription>{item.description}</CardDescription>
-                      </CardHeader>
-                    </Card>
-                  ))}
-                </Grid>
+          {/* 6. PUZZLE ECOSYSTEM */}
 
-                <Text className="home-hero__description">
-                  Component API maturity and package-specific compatibility
-                  notes are documented with each package.
-                </Text>
-              </Stack>
-            </Section>
+          <IntegrationsSection
+            id="ecosystem"
+            className="home-below-fold"
+            variant="grid"
+            eyebrow="The Puzzle ecosystem"
+            title="More than components."
+            description="A collection of focused packages designed to work together where useful. Use them independently or build on top of the wider ecosystem."
+            items={ecosystem.map((item) => ({
+              id: item.href,
+              name: item.name,
+              description: item.description,
+              href: item.href,
+              category: "Puzzle package",
+            }))}
+          />
 
-            <Section className="home-developer home-below-fold" id="developers">
-              <Stack
-                className="home-developer__layout"
-                direction={{ mobile: "col", desktop: "row" }}
-                alignV="start"
-                alignH={{ mobile: "center", desktop: "evenly" }}
-                gap="xl"
-              >
-                <Stack
-                  className="home-hero__content home-developer__content"
-                  direction="col"
-                  alignH={{ mobile: "stretch", desktop: "start" }}
-                  alignV="center"
-                >
-                  <Stack
-                    direction="col"
-                    alignV="center"
-                    alignH="start"
-                    className="desktop:max-w-105"
-                  >
-                    <Badge color="secondary" content="Made for developers" />
-                    <Heading level="display1" as="h2">
-                      Your ideas.
-                      <br />
-                      <span>Without the friction.</span>
-                    </Heading>
-                    <Text className="home-hero__description">
-                      Predictable APIs, powerful composition and a consistent
-                      design language. Puzzle gives you the building blocks to
-                      turn ideas into polished experiences.
-                    </Text>
-                  </Stack>
-                  <div className="home-developer__benefits">
-                    <div>
-                      <span>01</span>
-                      <strong>TypeScript-first</strong>
-                      <p>
-                        Excellent types and a predictable developer experience.
-                      </p>
-                    </div>
-                    <div>
-                      <span>02</span>
-                      <strong>Flexible by design</strong>
-                      <p>
-                        Customize and compose components to fit your product.
-                      </p>
-                    </div>
-                    <div>
-                      <span>03</span>
-                      <strong>Accessibility matters</strong>
-                      <p>
-                        Thoughtful interaction patterns and semantic
-                        foundations.
-                      </p>
-                    </div>
-                  </div>
-                </Stack>
-                <div className="home-code">
-                  <div className="home-code__header">
-                    <div className="home-preview__dots">
-                      <span />
-                      <span />
-                      <span />
-                    </div>
-                    <span>Welcome.tsx</span>
-                    <Badge color="secondary" content="TSX" />
-                  </div>
-                  <pre>
-                    <code>{codeExample}</code>
-                  </pre>
-                  <div className="home-code__footer">
-                    <span>Simple. Composable. Predictable.</span>
-                    <span>⌘ + C</span>
-                  </div>
-                </div>
-              </Stack>
-            </Section>
+          {/* 7. CODE EXAMPLE */}
 
-            <Section theme="dark" className="home-cta home-below-fold">
-              <Stack direction="col" alignH="center">
-                <Stack direction="col" alignV="start" alignH="center" gap="0">
-                  <PuzzleLogo size={128} className="mt-4" />
-                  <Heading level="headline1">
-                    Make something
-                    <br />
-                    <span>remarkable.</span>
-                  </Heading>
-                  <Text className="home-hero__description">
-                    Start building with Puzzle. Explore the components, create
-                    your design system and bring your ideas to life.
-                  </Text>
-                </Stack>
-                <Button variant="primary" href="/docs/getting-started">
-                  Get started with Puzzle <ArrowIcon />
-                </Button>
-              </Stack>
-            </Section>
-          </SectionStack>
-          <footer className="home-footer">
-            <Link className="home-brand" href="/">
-              <PuzzleLogo size={28} />
-              <Text as="span">puzzle-ui.com</Text>
-            </Link>
+          <CodeShowcaseSection
+            id="code-example"
+            className="home-below-fold"
+            theme="dark"
+            variant="single"
+            eyebrow="A familiar React experience"
+            title="Simple APIs. Composable interfaces."
+            description="Use Puzzle components directly in your React application. Start small and compose more complex interfaces as your product grows."
+            items={[
+              {
+                id: "welcome-component",
+                title: "A simple component",
+                filename: "Welcome.tsx",
+                language: "tsx",
+                code: codeExample,
+              },
+            ]}
+            copyable
+            showLineNumbers
+          />
 
-            <span>Made for developers who care about the details.</span>
+          {/* 8. GETTING STARTED OPTIONS */}
 
-            <div>
-              <Link href="/docs/getting-started">Documentation</Link>
-              <Link
+          <UseCasesSection
+            id="getting-started"
+            className="home-below-fold"
+            variant="persona"
+            eyebrow="Start building"
+            title={
+              <>
+                Your project.
+                <br />
+                <span>Your choice.</span>
+              </>
+            }
+            description="Whether you are starting from scratch or integrating Puzzle into an existing React application, there is a straightforward way to get started."
+            items={[
+              {
+                id: "new-project",
+                persona: "New projects",
+                title: "Create a project with Puzzle",
+                description:
+                  "Generate a new React application with the Puzzle ecosystem configured. Supports Next.js, TanStack Start and standard React with Vite.",
+                benefits: [
+                  "Choose your preferred framework",
+                  "Start with a configured project",
+                  "Add the packages you need",
+                ],
+                action: (
+                  <Button variant="primary" href="/docs/create">
+                    Explore project generator <ArrowIcon />
+                  </Button>
+                ),
+              },
+              {
+                id: "existing-project",
+                persona: "Existing projects",
+                title: "Add Puzzle to your application",
+                description:
+                  "Install the UI and theme packages independently and start using components in your existing React project.",
+                benefits: [
+                  "Install packages independently",
+                  "Keep your existing application structure",
+                  "Adopt Puzzle incrementally",
+                ],
+                action: (
+                  <Button variant="outline" href="/docs/getting-started">
+                    Read installation guide <ArrowIcon />
+                  </Button>
+                ),
+              },
+            ]}
+          />
+
+          {/* 9. BENEFITS */}
+
+          <BenefitsSection
+            id="developer-experience"
+            className="home-below-fold"
+            theme="dark"
+            variant="checklist"
+            eyebrow="Made for developers"
+            title={
+              <>
+                Your ideas.
+                <br />
+                <span>Without the friction.</span>
+              </>
+            }
+            description="Predictable APIs, powerful composition and a consistent design language. Puzzle gives you the building blocks to turn ideas into polished experiences."
+            items={[
+              {
+                id: "typescript",
+                title: "TypeScript-first",
+                description:
+                  "Excellent types and predictable APIs help you understand how components behave and how to compose them.",
+              },
+              {
+                id: "flexible",
+                title: "Flexible by design",
+                description:
+                  "Customize and compose components to fit your product instead of adapting your product to a rigid component library.",
+              },
+              {
+                id: "accessible",
+                title: "Accessibility matters",
+                description:
+                  "Thoughtful interaction patterns and semantic foundations are part of the component design process.",
+              },
+              {
+                id: "consistent",
+                title: "A consistent design language",
+                description:
+                  "Shared theme tokens and reusable building blocks help keep your application visually coherent.",
+              },
+            ]}
+          />
+
+          {/* 10. FAQ */}
+
+          <FAQSection
+            id="faq"
+            className="home-below-fold"
+            variant="accordion"
+            eyebrow="Frequently asked questions"
+            title="A few things worth knowing."
+            description="Some quick answers to help you decide whether Puzzle is right for your next project."
+            items={[
+              {
+                id: "what-is-puzzle",
+                question: "What is Puzzle?",
+                answer:
+                  "Puzzle is a TypeScript-first React design system and ecosystem of developer packages. It includes UI components, theme tools, reusable page sections and additional packages for common application needs.",
+              },
+              {
+                id: "frameworks",
+                question: "Which frameworks can I use?",
+                answer:
+                  "Puzzle is designed for React applications. The project generator supports Next.js, TanStack Start and standard React applications built with Vite. Check the documentation for package-specific framework compatibility.",
+              },
+              {
+                id: "existing-project",
+                question: "Can I use Puzzle in an existing project?",
+                answer:
+                  "Yes. You can install the packages independently and introduce Puzzle into an existing React application. You do not need to migrate your entire application at once.",
+              },
+              {
+                id: "customization",
+                question: "Can I customize the design?",
+                answer:
+                  "Yes. Puzzle includes a theme system and design tokens so you can adapt the visual language to your application.",
+              },
+              {
+                id: "opensource",
+                question: "Is Puzzle open source?",
+                answer:
+                  "Yes. The repository is publicly available on GitHub under the MIT license.",
+              },
+              {
+                id: "pieces",
+                question: "What is the Pieces package?",
+                answer:
+                  "The Pieces package contains reusable React page sections and interface compositions. It helps you build complete pages from consistent, configurable building blocks.",
+              },
+            ]}
+          />
+
+          {/* 11. FINAL CTA */}
+
+          <CTASection
+            id="start-building"
+            className="home-below-fold"
+            theme="dark"
+            variant="centered"
+            eyebrow="Build with Puzzle"
+            title={
+              <>
+                Make something
+                <br />
+                <span>remarkable.</span>
+              </>
+            }
+            description="Explore the components, create your design system and bring your ideas to life."
+            media={<PuzzleLogo size={112} />}
+            primaryAction={
+              <Button variant="primary" href="/docs/getting-started">
+                Get started with Puzzle <ArrowIcon />
+              </Button>
+            }
+            secondaryAction={
+              <Button
+                variant="outline"
                 href="https://github.com/senorprogramador/puzzle"
                 target="_blank"
                 rel="noreferrer"
               >
-                GitHub
-              </Link>
-              <span>© {new Date().getFullYear()} Puzzle UI</span>
-            </div>
-          </footer>
-        </PageLayout.Main>
-      </PageLayout>
+                View on GitHub
+              </Button>
+            }
+          />
+        </main>
+
+        {/* 12. FOOTER */}
+
+        <FooterSection
+          variant="multi-column"
+          logo={
+            <Link className="home-brand" href="/">
+              <PuzzleLogo size={32} />
+              <span>puzzle-ui.com</span>
+            </Link>
+          }
+          description="A TypeScript-first React design system for developers who care about the details."
+          navigationGroups={[
+            {
+              id: "documentation",
+              label: "Documentation",
+              links: [
+                {
+                  id: "getting-started",
+                  label: "Getting started",
+                  href: "/docs/getting-started",
+                },
+                {
+                  id: "components",
+                  label: "UI components",
+                  href: "/docs/ui",
+                },
+                {
+                  id: "pieces",
+                  label: "Pieces",
+                  href: "/docs/pieces",
+                },
+                {
+                  id: "theme",
+                  label: "Theme",
+                  href: "/docs/theme",
+                },
+              ],
+            },
+            {
+              id: "ecosystem",
+              label: "Ecosystem",
+              links: [
+                {
+                  id: "hooks",
+                  label: "Hooks",
+                  href: "/docs/hooks",
+                },
+                {
+                  id: "icons",
+                  label: "Icons",
+                  href: "/docs/icons",
+                },
+                {
+                  id: "seo",
+                  label: "SEO",
+                  href: "/docs/seo",
+                },
+                {
+                  id: "auth",
+                  label: "Authentication",
+                  href: "/docs/auth",
+                },
+                {
+                  id: "storage",
+                  label: "Storage",
+                  href: "/docs/storage",
+                },
+              ],
+            },
+            {
+              id: "resources",
+              label: "Resources",
+              links: [
+                {
+                  id: "create",
+                  label: "Project generator",
+                  href: "/docs/create",
+                },
+                {
+                  id: "github",
+                  label: "GitHub",
+                  href: "https://github.com/senorprogramador/puzzle",
+                },
+              ],
+            },
+          ]}
+          copyright={`© ${new Date().getFullYear()} Puzzle UI`}
+        />
+      </div>
     </Theme>
   );
 };

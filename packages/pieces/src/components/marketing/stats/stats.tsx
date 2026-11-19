@@ -1,5 +1,7 @@
 "use client";
 
+import { Heading, Text } from "@puzzle-ui/ui";
+
 import { useEffect, useState, type ElementType } from "react";
 import {
   MarketingSection,
@@ -62,12 +64,12 @@ const StatContent = ({
       )}
       {item.suffix}
     </div>
-    <h3>{item.label}</h3>
-    {item.description ? <p>{item.description}</p> : null}
+    <Heading level="headline3" as="h3">{item.label}</Heading>
+    {item.description ? <Text as="p">{item.description}</Text> : null}
     {item.trend ? (
-      <p className="puzzle-stats__trend" data-direction={item.trend.direction}>
+      <Text as="p" className="puzzle-stats__trend" data-direction={item.trend.direction}>
         {item.trend.label}
-      </p>
+      </Text>
     ) : null}
     {typeof item.progress === "number" ? (
       <progress

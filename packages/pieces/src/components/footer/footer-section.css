@@ -3,7 +3,7 @@
   min-width: 0;
   padding: var(--puzzle-space-4, 1rem);
   color: var(--puzzle-color-text);
-  background: var(--puzzle-color-surface);
+  background: var(--puzzle-color-background);
   border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
 }
 
@@ -44,7 +44,17 @@
 .puzzle-footer-section__group h2,
 .puzzle-footer-section__newsletter h2 {
   margin: 0;
+}
+
+.puzzle-footer-section__newsletter h2 {
   font-size: var(--puzzle-font-size-base, 1rem);
+}
+
+.puzzle-footer-section__group > .puzzle-heading.puzzle-typography-headline2,
+.puzzle-footer-section__group > .puzzle-heading.puzzle-typography-headline3 {
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .puzzle-footer-section__group ul,

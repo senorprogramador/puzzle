@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 
 import { EventSection } from "./event-section";
@@ -57,7 +58,8 @@ describe("EventSection", () => {
     expect(screen.getByText("Agency growth workshop")).toBeVisible();
   });
 
-  it("supports category filtering, event links, and empty results", () => {
+  it("supports category filtering, event links, and empty results", async () => {
+    const user = userEvent.setup();
     const { rerender } = render(
       <EventSection
         title="Upcoming events"
@@ -71,9 +73,9 @@ describe("EventSection", () => {
       "href",
       "/events/saas-summit",
     );
-    fireEvent.change(screen.getByRole("combobox", { name: "Category" }), {
-      target: { value: "Conference" },
-    });
+    screen.getByRole("combobox", { name: "Category" }).focus();
+    await user.keyboard("c");
+    await user.keyboard("{Enter}");
     expect(screen.getByText("Northstar SaaS Summit")).toBeVisible();
     expect(screen.queryByText("Product design lab")).toBeNull();
 
