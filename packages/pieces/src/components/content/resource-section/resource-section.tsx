@@ -2,7 +2,15 @@
 
 import { useCallback, type ElementType } from "react";
 import { useListFilter } from "@puzzle-ui/hooks";
-import { Badge, Card, CardContent, TextInput } from "@puzzle-ui/ui";
+import {
+  Badge,
+  Card,
+  CardContent,
+  TextInput,
+  Heading,
+  Text,
+  Select,
+} from "@puzzle-ui/ui";
 
 import {
   MarketingSection,
@@ -39,7 +47,7 @@ const ResourceCard = ({
       {resource.type ? (
         <Badge content={resource.type} color="info" />
       ) : null}
-      <h3>
+      <Heading level="headline3" as="h3">
         <a
           href={resource.href}
           download={resource.download}
@@ -47,8 +55,8 @@ const ResourceCard = ({
         >
           {resource.title}
         </a>
-      </h3>
-      {resource.description ? <p>{resource.description}</p> : null}
+      </Heading>
+      {resource.description ? <Text as="p">{resource.description}</Text> : null}
       {resource.updatedAt ? (
         <time dateTime={resource.updatedAt}>{resource.updatedAt}</time>
       ) : null}
@@ -112,22 +120,20 @@ const ResourceSection = <C extends ElementType = "section">({
             </label>
           ) : null}
           {filterable && filter.categories.length ? (
-            <label>
-              Category
-              <select
-                value={filter.selectedCategory}
-                onChange={(event) =>
-                  filter.setSelectedCategory(event.currentTarget.value)
-                }
-              >
-                <option value="">All categories</option>
-                {filter.categories.map((category) => (
-                  <option value={category} key={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <Select
+              label="Category"
+              value={filter.selectedCategory}
+              options={[
+                { value: "", label: "All categories" },
+                ...filter.categories.map((category) => ({
+                  value: category,
+                  label: category,
+                })),
+              ]}
+              onChange={(category) =>
+                filter.setSelectedCategory(category ?? "")
+              }
+            />
           ) : null}
         </div>
       ) : null}

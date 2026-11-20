@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://puzzle-ui.com/schemas/component-registry-v1.json",
+  "title": "Puzzle component registry",
+  "type": "object",
+  "required": ["schemaVersion", "packages", "components"],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "packages": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["@puzzle-ui/pieces", "@puzzle-ui/ui"]
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/component"
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "component": {
+      "type": "object",
+      "required": [
+        "name",
+        "package",
+        "entryPoints",
+        "category",
+        "description",
+        "source"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "canonicalExport", "entryPoints", "source"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "canonicalExport": {
+                "type": "string",
+                "minLength": 1
+              },
+              "entryPoints": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "documentation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "package": {
+          "enum": ["@puzzle-ui/pieces", "@puzzle-ui/ui"]
+        },
+        "entryPoints": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "category": {
+          "enum": [
+            "hero",
+            "dashboard",
+            "navigation",
+            "project",
+            "data-display",
+            "feedback",
+            "settings",
+            "activity",
+            "onboarding",
+            "footer",
+            "marketing",
+            "commerce",
+            "content",
+            "business",
+            "actions",
+            "editors",
+            "forms",
+            "layout",
+            "overlays",
+            "typography",
+            "utilities"
+          ]
+        },
+        "subcategory": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 280
+        },
+        "useCases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "marketing",
+              "dashboard",
+              "commerce",
+              "content",
+              "business",
+              "application-shell",
+              "data-entry",
+              "data-display",
+              "navigation",
+              "feedback",
+              "settings",
+              "media"
+            ]
+          }
+        },
+        "pageTypes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "landing",
+              "product",
+              "pricing",
+              "catalog",
+              "booking",
+              "blog",
+              "article",
+              "event",
+              "dashboard",
+              "workspace",
+              "settings",
+              "authentication",
+              "form",
+              "generic"
+            ]
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "responsive",
+              "interactive",
+              "keyboard-navigation",
+              "media",
+              "data-entry",
+              "data-display",
+              "navigation",
+              "overlay",
+              "composable",
+              "server-rendering",
+              "streaming"
+            ]
+          }
+        },
+        "contentRequirements": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "requiredProps": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "dataRequirements": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mediaRequirements": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "interactiveBehavior": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "variants": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": ["name", "kind", "source"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "kind": {
+                "enum": ["prop", "component", "preset"]
+              },
+              "source": {
+                "type": "string",
+                "minLength": 1
+              },
+              "prop": {
+                "type": "string",
+                "minLength": 1
+              },
+              "typeName": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "composition": {
+          "type": "object",
+          "required": ["kind"],
+          "properties": {
+            "kind": {
+              "enum": [
+                "section",
+                "primitive",
+                "compound-root",
+                "compound-part",
+                "utility"
+              ]
+            },
+            "family": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "dependencies": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": ["package"],
+            "properties": {
+              "package": {
+                "type": "string",
+                "pattern": "^(?:@[a-z0-9][a-z0-9._-]*/)?[a-z0-9][a-z0-9._-]*$"
+              },
+              "export": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "documentation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "maturity": {
+          "enum": ["stable", "beta", "experimental"]
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

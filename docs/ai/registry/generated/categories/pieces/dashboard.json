@@ -1,0 +1,364 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "DashboardActivityFeed",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "dashboard",
+      "subcategory": "dashboard",
+      "description": "Compose accessible dashboard headers, statistics, activity feeds, progress cards, and layouts with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx",
+      "source": "packages/pieces/src/components/dashboard/dashboard-activity-feed.tsx",
+      "useCases": [
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "dashboard"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "title (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "aliases": [
+        {
+          "name": "ActivityTimeline",
+          "canonicalExport": "DashboardActivityFeed",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/data-display/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx"
+        }
+      ]
+    },
+    {
+      "name": "DashboardHeader",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "dashboard",
+      "subcategory": "dashboard",
+      "description": "Compose accessible dashboard headers, statistics, activity feeds, progress cards, and layouts with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx",
+      "source": "packages/pieces/src/components/dashboard/dashboard-header.tsx",
+      "useCases": [
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "dashboard"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)",
+        "eyebrow (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DashboardOverviewSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "dashboard",
+      "subcategory": "dashboard",
+      "description": "Compose dashboard overviews, activity, onboarding, empty states, settings, and project administration screens.",
+      "documentation": "apps/site/content/docs/pieces/components/application-dashboard.mdx",
+      "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.tsx",
+      "useCases": [
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "dashboard"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)",
+        "eyebrow (optional)",
+        "children (optional)"
+      ],
+      "variants": [
+        {
+          "name": "grid",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        },
+        {
+          "name": "cards",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        },
+        {
+          "name": "metrics",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        },
+        {
+          "name": "compact",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        },
+        {
+          "name": "analytics",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        },
+        {
+          "name": "welcome",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        },
+        {
+          "name": "activity",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        },
+        {
+          "name": "full-width",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        },
+        {
+          "name": "executive",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.types.ts",
+          "prop": "variant",
+          "typeName": "DashboardOverviewSectionVariant"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DashboardProgressCard",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "dashboard",
+      "subcategory": "dashboard",
+      "description": "Compose accessible dashboard headers, statistics, activity feeds, progress cards, and layouts with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx",
+      "source": "packages/pieces/src/components/dashboard/dashboard-progress-card.tsx",
+      "useCases": [
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "dashboard"
+      },
+      "requiredProps": [
+        "title",
+        "value"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)"
+      ],
+      "aliases": [
+        {
+          "name": "ProgressOverview",
+          "canonicalExport": "DashboardProgressCard",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/data-display/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx"
+        }
+      ]
+    },
+    {
+      "name": "DashboardShell",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "dashboard",
+      "subcategory": "dashboard",
+      "description": "Compose accessible dashboard headers, statistics, activity feeds, progress cards, and layouts with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx",
+      "source": "packages/pieces/src/components/dashboard/dashboard-shell.tsx",
+      "useCases": [
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "dashboard"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "sidebarLabel (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DashboardStatCard",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "dashboard",
+      "subcategory": "dashboard",
+      "description": "Compose accessible dashboard headers, statistics, activity feeds, progress cards, and layouts with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx",
+      "source": "packages/pieces/src/components/dashboard/dashboard-stat-card.tsx",
+      "useCases": [
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "dashboard"
+      },
+      "requiredProps": [
+        "label"
+      ],
+      "contentRequirements": [
+        "label (required)",
+        "description (optional)"
+      ],
+      "aliases": [
+        {
+          "name": "StatCard",
+          "canonicalExport": "DashboardStatCard",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/data-display/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx"
+        }
+      ]
+    },
+    {
+      "name": "DashboardStatGroup",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "dashboard",
+      "subcategory": "dashboard",
+      "description": "Compose accessible dashboard headers, statistics, activity feeds, progress cards, and layouts with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx",
+      "source": "packages/pieces/src/components/dashboard/dashboard-stat-group.tsx",
+      "useCases": [
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "dashboard"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "label (optional)"
+      ],
+      "aliases": [
+        {
+          "name": "StatGroup",
+          "canonicalExport": "DashboardStatGroup",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/pieces/src/components/data-display/index.ts",
+          "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx"
+        }
+      ]
+    }
+  ]
+}

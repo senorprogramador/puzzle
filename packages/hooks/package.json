@@ -1,13 +1,15 @@
 {
   "name": "@puzzle-ui/hooks",
   "version": "0.12.0",
-  "description": "Keyboard shortcut and roving-focus hooks for React applications",
+  "description": "Reusable interaction and rendering hooks for React applications",
   "homepage": "https://puzzle-ui.com/docs/hooks",
   "keywords": [
     "puzzle-ui",
     "react",
     "typescript",
     "react-hooks",
+    "visibility",
+    "rendering",
     "keyboard-shortcuts",
     "roving-focus"
   ],

@@ -1,6 +1,6 @@
 "use client";
 
-import { Card } from "@puzzle-ui/ui";
+import { Card, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import { useState } from "react";
 import {
@@ -30,10 +30,10 @@ const CategoryCard = ({
   >
     <CommerceImageView image={item.image} label={item.title} />
     <div className="puzzle-categories__copy">
-      <h3>
+      <Heading level="headline3" as="h3">
         {item.href ? <a href={item.href}>{item.title}</a> : item.title}
-      </h3>
-      {item.description ? <p>{item.description}</p> : null}
+      </Heading>
+      {item.description ? <Text as="p">{item.description}</Text> : null}
     </div>
   </Card>
 );
@@ -78,9 +78,9 @@ const CategoryCarousel = ({
     >
       <div aria-live="polite" aria-atomic="true">
         <CategoryCard item={item} variant={variant} />
-        <p className="puzzle-categories__position">
+        <Text as="p" className="puzzle-categories__position">
           {activeIndex + 1} of {items.length}
-        </p>
+        </Text>
       </div>
       <div className="puzzle-categories__controls">
         <button

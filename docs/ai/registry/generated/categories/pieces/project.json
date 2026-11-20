@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "ProjectCard",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "project",
+      "subcategory": "project",
+      "description": "Compose generic project cards, collections, progress, member lists, and headers with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/project.mdx",
+      "source": "packages/pieces/src/components/project/project.tsx",
+      "useCases": [
+        "dashboard",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "project"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)"
+      ],
+      "dataRequirements": [
+        "members (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ProjectGrid",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "project",
+      "subcategory": "project",
+      "description": "Compose generic project cards, collections, progress, member lists, and headers with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/project.mdx",
+      "source": "packages/pieces/src/components/project/project.tsx",
+      "useCases": [
+        "dashboard",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "project"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ProjectHeader",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "project",
+      "subcategory": "project",
+      "description": "Compose generic project cards, collections, progress, member lists, and headers with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/project.mdx",
+      "source": "packages/pieces/src/components/project/project.tsx",
+      "useCases": [
+        "dashboard",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "project"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ProjectList",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "project",
+      "subcategory": "project",
+      "description": "Compose generic project cards, collections, progress, member lists, and headers with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/project.mdx",
+      "source": "packages/pieces/src/components/project/project.tsx",
+      "useCases": [
+        "dashboard",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "project"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ProjectMembers",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "project",
+      "subcategory": "project",
+      "description": "Compose generic project cards, collections, progress, member lists, and headers with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/project.mdx",
+      "source": "packages/pieces/src/components/project/project.tsx",
+      "useCases": [
+        "dashboard",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "project"
+      },
+      "requiredProps": [
+        "members"
+      ],
+      "contentRequirements": [
+        "label (optional)"
+      ],
+      "dataRequirements": [
+        "members (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ProjectProgress",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "project",
+      "subcategory": "project",
+      "description": "Compose generic project cards, collections, progress, member lists, and headers with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/project.mdx",
+      "source": "packages/pieces/src/components/project/project.tsx",
+      "useCases": [
+        "dashboard",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "project"
+      },
+      "requiredProps": [
+        "label",
+        "value"
+      ],
+      "contentRequirements": [
+        "label (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ProjectStatusBadge",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "project",
+      "subcategory": "project",
+      "description": "Compose generic project cards, collections, progress, member lists, and headers with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/project.mdx",
+      "source": "packages/pieces/src/components/project/project.tsx",
+      "useCases": [
+        "dashboard",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "project"
+      },
+      "requiredProps": [
+        "label"
+      ],
+      "contentRequirements": [
+        "label (required)"
+      ],
+      "variants": [
+        {
+          "name": "default",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/project/project.types.ts",
+          "prop": "tone",
+          "typeName": "ProjectStatusTone"
+        },
+        {
+          "name": "info",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/project/project.types.ts",
+          "prop": "tone",
+          "typeName": "ProjectStatusTone"
+        },
+        {
+          "name": "success",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/project/project.types.ts",
+          "prop": "tone",
+          "typeName": "ProjectStatusTone"
+        },
+        {
+          "name": "warning",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/project/project.types.ts",
+          "prop": "tone",
+          "typeName": "ProjectStatusTone"
+        },
+        {
+          "name": "danger",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/project/project.types.ts",
+          "prop": "tone",
+          "typeName": "ProjectStatusTone"
+        }
+      ],
+      "aliases": []
+    }
+  ]
+}

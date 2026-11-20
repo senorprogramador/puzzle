@@ -1,4 +1,4 @@
-import { Accordion, Tabs } from "@puzzle-ui/ui";
+import { Accordion, Tabs, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   MarketingSection,
@@ -22,11 +22,11 @@ const FeatureContent = ({
     {item.media && !hideMedia ? <div className="puzzle-features__media">{item.media}</div> : null}
     {item.icon ? <div className="puzzle-features__icon">{item.icon}</div> : null}
     <div className="puzzle-features__copy">
-      <h3>
+      <Heading level="headline3" as="h3">
         {numbered ? `${index + 1}. ` : null}
         {item.title}
-      </h3>
-      {item.description ? <p>{item.description}</p> : null}
+      </Heading>
+      {item.description ? <Text as="p">{item.description}</Text> : null}
       {item.content}
       {item.action ? <div className="puzzle-features__action">{item.action}</div> : null}
     </div>

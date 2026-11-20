@@ -1,0 +1,528 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "Autocomplete",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "autocomplete",
+      "description": "Find and select options with searchable suggestions.",
+      "documentation": "apps/site/content/docs/ui/forms/autocomplete.mdx",
+      "source": "packages/ui/src/components/forms/autocomplete/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Autocomplete"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Checkbox",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "checkbox",
+      "description": "Select independent options with checked and mixed states.",
+      "documentation": "apps/site/content/docs/ui/forms/checkbox.mdx",
+      "source": "packages/ui/src/components/forms/checkbox/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Checkbox"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ColorPicker",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "color-picker",
+      "description": "Choose colors with swatches and editable color values.",
+      "documentation": "apps/site/content/docs/ui/forms/color-picker.mdx",
+      "source": "packages/ui/src/components/forms/color-picker/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Color Picker"
+      },
+      "aliases": []
+    },
+    {
+      "name": "DatePicker",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "date-picker",
+      "description": "Choose a date using a calendar and input field.",
+      "documentation": "apps/site/content/docs/ui/forms/date-picker.mdx",
+      "source": "packages/ui/src/components/forms/date-picker/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Date Picker"
+      },
+      "aliases": []
+    },
+    {
+      "name": "FileUpload",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "file-upload",
+      "description": "Select files and communicate upload progress and errors.",
+      "documentation": "apps/site/content/docs/ui/forms/file-upload.mdx",
+      "source": "packages/ui/src/components/forms/file-upload/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "File Upload"
+      },
+      "aliases": []
+    },
+    {
+      "name": "FormField",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "form-field",
+      "description": "Connect inputs to labels, descriptions, and validation feedback.",
+      "documentation": "apps/site/content/docs/ui/forms/form-field.mdx",
+      "source": "packages/ui/src/components/forms/form-field/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Form Field"
+      },
+      "aliases": []
+    },
+    {
+      "name": "InputGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "input-group",
+      "description": "Compose inputs with leading or trailing content.",
+      "documentation": "apps/site/content/docs/ui/forms/input-group.mdx",
+      "source": "packages/ui/src/components/forms/input-group/input-group.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Input Group"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Label",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "label",
+      "description": "Give form controls a clear, associated label.",
+      "documentation": "apps/site/content/docs/ui/forms/label.mdx",
+      "source": "packages/ui/src/components/forms/label/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Label"
+      },
+      "aliases": []
+    },
+    {
+      "name": "NumberInput",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "number-input",
+      "description": "Enter numeric values with increment and decrement controls.",
+      "documentation": "apps/site/content/docs/ui/forms/number-input.mdx",
+      "source": "packages/ui/src/components/forms/input/number-input.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Number Input"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Radio",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "radio-group",
+      "description": "A composable part of RadioGroup. Choose a single option from a set of radio controls.",
+      "documentation": "apps/site/content/docs/ui/forms/radio-group.mdx",
+      "source": "packages/ui/src/components/forms/radio-group/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "RadioGroup"
+      },
+      "aliases": []
+    },
+    {
+      "name": "RadioGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "radio-group",
+      "description": "Choose a single option from a set of radio controls.",
+      "documentation": "apps/site/content/docs/ui/forms/radio-group.mdx",
+      "source": "packages/ui/src/components/forms/radio-group/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "RadioGroup"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Select",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "select",
+      "description": "Choose one or more values from a dropdown list.",
+      "documentation": "apps/site/content/docs/ui/forms/select.mdx",
+      "source": "packages/ui/src/components/forms/select/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Select"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Slider",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "slider",
+      "description": "Adjust a value along a track with optional marks.",
+      "documentation": "apps/site/content/docs/ui/forms/slider.mdx",
+      "source": "packages/ui/src/components/forms/slider/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Slider"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Stepper",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "stepper",
+      "description": "Guide users through the steps of a multi-stage flow.",
+      "documentation": "apps/site/content/docs/ui/forms/stepper.mdx",
+      "source": "packages/ui/src/components/forms/stepper/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Stepper"
+      },
+      "requiredProps": [
+        "label"
+      ],
+      "contentRequirements": [
+        "label (required)",
+        "description (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Switch",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "switch",
+      "description": "Turn a setting on or off with a compact toggle.",
+      "documentation": "apps/site/content/docs/ui/forms/switch.mdx",
+      "source": "packages/ui/src/components/forms/switch/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Switch"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TextAreaInput",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "text-area-input",
+      "description": "Collect longer messages and multi-line text.",
+      "documentation": "apps/site/content/docs/ui/forms/text-area-input.mdx",
+      "source": "packages/ui/src/components/forms/input/text-area-input.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Text Area Input"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TextInput",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "text-input",
+      "description": "Collect single-line text with familiar input behavior.",
+      "documentation": "apps/site/content/docs/ui/forms/text-input.mdx",
+      "source": "packages/ui/src/components/forms/input/text-input.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Text Input"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TimePicker",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "time-picker",
+      "description": "Enter and select a time of day.",
+      "documentation": "apps/site/content/docs/ui/forms/time-picker.mdx",
+      "source": "packages/ui/src/components/forms/time-picker/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Time Picker"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TokenInput",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "token-input",
+      "description": "Enter verification codes in individual character slots.",
+      "documentation": "apps/site/content/docs/ui/forms/token-input.mdx",
+      "source": "packages/ui/src/components/forms/token-input/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Token Input"
+      },
+      "aliases": []
+    }
+  ]
+}

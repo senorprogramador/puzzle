@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { Skeleton } from "@puzzle-ui/ui";
+import { Skeleton, Heading, Text } from "@puzzle-ui/ui";
 
 import "./dashboard-overview-section.css";
 
@@ -40,15 +40,15 @@ export const DashboardOverviewSection = ({
       <header className="puzzle-dashboard-overview__header">
         <div className="puzzle-dashboard-overview__heading">
           {eyebrow ? (
-            <p className="puzzle-dashboard-overview__eyebrow">{eyebrow}</p>
+            <Text as="p" className="puzzle-dashboard-overview__eyebrow">{eyebrow}</Text>
           ) : null}
-          <h2 id={titleId} className="puzzle-dashboard-overview__title">
+          <Heading level="headline2" as="h2" id={titleId} className="puzzle-dashboard-overview__title">
             {title}
-          </h2>
+          </Heading>
           {description ? (
-            <p className="puzzle-dashboard-overview__description">
+            <Text as="p" className="puzzle-dashboard-overview__description">
               {description}
-            </p>
+            </Text>
           ) : null}
         </div>
         {dateRange || actions ? (

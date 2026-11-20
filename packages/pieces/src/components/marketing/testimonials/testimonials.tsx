@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Carousel, CarouselController, Rating } from "@puzzle-ui/ui";
+import { Button, Carousel, CarouselController, Rating, Text } from "@puzzle-ui/ui";
 import { Icon } from "@puzzle-ui/icons";
 import {
   useState,
@@ -31,7 +31,7 @@ const TestimonialContent = ({ item }: { item: TestimonialItem }) => (
       />
     ) : null}
     <blockquote>
-      <p>{item.quote}</p>
+      <Text as="p">{item.quote}</Text>
       <footer>
         {item.avatar ? (
           <span className="puzzle-testimonials__avatar" aria-hidden="true">

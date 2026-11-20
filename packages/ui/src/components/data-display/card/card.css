@@ -72,7 +72,7 @@
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: start;
     column-gap: var(--puzzle-space-3, 0.75rem);
-    row-gap: var(--puzzle-space-1, 0.25rem);
+    row-gap: var(--puzzle-space-2, 0.5rem);
     min-width: 0;
 }
 

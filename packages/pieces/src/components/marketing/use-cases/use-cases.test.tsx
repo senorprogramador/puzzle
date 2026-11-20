@@ -60,7 +60,9 @@ describe("UseCasesSection", () => {
       <UseCasesSection items={items} filterable />,
     );
 
-    await user.selectOptions(screen.getByLabelText("Category"), "Delivery");
+    screen.getByRole("combobox", { name: "Category" }).focus();
+    await user.keyboard("d");
+    await user.keyboard("{Enter}");
     expect(screen.getByText("Operations teams")).toBeVisible();
     expect(screen.queryByText("Product teams")).toBeNull();
 

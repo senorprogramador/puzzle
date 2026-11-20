@@ -1,4 +1,4 @@
-import { CompanyInfo, MetricList, ProfileCard } from "@puzzle-ui/ui";
+import { CompanyInfo, MetricList, ProfileCard, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   MarketingSection,
@@ -47,8 +47,8 @@ const AboutSection = <C extends ElementType = "section">({
 
         {story ? (
           <article className="puzzle-about-section__story">
-            {story.title ? <h3>{story.title}</h3> : null}
-            <p>{story.description}</p>
+            {story.title ? <Heading level="headline3" as="h3">{story.title}</Heading> : null}
+            <Text as="p">{story.description}</Text>
             {story.image ? (
               <BusinessFigure
                 image={story.image}
@@ -62,14 +62,14 @@ const AboutSection = <C extends ElementType = "section">({
           <div className="puzzle-about-section__purpose">
             {mission ? (
               <article>
-                <h3>Our mission</h3>
-                <p>{mission}</p>
+                <Heading level="headline3" as="h3">Our mission</Heading>
+                <Text as="p">{mission}</Text>
               </article>
             ) : null}
             {vision ? (
               <article>
-                <h3>Our vision</h3>
-                <p>{vision}</p>
+                <Heading level="headline3" as="h3">Our vision</Heading>
+                <Text as="p">{vision}</Text>
               </article>
             ) : null}
           </div>
@@ -101,8 +101,8 @@ const AboutSection = <C extends ElementType = "section">({
                   {value.icon ? (
                     <span aria-hidden="true">{value.icon}</span>
                   ) : null}
-                  <h3>{value.title}</h3>
-                  {value.description ? <p>{value.description}</p> : null}
+                  <Heading level="headline3" as="h3">{value.title}</Heading>
+                  {value.description ? <Text as="p">{value.description}</Text> : null}
                 </article>
               </li>
             ))}
@@ -115,8 +115,8 @@ const AboutSection = <C extends ElementType = "section">({
               <li key={item.id}>
                 <span className="puzzle-about-section__year">{item.year}</span>
                 <div>
-                  <h3>{item.title}</h3>
-                  {item.description ? <p>{item.description}</p> : null}
+                  <Heading level="headline3" as="h3">{item.title}</Heading>
+                  {item.description ? <Text as="p">{item.description}</Text> : null}
                 </div>
               </li>
             ))}

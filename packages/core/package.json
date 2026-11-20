@@ -32,6 +32,26 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
+    },
+    "./rendering": {
+      "import": {
+        "types": "./dist/rendering/index.d.ts",
+        "default": "./dist/rendering/index.js"
+      },
+      "require": {
+        "types": "./dist/rendering/index.d.cts",
+        "default": "./dist/rendering/index.cjs"
+      }
+    },
+    "./resources": {
+      "import": {
+        "types": "./dist/resources/index.d.ts",
+        "default": "./dist/resources/index.js"
+      },
+      "require": {
+        "types": "./dist/resources/index.d.cts",
+        "default": "./dist/resources/index.cjs"
+      }
     }
   },
   "files": [
@@ -47,7 +67,7 @@
   },
   "devDependencies": {
     "tsdown": "^0.23.1",
-    "tsup": "latest",
+    "tsup": "9.0.0",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
   }

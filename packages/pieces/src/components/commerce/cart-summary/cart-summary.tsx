@@ -1,4 +1,4 @@
-import { Card } from "@puzzle-ui/ui";
+import { Card, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   MarketingSection,
@@ -50,13 +50,13 @@ const CartItemRow = ({
         <CommerceImageView image={item.image} label={item.name} />
       ) : null}
       <div className="puzzle-cart-summary__item-copy">
-        <h3>
+        <Heading level="headline3" as="h3">
           {item.href ? <a href={item.href}>{item.name}</a> : item.name}
-        </h3>
-        {item.description ? <p>{item.description}</p> : null}
-        <p className="puzzle-cart-summary__quantity">
+        </Heading>
+        {item.description ? <Text as="p">{item.description}</Text> : null}
+        <Text as="p" className="puzzle-cart-summary__quantity">
           Quantity: {formatQuantity(item.quantity, locale)}
-        </p>
+        </Text>
         <div className="puzzle-cart-summary__unit-price">
           <span>Each</span>
           <CommercePrice price={item.unitPrice} locale={locale} />
@@ -163,7 +163,7 @@ const CartSummarySection = <C extends ElementType = "section">({
               className="puzzle-cart-summary__summary"
               variant="outlined"
             >
-              <h3>Order summary</h3>
+              <Heading level="headline3" as="h3">Order summary</Heading>
               <SummaryTotals totals={totals} locale={locale} />
               {actions ? (
                 <div className="puzzle-cart-summary__actions">{actions}</div>

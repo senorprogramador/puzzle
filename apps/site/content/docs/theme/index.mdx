@@ -1,6 +1,6 @@
 ---
-title: Theme
-description: The @puzzle-ui/theme package owns Puzzle's design tokens, color themes, typography, fonts, and theme scoping.
+title: React Design Tokens and Theming
+description: Create a React design system with typed design tokens, light and dark color schemes, typography, local fonts, and scoped theme providers.
 ---
 
 <code>@puzzle-ui/theme</code> is the source of truth for Puzzle's visual design.
@@ -8,7 +8,8 @@ It turns a typed token object into CSS custom properties, loads configured
 fonts, resolves light and dark color schemes, and lets you scope a theme to the
 whole document or a single subtree.
 
-All <code>@puzzle-ui/ui</code> components consume these CSS custom properties, so a single <code>Theme</code> provider styles your application.
+All [Puzzle UI components](/docs/ui) consume these CSS custom properties, so a
+single <code>Theme</code> provider styles your application.
 
 The [`Theme` provider](/docs/theme/theme-provider) and standalone
 [`GoogleFont`](/docs/theme/typography) component have **Stable** APIs, with
@@ -120,12 +121,15 @@ import type {
   ThemeColorSchemeTokens,
   ThemeTypographyRoleTokens,
   ThemeTypographyFontRole,
+  ColorThemes,
   TypographyStyle,
   ColorTheme,
   Breakpoint,
   FontRole,
   FontStyle,
   FontDisplay,
+  FontSource,
+  FontPreload,
   FontConfig,
   ResolvedFontConfig,
   FontStylesheet,
@@ -136,6 +140,17 @@ import type {
   ThemeImageComponent,
 } from "@puzzle-ui/theme";
 ```
+
+## Subpath exports
+
+| Import | Public exports | Guidance |
+| --- | --- | --- |
+| `@puzzle-ui/theme/components-context` | `ThemeComponentsProvider`, `useThemeComponents` | Advanced component integrations; most applications should configure overrides through [`Theme.components`](/docs/theme/components). |
+| `@puzzle-ui/theme/scope-context` | `ThemeScopeProvider`, `useThemeScope`, `ThemeScopeContextValue` | Advanced scoped-theme and portal integrations; prefer [`Theme scope="local"`](/docs/theme/theme-provider) for application code. |
+| `@puzzle-ui/theme/nitro` | `createFontRouteRules`, `FONT_STYLESHEET_CACHE_CONTROL`, `VERSIONED_FONT_CACHE_CONTROL`, `CreateFontRouteRulesOptions`, `FontRouteRule` | Apply cache rules to self-hosted fonts; see [Nitro cache headers](/docs/theme/cli#cache-headers-with-nitro). |
+
+Use [Puzzle UI](/docs/ui) for individual interface components and
+[Puzzle Pieces](/docs/pieces) for responsive page-level compositions.
 
 ## How it works
 

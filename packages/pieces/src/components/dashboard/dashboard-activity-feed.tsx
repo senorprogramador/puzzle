@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import { useId } from "react";
 
 import "./dashboard.css";
@@ -24,9 +25,9 @@ const DefaultActivityItem = ({ item }: { item: DashboardActivityItem }) => {
         </span>
       )}
       <div className="puzzle-dashboard-activity-feed__content">
-        <p className="puzzle-dashboard-activity-feed__description">
+        <Text as="p" className="puzzle-dashboard-activity-feed__description">
           {description}
-        </p>
+        </Text>
         <time
           className="puzzle-dashboard-activity-feed__time"
           dateTime={item.dateTime}
@@ -54,9 +55,9 @@ export const DashboardActivityFeed = ({
         .join(" ")}
       aria-labelledby={titleId}
     >
-      <h2 id={titleId} className="puzzle-dashboard-activity-feed__title">
+      <Heading level="headline2" as="h2" id={titleId} className="puzzle-dashboard-activity-feed__title">
         {title}
-      </h2>
+      </Heading>
       {items.length === 0 ? (
         <div className="puzzle-dashboard-activity-feed__empty">
           {emptyState}

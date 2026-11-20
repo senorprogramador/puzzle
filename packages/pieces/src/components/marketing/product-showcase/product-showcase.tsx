@@ -1,4 +1,4 @@
-import { MediaFrame, Tabs } from "@puzzle-ui/ui";
+import { MediaFrame, Tabs, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import { useState } from "react";
 import {
@@ -43,7 +43,7 @@ const ProductMedia = ({
             <li key={annotation.id}>
               <details>
                 <summary>{annotation.label}</summary>
-                <p>{annotation.description}</p>
+                <Text as="p">{annotation.description}</Text>
               </details>
             </li>
           ))}
@@ -55,8 +55,8 @@ const ProductMedia = ({
 
 const ProductCopy = ({ item }: { item: ProductShowcaseItem }) => (
   <div className="puzzle-product-showcase__copy">
-    <h3>{item.title}</h3>
-    {item.description ? <p>{item.description}</p> : null}
+    <Heading level="headline3" as="h3">{item.title}</Heading>
+    {item.description ? <Text as="p">{item.description}</Text> : null}
     {item.action ? (
       <div className="puzzle-product-showcase__action">{item.action}</div>
     ) : null}
@@ -107,9 +107,9 @@ const ProductCarousel = ({
         aria-atomic="true"
       >
         <ProductCard item={activeItem} variant={variant} />
-        <p className="puzzle-product-showcase__carousel-position">
+        <Text as="p" className="puzzle-product-showcase__carousel-position">
           {activeIndex + 1} of {items.length}
-        </p>
+        </Text>
       </div>
       <div className="puzzle-product-showcase__carousel-controls">
         <button

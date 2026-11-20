@@ -7,6 +7,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppBar } from "./index";
 import { PageLayout } from "../page-layout";
 
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+
 const frames: HTMLIFrameElement[] = [];
 
 afterEach(() => {

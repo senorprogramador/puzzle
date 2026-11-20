@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import { useId } from "react";
 import { validateContentIds } from "../content/shared";
 import type {
@@ -58,7 +59,7 @@ const FooterSection = ({
           <div className="puzzle-footer-section__identity">
             {logo ? <div className="puzzle-footer-section__logo">{logo}</div> : null}
             {description ? (
-              <p className="puzzle-footer-section__description">{description}</p>
+              <Text as="p" className="puzzle-footer-section__description">{description}</Text>
             ) : null}
           </div>
         ) : null}
@@ -73,7 +74,7 @@ const FooterSection = ({
                 className="puzzle-footer-section__group"
                 key={group.id}
               >
-                <h2>{group.label}</h2>
+                <Heading level="headline3" as="h2">{group.label}</Heading>
                 <FooterLinks links={group.links} />
               </section>
             ))}
@@ -102,7 +103,7 @@ const FooterSection = ({
             className="puzzle-footer-section__newsletter"
             aria-labelledby={newsletterHeadingId}
           >
-            <h2 id={newsletterHeadingId}>Newsletter</h2>
+            <Heading level="headline2" as="h2" id={newsletterHeadingId}>Newsletter</Heading>
             {newsletter}
           </section>
         ) : null}
@@ -114,7 +115,7 @@ const FooterSection = ({
         {copyright || legalLinks.length ? (
           <div className="puzzle-footer-section__bottom">
             {copyright ? (
-              <p className="puzzle-footer-section__copyright">{copyright}</p>
+              <Text as="p" className="puzzle-footer-section__copyright">{copyright}</Text>
             ) : null}
             {legalLinks.length ? (
               <nav aria-label={legalLabel} className="puzzle-footer-section__legal">

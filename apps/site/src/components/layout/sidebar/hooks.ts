@@ -32,9 +32,19 @@ export const hooks: TreeViewItem = {
       href: `${folder}/use-reduced-motion`,
     },
     {
+      id: "hooks-use-color-scheme",
+      label: "Color Scheme",
+      href: `${folder}/use-color-scheme`,
+    },
+    {
       id: "hooks-use-async-action",
       label: "Async Action",
       href: `${folder}/use-async-action`,
+    },
+    {
+      id: "hooks-use-resource-prefetch",
+      label: "Resource Prefetch",
+      href: `${folder}/use-resource-prefetch`,
     },
   ],
 } as const;

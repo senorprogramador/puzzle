@@ -79,6 +79,39 @@ describe("Badge colors (browser)", () => {
 });
 
 describe("Badge layout (browser)", () => {
+  it("uses flex display for standalone and wrapped badges", () => {
+    render(
+      <Theme>
+        <Badge content="Standalone" />
+        <Badge content="4">
+          <div data-testid="target" />
+        </Badge>
+      </Theme>,
+    );
+
+    const standalone = screen.getByText("Standalone").parentElement!;
+    const wrapped = screen.getByTestId("target").parentElement!;
+    expect(getComputedStyle(standalone).display).toBe("flex");
+    expect(getComputedStyle(wrapped).display).toBe("flex");
+  });
+
+  it("puts following text on a new line after a standalone badge", () => {
+    render(
+      <Theme>
+        <p>
+          <Badge content="Standalone" />
+          <strong data-testid="following-text">Following text</strong>
+        </p>
+      </Theme>,
+    );
+
+    const badge = screen.getByText("Standalone").parentElement!;
+    const followingText = screen.getByTestId("following-text");
+    expect(followingText.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      badge.getBoundingClientRect().bottom,
+    );
+  });
+
   for (const overlap of ["rectangular", "circular"] as const) {
     for (const vertical of ["top", "bottom"] as const) {
       for (const horizontal of ["left", "right"] as const) {
@@ -143,7 +176,7 @@ describe("Badge layout (browser)", () => {
     }
   }
 
-  it("keeps standalone labels in flow with padding around their text", () => {
+  it("keeps standalone labels content-sized with padding around their text", () => {
     render(
       <Theme>
         <Badge content="Component showcase" />

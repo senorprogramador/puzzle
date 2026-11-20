@@ -1,5 +1,9 @@
 import { isFullStackFramework } from "../src/constants";
-import type { AuthDatabase, Framework, ProjectOptions } from "../src/types";
+import type {
+  AuthDatabase,
+  Framework,
+  ProjectConfiguration,
+} from "../src/types";
 
 export type Scaffold = {
   /** Unique, kebab-case name used for the project directory and test titles. */
@@ -58,12 +62,13 @@ export const selectScaffolds = (scaffolds: Scaffold[]) => {
       );
 };
 
-export const toProjectOptions = (scaffold: Scaffold): ProjectOptions => ({
-  name: scaffold.id,
-  directory: scaffold.id,
+export const toProjectConfiguration = (
+  scaffold: Scaffold,
+): ProjectConfiguration => ({
+  projectName: scaffold.id,
   framework: scaffold.framework,
-  packageManager: "bun",
-  tailwind: scaffold.tailwind,
+  styling: scaffold.tailwind ? "tailwind" : "none",
   auth: scaffold.auth,
   ...(scaffold.database ? { database: scaffold.database } : {}),
+  packageManager: "bun",
 });

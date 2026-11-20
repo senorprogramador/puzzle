@@ -1,0 +1,46 @@
+---
+title: Color Scheme
+description: Read an element's computed light or dark color scheme with an SSR-safe React hook.
+---
+
+`useColorScheme` reads the computed value of the CSS `color-scheme` property. By default, it checks `document.documentElement` and updates when that element's `class`, `style`, or `data-theme` attribute changes.
+
+## Usage
+
+```tsx
+import { useColorScheme } from "@puzzle-ui/hooks";
+
+function ColorSchemeStatus() {
+  const scheme = useColorScheme();
+
+  return <p>Active color scheme: {scheme ?? "Detecting"}</p>;
+}
+```
+
+The value is `undefined` during server rendering and until the client effect reads the computed style. A value containing `dark` returns `"dark"`; other computed values return `"light"`.
+
+## Custom target and property
+
+Pass a function that returns the element to inspect and the CSS property to read. The target function runs from an effect, so it can safely query the document without accessing browser globals during server rendering.
+
+```tsx
+const scheme = useColorScheme({
+  target: () => document.querySelector<HTMLElement>("[data-theme-root]"),
+  property: "--page-color-scheme",
+});
+```
+
+The hook observes `class`, `style`, and `data-theme` attribute changes on the target. It does not subscribe directly to the system `prefers-color-scheme` media query; use [`useReducedMotion`](/docs/hooks/use-reduced-motion) for the corresponding motion preference.
+
+## API
+
+```ts
+type ColorScheme = "light" | "dark";
+
+type UseColorSchemeOptions = {
+  target?: () => HTMLElement | null;
+  property?: string;
+};
+
+useColorScheme(options?: UseColorSchemeOptions): ColorScheme | undefined;
+```

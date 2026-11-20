@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "AboutSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "about-section",
+      "description": "Tell a company story with mission, values, milestones, team profiles, images, and measurable outcomes.",
+      "documentation": "apps/site/content/docs/pieces/components/about-section.mdx",
+      "source": "packages/pieces/src/components/business/about-section/about-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "about-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "AwardsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "awards-section",
+      "description": "Share awards and recognition with the awarding organization, year, logo, description, and external destination.",
+      "documentation": "apps/site/content/docs/pieces/components/awards-section.mdx",
+      "source": "packages/pieces/src/components/business/awards-section/awards-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "awards-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CareersSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "careers-section",
+      "description": "Present job openings by role, department, location, employment type, benefits, culture, and application link.",
+      "documentation": "apps/site/content/docs/pieces/components/careers-section.mdx",
+      "source": "packages/pieces/src/components/business/careers-section/careers-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "careers-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CaseStudiesSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "case-studies-section",
+      "description": "Explain client work with challenge, solution, results, media, metrics, and responsive portfolio layouts.",
+      "documentation": "apps/site/content/docs/pieces/components/case-studies-section.mdx",
+      "source": "packages/pieces/src/components/business/case-studies-section/case-studies-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "case-studies-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContactSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "contact-section",
+      "description": "Share contact details, department contacts, opening hours, a form slot, map slot, CTA, and success-state content.",
+      "documentation": "apps/site/content/docs/pieces/components/contact-section.mdx",
+      "source": "packages/pieces/src/components/business/contact-section/contact-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "contact-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "LocationSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "location-section",
+      "description": "Present offices, hotels, restaurants, contact details, opening hours, and app-provided map content.",
+      "documentation": "apps/site/content/docs/pieces/components/location-section.mdx",
+      "source": "packages/pieces/src/components/business/location-section/location-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "location-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "PartnersSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "partners-section",
+      "description": "Introduce partner organizations with logos, descriptions, categories, featured placements, and website links.",
+      "documentation": "apps/site/content/docs/pieces/components/partners-section.mdx",
+      "source": "packages/pieces/src/components/business/partners-section/partners-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "partners-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ServicesSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "services-section",
+      "description": "Present consulting, agency, hospitality, or product services with responsive layouts, optional media, pricing, categories, and links.",
+      "documentation": "apps/site/content/docs/pieces/components/services-section.mdx",
+      "source": "packages/pieces/src/components/business/services-section/services-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "services-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TeamSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "team-section",
+      "description": "Introduce people with responsive profile layouts, biography, avatar, social links, featured profiles, and departments.",
+      "documentation": "apps/site/content/docs/pieces/components/team-section.mdx",
+      "source": "packages/pieces/src/components/business/team-section/team-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "team-section"
+      },
+      "aliases": []
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   EditorialAuthorView,
@@ -38,11 +39,11 @@ const BlogArticleCard = ({
       {article.category ? (
         <EditorialCategory>{article.category}</EditorialCategory>
       ) : null}
-      <h3 className="puzzle-blog-section__article-title">
+      <Heading level="headline3" as="h3" className="puzzle-blog-section__article-title">
         {article.href ? <a href={article.href}>{article.title}</a> : article.title}
-      </h3>
+      </Heading>
       {article.excerpt ? (
-        <p className="puzzle-blog-section__excerpt">{article.excerpt}</p>
+        <Text as="p" className="puzzle-blog-section__excerpt">{article.excerpt}</Text>
       ) : null}
       {article.author || article.date || article.readingTime ? (
         <div className="puzzle-blog-section__meta">
@@ -117,7 +118,7 @@ const renderByCategory = (items: readonly BlogArticle[]) => {
     <div className="puzzle-blog-section__categories">
       {[...categories].map(([category, articles]) => (
         <section key={category} className="puzzle-blog-section__category-group">
-          <h3>{category}</h3>
+          <Heading level="headline3" as="h3">{category}</Heading>
           <BlogList items={articles} />
         </section>
       ))}

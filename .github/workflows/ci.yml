@@ -54,8 +54,14 @@ jobs:
         with:
           bun-version: 1.4.4
 
+      - name: Check dependency specifications
+        run: bun run check:dependency-specs
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Check component registry
+        run: bun run registry:check
 
       - name: Build packages
         run: bun run build
@@ -67,7 +73,7 @@ jobs:
         run: bunx playwright install --with-deps chromium
         working-directory: packages/fullstack
 
-      - name: Run all package tests
+      - name: Run workspace and reference-site tests
         run: bun run test:all
 
       - name: Build documentation site
@@ -163,7 +169,7 @@ jobs:
           target: /deploy
 
       - name: Deploy on server
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}

@@ -7,7 +7,7 @@ import {
   type FormEventHandler,
 } from "react";
 import { useAsyncAction } from "@puzzle-ui/hooks";
-import { Button, LinearProgress, TextInput } from "@puzzle-ui/ui";
+import { Button, LinearProgress, TextInput, Text } from "@puzzle-ui/ui";
 
 import {
   MarketingSection,
@@ -117,7 +117,7 @@ const WaitlistSection = ({
         ) : null}
         {progress && normalizedProgress !== undefined ? (
           <div className="puzzle-waitlist-section__progress">
-            {progress.label ? <p>{progress.label}</p> : null}
+            {progress.label ? <Text as="p">{progress.label}</Text> : null}
             <LinearProgress
               value={normalizedProgress}
               aria-label={
@@ -171,14 +171,14 @@ const WaitlistSection = ({
         {children}
       </div>
       {statusError ? (
-        <p className="puzzle-waitlist-section__error" role="alert">
+        <Text as="p" className="puzzle-waitlist-section__error" role="alert">
           {error ?? getErrorMessage(statusError)}
-        </p>
+        </Text>
       ) : null}
       {success || submission.status === "success" ? (
-        <p className="puzzle-waitlist-section__success" role="status" aria-live="polite">
+        <Text as="p" className="puzzle-waitlist-section__success" role="status" aria-live="polite">
           {success ?? "You are on the list. We will be in touch."}
-        </p>
+        </Text>
       ) : null}
     </MarketingSection>
   );

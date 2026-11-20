@@ -1,7 +1,19 @@
 ---
 title: React UI Component Library
-description: Explore Puzzle UI's TypeScript React component library with live examples, props, and accessibility guidance for forms, layouts, navigation, and overlays.
+description: Explore accessible TypeScript React components for actions, forms, data display, navigation, layout, overlays, and typography, with live examples and API guidance.
 ---
+
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Preview,
+  Stack,
+} from "@puzzle-ui/ui";
+import { UIComponentCatalog } from "../../../src/components/doc-examples/ui/component-catalog";
 
 <code>@puzzle-ui/ui</code> is a TypeScript React UI component library for building
 interfaces with consistent theme tokens, layout, and interaction patterns.
@@ -14,6 +26,18 @@ Newer or less-tested APIs are labeled Beta or Experimental on their pages.
 These labels describe API maturity, not production readiness. Review each
 component's documented accessibility and framework limitations when
 integrating it.
+
+## Choose the right layer
+
+- **Use `@puzzle-ui/ui`** for reusable interface primitives such as buttons,
+  cards, form controls, navigation, overlays, and typography.
+- **Use `@puzzle-ui/pieces`** when you need responsive, page-level sections or
+  compositions rather than individual controls.
+- **Use `@puzzle-ui/theme`** to configure shared design tokens, color schemes,
+  typography, and scoped themes.
+- **Do not use the UI package as a router or application framework.** Its
+  components stay composable and router-independent; connect them to your
+  application's own navigation and data flow.
 
 ## Getting started
 
@@ -35,128 +59,102 @@ const App = () => (
 );
 ```
 
+## Live component preview
+
+This example combines a card, typography, layout, and actions. Open **Code** in
+the preview to copy the corresponding JSX.
+
+<Preview
+  hideDevices
+  align="center"
+  justify="center"
+  code={`\
+<Card>
+  <CardHeader>
+    <CardTitle>Project Atlas</CardTitle>
+    <CardDescription>Keep the next release moving.</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <Stack direction="row" gap="sm">
+      <Button variant="primary">Open project</Button>
+      <Button variant="outline">View details</Button>
+    </Stack>
+  </CardContent>
+</Card>
+`}
+>
+  <Card>
+    <CardHeader>
+      <CardTitle>Project Atlas</CardTitle>
+      <CardDescription>Keep the next release moving.</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <Stack direction="row" gap="sm">
+        <Button variant="primary">Open project</Button>
+        <Button variant="outline">View details</Button>
+      </Stack>
+    </CardContent>
+  </Card>
+</Preview>
+
 ## Actions
 
 Build buttons, grouped actions, and single- or multiple-selection toggle controls.
 
-- [Button](/docs/ui/actions/button)
-- [Button Group](/docs/ui/actions/button-group)
-- [Toggle Group](/docs/ui/actions/toggle-group)
+<UIComponentCatalog category="actions" />
 
 ## Data display
 
 Present cards, data tables, user avatars, status badges, and loading states.
 
-- [Alert](/docs/ui/data-display/alert)
-- [Avatar](/docs/ui/data-display/avatar)
-- [Badge](/docs/ui/data-display/badge)
-- [Card](/docs/ui/data-display/card)
-- [Data Table](/docs/ui/data-display/data-table)
-- [Empty State](/docs/ui/data-display/empty-state)
-- [Image](/docs/ui/data-display/image)
-- [Image Collage (ImageBox)](/docs/ui/data-display/image-box)
-- [Paper](/docs/ui/data-display/paper)
-- [Progress](/docs/ui/data-display/progress)
-- [Rating](/docs/ui/data-display/rating)
-- [Skeleton](/docs/ui/data-display/skeleton)
+<UIComponentCatalog category="data-display" />
 
 ## Editors
 
 Add a rich text editor, formatting toolbar, and structured document renderer.
 
-- [Text Editor, Toolbar, and Renderer](/docs/ui/editors/text-editor)
+<UIComponentCatalog category="editors" />
 
 ## Forms
 
 Build labeled form fields with text inputs, select dropdowns, date pickers,
 file uploads, and verification code inputs.
 
-- [Autocomplete](/docs/ui/forms/autocomplete)
-- [Checkbox](/docs/ui/forms/checkbox)
-- [Color Picker](/docs/ui/forms/color-picker)
-- [Date Picker](/docs/ui/forms/date-picker)
-- [File Upload](/docs/ui/forms/file-upload)
-- [Form Field](/docs/ui/forms/form-field)
-- [Input Group](/docs/ui/forms/input-group)
-- [Label](/docs/ui/forms/label)
-- [Number Input](/docs/ui/forms/number-input)
-- [Radio Group](/docs/ui/forms/radio-group)
-- [Select](/docs/ui/forms/select)
-- [Slider](/docs/ui/forms/slider)
-- [Stepper](/docs/ui/forms/stepper)
-- [Switch](/docs/ui/forms/switch)
-- [Text Area Input](/docs/ui/forms/text-area-input)
-- [Text Input](/docs/ui/forms/text-input)
-- [Time Picker](/docs/ui/forms/time-picker)
-- [Token Input](/docs/ui/forms/token-input)
+<UIComponentCatalog category="forms" />
 
 ## Layout
 
 Build responsive page layouts with containers, CSS grids, flexbox stacks,
 sidebars, scrollable regions, and resizable panels.
 
-- [App Bar](/docs/ui/layout/app-bar)
-- [Aspect Ratio](/docs/ui/layout/aspect-ratio)
-- [Background](/docs/ui/layout/background)
-- [Bottom Navigation](/docs/ui/layout/bottom-navigation)
-- [Breadcrumbs](/docs/ui/layout/breadcrumbs)
-- [Collapsable Sidebar](/docs/ui/layout/collapsable-sidebar)
-- [Container](/docs/ui/layout/container)
-- [Grid](/docs/ui/layout/grid)
-- [Page Layout](/docs/ui/layout/page-layout)
-- [Resizable Panels](/docs/ui/layout/resizable-panels)
-- [Scroll Area](/docs/ui/layout/scroll-area)
-- [Section](/docs/ui/layout/section)
-- [Section Header](/docs/ui/layout/section-header)
-- [Section Stack](/docs/ui/layout/section-stack)
-- [Separator](/docs/ui/layout/separator)
-- [Sidebar](/docs/ui/layout/sidebar)
-- [Stack](/docs/ui/layout/stack)
+<UIComponentCatalog category="layout" />
 
 ## Navigation
 
 Organize content with tabs and accordions, browse carousels, and navigate
 paginated collections or tree views.
 
-- [Accordion](/docs/ui/navigation/accordion)
-- [Carousel](/docs/ui/navigation/carousel)
-- [Link](/docs/ui/navigation/link)
-- [Pagination](/docs/ui/navigation/pagination)
-- [Tabs](/docs/ui/navigation/tabs)
-- [Tree View](/docs/ui/navigation/tree-view)
+<UIComponentCatalog category="navigation" />
 
 ## Overlays
 
 Build modal dialogs, slide-out drawers, dropdown menus, popovers, tooltips,
 command palettes, and toast notifications.
 
-- [Backdrop](/docs/ui/overlays/backdrop)
-- [Command](/docs/ui/overlays/command)
-- [Context Menu](/docs/ui/overlays/context-menu)
-- [Dialog](/docs/ui/overlays/dialog)
-- [Drawer](/docs/ui/overlays/drawer)
-- [Dropdown Menu](/docs/ui/overlays/dropdown-menu)
-- [Notification](/docs/ui/overlays/notification)
-- [Popout](/docs/ui/overlays/popout)
-- [Popover](/docs/ui/overlays/popover)
-- [Portal](/docs/ui/overlays/portal)
-- [Tooltip](/docs/ui/overlays/tooltip)
+<UIComponentCatalog category="overlays" />
 
 ## Typography
 
 Style headings and body text with theme typography while preserving semantic HTML.
 
-- [Heading](/docs/ui/typography/heading)
-- [Text](/docs/ui/typography/text)
+<UIComponentCatalog category="typography" />
 
 ## Utilities
 
 Preview React components with source code, lock background scrolling, and
 animate content entering or leaving the page.
 
-- [Preview](/docs/ui/utilities/preview)
-- [Scroll Lock](/docs/ui/utilities/scroll-lock)
-- [Transition](/docs/ui/utilities/transition)
+<UIComponentCatalog category="utilities" />
 
 ## Theming
 

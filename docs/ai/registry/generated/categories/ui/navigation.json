@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "Accordion",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "accordion",
+      "description": "Expand and collapse related sections of content.",
+      "documentation": "apps/site/content/docs/ui/navigation/accordion.mdx",
+      "source": "packages/ui/src/components/navigation/accordion/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Accordion"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Carousel",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "carousel",
+      "description": "Browse items with slides, navigation, and pager controls.",
+      "documentation": "apps/site/content/docs/ui/navigation/carousel.mdx",
+      "source": "packages/ui/src/components/navigation/carousel/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Carousel"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CarouselController",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "carousel",
+      "description": "A composable part of Carousel. Browse items with slides, navigation, and pager controls.",
+      "documentation": "apps/site/content/docs/ui/navigation/carousel.mdx",
+      "source": "packages/ui/src/components/navigation/carousel/controller.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Carousel"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Link",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "link",
+      "description": "Navigate with themed links and optional router integration.",
+      "documentation": "apps/site/content/docs/ui/navigation/link.mdx",
+      "source": "packages/ui/src/components/navigation/link/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Link"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Pagination",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "pagination",
+      "description": "Navigate between pages of a larger collection.",
+      "documentation": "apps/site/content/docs/ui/navigation/pagination.mdx",
+      "source": "packages/ui/src/components/navigation/pagination/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Pagination"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Tabs",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "tabs",
+      "description": "Switch between related views using a tab list.",
+      "documentation": "apps/site/content/docs/ui/navigation/tabs.mdx",
+      "source": "packages/ui/src/components/navigation/tabs/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Tabs"
+      },
+      "requiredProps": [
+        "id",
+        "tab",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TabsTab",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "tabs",
+      "description": "A composable part of Tabs. Switch between related views using a tab list.",
+      "documentation": "apps/site/content/docs/ui/navigation/tabs.mdx",
+      "source": "packages/ui/src/components/navigation/tabs/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Tabs"
+      },
+      "requiredProps": [
+        "id",
+        "tab",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TreeView",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "tree-view",
+      "description": "Browse and select items in a hierarchical tree.",
+      "documentation": "apps/site/content/docs/ui/navigation/tree-view.mdx",
+      "source": "packages/ui/src/components/navigation/tree-view/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Tree View"
+      },
+      "aliases": []
+    }
+  ]
+}

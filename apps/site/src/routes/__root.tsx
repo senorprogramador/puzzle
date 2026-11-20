@@ -35,11 +35,15 @@ import {
   PUBLISHER_ID,
 } from "@/lib/seo";
 
+import { searchIntentMap } from "@/lib/search-intents";
+
 import { TanStackLink } from "../components/navigation/link/link";
 
+const homeSearchIntent = searchIntentMap["/"];
+
 const rootSeoHead = createSeoHead({
-  title: "TypeScript-First React Design System",
-  description: SITE_DESCRIPTION,
+  title: homeSearchIntent.title,
+  description: homeSearchIntent.description,
   locale: "en-US",
   author: AUTHOR.name,
 

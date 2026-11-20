@@ -1,7 +1,12 @@
 import * as p from "@clack/prompts";
+import { Readable } from "node:stream";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { promptInitialUser } from "./initial-user";
+import {
+  promptInitialUser,
+  readInitialUserFromStdin,
+  validateInitialUser,
+} from "./initial-user";
 
 vi.mock("@clack/prompts", () => ({
   log: { info: vi.fn() },
@@ -62,5 +67,59 @@ describe("promptInitialUser", () => {
     }
 
     expect(await promptInitialUser()).toBeNull();
+  });
+});
+
+describe("initial-user credential input", () => {
+  it("reads JSON credentials from stdin and normalizes only the email", async () => {
+    const password = "Sensitive 'quoted' $password\\";
+    const bytes = new TextEncoder().encode(
+      JSON.stringify({
+        email: " Owner@Example.com ",
+        password: `${password} \u{1F642}`,
+      }),
+    );
+    const split = bytes.findIndex((byte) => byte >= 0x80);
+
+    await expect(
+      readInitialUserFromStdin(Readable.from([bytes.slice(0, split + 1), bytes.slice(split + 1)])),
+    ).resolves.toEqual({
+      email: "owner@example.com",
+      password: `${password} \u{1F642}`,
+    });
+  });
+
+  it.each([
+    ["invalid JSON", "{"],
+    [
+      "unsupported fields",
+      JSON.stringify({
+        email: "owner@example.com",
+        password: "long enough password",
+        database: "d1",
+      }),
+    ],
+    ["short passwords", JSON.stringify({ email: "owner@example.com", password: "short" })],
+    ["invalid email", JSON.stringify({ email: "invalid", password: "long enough password" })],
+  ])("rejects %s", async (_description, content) => {
+    await expect(
+      readInitialUserFromStdin(Readable.from([content])),
+    ).rejects.toThrow();
+  });
+
+  it("rejects configuration objects that could embed credential fields", () => {
+    expect(() =>
+      validateInitialUser({
+        email: "owner@example.com",
+        password: "long enough password",
+        secret: "unexpected",
+      }),
+    ).toThrow("Unsupported initial user credential field");
+  });
+
+  it("rejects invalid UTF-8 input", async () => {
+    await expect(
+      readInitialUserFromStdin(Readable.from([Uint8Array.from([0xff])])),
+    ).rejects.toThrow("valid UTF-8");
   });
 });

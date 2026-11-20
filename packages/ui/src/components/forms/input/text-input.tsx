@@ -7,7 +7,7 @@ import { Icon } from "@puzzle-ui/icons";
 
 import "./input.css";
 
-type TextInputType = "text" | "email" | "password" | "phone";
+type TextInputType = "text" | "email" | "password" | "phone" | "search";
 
 type TextInputProps = Omit<
   ComponentPropsWithRef<"input">,

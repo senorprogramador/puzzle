@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "Heading",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "typography",
+      "subcategory": "heading",
+      "description": "Apply heading styles independently of semantic level.",
+      "documentation": "apps/site/content/docs/ui/typography/heading.mdx",
+      "source": "packages/ui/src/components/typography/heading.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Heading"
+      },
+      "requiredProps": [
+        "level"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Text",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "typography",
+      "subcategory": "text",
+      "description": "Style body copy and supporting text with theme typography.",
+      "documentation": "apps/site/content/docs/ui/typography/text.mdx",
+      "source": "packages/ui/src/components/typography/text.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Text"
+      },
+      "aliases": []
+    }
+  ]
+}

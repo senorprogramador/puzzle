@@ -7,32 +7,50 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
-const dirname =
-  typeof __dirname !== "undefined"
-    ? __dirname
-    : path.dirname(fileURLToPath(import.meta.url));
+const appRoot = path.dirname(fileURLToPath(import.meta.url));
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: {
-      "@puzzle-ui/core": fileURLToPath(
-        new URL("../../packages/core/src/index.ts", import.meta.url),
-      ),
-      "@puzzle-ui/hooks": fileURLToPath(
-        new URL("../../packages/hooks/src/index.ts", import.meta.url),
-      ),
-      "@puzzle-ui/theme": fileURLToPath(
-        new URL("../../packages/theme/src/index.ts", import.meta.url),
-      ),
-      "@puzzle-ui/ui": fileURLToPath(
-        new URL("../../packages/ui/src/index.ts", import.meta.url),
-      ),
-      "@puzzle-ui/icons": fileURLToPath(
-        new URL("../../packages/icons/src", import.meta.url),
-      ),
-    },
+    alias: [
+      {
+        find: /^@puzzle-ui\/core$/,
+        replacement: fileURLToPath(
+          new URL("../../packages/core/src/index.ts", import.meta.url),
+        ),
+      },
+      {
+        find: /^@puzzle-ui\/hooks$/,
+        replacement: fileURLToPath(
+          new URL("../../packages/hooks/src/index.ts", import.meta.url),
+        ),
+      },
+      {
+        find: /^@puzzle-ui\/theme$/,
+        replacement: fileURLToPath(
+          new URL("../../packages/theme/src/index.ts", import.meta.url),
+        ),
+      },
+      {
+        find: /^@puzzle-ui\/ui$/,
+        replacement: fileURLToPath(
+          new URL("../../packages/ui/src/index.ts", import.meta.url),
+        ),
+      },
+      {
+        find: /^@puzzle-ui\/icons$/,
+        replacement: fileURLToPath(
+          new URL("../../packages/icons/src", import.meta.url),
+        ),
+      },
+      {
+        find: /^@puzzle-ui\/pieces$/,
+        replacement: fileURLToPath(
+          new URL("../../packages/pieces/src/index.ts", import.meta.url),
+        ),
+      },
+    ],
   },
   test: {
     projects: [
@@ -42,7 +60,7 @@ export default defineConfig({
           // The plugin will run tests for the stories defined in your Storybook config
           // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
           storybookTest({
-            configDir: path.join(dirname, ".storybook"),
+            configDir: path.join(appRoot, ".storybook"),
           }),
         ],
         test: {

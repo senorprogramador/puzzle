@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "test:rendering": "node --test tests/rendering.test.mjs",
     "fonts:download": "puzzle-theme fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
     "db:setup": "node scripts/setup-mongodb.mjs",
     "db:seed": "WORKSPACE_DEMO_RESET=yes bun ../../packages/workspace/scripts/seed.ts"
