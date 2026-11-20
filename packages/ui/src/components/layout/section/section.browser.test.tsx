@@ -31,8 +31,12 @@ describe("Section scoped colors (browser)", () => {
 
       for (const theme of ["light", "dark", "light"] as const) {
         rerender(renderSection(theme));
-        const section = screen.getByText("Scoped content");
-        const implicit = screen.getByText("Implicit default");
+        const section = screen
+          .getByText("Scoped content")
+          .closest(".puzzle-section")!;
+        const implicit = screen
+          .getByText("Implicit default")
+          .closest(".puzzle-section")!;
         const style = getComputedStyle(section);
 
         expect(style.backgroundColor).toBe(
@@ -53,7 +57,7 @@ describe("Section scoped colors (browser)", () => {
 
 describe("Section width (browser)", () => {
   for (const width of [320, 1200]) {
-    it(`constrains default sections and leaves fullWidth sections unconstrained in a ${width}px parent`, () => {
+    it(`fills the parent width and constrains default section content in a ${width}px parent`, () => {
       const style: CSSProperties & Record<`--${string}`, string> = {
         width,
         "--puzzle-container-width": "800px",
@@ -66,15 +70,27 @@ describe("Section width (browser)", () => {
         </div>,
       );
 
-      const section = screen.getByText("Default");
+      const defaultContent = screen.getByText("Default");
+      const section = defaultContent.closest(".puzzle-section")!;
+      const content = defaultContent;
       const full = screen.getByText("Full width");
       const bounds = section.getBoundingClientRect();
+      const contentBounds = content.getBoundingClientRect();
       const fullBounds = full.getBoundingClientRect();
 
-      expect(section).toHaveClass("puzzle-section", "puzzle-container", "puzzle-container--container");
-      expect(bounds.width).toBe(Math.min(width, 800));
-      expect(bounds.left - fullBounds.left).toBe((width - Math.min(width, 800)) / 2);
-      expect(getComputedStyle(section).paddingLeft).toBe("16px");
+      expect(section).toHaveClass("puzzle-section");
+      expect(section).not.toHaveClass("puzzle-container");
+      expect(bounds.width).toBe(width);
+      expect(content).toHaveClass(
+        "puzzle-section__content",
+        "puzzle-container",
+        "puzzle-container--container",
+      );
+      expect(contentBounds.width).toBe(Math.min(width, 800));
+      expect(contentBounds.left - bounds.left).toBe(
+        (width - Math.min(width, 800)) / 2,
+      );
+      expect(getComputedStyle(content).paddingLeft).toBe("16px");
       expect(full).not.toHaveClass("puzzle-container");
       expect(full).not.toHaveClass("puzzle-container--container");
       expect(fullBounds.width).toBe(width);

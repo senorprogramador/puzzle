@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "DashboardBreadcrumbs",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "navigation",
+      "description": "Build responsive, router-independent dashboard navigation and account controls with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/navigation.mdx",
+      "source": "packages/pieces/src/components/navigation/dashboard-breadcrumbs.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "navigation"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "label (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "interactiveBehavior": [
+        "onNavigate"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DashboardMobileNavigation",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "navigation",
+      "description": "Build responsive, router-independent dashboard navigation and account controls with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/navigation.mdx",
+      "source": "packages/pieces/src/components/navigation/dashboard-mobile-navigation.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "navigation"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "label (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "interactiveBehavior": [
+        "onNavigate"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DashboardNavigation",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "navigation",
+      "description": "Build responsive, router-independent dashboard navigation and account controls with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/navigation.mdx",
+      "source": "packages/pieces/src/components/navigation/dashboard-navigation.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "navigation"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "label (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "interactiveBehavior": [
+        "onNavigate"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DashboardSidebar",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "navigation",
+      "description": "Build responsive, router-independent dashboard navigation and account controls with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/navigation.mdx",
+      "source": "packages/pieces/src/components/navigation/dashboard-sidebar.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "navigation"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "label (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "interactiveBehavior": [
+        "onNavigate"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DashboardTopbar",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "navigation",
+      "description": "Build responsive, router-independent dashboard navigation and account controls with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/navigation.mdx",
+      "source": "packages/pieces/src/components/navigation/dashboard-topbar.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "navigation"
+      },
+      "contentRequirements": [
+        "children (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DashboardUserMenu",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "navigation",
+      "description": "Build responsive, router-independent dashboard navigation and account controls with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/navigation.mdx",
+      "source": "packages/pieces/src/components/navigation/dashboard-user-menu.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "navigation"
+      },
+      "requiredProps": [
+        "trigger",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "label (optional)"
+      ],
+      "aliases": []
+    }
+  ]
+}

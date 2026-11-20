@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "OnboardingSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "onboarding",
+      "subcategory": "onboarding",
+      "description": "Present accessible, application-controlled onboarding steps, progress, and actions.",
+      "documentation": "apps/site/content/docs/pieces/components/onboarding.mdx",
+      "source": "packages/pieces/src/components/onboarding/onboarding-section.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "onboarding"
+      },
+      "requiredProps": [
+        "title",
+        "steps"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)",
+        "children (optional)"
+      ],
+      "dataRequirements": [
+        "steps (required)"
+      ],
+      "interactiveBehavior": [
+        "onStepChange"
+      ],
+      "variants": [
+        {
+          "name": "steps",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "checklist",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "progress",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "wizard",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "cards",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "welcome",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "horizontal",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "vertical",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        },
+        {
+          "name": "compact",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/onboarding/onboarding-section.types.ts",
+          "prop": "variant",
+          "typeName": "OnboardingSectionVariant"
+        }
+      ],
+      "aliases": []
+    }
+  ]
+}

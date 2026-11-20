@@ -1,5 +1,7 @@
 "use client";
 
+import { Heading, Text } from "@puzzle-ui/ui";
+
 import { useState, type ElementType } from "react";
 import {
   MarketingSection,
@@ -20,7 +22,7 @@ const LocationDetails = ({ location }: { location: LocationItem }) => (
     {location.image ? (
       <div className="puzzle-location-section__image">{location.image}</div>
     ) : null}
-    {location.description ? <p>{location.description}</p> : null}
+    {location.description ? <Text as="p">{location.description}</Text> : null}
     {location.address ? <address>{location.address}</address> : null}
     <dl>
       {location.phone ? (
@@ -138,7 +140,7 @@ const LocationSection = <C extends ElementType = "section">({
                   : undefined
               }
             >
-              <h3>{selectedLocation.name}</h3>
+              <Heading level="headline3" as="h3">{selectedLocation.name}</Heading>
               <LocationDetails location={selectedLocation} />
             </article>
           ) : null}

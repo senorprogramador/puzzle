@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Carousel, CarouselController } from "@puzzle-ui/ui";
+import { Button, Carousel, CarouselController, Heading } from "@puzzle-ui/ui";
 import { Icon } from "@puzzle-ui/icons";
 import {
   useState,
@@ -122,7 +122,7 @@ const LogoCloudSection = <C extends ElementType = "section">(
         <div className="puzzle-logo-cloud__groups">
           {groups.map(([group, groupLogos]) => (
             <div className="puzzle-logo-cloud__group" key={group}>
-              <h3>{group}</h3>
+              <Heading level="headline3" as="h3">{group}</Heading>
               <ul className="puzzle-logo-cloud__list">
                 {groupLogos.map((logo) => (
                   <li key={logo.id} data-featured={logo.featured || undefined}>

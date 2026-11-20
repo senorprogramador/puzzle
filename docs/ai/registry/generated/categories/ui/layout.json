@@ -1,0 +1,626 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "AppBar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "app-bar",
+      "description": "Compose an application header with branding and navigation.",
+      "documentation": "apps/site/content/docs/ui/layout/app-bar.mdx",
+      "source": "packages/ui/src/components/layout/app-bar/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "App Bar"
+      },
+      "aliases": []
+    },
+    {
+      "name": "AspectRatio",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "aspect-ratio",
+      "description": "Keep media and other content at a consistent aspect ratio.",
+      "documentation": "apps/site/content/docs/ui/layout/aspect-ratio.mdx",
+      "source": "packages/ui/src/components/layout/aspect-ratio/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Aspect Ratio"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Background",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "background",
+      "description": "Add themed patterns, fades, and mesh backgrounds.",
+      "documentation": "apps/site/content/docs/ui/layout/background.mdx",
+      "source": "packages/ui/src/components/layout/background/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Background"
+      },
+      "aliases": []
+    },
+    {
+      "name": "BottomNavigation",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "bottom-navigation",
+      "description": "Keep primary destinations within reach at the bottom of a view.",
+      "documentation": "apps/site/content/docs/ui/layout/bottom-navigation.mdx",
+      "source": "packages/ui/src/components/layout/bottom-navigation/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "BottomNavigation"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "ariaLabel (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "BottomNavigationItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "bottom-navigation",
+      "description": "A composable part of BottomNavigation. Keep primary destinations within reach at the bottom of a view.",
+      "documentation": "apps/site/content/docs/ui/layout/bottom-navigation.mdx",
+      "source": "packages/ui/src/components/layout/bottom-navigation/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "BottomNavigation"
+      },
+      "requiredProps": [
+        "icon",
+        "label"
+      ],
+      "contentRequirements": [
+        "label (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Breadcrumbs",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "breadcrumbs",
+      "description": "Show the current location within a page hierarchy.",
+      "documentation": "apps/site/content/docs/ui/layout/breadcrumbs.mdx",
+      "source": "packages/ui/src/components/layout/breadcrumbs/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Breadcrumbs"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "CollapsableSidebar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "collapsable-sidebar",
+      "description": "Organize navigation in an expandable side panel.",
+      "documentation": "apps/site/content/docs/ui/layout/collapsable-sidebar.mdx",
+      "source": "packages/ui/src/components/layout/collapsable-sidebar/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Collapsable Sidebar"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "ariaLabel (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "interactiveBehavior": [
+        "onCollapsedChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Container",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "container",
+      "description": "Constrain content width with consistent page gutters.",
+      "documentation": "apps/site/content/docs/ui/layout/container.mdx",
+      "source": "packages/ui/src/components/layout/container/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Container"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Grid",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "grid",
+      "description": "Arrange responsive columns and rows with optional item spans.",
+      "documentation": "apps/site/content/docs/ui/layout/grid.mdx",
+      "source": "packages/ui/src/components/layout/grid/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Grid"
+      },
+      "aliases": []
+    },
+    {
+      "name": "GridItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "grid",
+      "description": "A composable part of Grid. Arrange responsive columns and rows with optional item spans.",
+      "documentation": "apps/site/content/docs/ui/layout/grid.mdx",
+      "source": "packages/ui/src/components/layout/grid/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Grid"
+      },
+      "aliases": []
+    },
+    {
+      "name": "PageLayout",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "page-layout",
+      "description": "Compose page headers, sidebars, and main content regions.",
+      "documentation": "apps/site/content/docs/ui/layout/page-layout.mdx",
+      "source": "packages/ui/src/components/layout/page-layout/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Page Layout"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ResizableHandle",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "resizable-panels",
+      "description": "A composable part of ResizablePanels. Split content into panels with draggable resize handles.",
+      "documentation": "apps/site/content/docs/ui/layout/resizable-panels.mdx",
+      "source": "packages/ui/src/components/layout/resizable-panels/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ResizablePanels"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ResizablePanel",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "resizable-panels",
+      "description": "A composable part of ResizablePanels. Split content into panels with draggable resize handles.",
+      "documentation": "apps/site/content/docs/ui/layout/resizable-panels.mdx",
+      "source": "packages/ui/src/components/layout/resizable-panels/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ResizablePanels"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ResizablePanels",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "resizable-panels",
+      "description": "Split content into panels with draggable resize handles.",
+      "documentation": "apps/site/content/docs/ui/layout/resizable-panels.mdx",
+      "source": "packages/ui/src/components/layout/resizable-panels/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "ResizablePanels"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ScrollArea",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "scroll-area",
+      "description": "Contain overflowing content in a dedicated scroll region.",
+      "documentation": "apps/site/content/docs/ui/layout/scroll-area.mdx",
+      "source": "packages/ui/src/components/layout/scroll-area/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Scroll Area"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Section",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "section",
+      "description": "Define page sections with themed spacing and surfaces.",
+      "documentation": "apps/site/content/docs/ui/layout/section.mdx",
+      "source": "packages/ui/src/components/layout/section/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "SectionHeader",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "section-header",
+      "description": "Compose a section eyebrow, heading, description, and actions.",
+      "documentation": "apps/site/content/docs/ui/layout/section-header.mdx",
+      "source": "packages/ui/src/components/layout/section-header/section-header.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Section Header"
+      },
+      "contentRequirements": [
+        "description (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "titleId (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SectionStack",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "section-stack",
+      "description": "Arrange page sections with consistent separation.",
+      "documentation": "apps/site/content/docs/ui/layout/section-stack.mdx",
+      "source": "packages/ui/src/components/layout/section-stack/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Section Stack"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Separator",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "separator",
+      "description": "Separate related content horizontally or vertically.",
+      "documentation": "apps/site/content/docs/ui/layout/separator.mdx",
+      "source": "packages/ui/src/components/layout/separator/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Separator"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Sidebar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "sidebar",
+      "description": "Place supporting content and navigation beside the main view.",
+      "documentation": "apps/site/content/docs/ui/layout/sidebar.mdx",
+      "source": "packages/ui/src/components/layout/sidebar/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Sidebar"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Stack",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "stack",
+      "description": "Arrange content with responsive direction, alignment, and gaps.",
+      "documentation": "apps/site/content/docs/ui/layout/stack.mdx",
+      "source": "packages/ui/src/components/layout/stack/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Stack"
+      },
+      "aliases": []
+    }
+  ]
+}

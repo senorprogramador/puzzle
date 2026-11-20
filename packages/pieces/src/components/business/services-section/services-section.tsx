@@ -1,4 +1,4 @@
-import { ServiceCard } from "@puzzle-ui/ui";
+import { ServiceCard, Heading } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   MarketingSection,
@@ -59,7 +59,7 @@ const renderCategories = (items: readonly BusinessService[]) => {
           key={category}
           aria-label={category}
         >
-          <h3>{category}</h3>
+          <Heading level="headline3" as="h3">{category}</Heading>
           {renderServices(services, "grid")}
         </section>
       ))}

@@ -1,7 +1,15 @@
 "use client";
 
 import { cn } from "@puzzle-ui/core";
+import { classifyComponent } from "@puzzle-ui/core/rendering";
+import type { IdentifiedResourceDescriptor } from "@puzzle-ui/core/resources";
+import { useResourcePrefetch } from "@puzzle-ui/hooks";
 import { Link } from "../../navigation/link";
+import type { DrawerProps } from "../../overlays/drawer";
+import {
+  DeferredBoundary,
+  type DeferredComponentLoader,
+} from "../../utilities/rendering/deferred";
 import {
   useEffect,
   useLayoutEffect,
@@ -11,9 +19,29 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { Drawer } from "../../overlays/drawer";
 import "./app-bar.css";
 import { Stack } from "../stack";
+
+const loadDrawer: DeferredComponentLoader<DrawerProps> = async (signal) => {
+  if (signal.aborted) {
+    throw new Error("Drawer loading was cancelled.");
+  }
+
+  const { Drawer } = await import("../../overlays/drawer");
+  return { default: Drawer };
+};
+
+const drawerClassification = classifyComponent({
+  role: "navigation-drawer",
+});
+
+const DRAWER_RESOURCE: IdentifiedResourceDescriptor<"component-chunk"> =
+  Object.freeze({
+    id: "puzzle-ui-app-bar-drawer",
+    type: "component-chunk",
+    priority: drawerClassification.priority,
+    prefetchStrategy: "idle",
+  });
 
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -104,6 +132,13 @@ const AppBar = <T,>({
   const hasCustomNavigation =
     customNavigationItems.length > 0 && renderCustomNavigationItems != null;
   const hasNavigation = navigationItems.length > 0 || hasCustomNavigation;
+
+  useResourcePrefetch({
+    resource: DRAWER_RESOURCE,
+    load: loadDrawer,
+    strategy: "idle",
+    enabled: hasNavigation,
+  });
 
   const style = {
     "--puzzle-app-bar-sticky": sticky ? "sticky" : "relative",
@@ -230,47 +265,69 @@ const AppBar = <T,>({
       </div>
 
       {hasNavigation && (
-        <div id={navigationId} className="puzzle-app-bar__mobile">
-          <Drawer
-            position="right"
-            open={open}
-            onOpenChange={setOpen}
-            className="puzzle-app-bar__drawer"
-            aria-label={ariaLabel}
-          >
-            <Stack direction="row" alignH="between" alignV="center">
-              {hasBrand && (
-                <Link
-                  className="puzzle-app-bar__brand"
-                  href={logoHref}
-                  aria-label={title ?? "Home"}
-                >
-                  {logo}
-                  {title && (
-                    <span className="puzzle-app-bar__title">{title}</span>
+        <DeferredBoundary
+          id={navigationId}
+          strategy="manual"
+          active={open}
+          load={loadDrawer}
+          componentProps={{
+            position: "right",
+            open,
+            onOpenChange: setOpen,
+            className: "puzzle-app-bar__drawer",
+            "aria-label": ariaLabel,
+            children: (
+              <>
+                <Stack direction="row" alignH="between" alignV="center">
+                  {hasBrand && (
+                    <Link
+                      className="puzzle-app-bar__brand"
+                      href={logoHref}
+                      aria-label={title ?? "Home"}
+                    >
+                      {logo}
+                      {title && (
+                        <span className="puzzle-app-bar__title">{title}</span>
+                      )}
+                    </Link>
                   )}
-                </Link>
-              )}
-              <button
-                className="puzzle-app-bar__menu-button"
-                type="button"
-                aria-label="Close navigation"
-                aria-expanded={open}
-                aria-controls={navigationId}
-                onClick={() => setOpen(false)}
-              >
-                <span aria-hidden="true">&times;</span>
+                  <button
+                    className="puzzle-app-bar__menu-button"
+                    type="button"
+                    aria-label="Close navigation"
+                    aria-expanded={open}
+                    aria-controls={navigationId}
+                    onClick={() => setOpen(false)}
+                  >
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </Stack>
+                <hr />
+                <nav
+                  className="puzzle-app-bar__drawer-navigation"
+                  aria-label={ariaLabel}
+                >
+                  {renderNavigationItems()}
+                </nav>
+              </>
+            ),
+          }}
+          fallback={null}
+          loadingFallback={
+            <div role="status" aria-live="polite">
+              Loading navigation…
+            </div>
+          }
+          errorFallback={(_error, retry) => (
+            <div role="alert">
+              <span>Unable to load navigation.</span>
+              <button type="button" onClick={retry}>
+                Retry
               </button>
-            </Stack>
-            <hr />
-            <nav
-              className="puzzle-app-bar__drawer-navigation"
-              aria-label={ariaLabel}
-            >
-              {renderNavigationItems()}
-            </nav>
-          </Drawer>
-        </div>
+            </div>
+          )}
+          className="puzzle-app-bar__mobile"
+        />
       )}
       {sticky && (
         <>

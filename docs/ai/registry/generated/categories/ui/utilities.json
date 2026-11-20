@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "Preview",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "utilities",
+      "subcategory": "preview",
+      "description": "Present runnable component examples alongside their code.",
+      "documentation": "apps/site/content/docs/ui/utilities/preview.mdx",
+      "source": "packages/ui/src/components/utilities/preview/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Preview"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "PreviewProvider",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "utilities",
+      "subcategory": "preview",
+      "description": "A composable part of Preview. Present runnable component examples alongside their code.",
+      "documentation": "apps/site/content/docs/ui/utilities/preview.mdx",
+      "source": "packages/ui/src/components/utilities/preview/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Preview"
+      },
+      "requiredProps": [
+        "children",
+        "loading"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DeferredBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/deferred"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/deferred.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": [
+        {
+          "name": "NextDeferredBoundary",
+          "canonicalExport": "DeferredBoundary",
+          "entryPoints": [
+            "./next/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/next/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        },
+        {
+          "name": "TanStackDeferredBoundary",
+          "canonicalExport": "DeferredBoundary",
+          "entryPoints": [
+            "./tanstack/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "FoldBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/fold"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/fold-boundary.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": [
+        {
+          "name": "NextFoldBoundary",
+          "canonicalExport": "FoldBoundary",
+          "entryPoints": [
+            "./next/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/next/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        },
+        {
+          "name": "TanStackFoldBoundary",
+          "canonicalExport": "FoldBoundary",
+          "entryPoints": [
+            "./tanstack/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "FoldProvider",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/fold"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/hooks/src/rendering/fold-provider.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "dependencies": [
+        {
+          "package": "@puzzle-ui/hooks",
+          "export": "FoldProvider"
+        }
+      ],
+      "aliases": [
+        {
+          "name": "NextFoldProvider",
+          "canonicalExport": "FoldProvider",
+          "entryPoints": [
+            "./next/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/next/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        },
+        {
+          "name": "TanStackFoldProvider",
+          "canonicalExport": "FoldProvider",
+          "entryPoints": [
+            "./tanstack/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "NextSsrBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "./next/server"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/next/server.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": []
+    },
+    {
+      "name": "SsrBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/ssr"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/ssr.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": [
+        {
+          "name": "TanStackSsrBoundary",
+          "canonicalExport": "SsrBoundary",
+          "entryPoints": [
+            "./tanstack/server"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/server.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "StaticBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/static"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/static.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": [
+        {
+          "name": "NextStaticBoundary",
+          "canonicalExport": "StaticBoundary",
+          "entryPoints": [
+            "./next/server"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/next/server.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        },
+        {
+          "name": "TanStackStaticBoundary",
+          "canonicalExport": "StaticBoundary",
+          "entryPoints": [
+            "./tanstack/server"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/server.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "ScrollLock",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "utilities",
+      "subcategory": "scroll-lock",
+      "description": "Prevent background scrolling while an overlay is active.",
+      "documentation": "apps/site/content/docs/ui/utilities/scroll-lock.mdx",
+      "source": "packages/ui/src/components/utilities/scroll-lock/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "utility",
+        "family": "Scroll Lock"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Transition",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "utilities",
+      "subcategory": "transition",
+      "description": "Animate mounting and unmounting with transition templates.",
+      "documentation": "apps/site/content/docs/ui/utilities/transition.mdx",
+      "source": "packages/ui/src/components/utilities/transition/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "utility",
+        "family": "Transition"
+      },
+      "aliases": []
+    }
+  ]
+}

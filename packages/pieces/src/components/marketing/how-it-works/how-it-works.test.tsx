@@ -63,4 +63,12 @@ describe("HowItWorksSection", () => {
     const { container } = render(<HowItWorksSection steps={[]} />);
     expect(container.querySelector(".puzzle-how-it-works__list")).toBeNull();
   });
+
+  it("loads carousel controls for the carousel variant", async () => {
+    render(<HowItWorksSection variant="carousel" steps={steps} />);
+
+    expect(
+      await screen.findByRole("button", { name: "Next step" }),
+    ).toBeVisible();
+  });
 });

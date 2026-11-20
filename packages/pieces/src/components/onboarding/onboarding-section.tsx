@@ -1,5 +1,5 @@
 import { useId, useRef, type KeyboardEvent } from "react";
-import { LinearProgress } from "@puzzle-ui/ui";
+import { LinearProgress, Heading, Text } from "@puzzle-ui/ui";
 
 import "./onboarding-section.css";
 
@@ -85,13 +85,13 @@ export const OnboardingSection = ({
     >
       <header className="puzzle-onboarding-section__header">
         <div>
-          <h2 id={titleId} className="puzzle-onboarding-section__title">
+          <Heading level="headline2" as="h2" id={titleId} className="puzzle-onboarding-section__title">
             {title}
-          </h2>
+          </Heading>
           {description ? (
-            <p className="puzzle-onboarding-section__description">
+            <Text as="p" className="puzzle-onboarding-section__description">
               {description}
-            </p>
+            </Text>
           ) : null}
         </div>
         {actions ? (
@@ -102,11 +102,11 @@ export const OnboardingSection = ({
       {steps.length ? (
         <>
           <div className="puzzle-onboarding-section__progress">
-            <p role="status" aria-live="polite">
+            <Text as="p" role="status" aria-live="polite">
               {completedCount === steps.length
                 ? "All onboarding steps complete."
                 : `${completedCount} of ${steps.length} steps complete`}
-            </p>
+            </Text>
             <LinearProgress
               value={progress}
               aria-label="Onboarding progress"
@@ -194,13 +194,13 @@ export const OnboardingSection = ({
                   {activeStep.media}
                 </div>
               ) : null}
-              <h3>{activeStep.title}</h3>
-              {activeStep.description ? <p>{activeStep.description}</p> : null}
+              <Heading level="headline3" as="h3">{activeStep.title}</Heading>
+              {activeStep.description ? <Text as="p">{activeStep.description}</Text> : null}
             </div>
           ) : null}
         </>
       ) : (
-        <p className="puzzle-onboarding-section__empty">No onboarding steps.</p>
+        <Text as="p" className="puzzle-onboarding-section__empty">No onboarding steps.</Text>
       )}
 
       {children ? (

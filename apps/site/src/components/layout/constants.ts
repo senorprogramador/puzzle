@@ -15,6 +15,11 @@ import { tutorials } from "./sidebar/tutorials";
 
 const items: TreeViewItem[] = [
   {
+    id: "documentation-overview",
+    label: "Documentation overview",
+    href: "/docs",
+  },
+  {
     id: "getting-started",
     label: "Getting Started",
     href: "/docs/getting-started",

@@ -7,6 +7,8 @@ import {
   Carousel,
   CarouselController,
   Dialog,
+  Heading,
+  Text,
 } from "@puzzle-ui/ui";
 
 import {
@@ -89,14 +91,14 @@ const VideoPlayer = ({
 
 const VideoDetails = ({ video }: { video: VideoItem }) => (
   <div className="puzzle-video-section__details">
-    <h3>{video.title}</h3>
+    <Heading level="headline3" as="h3">{video.title}</Heading>
     {video.duration ? (
       <span className="puzzle-video-section__duration">{video.duration}</span>
     ) : null}
-    {video.description ? <p>{video.description}</p> : null}
+    {video.description ? <Text as="p">{video.description}</Text> : null}
     {video.quote ? (
       <blockquote>
-        <p>{video.quote}</p>
+        <Text as="p">{video.quote}</Text>
         {video.actor ? <footer>{video.actor}</footer> : null}
       </blockquote>
     ) : null}

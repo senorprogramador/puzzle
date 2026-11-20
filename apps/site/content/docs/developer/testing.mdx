@@ -22,13 +22,13 @@ bun install
 
 ## Run the repository test command
 
-The root test script builds the packages first, runs package test scripts, runs the project generator tests, and runs the UI browser tests.
+The root `test:all` script builds the packages first, runs package test scripts, runs the project generator tests, and runs the UI and Pieces browser tests.
 
 ```bash
-bun run vitest
+bun run test:all
 ```
 
-This is the broadest standard test command in the repository.
+This is the broadest standard test command in the repository. It also runs MongoDB integration tests; Docker Compose and Playwright Chromium are required.
 
 ## Package-specific tests
 
@@ -110,7 +110,7 @@ Several backend packages use Node's built-in test runner.
 ```bash
 bun run --filter "@puzzle-ui/auth" test
 bun run --filter "@puzzle-ui/session" test
-bun run --filter "@puzzle-ui/storage" test
+bun run --filter "@puzzle-ui/storage" vitest
 bun run --filter "@puzzle-ui/storage-d1" test
 ```
 

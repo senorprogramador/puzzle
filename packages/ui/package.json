@@ -38,6 +38,96 @@
         "types": "./dist/index.d.cts",
         "default": "./dist/index.cjs"
       }
+    },
+    "./rendering/deferred": {
+      "import": {
+        "types": "./dist/components/utilities/rendering/deferred.d.ts",
+        "default": "./dist/components/utilities/rendering/deferred.js"
+      },
+      "require": {
+        "types": "./dist/components/utilities/rendering/deferred.d.cts",
+        "default": "./dist/components/utilities/rendering/deferred.cjs"
+      }
+    },
+    "./rendering/ssr": {
+      "import": {
+        "types": "./dist/components/utilities/rendering/ssr.d.ts",
+        "default": "./dist/components/utilities/rendering/ssr.js"
+      },
+      "require": {
+        "types": "./dist/components/utilities/rendering/ssr.d.cts",
+        "default": "./dist/components/utilities/rendering/ssr.cjs"
+      }
+    },
+    "./rendering/static": {
+      "import": {
+        "types": "./dist/components/utilities/rendering/static.d.ts",
+        "default": "./dist/components/utilities/rendering/static.js"
+      },
+      "require": {
+        "types": "./dist/components/utilities/rendering/static.d.cts",
+        "default": "./dist/components/utilities/rendering/static.cjs"
+      }
+    },
+    "./rendering/fold": {
+      "import": {
+        "types": "./dist/components/utilities/rendering/fold.d.ts",
+        "default": "./dist/components/utilities/rendering/fold.js"
+      },
+      "require": {
+        "types": "./dist/components/utilities/rendering/fold.d.cts",
+        "default": "./dist/components/utilities/rendering/fold.cjs"
+      }
+    },
+    "./next/client": {
+      "import": {
+        "types": "./dist/components/utilities/rendering/next/client.d.ts",
+        "default": "./dist/components/utilities/rendering/next/client.js"
+      },
+      "require": {
+        "types": "./dist/components/utilities/rendering/next/client.d.cts",
+        "default": "./dist/components/utilities/rendering/next/client.cjs"
+      }
+    },
+    "./next/server": {
+      "import": {
+        "types": "./dist/components/utilities/rendering/next/server.d.ts",
+        "default": "./dist/components/utilities/rendering/next/server.js"
+      },
+      "require": {
+        "types": "./dist/components/utilities/rendering/next/server.d.cts",
+        "default": "./dist/components/utilities/rendering/next/server.cjs"
+      }
+    },
+    "./tanstack/client": {
+      "import": {
+        "types": "./dist/components/utilities/rendering/tanstack/client.d.ts",
+        "default": "./dist/components/utilities/rendering/tanstack/client.js"
+      },
+      "require": {
+        "types": "./dist/components/utilities/rendering/tanstack/client.d.cts",
+        "default": "./dist/components/utilities/rendering/tanstack/client.cjs"
+      }
+    },
+    "./tanstack/server": {
+      "import": {
+        "types": "./dist/components/utilities/rendering/tanstack/server.d.ts",
+        "default": "./dist/components/utilities/rendering/tanstack/server.js"
+      },
+      "require": {
+        "types": "./dist/components/utilities/rendering/tanstack/server.d.cts",
+        "default": "./dist/components/utilities/rendering/tanstack/server.cjs"
+      }
+    },
+    "./tanstack/shared": {
+      "import": {
+        "types": "./dist/components/utilities/rendering/tanstack/shared.d.ts",
+        "default": "./dist/components/utilities/rendering/tanstack/shared.js"
+      },
+      "require": {
+        "types": "./dist/components/utilities/rendering/tanstack/shared.d.cts",
+        "default": "./dist/components/utilities/rendering/tanstack/shared.cjs"
+      }
     }
   },
   "files": [
@@ -50,7 +140,8 @@
     "test:unit": "bunx vitest run --project unit",
     "test:component": "bunx vitest run --project component",
     "test:browser": "bunx vitest run --project browser",
-    "test:all": "bunx vitest run",
+    "test:all": "bunx vitest run && bun run test:streaming",
+    "test:streaming": "bun test src/components/utilities/rendering/rendering-stream.test.mjs",
     "vitest:watch": "bunx vitest run --watch --passWithNoTests",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
@@ -77,6 +168,6 @@
     "playwright": "1.65.1",
     "tsdown": "^0.23.1",
     "typescript": "^7.0.2",
-    "vitest": "latest"
+    "vitest": "5.1.1"
   }
 }

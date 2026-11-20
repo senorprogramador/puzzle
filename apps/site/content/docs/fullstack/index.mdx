@@ -1,6 +1,6 @@
 ---
-title: Fullstack
-description: Browser clients, React authentication UI, server handlers, and framework adapters for Puzzle Auth.
+title: Full-Stack React Authentication
+description: Connect React authentication experiences to server handlers and Next.js or TanStack Start adapters with a browser-safe auth client.
 ---
 
 `@puzzle-ui/fullstack` connects Puzzle authentication services to browser applications and server routes. It provides a browser-safe auth client and React components, server-side `Request`/`Response` handlers, and adapters for Next.js and TanStack Start. It complements the framework-independent `@puzzle-ui/auth` and `@puzzle-ui/session` packages rather than replacing them.
@@ -83,3 +83,7 @@ Create and configure an `AuthServer` from your server-side auth and session mana
 | `@puzzle-ui/fullstack/auth/tanstack` | TanStack Start request-handler adapter. |
 
 There is no package-root import; use one of the exported subpaths above. Keep auth policy and storage configuration in the appropriate lower-level packages, and use Fullstack to connect them to your app. For the end-to-end app setup, continue with the [developer authentication guide](/docs/developer/authentication).
+
+Use [Puzzle UI](/docs/ui) and [Puzzle Theme](/docs/theme) for the rest of the
+application interface; Fullstack's auth experience components can be composed
+with either package.

@@ -5,7 +5,7 @@ import {
   type FormEventHandler,
 } from "react";
 import { useAsyncAction } from "@puzzle-ui/hooks";
-import { Button, LinearProgress } from "@puzzle-ui/ui";
+import { Button, LinearProgress, Text } from "@puzzle-ui/ui";
 
 import {
   MarketingSection,
@@ -49,9 +49,9 @@ const BookingSteps = ({
 
   return (
     <div className="puzzle-booking-section__steps">
-      <p role="status" aria-live="polite">
+      <Text as="p" role="status" aria-live="polite">
         Step {activeIndex + 1} of {steps.length}
-      </p>
+      </Text>
       <LinearProgress
         value={progress}
         aria-label="Booking progress"
@@ -167,14 +167,14 @@ const BookingSection = ({
         content
       )}
       {statusError ? (
-        <p className="puzzle-booking-section__error" role="alert">
+        <Text as="p" className="puzzle-booking-section__error" role="alert">
           {error ?? getErrorMessage(statusError)}
-        </p>
+        </Text>
       ) : null}
       {success || submission.status === "success" ? (
-        <p className="puzzle-booking-section__success" role="status" aria-live="polite">
+        <Text as="p" className="puzzle-booking-section__success" role="status" aria-live="polite">
           {success ?? "Your booking request was received."}
-        </p>
+        </Text>
       ) : null}
     </MarketingSection>
   );

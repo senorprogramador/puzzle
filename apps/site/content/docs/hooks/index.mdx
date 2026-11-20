@@ -1,9 +1,9 @@
 ---
-title: Hooks
-description: Reusable React hooks for accessible interaction, reduced motion, list filtering, and async actions.
+title: React Hooks for TypeScript Applications
+description: Browse reusable React hooks for keyboard interactions, focus management, rendering boundaries, resource prefetching, color schemes, and motion preferences.
 ---
 
-<code>@puzzle-ui/hooks</code> provides small, composable hooks for keyboard interactions, composite widgets, user motion preferences, and async actions. Hooks manage shared interaction state while leaving markup and visual styling to your application.
+<code>@puzzle-ui/hooks</code> provides small, composable hooks for keyboard interactions, composite widgets, visibility-driven rendering, user color and motion preferences, and async actions. Hooks manage shared interaction state while leaving markup and visual styling to your application.
 
 ## Install
 
@@ -65,12 +65,55 @@ function EscapeShortcut() {
 | `useRovingFocus` | Implement roving tab stops and arrow-key navigation for a group of focusable items. | [Roving Focus](/docs/hooks/use-roving-focus) |
 | `useListFilter` | Filter a typed collection by query and category. | [List Filter](/docs/hooks/use-list-filter) |
 | `useReducedMotion` | Track the browser's reduced-motion preference with an SSR-safe default. | [Reduced Motion](/docs/hooks/use-reduced-motion) |
+| `useColorScheme` | Read a target element's computed light or dark color scheme. | [Color Scheme](/docs/hooks/use-color-scheme) |
 | `useAsyncAction` | Track pending, successful, and failed async actions and expose the error. | [Async Action](/docs/hooks/use-async-action) |
+| `useFold` | Track a rendering boundary and control activation based on visibility or proximity. | [Fold and Visibility](/docs/hooks/use-fold) |
+| `useVisibility` | Observe viewport and proximity state without controlling activation. | [Fold and Visibility](/docs/hooks/use-fold) |
+| `useFoldState` | Subscribe to a registered boundary by ID. | [Fold and Visibility](/docs/hooks/use-fold) |
+| `useIsVisible` | Read whether a registered boundary intersects the viewport. | [Fold and Visibility](/docs/hooks/use-fold) |
+| `useIsNearby` | Read whether a registered boundary is near or inside the viewport. | [Fold and Visibility](/docs/hooks/use-fold) |
+| `useFoldOptimization` | Read the normalized rendering and visibility settings inherited from a provider. | [Fold and Visibility](/docs/hooks/use-fold) |
+| `useResourcePrefetch` | Schedule deduplicated resource loading without mounting a component. | [Resource Prefetch](/docs/hooks/use-resource-prefetch) |
+
+## Rendering provider and advanced exports
+
+Use `FoldProvider` to share rendering defaults, visibility observation, and an
+application-level resource scheduler across boundaries. It is optional for
+`useFold` and `useVisibility`; `useResourcePrefetch` requires a provider with a
+scheduler.
+
+```tsx
+import { FoldProvider } from "@puzzle-ui/hooks";
+
+<FoldProvider config={{ profile: "balanced" }}>
+  <Application />
+</FoldProvider>;
+```
+
+The root entry point also exports `DEFAULT_PROXIMITY_ROOT_MARGINS`, the
+priority-based defaults used by visibility hooks. Supporting public types
+include `FoldProviderProps`, `FoldProviderVisibilityOptions`,
+`FoldActivationMode`, `FoldActivationTrigger`, `FoldStateSnapshot`,
+`ObservedVisibilityState`, `VisibilityMeasurement`,
+`VisibilityObserverOptions`, and `VisibilityRect`.
+
+Diagnostics are typed by `RenderingDiagnosticBoundaryContext`,
+`RenderingDiagnosticEvent`, `RenderingDiagnosticEventInput`, and
+`RenderingDiagnosticResourceContext`. Enable provider diagnostics explicitly;
+Puzzle does not send telemetry.
 
 ## Exports
 
-The package root, `@puzzle-ui/hooks`, exports `useKeyboardKeys`, `useRovingFocus`, `useListFilter`, `useReducedMotion`, and `useAsyncAction`, along with their public option and return types. There are no documented subpath exports.
+The package root, `@puzzle-ui/hooks`, exports the hooks, provider, configuration
+constant, and public types above. It is the package's only import entry point;
+there are no subpath exports.
 
 ## SSR and production notes
 
 These are React hooks and must be called at the top level of a React component or custom hook. Browser APIs are accessed only from subscriptions or effects. `useReducedMotion` returns `true` during server rendering and hydration, avoiding motion until the user's browser preference is known. In frameworks that distinguish server and client modules, call interactive hooks from a client component.
+
+## Related packages
+
+Hooks provide interaction and rendering behavior without prescribing markup.
+Compose them with [Puzzle UI components](/docs/ui), shared [theme tokens](/docs/theme),
+or [page-level Pieces sections](/docs/pieces).

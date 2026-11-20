@@ -1,6 +1,6 @@
 "use client";
 
-import { Accordion } from "@puzzle-ui/ui";
+import { Accordion, Heading, TextInput } from "@puzzle-ui/ui";
 import { useId, useState, type ElementType } from "react";
 import {
   MarketingSection,
@@ -78,7 +78,7 @@ const FAQSection = <C extends ElementType = "section">({
       {isSearchable ? (
         <label className="puzzle-faq__search">
           <span>{searchLabel}</span>
-          <input
+          <TextInput
             type="search"
             placeholder={searchPlaceholder}
             value={query}
@@ -106,7 +106,7 @@ const FAQSection = <C extends ElementType = "section">({
               id={variant === "categorized" ? `${generatedId}-category-${index}` : undefined}
               aria-labelledby={`${generatedId}-heading-${index}`}
             >
-              <h3 id={`${generatedId}-heading-${index}`}>{category}</h3>
+              <Heading level="headline3" as="h3" id={`${generatedId}-heading-${index}`}>{category}</Heading>
               {renderAccordion(
                 filteredItems.filter(
                   (item) => (item.category ?? "General") === category,

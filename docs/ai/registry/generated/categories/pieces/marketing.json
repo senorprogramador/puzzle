@@ -1,0 +1,530 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "AnnouncementSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "announcement",
+      "description": "Present announcements, promotions, countdowns, and multiple dismissible notices with accessible controls.",
+      "documentation": "apps/site/content/docs/pieces/components/announcement.mdx",
+      "source": "packages/pieces/src/components/marketing/announcement/announcement.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "announcement"
+      },
+      "aliases": []
+    },
+    {
+      "name": "BenefitsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "benefits",
+      "description": "Communicate customer outcomes with responsive benefit lists, cards, icons, media, and featured content.",
+      "documentation": "apps/site/content/docs/pieces/components/benefits.mdx",
+      "source": "packages/pieces/src/components/marketing/benefits/benefits.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "benefits"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CodeShowcaseSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "code-showcase",
+      "description": "Present copyable SaaS integration snippets with accessible tabs, optional line numbers, and a lightweight editable playground.",
+      "documentation": "apps/site/content/docs/pieces/components/code-showcase.mdx",
+      "source": "packages/pieces/src/components/marketing/code-showcase/code-showcase.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "code-showcase"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ComparisonSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "comparison",
+      "description": "Compare plans, products, or options with responsive cards or an accessible, keyboard-scrollable feature table.",
+      "documentation": "apps/site/content/docs/pieces/components/comparison.mdx",
+      "source": "packages/pieces/src/components/marketing/comparison/comparison.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "comparison"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CTASection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "cta",
+      "description": "Invite visitors to a consumer-defined next step with responsive call-to-action layouts and optional media.",
+      "documentation": "apps/site/content/docs/pieces/components/cta.mdx",
+      "source": "packages/pieces/src/components/marketing/cta/cta.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "cta"
+      },
+      "aliases": []
+    },
+    {
+      "name": "FAQSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "faq",
+      "description": "Answer common questions with accessible accordion layouts, optional categories, and local search.",
+      "documentation": "apps/site/content/docs/pieces/components/faq.mdx",
+      "source": "packages/pieces/src/components/marketing/faq/faq.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "faq"
+      },
+      "aliases": []
+    },
+    {
+      "name": "FeaturesSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "features",
+      "description": "Explain product capabilities using responsive feature layouts, optional media, and accessible tabs or accordions.",
+      "documentation": "apps/site/content/docs/pieces/components/features.mdx",
+      "source": "packages/pieces/src/components/marketing/features/features.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "features"
+      },
+      "aliases": []
+    },
+    {
+      "name": "HowItWorksSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "how-it-works",
+      "description": "Explain a product or process with semantic ordered steps, media, actions, and optional carousel navigation.",
+      "documentation": "apps/site/content/docs/pieces/components/how-it-works.mdx",
+      "source": "packages/pieces/src/components/marketing/how-it-works/how-it-works.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "how-it-works"
+      },
+      "aliases": []
+    },
+    {
+      "name": "IntegrationsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "integrations",
+      "description": "Organize SaaS integrations by category, highlight key connections, and optionally filter the directory.",
+      "documentation": "apps/site/content/docs/pieces/components/integrations.mdx",
+      "source": "packages/pieces/src/components/marketing/integrations/integrations.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "integrations"
+      },
+      "aliases": []
+    },
+    {
+      "name": "LogoCloudSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "logo-cloud",
+      "description": "Display accessible customer, partner, and integration logos in responsive grids, groups, or carousels.",
+      "documentation": "apps/site/content/docs/pieces/components/logo-cloud.mdx",
+      "source": "packages/pieces/src/components/marketing/logo-cloud/logo-cloud.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "logo-cloud"
+      },
+      "aliases": []
+    },
+    {
+      "name": "PricingSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "pricing",
+      "description": "Compose subscription and usage-based SaaS plans with explicit billing options, accessible comparisons, and optional calculators.",
+      "documentation": "apps/site/content/docs/pieces/components/pricing.mdx",
+      "source": "packages/pieces/src/components/marketing/pricing/pricing.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "pricing"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ProductShowcaseSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "product-showcase",
+      "description": "Present SaaS product screens in responsive layouts with device frames, annotations, tabs, and carousels.",
+      "documentation": "apps/site/content/docs/pieces/components/product-showcase.mdx",
+      "source": "packages/pieces/src/components/marketing/product-showcase/product-showcase.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "product-showcase"
+      },
+      "aliases": []
+    },
+    {
+      "name": "RoadmapSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "roadmap",
+      "description": "Present SaaS roadmap milestones by date, status, release, or group with optional accessible progress indicators.",
+      "documentation": "apps/site/content/docs/pieces/components/roadmap.mdx",
+      "source": "packages/pieces/src/components/marketing/roadmap/roadmap.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "roadmap"
+      },
+      "aliases": []
+    },
+    {
+      "name": "SecuritySection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "security",
+      "description": "Present consumer-supplied security controls, compliance labels, links, metrics, and optional audit information.",
+      "documentation": "apps/site/content/docs/pieces/components/security.mdx",
+      "source": "packages/pieces/src/components/marketing/security/security.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "security"
+      },
+      "aliases": []
+    },
+    {
+      "name": "StatsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "stats",
+      "description": "Present numeric metrics, trends, descriptions, and progress with responsive layouts and reduced-motion support.",
+      "documentation": "apps/site/content/docs/pieces/components/stats.mdx",
+      "source": "packages/pieces/src/components/marketing/stats/stats.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "stats"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TestimonialsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "testimonials",
+      "description": "Present attributed customer quotes, ratings, logos, avatars, and media in responsive testimonial layouts.",
+      "documentation": "apps/site/content/docs/pieces/components/testimonials.mdx",
+      "source": "packages/pieces/src/components/marketing/testimonials/testimonials.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "testimonials"
+      },
+      "aliases": []
+    },
+    {
+      "name": "UseCasesSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "use-cases",
+      "description": "Explain SaaS workflows with audience details, benefits, media, actions, and optional category filters.",
+      "documentation": "apps/site/content/docs/pieces/components/use-cases.mdx",
+      "source": "packages/pieces/src/components/marketing/use-cases/use-cases.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "use-cases"
+      },
+      "aliases": []
+    },
+    {
+      "name": "WaitlistSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "waitlist-section",
+      "description": "Collect early-access interest with accessible signup, progress, countdown, and referral content.",
+      "documentation": "apps/site/content/docs/pieces/components/waitlist-section.mdx",
+      "source": "packages/pieces/src/components/marketing/waitlist-section/waitlist-section.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "waitlist-section"
+      },
+      "aliases": []
+    }
+  ]
+}

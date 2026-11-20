@@ -48,3 +48,5 @@ export type { ColorType, RGBColor, HSLColor } from "./color/color.types";
 
 /** Timing utilities */
 export { debounce } from "./timing/debounce";
+
+export * from "./rendering";

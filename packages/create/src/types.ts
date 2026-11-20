@@ -6,6 +6,15 @@ export type AuthDatabase = "mongodb" | "d1" | "custom";
 
 export type PackageManager = "bun" | "npm" | "pnpm" | "yarn";
 
+export type ProjectConfiguration = {
+  projectName: string;
+  framework: Framework;
+  styling: "tailwind" | "none";
+  auth: boolean;
+  database?: AuthDatabase;
+  packageManager?: PackageManager;
+};
+
 export type ProjectOptions = {
   name: string;
   directory: string;

@@ -1,5 +1,7 @@
 "use client";
 
+import { Heading, Text } from "@puzzle-ui/ui";
+
 import { useId, useState, type ElementType, type ReactNode } from "react";
 import {
   MarketingSection,
@@ -43,8 +45,8 @@ const ComparisonCards = ({
         }
       >
         <article className="puzzle-comparison__card">
-          <h3>{option.title}</h3>
-          {option.description ? <p>{option.description}</p> : null}
+          <Heading level="headline3" as="h3">{option.title}</Heading>
+          {option.description ? <Text as="p">{option.description}</Text> : null}
           <dl>
             {features.map((feature) => (
               <div key={feature.id}>
@@ -155,7 +157,7 @@ const ComparisonSection = <C extends ElementType = "section">(
                     ) : (
                       option.title
                     )}
-                    {option.description ? <p>{option.description}</p> : null}
+                    {option.description ? <Text as="p">{option.description}</Text> : null}
                   </th>
                 ))}
               </tr>

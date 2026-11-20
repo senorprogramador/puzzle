@@ -116,6 +116,9 @@
     grid-column: span 2;
   }
 
+}
+
+@media (min-width: 64rem) {
   .puzzle-features[data-variant="sticky"] .puzzle-features__sticky-layout {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
@@ -125,5 +128,4 @@
     position: sticky;
     inset-block-start: var(--puzzle-space-4, 1rem);
   }
-
 }

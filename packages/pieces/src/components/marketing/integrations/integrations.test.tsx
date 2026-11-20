@@ -67,7 +67,9 @@ describe("IntegrationsSection", () => {
     await user.clear(
       screen.getByRole("searchbox", { name: "Search integrations" }),
     );
-    await user.selectOptions(screen.getByLabelText("Category"), "Communication");
+    screen.getByRole("combobox", { name: "Category" }).focus();
+    await user.keyboard("c");
+    await user.keyboard("{Enter}");
     expect(screen.getByText("Slack")).toBeVisible();
     expect(screen.queryByText("Linear")).toBeNull();
   });

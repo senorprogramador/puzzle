@@ -1,4 +1,4 @@
-import { Tabs } from "@puzzle-ui/ui";
+import { Tabs, Heading, TextAreaInput, Label } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import { useId, useState } from "react";
 import {
@@ -110,10 +110,10 @@ const CodePanel = ({
       </div>
       {editable ? (
         <>
-          <label className="puzzle-code-showcase__visually-hidden" htmlFor={editorId}>
+          <Label className="puzzle-code-showcase__visually-hidden" htmlFor={editorId}>
             Edit {snippet.title ?? snippet.language} code
-          </label>
-          <textarea
+          </Label>
+          <TextAreaInput
             id={editorId}
             className="puzzle-code-showcase__editor"
             value={code}
@@ -222,7 +222,7 @@ const CodeShowcaseSection = <C extends ElementType = "section">({
         <ol className="puzzle-code-showcase__installation">
           {items.map((snippet) => (
             <li key={snippet.id}>
-              {snippet.title ? <h3>{snippet.title}</h3> : null}
+              {snippet.title ? <Heading level="headline3" as="h3">{snippet.title}</Heading> : null}
               {panel(snippet)}
             </li>
           ))}

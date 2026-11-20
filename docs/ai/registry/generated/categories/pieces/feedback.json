@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "ConfirmAction",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "feedback",
+      "subcategory": "feedback",
+      "description": "Present notifications, confirmation dialogs, and recovery actions with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/feedback.mdx",
+      "source": "packages/pieces/src/components/feedback/confirm-action.tsx",
+      "useCases": [
+        "feedback"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "feedback"
+      },
+      "requiredProps": [
+        "triggerLabel",
+        "title",
+        "confirmLabel",
+        "onConfirm"
+      ],
+      "contentRequirements": [
+        "triggerLabel (required)",
+        "title (required)",
+        "description (optional)",
+        "confirmLabel (required)",
+        "cancelLabel (optional)"
+      ],
+      "interactiveBehavior": [
+        "onConfirm"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ErrorStatePanel",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "feedback",
+      "subcategory": "feedback",
+      "description": "Present notifications, confirmation dialogs, and recovery actions with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/feedback.mdx",
+      "source": "packages/pieces/src/components/feedback/feedback.tsx",
+      "useCases": [
+        "feedback"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "feedback"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "NotificationItem",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "feedback",
+      "subcategory": "feedback",
+      "description": "Present notifications, confirmation dialogs, and recovery actions with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/feedback.mdx",
+      "source": "packages/pieces/src/components/feedback/feedback.tsx",
+      "useCases": [
+        "feedback"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "feedback"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)",
+        "dismissLabel (optional)"
+      ],
+      "interactiveBehavior": [
+        "onDismiss"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "NotificationList",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "feedback",
+      "subcategory": "feedback",
+      "description": "Present notifications, confirmation dialogs, and recovery actions with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/feedback.mdx",
+      "source": "packages/pieces/src/components/feedback/feedback.tsx",
+      "useCases": [
+        "feedback"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "feedback"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "label (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "aliases": []
+    }
+  ]
+}

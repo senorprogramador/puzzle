@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "Button",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "actions",
+      "subcategory": "button",
+      "description": "Trigger actions with clear sizes, variants, and loading states.",
+      "documentation": "apps/site/content/docs/ui/actions/button.mdx",
+      "source": "packages/ui/src/components/actions/button/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Button"
+      },
+      "contentRequirements": [
+        "children (optional)"
+      ],
+      "variants": [
+        {
+          "name": "primary",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "secondary",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "outline",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "ghost",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "danger",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "link",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "toggle",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "toggle-active",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "xs",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        },
+        {
+          "name": "sm",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        },
+        {
+          "name": "md",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        },
+        {
+          "name": "lg",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        },
+        {
+          "name": "icon",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ButtonGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "actions",
+      "subcategory": "button-group",
+      "description": "Arrange related actions in a connected set of buttons.",
+      "documentation": "apps/site/content/docs/ui/actions/button-group.mdx",
+      "source": "packages/ui/src/components/actions/button-group/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Button Group"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ToggleGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "actions",
+      "subcategory": "toggle-group",
+      "description": "Select one or more options from a group of toggles.",
+      "documentation": "apps/site/content/docs/ui/actions/toggle-group.mdx",
+      "source": "packages/ui/src/components/actions/toggle-group/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Toggle Group"
+      },
+      "aliases": []
+    }
+  ]
+}

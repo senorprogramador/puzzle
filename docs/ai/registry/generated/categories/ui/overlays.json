@@ -1,0 +1,1168 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "Backdrop",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "backdrop",
+      "description": "Dim the surrounding view behind focused content.",
+      "documentation": "apps/site/content/docs/ui/overlays/backdrop.mdx",
+      "source": "packages/ui/src/components/overlays/backdrop/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Backdrop"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Command",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "command",
+      "description": "Find actions through a searchable command list or dialog.",
+      "documentation": "apps/site/content/docs/ui/overlays/command.mdx",
+      "source": "packages/ui/src/components/overlays/command/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Command"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CommandDialog",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "command",
+      "description": "A composable part of Command. Find actions through a searchable command list or dialog.",
+      "documentation": "apps/site/content/docs/ui/overlays/command.mdx",
+      "source": "packages/ui/src/components/overlays/command/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Command"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenu",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "ContextMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuCheckboxItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuLabel",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuRadioGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuRadioItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuSeparator",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuSub",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuSubContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuSubTrigger",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuTrigger",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Dialog",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dialog",
+      "description": "Present focused modal content with dismissal controls.",
+      "documentation": "apps/site/content/docs/ui/overlays/dialog.mdx",
+      "source": "packages/ui/src/components/overlays/dialog/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Dialog"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Drawer",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "drawer",
+      "description": "Reveal supporting content in a sliding side panel.",
+      "documentation": "apps/site/content/docs/ui/overlays/drawer.mdx",
+      "source": "packages/ui/src/components/overlays/drawer/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Drawer"
+      },
+      "requiredProps": [
+        "open",
+        "onOpenChange"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenu",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuCheckboxItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-content.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuLabel",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuRadioGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-radio.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuRadioItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-radio.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuSeparator",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuTrigger",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-trigger.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Notification",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "notification",
+      "description": "Deliver transient feedback with a provider and viewport.",
+      "documentation": "apps/site/content/docs/ui/overlays/notification.mdx",
+      "source": "packages/ui/src/components/overlays/notification/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Notification"
+      },
+      "requiredProps": [
+        "notification",
+        "onDismiss"
+      ],
+      "interactiveBehavior": [
+        "onDismiss"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "NotificationProvider",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "notification",
+      "description": "A composable part of Notification. Deliver transient feedback with a provider and viewport.",
+      "documentation": "apps/site/content/docs/ui/overlays/notification.mdx",
+      "source": "packages/ui/src/components/overlays/notification/notification-provider.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Notification"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "label (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "NotificationViewport",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "notification",
+      "description": "A composable part of Notification. Deliver transient feedback with a provider and viewport.",
+      "documentation": "apps/site/content/docs/ui/overlays/notification.mdx",
+      "source": "packages/ui/src/components/overlays/notification/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Notification"
+      },
+      "requiredProps": [
+        "notifications",
+        "position",
+        "label",
+        "onDismiss"
+      ],
+      "contentRequirements": [
+        "label (required)"
+      ],
+      "dataRequirements": [
+        "notifications (required)"
+      ],
+      "interactiveBehavior": [
+        "onDismiss"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Popout",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "popout",
+      "description": "Attach a contextual panel to a trigger.",
+      "documentation": "apps/site/content/docs/ui/overlays/popout.mdx",
+      "source": "packages/ui/src/components/overlays/popout/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Popout"
+      },
+      "requiredProps": [
+        "trigger",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Popover",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "popover",
+      "description": "Show interactive content in an anchored floating panel.",
+      "documentation": "apps/site/content/docs/ui/overlays/popover.mdx",
+      "source": "packages/ui/src/components/overlays/popover/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Popover"
+      },
+      "requiredProps": [
+        "trigger",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "title (optional)",
+        "closeLabel (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Portal",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "portal",
+      "description": "Render content outside its parent into a portal target.",
+      "documentation": "apps/site/content/docs/ui/overlays/portal.mdx",
+      "source": "packages/ui/src/components/overlays/portal/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Portal"
+      },
+      "aliases": []
+    },
+    {
+      "name": "PortalTarget",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "portal",
+      "description": "A composable part of Portal. Render content outside its parent into a portal target.",
+      "documentation": "apps/site/content/docs/ui/overlays/portal.mdx",
+      "source": "packages/ui/src/components/overlays/portal/target.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Portal"
+      },
+      "requiredProps": [
+        "id"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Tooltip",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "tooltip",
+      "description": "Add a short explanation on hover or keyboard focus.",
+      "documentation": "apps/site/content/docs/ui/overlays/tooltip.mdx",
+      "source": "packages/ui/src/components/overlays/tooltip/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Tooltip"
+      },
+      "requiredProps": [
+        "trigger",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    }
+  ]
+}

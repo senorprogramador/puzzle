@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "TextEditor",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "editors",
+      "subcategory": "text-editor",
+      "description": "Edit rich text with a formatting toolbar and document renderer.",
+      "documentation": "apps/site/content/docs/ui/editors/text-editor.mdx",
+      "source": "packages/ui/src/components/editors/text-editor/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "TextEditor"
+      },
+      "interactiveBehavior": [
+        "onChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TextEditorToolbar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "editors",
+      "subcategory": "text-editor",
+      "description": "A composable part of TextEditor. Edit rich text with a formatting toolbar and document renderer.",
+      "documentation": "apps/site/content/docs/ui/editors/text-editor.mdx",
+      "source": "packages/ui/src/components/editors/text-editor/text-editor-toolbar.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "TextEditor"
+      },
+      "contentRequirements": [
+        "ariaLabel (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TextRenderer",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "editors",
+      "subcategory": "text-editor",
+      "description": "A composable part of TextEditor. Edit rich text with a formatting toolbar and document renderer.",
+      "documentation": "apps/site/content/docs/ui/editors/text-editor.mdx",
+      "source": "packages/ui/src/components/editors/text-editor/text-renderer.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "TextEditor"
+      },
+      "aliases": []
+    }
+  ]
+}

@@ -1,0 +1,1038 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "Alert",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "alert",
+      "description": "Highlight important information, warnings, and errors.",
+      "documentation": "apps/site/content/docs/ui/data-display/alert.mdx",
+      "source": "packages/ui/src/components/data-display/alert/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Alert"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Avatar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "avatar",
+      "description": "Represent people with profile images or initials.",
+      "documentation": "apps/site/content/docs/ui/data-display/avatar.mdx",
+      "source": "packages/ui/src/components/data-display/avatar/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Avatar"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Badge",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "badge",
+      "description": "Annotate content with a count, label, or status.",
+      "documentation": "apps/site/content/docs/ui/data-display/badge.mdx",
+      "source": "packages/ui/src/components/data-display/badge/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Badge"
+      },
+      "requiredProps": [
+        "content"
+      ],
+      "contentRequirements": [
+        "content (required)",
+        "children (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "BusinessImageView",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Lazily renders a sized image from BusinessImage, or an accessible unavailable-image placeholder when no source exists.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "image"
+      ],
+      "mediaRequirements": [
+        "image (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "CaseStudyCard",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Presents a case study with optional media, client and industry details, challenge, solution, results, metrics, and link.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)"
+      ],
+      "dataRequirements": [
+        "metrics (optional)"
+      ],
+      "mediaRequirements": [
+        "media (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "CompanyInfo",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Displays a company name with optional logo, tagline, description, and linked-name behavior.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "name"
+      ],
+      "contentRequirements": [
+        "description (optional)"
+      ],
+      "mediaRequirements": [
+        "logo (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ContactDetails",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Renders labeled contact values as a definition list and links values when an item href is supplied.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "aliases": []
+    },
+    {
+      "name": "LogoCollection",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Renders a collection of organization logos or names with optional links, descriptions, labels, and scrolling.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "label (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "MetricList",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Displays labeled metric values and optional descriptions as a definition list.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ProfileCard",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Displays a person's avatar, name, role, optional biography, profile link, featured state, and social links.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "name",
+        "role"
+      ],
+      "dataRequirements": [
+        "socials (optional)"
+      ],
+      "mediaRequirements": [
+        "avatar (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ServiceCard",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Presents a service with optional number, icon, image, description, pricing, action, link, and featured state.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)"
+      ],
+      "mediaRequirements": [
+        "image (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SocialLinks",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Renders non-empty social-link data as an accessible list with optional external-link handling.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Card",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardAction",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardDescription",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardFooter",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardHeader",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardMedia",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardTitle",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "DataTable",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "data-table",
+      "description": "Browse tabular data with asynchronous loading, pagination, local sorting, and search.",
+      "documentation": "apps/site/content/docs/ui/data-display/data-table.mdx",
+      "source": "packages/ui/src/components/data-display/data-table/data-table.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Data Table"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyState",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateDescription",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateHeader",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateMedia",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateTitle",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Image",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "image",
+      "description": "Display responsive images with fitting and placeholders.",
+      "documentation": "apps/site/content/docs/ui/data-display/image.mdx",
+      "source": "packages/ui/src/components/data-display/image/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Image"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ImageBox",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "image-box",
+      "description": "Arrange photos in a responsive image collage.",
+      "documentation": "apps/site/content/docs/ui/data-display/image-box.mdx",
+      "source": "packages/ui/src/components/data-display/image-box/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Image Box"
+      },
+      "requiredProps": [
+        "images"
+      ],
+      "mediaRequirements": [
+        "images (required)",
+        "onImageClick (optional)"
+      ],
+      "interactiveBehavior": [
+        "onImageClick",
+        "onViewAll"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "MediaFrame",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "media-frame",
+      "description": "Frame images and product media in browser or device mockups.",
+      "documentation": "apps/site/content/docs/ui/data-display/media-frame.mdx",
+      "source": "packages/ui/src/components/data-display/media-frame/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Media Frame"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "title (optional)",
+        "caption (optional)",
+        "children (required)"
+      ],
+      "mediaRequirements": [
+        "frame (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Paper",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "paper",
+      "description": "Place content on a simple themed surface.",
+      "documentation": "apps/site/content/docs/ui/data-display/paper.mdx",
+      "source": "packages/ui/src/components/data-display/paper/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Paper"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CircularProgress",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "progress",
+      "description": "A composable part of Progress. Show activity with circular or linear progress indicators.",
+      "documentation": "apps/site/content/docs/ui/data-display/progress.mdx",
+      "source": "packages/ui/src/components/data-display/progress/circular-progress.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Progress"
+      },
+      "aliases": []
+    },
+    {
+      "name": "LinearProgress",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "progress",
+      "description": "A composable part of Progress. Show activity with circular or linear progress indicators.",
+      "documentation": "apps/site/content/docs/ui/data-display/progress.mdx",
+      "source": "packages/ui/src/components/data-display/progress/linear-progress.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Progress"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Rating",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "rating",
+      "description": "Display or collect a rating using familiar stars.",
+      "documentation": "apps/site/content/docs/ui/data-display/rating.mdx",
+      "source": "packages/ui/src/components/data-display/rating/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Rating"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Skeleton",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "skeleton",
+      "description": "Reserve space with placeholders while content loads.",
+      "documentation": "apps/site/content/docs/ui/data-display/skeleton.mdx",
+      "source": "packages/ui/src/components/data-display/skeleton/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Skeleton"
+      },
+      "aliases": []
+    }
+  ]
+}

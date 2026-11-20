@@ -1,4 +1,4 @@
-import { ContactDetails } from "@puzzle-ui/ui";
+import { ContactDetails, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   MarketingSection,
@@ -72,7 +72,7 @@ const ContactSection = <C extends ElementType = "section">({
                 className="puzzle-contact-section__department"
                 key={department.id}
               >
-                <h3>{department.name}</h3>
+                <Heading level="headline3" as="h3">{department.name}</Heading>
                 {department.contacts.map((contact) => {
                   const personDetails: BusinessContactItem[] = [
                     ...(contact.email
@@ -102,8 +102,8 @@ const ContactSection = <C extends ElementType = "section">({
                       className="puzzle-contact-section__person"
                       key={contact.id}
                     >
-                      <h4>{contact.name}</h4>
-                      {contact.role ? <p>{contact.role}</p> : null}
+                      <Heading level="headline4" as="h4">{contact.name}</Heading>
+                      {contact.role ? <Text as="p">{contact.role}</Text> : null}
                       <ContactDetails items={personDetails} />
                     </article>
                   );

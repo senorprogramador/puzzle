@@ -6,7 +6,7 @@ import type { SectionAlignment, SectionRootProps } from "../section";
 
 export type MarketingSectionBaseProps<
   C extends ElementType = "section",
-> = Omit<SectionRootProps<C>, "children"> & {
+> = Omit<SectionRootProps<C>, "children" | "title"> & {
   actions?: ReactNode;
   alignment?: SectionAlignment;
   children?: ReactNode;
