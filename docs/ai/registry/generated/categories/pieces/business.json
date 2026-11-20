@@ -29,6 +29,78 @@
       "aliases": []
     },
     {
+      "name": "AccommodationDetailsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "accommodation-details-section",
+      "description": "Compose accommodation metadata, sleeping arrangements, highlights, media, facilities, and optional actions.",
+      "documentation": "apps/site/content/docs/pieces/components/accommodation-details.mdx",
+      "source": "packages/pieces/src/components/business/accommodation-details-section/accommodation-details-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "accommodation-details-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "AccommodationOverviewSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "accommodation-overview-section",
+      "description": "Present accommodation options with responsive cards, stay details, prices, highlights, and a focused carousel.",
+      "documentation": "apps/site/content/docs/pieces/components/accommodation-overview.mdx",
+      "source": "packages/pieces/src/components/business/accommodation-overview-section/accommodation-overview-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "accommodation-overview-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "AmenityListSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "amenity-list-section",
+      "description": "Organize accommodation facilities into accessible, responsive categories and layouts.",
+      "documentation": "apps/site/content/docs/pieces/components/amenity-list.mdx",
+      "source": "packages/pieces/src/components/business/amenity-list-section/amenity-list-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "amenity-list-section"
+      },
+      "aliases": []
+    },
+    {
       "name": "AwardsSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [

@@ -79,17 +79,22 @@ jobs:
         run: bunx playwright install --with-deps chromium
         working-directory: packages/fullstack
 
-      - name: Run workspace and reference-site tests
+      - name: Run workspace, homepage theme, and reference-site tests
         run: bun run test:all
-
-      - name: Build documentation site
-        run: bun run --filter '@puzzle-ui/site' build
 
       - name: Run site SEO unit tests
         run: bun run --filter '@puzzle-ui/site' test:seo
 
       - name: Run rendered site SEO smoke checks
         run: bun run --filter '@puzzle-ui/site' test:seo:smoke
+
+      - name: Upload homepage theme screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-theme-screenshots-node-${{ matrix.node-version }}
+          path: apps/site/test-results/homepage-theme/
+          if-no-files-found: warn
 
   changes:
     name: Detect website changes

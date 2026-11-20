@@ -8,7 +8,9 @@ import {
   SITE_URL,
   getCanonicalUrl,
 } from "@/lib/seo";
-import { ecosystem } from "@/lib/homepage";
+import { aiReadinessFaqs, ecosystem } from "@/lib/homepage";
+import { HomeAiReadiness } from "@/components/home-ai-readiness";
+import { useColorScheme, type ColorScheme } from "@puzzle-ui/hooks";
 import { Theme, type ThemeMode } from "@puzzle-ui/theme";
 import {
   Badge,
@@ -48,6 +50,20 @@ import { Header } from "@/components/layout/header";
 import "./home.css";
 
 type ComponentPanels = typeof componentPanels;
+
+const getHomepageThemeScope = (): HTMLElement | null => {
+  if (typeof document === "undefined") return null;
+  return document.querySelector<HTMLElement>(
+    ".puzzle-theme-scope[data-puzzle-theme-scope]",
+  );
+};
+
+const getSystemColorScheme = (): ColorScheme =>
+  typeof window !== "undefined" &&
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
 
 const codeExample = `import {
   Button,
@@ -128,7 +144,13 @@ const PuzzleLogo = ({
  * This remains a custom component because the interactive behavior is
  * specific to the Puzzle homepage rather than a generic marketing section.
  */
-const ComponentPreview = ({ onToggleTheme }: { onToggleTheme: () => void }) => (
+const ComponentPreview = ({
+  isDarkMode,
+  onToggleTheme,
+}: {
+  isDarkMode: boolean;
+  onToggleTheme: () => void;
+}) => (
   <div className="home-preview">
     <div className="home-preview__topbar">
       <div className="home-preview__dots">
@@ -196,7 +218,7 @@ const ComponentPreview = ({ onToggleTheme }: { onToggleTheme: () => void }) => (
 
             <Switch
               id="home-dark-mode"
-              defaultChecked
+              checked={isDarkMode}
               onChange={onToggleTheme}
             />
           </div>
@@ -393,11 +415,18 @@ const DeferredComponentCarousel = ({ panels }: { panels: ComponentPanels }) => {
 
 const Home = () => {
   const panels = Route.useLoaderData();
+  const colorScheme = useColorScheme({ target: getHomepageThemeScope });
 
-  const [theme, setTheme] = useState<ThemeMode>("dark");
+  const [theme, setTheme] = useState<ThemeMode>("system");
 
   const toggleTheme = () => {
-    setTheme((current) => (current === "dark" ? "light" : "dark"));
+    setTheme((current) => {
+      const activeScheme =
+        current === "system"
+          ? colorScheme ?? getSystemColorScheme()
+          : current;
+      return activeScheme === "dark" ? "light" : "dark";
+    });
   };
 
   return (
@@ -461,7 +490,10 @@ const Home = () => {
             }
             media={
               <div className="home-hero__visual">
-                <ComponentPreview onToggleTheme={toggleTheme} />
+                <ComponentPreview
+                  isDarkMode={colorScheme === "dark"}
+                  onToggleTheme={toggleTheme}
+                />
               </div>
             }
             meta={
@@ -821,7 +853,11 @@ const Home = () => {
             ]}
           />
 
-          {/* 10. FAQ */}
+          {/* 10. AI-READY DEVELOPMENT */}
+
+          <HomeAiReadiness />
+
+          {/* 11. FAQ */}
 
           <FAQSection
             id="faq"
@@ -867,10 +903,22 @@ const Home = () => {
                 answer:
                   "The Pieces package contains reusable React page sections and interface compositions. It helps you build complete pages from consistent, configurable building blocks.",
               },
+              ...aiReadinessFaqs.map((faq) => ({
+                id: faq.id,
+                question: faq.question,
+                answer: (
+                  <>
+                    {faq.answer}{" "}
+                    {"link" in faq && (
+                      <Link href={faq.link.href}>{faq.link.label}</Link>
+                    )}
+                  </>
+                ),
+              })),
             ]}
           />
 
-          {/* 11. FINAL CTA */}
+          {/* 12. FINAL CTA */}
 
           <CTASection
             id="start-building"
@@ -905,7 +953,7 @@ const Home = () => {
           />
         </main>
 
-        {/* 12. FOOTER */}
+        {/* 13. FOOTER */}
 
         <FooterSection
           variant="multi-column"

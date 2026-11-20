@@ -24,7 +24,7 @@
     "seo:validate": "bun run --filter '@puzzle-ui/site' validate:seo",
     "test:e2e": "bun run --filter '@puzzle-ui/create' test:e2e",
     "test:reference": "bun run build && bun run --filter '@puzzle-ui/playground' build && bun run --filter '@puzzle-ui/playground' test:e2e",
-    "test:all": "bun run build && bun run --filter '!@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser && bun run --filter '@puzzle-ui/pieces' test:browser && bun run --filter '@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/playground' build && bun run --filter '@puzzle-ui/playground' test:e2e",
+    "test:all": "bun run build && bun run --filter '!@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser && bun run --filter '@puzzle-ui/pieces' test:browser && bun run --filter '@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/playground' build && bun run --filter '@puzzle-ui/playground' test:e2e && bun run --filter '@puzzle-ui/site' build && bun run --filter '@puzzle-ui/site' test:homepage:theme",
     "benchmark:auth": "bun run build && node scripts/benchmark-auth.mjs",
     "benchmark:seo": "bun run build && bun run packages/seo/scripts/benchmark.ts",
     "benchmark:rendering": "bun run build && bun run --filter workspace-next build && bun run --filter workspace-tanstack build && node scripts/benchmark-rendering.mjs",

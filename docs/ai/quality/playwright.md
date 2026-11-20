@@ -11,7 +11,7 @@ pure logic and component contracts in their existing unit and component tests.
 | UI and Pieces | Vitest projects: unit, component, and Playwright browser |
 | Create CLI | Vitest plus Playwright for generated application flows |
 | Workspace Next and TanStack apps | Node's test runner with Playwright for rendering and hydration |
-| Documentation site | Targeted Playwright scripts, including preview-layout and hydration |
+| Documentation site | Targeted Playwright scripts for preview-layout, hydration, and homepage theme QA |
 | Reference website | Node's test runner with Playwright against the built Vite preview |
 
 Use the affected package or app manifest for exact commands. Root
@@ -59,6 +59,20 @@ client does not recognize; report that distinction instead of implying a
 server-side 404.
 
 ## Screenshots for inspection
+
+The documentation site's `test:homepage:theme` check runs against the
+production build, switches the homepage from dark to light mode, checks
+theme color consistency and WCAG AA text contrast, and verifies overflow at six
+responsive widths. It captures the AI section in both themes at mobile (390px)
+and desktop (1440px) widths. `bun run test:all` and the site's
+`validate:seo` command include this check. Screenshots are diagnostic captures,
+not baseline comparisons; inspect them using the workflow in
+[visual testing](./visual-testing.md).
+
+By default, captures are written to
+`apps/site/test-results/homepage-theme/`. Set
+`PUZZLE_HOMEPAGE_THEME_SCREENSHOT_DIR` to use another directory. CI uploads the
+captures as a per-Node-version artifact.
 
 The reference-site test can optionally capture full-page screenshots at every
 route and required viewport. After building the packages and app, set an output

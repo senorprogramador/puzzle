@@ -21,6 +21,9 @@
       },
       "nonComponentExports": [],
       "documentationOverrides": {
+        "AccommodationDetailsSection": "apps/site/content/docs/pieces/components/accommodation-details.mdx",
+        "AccommodationOverviewSection": "apps/site/content/docs/pieces/components/accommodation-overview.mdx",
+        "AmenityListSection": "apps/site/content/docs/pieces/components/amenity-list.mdx",
         "DashboardOverviewSection": "apps/site/content/docs/pieces/components/application-dashboard.mdx",
         "EmptyStatePanel": "apps/site/content/docs/pieces/components/empty-state.mdx",
         "EmptyStateSection": "apps/site/content/docs/pieces/components/empty-state.mdx",

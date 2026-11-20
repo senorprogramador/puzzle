@@ -16,6 +16,7 @@ const categoryOverviews = new Set([
   "specialized-interactive",
 ]);
 const nonSectionPages = new Set([
+  "accommodation-discovery",
   "data-display",
   "feedback",
   "hero",

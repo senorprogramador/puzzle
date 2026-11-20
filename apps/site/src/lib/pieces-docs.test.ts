@@ -130,6 +130,9 @@ const componentDocs = [
   ["careers-section", "CareersSection"],
   ["partners-section", "PartnersSection"],
   ["awards-section", "AwardsSection"],
+  ["accommodation-overview", "AccommodationOverviewSection"],
+  ["accommodation-details", "AccommodationDetailsSection"],
+  ["amenity-list", "AmenityListSection"],
   ["dashboard", "DashboardOverviewSection"],
   ["activity", "ActivitySection"],
   ["onboarding", "OnboardingSection"],
@@ -155,8 +158,8 @@ const categoryPages = [
 ] as const;
 
 describe("Pieces documentation coverage", () => {
-  it("documents all 48 section families with public imports and previews", () => {
-    expect(componentDocs).toHaveLength(48);
+  it("documents all 51 section families with public imports and previews", () => {
+    expect(componentDocs).toHaveLength(51);
 
     const sidebar = readFileSync(sidebarPath, "utf8");
     for (const [slug, componentName] of componentDocs) {

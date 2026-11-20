@@ -10,13 +10,16 @@ the repository's reference website without adding a parallel test system.
 | Reference website or shared app composition | `bun run test:reference` |
 | UI or Pieces behavior | The package's `test:unit`, `test:component`, or `test:browser` command |
 | Documentation preview layout | `bun run --filter "@puzzle-ui/site" test:preview-layout` |
+| Homepage theme and contrast | `bun run --filter "@puzzle-ui/site" test:homepage:theme` |
 | Framework rendering or hydration | The affected app's rendering tests and the site's hydration validator |
 | Broad release or cross-package change | `bun run test:all` |
 
 `bun run test:reference` builds workspace packages and the playground, then runs
 Playwright against the production preview. It requires the Playwright Chromium
 browser. `bun run test:all` includes this suite and the repository's package,
-browser, and MongoDB integration tests; MongoDB tests require Docker Compose.
+browser, and MongoDB integration tests; it also builds the documentation site
+and checks the homepage's dark/light theme, contrast, and responsive layout.
+MongoDB tests require Docker Compose.
 The separate `bun run test:e2e` command exercises generated CLI projects and
 requires Docker and network access.
 
@@ -33,7 +36,7 @@ Read [Playwright strategy](./playwright.md), [visual testing](./visual-testing.m
 - Workspace framework apps use Node's test runner with Playwright for rendering
   and hydration behavior.
 - The documentation site has Playwright validators for preview layout,
-  hydration, and SEO endpoints.
+  hydration, SEO endpoints, and homepage theme/contrast screenshots.
 - `apps/playground` is the client-side reference website and Storybook app. Its
   production-preview tests use Node's test runner and Playwright. The e2e
   command also runs axe-core checks and screenshot comparisons across the

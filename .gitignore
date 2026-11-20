@@ -47,6 +47,7 @@ json/
 
 # Vitest browser artifacts
 .vitest/
+apps/site/test-results/
 
 # Cloudflare Workers / Miniflare local state
 .wrangler/
