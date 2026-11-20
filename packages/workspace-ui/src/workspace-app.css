@@ -6,6 +6,29 @@
   padding: var(--puzzle-space-3, 0.75rem) var(--puzzle-space-6, 1.5rem);
 }
 
+@media (min-width: 48.001rem) {
+  .puzzle-workspace-shell .puzzle-dashboard-shell__layout {
+    display: block;
+  }
+
+  .puzzle-workspace-shell .puzzle-dashboard-shell__sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-end: 0;
+    box-sizing: border-box;
+    width: 16rem;
+    overflow-y: auto;
+    background: var(--puzzle-color-background);
+    border-inline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-inline-end: 0;
+  }
+
+  .puzzle-workspace-shell .puzzle-dashboard-shell__topbar,
+  .puzzle-workspace-shell .puzzle-dashboard-shell__main {
+    margin-inline-end: 16rem;
+  }
+}
+
 .puzzle-workspace-content,
 .puzzle-workspace-section {
   display: flex;

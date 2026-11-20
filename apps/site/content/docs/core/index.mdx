@@ -1,0 +1,107 @@
+---
+title: Core Utilities
+description: Use Puzzle's framework-independent TypeScript helpers for class names, responsive values, formatting, rendering, and resource scheduling.
+---
+
+<code>@puzzle-ui/core</code> contains small, framework-independent utilities
+shared across Puzzle. It has no React dependency, so you can also use it in
+Node.js, Bun, browser, and edge-runtime code.
+
+## Install
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/core
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/core
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/core
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/core
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+## Build a reusable component helper
+
+Use `cn` to compose caller-provided classes with conditional states, and use
+`resolveResponsiveValue` when an API accepts responsive values. Both helpers
+are useful in your own components as well as when extending Puzzle components.
+
+```ts
+import { cn, resolveResponsiveValue } from "@puzzle-ui/core";
+
+const getCardProps = (isFeatured: boolean, className?: string) => ({
+  className: cn(
+    "product-card",
+    isFeatured && "product-card--featured",
+    className,
+  ),
+  direction: resolveResponsiveValue({
+    mobile: "col",
+    tablet: "row",
+  }),
+});
+```
+
+`cn` removes falsey class values and joins the remaining strings. Responsive
+values are expanded using Puzzle's shared breakpoints, so consumers receive a
+consistent value at each breakpoint.
+
+## Format values for a locale
+
+Pass the locale explicitly to the `Intl`-based formatters. For dates, pass the
+same time zone on the server and client to keep rendered output consistent.
+
+```ts
+import {
+  formatCurrency,
+  formatDateRange,
+  type DateRange,
+} from "@puzzle-ui/core";
+
+const stay: DateRange = {
+  start: new Date("2026-06-10T00:00:00.000Z"),
+  end: new Date("2026-06-14T00:00:00.000Z"),
+};
+
+const price = formatCurrency(425, "EUR", "nl-NL");
+const dates = formatDateRange(stay, "nl-NL", {
+  dateStyle: "medium",
+  timeZone: "Europe/Amsterdam",
+});
+```
+
+These helpers format values; they do not translate labels or choose a locale
+for your application. Use [`@puzzle-ui/i18n`](/docs/multilingual) when you need
+typed translations and locale resolution.
+
+## Public entry points
+
+| Import | Use |
+| --- | --- |
+| `@puzzle-ui/core` | Class names, string casing, responsive values, CSS and color helpers, formatting, and shared utilities. |
+| `@puzzle-ui/core/rendering` | Framework-neutral rendering strategies, visibility contracts, and optimization policies. |
+| `@puzzle-ui/core/resources` | Resource scheduler contracts and helpers. |
+
+Use only these package entry points rather than importing files from the
+package source. For a themed interface, continue with [Theme](/docs/theme) and
+[UI components](/docs/ui); for reusable interactions, see [Hooks](/docs/hooks).

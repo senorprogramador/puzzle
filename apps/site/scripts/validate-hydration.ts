@@ -5,7 +5,11 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, type Browser } from "playwright";
 
-import { COLOR_THEMES, DEFAULT_COLOR_SCHEME } from "@puzzle-ui/theme";
+import {
+  COLOR_THEMES,
+  DEFAULT_COLOR_SCHEME,
+  THEME_TOKEN_REGISTRY,
+} from "@puzzle-ui/theme";
 
 import {
   AUTHOR,
@@ -14,7 +18,10 @@ import {
   SITE_DESCRIPTION,
   SITE_URL,
 } from "../src/lib/seo";
-import { WEBSITE_TEMPLATES } from "../src/components/theme-studio/theme-studio-model";
+import {
+  WEBSITE_TEMPLATES,
+  getThemeTokenGroups,
+} from "../src/components/theme-studio/theme-studio-model";
 
 type GraphNode = {
   "@id"?: string;
@@ -452,7 +459,22 @@ try {
 
   const studioPage = await browser.newPage();
   const studioErrors: string[] = [];
-  studioPage.on("pageerror", (error) => studioErrors.push(error.message));
+  const fontPreviewRequests: string[] = [];
+  await studioPage.route("https://fonts.googleapis.com/**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "text/css",
+      body: "",
+    }),
+  );
+  studioPage.on("request", (request) => {
+    if (request.url().startsWith("https://fonts.googleapis.com/")) {
+      fontPreviewRequests.push(request.url());
+    }
+  });
+  studioPage.on("pageerror", (error) =>
+    studioErrors.push(error.stack ?? error.message),
+  );
   studioPage.on("console", (message) => {
     if (
       message.type() === "error" &&
@@ -466,10 +488,71 @@ try {
   await studioPage.goto(`${origin}${themeStudioPath}`, {
     waitUntil: "networkidle",
   });
+  assert.ok(
+    await studioPage.locator('a[href="/docs/getting-started"]').isVisible(),
+    "Theme Studio renders the shared site app bar",
+  );
+  const sidebar = studioPage.locator(".theme-studio__sidebar");
+  const sidebarScrollarea = studioPage.locator(
+    ".theme-studio__sidebar-scrollarea",
+  );
+  assert.equal(
+    await sidebar.locator(".theme-studio__template-list").count(),
+    1,
+    "template selection is inside the sidebar",
+  );
+  assert.equal(
+    await sidebar.locator(".theme-studio__preset-list").count(),
+    1,
+    "color presets are inside the sidebar",
+  );
+  const desktopSidebarBox = await sidebar.boundingBox();
+  const desktopPreviewBox = await studioPage
+    .locator(".theme-studio__preview-panel")
+    .boundingBox();
+  assert.ok(
+    desktopSidebarBox &&
+      desktopPreviewBox &&
+      desktopSidebarBox.x > desktopPreviewBox.x,
+    "desktop sidebar is positioned beside the website preview",
+  );
+  const desktopSidebarScroll = await sidebarScrollarea.evaluate((element) => ({
+    maxHeight: getComputedStyle(element).maxHeight,
+    overflowY: getComputedStyle(element).overflowY,
+    scrollHeight: element.scrollHeight,
+    clientHeight: element.clientHeight,
+  }));
+  assert.equal(desktopSidebarScroll.overflowY, "auto");
+  assert.ok(
+    desktopSidebarScroll.scrollHeight > desktopSidebarScroll.clientHeight,
+    "desktop sidebar controls scroll independently",
+  );
   assert.equal(
     await studioPage.locator(".theme-studio__preset-card").count(),
     Object.keys(COLOR_THEMES).length + 1,
     "Theme Studio displays every registry entry and the package default",
+  );
+  assert.equal(
+    await studioPage.locator(".theme-studio__token-group").count(),
+    getThemeTokenGroups().length,
+    "Theme Studio displays each registry token group",
+  );
+  for (const group of getThemeTokenGroups()) {
+    const tokenGroup = studioPage.locator(
+      `.theme-studio__token-group[data-token-group="${group}"]`,
+    );
+    await tokenGroup.locator("summary").click();
+    assert.equal(
+      await tokenGroup.locator(".theme-studio__token-field").count(),
+      THEME_TOKEN_REGISTRY.filter((entry) => entry.group === group).length,
+      `${group}: Theme Studio displays every registered token`,
+    );
+    await tokenGroup.locator("summary").click();
+  }
+  assert.deepEqual(
+    fontPreviewRequests,
+    [],
+    "Google Font preview stylesheets are not requested before opening a picker",
   );
   const rootThemeStyle = await studioPage
     .locator('style[data-puzzle-theme="true"]')
@@ -507,19 +590,16 @@ try {
     ),
     "the selected preset supplies its supported dark-mode colors",
   );
-  await studioPage.getByLabel("primary dark color").evaluate((element) => {
-    const input = element as HTMLInputElement;
-    const setter = Object.getOwnPropertyDescriptor(
-      HTMLInputElement.prototype,
-      "value",
-    )?.set;
-
-    if (!setter) throw new Error("Color input value setter is unavailable.");
-
-    setter.call(input, "#123456");
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-    input.dispatchEvent(new Event("change", { bubbles: true }));
+  await studioPage
+    .getByRole("button", { name: "primary dark color" })
+    .click();
+  const colorPickerDialog = studioPage.getByRole("dialog", {
+    name: "Choose primary dark color",
   });
+  await colorPickerDialog
+    .getByRole("textbox", { name: "Color value" })
+    .fill("#123456");
+  await colorPickerDialog.getByRole("button", { name: "Apply" }).click();
   await studioPage
     .locator(".theme-studio__status")
     .filter({ hasText: "Customized" })
@@ -535,17 +615,111 @@ try {
     /"primary": "#123456"/,
     "custom token overrides appear in generated code",
   );
+
+  const spacingGroup = studioPage.locator(
+    '.theme-studio__token-group[data-token-group="spacing"]',
+  );
+  const spacingToken = THEME_TOKEN_REGISTRY.find(
+    (entry) => entry.group === "spacing" && entry.name === "4",
+  );
+  if (!spacingToken) {
+    throw new Error("The Theme package has no spacing token 4.");
+  }
+  await spacingGroup.locator("summary").click();
+  await studioPage
+    .getByRole("textbox", { name: "4 (--puzzle-space-4)" })
+    .fill("1.5rem");
+  await studioPage.waitForFunction(
+    () =>
+      document
+        .querySelector("style[data-puzzle-theme-scope-style]")
+        ?.textContent?.includes("--puzzle-space-4: 1.5rem"),
+    undefined,
+  );
+  assert.match(
+    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
+    /"4": "1.5rem"/,
+    "design-token overrides appear in generated Theme code",
+  );
+  await studioPage
+    .getByRole("button", {
+      name: `Reset 4 (${spacingToken.cssVariable})`,
+    })
+    .click();
+  await studioPage.waitForFunction(
+    ({ variable, value }) =>
+      document
+        .querySelector("style[data-puzzle-theme-scope-style]")
+        ?.textContent?.includes(`${variable}: ${value}`),
+    {
+      variable: spacingToken.cssVariable,
+      value: spacingToken.defaultValue,
+    },
+  );
+  assert.doesNotMatch(
+    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
+    /"spacing":/,
+    "resetting one token removes only its override",
+  );
+  await studioPage
+    .getByRole("textbox", { name: "4 (--puzzle-space-4)" })
+    .fill("1.5rem");
+  await studioPage.waitForFunction(
+    () =>
+      document
+        .querySelector("style[data-puzzle-theme-scope-style]")
+        ?.textContent?.includes("--puzzle-space-4: 1.5rem"),
+    undefined,
+  );
   assert.equal(
     rootThemeStyle,
     await studioPage.locator('style[data-puzzle-theme="true"]').textContent(),
     "Theme Studio leaves the parent site theme unchanged",
   );
 
-  await studioPage.getByRole("button", { name: "Restore preset" }).click();
+  await studioPage
+    .getByRole("button", { name: "Restore preset colors" })
+    .click();
+  assert.match(
+    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
+    /"spacing":/,
+    "restoring preset colors preserves design-token overrides",
+  );
+  await spacingGroup
+    .getByRole("button", { name: "Reset group" })
+    .click();
   assert.doesNotMatch(
-    await studioPage.locator(".theme-studio__code-panel pre").innerText(),
+    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
     /tokens=/,
-    "restoring a preset removes token overrides from generated code",
+    "resetting a token group removes its generated override",
+  );
+
+  const bodyFontPicker = studioPage.getByRole("combobox", {
+    name: "Body font",
+  });
+  await bodyFontPicker.fill("Inter");
+  await studioPage.getByRole("option", { name: "Inter", exact: true }).click();
+  await studioPage.waitForFunction(
+    () =>
+      document
+        .querySelector(".theme-studio__code-panel pre")
+        ?.textContent?.includes('"family": "Inter"'),
+    undefined,
+    { timeout: 5000 },
+  );
+  assert.ok(
+    fontPreviewRequests.length > 0,
+    "opening a font picker lazily requests a visible font preview",
+  );
+  assert.match(
+    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
+    /"body": \{\s+"family": "Inter"/,
+    "selected Google Fonts appear in generated Theme code",
+  );
+  assert.match(
+    await studioPage.locator(".theme-studio__code-panel pre").nth(1).innerText(),
+    /"body": \{\s+"family": "Inter"/,
+    "selected Google Fonts appear in puzzle-fonts.json",
   );
   let selectedThemeIndex = 0;
   for (const template of WEBSITE_TEMPLATES) {
@@ -600,7 +774,62 @@ try {
     }
   }
 
+  await preview.getByRole("button", { name: "Home", exact: true }).click();
+  for (const template of WEBSITE_TEMPLATES) {
+    await studioPage
+      .getByRole("button", { name: template.label, exact: true })
+      .click();
+    const heroImages = preview.locator(".puzzle-hero img");
+    assert.ok(
+      (await heroImages.count()) > 0,
+      `${template.label}: home hero renders a Puzzle image`,
+    );
+    assert.ok(
+      (await heroImages.evaluateAll((images) =>
+        images.every(
+          (image) =>
+            image.getAttribute("src") &&
+            image.getAttribute("alt")?.trim().length,
+        ),
+      )),
+      `${template.label}: hero images have a source and descriptive alternative text`,
+    );
+  }
+
+  await studioPage.setViewportSize({ width: 768, height: 1024 });
+  const tabletTemplateBox = await studioPage
+    .locator(".theme-studio__template-list")
+    .boundingBox();
+  const tabletPreviewBox = await studioPage
+    .locator(".theme-studio__preview-panel")
+    .boundingBox();
+  assert.ok(
+    tabletTemplateBox &&
+      tabletPreviewBox &&
+      tabletTemplateBox.y < tabletPreviewBox.y,
+    "tablet sidebar controls appear before the preview",
+  );
+  assert.equal(
+    await sidebarScrollarea.evaluate(
+      (element) => getComputedStyle(element).overflowY,
+    ),
+    "visible",
+    "tablet sidebar controls do not get trapped in a constrained scroll area",
+  );
+
   await studioPage.setViewportSize({ width: 390, height: 844 });
+  const mobileTemplateBox = await studioPage
+    .locator(".theme-studio__template-list")
+    .boundingBox();
+  const mobilePreviewBox = await studioPage
+    .locator(".theme-studio__preview-panel")
+    .boundingBox();
+  assert.ok(
+    mobileTemplateBox &&
+      mobilePreviewBox &&
+      mobileTemplateBox.y < mobilePreviewBox.y,
+    "mobile sidebar controls appear before the preview",
+  );
   const presetCardBox = await studioPage
     .locator(".theme-studio__preset-card")
     .nth(1)

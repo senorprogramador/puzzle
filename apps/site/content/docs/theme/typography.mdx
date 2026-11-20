@@ -44,6 +44,19 @@ Pass a `fonts` map to `Theme`. Each entry is a `FontConfig`:
 
 `Theme` renders the Google Fonts preconnect links and one stylesheet link per font, and builds properly quoted `font-family` values including your fallbacks.
 
+`GOOGLE_FONT_FAMILIES` is the complete, readonly runtime catalog behind
+`GoogleFontFamily`. Use it to build font pickers without maintaining a second
+list:
+
+```tsx
+import { GOOGLE_FONT_FAMILIES } from "@puzzle-ui/theme";
+
+const fontOptions = GOOGLE_FONT_FAMILIES.map((family) => ({
+  value: family,
+  label: family,
+}));
+```
+
 ### Self-hosting fonts
 
 To serve fonts from your own application, create `puzzle-fonts.json`, run

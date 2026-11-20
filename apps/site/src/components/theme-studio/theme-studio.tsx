@@ -1,262 +1,170 @@
-import { useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 
-import { Theme } from "@puzzle-ui/theme";
+import { assertSafeCssValue } from "@puzzle-ui/core";
+import { Button, Card, ColorPicker, Select, TextInput } from "@puzzle-ui/ui";
+import {
+  THEME_TOKEN_REGISTRY,
+  Theme,
+  type ThemeColorSchemeTokens,
+  type ThemeTokenRegistryEntry,
+} from "@puzzle-ui/theme";
+import { GoogleFontPicker } from "./google-font-picker";
+import { ThemeStudioCodePanel } from "./code-panel";
+import { WebsiteTemplatePreview } from "./templates/website-templates";
+import { Header } from "@/components/layout/header";
 
 import {
   COLOR_ROLES,
+  FEATURED_COLOR_ROLES,
   INITIAL_THEME_STUDIO_STATE,
   PREVIEW_PAGES,
+  SPACING_PRESETS,
   WEBSITE_TEMPLATES,
   createThemeImplementation,
+  createPuzzleFontsJson,
   getBaseColorScheme,
   getColorThemeName,
   getColorThemePresets,
+  getSelectedSpacingPreset,
+  getThemeTokenGroups,
+  getThemeTokenPath,
+  getThemeTokenValue,
+  hasThemeTokenOverrides,
+  hasColorOverrides,
   isThemeCustomized,
   themeStudioReducer,
   type PreviewPage,
-  type WebsiteTemplate,
 } from "./theme-studio-model";
 
 import "./theme-studio.css";
 
-const TEMPLATE_CONTENT: Record<
-  WebsiteTemplate,
-  {
-    brand: string;
-    tagline: string;
-    headline: string;
-    description: string;
-    sectionTitle: string;
-    cards: [string, string, string];
-    action: string;
-  }
-> = {
-  marketing: {
-    brand: "Northstar",
-    tagline: "Make good work matter",
-    headline: "A clearer path to your next big idea.",
-    description:
-      "Bring your best work into focus with thoughtful tools built for teams that want to move forward.",
-    sectionTitle: "Everything you need to move forward",
-    cards: ["Find your focus", "Build momentum", "See what is next"],
-    action: "Start a conversation",
-  },
-  bnb: {
-    brand: "Hearth & Stay",
-    tagline: "A little space to exhale",
-    headline: "Come away. Feel at home.",
-    description:
-      "Slow mornings, thoughtful details, and a welcoming place to return to at the end of the day.",
-    sectionTitle: "A stay made for slowing down",
-    cards: ["Quiet rooms", "A generous breakfast", "The local way"],
-    action: "Check availability",
-  },
-  restaurant: {
-    brand: "Olive & Ember",
-    tagline: "Seasonal food, shared well",
-    headline: "Gather around something good.",
-    description:
-      "A neighborhood table for ingredient-led cooking, long lunches, and evenings worth lingering over.",
-    sectionTitle: "From our kitchen to your table",
-    cards: ["Made with the season", "A table for everyone", "A thoughtful pour"],
-    action: "Book a table",
-  },
-  blog: {
-    brand: "Fieldnotes",
-    tagline: "Ideas worth keeping",
-    headline: "Stories for a more curious world.",
-    description:
-      "Notes, perspectives, and practical ideas from people making thoughtful things happen.",
-    sectionTitle: "The latest from Fieldnotes",
-    cards: ["The art of starting small", "A slower kind of progress", "Making room for ideas"],
-    action: "Read the journal",
-  },
-  corporate: {
-    brand: "Meridian",
-    tagline: "A better way forward",
-    headline: "Make your next move with confidence.",
-    description:
-      "Practical expertise and a clear point of view for organizations ready to grow with purpose.",
-    sectionTitle: "Expertise built around your goals",
-    cards: ["Strategy", "Operations", "Partnerships"],
-    action: "Talk to our team",
-  },
-};
+const isPreviewPage = (value: string): value is PreviewPage =>
+  (PREVIEW_PAGES as readonly string[]).includes(value);
 
-const PAGE_LABELS: Record<PreviewPage, string> = {
-  home: "Home",
-  about: "About",
-  contact: "Contact",
-};
+const FEATURED_COLOR_ROLE_SET: ReadonlySet<string> = new Set(
+  FEATURED_COLOR_ROLES,
+);
 
-const getPageContent = (
-  page: PreviewPage,
-  template: (typeof TEMPLATE_CONTENT)[WebsiteTemplate],
-) => {
-  if (page === "about") {
-    return {
-      headline: `A little more about ${template.brand}.`,
-      description: template.description,
-      sectionTitle: "The things we believe",
-    };
-  }
+const formatTokenName = (name: string): string =>
+  name.replace(/([a-z])([A-Z])/g, "$1 $2");
 
-  if (page === "contact") {
-    return {
-      headline: "We would love to hear from you.",
-      description: `Get in touch with ${template.brand} and tell us what you have in mind.`,
-      sectionTitle: "Start with a hello",
-    };
-  }
+const formatTokenGroup = (group: string): string =>
+  group
+    .split(".")
+    .map(formatTokenName)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" / ");
 
-  return {
-    headline: template.headline,
-    description: template.description,
-    sectionTitle: template.sectionTitle,
-  };
-};
-
-const ThemeStudioWebsite = ({
-  templateId,
-  page,
-  onPageChange,
+const ThemeTokenField = ({
+  entry,
+  value,
+  onChange,
+  onReset,
 }: {
-  templateId: WebsiteTemplate;
-  page: PreviewPage;
-  onPageChange: (page: PreviewPage) => void;
+  entry: ThemeTokenRegistryEntry;
+  value: string;
+  onChange: (value: string) => void;
+  onReset: () => void;
 }) => {
-  const template = TEMPLATE_CONTENT[templateId];
-  const pageContent = getPageContent(page, template);
+  const [draft, setDraft] = useState(value);
+  const [error, setError] = useState<string>();
+  const inputId = `theme-studio-token-${entry.cssVariable.replace(
+    /[^a-zA-Z0-9_-]/g,
+    "-",
+  )}`;
+
+  useEffect(() => setDraft(value), [value]);
+
+  const handleChange = (nextValue: string) => {
+    setDraft(nextValue);
+
+    if (nextValue === "") {
+      onChange("");
+      setError(undefined);
+      return;
+    }
+
+    try {
+      assertSafeCssValue(nextValue, `Theme Studio ${entry.group}.${entry.name}`);
+      onChange(nextValue);
+      setError(undefined);
+    } catch (validationError) {
+      if (!(validationError instanceof TypeError)) throw validationError;
+      setError(validationError.message);
+    }
+  };
 
   return (
-    <div
-      id="preview-home"
-      className="theme-studio__website"
-      data-template={templateId}
-      data-preview-page={page}
-    >
-      <header className="theme-studio__website-header">
-        <a className="theme-studio__brand" href="#preview-home">
-          <span className="theme-studio__brand-mark" aria-hidden="true">
-            {template.brand.charAt(0)}
-          </span>
-          <span>
-            <strong>{template.brand}</strong>
-            <small>{template.tagline}</small>
-          </span>
-        </a>
-
-        <nav className="theme-studio__website-nav" aria-label="Preview pages">
-          {PREVIEW_PAGES.map((previewPage) => (
-            <button
-              key={previewPage}
-              type="button"
-              aria-current={page === previewPage ? "page" : undefined}
-              onClick={() => onPageChange(previewPage)}
-            >
-              {PAGE_LABELS[previewPage]}
-            </button>
-          ))}
-          <button
-            type="button"
-            className="theme-studio__button theme-studio__button--primary theme-studio__nav-action"
-            onClick={() => onPageChange("contact")}
-          >
-            {template.action}
-          </button>
-        </nav>
-      </header>
-
-      <div>
-        <section className="theme-studio__hero">
-          <div className="theme-studio__hero-copy">
-            <p className="theme-studio__eyebrow">{template.tagline}</p>
-            <h2>{pageContent.headline}</h2>
-            <p className="theme-studio__hero-description">
-              {pageContent.description}
-            </p>
-            <button
-              type="button"
-              className="theme-studio__button theme-studio__button--primary"
-              onClick={() => onPageChange("contact")}
-            >
-              {template.action}
-            </button>
-          </div>
-          <div className="theme-studio__hero-art" aria-hidden="true">
-            <span className="theme-studio__art-orbit" />
-            <span className="theme-studio__art-card">
-              <span className="theme-studio__art-line" />
-              <span className="theme-studio__art-line" />
-              <span className="theme-studio__art-chip" />
-            </span>
-          </div>
-        </section>
-
-        <section className="theme-studio__feature-section">
-          <div className="theme-studio__feature-heading">
-            <p className="theme-studio__eyebrow">{template.brand}</p>
-            <h3>{pageContent.sectionTitle}</h3>
-          </div>
-          <div className="theme-studio__feature-grid">
-            {template.cards.map((card, index) => (
-              <article className="theme-studio__feature-card" key={card}>
-                <span className="theme-studio__feature-number">
-                  0{index + 1}
-                </span>
-                <h4>{card}</h4>
-                <p>
-                  Thoughtful details, a clear point of view, and the care to
-                  make every part feel considered.
-                </p>
-                <a href="#preview-details">Explore the details</a>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="theme-studio__contact-card" id="preview-details">
-          <div>
-            <p className="theme-studio__eyebrow">Stay in the loop</p>
-            <h3>Good things start with a conversation.</h3>
-          </div>
-          <form
-            className="theme-studio__contact-form"
-            onSubmit={(event) => event.preventDefault()}
-          >
-            <label htmlFor="theme-studio-preview-email">Your email</label>
-            <div className="theme-studio__form-row">
-              <input
-                id="theme-studio-preview-email"
-                type="email"
-                placeholder="you@example.com"
-              />
-              <button
-                type="submit"
-                className="theme-studio__button theme-studio__button--primary"
-              >
-                Get in touch
-              </button>
-            </div>
-          </form>
-        </section>
+    <div className="theme-studio__token-field">
+      <div className="theme-studio__token-field-heading">
+        <label className="theme-studio__token-label" htmlFor={inputId}>
+          <strong>{formatTokenName(entry.name)}</strong>
+          <code>{entry.cssVariable}</code>
+        </label>
+        <Button
+          className="theme-studio__text-button"
+          variant="link"
+          size="sm"
+          aria-label={`Reset ${formatTokenName(entry.name)} (${entry.cssVariable})`}
+          disabled={value === entry.defaultValue}
+          onClick={onReset}
+        >
+          Reset
+        </Button>
       </div>
-
-      <footer className="theme-studio__website-footer">
-        <span>{template.brand}</span>
-        <span>Thoughtfully made with Puzzle</span>
-        <a href="#preview-home">Back to top</a>
-      </footer>
+      <TextInput
+        id={inputId}
+        inputMode={entry.inputKind === "number" ? "decimal" : undefined}
+        value={draft}
+        aria-invalid={Boolean(error)}
+        aria-label={`${formatTokenName(entry.name)} (${entry.cssVariable})`}
+        onChange={(event) => handleChange(event.currentTarget.value)}
+      />
+      {error && (
+        <span className="theme-studio__token-error" role="alert">
+          {error}
+        </span>
+      )}
     </div>
   );
 };
+
+const ThemeStudioColorField = ({
+  role,
+  mode,
+  value,
+  onChange,
+}: {
+  role: keyof ThemeColorSchemeTokens;
+  mode: "light" | "dark";
+  value: string;
+  onChange: (value: string) => void;
+}) => (
+  <div className="theme-studio__color-field">
+    <span>
+      <code>{value}</code>
+    </span>
+    <ColorPicker
+      rootClassName="theme-studio__color-picker"
+      className="theme-studio__color-trigger"
+      label={`${role} ${mode} color`}
+      value={value}
+      format="hex"
+      clearable={false}
+      onChange={(nextColor) => {
+        if (nextColor !== undefined) onChange(nextColor);
+      }}
+    />
+  </div>
+);
 
 const ThemeStudio = () => {
   const [state, dispatch] = useReducer(
     themeStudioReducer,
     INITIAL_THEME_STUDIO_STATE,
   );
-  const customized = isThemeCustomized(state.tokens);
+  const customized = isThemeCustomized(state.tokens, state.fonts);
+  const selectedSpacingPreset = getSelectedSpacingPreset(state.tokens);
   const selectedPresetName = state.colorTheme
     ? getColorThemeName(state.colorTheme)
     : null;
@@ -268,12 +176,15 @@ const ThemeStudio = () => {
       ? "Custom theme - No preset selected"
       : "Puzzle default";
   const implementation = createThemeImplementation(state);
+  const fontsConfiguration = createPuzzleFontsJson(state);
   const colors = getBaseColorScheme(state.colorTheme, state.mode);
   const defaultColors = getBaseColorScheme(null, state.mode);
 
   return (
-    <main className="theme-studio">
-      <div className="theme-studio__container">
+    <>
+      <Header />
+      <main className="theme-studio">
+        <div className="theme-studio__container">
         <header className="theme-studio__header">
           <div>
             <p className="theme-studio__eyebrow">Puzzle design system</p>
@@ -288,138 +199,6 @@ const ThemeStudio = () => {
           </span>
         </header>
 
-        <section
-          className="theme-studio__section"
-          aria-labelledby="theme-studio-templates-title"
-        >
-          <div className="theme-studio__section-heading">
-            <div>
-              <h2 id="theme-studio-templates-title">Website templates</h2>
-              <p>Choose a website style. Your color theme stays independent.</p>
-            </div>
-          </div>
-          <div className="theme-studio__template-list">
-            {WEBSITE_TEMPLATES.map((template) => (
-              <button
-                key={template.id}
-                type="button"
-                className="theme-studio__template-button"
-                aria-pressed={state.template === template.id}
-                onClick={() =>
-                  dispatch({ type: "template", template: template.id })
-                }
-              >
-                <span className="theme-studio__template-icon" aria-hidden="true">
-                  {template.label.charAt(0)}
-                </span>
-                <span>{template.label}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section
-          className="theme-studio__section"
-          aria-labelledby="theme-studio-presets-title"
-        >
-          <div className="theme-studio__section-heading">
-            <div>
-              <h2 id="theme-studio-presets-title">Color theme presets</h2>
-              <p>
-                Explore the built-in color themes included with Puzzle. Select
-                a theme to instantly apply it to your website preview.
-              </p>
-            </div>
-            <button
-              className="theme-studio__text-button"
-              type="button"
-              disabled={!state.colorTheme && !customized}
-              onClick={() => dispatch({ type: "reset-default" })}
-            >
-              Reset to package default
-            </button>
-          </div>
-
-          <div
-            className="theme-studio__preset-list"
-            role="group"
-            aria-label="Built-in color theme presets"
-          >
-            <button
-              type="button"
-              className="theme-studio__preset-card"
-              aria-pressed={state.colorTheme === null && !customized}
-              onClick={() => dispatch({ type: "preset", colorTheme: null })}
-            >
-              <span className="theme-studio__preset-name">Puzzle default</span>
-              <span className="theme-studio__preset-description">
-                Package colors
-              </span>
-              <span className="theme-studio__swatches" aria-hidden="true">
-                {[
-                  defaultColors.primary,
-                  defaultColors.secondary,
-                  defaultColors.accent,
-                ].map(
-                  (color, index) => (
-                    <span
-                      className="theme-studio__swatch"
-                      key={`${index}-${color}`}
-                      style={{ backgroundColor: color }}
-                    />
-                  ),
-                )}
-              </span>
-              <span className="theme-studio__preset-surfaces" aria-hidden="true">
-                <span style={{ backgroundColor: defaultColors.background }} />
-                <span style={{ backgroundColor: defaultColors.surface }} />
-              </span>
-              <span className="theme-studio__preset-caption">
-                Primary / secondary / accent
-              </span>
-            </button>
-
-            {getColorThemePresets().map((preset) => (
-              <button
-                key={preset.id}
-                type="button"
-                className="theme-studio__preset-card"
-                aria-pressed={
-                  state.colorTheme === preset.id
-                }
-                onClick={() =>
-                  dispatch({ type: "preset", colorTheme: preset.id })
-                }
-              >
-                <span className="theme-studio__preset-name">{preset.name}</span>
-                <span className="theme-studio__preset-description">
-                  {customized && state.colorTheme === preset.id
-                    ? "Customized"
-                    : preset.id}
-                </span>
-                <span className="theme-studio__swatches" aria-hidden="true">
-                  {[preset.colors.primary, preset.colors.secondary, preset.colors.accent].map(
-                    (color, index) => (
-                      <span
-                        className="theme-studio__swatch"
-                        key={`${index}-${color}`}
-                        style={{ backgroundColor: color }}
-                      />
-                    ),
-                  )}
-                </span>
-                <span className="theme-studio__preset-surfaces" aria-hidden="true">
-                  <span style={{ backgroundColor: preset.colors.background }} />
-                  <span style={{ backgroundColor: preset.colors.surface }} />
-                </span>
-                <span className="theme-studio__preset-caption">
-                  Primary / secondary / accent
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
-
         <div className="theme-studio__workspace">
           <section
             className="theme-studio__preview-panel"
@@ -428,18 +207,32 @@ const ThemeStudio = () => {
             <div className="theme-studio__panel-heading">
               <div>
                 <h2 id="theme-studio-preview-title">Live website preview</h2>
-                <p>Page: {PAGE_LABELS[state.page]}</p>
+                <Select
+                  rootClassName="theme-studio__page-picker"
+                  label="Preview page"
+                  value={state.page}
+                  options={PREVIEW_PAGES.map((page) => ({
+                    value: page,
+                    label: page.charAt(0).toUpperCase() + page.slice(1),
+                  }))}
+                  onChange={(page) => {
+                    if (page && isPreviewPage(page)) {
+                      dispatch({ type: "page", page });
+                    }
+                  }}
+                />
               </div>
               <div className="theme-studio__mode-toggle" aria-label="Preview mode">
                 {(["light", "dark"] as const).map((mode) => (
-                  <button
+                  <Button
                     key={mode}
-                    type="button"
+                    variant={state.mode === mode ? "toggle-active" : "toggle"}
+                    size="sm"
                     aria-pressed={state.mode === mode}
                     onClick={() => dispatch({ type: "mode", mode })}
                   >
                     {mode === "light" ? "Light" : "Dark"}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -449,18 +242,195 @@ const ThemeStudio = () => {
                 globalStyles={false}
                 theme={state.mode}
                 colorTheme={state.colorTheme ?? undefined}
+                fonts={state.fonts}
+                fontSource="google"
                 tokens={state.tokens}
               >
-                <ThemeStudioWebsite
-                  templateId={state.template}
-                  page={state.page}
-                  onPageChange={(page) => dispatch({ type: "page", page })}
-                />
+                <div
+                  className="theme-studio__website"
+                  data-template={state.template}
+                  data-preview-page={state.page}
+                >
+                  <WebsiteTemplatePreview
+                    template={state.template}
+                    page={state.page}
+                    onPageChange={(page) => dispatch({ type: "page", page })}
+                  />
+                </div>
               </Theme>
             </div>
           </section>
 
-          <aside className="theme-studio__customization">
+          <aside className="theme-studio__sidebar">
+            <div className="theme-studio__sidebar-scrollarea">
+              <section
+                className="theme-studio__section"
+                aria-labelledby="theme-studio-templates-title"
+              >
+                <div className="theme-studio__section-heading">
+                  <div>
+                    <h2 id="theme-studio-templates-title">Website templates</h2>
+                    <p>
+                      Choose a website style. Your color theme stays
+                      independent.
+                    </p>
+                  </div>
+                </div>
+                <div className="theme-studio__template-list">
+                  {WEBSITE_TEMPLATES.map((template) => (
+                    <Card
+                      key={template.id}
+                      as="button"
+                      type="button"
+                      variant="outlined"
+                      size="sm"
+                      interactive
+                      className="theme-studio__template-button"
+                      aria-pressed={state.template === template.id}
+                      onClick={() =>
+                        dispatch({ type: "template", template: template.id })
+                      }
+                    >
+                      <span
+                        className="theme-studio__template-icon"
+                        aria-hidden="true"
+                      >
+                        {template.label.charAt(0)}
+                      </span>
+                      <span>{template.label}</span>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+
+              <section
+                className="theme-studio__section"
+                aria-labelledby="theme-studio-presets-title"
+              >
+                <div className="theme-studio__section-heading">
+                  <div>
+                    <h2 id="theme-studio-presets-title">
+                      Color theme presets
+                    </h2>
+                    <p>
+                      Explore the built-in color themes included with Puzzle.
+                      Select a theme to instantly apply it to your website
+                      preview.
+                    </p>
+                  </div>
+                  <Button
+                    className="theme-studio__text-button"
+                    variant="link"
+                    size="sm"
+                    disabled={!state.colorTheme && !customized}
+                    onClick={() => dispatch({ type: "reset-default" })}
+                  >
+                    Reset to package default
+                  </Button>
+                </div>
+
+                <div
+                  className="theme-studio__preset-list"
+                  role="group"
+                  aria-label="Built-in color theme presets"
+                >
+                  <Card
+                    as="button"
+                    type="button"
+                    variant="outlined"
+                    size="sm"
+                    interactive
+                    className="theme-studio__preset-card"
+                    aria-pressed={state.colorTheme === null && !customized}
+                    onClick={() =>
+                      dispatch({ type: "preset", colorTheme: null })
+                    }
+                  >
+                    <span className="theme-studio__preset-name">
+                      Puzzle default
+                    </span>
+                    <span className="theme-studio__preset-description">
+                      Package colors
+                    </span>
+                    <span className="theme-studio__swatches" aria-hidden="true">
+                      {[
+                        defaultColors.primary,
+                        defaultColors.secondary,
+                        defaultColors.accent,
+                      ].map((color, index) => (
+                        <span
+                          className="theme-studio__swatch"
+                          key={`${index}-${color}`}
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                    </span>
+                    <span
+                      className="theme-studio__preset-surfaces"
+                      aria-hidden="true"
+                    >
+                      <span
+                        style={{ backgroundColor: defaultColors.background }}
+                      />
+                      <span style={{ backgroundColor: defaultColors.surface }} />
+                    </span>
+                    <span className="theme-studio__preset-caption">
+                      Primary / secondary / accent
+                    </span>
+                  </Card>
+
+                  {getColorThemePresets().map((preset) => (
+                    <Card
+                      key={preset.id}
+                      as="button"
+                      type="button"
+                      variant="outlined"
+                      size="sm"
+                      interactive
+                      className="theme-studio__preset-card"
+                      aria-pressed={state.colorTheme === preset.id}
+                      onClick={() =>
+                        dispatch({ type: "preset", colorTheme: preset.id })
+                      }
+                    >
+                      <span className="theme-studio__preset-name">
+                        {preset.name}
+                      </span>
+                      <span className="theme-studio__preset-description">
+                        {customized && state.colorTheme === preset.id
+                          ? "Customized"
+                          : preset.id}
+                      </span>
+                      <span className="theme-studio__swatches" aria-hidden="true">
+                        {[
+                          preset.colors.primary,
+                          preset.colors.secondary,
+                          preset.colors.accent,
+                        ].map((color, index) => (
+                          <span
+                            className="theme-studio__swatch"
+                            key={`${index}-${color}`}
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </span>
+                      <span
+                        className="theme-studio__preset-surfaces"
+                        aria-hidden="true"
+                      >
+                        <span
+                          style={{ backgroundColor: preset.colors.background }}
+                        />
+                        <span style={{ backgroundColor: preset.colors.surface }} />
+                      </span>
+                      <span className="theme-studio__preset-caption">
+                        Primary / secondary / accent
+                      </span>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+
             <section
               className="theme-studio__panel"
               aria-labelledby="theme-studio-customize-title"
@@ -470,66 +440,251 @@ const ThemeStudio = () => {
                   <h2 id="theme-studio-customize-title">Customize colors</h2>
                   <p>{state.mode === "light" ? "Light" : "Dark"} scheme</p>
                 </div>
-                <button
+                <Button
                   className="theme-studio__text-button"
-                  type="button"
-                  disabled={!customized}
+                  variant="link"
+                  size="sm"
+                  disabled={!hasColorOverrides(state.tokens)}
                   onClick={() => dispatch({ type: "restore-preset" })}
                 >
-                  {state.colorTheme ? "Restore preset" : "Restore default"}
-                </button>
+                  {state.colorTheme
+                    ? "Restore preset colors"
+                    : "Restore default colors"}
+                </Button>
               </div>
 
               <div className="theme-studio__color-fields">
-                {COLOR_ROLES.map((role) => (
-                  <label className="theme-studio__color-field" key={role}>
-                    <span>
-                      <strong>
-                        {role.charAt(0).toUpperCase() + role.slice(1)}
-                      </strong>
-                      <code>
-                        {state.tokens.colorSchemes?.[state.mode]?.[role] ??
-                          colors[role]}
-                      </code>
-                    </span>
-                    <input
-                      type="color"
-                      aria-label={`${role} ${state.mode} color`}
+                {FEATURED_COLOR_ROLES.map((role) => (
+                  <ThemeStudioColorField
+                    key={role}
+                    role={role}
+                    mode={state.mode}
+                    value={
+                      state.tokens.colorSchemes?.[state.mode]?.[role] ??
+                      colors[role]
+                    }
+                    onChange={(value) =>
+                      dispatch({ type: "color", role, value })
+                    }
+                  />
+                ))}
+                <details className="theme-studio__advanced-colors">
+                  <summary>All color roles</summary>
+                  {COLOR_ROLES.filter(
+                    (role) => !FEATURED_COLOR_ROLE_SET.has(role),
+                  ).map((role) => (
+                    <ThemeStudioColorField
+                      key={role}
+                      role={role}
+                      mode={state.mode}
                       value={
                         state.tokens.colorSchemes?.[state.mode]?.[role] ??
                         colors[role]
                       }
-                      onChange={(event) =>
-                        dispatch({
-                          type: "color",
-                          role,
-                          value: event.currentTarget.value,
-                        })
+                      onChange={(value) =>
+                        dispatch({ type: "color", role, value })
                       }
                     />
-                  </label>
+                  ))}
+                </details>
+              </div>
+            </section>
+
+            <section
+              className="theme-studio__panel"
+              aria-labelledby="theme-studio-typography-title"
+            >
+              <div className="theme-studio__panel-heading">
+                <div>
+                  <h2 id="theme-studio-typography-title">Typography</h2>
+                  <p>
+                    Choose independent Google Fonts for the preview. Unselected
+                    roles keep Puzzle&apos;s built-in defaults.
+                  </p>
+                </div>
+              </div>
+              <div className="theme-studio__font-fields">
+                <GoogleFontPicker
+                  label="Body font"
+                  description="Paragraphs, labels, and general interface text."
+                  value={state.fonts.body?.family}
+                  onChange={(family) =>
+                    dispatch({ type: "font", role: "body", family })
+                  }
+                />
+                <GoogleFontPicker
+                  label="Heading font"
+                  description="Headlines and prominent section titles."
+                  value={state.fonts.heading?.family}
+                  onChange={(family) =>
+                    dispatch({ type: "font", role: "heading", family })
+                  }
+                />
+                <GoogleFontPicker
+                  label="Accent font"
+                  description="Editorial highlights and accent copy."
+                  value={state.fonts.accent?.family}
+                  onChange={(family) =>
+                    dispatch({ type: "font", role: "accent", family })
+                  }
+                />
+              </div>
+            </section>
+
+            <section
+              className="theme-studio__panel"
+              aria-labelledby="theme-studio-spacing-title"
+            >
+              <div className="theme-studio__panel-heading">
+                <div>
+                  <h2 id="theme-studio-spacing-title">Spacing options</h2>
+                  <p>
+                    Adjust spacing throughout the preview. Default restores the
+                    Theme package spacing scale.
+                  </p>
+                </div>
+                {selectedSpacingPreset === null && (
+                  <span className="theme-studio__spacing-status">
+                    Custom spacing
+                  </span>
+                )}
+              </div>
+              <div
+                className="theme-studio__spacing-options"
+                role="group"
+                aria-label="Spacing presets"
+              >
+                {SPACING_PRESETS.map((preset) => (
+                  <Card
+                    key={preset.id}
+                    as="button"
+                    type="button"
+                    variant="outlined"
+                    size="sm"
+                    interactive
+                    className="theme-studio__spacing-card"
+                    aria-pressed={selectedSpacingPreset === preset.id}
+                    onClick={() =>
+                      dispatch({
+                        type: "spacing-preset",
+                        spacingPreset: preset.id,
+                      })
+                    }
+                  >
+                    <span>{preset.label}</span>
+                    <span>
+                      {preset.id === "default"
+                        ? "Package scale"
+                        : `${Math.round(preset.scale * 100)}% scale`}
+                    </span>
+                  </Card>
                 ))}
               </div>
             </section>
 
             <section
-              className="theme-studio__panel theme-studio__code-panel"
-              aria-labelledby="theme-studio-code-title"
+              className="theme-studio__panel"
+              aria-labelledby="theme-studio-tokens-title"
             >
               <div className="theme-studio__panel-heading">
                 <div>
-                  <h2 id="theme-studio-code-title">Implementation code</h2>
-                  <p>Uses the public Theme provider API.</p>
+                  <h2 id="theme-studio-tokens-title">Design tokens</h2>
+                  <p>
+                    Edit supported non-color values. Unchanged tokens keep the
+                    Theme package defaults.
+                  </p>
                 </div>
+                <Button
+                  className="theme-studio__text-button"
+                  variant="link"
+                  size="sm"
+                  disabled={!hasThemeTokenOverrides(state.tokens)}
+                  onClick={() => dispatch({ type: "reset-design-tokens" })}
+                >
+                  Reset token overrides
+                </Button>
               </div>
-              <pre>
-                <code>{implementation}</code>
-              </pre>
+              <div className="theme-studio__token-groups">
+                {getThemeTokenGroups().map((group) => {
+                  const entries = THEME_TOKEN_REGISTRY.filter(
+                    (entry) => entry.group === group,
+                  );
+                  const groupPath = group.split(".");
+                  const groupHasOverrides = hasThemeTokenOverrides(
+                    state.tokens,
+                    group,
+                  );
+
+                  return (
+                    <details
+                      className="theme-studio__token-group"
+                      data-token-group={group}
+                      key={group}
+                    >
+                      <summary>
+                        <span>{formatTokenGroup(group)}</span>
+                        <span>{entries.length} tokens</span>
+                      </summary>
+                      <div className="theme-studio__token-group-content">
+                        <Button
+                          className="theme-studio__text-button"
+                          variant="link"
+                          size="sm"
+                          disabled={!groupHasOverrides}
+                          onClick={() =>
+                            dispatch({
+                              type: "reset-token-group",
+                              path: groupPath,
+                            })
+                          }
+                        >
+                          Reset group
+                        </Button>
+                        {entries.map((entry) => (
+                          <ThemeTokenField
+                            key={entry.cssVariable}
+                            entry={entry}
+                            value={getThemeTokenValue(state.tokens, entry)}
+                            onChange={(value) => {
+                              const path = getThemeTokenPath(entry);
+                              dispatch(
+                                value === "" || value === entry.defaultValue
+                                  ? { type: "reset-token", path }
+                                  : { type: "token", path, value },
+                              );
+                            }}
+                            onReset={() =>
+                              dispatch({
+                                type: "reset-token",
+                                path: getThemeTokenPath(entry),
+                              })
+                            }
+                          />
+                        ))}
+                      </div>
+                    </details>
+                  );
+                })}
+              </div>
             </section>
+
+            <ThemeStudioCodePanel
+              title="Theme implementation"
+              description="Use this provider configuration in your application."
+              code={implementation}
+            />
+            <ThemeStudioCodePanel
+              title="puzzle-fonts.json"
+              description="Download and self-host the Google Fonts used by your theme with the Puzzle Theme CLI."
+              code={fontsConfiguration}
+              emptyMessage="Select at least one Google Font to generate this configuration."
+            />
+            </div>
           </aside>
         </div>
-      </div>
-    </main>
+        </div>
+      </main>
+    </>
   );
 };
 

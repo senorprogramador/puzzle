@@ -55,19 +55,22 @@ const buildLlmsTxt = (): string => {
 
   const startPage = getPage("/docs/getting-started");
   const packageOverviews = [
-    "/docs/ui",
-    "/docs/theme",
+    "/docs/core",
     "/docs/hooks",
     "/docs/icons",
-    "/docs/pieces/components/hero",
+    "/docs/theme",
+    "/docs/ui",
+    "/docs/pieces",
+    "/docs/auth",
+    "/docs/session",
+    "/docs/storage",
+    "/docs/fullstack",
     "/docs/seo",
     "/docs/multilingual",
-    "/docs/auth",
-    "/docs/fullstack",
-    "/docs/storage",
     "/docs/create",
   ].map(getPage);
   const tutorials = [
+    "/docs/tutorials/theme",
     "/docs/tutorials/seo",
     "/docs/tutorials/auth",
     "/docs/tutorials/auth-tanstack-start",

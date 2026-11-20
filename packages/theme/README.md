@@ -60,24 +60,34 @@ Customize the color scheme, color theme, fonts, and tokens:
 </Theme>
 ```
 
-  `COLOR_THEMES` is the read-only registry of built-in color themes. Its keys
-  are the identifiers accepted by `Theme`'s `colorTheme` prop, and each value
-  contains the actual light colors and dark-mode brand overrides:
+`COLOR_THEMES` is the read-only registry of built-in color themes. Its keys
+are the identifiers accepted by `Theme`'s `colorTheme` prop, and each value
+contains the actual light colors and dark-mode brand overrides:
 
-  ```ts
-  import { COLOR_THEMES, type ColorThemes } from "@puzzle-ui/theme";
+```ts
+import { COLOR_THEMES } from "@puzzle-ui/theme";
 
-  const presets = Object.entries(COLOR_THEMES) as [
-    ColorThemes,
-    (typeof COLOR_THEMES)[ColorThemes],
-  ][];
-  ```
+const presets = Object.entries(COLOR_THEMES);
+```
 
-  When `colorTheme` is omitted, `Theme` uses its package defaults. The
-  `DEFAULT_COLOR_SCHEME` export exposes those default light and dark color
-  values for tools that need to preview them without defining a second palette.
+When `colorTheme` is omitted, `Theme` uses its package defaults. The
+`DEFAULT_COLOR_SCHEME` export exposes those default light and dark color values
+for tools that need to preview them without defining a second palette.
 
-  ## Features
+`THEME_TOKEN_REGISTRY` provides read-only metadata for every non-color token
+and named typography-role value, including its default and generated CSS
+variable. It is intended for tools that need to inspect or edit supported
+tokens without duplicating the package's token definitions:
+
+```ts
+import { THEME_TOKEN_REGISTRY } from "@puzzle-ui/theme";
+
+const spacing = THEME_TOKEN_REGISTRY.filter(
+  (token) => token.group === "spacing",
+);
+```
+
+## Features
 
   | Area                 | Description                                                                                       | Docs                                                                |
 | -------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |

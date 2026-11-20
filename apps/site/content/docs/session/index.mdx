@@ -1,0 +1,201 @@
+---
+title: Session Management
+description: Create, validate, rotate, and revoke secure server-side sessions with Puzzle Storage and HttpOnly cookies.
+---
+
+<code>@puzzle-ui/session</code> manages opaque server-side sessions on top of a
+Puzzle Storage adapter. It works independently of an authentication system,
+which makes it useful for anonymous carts and custom sign-in flows. For
+account registration, MFA, and a protected dashboard, follow the
+[Auth tutorial](/docs/tutorials/auth) instead.
+
+## Install
+
+Add Session and choose a storage adapter for your server:
+
+<PackageManagerTabs>
+  <PackageManagerTab value="npm">
+
+```bash
+npm install @puzzle-ui/session @puzzle-ui/storage @puzzle-ui/storage-mongodb
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="bun">
+
+```bash
+bun add @puzzle-ui/session @puzzle-ui/storage @puzzle-ui/storage-mongodb
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="pnpm">
+
+```bash
+pnpm add @puzzle-ui/session @puzzle-ui/storage @puzzle-ui/storage-mongodb
+```
+
+  </PackageManagerTab>
+  <PackageManagerTab value="yarn">
+
+```bash
+yarn add @puzzle-ui/session @puzzle-ui/storage @puzzle-ui/storage-mongodb
+```
+
+  </PackageManagerTab>
+</PackageManagerTabs>
+
+This example uses MongoDB. Configure its connection and migrations using the
+[Storage guide](/docs/storage#mongodb-adapter); Cloudflare Workers can use the
+[D1 adapter](/docs/storage#cloudflare-d1-adapter) instead.
+
+## Initialize the session manager
+
+Create one manager with your server's storage adapter and initialize both the
+storage collections and manager before handling requests. Session management
+requires unique constraints, conditional writes, and atomic batches; it fails
+closed when the adapter cannot provide those capabilities.
+
+```ts
+import {
+  createSessionCookieOptions,
+  initializeSessionStorage,
+  StorageSessionManager,
+} from "@puzzle-ui/session";
+
+const idleTimeoutSeconds = 60 * 60 * 24 * 7;
+const sessions = new StorageSessionManager(storage, {
+  lifetime: {
+    idleTimeoutSeconds,
+    absoluteLifetimeSeconds: 60 * 60 * 24 * 30,
+  },
+  maximumSessionsPerUser: 10,
+});
+
+await initializeSessionStorage(storage);
+await sessions.initialize();
+
+const cookieOptions = createSessionCookieOptions({
+  production: isProduction,
+});
+```
+
+`storage` is the configured adapter from the storage guide. Set
+`isProduction` from your server environment; production cookies require HTTPS
+and are marked `Secure`.
+
+## Create and deliver a session
+
+Create an anonymous session for a visitor, or use `kind: "authenticated"` and
+a verified user ID after your sign-in flow succeeds. Only send the opaque
+token through an HttpOnly cookie; never return it in JSON or store it in
+browser-accessible storage.
+
+```ts
+import { serializeSessionCookie } from "@puzzle-ui/session";
+
+const created = await sessions.create({
+  kind: "anonymous",
+  userId: null,
+});
+
+return new Response(null, {
+  headers: {
+    "Set-Cookie": serializeSessionCookie(
+      created.token,
+      cookieOptions,
+      idleTimeoutSeconds,
+    ),
+  },
+});
+```
+
+## Validate a request
+
+Read the token from the incoming cookie and validate it against storage on the
+server. A missing, expired, or revoked session is unauthenticated.
+
+```ts
+import { readSessionCookie } from "@puzzle-ui/session";
+
+const token = readSessionCookie(
+  request.headers.get("cookie"),
+  cookieOptions.name,
+);
+const session = token ? await sessions.validate(token) : null;
+
+if (!session) {
+  return new Response("Sign in required", { status: 401 });
+}
+```
+
+For actions that change state, also validate the request origin or use
+`protectStateChangingRequest` to apply the package's CSRF protections. Session
+validation alone does not protect an endpoint from cross-site requests.
+
+## Rotate a session
+
+Rotate a session after a privilege change. Rotation atomically revokes the old
+session and returns a new token to put in the cookie.
+
+```ts
+import { serializeSessionCookie } from "@puzzle-ui/session";
+
+const rotated = await sessions.rotate({ sessionId: session.id });
+return new Response(null, {
+  headers: {
+    "Set-Cookie": serializeSessionCookie(
+      rotated.token,
+      cookieOptions,
+      idleTimeoutSeconds,
+    ),
+  },
+});
+```
+
+## Sign out
+
+Revoke the current session on sign-out, then clear the same cookie.
+
+```ts
+import { serializeClearedSessionCookie } from "@puzzle-ui/session";
+
+await sessions.revoke(session.id);
+return new Response(null, {
+  headers: {
+    "Set-Cookie": serializeClearedSessionCookie(cookieOptions),
+  },
+});
+```
+
+## Store short-lived session data
+
+Use `SessionDataManager` for small values such as a cart. Allowlist each
+namespace and give expiring values a time-to-live.
+
+```ts
+import { SessionDataManager } from "@puzzle-ui/session";
+
+const data = new SessionDataManager(storage, {
+  allowedNamespaces: ["cart"],
+});
+await data.initialize();
+
+await data.set(
+  session.id,
+  "cart",
+  "items",
+  [{ productId: "product-1", quantity: 2 }],
+  60 * 60,
+);
+```
+
+Session data is not a replacement for durable application records. Keep
+authorization decisions on the server and use your storage adapter's
+conformance tests before deploying a custom adapter.
+
+## Next steps
+
+- [Storage contracts and adapters](/docs/storage)
+- [Authentication services](/docs/auth)
+- [Full-stack authentication](/docs/fullstack)
+- [Complete Auth tutorial](/docs/tutorials/auth)

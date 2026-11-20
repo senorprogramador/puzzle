@@ -1611,6 +1611,7 @@ const WorkspaceApp = ({
 
   return (
     <DashboardShell
+      className="puzzle-workspace-shell"
       sidebar={
         <DashboardSidebar
           items={navItems}

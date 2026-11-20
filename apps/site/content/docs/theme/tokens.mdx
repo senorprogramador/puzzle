@@ -23,6 +23,19 @@ Pass a deep-partial `tokens` object to `Theme`. Anything you omit keeps its defa
 
 Every value is validated as a safe CSS value before it is injected.
 
+Tools can discover supported non-color tokens, defaults, and their generated
+CSS custom properties from the public `THEME_TOKEN_REGISTRY` export. The
+registry is derived from the package defaults, so consumers do not need to
+maintain a parallel token list:
+
+```ts
+import { THEME_TOKEN_REGISTRY } from "@puzzle-ui/theme";
+
+const spacing = THEME_TOKEN_REGISTRY.filter(
+  (token) => token.group === "spacing",
+);
+```
+
 ## Token groups
 
 ### Spacing
