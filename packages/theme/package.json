@@ -76,7 +76,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "ai"
   ],
   "scripts": {
     "build": "tsdown",

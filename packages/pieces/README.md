@@ -58,7 +58,7 @@ exports.
 
 ## Available section families
 
-These are the 48 documented section families. `Hero` and existing dashboard,
+These are the 51 documented section families. `Hero` and existing dashboard,
 navigation, project, data-display, and feedback compositions are also
 available; see the [component catalog](https://puzzle-ui.com/docs/pieces).
 
@@ -68,7 +68,7 @@ available; see the [component catalog](https://puzzle-ui.com/docs/pieces).
 | SaaS & Product (7) | Product Showcase, Integrations, Use Cases, Security, Pricing, Code Showcase, Roadmap |
 | Commerce (6) | Product Grid, Categories, Product Gallery, Cart Summary, Product Details, Commerce Benefits |
 | Content & Editorial (5) | Blog, Content, Gallery, Timeline, Changelog |
-| Business & Corporate (8) | About, Team, Services, Case Studies, Contact, Careers, Partners, Awards |
+| Business & Corporate (11) | About, Team, Services, Case Studies, Contact, Careers, Partners, Awards, Accommodation Overview, Accommodation Details, Amenity List |
 | Application & Dashboard (5) | Dashboard Overview, Activity, Onboarding, Empty State, Settings |
 | Specialized & Interactive (7) | Video, Booking, Location, Waitlist, Resource, Event, Footer |
 
@@ -83,6 +83,16 @@ to compare use cases:
 - [Business & Corporate](https://puzzle-ui.com/docs/pieces/components/business)
 - [Application & Dashboard](https://puzzle-ui.com/docs/pieces/components/application-dashboard)
 - [Specialized & Interactive](https://puzzle-ui.com/docs/pieces/components/specialized-interactive)
+
+The accommodation sections are presentation-only: compose them with the
+existing `AccommodationHero`, `GallerySection`, `TestimonialsSection`, and
+`CTASection`. The [accommodation discovery example](https://puzzle-ui.com/docs/pieces/components/accommodation-discovery)
+shows the full composition; availability, booking, payments, and guest data
+remain application responsibilities.
+
+- [AccommodationOverviewSection](https://puzzle-ui.com/docs/pieces/components/accommodation-overview)
+- [AccommodationDetailsSection](https://puzzle-ui.com/docs/pieces/components/accommodation-details)
+- [AmenityListSection](https://puzzle-ui.com/docs/pieces/components/amenity-list)
 
 ## Styling and themes
 

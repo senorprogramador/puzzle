@@ -1,20 +1,9 @@
-import { cn } from "@puzzle-ui/core";
+import { cn, formatCurrency, formatNumber } from "@puzzle-ui/core";
 import type { CommerceMoney, CommerceRating } from "./shared.types";
 import "./shared.css";
 
 const formatMoney = (money: CommerceMoney, locale = "en-US") => {
-  if (!Number.isFinite(money.amount)) {
-    throw new RangeError("Currency amount must be a finite number.");
-  }
-
-  if (typeof money.currency !== "string" || money.currency.trim() === "") {
-    throw new TypeError("Currency must be a non-empty ISO 4217 code.");
-  }
-
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency: money.currency,
-  }).format(money.amount);
+  return formatCurrency(money.amount, money.currency, locale);
 };
 
 const formatQuantity = (quantity: number, locale = "en-US") => {
@@ -22,9 +11,7 @@ const formatQuantity = (quantity: number, locale = "en-US") => {
     throw new RangeError("Quantity must be a non-negative safe integer.");
   }
 
-  return new Intl.NumberFormat(locale, {
-    maximumFractionDigits: 0,
-  }).format(quantity);
+  return formatNumber(quantity, locale, { maximumFractionDigits: 0 });
 };
 
 const validateCommerceRating = (
@@ -58,9 +45,7 @@ const validateCommerceRating = (
 };
 
 const formatRating = (rating: CommerceRating, locale = "en-US") =>
-  new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(
-    rating.value,
-  );
+  formatNumber(rating.value, locale, { maximumFractionDigits: 1 });
 
 const CommercePrice = ({
   price,

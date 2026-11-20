@@ -18,6 +18,7 @@ not replace package documentation or duplicate package instructions.
 | Run browser QA or assess a generated/reference website | [Quality overview](./quality/README.md), [Playwright strategy](./quality/playwright.md), [visual testing](./quality/visual-testing.md), [responsive testing](./quality/responsive-testing.md), [accessibility](./quality/accessibility.md) |
 | Review evidence from the current quality initiative | [Initiative assessment](./quality/initiative-assessment.md) |
 | Plan and generate a website | [Website planning engine](./website/README.md), [15-phase workflow](./website/generation-workflow.md) |
+| Install Puzzle consumer instructions in an application | [AI integration guide](./integration/README.md), [generated package registry](./integration/registry.json) |
 | Change documentation-site content or navigation | [Site instructions](../../apps/site/AGENTS.md) |
 | Work on auth security | [Auth security guide](../../apps/site/content/docs/auth/security.mdx), [security policy](../../SECURITY.md) |
 

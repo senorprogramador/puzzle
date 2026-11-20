@@ -41,7 +41,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "ai"
   ],
   "sideEffects": false,
   "scripts": {

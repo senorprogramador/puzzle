@@ -1,0 +1,103 @@
+.puzzle-amenity-list {
+  min-width: 0;
+}
+
+.puzzle-amenity-list__categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  align-items: start;
+  gap: var(--puzzle-space-5, 1.25rem);
+  min-width: 0;
+}
+
+.puzzle-amenity-list--list .puzzle-amenity-list__categories {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.puzzle-amenity-list__category {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-amenity-list__category > h3,
+.puzzle-amenity-list__category summary {
+  margin: 0;
+}
+
+.puzzle-amenity-list__category details {
+  min-width: 0;
+}
+
+.puzzle-amenity-list__category summary {
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-amenity-list__category summary:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-amenity-list__items {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-amenity-list__category details > .puzzle-amenity-list__items {
+  margin-block-start: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-amenity-list__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+  padding: var(--puzzle-space-3, 0.75rem);
+  overflow-wrap: anywhere;
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-amenity-list[data-variant="compact"] .puzzle-amenity-list__item {
+  gap: var(--puzzle-space-2, 0.5rem);
+  padding: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-amenity-list--list .puzzle-amenity-list__item {
+  border-inline: 0;
+  border-block-start: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-amenity-list__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--puzzle-color-primary);
+}
+
+.puzzle-amenity-list__copy {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-amenity-list__label {
+  overflow-wrap: anywhere;
+}
+
+.puzzle-amenity-list__copy p {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.puzzle-amenity-list__content {
+  min-width: 0;
+}

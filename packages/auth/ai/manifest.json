@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "packageName": "@puzzle-ui/auth",
+  "instructionVersion": 1,
+  "contentFile": "instructions.md",
+  "instructionDependencies": [
+    "@puzzle-ui/session",
+    "@puzzle-ui/storage"
+  ],
+  "documentationUrl": "https://puzzle-ui.com/docs/auth"
+}

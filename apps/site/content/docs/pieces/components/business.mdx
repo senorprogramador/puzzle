@@ -4,6 +4,7 @@ description: Present organizational profiles, teams, services, case studies, car
 ---
 
 import {
+  AccommodationOverviewSection,
   AboutSection,
   LocationSection,
   ServicesSection,
@@ -26,6 +27,9 @@ Business sections give organizations reusable ways to present people, work, serv
 | Careers Section | Present open roles and workplace information. | [Careers Section](/docs/pieces/components/careers-section) |
 | Partners Section | Show partner organizations. | [Partners Section](/docs/pieces/components/partners-section) |
 | Awards Section | Present awards and recognition. | [Awards Section](/docs/pieces/components/awards-section) |
+| Accommodation Overview | Compare accommodation options and guest-facing details. | [Accommodation Overview](/docs/pieces/components/accommodation-overview) |
+| Accommodation Details | Compose one accommodation profile with media and facilities slots. | [Accommodation Details](/docs/pieces/components/accommodation-details) |
+| Amenity List | Group facilities in compact, expanded, grid, list, or collapsible layouts. | [Amenity List](/docs/pieces/components/amenity-list) |
 
 ## About, services, and locations
 
@@ -89,6 +93,48 @@ Business sections give organizations reusable ways to present people, work, serv
     ]}
   />
 </Preview>
+
+## Accommodation and hospitality
+
+<Preview
+  fit="device"
+  code={`<AccommodationOverviewSection title="Find your stay" items={stays} />`}
+>
+  <AccommodationOverviewSection
+    title="Find your stay"
+    description="Compare a quiet cabin, a family home, and a coastal lodge."
+    items={[
+      {
+        id: "cabin",
+        name: "Pinecone Cabin",
+        capacity: 2,
+        bedrooms: 0,
+        beds: 1,
+        bathrooms: 1,
+        price: { amount: 125, currency: "EUR" },
+        image: {
+          src: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1200&q=85",
+          alt: "A compact cabin among trees",
+        },
+      },
+      {
+        id: "willow",
+        name: "Willow House",
+        capacity: 6,
+        bedrooms: 3,
+        beds: 5,
+        bathrooms: 2,
+      },
+    ]}
+  />
+</Preview>
+
+Compose [Accommodation Details](/docs/pieces/components/accommodation-details)
+with [Amenity List](/docs/pieces/components/amenity-list) and existing
+[Hero](/docs/pieces/components/hero) and
+[GallerySection](/docs/pieces/components/gallery-section). The complete
+[Accommodation Discovery example](/docs/pieces/components/accommodation-discovery)
+also includes guest reviews and a CTA.
 
 ## Composition and accessibility
 

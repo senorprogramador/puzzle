@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "packageName": "@puzzle-ui/hooks",
+  "instructionVersion": 1,
+  "contentFile": "instructions.md",
+  "instructionDependencies": [
+    "@puzzle-ui/core"
+  ],
+  "documentationUrl": "https://puzzle-ui.com/docs/hooks"
+}

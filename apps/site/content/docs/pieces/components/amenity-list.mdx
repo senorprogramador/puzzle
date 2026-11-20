@@ -1,0 +1,140 @@
+---
+title: AmenityListSection
+description: Organize accommodation facilities into accessible, responsive categories and layouts.
+---
+
+import { AmenityListSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { AmenityListVariantsExample } from "../../../../src/components/doc-examples/pieces/accommodation";
+
+`AmenityListSection` presents facilities grouped by category. It supports
+compact or expanded content, grid or list layout, optional native collapsible
+groups, icons, and custom React content.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { AmenityListSection, type AmenityCategory } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The preview covers compact and expanded content in both layouts, plus native
+collapsible categories.
+
+<AmenityListVariantsExample />
+
+## API
+
+| Prop or type | Type | Description |
+| --- | --- | --- |
+| `categories` | `readonly AmenityCategory[]` | Required categories with stable IDs, names, and amenity lists. |
+| `variant` | `AmenityListVariant` | `expanded` (default) shows descriptions; `compact` omits descriptions. |
+| `layout` | `AmenityListLayout` | `grid` (default) or `list`. |
+| `collapsible` | `boolean` | Uses native `<details>` groups when true; defaults to false. |
+| `defaultExpanded` | `boolean` | Initial open state for collapsible categories; defaults to false. |
+| `AmenityCategory.items` | `readonly Amenity[]` | Facilities within the category. Empty categories are omitted. |
+| `Amenity.label` | `ReactNode` | Required visible name. |
+| `Amenity.icon` | `ReactNode` | Optional decorative icon; the visible label remains the accessible name. |
+| `Amenity.description` | `ReactNode` | Optional supporting description, shown by the expanded variant. |
+| `Amenity.content` | `ReactNode` | Optional custom content shown in either variant. |
+| Shared section props | `MarketingSectionBaseProps` | Semantic section, heading, actions, children, theme, and native attributes. |
+
+### Required and default values
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `categories` | Yes | — |
+| `variant` | No | `"expanded"` |
+| `layout` | No | `"grid"` |
+| `collapsible` | No | `false` |
+| `defaultExpanded` | No | `false` |
+
+## Usage
+
+```tsx
+const facilities: AmenityCategory[] = [
+  {
+    id: "comfort",
+    name: "Comfort",
+    items: [
+      {
+        id: "wifi",
+        label: "High-speed Wi-Fi",
+        description: "Available throughout the accommodation.",
+      },
+      {
+        id: "linen",
+        label: "Fresh linen",
+        content: <a href="/guest-guide#linen">Read the linen policy</a>,
+      },
+    ],
+  },
+];
+
+<AmenityListSection
+  title="Facilities"
+  categories={facilities}
+  variant="expanded"
+  layout="grid"
+  collapsible
+/>;
+```
+
+Category IDs must be unique; amenity IDs must be unique within each category.
+The component does not infer a standard amenity taxonomy or generate icons.
+
+## Accessibility
+
+Collapsible groups use native `<details>` and `<summary>`, preserving browser
+keyboard interaction and expanded state. Category names are the summary labels;
+every icon is decorative because each amenity retains its visible text label.
+Provide accessible names inside custom content for interactive elements.
+
+## Responsive behavior
+
+The grid uses fluid auto-fitting columns and collapses to one column when
+space is limited. The list always uses one column. Long names and descriptions
+wrap naturally; no fixed heights or clipping are applied.
+
+## Theme support
+
+Borders, surfaces, muted text, and icon emphasis use Puzzle semantic tokens.
+The section inherits light, dark, and scoped themes without requiring a
+provider beyond the application's existing `Theme` setup.
+
+## Customization
+
+Provide any React node as an amenity icon or custom content. `children` can add
+section-level content without replacing the typed category data.
+
+```tsx
+<AmenityListSection
+  categories={facilities}
+  collapsible
+  defaultExpanded
+  className="brand-facilities"
+>
+  <p>Ask us if you need anything not listed.</p>
+</AmenityListSection>
+```
+
+## Composition
+
+Use this component in `AccommodationDetailsSection`'s `facilities` slot, or
+alongside the [AccommodationOverviewSection](/docs/pieces/components/accommodation-overview).
+See the [complete accommodation discovery example](/docs/pieces/components/accommodation-discovery).
+
+## Framework compatibility
+
+The component is server-renderable and does not use React state or browser
+globals. Native disclosure interaction works in Next.js and TanStack Start.
+
+## Related components
+
+- [Accommodation overview](/docs/pieces/components/accommodation-overview)
+- [Accommodation details](/docs/pieces/components/accommodation-details)
+- [BenefitsSection](/docs/pieces/components/benefits)
+- [Accordion](/docs/ui/navigation/accordion)

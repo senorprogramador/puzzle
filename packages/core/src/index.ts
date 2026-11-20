@@ -46,6 +46,16 @@ export {
 
 export type { ColorType, RGBColor, HSLColor } from "./color/color.types";
 
+/** Formatting utilities */
+export {
+  formatCurrency,
+  formatDate,
+  formatDateRange,
+  formatNumber,
+  formatTime,
+  type DateRange,
+} from "./formatting";
+
 /** Timing utilities */
 export { debounce } from "./timing/debounce";
 

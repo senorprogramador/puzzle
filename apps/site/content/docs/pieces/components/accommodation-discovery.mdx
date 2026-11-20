@@ -1,0 +1,61 @@
+---
+title: Accommodation Discovery Composition
+description: Compose an accommodation hero, overview, detailed profile, gallery, amenities, guest reviews, and CTA.
+---
+
+import { AccommodationDiscoveryExample } from "../../../../src/components/doc-examples/pieces/accommodation";
+import { Badge, Preview } from "@puzzle-ui/ui";
+
+This example combines the existing `AccommodationHero` with the new
+accommodation overview, details, and amenity sections. It reuses `GallerySection`,
+`TestimonialsSection`, and `CTASection`; it does not add a booking engine or a
+second hero/gallery implementation.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Complete example
+
+The example uses three fictional stays with intentionally different shapes:
+
+1. **Pinecone Cabin:** small capacity, a studio-style sleeping arrangement, one
+   image, and a short list of facilities.
+2. **Willow House:** family capacity, several bedrooms and beds, and a
+   mid-sized facility list.
+3. **Shoreline Lodge:** the largest capacity, multiple bedrooms, six gallery
+   images, and extensive facilities and highlights.
+
+<Preview fit="device" code={`<AccommodationDiscoveryExample />`}>
+  <AccommodationDiscoveryExample />
+</Preview>
+
+## Composition map
+
+| Page area | Component | Responsibility |
+| --- | --- | --- |
+| Introduction | Existing `AccommodationHero` | Establish the accommodation story and primary action. |
+| Discovery | `AccommodationOverviewSection` | Compare names, images, capacity, sleeping counts, price, badges, and highlights. |
+| Profile | `AccommodationDetailsSection` | Present a selected stay's description, sleeping layout, and highlights. |
+| Photos | Existing `GallerySection` | Display photos and provide its optional keyboard-operable lightbox. |
+| Facilities | `AmenityListSection` | Group amenities with optional collapsible categories. |
+| Social proof | Existing `TestimonialsSection` | Display guest feedback supplied by the application. |
+| Next step | Existing `CTASection` | Present a caller-owned contact action. |
+
+## Responsive and accessibility notes
+
+The example relies on fluid component layouts and responsive image ratios. Test
+320, 375, 430, 768, 1024, 1280, 1440, and 1920px widths, plus intermediate
+sizes. Keep content slots shrinkable, use meaningful image alternatives, keep
+headings in a logical order, and provide labels for custom icon-only actions.
+Native details summaries and the existing carousel/gallery controls retain
+keyboard support.
+
+## Ownership and limitations
+
+All stays, reviews, prices, and facilities are fictional presentation data.
+Availability, booking, payments, routing, translated labels, and data fetching
+remain application responsibilities. See the individual references for full
+types, defaults, accessibility, theming, and customization:
+
+- [AccommodationOverviewSection](/docs/pieces/components/accommodation-overview)
+- [AccommodationDetailsSection](/docs/pieces/components/accommodation-details)
+- [AmenityListSection](/docs/pieces/components/amenity-list)

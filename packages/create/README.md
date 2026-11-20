@@ -41,6 +41,18 @@ MongoDB and D1 Auth configurations require initial-user credentials on stdin wit
 
 The generator installs `@puzzle-ui/ui` and `@puzzle-ui/theme`, maps Puzzle `Link` (and `Image` on Next.js) to the framework's components in the theme, adds a starter page that links to the package docs, and uses the detected package manager for framework generation and dependency installation. Tailwind is enabled by default; Puzzle Auth is optional and disabled by default.
 
+## AI instructions
+
+The CLI can generate package-aware consumer instructions from locally installed Puzzle packages:
+
+```bash
+create-puzzle ai init
+create-puzzle ai update
+create-puzzle ai check
+```
+
+Select agents with `--agents copilot,claude,cursor,agents`, packages with `--packages @puzzle-ui/ui,@puzzle-ui/theme`, and preview with `--dry-run`. Use `--non-interactive` for automation; `--yes` selects all agents on first setup. Instruction generation is offline, preserves user-owned content, and tracks managed output in `.puzzle/ai/manifest.json`. See the [AI instructions guide](https://puzzle-ui.com/docs/create/ai-integration).
+
 When Auth is enabled, the CLI adds client auth components and, for full-stack frameworks, sign-in and sign-up pages, a protected `/dashboard` route, an API route, and server modules wired to the chosen database. MongoDB projects get a `docker-compose.yml` with access control; its administrator and least-privileged application passwords are randomly generated into `.env`, which `docker compose` reads. Run `bun run db:setup` (or your selected package manager) before `dev`. It starts the replica set, checks both accounts and primary readiness, and can initialize missing users on older local volumes without users. It never resets existing passwords or deletes data. If credentials do not match an existing volume, restore its original `.env` or update the user password as an administrator; exported shell variables also override Compose's `.env`. D1 projects get `wrangler.jsonc` and the Cloudflare runtime integration. A `.env` with preview database settings and generated secrets is written for local development. A custom database leaves a storage adapter placeholder. Review the server setup against the [Authentication setup guide](https://puzzle-ui.com/docs/developer/authentication) before production.
 
 After signing in with a password, register a passkey in the dashboard's MFA settings before using it to sign in. Save the recovery codes shown at enrollment. Passkeys are bound to the exact `APP_ORIGIN` and its hostname; use HTTPS in production and update `APP_ORIGIN` for your deployed host.

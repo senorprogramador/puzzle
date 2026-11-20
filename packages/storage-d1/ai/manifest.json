@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "packageName": "@puzzle-ui/storage-d1",
+  "instructionVersion": 1,
+  "contentFile": "instructions.md",
+  "instructionDependencies": [
+    "@puzzle-ui/storage"
+  ],
+  "documentationUrl": "https://puzzle-ui.com/docs/storage"
+}

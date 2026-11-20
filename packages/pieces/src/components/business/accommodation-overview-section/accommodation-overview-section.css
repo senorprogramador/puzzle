@@ -1,0 +1,132 @@
+.puzzle-accommodation-overview {
+  min-width: 0;
+}
+
+.puzzle-accommodation-overview__items {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  align-items: start;
+  gap: var(--puzzle-space-5, 1.25rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-accommodation-overview__items > li {
+  min-width: 0;
+}
+
+.puzzle-accommodation-overview__card {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: var(--puzzle-space-4, 1rem);
+  padding: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-accommodation-overview__card[data-featured="true"] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-accommodation-overview__image {
+  min-width: 0;
+}
+
+.puzzle-accommodation-overview__image img,
+.puzzle-accommodation-overview__image .puzzle-business-image-placeholder {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.puzzle-accommodation-overview__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-accommodation-overview__copy {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-accommodation-overview__copy h3,
+.puzzle-accommodation-overview__copy p {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-accommodation-overview__copy h3 a {
+  color: inherit;
+}
+
+.puzzle-accommodation-overview__copy > p {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-accommodation-overview__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-accommodation-overview__price > span {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-accommodation-overview__action {
+  min-width: 0;
+}
+
+.puzzle-accommodation-overview__details-link {
+  justify-self: start;
+}
+
+.puzzle-accommodation-overview__details-link:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-accommodation-overview[data-variant="list"]
+  .puzzle-accommodation-overview__items {
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+
+.puzzle-accommodation-overview[data-variant="list"]
+  .puzzle-accommodation-overview__items
+  > li
+  + li {
+  border-block-start: var(--puzzle-border-width, 1px) solid
+    var(--puzzle-color-border);
+}
+
+.puzzle-accommodation-overview[data-variant="list"]
+  .puzzle-accommodation-overview__card {
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+  align-items: start;
+  padding-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.puzzle-accommodation-overview[data-variant="carousel"]
+  .puzzle-accommodation-overview__items {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 32rem;
+  margin-inline: auto;
+}
+
+@media (max-width: 36rem) {
+  .puzzle-accommodation-overview[data-variant="list"]
+    .puzzle-accommodation-overview__card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

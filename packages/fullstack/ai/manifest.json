@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "packageName": "@puzzle-ui/fullstack",
+  "instructionVersion": 1,
+  "contentFile": "instructions.md",
+  "instructionDependencies": [
+    "@puzzle-ui/auth",
+    "@puzzle-ui/session",
+    "@puzzle-ui/ui"
+  ],
+  "documentationUrl": "https://puzzle-ui.com/docs/fullstack"
+}

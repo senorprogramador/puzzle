@@ -1,0 +1,79 @@
+---
+title: AI instructions
+description: Install, update, and validate offline Puzzle package guidance for GitHub Copilot, Claude Code, Cursor, and AGENTS.md-based agents.
+---
+
+`@puzzle-ui/create` can install consumer instructions from the Puzzle packages in your project. The instructions describe how to use the installed public APIs; they are separate from Puzzle's repository-only development guidance.
+
+## Initialize
+
+Install the Puzzle packages you want to use, then run the CLI from the application or workspace directory:
+
+```bash
+npx @puzzle-ui/create ai init
+```
+
+You can also use the `create-puzzle` binary already installed in your project. The command detects public Puzzle dependencies and their versions from `dependencies` and `devDependencies` in `package.json` files under the selected directory. It reads package instructions from the installed package contents and includes only explicitly required instruction dependencies.
+
+Use `--packages` to select direct Puzzle dependencies explicitly:
+
+```bash
+create-puzzle ai init --packages @puzzle-ui/ui,@puzzle-ui/theme
+```
+
+Use `--agents` to select one or more output formats:
+
+```bash
+create-puzzle ai init --agents copilot,claude,cursor,agents
+```
+
+Supported agent identifiers:
+
+| Identifier | Generated file |
+| --- | --- |
+| `copilot` | `.github/instructions/puzzle-ai.instructions.md` with `applyTo` metadata |
+| `claude` | `.claude/rules/puzzle-ai.md` with path-scoped rules |
+| `cursor` | `.cursor/rules/puzzle-ai.mdc` with `globs` metadata |
+| `agents` | A managed section in the root `AGENTS.md` |
+
+When run interactively, the CLI offers agent selection. In automation, pass `--agents` and `--non-interactive`; `--yes` selects all four agents on first setup. Use `--dry-run` to preview file changes without writing them.
+
+## Update and check
+
+After adding, upgrading, or removing Puzzle packages, regenerate the selected instructions:
+
+```bash
+create-puzzle ai update
+```
+
+The command resolves currently installed versions, replaces only Puzzle-managed content, and updates `.puzzle/ai/manifest.json`. Repeated init or update runs are idempotent.
+
+Use `ai check` in CI to fail when installed package versions, instruction content, selected agents, or generated files differ from the manifest:
+
+```bash
+create-puzzle ai check
+```
+
+Generation, update, and check are offline after the CLI and Puzzle packages are installed. They do not call a remote service or execute instruction contents. The `npx` launcher may need network access to obtain the CLI itself if it is not already available.
+
+## Existing files and conflicts
+
+Puzzle never replaces an existing dedicated agent file that it does not manage. If a generated path already belongs to you, the CLI reports a conflict and leaves it untouched. Choose another filename or resolve the conflict before retrying.
+
+When `AGENTS.md` already exists, Puzzle appends a delimited managed section and preserves surrounding instructions. Updates replace only that section. Manual edits inside the managed markers are reported as conflicts rather than discarded; edits outside the section are retained.
+
+The local manifest records the package versions, instruction versions and hashes, selected agents, and managed output files. It contains no credentials.
+
+## Workspaces and package managers
+
+Run the command from each app/workspace that should receive its own instructions. Running it from a monorepo root aggregates public Puzzle dependencies declared in descendant workspace manifests. The resolver supports npm, pnpm, Bun, and Yarn projects that expose installed packages through `node_modules`; Yarn Plug'n'Play without `node_modules` is not currently supported.
+
+## Troubleshooting
+
+- **No packages detected:** install the Puzzle package first and run the command from its project or workspace directory.
+- **A declared package is missing:** install the project's dependencies before generating instructions.
+- **Instruction dependency missing:** install the package named in the error; the requested package requires its published guidance.
+- **File conflict:** keep the existing file, move it, or remove only the conflicting Puzzle output after reviewing its contents. Do not delete the whole agent configuration directory.
+- **Stale instructions:** run `create-puzzle ai update`, then `create-puzzle ai check`.
+
+The generated guidance is a compact usage aid, not a replacement for the [package documentation](/docs) or the installed TypeScript declarations.

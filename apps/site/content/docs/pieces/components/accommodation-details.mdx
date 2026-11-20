@@ -1,0 +1,160 @@
+---
+title: AccommodationDetailsSection
+description: Compose accommodation metadata, sleeping arrangements, highlights, media, facilities, and optional actions.
+---
+
+import { AccommodationDetailsSection, AmenityListSection, GallerySection } from "@puzzle-ui/pieces";
+import { Badge, Button, Preview } from "@puzzle-ui/ui";
+import {
+  AccommodationDetailsExample,
+  AccommodationDetailsVariantsExample,
+} from "../../../../src/components/doc-examples/pieces/accommodation";
+
+`AccommodationDetailsSection` presents a single accommodation profile. Its
+media and facilities are composable React slots, so existing gallery,
+amenity, and application components can be reused without a second gallery or
+hero implementation.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  AccommodationDetailsSection,
+  AmenityListSection,
+  GallerySection,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The `split` variant places media beside details at wider widths and stacks on
+mobile. `stacked` keeps a single column at every width.
+
+<AccommodationDetailsVariantsExample />
+
+## API
+
+| Prop or type | Type | Description |
+| --- | --- | --- |
+| `accommodation` | `AccommodationDetails` | Required profile with a name and optional description, counts, sleeping arrangements, and highlights. |
+| `variant` | `AccommodationDetailsVariant` | `split` (default) or `stacked`. |
+| `media` | `ReactNode` | Optional photo or media slot. Use the existing `GallerySection` when a gallery is needed. |
+| `facilities` | `ReactNode` | Optional facilities slot. Use `AmenityListSection` rather than duplicating amenity rendering. |
+| `AccommodationDetails.capacity`, `bedrooms`, `beds`, `bathrooms` | `number` | Optional non-negative safe-integer counts. |
+| `AccommodationDetails.sleepingArrangements` | `readonly AccommodationSleepingArrangement[]` | Optional rooms with stable IDs, names, and bed descriptions. |
+| `AccommodationDetails.highlights` | `readonly AccommodationFeature[]` | Optional highlights with labels and optional icon/description. |
+| Shared section props | `MarketingSectionBaseProps` | `title` and `description` default to the accommodation name and description; includes actions, children, and native section props. |
+
+### Required and default values
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `accommodation` | Yes | — |
+| `accommodation.name` | Yes | — |
+| `variant` | No | `"split"` |
+| `media` | No | — |
+| `facilities` | No | — |
+
+## Usage
+
+```tsx
+const amenities: AmenityCategory[] = [
+  {
+    id: "comfort",
+    name: "Comfort",
+    items: [{ id: "wifi", label: "High-speed Wi-Fi" }],
+  },
+];
+
+<AccommodationDetailsSection
+  accommodation={{
+    name: "Willow House",
+    description: "A family home beside the river.",
+    capacity: 6,
+    bedrooms: 3,
+    beds: 5,
+    bathrooms: 2,
+    sleepingArrangements: [
+      { id: "main", name: "Main bedroom", description: "One king bed" },
+    ],
+  }}
+  media={<GallerySection items={images} variant="bento" lightbox />}
+  facilities={
+    <AmenityListSection title="Facilities" categories={amenities} />
+  }
+  actions={<Button href="/contact">Ask about this stay</Button>}
+/>;
+```
+
+Counts are validated as non-negative safe integers; sleeping arrangement IDs
+and highlight IDs must be unique. Use `children` for additional content that
+belongs to the section. The component does not fetch media, availability, or
+booking data.
+
+## Accessibility
+
+The section uses the shared semantic section heading and definition-list
+metadata. Sleeping arrangements are a list, and highlights retain visible
+labels even when icons are supplied. Choose meaningful image alternatives in
+the media slot and keep heading levels logical when composing nested sections.
+
+## Responsive behavior
+
+`split` becomes two flexible columns at 48rem; below that it stacks without
+fixed heights. `stacked` remains one column. Each slot is constrained to its
+available width so a gallery, video, or caller-provided content can shrink.
+Use the viewport selector to check 320–1920px widths and intermediate sizes.
+
+## Theme support
+
+Details and shared metadata use Puzzle semantic tokens and inherit the active
+root or scoped theme. Nested Pieces components consume the same theme.
+
+## Customization
+
+Use `media`, `facilities`, `actions`, `children`, and `className` to compose
+application-specific content. Existing `GallerySection` and
+`AmenityListSection` remain responsible for their own interactions and
+presentation.
+
+```tsx
+<AccommodationDetailsSection
+  accommodation={stay}
+  media={<GallerySection items={images} variant="grid" />}
+  facilities={<AmenityListSection categories={amenities} collapsible />}
+  className="brand-stay-details"
+>
+  <BookingPolicy />
+</AccommodationDetailsSection>
+```
+
+## Composition
+
+This section is designed to accompany [AccommodationOverviewSection](/docs/pieces/components/accommodation-overview),
+[AmenityListSection](/docs/pieces/components/amenity-list), the existing
+[AccommodationHero](/docs/pieces/components/hero), and
+[GallerySection](/docs/pieces/components/gallery-section).
+
+<Preview
+  fit="device"
+  code={`<AccommodationDetailsExample />`}
+>
+  <AccommodationDetailsExample />
+</Preview>
+
+## Framework compatibility
+
+The section is router-independent and has no browser-only state. It can be
+server-rendered in Next.js and TanStack Start; callback-driven controls supplied
+through `actions` or `children` should follow the framework's client-boundary
+rules.
+
+## Related components
+
+- [Accommodation overview](/docs/pieces/components/accommodation-overview)
+- [Amenity list](/docs/pieces/components/amenity-list)
+- [GallerySection](/docs/pieces/components/gallery-section)
+- [Hero](/docs/pieces/components/hero)
+- [Framework integration](/docs/pieces/framework-integration)

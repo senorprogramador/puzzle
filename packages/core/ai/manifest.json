@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "packageName": "@puzzle-ui/core",
+  "instructionVersion": 1,
+  "contentFile": "instructions.md",
+  "instructionDependencies": [],
+  "documentationUrl": "https://puzzle-ui.com/docs/getting-started"
+}

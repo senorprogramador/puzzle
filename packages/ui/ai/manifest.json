@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "packageName": "@puzzle-ui/ui",
+  "instructionVersion": 1,
+  "contentFile": "instructions.md",
+  "instructionDependencies": [
+    "@puzzle-ui/theme"
+  ],
+  "documentationUrl": "https://puzzle-ui.com/docs/ui"
+}

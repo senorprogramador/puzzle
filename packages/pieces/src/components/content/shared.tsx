@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { formatDate } from "@puzzle-ui/core";
 import "./shared.css";
 
 export type EditorialImage = {
@@ -91,12 +92,12 @@ export const EditorialDate = ({ date }: { date: string }) => {
 
   return (
     <time dateTime={value.toISOString()}>
-      {new Intl.DateTimeFormat("en-US", {
+      {formatDate(value, "en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
         timeZone: "UTC",
-      }).format(value)}
+      })}
     </time>
   );
 };

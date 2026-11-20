@@ -229,6 +229,26 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/location-section`,
         },
         {
+          id: "pieces-accommodation-discovery",
+          label: "Accommodation Discovery",
+          href: `${componentsFolder}/accommodation-discovery`,
+        },
+        {
+          id: "pieces-accommodation-overview",
+          label: "Accommodation Overview",
+          href: `${componentsFolder}/accommodation-overview`,
+        },
+        {
+          id: "pieces-accommodation-details",
+          label: "Accommodation Details",
+          href: `${componentsFolder}/accommodation-details`,
+        },
+        {
+          id: "pieces-amenity-list",
+          label: "Amenity List",
+          href: `${componentsFolder}/amenity-list`,
+        },
+        {
           id: "pieces-careers-section",
           label: "Careers Section",
           href: `${componentsFolder}/careers-section`,

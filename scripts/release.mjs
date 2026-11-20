@@ -468,6 +468,7 @@ const main = async () => {
   const releaseFiles = [
     ...manifests.map(({ manifestPath }) => relative(root, manifestPath)),
     relative(root, lockfile),
+    "docs/ai/integration/registry.json",
   ];
 
   const names = new Set(manifests.map(({ manifest }) => manifest.name));
@@ -526,6 +527,12 @@ const main = async () => {
         cwd: dir,
       });
     }
+
+    runOrFail(
+      "AI instruction tarball and consumer CLI validation",
+      "bun",
+      ["packages/create/src/ai/check.ts", "--write-index"],
+    );
 
     runOrFail("Documentation site build", "bun", [
       "run",

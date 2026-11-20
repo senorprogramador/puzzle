@@ -12,6 +12,7 @@ import { getProjectConfiguration } from "./prompts";
 import { readInitialUserFromStdin } from "./auth/initial-user";
 import type { RequestMongoReset } from "./auth/prepare-mongodb";
 import { validateProjectDirectory } from "./utils/validate-project";
+import { runAiCli } from "./ai/cli";
 
 type CliArguments =
   | { mode: "interactive" }
@@ -35,6 +36,7 @@ type CliContext = {
 const usage = `Usage:
   create-puzzle
   create-puzzle --help
+  create-puzzle ai init|update|check [options]
   create-puzzle --config <path> [--validate | --dry-run] [--credentials-stdin]
 
 Configuration files are JSON and must match config.schema.json.
@@ -123,6 +125,15 @@ export const runCli = async (
     requestMongoReset,
   }: CliContext = {},
 ): Promise<void> => {
+  if (args[0] === "ai") {
+    await runAiCli(args.slice(1), {
+      cwd,
+      write,
+      interactive: Boolean(process.stdin.isTTY),
+    });
+    return;
+  }
+
   const parsed = parseCliArguments(args);
 
   if (parsed.mode === "help") {

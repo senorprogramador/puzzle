@@ -11,7 +11,8 @@ for API and compatibility details.
 [`@puzzle-ui/ui`](https://puzzle-ui.com/docs/ui),
 [`@puzzle-ui/theme`](https://puzzle-ui.com/docs/theme), and the other Puzzle
 packages build on: class name composition, string casing, CSS value safety,
-color parsing and conversion, responsive value resolution, and debouncing.
+color parsing and conversion, responsive value resolution, international
+formatting, and debouncing.
 It has no React dependency and runs in browsers, Node.js, Bun, and edge
 runtimes.
 
@@ -45,6 +46,45 @@ stringWithCasing("hello world", "kebabcase");
 resolveResponsiveValue({ mobile: "col", desktop: "row" });
 // { mobile: "col", tablet: "col", desktop: "row" }
 ```
+
+## Formatting
+
+The formatting helpers use the platform `Intl` APIs and require an explicit
+locale. Date and time formatting options, including `timeZone`, are supplied by
+the caller. For consistent server and client output, pass the same locale and
+timezone options in both environments.
+
+```ts
+import {
+  formatCurrency,
+  formatDateRange,
+  formatNumber,
+  formatTime,
+  type DateRange,
+} from "@puzzle-ui/core";
+
+const stay: DateRange = {
+  start: new Date("2025-06-10T00:00:00.000Z"),
+  end: new Date("2025-06-14T00:00:00.000Z"),
+};
+
+formatCurrency(425, "EUR", "nl-NL");
+formatNumber(2, "nl-NL"); // Use for counts when no translated label is needed.
+formatDateRange(stay, "nl-NL", {
+  dateStyle: "medium",
+  timeZone: "Europe/Amsterdam",
+});
+formatTime(new Date("2025-06-10T18:30:00.000Z"), "nl-NL", {
+  hour: "numeric",
+  minute: "2-digit",
+  timeZone: "Europe/Amsterdam",
+});
+```
+
+`DateRange` is a framework-independent `{ start, end }` pair of `Date` values;
+`formatDateRange` rejects invalid dates and ranges whose start is after their
+end. Currency and numeric formatters reject non-finite values. Guest and night
+labels still need translated, plural-aware copy from the consuming application.
 
 ## Rendering foundation
 
@@ -152,6 +192,7 @@ loader or framework cache owns result freshness.
 | Strings    | `cn`, `stringWithCasing`, `normalizeSearchString`, `withSafeCharacters`, `escapeCssString`, `assertSafeCssValue`, `nameToInitials`                                                                                                  |
 | Colors     | `isColor`, `isHexColor`, `isCssVariable`, `isDarkColor`, `isColorDark`, `getColorType`, `parseColor`, `parseRgb`, `hexToRgb`, `hexToRgba`, `rgbToHex`, `hslToRgb`, `rgbToHsl`, `rgbToCss`, `hslToCss`, `getColorLuminance`, `clamp` |
 | Responsive | `BREAKPOINTS`, `resolveResponsiveValue`, `resolveResponsiveValueForBreakpoint`                                                                                                                                                      |
+| Formatting | `formatCurrency`, `formatDate`, `formatDateRange`, `formatNumber`, `formatTime`, `DateRange`                                                                                                                                          |
 | Timing     | `debounce` (returns a debounced function with a `cancel()` method)                                                                                                                                                                  |
 | Rendering  | `@puzzle-ui/core/rendering` classification, fold prediction, configuration and policy helpers, priorities, and rendering, visibility, scheduler, and adapter contracts                                                                  |
 | Resources  | `@puzzle-ui/core/resources` resource descriptors, priorities, scheduler, loader, registration, and lifecycle types                                                                                                                 |

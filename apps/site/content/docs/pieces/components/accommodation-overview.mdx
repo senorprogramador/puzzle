@@ -1,0 +1,153 @@
+---
+title: AccommodationOverviewSection
+description: Present accommodation options with responsive cards, stay details, prices, highlights, and a focused carousel.
+---
+
+import { AccommodationOverviewSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { AccommodationOverviewVariantsExample } from "../../../../src/components/doc-examples/pieces/accommodation";
+
+`AccommodationOverviewSection` presents accommodation data supplied by your
+application. Cards can show images, guest capacity, bedrooms, beds, bathrooms,
+price indications, badges, highlights, and a caller-provided action.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  AccommodationOverviewSection,
+  type AccommodationOverviewItem,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Grid and list layouts adapt to the available width. The carousel uses the
+existing UI carousel and is only rendered when there are at least two stays.
+
+<AccommodationOverviewVariantsExample />
+
+## API
+
+| Prop or type | Type | Description |
+| --- | --- | --- |
+| `variant` | `AccommodationOverviewVariant` | `grid` (default), `list`, or `carousel`. |
+| `items` | `readonly AccommodationOverviewItem[]` | Accommodation records with unique IDs. |
+| `locale` | `string` | Currency locale passed to the existing commerce price renderer; defaults to `"en-US"` for compatibility. |
+| `AccommodationOverviewItem.name` | `string` | Required accommodation name. |
+| `AccommodationOverviewItem.image` | `EditorialImage` | Optional responsive image and alternative text; an empty or missing source is handled by the shared image primitive. |
+| `AccommodationOverviewItem.description` | `ReactNode` | Optional descriptive content. |
+| `AccommodationOverviewItem.capacity`, `bedrooms`, `beds`, `bathrooms` | `number` | Optional non-negative safe-integer counts. |
+| `AccommodationOverviewItem.price` | `CommerceMoney` | Optional amount and ISO 4217 currency; displayed using the existing Pieces price renderer. |
+| `AccommodationOverviewItem.priceNote` | `ReactNode` | Optional text such as a stay period or pricing qualifier. |
+| `AccommodationOverviewItem.badges` | `readonly AccommodationBadge[]` | Optional badges with stable IDs and caller-provided content. |
+| `AccommodationOverviewItem.highlights` | `readonly AccommodationFeature[]` | Optional short features with optional icon and description. |
+| `AccommodationOverviewItem.href` | `string` | Native destination for the name and default “View details” link. |
+| `AccommodationOverviewItem.action` | `ReactNode` | Custom CTA; takes precedence over the default details link. |
+| `AccommodationOverviewItem.featured` | `boolean` | Adds a featured badge and visual emphasis. |
+| Shared section props | `MarketingSectionBaseProps` | Section root, heading, actions, children, theme, and native attributes. |
+
+### Required and default values
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `items` | Yes | — |
+| `variant` | No | `"grid"` |
+| `locale` | No | `"en-US"` |
+
+## Usage
+
+```tsx
+const stays: AccommodationOverviewItem[] = [
+  {
+    id: "pinecone-cabin",
+    name: "Pinecone Cabin",
+    description: "A quiet woodland cabin for two.",
+    image: { src: "/stays/pinecone.jpg", alt: "Pinecone Cabin among trees" },
+    capacity: 2,
+    bedrooms: 0,
+    beds: 1,
+    bathrooms: 1,
+    price: { amount: 125, currency: "EUR" },
+    priceNote: "per night",
+    href: "/stays/pinecone-cabin",
+    featured: true,
+  },
+];
+
+<AccommodationOverviewSection
+  title="Find your place to stay"
+  variant="grid"
+  items={stays}
+/>;
+```
+
+The component validates unique item, badge, and highlight IDs and rejects
+negative, fractional, or unsafe accommodation counts. `price` is optional;
+there is no booking, availability, or payment behavior. If both `action` and
+`href` are supplied, the custom action is rendered instead of the default
+details link.
+
+## Accessibility
+
+Cards use article semantics inside a list, with a heading, descriptive image
+alternative text, and definition-list metadata. Featured and badge content is
+textual. Provide a meaningful label for caller-supplied icon-only actions.
+Carousel controls and keyboard/touch navigation come from the UI package's
+existing `Carousel`.
+
+## Responsive behavior
+
+The grid uses an auto-fitting fluid layout. List cards stack on narrow viewports
+and align image and copy side by side when space allows. Images retain a
+consistent 4:3 ratio without fixed card heights. The carousel shows one, two,
+or three cards at the UI breakpoints and is omitted for a single item.
+Long names and descriptions wrap instead of forcing horizontal overflow.
+
+## Theme support
+
+Cards and labels consume semantic Puzzle theme tokens and inherit root or
+scoped themes. No component-specific color palette is introduced.
+
+## Customization
+
+Use the shared `actions`, `children`, and `className` section props, or provide
+an item-level `action` for a CTA inside its card. The card image, features, and
+badges accept React content where appropriate.
+
+```tsx
+import { Button } from "@puzzle-ui/ui";
+
+<AccommodationOverviewSection
+  items={stays.map((stay) => ({
+    ...stay,
+    action: <Button href={stay.href}>See this stay</Button>,
+  }))}
+/>
+```
+
+## Composition
+
+Compose this overview with [AccommodationDetailsSection](/docs/pieces/components/accommodation-details),
+[AmenityListSection](/docs/pieces/components/amenity-list), the existing
+[AccommodationHero](/docs/pieces/components/hero), and
+[GallerySection](/docs/pieces/components/gallery-section). The overview does
+not create a second hero, image gallery, or booking system.
+
+## Framework compatibility
+
+The module is a client component to host the existing interactive carousel;
+its default grid and list output remains server-renderable. It is
+router-independent and accepts application-owned data. In Next.js App Router
+and TanStack Start, keep any callback-driven action inside the appropriate
+client boundary.
+
+## Related components
+
+- [Accommodation details](/docs/pieces/components/accommodation-details)
+- [Amenity list](/docs/pieces/components/amenity-list)
+- [Accommodation discovery example](/docs/pieces/components/accommodation-discovery)
+- [ProductGridSection](/docs/pieces/components/product-grid)
+- [Framework integration](/docs/pieces/framework-integration)

@@ -18,6 +18,7 @@ const run = (command, args, options) => {
 const createFixture = async (directory) => {
   await mkdir(join(directory, "scripts"));
   await mkdir(join(directory, "bin"));
+  await mkdir(join(directory, "docs/ai/integration"), { recursive: true });
   await copyFile(join(root, "scripts/release.mjs"), join(directory, "scripts/release.mjs"));
   await writeFile(join(directory, "package.json"), JSON.stringify({
     name: "release-test",
@@ -25,6 +26,14 @@ const createFixture = async (directory) => {
     workspaces: ["packages/*"],
   }));
   const originals = {};
+  originals["docs/ai/integration/registry.json"] = JSON.stringify({
+    schemaVersion: 1,
+    packages: [],
+  });
+  await writeFile(
+    join(directory, "docs/ai/integration/registry.json"),
+    originals["docs/ai/integration/registry.json"],
+  );
   for (const entry of await readdir(join(root, "packages"), { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
     const manifest = JSON.parse(await readFile(join(root, "packages", entry.name, "package.json"), "utf8"));
@@ -101,6 +110,8 @@ if (command === "script") {
     assert.doesNotMatch(lock, /0\\.4\\.0/);
   }
   process.exit(result.status ?? 1);
+} else if (command === "bun" && args[0] === "packages/create/src/ai/check.ts") {
+  if (process.env.FAIL_STEP === "ai-check") process.exit(1);
 } else if (command === "npm") {
   if (process.env.DRY_RUN === "true") assert.ok(args.includes("--dry-run"), "Never publish during a dry run");
   const authenticated = join(process.env.FIXTURE_ROOT, "npm-authenticated");
@@ -437,7 +448,7 @@ for (const failure of [undefined, "--lockfile-only", "--frozen-lockfile"]) {
 }
 
 for (const failure of [
-  undefined, "baseline", "copilot", "invalid-json", "missing-package",
+  undefined, "baseline", "ai-check", "copilot", "invalid-json", "missing-package",
   "duplicate-package", "commit", "push", "publish", "tag",
   "omitted-unreleased", "multiline-note", "duplicate-root",
 ]) {

@@ -14,6 +14,7 @@
   },
   "files": [
     "dist",
+    "ai",
     "README.md",
     "CONFIGURATION.md",
     "config.schema.json"
@@ -36,6 +37,7 @@
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p . && tsc --noEmit -p e2e",
     "test": "vitest run",
+    "ai:check": "bun src/ai/check.ts",
     "test:e2e": "vitest run -c vitest.e2e.config.ts",
     "test:watch": "bunx vitest run --watch --passWithNoTests",
     "prepack": "npm run build"

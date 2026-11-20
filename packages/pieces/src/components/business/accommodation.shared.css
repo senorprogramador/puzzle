@@ -1,0 +1,49 @@
+.puzzle-accommodation-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-4, 1rem);
+  margin: 0;
+}
+
+.puzzle-accommodation-stats > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-1, 0.25rem);
+  min-width: 0;
+}
+
+.puzzle-accommodation-stats dt {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-accommodation-stats dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.puzzle-accommodation-features {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-accommodation-features > li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-accommodation-features__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--puzzle-color-primary);
+}
+
+.puzzle-accommodation-features__copy p {
+  margin-block-start: var(--puzzle-space-1, 0.25rem);
+  color: var(--puzzle-color-text-muted);
+}
