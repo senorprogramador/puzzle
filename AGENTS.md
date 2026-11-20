@@ -16,7 +16,7 @@ Packages are independently adoptable and organized by responsibility: Core provi
 
 ## 4. Application architecture
 
-Applications live under `apps/`: the documentation site, Storybook/playground, and Next.js and TanStack Start Workspace examples. The site uses the component packages to document them; the Workspace apps share a private domain package and UI package. They are examples and applications, not package APIs. Confirm current routes, dependencies, and local instructions in the app manifest and package map.
+Applications live under `apps/`: the documentation site, the client-side reference website and Storybook playground, and Next.js and TanStack Start Workspace examples. The site uses the component packages to document them; the Workspace apps share a private domain package and UI package. They are examples and applications, not package APIs. Confirm current routes, dependencies, and local instructions in the app manifest and package map.
 
 ## 5. Dependency boundaries
 
@@ -80,7 +80,7 @@ mandate to use every Puzzle package or build a generator application.
 
 ## 12. Testing and validation
 
-Read the relevant manifest before choosing a command. Root checks are `bun run build`, `bun run typecheck`, and `bun run test:all`; the latter includes package tests, browser tests, and MongoDB integration tests. `bun run test:e2e` covers generated project shapes and requires Docker and network access; run it for generator/template changes and changes to packages used by generated projects. Browser tests require Playwright Chromium; MongoDB tests require Docker Compose. Run app-specific checks with their manifest names (currently `workspace-next` and `workspace-tanstack`) when those apps are affected. For documentation changes, run `bun run --filter "@puzzle-ui/site" build`; use the [testing guide](apps/site/content/docs/developer/testing.mdx) for test selection and requirements.
+Read the relevant manifest before choosing a command. Root checks are `bun run build`, `bun run typecheck`, `bun run test:all`, and `bun run test:reference`. `typecheck` covers packages, the site, and playground, not every application. `test:all` includes package tests, browser tests, MongoDB integration tests, and the reference-site browser suite. `test:reference` builds workspace packages and the playground before testing the production preview. `bun run test:e2e` covers generated project shapes and requires Docker and network access; run it for generator/template changes and changes to packages used by generated projects. Browser tests require Playwright Chromium; MongoDB tests require Docker Compose. Run app-specific checks with their manifest names (currently `workspace-next` and `workspace-tanstack`) when those apps are affected. For documentation changes, run `bun run --filter "@puzzle-ui/site" build`; use the [testing guide](apps/site/content/docs/developer/testing.mdx) and [AI quality guides](docs/ai/quality/README.md) for test selection and requirements.
 
 ## 13. Context and token efficiency
 

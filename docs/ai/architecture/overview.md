@@ -56,6 +56,7 @@ flowchart LR
   playground --> core
   playground --> hooks
   playground --> icons
+  playground --> pieces
   playground --> theme
   playground --> ui
 
@@ -123,7 +124,7 @@ flowchart LR
 ## Application architecture
 
 - **`apps/site` (`@puzzle-ui/site`):** the Fumadocs documentation site built on TanStack Start and Vite. It consumes the UI, Pieces, Theme, Hooks, Icons, and SEO packages.
-- **`apps/playground` (`@puzzle-ui/playground`):** a Vite application and Storybook playground for UI packages.
+- **`apps/playground` (`@puzzle-ui/playground`):** a client-side Vite reference website composed from UI and Pieces, alongside Storybook for isolated package examples. It has no SSR, database, or Auth; its production-preview browser suite exercises routes, interactions, runtime diagnostics, and responsive overflow.
 - **`apps/workspace-next` (`workspace-next`):** the Next.js App Router example, with server routes and browser UI backed by the shared Workspace packages and MongoDB adapter.
 - **`apps/workspace-tanstack` (`workspace-tanstack`):** the TanStack Start counterpart, using the same domain and UI packages.
 
@@ -142,7 +143,7 @@ The Workspace apps are parity-focused examples, not evidence that every package 
 
 - **Workspace/package builds:** Bun workspaces orchestrate package scripts. Most libraries use `tsdown` to emit ESM, CommonJS, and declarations. The root `bun run build` first checks generated SEO schema data, then builds packages under `packages/`.
 - **Applications:** Vite builds the site, playground, and TanStack Start app; Next.js builds the Next app. App-level scripts are defined in each app manifest. Root `bun run typecheck` covers packages and the site, not every application.
-- **Tests:** package suites use Vitest, Node's test runner, or Bun's test runner. UI and Pieces include Playwright-backed browser projects; Workspace apps have rendering tests; site scripts test docs, SEO, tutorials, and hydration. MongoDB adapter integration tests use Docker Compose. `@puzzle-ui/create` has a generated-project E2E suite that also requires network access.
+- **Tests:** package suites use Vitest, Node's test runner, or Bun's test runner. UI and Pieces include Playwright-backed browser projects; Workspace apps have rendering tests; the playground uses Node's test runner with Playwright against its production preview; site scripts test docs, SEO, tutorials, and hydration. MongoDB adapter integration tests use Docker Compose. `@puzzle-ui/create` has a generated-project E2E suite that also requires network access.
 - **CI:** [`.github/workflows/ci.yml`](../../../.github/workflows/ci.yml) builds, type-checks, installs Chromium, runs `bun run test:all`, and builds the site. The separate Create E2E workflow is in [`.github/workflows/create-e2e.yml`](../../../.github/workflows/create-e2e.yml).
 
 For exact validation commands, environment requirements, and package selectors, see the [testing guide](../../../apps/site/content/docs/developer/testing.mdx) and package manifests.

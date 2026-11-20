@@ -12,6 +12,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit -p .",
+    "test:e2e": "node --test tests/reference-site.test.mjs",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -20,6 +21,7 @@
     "@puzzle-ui/core": "workspace:*",
     "@puzzle-ui/hooks": "workspace:*",
     "@puzzle-ui/icons": "workspace:*",
+    "@puzzle-ui/pieces": "workspace:*",
     "@puzzle-ui/theme": "workspace:*",
     "@puzzle-ui/ui": "workspace:*",
     "react": "^19.0.0",
@@ -28,8 +30,8 @@
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@vitejs/plugin-react": "^2.0.0",
-    "typescript": "^4.6.4",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "^7.0.2",
     "vite": "latest",
     "storybook": "^10.6.2",
     "@storybook/react-vite": "^10.6.2",

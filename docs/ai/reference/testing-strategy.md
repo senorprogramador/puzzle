@@ -20,10 +20,12 @@ simulation cannot establish. Add E2E coverage when correctness depends on
 multiple real layers. Do not use an E2E test as a substitute for focused
 contract tests.
 
-The repository has Playwright/browser coverage, but no dedicated visual
-regression baseline or screenshot matcher was verified. Treat screenshot
-comparison as manual unless the relevant package provides an explicit visual
-assertion; do not claim automated visual-regression coverage otherwise.
+The repository has Playwright/browser coverage, including a production-preview
+suite for the client-side reference website. No dedicated visual-regression
+baseline or screenshot matcher is configured. Treat screenshot comparison as
+manual; do not claim automated visual-regression coverage otherwise. See the
+[AI quality guides](../quality/README.md) for the reference-site test command,
+viewport matrix, and visual inspection workflow.
 
 ## Select validation
 
@@ -36,9 +38,11 @@ assertion; do not claim automated visual-regression coverage otherwise.
    default for every small edit.
 
 Known root commands include `bun run build`, `bun run typecheck`,
-`bun run test:all`, and `bun run test:e2e`. `test:all` includes package,
-browser, and MongoDB integration tests; `test:e2e` exercises generated project
-shapes and requires Docker and network access. UI and Pieces provide focused
+`bun run test:all`, `bun run test:reference`, and `bun run test:e2e`.
+`test:all` includes package, browser, MongoDB integration, and reference-site
+tests; `test:reference` builds workspace packages and the playground, then
+tests its production preview. `test:e2e` exercises generated project shapes
+and requires Docker and network access. UI and Pieces provide focused
 `test:unit`, `test:component`, and `test:browser` scripts. The documentation
 site uses `bun run --filter "@puzzle-ui/site" build`. Check current manifests
 before using any command or assuming its prerequisites.
