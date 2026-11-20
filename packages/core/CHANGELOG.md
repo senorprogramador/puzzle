@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/core` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.14.0 - 2026-11-20
+
+- No changes; version bumped in lockstep.
+
 ## 0.13.0 - 2026-11-20
 
 - Added `formatCurrency`, `formatDate`, `formatDateRange`, `formatNumber` and `formatTime`, plus the `DateRange` type. They use `Intl` with an explicit locale and caller-supplied options such as `timeZone`.

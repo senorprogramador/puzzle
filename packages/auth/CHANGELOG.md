@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/auth` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.14.0 - 2026-11-20
+
+- No changes; version bumped in lockstep.
+
 ## 0.13.0 - 2026-11-20
 
 - `SimpleWebAuthnProvider` now accepts `supportedAlgorithmIDs`, a list of COSE algorithm IDs. It is validated as a non-empty list of unique IDs and applied to registration and verification. The default is EdDSA, ES256 and RS256. The `SimpleWebAuthnProviderOptions` type is exported.

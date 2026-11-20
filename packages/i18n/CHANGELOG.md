@@ -1,10 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.14.0 - 2026-11-20
 
-### Added
-
-- Added the SSR-safe multilingual runtime, React bindings, localized routing
-  and SEO, compiler transforms and type generation, request adapters, catalog
-  and Sanity content sources, CLI, diagnostics, and human-reviewed translation
-  assistance.
+- Added the pre-release `@puzzle-ui/i18n` package with an SSR-safe multilingual runtime, typed translations and formatting, and React bindings.
+- Added localized routing and SEO helpers, including sitemap generation.
+- Added compiler transforms, TypeScript type generation and a Vite plugin, plus the `puzzle-i18n` CLI for scanning and managing catalogs.
+- Added catalog and Sanity content sources, request adapters for Next.js, React Router and TanStack, and developer diagnostics.
+- Added human-reviewed AI translation assistance workflows.

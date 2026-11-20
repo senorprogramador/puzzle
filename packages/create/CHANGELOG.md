@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/create` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.14.0 - 2026-11-20
+
+- No changes; version bumped in lockstep.
+
 ## 0.13.0 - 2026-11-20
 
 - Added non-interactive configuration mode: `create-puzzle --config <file>` with `--validate` and `--dry-run`. It is backed by a published `config.schema.json` and documented in `CONFIGURATION.md`.

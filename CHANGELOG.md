@@ -22,6 +22,22 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.14.0 - 2026-11-20
+
+### `@puzzle-ui/theme`
+
+- Added the `GOOGLE_FONT_FAMILIES` catalog and `GoogleFontFamily` type as public exports for font pickers and tooling.
+- Exported `COLOR_THEMES` (built-in color theme presets) and `DEFAULT_COLOR_SCHEME` (default light and dark colors) so tools can preview themes without duplicating palettes.
+- Added `THEME_TOKEN_REGISTRY` with read-only metadata (group, input kind, default, generated CSS variable) for every non-color token and typography-role value, plus `ThemeTokenGroup`, `ThemeTokenInputKind` and `ThemeTokenRegistryEntry` types.
+
+### `@puzzle-ui/i18n`
+
+- Added the pre-release `@puzzle-ui/i18n` package with an SSR-safe multilingual runtime, typed translations and formatting, and React bindings.
+- Added localized routing and SEO helpers, including sitemap generation.
+- Added compiler transforms, TypeScript type generation and a Vite plugin, plus the `puzzle-i18n` CLI for scanning and managing catalogs.
+- Added catalog and Sanity content sources, request adapters for Next.js, React Router and TanStack, and developer diagnostics.
+- Added human-reviewed AI translation assistance workflows.
+
 ## 0.13.0 - 2026-11-20
 
 ### `@puzzle-ui/core`

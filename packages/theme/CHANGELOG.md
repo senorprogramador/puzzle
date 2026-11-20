@@ -3,6 +3,12 @@
 All notable changes to `@puzzle-ui/theme` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.14.0 - 2026-11-20
+
+- Added the `GOOGLE_FONT_FAMILIES` catalog and `GoogleFontFamily` type as public exports for font pickers and tooling.
+- Exported `COLOR_THEMES` (built-in color theme presets) and `DEFAULT_COLOR_SCHEME` (default light and dark colors) so tools can preview themes without duplicating palettes.
+- Added `THEME_TOKEN_REGISTRY` with read-only metadata (group, input kind, default, generated CSS variable) for every non-color token and typography-role value, plus `ThemeTokenGroup`, `ThemeTokenInputKind` and `ThemeTokenRegistryEntry` types.
+
 ## 0.13.0 - 2026-11-20
 
 - Exported the `ColorThemes` type.

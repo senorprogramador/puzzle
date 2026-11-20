@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/hooks` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.14.0 - 2026-11-20
+
+- No changes; version bumped in lockstep.
+
 ## 0.13.0 - 2026-11-20
 
 - Added `useColorScheme` to read an element's computed light or dark scheme. It updates when the element's class, style or `data-theme` changes.
