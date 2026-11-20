@@ -1,0 +1,38 @@
+---
+title: Locale registry and resolution
+description: Define supported BCP 47 locales and resolve a request locale predictably.
+---
+
+`createLocaleRegistry` validates locale tags, aliases, defaults, and explicit
+fallbacks. Tags are canonicalized using `Intl.getCanonicalLocales`.
+
+```ts
+import { createLocaleRegistry, resolveLocale } from "@puzzle-ui/i18n";
+
+const registry = createLocaleRegistry({
+  locales: [
+    { locale: "en", aliases: ["en-US"] },
+    { locale: "nl" },
+    { locale: "fr-CA", fallbacks: ["fr"] },
+    { locale: "fr" },
+  ],
+  defaultLocale: "en",
+  fallbackLocale: "nl",
+});
+
+const result = resolveLocale({
+  registry,
+  explicit: "fr-CA",
+  urlLocale: "nl",
+  cookie: "en",
+  acceptLanguage: "fr-CA,fr;q=0.8,en;q=0.6",
+});
+```
+
+Resolution priority is explicit input, URL locale, user preference, cookie,
+Accept-Language, browser locale, then the configured default. Invalid request
+values are skipped. The returned `source` identifies the winner.
+
+`fallbackChain(locale)` includes the selected locale, its configured fallback
+chain, a supported base language when available, the fallback locale, and the
+default locale without duplicates.

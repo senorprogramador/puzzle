@@ -1,0 +1,63 @@
+---
+title: Localized routing
+description: Match and generate localized paths, slugs, route aliases, and locale domains safely.
+---
+
+Import route helpers from `@puzzle-ui/i18n/routing`:
+
+```ts
+import { createLocalizedRouting } from "@puzzle-ui/i18n/routing";
+
+const routing = createLocalizedRouting({
+  registry: i18n.registry,
+  prefixDefaultLocale: false,
+  basePath: "/docs",
+  routes: {
+    product: {
+      en: "/products/:id",
+      nl: {
+        path: "/producten/:slug",
+        aliases: ["/item/:slug"],
+      },
+    },
+  },
+  origins: {
+    en: "https://en.example.com",
+    nl: "https://nl.example.com",
+  },
+});
+
+routing.match("/docs/nl/about?tab=profile#bio");
+routing.localize("/docs/about?tab=profile#bio", "nl");
+routing.alternatePaths("/docs/about");
+
+const route = routing.matchRoute("/docs/nl/item/42?ref=home");
+const dutchProduct = routing.localizeRoute("product", "nl", { slug: "42" });
+const productLinks = routing.alternateRoutePaths("product", { id: "42" });
+```
+
+`match` returns the locale, unprefixed pathname, search, hash, and whether a
+supported locale prefix was found. `localize` preserves query and hash values.
+Route IDs and `localizeRoute` locales are inferred from the route map. Every
+route must define a path for every locale. Route parameters are whole-segment
+`:name` patterns; parameter names may differ by locale and are mapped by
+segment position.
+
+`matchRoute` returns the matched route ID, parameters, alias status, canonical
+path, and an optional `redirectTo` target. It does not perform redirects;
+delegate redirect responses to the framework. `alternateRoutePaths` creates
+one URL per locale. Configured origins must be bare HTTP(S) origins without
+credentials or paths; generated links use the target locale's origin and omit
+locale prefixes. Absolute URLs are matched only against configured origins.
+
+Optional and catch-all parameters are not supported. External and
+protocol-relative inputs, malformed escapes, traversal, and encoded
+path-separators are rejected. Duplicate separators and unsafe base paths are
+rejected as well. If `basePath` is configured, matching inputs must be under
+that path and generated URLs include it. Unmapped paths retain the legacy
+prefix-based behavior.
+
+Redirect targets are returned as data only. The package does not execute
+redirects; pass a validated `redirectTo` to your framework's redirect API and
+keep external destinations out of that boundary. Queries and fragments are
+preserved but never included in SEO canonical paths or route diagnostics.

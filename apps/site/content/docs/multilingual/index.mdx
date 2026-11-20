@@ -1,0 +1,80 @@
+---
+title: Puzzle Multilingual
+description: Type-safe locale management, ICU translations, localized paths, React bindings, and SEO metadata with Puzzle.
+---
+
+`@puzzle-ui/i18n` provides a framework-independent translation runtime and
+locale utilities, with optional React bindings. The current package covers
+locale resolution, ICU messages, Intl formatting, prefixed paths, catalog
+validation/type generation, TypeScript source scanning, a Vite build plugin,
+in-memory/HTTP/filesystem JSON sources, request-locale adapters, localized SEO
+metadata/sitemaps, and human-reviewed AI suggestions.
+
+This package is in development and has not been published to npm. The
+installation command below will be available after release.
+
+## Install
+
+```sh
+bun add @puzzle-ui/i18n
+```
+
+Install React 19 as a peer dependency when using
+`@puzzle-ui/i18n/react`.
+
+## Create a runtime
+
+```ts
+import { createI18n } from "@puzzle-ui/i18n";
+
+const i18n = createI18n({
+  locales: [
+    { locale: "en", nativeName: "English" },
+    { locale: "nl", nativeName: "Nederlands" },
+  ],
+  defaultLocale: "en",
+  catalogs: {
+    en: {
+      greeting: "Hello {name}",
+      files: "{count, plural, one {# file} other {# files}}",
+    },
+    nl: {
+      greeting: "Hallo {name}",
+      files: "{count, plural, one {# bestand} other {# bestanden}}",
+    },
+  },
+});
+
+const t = i18n.createTranslator("nl").t;
+t("greeting", { name: "Ada" });
+t("files", { count: 2 });
+```
+
+Translation keys and required interpolation values are inferred from the
+catalogs. The runtime has no mutable global locale: create a translator for
+each request or render tree.
+
+## Guides
+
+- [Locale registry and resolution](/docs/multilingual/locales)
+- [ICU translations and formatting](/docs/multilingual/translations)
+- [Localized paths](/docs/multilingual/routing)
+- [React integration](/docs/multilingual/react)
+- [Framework request adapters](/docs/multilingual/frameworks)
+- [Catalog validation and type generation](/docs/multilingual/catalogs)
+- [Compiler and source scanning](/docs/multilingual/compiler)
+- [Development diagnostics](/docs/multilingual/devtools)
+- [Local and remote JSON sources](/docs/multilingual/sources)
+- [Localized content resolution](/docs/multilingual/content)
+- [CLI](/docs/multilingual/cli)
+- [Localized SEO metadata](/docs/multilingual/seo)
+- [AI translation suggestions](/docs/multilingual/ai)
+
+## Scope and compatibility
+
+Framework request-locale helpers are dependency-free and do not register
+middleware or routes; validate their use in your framework's native request
+boundaries. CMS vendor adapters are not included.
+There is no built-in AI provider; use an injected server-only provider and a
+durable review store in production. Consumer-focused AI instructions ship in
+the package's `ai/instructions.md`.

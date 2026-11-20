@@ -1,0 +1,67 @@
+---
+title: Accessibility
+description: Build localized controls and content with native semantics, scoped language metadata, and safe rich-text rendering.
+---
+
+The React bindings prefer native controls and browser semantics. The
+`LocaleSwitcher` renders a labeled select and supports `id`, `name`,
+`disabled`, `required`, class names, and `aria-describedby`. Keep its label
+visible and ensure the referenced description exists.
+
+```tsx
+import { useState } from "react";
+import { createI18nReact } from "@puzzle-ui/i18n/react";
+import { i18n } from "./i18n";
+
+const { LocaleSwitcher, Provider, useLocaleAttributes } =
+  createI18nReact(i18n);
+
+function LocalizedContent({
+  onLocaleChange,
+}: {
+  onLocaleChange: (locale: string) => void;
+}) {
+  const { lang, dir } = useLocaleAttributes();
+
+  return (
+    <main lang={lang} dir={dir}>
+      <label htmlFor="language">Language</label>
+      <LocaleSwitcher
+        id="language"
+        aria-describedby="language-help"
+        onLocaleChange={onLocaleChange}
+      />
+      <p id="language-help">Choose the language for this page.</p>
+    </main>
+  );
+}
+
+function LocalizedPage() {
+  const [locale, setLocale] = useState("ar");
+
+  return (
+    <Provider locale={locale}>
+      <LocalizedContent onLocaleChange={setLocale} />
+    </Provider>
+  );
+}
+```
+
+`useLocaleAttributes` returns the canonical `lang` and resolved `dir` for the
+current provider. Apply them to the relevant page or content region; the
+library does not mutate document-global attributes, which could conflict with
+other localized regions or concurrent rendering. Locale options include
+language metadata so native controls can expose each option's language and
+direction.
+
+Use `Translation` for plain text and `RichTranslation` only with explicit
+component mappings for ICU tags. This preserves React's escaping and keeps
+untrusted catalog text from becoming markup. Prefer semantic headings,
+landmarks, and form labels in the surrounding application.
+
+The browser fixture checks the select's accessible name and description,
+keyboard focus and switching, locale `lang`/`dir`, literal untrusted text,
+forced-colors mode, and reduced-motion preference. Run it with
+`bun run --filter @puzzle-ui/i18n test:browser`. Automated browser checks do
+not replace testing with the screen readers and input methods supported by
+your application.

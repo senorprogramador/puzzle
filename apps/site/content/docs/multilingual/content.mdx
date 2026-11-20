@@ -1,0 +1,94 @@
+---
+title: Localized content resolution
+description: Resolve versioned published or preview content through locale fallbacks and an adapter-owned CMS source.
+---
+
+`@puzzle-ui/i18n/content` provides a framework- and CMS-independent content
+resolver. Implement `ContentSource` around the CMS or database already used by
+your application:
+
+```ts
+import { createContentResolver } from "@puzzle-ui/i18n/content";
+
+const content = createContentResolver({
+  registry: i18n.registry,
+  source: {
+    async load({ locale, slug, version, preview }, signal) {
+      return cms.getLocalizedDocument({
+        locale,
+        slug,
+        version,
+        includeDrafts: preview,
+        signal,
+      });
+    },
+  },
+  validate(content) {
+    articleSchema.parse(content);
+  },
+});
+```
+
+Resolve a page with a locale and localized slug:
+
+```ts
+const result = await content.resolve({
+  locale: "nl",
+  slug: "artikelen/hello",
+  version: 3,
+});
+```
+
+The resolver checks the registry fallback chain in order and returns a
+discriminated `found` or `missing` result. A found result reports the requested
+and resolved locales and whether fallback was used. Draft documents are
+excluded unless `preview: true`; requested versions that are unavailable
+resolve as missing. Source errors, aborts, mismatched locales/slugs, and schema
+validation failures are surfaced rather than silently replaced.
+
+The resolver rejects absolute, traversal, query, fragment, malformed-encoding,
+and encoded-separator slugs. The source must honor the requested version and
+preview mode where possible. Authenticate and authorize preview requests in
+your server boundary before setting `preview: true`; the flag is not an access
+control mechanism. The included API is an adapter contract, not a Sanity,
+Contentful, or other vendor-specific integration.
+
+The resolver freezes the returned document envelope, not arbitrary nested
+content. Validate CMS data against an application schema and escape or render
+rich text with a safe renderer; never inject untrusted content with
+`dangerouslySetInnerHTML`.
+
+## Sanity source
+
+For Sanity, `createSanityContentSource` adapts an injected client without
+adding a Sanity SDK dependency:
+
+```ts
+import {
+  createContentResolver,
+  createSanityContentSource,
+} from "@puzzle-ui/i18n/content";
+
+const source = createSanityContentSource<Article>(
+  {
+    fetch: (query, params, options) =>
+      sanityClient.fetch(query, params, options),
+  },
+  { documentType: "article", cacheTtlMs: 30_000 },
+);
+const articles = createContentResolver({
+  registry: i18n.registry,
+  source,
+  validate: (document) => articleSchema.parse(document),
+});
+```
+
+The injected client exposes `fetch(query, params, options?)`; the adapter uses
+a fixed parameterized GROQ query and passes an abort signal when provided.
+Locale is canonicalized, slugs are validated and matched against
+`slug.current`, and requested versions match `version`, `_rev`, `_updatedAt`,
+or the fallback value `1`. Without a requested version, lookup is unversioned.
+Non-preview queries exclude drafts; preview queries may include and prefer
+drafts only when the injected client's Sanity perspective allows them. The
+adapter caches normalized content locally and does not create, configure, or
+credential the Sanity client.

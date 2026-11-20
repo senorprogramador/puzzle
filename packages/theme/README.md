@@ -60,9 +60,26 @@ Customize the color scheme, color theme, fonts, and tokens:
 </Theme>
 ```
 
-## Features
+  `COLOR_THEMES` is the read-only registry of built-in color themes. Its keys
+  are the identifiers accepted by `Theme`'s `colorTheme` prop, and each value
+  contains the actual light colors and dark-mode brand overrides:
 
-| Area                 | Description                                                                                       | Docs                                                                |
+  ```ts
+  import { COLOR_THEMES, type ColorThemes } from "@puzzle-ui/theme";
+
+  const presets = Object.entries(COLOR_THEMES) as [
+    ColorThemes,
+    (typeof COLOR_THEMES)[ColorThemes],
+  ][];
+  ```
+
+  When `colorTheme` is omitted, `Theme` uses its package defaults. The
+  `DEFAULT_COLOR_SCHEME` export exposes those default light and dark color
+  values for tools that need to preview them without defining a second palette.
+
+  ## Features
+
+  | Area                 | Description                                                                                       | Docs                                                                |
 | -------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | Theme provider       | Injects token CSS variables, loads fonts, and applies global styles at root or local scope.       | [Theme Provider](https://puzzle-ui.com/docs/theme/theme-provider)   |
 | Design tokens        | Typed token groups for spacing, radius, shadows, elevation, borders, layout, motion, and z-index. | [Design Tokens](https://puzzle-ui.com/docs/theme/tokens)            |

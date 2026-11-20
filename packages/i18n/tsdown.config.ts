@@ -1,0 +1,32 @@
+import { defineConfig } from "tsdown";
+
+export default defineConfig({
+  entry: [
+    "src/index.ts",
+    "src/routing/index.ts",
+    "src/seo/index.ts",
+    "src/seo/sitemap.ts",
+    "src/react/index.tsx",
+    "src/devtools/index.tsx",
+    "src/content/index.ts",
+    "src/compiler/index.ts",
+    "src/compiler/typescript.ts",
+    "src/compiler/vite.ts",
+    "src/ai/index.ts",
+    "src/ai/review.ts",
+    "src/sources/index.ts",
+    "src/sources/node.ts",
+    "src/cli/index.ts",
+    "src/cli/bin.ts",
+    "src/adapters/next.ts",
+    "src/adapters/tanstack.ts",
+    "src/adapters/react-router.ts",
+  ],
+  unbundle: true,
+  format: ["esm", "cjs"],
+  fixedExtension: false,
+  dts: true,
+  clean: true,
+  sourcemap: true,
+  copy: ["../../LICENSE"],
+});

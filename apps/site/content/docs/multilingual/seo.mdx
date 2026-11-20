@@ -1,0 +1,95 @@
+---
+title: Localized SEO metadata
+description: Produce canonical URLs and hreflang alternates compatible with Puzzle SEO.
+---
+
+`@puzzle-ui/i18n/seo` creates metadata values that fit Puzzle SEO's existing
+`SeoPageMetadata` contract; it does not add another SEO provider.
+
+```ts
+import { createLocalizedSeoMetadata } from "@puzzle-ui/i18n/seo";
+
+const metadata = createLocalizedSeoMetadata({
+  registry: i18n.registry,
+  baseUrl: "https://example.com",
+  basePath: "/docs",
+  locale: "nl",
+  path: "/articles/hello",
+  title: "Hallo",
+  description: "Een pagina",
+  openGraph: { type: "article" },
+  localizedPaths: {
+    en: "/articles/hello",
+    nl: "/artikelen/hallo",
+  },
+});
+```
+
+Pass the result to the existing `@puzzle-ui/seo` metadata APIs. The helper
+validates the origin and supported locale, adds the canonical URL, emits one
+alternate for each registered locale, and adds `x-default` for the configured
+default locale. Locale-specific origins are supported with `baseUrls` when
+each language is served from a different domain.
+
+Validate localized route maps before publishing:
+
+```ts
+import { validateLocalizedSeo } from "@puzzle-ui/i18n/seo";
+
+const issues = validateLocalizedSeo({
+  registry: i18n.registry,
+  baseUrl: "https://example.com",
+  pages: [
+    {
+      id: "hello",
+      path: "/articles/hello",
+      localizedPaths: {
+        en: "/articles/hello",
+        nl: "/artikelen/hallo",
+      },
+    },
+  ],
+});
+```
+
+The helper also emits localized Open Graph URL and locale values, plus optional
+title and description. `basePath` is applied to canonical and alternate URLs.
+
+The validator reports missing locale paths, unsupported locale keys, unsafe
+paths, locale-prefix mismatches, duplicate canonical URLs, canonical conflicts,
+and invalid, duplicate, missing, or mismatched `hreflang` entries when
+`hreflangAlternates` is supplied for a page.
+
+`withStructuredDataLocale(data, locale, canonicalUrl?)` adds a canonical BCP 47
+`inLanguage` value to a Schema.org object and rejects conflicting language
+values. When `canonicalUrl` is provided, an existing `url` or
+`mainEntityOfPage` URL must match it.
+
+For reciprocal localized sitemap alternates, install `@puzzle-ui/seo` and use
+the explicit sitemap subpath:
+
+```ts
+import { generateLocalizedSitemap } from "@puzzle-ui/i18n/seo/sitemap";
+
+const sitemap = generateLocalizedSitemap({
+  registry: i18n.registry,
+  baseUrl: "https://example.com",
+  basePath: "/docs",
+  pages: [
+    {
+      path: "/articles/hello",
+      localizedPaths: {
+        en: "/articles/hello",
+        nl: "/artikelen/hallo",
+      },
+    },
+  ],
+  validateAlternates: true,
+});
+```
+
+The sitemap helper delegates serialization, limits, and sitemap validation to
+Puzzle SEO. For locale-specific sitemap origins, pass `baseUrls` and explicitly
+set `allowExternalUrls: true`; otherwise cross-origin sitemap entries are
+rejected. For framework page metadata, keep using each framework's native
+metadata API with the values returned by `createLocalizedSeoMetadata`.

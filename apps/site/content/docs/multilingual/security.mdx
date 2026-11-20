@@ -1,0 +1,60 @@
+---
+title: Security boundaries
+description: Keep localized routing, catalog loading, CMS content, diagnostics, and AI review inside explicit security boundaries.
+---
+
+Treat locale values, paths, catalogs, remote content, and provider responses as
+untrusted input. The package validates common boundaries, but the application
+remains responsible for authentication, authorization, deployment policy, and
+safe rendering.
+
+## Routes and redirects
+
+Use the route-map helpers for same-origin paths. They reject external and
+protocol-relative inputs, malformed segments, traversal, and paths outside a
+configured `basePath`. Redirect targets are returned as data; your framework
+must enforce same-origin redirects and its own host policy before sending them.
+Never use an unchecked `Host` header to construct canonical URLs.
+
+Configured route diagnostics report route templates such as
+`/articles/:slug`, not concrete parameter values. Unmatched paths use a
+sentinel, and query strings and fragments are not recorded.
+
+## Catalogs and CMS content
+
+HTTP catalog sources accept only HTTP(S), reject URL credentials and fragments,
+disallow redirects, bound response size and time, and isolate caches by locale
+and namespace. Keep authorization headers in trusted server code. Filesystem
+sources resolve symlinks and reject paths outside their configured root.
+
+Catalog and CMS values are data, not HTML. Translation components render
+strings as text; use `RichTranslation` with explicitly supplied React elements
+for supported ICU tags. Validate CMS records with an application schema and
+render rich text through a safe renderer. Do not pass catalogs or content to
+`dangerouslySetInnerHTML`.
+
+The Sanity source uses a fixed parameterized query and an injected client. The
+application owns its credentials, client perspective, and preview
+authorization. A `preview` flag is not an authorization check.
+
+## AI suggestions and review
+
+Call injected suggestion providers only on the server. Wrap them with
+`createAuthorizedSuggestionProvider` to fail closed before provider access;
+the application must derive the authorization decision from trusted identity.
+Keep provider credentials and source content out of client bundles and routine
+logs.
+
+Persist review suggestions and audit records through a transactional store.
+The persistence implementation must atomically compare the source revision,
+apply approval, and append audit history. Authenticate and authorize reviewers
+before calling `approve` or `reject`; a suggestion's quality score is advisory,
+not an approval.
+
+## Verification
+
+The i18n unit tests cover unsafe route inputs, HTTP source boundaries, content
+validation, review authorization, and optimistic updates. The browser test
+verifies that untrusted translation strings remain literal text and do not
+create elements. These checks complement, but do not replace, application
+penetration testing and deployment-specific policy review.

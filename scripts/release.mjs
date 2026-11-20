@@ -24,6 +24,7 @@ const releaseOrder = [
   "auth",
   "fullstack",
   "seo",
+  "i18n",
 ];
 
 const packages = releaseOrder.map((name) => {

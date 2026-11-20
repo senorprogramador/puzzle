@@ -8,7 +8,9 @@ Automated route and overflow checks do not replace review of the rendered page.
 The reference site uses Playwright screenshot comparisons with 63 full-page
 baselines across nine routes and seven viewport projects. Linux baselines are
 kept separately under `apps/playground/tests/__screenshots__/linux/` because
-system font rendering differs from the existing local baselines. Run
+system font rendering differs from the existing local baselines. The CI test
+job is pinned to Ubuntu 24.04 to keep its rendering aligned with these
+snapshots. Run
 `bun run --filter "@puzzle-ui/playground" test:visual` to compare them, and
 update them intentionally with
 `bun run --filter "@puzzle-ui/playground" test:visual:update`. The e2e suite

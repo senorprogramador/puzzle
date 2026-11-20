@@ -1,0 +1,32 @@
+---
+title: Performance budgets
+description: Measure translation lookup, provider stability, lazy namespace loading, and package bundle size.
+---
+
+`@puzzle-ui/i18n` keeps locale state per runtime/provider, memoizes locale-bound
+Intl formatters, and coalesces concurrent loads for the same locale and
+namespace. A canceled waiter does not abort work needed by other callers; the
+underlying load is canceled when every waiter has canceled.
+
+Run the package benchmark from the workspace root:
+
+```sh
+bun run benchmark:i18n
+```
+
+The benchmark builds the package and enforces these initial budgets:
+
+| Measurement | Budget |
+| --- | ---: |
+| Root ESM bundle (`dist/index.js`) | 64 KiB |
+| React ESM bundle (`dist/react/index.js`) | 32 KiB |
+| DevTools ESM bundle (`dist/devtools/index.js`) | 32 KiB |
+| Median warm translation lookup | 100 μs |
+| Concurrent callers for one namespace | 32 callers, 1 source load |
+
+The browser fixture also verifies that a provider retains the same translator
+for an unchanged locale across unrelated parent renders. React tests cover
+memoized Intl formatters, while runtime tests cover namespace coalescing,
+cancellation, and request isolation. Record benchmark output when changing
+these budgets; compare measurements on the same runtime and hardware, and do
+not treat a passing microbenchmark as a substitute for application profiling.

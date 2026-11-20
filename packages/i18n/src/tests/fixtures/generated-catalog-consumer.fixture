@@ -1,0 +1,52 @@
+import { createI18n } from "../../index";
+import type { Messages, MessagesByLocale } from "./generated-catalogs";
+
+const localizedCatalogs = {
+  en: {
+    common: {
+      greeting: "Hello {name}",
+      stable: "Same",
+    },
+    englishOnly: "English only",
+  },
+  fr: {
+    common: {
+      greeting: "Bonjour {prenom}",
+      stable: "Identique",
+    },
+    frenchOnly: "Français seulement",
+  },
+} satisfies MessagesByLocale;
+
+const commonCatalogs = {
+  en: {
+    common: {
+      greeting: localizedCatalogs.en.common.greeting,
+      stable: localizedCatalogs.en.common.stable,
+    },
+  },
+  fr: {
+    common: {
+      greeting: localizedCatalogs.fr.common.greeting,
+      stable: localizedCatalogs.fr.common.stable,
+    },
+  },
+} satisfies Record<"en" | "fr", Messages>;
+
+const i18n = createI18n({
+  locales: [{ locale: "en" }, { locale: "fr" }],
+  defaultLocale: "en",
+  catalogs: commonCatalogs,
+});
+const translator = i18n.createTranslator("en");
+
+translator.t("common.greeting", { name: "Ada", prenom: "Ada" });
+
+// @ts-expect-error Every locale's required placeholders must be supplied.
+translator.t("common.greeting", { name: "Ada" });
+
+// @ts-expect-error Locale-only keys are not safe across the generated catalog set.
+translator.t("englishOnly");
+
+// @ts-expect-error Locale-only keys are not safe across the generated catalog set.
+translator.t("frenchOnly");

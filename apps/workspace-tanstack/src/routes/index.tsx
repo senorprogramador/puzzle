@@ -17,6 +17,9 @@ const HomePage = () => (
         description="Plan projects, track tasks, and keep every workspace update in view."
         actions={
           <Stack direction="row" gap="sm" wrap="wrap">
+            <Button href="/multilingual" variant="outline">
+              Explore localized content
+            </Button>
             <Button href="/sign-up">Create an account</Button>
             <Button href="/sign-in" variant="outline">
               Sign in

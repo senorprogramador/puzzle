@@ -21,6 +21,7 @@ not replace package documentation or duplicate package instructions.
 | Install Puzzle consumer instructions in an application | [AI integration guide](./integration/README.md), [generated package registry](./integration/registry.json) |
 | Change documentation-site content or navigation | [Site instructions](../../apps/site/AGENTS.md) |
 | Work on auth security | [Auth security guide](../../apps/site/content/docs/auth/security.mdx), [security policy](../../SECURITY.md) |
+| Work on multilingual runtime, routing, React, catalogs/sources, CLI, or SEO APIs | [Multilingual package instructions](../../packages/i18n/AGENTS.md), [public docs](../../apps/site/content/docs/multilingual/index.mdx) |
 
 Read the root [AGENTS.md](../../AGENTS.md) first for repository-wide task
 routing. Then read only the nearest relevant package or app `AGENTS.md`; these

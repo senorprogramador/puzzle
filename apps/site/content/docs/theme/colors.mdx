@@ -58,20 +58,21 @@ The `colorTheme` prop swaps the default color schemes for a curated palette:
 </Theme>
 ```
 
-Available themes:
+The public `COLOR_THEMES` registry contains every available theme. Its keys
+are the supported `ColorThemes` identifiers, so tools can discover presets
+without maintaining a separate list:
 
-- `cobalt-sky`
-- `violet-dream`
-- `emerald-forest`
-- `coral-navy`
-- `ocean-blue`
-- `mint-graphite`
-- `plum-rose`
-- `graphite-cyan`
-- `soft-white-terracotta`
-- `electric-indigo`
+```ts
+import { COLOR_THEMES } from "@puzzle-ui/theme";
 
-Each color theme (`ColorTheme`) defines a complete light scheme plus dark-mode overrides for the brand roles (`primary`, `secondary`, and `accent` with their foregrounds); the remaining dark roles fall back to the theme's light values merged with Puzzle's dark defaults. `tokens.colorSchemes` overrides still apply on top of a color theme, so you can pick a palette and fine-tune individual roles.
+const presets = Object.entries(COLOR_THEMES);
+```
+
+Each color theme (`ColorTheme`) defines a complete light scheme plus dark-mode overrides for the brand roles (`primary`, `secondary`, and `accent` with their foregrounds); the remaining dark roles fall back to the theme's light values. `tokens.colorSchemes` overrides still apply on top of a color theme, so you can pick a palette and fine-tune individual roles.
+
+When `colorTheme` is omitted, the provider uses Puzzle's default token colors.
+`DEFAULT_COLOR_SCHEME` exposes those resolved default color schemes for
+theme tools and previews.
 
 ## Guidelines
 

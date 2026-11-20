@@ -1,0 +1,25 @@
+---
+title: ICU translations and formatting
+description: Use typed catalog keys, ICU interpolation and plural messages, and Intl formatting.
+---
+
+The root `@puzzle-ui/i18n` API uses ICU MessageFormat. Catalog values must be
+strings or nested objects of strings.
+
+```ts
+const t = i18n.createTranslator("en").t;
+t("welcome", { name: "Ada" });
+t("cart.items", { count: 3 });
+```
+
+Use the standard ICU forms for interpolation, plural and select expressions,
+and number/date/time arguments. Catalog validation reports malformed messages
+and placeholder mismatches between locales.
+
+For values outside a message, the package exports `formatNumber`,
+`formatCurrency`, `formatDate`, `formatRelativeTime`, and `formatList`. They use
+the platform `Intl` implementation and accept standard `Intl` option types.
+
+The `t()` API returns plain text. React consumers can render ICU tag syntax
+with typed callbacks via `useRichTranslation`; the result is ordinary React
+content, not HTML. Never pass translations to `dangerouslySetInnerHTML`.

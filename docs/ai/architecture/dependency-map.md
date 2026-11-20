@@ -15,6 +15,7 @@ This map records direct dependency relationships among workspaces. The root [`pa
 | `packages/create` (`@puzzle-ui/create`) | None |
 | `packages/fullstack` (`@puzzle-ui/fullstack`) | `@puzzle-ui/auth`, `@puzzle-ui/session`, `@puzzle-ui/ui` |
 | `packages/hooks` (`@puzzle-ui/hooks`) | `@puzzle-ui/core` |
+| `packages/i18n` (`@puzzle-ui/i18n`) | None |
 | `packages/icons` (`@puzzle-ui/icons`) | `@puzzle-ui/core` |
 | `packages/pieces` (`@puzzle-ui/pieces`) | `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/theme`, `@puzzle-ui/ui` |
 | `packages/seo` (`@puzzle-ui/seo`) | None |
@@ -31,9 +32,9 @@ These edges are resolved by matching dependency names against the current worksp
 
 ## Development-only workspace dependencies
 
-`packages/workspace` (`@puzzle-ui/workspace`) declares `@puzzle-ui/auth` and `@puzzle-ui/storage-mongodb` in `devDependencies`; these are not runtime imports of the Workspace domain package. No other workspace manifest currently declares a dependency on another workspace only in `devDependencies`.
+`packages/workspace` (`@puzzle-ui/workspace`) declares `@puzzle-ui/auth` and `@puzzle-ui/storage-mongodb` in `devDependencies`; these are not runtime imports of the Workspace domain package. `packages/i18n` declares `@puzzle-ui/seo` as a development dependency to type-check its compatible metadata contract; its SEO peer is optional and type-only at runtime.
 
-External development tools—such as TypeScript, `tsdown`, Vite, Vitest, Storybook, and Playwright—are not architectural package edges. Their exact package and version declarations remain in the corresponding manifests.
+External development tools—such as TypeScript, `tsdown`, Vite, Vitest, Storybook, and Playwright—are not architectural package edges. `@puzzle-ui/i18n` also uses platform `fetch` for its HTTP source; Node built-ins are isolated to `/sources/node` and `/cli`. Their exact package and version declarations remain in the corresponding manifests.
 
 ## Peer and optional framework dependencies
 
@@ -43,6 +44,7 @@ Peer dependencies are supplied by consumers rather than bundled as package runti
 | --- | --- |
 | `apps/site` (`@puzzle-ui/site`) | `typescript` 7.x (private docs app peer). |
 | `@puzzle-ui/hooks` | Required `react` 19. |
+| `@puzzle-ui/i18n` | Optional `react` 19 and `@puzzle-ui/seo` 0.13. |
 | `@puzzle-ui/icons` | Required `react` and `react-dom` 19. |
 | `@puzzle-ui/pieces` | Required `react` and `react-dom` 19. |
 | `@puzzle-ui/theme` | Required `react` and `react-dom` 19. |
@@ -55,4 +57,4 @@ No workspace manifest currently declares entries in `optionalDependencies`. Full
 
 ## Other runtime dependencies
 
-Workspace-to-workspace edges do not include third-party package relationships. The package map lists the main external runtime dependencies and integrations, including React/Fumadocs/TanStack in the site, Next.js or TanStack Start and MongoDB in the Workspace apps, SimpleWebAuthn in Auth/Fullstack, Iconify in Icons, MongoDB in its adapter, and Zod in Workspace. Consult each manifest for the complete direct dependency list and supported versions.
+Workspace-to-workspace edges do not include third-party package relationships. The package map lists the main external runtime dependencies and integrations, including ICU `intl-messageformat` in Multilingual, React/Fumadocs/TanStack in the site, Next.js or TanStack Start and MongoDB in the Workspace apps, SimpleWebAuthn in Auth/Fullstack, Iconify in Icons, MongoDB in its adapter, and Zod in Workspace. Consult each manifest for the complete direct dependency list and supported versions.

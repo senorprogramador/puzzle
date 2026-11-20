@@ -1,0 +1,26 @@
+---
+title: Catalog validation and type generation
+description: Detect catalog syntax and locale consistency issues and generate TypeScript declarations.
+---
+
+The `@puzzle-ui/i18n/compiler` entry validates ICU messages, locale keys, and
+placeholder consistency. It also creates declarations from a base catalog.
+
+```ts
+import {
+  generateCatalogTypes,
+  validateCatalogs,
+} from "@puzzle-ui/i18n/compiler";
+
+const issues = validateCatalogs({
+  defaultLocale: "en",
+  catalogs: { en, nl },
+});
+
+const declarations = generateCatalogTypes(en, "Messages");
+```
+
+`validateCatalogs` reports missing and extra keys, invalid messages, invalid
+locale tags, and placeholder mismatches. It does not scan application source
+for unused keys or write files; integrate the returned diagnostics and
+declaration text into your existing build tooling.

@@ -8,6 +8,10 @@ Individual package changelogs contain their own history.
 
 ### Added
 
+- Added the pre-release `@puzzle-ui/i18n` package with typed translations,
+  React bindings, localized routing and SEO, compiler/type generation,
+  catalog/content sources, framework adapters, and review workflows.
+
 ### Changed
 
 ### Fixed

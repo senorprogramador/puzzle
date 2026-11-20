@@ -5,6 +5,8 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium, type Browser } from "playwright";
 
+import { COLOR_THEMES, DEFAULT_COLOR_SCHEME } from "@puzzle-ui/theme";
+
 import {
   AUTHOR,
   AUTHOR_ID,
@@ -12,6 +14,7 @@ import {
   SITE_DESCRIPTION,
   SITE_URL,
 } from "../src/lib/seo";
+import { WEBSITE_TEMPLATES } from "../src/components/theme-studio/theme-studio-model";
 
 type GraphNode = {
   "@id"?: string;
@@ -432,6 +435,209 @@ try {
     await page.waitForURL((url) => url.pathname === path);
     await check(path);
   }
+
+  const themeStudioPath = "/theme-studio";
+  const themeStudioResponse = await fetch(`${origin}${themeStudioPath}`);
+  assert.equal(themeStudioResponse.status, 200, "Theme Studio direct HTTP status");
+  const themeStudioHtml = await themeStudioResponse.text();
+  assert.match(themeStudioHtml, /<title>[^<]*Theme Studio[^<]*<\/title>/);
+  assert.match(themeStudioHtml, /<h1[^>]*>Theme Studio<\/h1>/);
+  assert.match(themeStudioHtml, /data-puzzle-theme-scope-style/);
+  assert.ok(
+    themeStudioHtml.includes(
+      `--puzzle-color-scheme-light-primary: ${DEFAULT_COLOR_SCHEME.light.primary}`,
+    ),
+    "Theme Studio server-renders the package default palette in a local scope",
+  );
+
+  const studioPage = await browser.newPage();
+  const studioErrors: string[] = [];
+  studioPage.on("pageerror", (error) => studioErrors.push(error.message));
+  studioPage.on("console", (message) => {
+    if (
+      message.type() === "error" &&
+      /hydrat|server rendered|did not match|cannot be a descendant|cannot contain a nested/i.test(
+        message.text(),
+      )
+    ) {
+      studioErrors.push(message.text());
+    }
+  });
+  await studioPage.goto(`${origin}${themeStudioPath}`, {
+    waitUntil: "networkidle",
+  });
+  assert.equal(
+    await studioPage.locator(".theme-studio__preset-card").count(),
+    Object.keys(COLOR_THEMES).length + 1,
+    "Theme Studio displays every registry entry and the package default",
+  );
+  const rootThemeStyle = await studioPage
+    .locator('style[data-puzzle-theme="true"]')
+    .textContent();
+  await studioPage.getByRole("button", { name: "Restaurant", exact: true }).click();
+  await studioPage.getByRole("button", { name: "About", exact: true }).click();
+  await studioPage.locator(".theme-studio__preset-card").nth(1).click();
+
+  const firstThemeId = Object.keys(COLOR_THEMES)[0];
+  if (firstThemeId === undefined) {
+    throw new Error("The Theme package has no color presets.");
+  }
+  const firstTheme = COLOR_THEMES[firstThemeId as keyof typeof COLOR_THEMES];
+  const preview = studioPage.locator(".theme-studio__website");
+  assert.equal(await preview.getAttribute("data-template"), "restaurant");
+  assert.equal(await preview.getAttribute("data-preview-page"), "about");
+  assert.equal(
+    await studioPage.locator(".theme-studio__preset-card").nth(1).getAttribute("aria-pressed"),
+    "true",
+  );
+
+  const localThemeStyle = studioPage.locator(
+    "style[data-puzzle-theme-scope-style]",
+  );
+  assert.ok(
+    (await localThemeStyle.textContent())?.includes(
+      `--puzzle-color-scheme-light-primary: ${firstTheme.light.primary}`,
+    ),
+    "the selected preset is applied by the local Theme provider",
+  );
+  await studioPage.getByRole("button", { name: "Dark", exact: true }).click();
+  assert.ok(
+    (await localThemeStyle.textContent())?.includes(
+      `--puzzle-color-scheme-dark-primary: ${firstTheme.dark.primary}`,
+    ),
+    "the selected preset supplies its supported dark-mode colors",
+  );
+  await studioPage.getByLabel("primary dark color").evaluate((element) => {
+    const input = element as HTMLInputElement;
+    const setter = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )?.set;
+
+    if (!setter) throw new Error("Color input value setter is unavailable.");
+
+    setter.call(input, "#123456");
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  await studioPage
+    .locator(".theme-studio__status")
+    .filter({ hasText: "Customized" })
+    .waitFor();
+  assert.ok(
+    (await localThemeStyle.textContent())?.includes(
+      "--puzzle-color-scheme-dark-primary: #123456",
+    ),
+    "custom token overrides update the live preview",
+  );
+  assert.match(
+    await studioPage.locator(".theme-studio__code-panel pre").innerText(),
+    /"primary": "#123456"/,
+    "custom token overrides appear in generated code",
+  );
+  assert.equal(
+    rootThemeStyle,
+    await studioPage.locator('style[data-puzzle-theme="true"]').textContent(),
+    "Theme Studio leaves the parent site theme unchanged",
+  );
+
+  await studioPage.getByRole("button", { name: "Restore preset" }).click();
+  assert.doesNotMatch(
+    await studioPage.locator(".theme-studio__code-panel pre").innerText(),
+    /tokens=/,
+    "restoring a preset removes token overrides from generated code",
+  );
+  let selectedThemeIndex = 0;
+  for (const template of WEBSITE_TEMPLATES) {
+    await studioPage
+      .getByRole("button", { name: template.label, exact: true })
+      .click();
+    assert.equal(
+      await preview.getAttribute("data-template"),
+      template.id,
+      `${template.label}: template selection updates the preview`,
+    );
+    assert.equal(
+      await studioPage
+        .locator(".theme-studio__preset-card")
+        .nth(selectedThemeIndex + 1)
+        .getAttribute("aria-pressed"),
+      "true",
+      `${template.label}: template selection preserves the color theme`,
+    );
+
+    for (const [index, identifier] of Object.keys(COLOR_THEMES).entries()) {
+      await studioPage
+        .locator(".theme-studio__preset-card")
+        .nth(index + 1)
+        .click();
+      selectedThemeIndex = index;
+      const preset = COLOR_THEMES[identifier as keyof typeof COLOR_THEMES];
+      const css = await localThemeStyle.textContent();
+
+      assert.equal(
+        await preview.getAttribute("data-template"),
+        template.id,
+        `${template.label} + ${identifier}: selected template is retained`,
+      );
+      assert.equal(
+        await preview.getAttribute("data-preview-page"),
+        "about",
+        `${template.label} + ${identifier}: selected page is retained`,
+      );
+      assert.ok(
+        css?.includes(
+          `--puzzle-color-scheme-light-primary: ${preset.light.primary}`,
+        ),
+        `${template.label} + ${identifier}: light preset colors are applied`,
+      );
+      assert.ok(
+        css?.includes(
+          `--puzzle-color-scheme-dark-primary: ${preset.dark.primary}`,
+        ),
+        `${template.label} + ${identifier}: dark preset colors are applied`,
+      );
+    }
+  }
+
+  await studioPage.setViewportSize({ width: 390, height: 844 });
+  const presetCardBox = await studioPage
+    .locator(".theme-studio__preset-card")
+    .nth(1)
+    .boundingBox();
+  assert.ok(
+    presetCardBox && presetCardBox.width >= 160 && presetCardBox.height >= 140,
+    "mobile preset cards remain large enough to select",
+  );
+  const presetListSize = await studioPage
+    .locator(".theme-studio__preset-list")
+    .evaluate((element) => ({
+      scrollWidth: element.scrollWidth,
+      clientWidth: element.clientWidth,
+    }));
+  assert.ok(
+    presetListSize.scrollWidth > presetListSize.clientWidth,
+    "mobile presets are available in a horizontally scrollable collection",
+  );
+  const templateListSize = await studioPage
+    .locator(".theme-studio__template-list")
+    .evaluate((element) => ({
+      scrollWidth: element.scrollWidth,
+      clientWidth: element.clientWidth,
+    }));
+  assert.ok(
+    templateListSize.scrollWidth > templateListSize.clientWidth,
+    "mobile website templates remain horizontally scrollable",
+  );
+  await studioPage.getByRole("button", { name: "Reset to package default" }).click();
+  assert.doesNotMatch(
+    await studioPage.locator(".theme-studio__code-panel pre").innerText(),
+    /colorTheme=/,
+    "resetting to the package default removes built-in preset selection",
+  );
+  assert.deepEqual(studioErrors, [], "Theme Studio hydrates without browser errors");
+  await studioPage.close();
+
   console.log("Page-scoped assets, hydration, navigation, history, reload, metadata and JSON-LD checks passed.");
 } finally {
   await browser?.close();

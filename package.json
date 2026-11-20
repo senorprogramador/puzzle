@@ -11,6 +11,7 @@
     "dev": "bun run --filter '@puzzle-ui/playground' dev",
     "workspace:next": "bun run --filter workspace-next dev",
     "workspace:tanstack": "bun run --filter workspace-tanstack dev",
+    "workspace:react-router": "bun run --filter workspace-react-router dev",
     "fonts:download": "bun run --filter '@puzzle-ui/site' fonts:download",
     "schema:generate": "bun run --filter '@puzzle-ui/seo' schema:generate",
     "schema:check": "bun run --filter '@puzzle-ui/seo' schema:check",
@@ -23,9 +24,11 @@
     "typecheck": "bun run --filter './packages/*' --filter './apps/site' --filter '@puzzle-ui/playground' typecheck",
     "seo:validate": "bun run --filter '@puzzle-ui/site' validate:seo",
     "test:e2e": "bun run --filter '@puzzle-ui/create' test:e2e",
+    "test:frameworks": "bun run --filter workspace-next typecheck && bun run --filter workspace-next test:rendering && bun run --filter workspace-next build && bun run --filter workspace-tanstack typecheck && bun run --filter workspace-tanstack test:rendering && bun run --filter workspace-tanstack build && bun run --filter workspace-react-router typecheck && bun run --filter workspace-react-router build && bun run --filter workspace-react-router test:rendering",
     "test:reference": "bun run build && bun run --filter '@puzzle-ui/playground' build && bun run --filter '@puzzle-ui/playground' test:e2e",
-    "test:all": "bun run build && bun run --filter '!@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser && bun run --filter '@puzzle-ui/pieces' test:browser && bun run --filter '@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/playground' build && bun run --filter '@puzzle-ui/playground' test:e2e && bun run --filter '@puzzle-ui/site' build && bun run --filter '@puzzle-ui/site' test:homepage:theme",
+    "test:all": "bun run build && bun run --filter '!@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/i18n' test:browser && bun run benchmark:i18n && bun run test:frameworks && bun run test:release && bun run --filter '@puzzle-ui/create' test && bun run --filter '@puzzle-ui/ui' test:browser && bun run --filter '@puzzle-ui/pieces' test:browser && bun run --filter '@puzzle-ui/storage-mongodb' vitest && bun run --filter '@puzzle-ui/playground' build && bun run --filter '@puzzle-ui/playground' test:e2e && bun run --filter '@puzzle-ui/site' build && bun run --filter '@puzzle-ui/site' test:homepage:theme",
     "benchmark:auth": "bun run build && node scripts/benchmark-auth.mjs",
+    "benchmark:i18n": "bun run --filter '@puzzle-ui/i18n' benchmark",
     "benchmark:seo": "bun run build && bun run packages/seo/scripts/benchmark.ts",
     "benchmark:rendering": "bun run build && bun run --filter workspace-next build && bun run --filter workspace-tanstack build && node scripts/benchmark-rendering.mjs",
     "benchmark:rendering:smoke": "bun run build && bun run --filter workspace-next build && bun run --filter workspace-tanstack build && node scripts/benchmark-rendering.mjs --smoke",
@@ -39,6 +42,7 @@
     "apps/site",
     "apps/workspace-next",
     "apps/workspace-tanstack",
+    "apps/workspace-react-router",
     "packages/*"
   ],
   "trustedDependencies": [

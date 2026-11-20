@@ -1,0 +1,104 @@
+---
+title: Compiler and source scanning
+description: Validate ICU catalogs, extract static TypeScript translation keys, and fail Vite builds on catalog drift.
+---
+
+`@puzzle-ui/i18n/compiler` validates catalog shape, ICU syntax, locale key
+coverage, and placeholder parity. It can also generate literal-preserving
+TypeScript declarations, report missing or unused keys, and use
+`optimizeCatalog(catalog, usedKeys)` to create a catalog containing only static
+keys found by the scanner. Keep dynamic-key diagnostics enabled before pruning
+so optimization does not silently remove translations.
+
+## Extract keys from source
+
+The optional `@puzzle-ui/i18n/compiler/typescript` entry uses the TypeScript
+compiler AST to find string-literal calls to `t` and `translate`. It reports
+dynamic keys rather than guessing their values:
+
+```ts
+import { extractTranslationKeys } from "@puzzle-ui/i18n/compiler/typescript";
+
+const result = extractTranslationKeys(
+  'const label = i18n.t("actions.save");',
+  { fileName: "settings.tsx" },
+);
+```
+
+Install TypeScript 5 as an optional peer to use AST scanning. Literal
+`t("key")`, `i18n.t("key")`, and `translate("key")` calls are recognized by
+default; configure `callees` to match additional function names. Dynamic
+expressions are intentionally not evaluated.
+
+## Vite integration
+
+The optional `@puzzle-ui/i18n/vite` entry validates catalogs and scans source
+files during Vite builds:
+
+```ts
+import { defineConfig } from "vite";
+import { puzzleI18n } from "@puzzle-ui/i18n/vite";
+
+export default defineConfig({
+  plugins: [
+    puzzleI18n({
+      catalogDirectory: "./locales",
+      sourceDirectories: ["./src"],
+      defaultLocale: "en",
+    }),
+  ],
+});
+```
+
+The plugin watches the configured catalog and source files and reruns the
+checks on incremental builds. It reports invalid ICU messages, missing and
+unused default-catalog keys, and dynamic source keys as build diagnostics.
+It does not rewrite application modules, so source maps are left to Vite's
+normal transform pipeline. Install Vite and TypeScript 5 as optional peers when
+using this integration.
+
+## Rewrite static keys
+
+The TypeScript entry can transform only literal translation keys and returns a
+source map alongside diagnostics:
+
+```ts
+import { transformTranslationKeys } from "@puzzle-ui/i18n/compiler/typescript";
+
+const result = transformTranslationKeys(
+  'const title = i18n.t("old.title");',
+  {
+    fileName: "src/page.ts",
+    replacements: { "old.title": "new.title" },
+  },
+);
+```
+
+Only static first arguments in `t` and `translate` calls are rewritten.
+Dynamic keys are reported instead of evaluated; replacement strings are
+escaped safely. Disable maps with `sourceMap: false` when a consumer transform
+does not need them.
+
+## Locale-difference declarations
+
+Use `generateLocaleCatalogTypes` when locale catalogs differ:
+
+```ts
+import { generateLocaleCatalogTypes } from "@puzzle-ui/i18n/compiler";
+
+const declarations = generateLocaleCatalogTypes({
+  en: { common: { greeting: "Hello {name}" }, englishOnly: "Hi" },
+  fr: { common: { greeting: "Bonjour {prenom}" }, frenchOnly: "Salut" },
+});
+```
+
+The generated `Messages` type contains keys common to every locale and unions
+message literals; `MessagesByLocale` preserves each locale's exact shape.
+Placeholder variables appearing in any common-locale variant remain required.
+Compile the generated declarations in a consumer fixture before committing
+generated output.
+
+The CLI also supports `puzzle-i18n scan <source-directory> --catalog
+<catalog-file>`. It recursively scans TypeScript and JavaScript source files,
+ignores common generated and dependency directories, and exits non-zero when
+keys are missing, unused, or dynamic.

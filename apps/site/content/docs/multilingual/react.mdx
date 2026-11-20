@@ -1,0 +1,142 @@
+---
+title: React integration
+description: Add request-scoped locale and typed translations to React render trees.
+---
+
+React 19 is an optional peer dependency. Create bindings once from the
+configured runtime and render its provider with the locale chosen for the
+current render:
+
+```tsx
+import { createI18nReact } from "@puzzle-ui/i18n/react";
+import { i18n } from "./i18n";
+
+const {
+  Provider,
+  useTranslation,
+  useRichTranslation,
+  useNamespace,
+  useLocaleAttributes,
+  useNumberFormat,
+  useDateFormat,
+  LocaleSwitcher,
+  Translation,
+  RichTranslation,
+  FormattedNumber,
+  FormattedCurrency,
+  FormattedDate,
+} = createI18nReact(i18n);
+
+function Welcome() {
+  const t = useTranslation();
+  return <h1>{t.t("greeting", { name: "Ada" })}</h1>;
+}
+
+function Announcement() {
+  const rich = useRichTranslation();
+  return (
+    <p>
+      {rich("announcement", {
+        name: "Ada",
+        strong: (children) => <strong>{children}</strong>,
+      })}
+    </p>
+  );
+}
+
+function Dashboard() {
+  const { lang, dir } = useLocaleAttributes();
+  const number = useNumberFormat();
+  const date = useDateFormat({ dateStyle: "long" });
+  const t = useTranslation();
+  const namespace = useNamespace("dashboard");
+
+  return (
+    <main lang={lang} dir={dir}>
+      {namespace.status === "loading" ? (
+        <p>Loading…</p>
+      ) : namespace.status === "error" ? (
+        <p role="alert">Could not load translations.</p>
+      ) : (
+        <h2>{t.t("dashboard.title")}</h2>
+      )}
+      <p>{number.format(1234.5)}</p>
+      <p>{date.format(new Date())}</p>
+      <p><FormattedNumber value={1234.5} /></p>
+      <p><FormattedCurrency value={19.95} currency="EUR" /></p>
+      <p><FormattedDate value={new Date()} options={{ dateStyle: "long" }} /></p>
+    </main>
+  );
+}
+
+export function Page() {
+  return (
+    <Provider locale="en">
+      <Welcome />
+      <Announcement />
+      <p id="language-help">Choose a language.</p>
+      <LocaleSwitcher
+        id="language"
+        label="Language"
+        aria-describedby="language-help"
+        onLocaleChange={(locale) => console.log(locale)}
+      />
+      <Translation id="greeting" values={{ name: "Ada" }} />
+      <RichTranslation
+        id="announcement"
+        values={{
+          name: "Ada",
+          strong: (children) => <strong>{children}</strong>,
+        }}
+      />
+    </Provider>
+  );
+}
+```
+
+The provider uses the locale prop as immutable render-tree state. Connect
+`onLocaleChange` to your application's navigation or state mechanism; the
+package does not depend on a router. Nested providers can render different
+locales without changing shared process state.
+
+Configure `namespaceLoader` on the runtime to enable `useNamespace`. The hook
+returns `loading`, `ready`, or `error`; its error state preserves the source
+failure instead of silently substituting text. On the server, call
+`await i18n.loadNamespace(locale, "dashboard")` before rendering to avoid
+shipping a loading state in the initial HTML. Namespace loads populate the
+requested locale and its configured fallback chain.
+
+`useRichTranslation` supports ICU tags such as `<strong>…</strong>` through
+explicit React callbacks. It returns React nodes, so React escapes text
+normally; it does not interpret catalog messages as HTML.
+
+`Translation` and `RichTranslation` are typed components for catalog keys and
+placeholder values. The `FormattedNumber`, `FormattedCurrency`,
+`FormattedDate`, `FormattedRelativeTime`, and `FormattedList` components use
+the current provider locale and accept an optional render prop for custom
+markup. They render text through React and do not inject HTML.
+
+The bindings also provide locale-aware `Intl.NumberFormat`,
+`Intl.DateTimeFormat`, `Intl.RelativeTimeFormat`, and `Intl.ListFormat`
+instances through corresponding hooks. `useLocaleAttributes()` returns the
+canonical `lang` and configured `dir` for document or section attributes.
+Apply these attributes at the desired layout boundary; the package does not
+mutate global document state.
+
+`LocaleSwitcher` uses a native `<select>` so keyboard and focus behavior remain
+browser-native. It associates its label with the select, supports `id`,
+`name`, `disabled`, `required`, class names, and `aria-describedby`, and sets
+the locale's `lang` and `dir` on each option. Configured direction takes
+precedence over inferred RTL script direction. The browser fixture checks
+accessible naming, keyboard switching, RTL attributes, forced colors, and
+that untrusted catalog text is rendered literally:
+
+```sh
+bun run --filter @puzzle-ui/i18n test:browser
+```
+
+Provider bindings may be nested or rendered concurrently on the server. Keep
+the `I18nInstance` and its namespace loader request-safe: create the runtime
+per request when catalog results depend on request data. Concurrent namespace
+loads within an instance are coalesced; cancellation of one render does not
+abort work still awaited by another render.

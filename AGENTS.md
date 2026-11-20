@@ -30,6 +30,8 @@ Applications live under `apps/`: the documentation site, the client-side referen
 
 This root file applies everywhere. For a task, inspect `AGENTS.md` only in the target package/app directory or its relevant ancestors and subdirectories when present; follow the nearest applicable instructions. Do not read every `AGENTS.md` in the repository. The Workspace Next app has its own Next.js-specific guidance.
 
+The `packages/i18n/AGENTS.md` file adds multilingual package development guidance; consumer-facing instructions are maintained under `packages/i18n/ai/`.
+
 ## 7. Task routing
 
 For each task:

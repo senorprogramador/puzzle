@@ -4,7 +4,7 @@ Puzzle is a TypeScript and React ecosystem designed for both human developers an
 
 ## Monorepo organization
 
-The root [`package.json`](../../../package.json) defines the Bun workspaces. At the time this index was written, expanding those patterns discovers 20 workspaces: 4 applications and 16 packages. The root manifest and each matched package manifest are authoritative; package names come from each manifest's `name`, not its directory.
+The root [`package.json`](../../../package.json) defines the Bun workspaces. At the time this index was written, expanding those patterns discovers 21 workspaces: 4 applications and 17 packages. The root manifest and each matched package manifest are authoritative; package names come from each manifest's `name`, not its directory.
 
 - [`apps/`](../../../apps/) contains the documentation site, component playground, and two Workspace examples.
 - [`packages/`](../../../packages/) contains published libraries and private packages shared by the sample apps.
@@ -18,7 +18,7 @@ The [package map](./package-map.md) records each current workspace's responsibil
 1. **Shared foundations:** `@puzzle-ui/core` supplies framework-independent utilities and rendering contracts; `@puzzle-ui/hooks` supplies React hooks; `@puzzle-ui/icons` supplies React icons.
 2. **Design system:** `@puzzle-ui/theme` owns theme tokens and providers; `@puzzle-ui/ui` provides reusable components; `@puzzle-ui/pieces` composes larger page sections from the design system.
 3. **Application services:** `@puzzle-ui/storage` defines database-neutral contracts; `@puzzle-ui/storage-d1` and `@puzzle-ui/storage-mongodb` implement adapters; `@puzzle-ui/session` and `@puzzle-ui/auth` provide session and authentication services.
-4. **Integration and tooling:** `@puzzle-ui/fullstack` separates auth client, server, and framework adapter entry points; `@puzzle-ui/seo` provides metadata, structured data, sitemap, robots, and framework entry points; `@puzzle-ui/create` scaffolds applications.
+4. **Integration and tooling:** `@puzzle-ui/fullstack` separates auth client, server, and framework adapter entry points; `@puzzle-ui/seo` provides metadata, structured data, sitemap, robots, and framework entry points; `@puzzle-ui/i18n` provides a pre-release locale, ICU, routing, catalog, and SEO toolkit; `@puzzle-ui/create` scaffolds applications.
 5. **Workspace examples:** private `@puzzle-ui/workspace` shares Workspace domain contracts/services; `@puzzle-ui/workspace-ui` provides its React UI. The Next.js and TanStack Start apps provide framework-specific application wiring.
 
 ## Direct runtime workspace dependencies
@@ -48,6 +48,7 @@ flowchart LR
     auth["@puzzle-ui/auth"]
     fullstack["@puzzle-ui/fullstack"]
     seo["@puzzle-ui/seo"]
+    i18n["@puzzle-ui/i18n"]
     create["@puzzle-ui/create"]
     workspace["@puzzle-ui/workspace"]
     workspaceui["@puzzle-ui/workspace-ui"]
@@ -119,7 +120,7 @@ flowchart LR
   workspaceui --> workspace
 ```
 
-`@puzzle-ui/seo`, `@puzzle-ui/create`, and `@puzzle-ui/storage` have no direct runtime dependency on another workspace package; their external dependencies and public exports are listed in the [package map](./package-map.md).
+`@puzzle-ui/seo`, `@puzzle-ui/i18n`, `@puzzle-ui/create`, and `@puzzle-ui/storage` have no direct runtime dependency on another workspace package; their external dependencies and public exports are listed in the [package map](./package-map.md).
 
 ## Application architecture
 

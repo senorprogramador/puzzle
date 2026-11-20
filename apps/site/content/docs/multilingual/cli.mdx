@@ -1,0 +1,81 @@
+---
+title: Multilingual CLI
+description: Validate locale JSON catalogs and generate TypeScript declarations with puzzle-i18n.
+---
+
+The published package exposes the `puzzle-i18n` binary. It supports non-destructive initialization, catalog
+validation, type declaration generation, and TypeScript AST source scanning.
+
+Initialize a config and example catalogs:
+
+```sh
+puzzle-i18n init . --default-locale en --locales en,nl
+```
+
+The CLI detects Next.js, TanStack, React Router, or a generic React setup from
+`package.json`. It creates `puzzle-i18n.config.json` and one example catalog
+per locale. If any target file already exists, initialization stops without
+overwriting it.
+
+The generated `puzzle-i18n.config.json` contains `defaultLocale`, `locales`,
+`catalogDirectory`, and `sourceDirectories`. Commands automatically read this
+file from the current directory; use `--config <file>` to choose another
+config. Missing or malformed explicit configs produce an error.
+
+Validate one `<locale>.json` file per configured locale:
+
+```sh
+puzzle-i18n validate
+```
+
+Generate declarations from the configured default-locale catalog:
+
+```sh
+puzzle-i18n generate-types
+```
+
+By default, this writes `messages.d.ts` in the current directory. Select a
+locale, output file, and declaration name as needed:
+
+```sh
+puzzle-i18n generate-types --locale nl --out ./src/messages.d.ts --type-name Messages
+```
+
+Scan all configured source directories against the default-locale catalog:
+
+```sh
+puzzle-i18n scan
+```
+
+Manual overrides remain available for projects without a config:
+
+```sh
+puzzle-i18n validate ./locales --default-locale en
+puzzle-i18n generate-types ./locales/en.json --out ./src/messages.d.ts
+puzzle-i18n scan ./src --catalog ./locales/en.json
+```
+
+By default the scanner recognizes `t("key")`, `i18n.t("key")`, and
+`translate("key")` in TypeScript/JavaScript files. Use `--callees
+"t,translate,formatMessage"` to configure additional function names. It ignores
+common dependency and build-output directories.
+
+## Troubleshooting and migration
+
+- `[missing-locale]` means a locale listed in the config has no matching
+  `<locale>.json` file under `catalogDirectory`.
+- `[dynamic-key]` means the scanner cannot statically determine a translation
+  key. Replace it with a literal where possible or include the relevant
+  function with `--callees`.
+- A config error lists the required fields. Keep locale tags canonical and
+  include the default locale in `locales`.
+- To migrate from repeated command-line paths, run `puzzle-i18n init` in the
+  project, review the generated config and catalogs, then use the no-argument
+  commands. If files already exist, initialization refuses to overwrite them;
+  edit the config manually and keep using the explicit flags until it is ready.
+
+`--help` and `--version` are supported. Validation exits with status `0` when
+checks pass, `1` for invalid catalogs, scan findings, or I/O errors, and `2` for
+invalid command usage. The generated declarations preserve nested catalog keys
+and message literals so they can be used as the generic catalog type in
+`createI18n`.

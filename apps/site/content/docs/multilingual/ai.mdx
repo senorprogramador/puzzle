@@ -1,0 +1,78 @@
+---
+title: AI translation suggestions
+description: Validate optional AI-generated translation suggestions without automatically modifying catalogs.
+---
+
+`@puzzle-ui/i18n/ai` exposes a provider contract rather than a built-in model or
+API client. Call it from a trusted server environment:
+
+```ts
+import { suggestTranslation } from "@puzzle-ui/i18n/ai";
+
+const suggestion = await suggestTranslation(provider, {
+  sourceLocale: "en",
+  targetLocale: "nl",
+  key: "welcome",
+  sourceMessage: "Hello {name}",
+  context: "A friendly greeting",
+});
+```
+
+The helper validates the candidate ICU syntax and requires the same placeholder
+names as the source. It returns `approved: false` and never writes to a catalog.
+Provider errors are surfaced as `TranslationSuggestionError` with a stable
+`code`; the original provider error remains available as `cause`. Wrap a provider
+with `createRateLimitedSuggestionProvider` to bound concurrent requests and
+optionally space them apart. `createAuthorizedSuggestionProvider` runs a
+server-owned authorization callback for each request and fails closed before
+calling the provider if authorization is denied or fails.
+
+For approval and change history, use a `TranslationReviewStore` implementation:
+
+```ts
+import {
+  createTranslationReviewWorkflow,
+} from "@puzzle-ui/i18n/ai";
+
+const workflow = createTranslationReviewWorkflow(provider, reviewStore, {
+  quality: {
+    terminology: [{ source: "Save", target: "Enregistrer", weight: 2 }],
+    checks: [{
+      id: "context-fit",
+      evaluate: ({ request, suggestion }) =>
+        request.context?.includes("button") && suggestion ? 100 : 0,
+    }],
+  },
+});
+const pending = await workflow.suggest({
+  sourceLocale: "en",
+  targetLocale: "nl",
+  key: "welcome",
+  sourceMessage: "Hello {name}",
+});
+
+// Authenticate and authorize the reviewer in your application first.
+const result = await workflow.approve(pending.id, reviewer.id);
+```
+
+Approval applies a suggestion only when its base translation revision is still
+current. The store must enforce this comparison atomically; the included
+`createInMemoryTranslationReviewStore` is for tests and demonstrations, not
+durable production use. Persist the suggestion and audit trail in a protected
+database for production, and authorize reviewers before calling `approve` or
+`reject`. `createTransactionalTranslationReviewStore` adapts a database-neutral
+transaction contract for atomic suggestion writes, translation compare-and-set,
+and audit append; provide an implementation backed by your application's
+transactional database.
+
+Quality rules produce a weighted report on the suggestion. Terminology checks
+look for configured source/target terms; custom checks can use contextual
+information and return a score or a score with a message. Quality is advisory:
+it does not approve or apply suggestions automatically.
+
+Call the provider only from a trusted server environment. Keep credentials and
+source content out of client bundles and routine logs; the package does not
+provide an AI service or application identity system. The authorization
+callback and reviewer identity must be derived and enforced by the host
+application. Provider calls throw a `server-only` error in browser runtimes as
+a guard against accidental client usage.

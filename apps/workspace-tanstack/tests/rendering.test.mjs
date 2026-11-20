@@ -343,3 +343,65 @@ test("TanStack Start preserves SSR, streams Suspense, and defers interactive chu
   assert.deepEqual(hydrationErrors, []);
   await page.close();
 });
+
+test("TanStack locale loaders hydrate server copy and keep navigation in search params", async () => {
+  const url = `${baseUrl}/multilingual?locale=fr&q=projet`;
+  const response = await fetch(url);
+  assert.equal(response.status, 200);
+
+  const html = await response.text();
+  assert.match(html, /<main[^>]*lang="fr"[^>]*dir="ltr"/);
+  assert.match(html, /Découvrez les espaces de travail traduits/);
+  assert.match(html, /Projets partagés/);
+
+  const page = await browser.newPage();
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+
+  await page.goto(`${baseUrl}/`);
+  await page.getByRole("link", { name: "Explore localized content" }).click();
+  await page.getByTestId("multilingual-title").waitFor();
+  assert.match(page.url(), /\/multilingual(?:\?|$)/);
+
+  const frenchContent = page.waitForFunction(
+    () =>
+      document
+        .querySelector('[data-testid="multilingual-page"]')
+        ?.getAttribute("lang") === "fr",
+  );
+  await page.getByTestId("locale-link-fr").click();
+  await frenchContent;
+  assert.equal(await page.getByTestId("multilingual-page").getAttribute("lang"), "fr");
+
+  await page.getByTestId("multilingual-search").fill("projet");
+  await page.getByTestId("multilingual-submit").click();
+  await page.waitForFunction(
+    () => new URL(location.href).searchParams.get("q") === "projet",
+  );
+  assert.equal(
+    await page.getByTestId("multilingual-topics").innerText(),
+    "Projets partagés",
+  );
+
+  const arabicContent = page.waitForFunction(
+    () =>
+      document
+        .querySelector('[data-testid="multilingual-page"]')
+        ?.getAttribute("lang") === "ar",
+  );
+  await page.getByTestId("locale-link-ar").click();
+  await arabicContent;
+  const localizedMain = page.getByTestId("multilingual-page");
+  assert.equal(await localizedMain.getAttribute("lang"), "ar");
+  assert.equal(await localizedMain.getAttribute("dir"), "rtl");
+
+  await page.getByTestId("multilingual-search").fill("مساحة العمل");
+  await page.getByTestId("multilingual-submit").click();
+  await page.getByText("نشاط مساحة العمل").waitFor();
+  const currentSearch = new URL(page.url()).searchParams;
+  assert.equal(currentSearch.get("locale"), "ar");
+  assert.equal(currentSearch.get("q"), "مساحة العمل");
+  assert.deepEqual(errors, []);
+
+  await page.close();
+});

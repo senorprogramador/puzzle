@@ -1,0 +1,66 @@
+---
+title: Local and remote JSON sources
+description: Load immutable locale catalogs from memory, HTTP, or Node filesystem paths.
+---
+
+The `@puzzle-ui/i18n/sources` entry point provides memory and HTTP JSON
+catalogs. The Node-only `@puzzle-ui/i18n/sources/node` entry point provides
+filesystem loading.
+
+```ts
+import { createRemoteCatalogSource } from "@puzzle-ui/i18n/sources";
+
+const source = createRemoteCatalogSource({
+  url: (locale) => `https://content.example.com/i18n/${locale}.json`,
+  timeoutMs: 4_000,
+  retries: 2,
+  cacheTtlMs: 30_000,
+  maxResponseBytes: 1_048_576,
+});
+
+const englishCatalog = await source.load("en");
+source.invalidate("en");
+```
+
+The HTTP source validates absolute HTTP(S) URLs, rejects credentials and
+fragments, disallows redirects, parses and freezes JSON catalogs, isolates
+caches by locale and namespace, supports abort signals, and exposes explicit
+invalidation. Request headers are snapshotted when the source is created, and
+response size is bounded. Errors include the locale and failure category
+without exposing response credentials or body contents. Configure credentials
+only in trusted server environments.
+
+## TypeScript catalogs
+
+Use `createTypeScriptCatalogSource` for catalogs imported as application
+modules. The source preserves the catalog types and can run a schema validator
+once per configured locale:
+
+```ts
+import { createTypeScriptCatalogSource } from "@puzzle-ui/i18n/sources";
+
+const source = createTypeScriptCatalogSource({
+  catalogs: { en, fr },
+  validate(catalog, { locale }) {
+    catalogSchemas[locale].parse(catalog);
+  },
+});
+
+const englishCatalog = await source.load("en");
+```
+
+The validator is application-provided and may use a schema library such as
+Zod; the package does not add a schema dependency. Catalogs are copied,
+validated as plain nested objects, and frozen. Locale and namespace lookups
+are explicit, and abort signals are checked before loading.
+
+For Node filesystem loading, use `createFileCatalogSource({ rootDir })` with an
+absolute root directory. Complete catalogs use `<root>/<locale>.json`;
+namespaced catalogs use `<root>/<locale>/<namespace path>.json`. Resolved
+symlinks are checked to remain within the configured root. Do not import this
+subpath into browser bundles.
+
+These sources return translation catalogs, not CMS documents. For versioned
+published/draft content and locale fallback resolution, use the separate
+`@puzzle-ui/i18n/content` adapter contract; a CMS source and schema validator
+remain application-provided.

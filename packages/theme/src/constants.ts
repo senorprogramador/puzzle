@@ -202,6 +202,11 @@ export const DEFAULT_TOKENS: ThemeTokens = {
   },
 };
 
+export const DEFAULT_COLOR_SCHEME = Object.freeze({
+  light: Object.freeze({ ...DEFAULT_TOKENS.colorSchemes.light }),
+  dark: Object.freeze({ ...DEFAULT_TOKENS.colorSchemes.dark }),
+});
+
 export const COLOR_THEMES = {
   "cobalt-sky": {
     light: {

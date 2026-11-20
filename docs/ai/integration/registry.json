@@ -72,6 +72,20 @@
       "contentHash": "9e4a10ede073c6bb6176fd160c03a3e22896fc430f35d1c8bed776df099219e7"
     },
     {
+      "name": "@puzzle-ui/i18n",
+      "version": "0.13.0",
+      "instructionVersion": 1,
+      "files": [
+        "ai/manifest.json",
+        "ai/instructions.md"
+      ],
+      "instructionDependencies": [
+        "@puzzle-ui/seo"
+      ],
+      "documentationUrl": "https://puzzle-ui.com/docs/multilingual",
+      "contentHash": "a6cc01df9c551c68c8e990e3d299d22a7e56ac69ca414a034371e2243998fe9d"
+    },
+    {
       "name": "@puzzle-ui/icons",
       "version": "0.13.0",
       "instructionVersion": 1,

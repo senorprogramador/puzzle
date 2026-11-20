@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "packageName": "@puzzle-ui/i18n",
+  "instructionVersion": 1,
+  "contentFile": "instructions.md",
+  "instructionDependencies": [
+    "@puzzle-ui/seo"
+  ],
+  "documentationUrl": "https://puzzle-ui.com/docs/multilingual"
+}

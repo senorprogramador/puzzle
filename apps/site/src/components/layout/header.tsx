@@ -18,6 +18,7 @@ const Header = ({}: HeaderProps) => {
       navigationItems={[
         { label: "Home", href: "/", current: true },
         { label: "Docs", href: "/docs/getting-started" },
+        { label: "Theme Studio", href: "/theme-studio" },
         { label: "About", href: "/docs/about" },
         { label: "Architecture", href: "/docs/architecture" },
       ]}

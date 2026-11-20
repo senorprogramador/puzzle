@@ -47,6 +47,8 @@ package or component level. The UI packages target React 19.
 - **Accessibility** — component-specific semantics and interaction guidance;
   behavior and coverage vary by component and consuming application.
 - **SEO** — metadata, structured data, sitemap, and robots utilities.
+- **Multilingual (pre-release)** — locale resolution, ICU translations,
+  Intl formatting, locale-prefixed paths, catalog checks, and React bindings.
 - **Authentication and sessions** — authentication primitives and session
   management, with client, server, and framework integration entry points.
 - **Storage** — storage contracts with Cloudflare D1 and MongoDB adapters.
@@ -81,6 +83,10 @@ They are pre-1.0; check each package's documentation before adopting it.
 | [`@puzzle-ui/storage-mongodb`](https://www.npmjs.com/package/@puzzle-ui/storage-mongodb) | npm | MongoDB storage adapter | `npm install @puzzle-ui/storage-mongodb` | [Storage](https://puzzle-ui.com/docs/storage) |
 | [`@puzzle-ui/fullstack`](https://www.npmjs.com/package/@puzzle-ui/fullstack) | npm | Auth client, server handlers, and Next.js/TanStack Start adapters | `npm install @puzzle-ui/fullstack react react-dom` | [Full-stack auth](https://puzzle-ui.com/docs/fullstack) |
 | [`@puzzle-ui/create`](https://www.npmjs.com/package/@puzzle-ui/create) | npm | Interactive React project generator | `npx @puzzle-ui/create` | [Create a project](https://puzzle-ui.com/docs/create) |
+
+The `@puzzle-ui/i18n` workspace is in development and is not published to npm.
+Its current scope and limitations are documented in the
+[Multilingual guide](https://puzzle-ui.com/docs/multilingual).
 
 The repository also contains the [documentation site](apps/site) and a
 [Storybook playground](apps/playground). See the

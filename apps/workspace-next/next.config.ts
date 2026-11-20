@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   transpilePackages: [
     "@puzzle-ui/ui",
     "@puzzle-ui/theme",
+    "@puzzle-ui/i18n",
     "@puzzle-ui/fullstack",
     "@puzzle-ui/pieces",
     "@puzzle-ui/workspace-ui",

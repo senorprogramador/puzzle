@@ -315,3 +315,102 @@ test("App Router preserves server output, streams Suspense content, and hydrates
     "Server Component implementation text must not be included in client bundles.",
   );
 });
+
+test("localized App Router routes resolve, prerender, translate, and hydrate per locale", async () => {
+  const manifest = JSON.parse(
+    await readFile(join(appRoot, ".next", "prerender-manifest.json"), "utf8"),
+  );
+  assert.ok(manifest.routes["/localized/en"]);
+  assert.ok(manifest.routes["/localized/fr"]);
+
+  const redirect = await fetch(`${baseUrl}/localized?source=proxy`, {
+    headers: { "accept-language": "fr-CA,fr;q=0.9,en;q=0.8" },
+    redirect: "manual",
+  });
+  assert.equal(redirect.status, 307);
+  const redirectUrl = new URL(redirect.headers.get("location"), baseUrl);
+  assert.equal(redirectUrl.pathname, "/localized/fr");
+  assert.equal(redirectUrl.searchParams.get("source"), "proxy");
+
+  const localizedResponse = await fetch(`${baseUrl}/localized/fr`);
+  assert.equal(localizedResponse.status, 200);
+  const localizedHtml = await localizedResponse.text();
+  assert.match(localizedHtml, /<title>Puzzle i18n avec le routeur App de Next\.js<\/title>/);
+  assert.match(localizedHtml, /property="og:locale" content="fr_FR"/);
+  assert.match(localizedHtml, /lang="fr"/);
+  assert.match(localizedHtml, /Ce message a été traduit dans un composant serveur\./);
+  assert.match(localizedHtml, /Ce message a été traduit dans un composant client\./);
+
+  const unknownLocale = await fetch(`${baseUrl}/localized/de`);
+  assert.equal(unknownLocale.status, 404);
+
+  const page = await browser.newPage();
+  const hydrationErrors = [];
+  page.on("pageerror", (error) => hydrationErrors.push(error.message));
+  await page.goto(`${baseUrl}/localized/fr`);
+  const clientMessage = page.getByTestId("localized-client-message");
+  await page.waitForFunction(
+    () =>
+      document.querySelector('[data-testid="localized-client-message"]')?.dataset
+        .hydrated === "true",
+  );
+  assert.equal(await clientMessage.getAttribute("lang"), "fr");
+  assert.equal(await clientMessage.textContent(), "Ce message a été traduit dans un composant client.");
+  assert.deepEqual(hydrationErrors, []);
+  await page.close();
+});
+
+test("request locale resolution honors cookies and Accept-Language with render-scoped caching", async () => {
+  const languageResponse = await fetch(`${baseUrl}/locale-request`, {
+    headers: { "accept-language": "fr-CA,fr;q=0.9,en;q=0.8" },
+  });
+  assert.equal(languageResponse.status, 200);
+  const languageHtml = await languageResponse.text();
+  assert.match(languageHtml, /data-testid="request-locale">fr<\/output>/);
+  assert.match(languageHtml, /data-testid="request-locale-source">accept-language<\/output>/);
+  assert.match(languageHtml, /data-testid="request-locale-cache" data-cache-hit="true"/);
+
+  const cookieResponse = await fetch(`${baseUrl}/locale-request`, {
+    headers: {
+      cookie: "puzzle-locale=fr",
+      "accept-language": "en-US,en;q=0.9",
+    },
+  });
+  const cookieHtml = await cookieResponse.text();
+  assert.match(cookieHtml, /data-testid="request-locale">fr<\/output>/);
+  assert.match(cookieHtml, /data-testid="request-locale-source">cookie<\/output>/);
+});
+
+test("localized Server Components stream after their Suspense fallback", async () => {
+  const response = await fetch(`${baseUrl}/localized/fr/stream`, {
+    headers: { "accept-encoding": "identity" },
+  });
+  assert.equal(response.status, 200);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  const chunks = [];
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    chunks.push(decoder.decode(value, { stream: true }));
+  }
+  chunks.push(decoder.decode());
+
+  const html = chunks.join("");
+  const fallbackChunk = chunks.findIndex((chunk) =>
+    chunk.includes("localized-stream-fallback"),
+  );
+  const streamedContentChunk = chunks.findIndex((chunk) =>
+    chunk.includes("localized-stream-content"),
+  );
+
+  assert.match(html, /data-testid="localized-stream-shell"/);
+  assert.match(html, /Le composant serveur localisé a terminé sa diffusion\./);
+  assert.notEqual(fallbackChunk, -1);
+  assert.ok(
+    streamedContentChunk > fallbackChunk,
+    "Localized content should arrive after its Suspense fallback.",
+  );
+});

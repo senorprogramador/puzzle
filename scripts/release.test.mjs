@@ -373,6 +373,9 @@ for (const failure of [undefined, "login"]) {
     const directory = await mkdtemp(join(tmpdir(), "puzzle-release-npm-test-"));
     try {
       await createFixture(directory);
+      const originals = JSON.parse(
+        await readFile(join(directory, "originals.json"), "utf8"),
+      );
       const result = run(process.execPath, ["scripts/release.mjs"], {
         cwd: directory,
         input: "minor\n",
@@ -394,7 +397,11 @@ for (const failure of [undefined, "login"]) {
         .trim().split("\n").map((line) => JSON.parse(line));
       assert.equal(commands.filter(({ command, args }) => command === "npm" && args[0] === "login").length, 1);
       const publishes = commands.filter(({ command, args }) => command === "npm" && args[0] === "publish");
-      assert.equal(publishes.length, failure ? 0 : 14);
+      const releasePackageCount = Object.keys(originals)
+        .filter((path) => path.endsWith("package.json"))
+        .filter((path) => JSON.parse(originals[path]).private !== true)
+        .length;
+      assert.equal(publishes.length, failure ? 0 : releasePackageCount);
       for (const publish of publishes) {
         assert.ok(publish.cwd.startsWith(join(await realpath(directory), "packages") + "/"));
       }
@@ -515,12 +522,6 @@ for (const failure of [
         assert.equal(index("npm", "publish"), -1);
       }
       if (!failure || failure === "tag") {
-        const publishes = commands.filter(({ command, args }) => command === "npm" && args[0] === "publish");
-        const releasePackageCount = Object.keys(originals)
-          .filter((path) => path.endsWith("package.json"))
-          .filter((path) => JSON.parse(originals[path]).private !== true)
-          .length;
-        assert.equal(publishes.length, releasePackageCount);
         assert.ok(index("git", "tag") > commands.findLastIndex(({ command }) => command === "npm"));
       } else {
         assert.equal(index("git", "tag"), -1);

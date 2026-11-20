@@ -1,0 +1,59 @@
+---
+title: Development diagnostics
+description: Collect locale, fallback, missing-key, namespace, and route diagnostics without adding DevTools to production bundles.
+---
+
+`@puzzle-ui/i18n/devtools` is an opt-in React panel. The separate subpath is
+not imported by the runtime; dynamically import it only in development builds.
+
+```tsx
+import { lazy, Suspense } from "react";
+import { createI18n } from "@puzzle-ui/i18n";
+
+const diagnosticsModule = import.meta.env.DEV
+  ? await import("@puzzle-ui/i18n/devtools")
+  : undefined;
+const diagnostics = diagnosticsModule?.createI18nDiagnostics();
+const i18n = createI18n({
+  locales: [{ locale: "en" }, { locale: "nl" }],
+  defaultLocale: "en",
+  catalogs: { en: { greeting: "Hello" }, nl: {} },
+  onEvent: diagnostics.record,
+});
+
+const I18nDevTools = import.meta.env.DEV
+  ? lazy(() =>
+      import("@puzzle-ui/i18n/devtools").then((module) => ({
+        default: module.I18nDevTools,
+      })),
+    )
+  : null;
+```
+
+Render the panel under a `Suspense` boundary when it is available. The runtime
+reports missing keys, fallbacks, and lazy namespace load states. The bounded
+diagnostics store keeps a recent event history and supports subscriptions and
+clearing.
+
+Framework request adapters can automatically add safe, pathname-only route
+events when given the localized route map and the diagnostics callback:
+
+```tsx
+import { createTanStackLocaleLoader } from "@puzzle-ui/i18n/tanstack";
+
+const resolveLocale = createTanStackLocaleLoader({
+  registry: i18n.registry,
+  routes: localizedRoutes,
+  onRoute: diagnostics.record,
+});
+
+export const Route = createFileRoute("/$locale/articles/$slug")({
+  loader: (args) => resolveLocale(args),
+});
+```
+
+Loaders report `matched`, `redirected`, or `unmatched` plus the route ID when
+available. The diagnostic `pathname` is the canonical route template (for
+example `/articles/:slug`), not the concrete URL; unmatched paths use a
+sentinel. Events omit query strings, fragments, and parameter values. Configure
+a route map to avoid reporting unrelated paths as localized route matches.

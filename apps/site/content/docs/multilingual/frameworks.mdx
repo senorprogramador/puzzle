@@ -1,0 +1,152 @@
+---
+title: Framework request adapters
+description: Resolve request locales from Next.js App Router, TanStack Router, and React Router loaders.
+---
+
+The framework subpaths adapt native request values to the same locale
+resolution order: route locale, locale cookie, `Accept-Language`, then the
+configured default. They do not register routes, rewrite URLs, or create
+framework-global locale state. Pass the resolved locale into the React
+provider or create a request-scoped translator on the server.
+
+## Next.js App Router
+
+Next.js 15/16 request APIs are asynchronous. Resolve the route `params` and
+headers in the server layout or page:
+
+```tsx
+import { headers } from "next/headers";
+import { resolveNextRequestLocale } from "@puzzle-ui/i18n/next";
+import { createI18nReact } from "@puzzle-ui/i18n/react";
+import type { ReactNode } from "react";
+import { i18n } from "./i18n";
+
+const { Provider: I18nProvider } = createI18nReact(i18n);
+
+export default async function LocaleLayout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const [routeParams, requestHeaders] = await Promise.all([
+    params,
+    headers(),
+  ]);
+  const { locale } = resolveNextRequestLocale({
+    registry: i18n.registry,
+    headers: requestHeaders,
+    urlLocale: routeParams.locale,
+  });
+
+  return <I18nProvider locale={locale}>{children}</I18nProvider>;
+}
+```
+
+Call the adapter in a request-bound server component; do not cache its result
+across requests. Next.js 16 awaits route params and headers, so do not pass
+synchronous values.
+
+## TanStack Router / Start
+
+The adapter returns a native route-loader-compatible function using the
+`Request` and route `params` supplied by TanStack:
+
+```tsx
+import { createFileRoute } from "@tanstack/react-router";
+import { createTanStackLocaleLoader } from "@puzzle-ui/i18n/tanstack";
+import { i18n } from "./i18n";
+
+const resolveLocale = createTanStackLocaleLoader({
+  registry: i18n.registry,
+});
+
+export const Route = createFileRoute("/$locale")({
+  loader: (args) => resolveLocale(args),
+});
+```
+
+Use the loader result in the route component and provide it to the React
+bindings. For Start, run request-dependent catalog loading only on the server;
+the browser imports must not include `@puzzle-ui/i18n/sources/node`.
+
+## React Router
+
+The React Router 7 adapter accepts the native `LoaderFunctionArgs` request and
+params:
+
+```tsx
+import type { Route } from "./+types/locale";
+import { createReactRouterLocaleLoader } from "@puzzle-ui/i18n/react-router";
+import { i18n } from "./i18n";
+
+const resolveLocale = createReactRouterLocaleLoader({
+  registry: i18n.registry,
+});
+
+export function loader(args: Route.LoaderArgs) {
+  return resolveLocale(args);
+}
+```
+
+Use React Router's metadata APIs and navigation primitives directly. The
+adapter does not implement route registration, localized slugs, or redirects;
+use `@puzzle-ui/i18n/routing` for same-origin path generation.
+
+## Verified native fixtures
+
+The repository includes fixture applications that exercise framework-owned
+request, route, rendering, and navigation APIs rather than mocking them.
+
+### Next.js App Router
+
+`apps/workspace-next` covers statically generated `/localized/en` and
+`/localized/fr` pages, `/localized/fr/stream`, and a dynamic `/locale-request`
+page. Its Next.js 16 `src/proxy.ts` matches `/localized/:path*` but redirects
+only the bare `/localized` path. Locale preference is cookie, then
+`Accept-Language`, then the default `en`; redirects preserve query parameters,
+and an unsupported URL locale returns 404.
+
+The fixture exercises async route params, `generateStaticParams` with
+`dynamicParams = false`, localized `generateMetadata` including Open Graph
+locale, asynchronous `headers()`/`cookies()`, React `cache()` for
+request-scoped deduplication, and `<Suspense>` around an async Server Component
+for streaming. A route locale takes precedence over request preferences.
+
+### TanStack Start and Router
+
+`apps/workspace-tanstack` exercises the `/multilingual` route with
+`?locale=fr&q=projet`. `validateSearch` restricts locales and bounds the query;
+`beforeLoad` provides locale context; `loaderDeps` and `loader` load data for
+the selected locale through a GET `createServerFn`. Locale links preserve the
+search query, and `useNavigate` updates the query and filters localized topics.
+The rendered route exposes the locale's `lang` and `dir`.
+
+The fixture uses `createFileRoute`, `Route.useLoaderData`, `Route.useSearch`,
+`Route.useRouteContext`, `Link`, and `useNavigate`, and is typechecked,
+render-tested, and production-built.
+
+### React Router
+
+`apps/workspace-react-router` is a React Router 7 data-router application with
+SSR and client hydration. It serves `/en/workspace`, `/fr/workspace`, and
+`/ar/workspace`; `/` redirects to `/en/workspace`, and `/xx/workspace`
+exercises the unsupported-locale error boundary. The localized page uses
+`?q=membres` search state, native loader/action data, and route `handle`
+metadata. Its production browser test verifies no-JavaScript SSR, hydration,
+locale navigation, metadata updates, search navigation, form actions, and
+errors.
+
+The app uses React Router's `createStaticHandler`, `createStaticRouter`, and
+`StaticRouterProvider` for server rendering and `createBrowserRouter` and
+`RouterProvider` for client hydration, with `useMatches` for metadata. The
+package suite also retains a small static data-router contract test. React
+Router remains an optional peer; no framework dependency is loaded by the
+package root.
+
+Run `bun run test:frameworks` for the Next.js and TanStack app typecheck,
+rendering, and production-build matrix, including React Router's typecheck,
+production client/SSR build, and rendering/browser suite. Run
+`bun run --filter @puzzle-ui/i18n test:unit` for the package's static React
+Router contract test; public entrypoints are covered by `test:package`.

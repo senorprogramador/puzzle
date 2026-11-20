@@ -14,6 +14,7 @@ import { Route as LlmsFullDottxtRouteImport } from './routes/llms-full[.]txt'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ThemeStudioRouteImport } from './routes/theme-studio'
 import { Route as DotwellKnownPuzzleDotjsonRouteImport } from './routes/[.]well-known.puzzle[.]json'
 import { Route as ApiSearchRouteImport } from './routes/api/search'
 import { Route as DocsSplatRouteImport } from './routes/docs/$'
@@ -43,6 +44,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ThemeStudioRoute = ThemeStudioRouteImport.update({
+  id: '/theme-studio',
+  path: '/theme-studio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DotwellKnownPuzzleDotjsonRoute =
   DotwellKnownPuzzleDotjsonRouteImport.update({
     id: '/.well-known/puzzle.json',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/llms.txt': typeof LlmsDottxtRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/theme-studio': typeof ThemeStudioRoute
   '/.well-known/puzzle.json': typeof DotwellKnownPuzzleDotjsonRoute
   '/api/search': typeof ApiSearchRoute
   '/docs/$': typeof DocsSplatRoute
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/llms.txt': typeof LlmsDottxtRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/theme-studio': typeof ThemeStudioRoute
   '/.well-known/puzzle.json': typeof DotwellKnownPuzzleDotjsonRoute
   '/api/search': typeof ApiSearchRoute
   '/docs/$': typeof DocsSplatRoute
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/llms.txt': typeof LlmsDottxtRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/theme-studio': typeof ThemeStudioRoute
   '/.well-known/puzzle.json': typeof DotwellKnownPuzzleDotjsonRoute
   '/api/search': typeof ApiSearchRoute
   '/docs/$': typeof DocsSplatRoute
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/theme-studio'
     | '/.well-known/puzzle.json'
     | '/api/search'
     | '/docs/$'
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/theme-studio'
     | '/.well-known/puzzle.json'
     | '/api/search'
     | '/docs/$'
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/llms.txt'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/theme-studio'
     | '/.well-known/puzzle.json'
     | '/api/search'
     | '/docs/$'
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  ThemeStudioRoute: typeof ThemeStudioRoute
   DotwellKnownPuzzleDotjsonRoute: typeof DotwellKnownPuzzleDotjsonRoute
   ApiSearchRoute: typeof ApiSearchRoute
   DocsSplatRoute: typeof DocsSplatRoute
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/theme-studio': {
+      id: '/theme-studio'
+      path: '/theme-studio'
+      fullPath: '/theme-studio'
+      preLoaderRoute: typeof ThemeStudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.well-known/puzzle.json': {
       id: '/.well-known/puzzle.json'
       path: '/.well-known/puzzle.json'
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   LlmsDottxtRoute: LlmsDottxtRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  ThemeStudioRoute: ThemeStudioRoute,
   DotwellKnownPuzzleDotjsonRoute: DotwellKnownPuzzleDotjsonRoute,
   ApiSearchRoute: ApiSearchRoute,
   DocsSplatRoute: DocsSplatRoute,

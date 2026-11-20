@@ -12,6 +12,7 @@ import { auth } from "./sidebar/auth";
 import { fullstack } from "./sidebar/fullstack";
 import { storage } from "./sidebar/storage";
 import { tutorials } from "./sidebar/tutorials";
+import { multilingual } from "./sidebar/multilingual";
 
 const items: TreeViewItem[] = [
   {
@@ -48,6 +49,7 @@ const items: TreeViewItem[] = [
   icons,
   hooks,
   seo,
+  multilingual,
   auth,
   fullstack,
   storage,
