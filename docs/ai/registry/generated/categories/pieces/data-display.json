@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "EmptyStatePanel",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "data-display",
+      "description": "Explain empty, search, success, and error states with accessible actions and application content.",
+      "documentation": "apps/site/content/docs/pieces/components/empty-state.mdx",
+      "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "data-display"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)",
+        "illustrationLabel (optional)",
+        "children (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "illustration",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "minimal",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "card",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "search",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "error",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "success",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "onboarding",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "full-page",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "compact",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "action",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "data-display",
+      "description": "Explain empty, search, success, and error states with accessible actions and application content.",
+      "documentation": "apps/site/content/docs/pieces/components/empty-state.mdx",
+      "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "data-display"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)",
+        "illustrationLabel (optional)",
+        "children (optional)"
+      ],
+      "variants": [
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "illustration",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "minimal",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "card",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "search",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "error",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "success",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "onboarding",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "full-page",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "compact",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        },
+        {
+          "name": "action",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/data-display/empty-state-panel.tsx",
+          "prop": "variant",
+          "typeName": "EmptyStateSectionVariant"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "MetricComparison",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "data-display",
+      "description": "Reuse Puzzle Pieces stat, timeline, progress, comparison, and empty-state compositions.",
+      "documentation": "apps/site/content/docs/pieces/components/data-display.mdx",
+      "source": "packages/pieces/src/components/data-display/metric-comparison.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "data-display"
+      },
+      "requiredProps": [
+        "title",
+        "primaryLabel",
+        "primaryValue",
+        "comparisonLabel",
+        "comparisonValue"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "primaryLabel (required)",
+        "comparisonLabel (required)",
+        "description (optional)"
+      ],
+      "aliases": []
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import { useId } from "react";
 
 import "./dashboard.css";
@@ -25,9 +26,9 @@ export const DashboardStatCard = ({
       aria-busy={loading || undefined}
     >
       <div className="puzzle-dashboard-stat-card__header">
-        <h2 id={labelId} className="puzzle-dashboard-stat-card__label">
+        <Heading level="headline2" as="h2" id={labelId} className="puzzle-dashboard-stat-card__label">
           {label}
-        </h2>
+        </Heading>
         {icon && (
           <span className="puzzle-dashboard-stat-card__icon" aria-hidden="true">
             {icon}
@@ -40,19 +41,19 @@ export const DashboardStatCard = ({
           aria-hidden="true"
         />
       ) : value !== undefined ? (
-        <p className="puzzle-dashboard-stat-card__value">{value}</p>
+        <Text as="p" className="puzzle-dashboard-stat-card__value">{value}</Text>
       ) : null}
       {description && !loading && (
-        <p className="puzzle-dashboard-stat-card__description">{description}</p>
+        <Text as="p" className="puzzle-dashboard-stat-card__description">{description}</Text>
       )}
       {trend && !loading && (
-        <p
+        <Text as="p"
           className="puzzle-dashboard-stat-card__trend"
           data-direction={trend.direction ?? "neutral"}
         >
           <span>{trend.value}</span>
           <span>{trend.label}</span>
-        </p>
+        </Text>
       )}
       {action && (
         <div className="puzzle-dashboard-stat-card__action">{action}</div>

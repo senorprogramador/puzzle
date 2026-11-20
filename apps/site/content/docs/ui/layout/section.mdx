@@ -18,15 +18,13 @@ import { Section } from "@puzzle-ui/ui";
 
 ## Themes and width
 
-Section applies section colors and vertical spacing. A non-default `theme`
-paints the background across the available width while its children sit in a
-centered `puzzle-container` limited by `--puzzle-container-width`, with horizontal
-gutters. Default sections apply the container classes directly to their root.
-With `theme="default"` (or no `theme` prop), background and text colors use the
-nearest Theme provider's semantic tokens, including local light/dark scopes
-and mode changes.
-Use `fullWidth` to leave content unconstrained without container gutters, or
-`noPadding` to remove vertical padding.
+Section applies its background across the available width and places content in
+a centered `puzzle-container` limited by `--puzzle-container-width`, with
+horizontal gutters. With `theme="default"` (or no `theme` prop), background and
+text colors use the nearest Theme provider's semantic tokens, including local
+light/dark scopes and mode changes. Use `fullWidth` to leave content
+unconstrained without container gutters, or `noPadding` to remove vertical
+padding.
 
 <Preview
   code={`\
@@ -56,7 +54,7 @@ Use `fullWidth` to leave content unconstrained without container gutters, or
 | ----------- | ------------------------------------------------------------------------ | ----------- | ---------------------------------- |
 | `children`  | `ReactNode`                                                              | -           | Section content.                   |
 | `theme`     | `"default" \| "light" \| "dark" \| "primary" \| "secondary" \| "accent"` | `"default"` | Theme treatment.                   |
-| `fullWidth` | `boolean`                                                                | `false`     | Removes the content width constraint and horizontal gutters. Themed backgrounds always fill the available width. |
+| `fullWidth` | `boolean`                                                                | `false`     | Removes the content width constraint and horizontal gutters. |
 | `noPadding` | `boolean`                                                                | `false`     | Removes vertical section padding. |
 | `className` | `string`                                                                 | -           | Root class.                        |
 

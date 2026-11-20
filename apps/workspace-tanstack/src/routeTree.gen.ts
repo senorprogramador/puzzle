@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as RenderingRouteImport } from './routes/rendering'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SignUpRouteImport } from './routes/sign-up'
@@ -19,7 +20,11 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as VerifyEmailChangeRouteImport } from './routes/verify-email-change'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as InvitationsAcceptRouteImport } from './routes/invitations/accept'
+import { Route as RenderingBenchmarkBaselineRouteImport } from './routes/rendering-benchmark.baseline'
+import { Route as RenderingErrorRouteImport } from './routes/rendering.error'
+import { Route as RenderingTargetRouteImport } from './routes/rendering.target'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as RenderingBenchmarkProfileProfileRouteImport } from './routes/rendering-benchmark.profile.$profile'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,6 +39,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RenderingRoute = RenderingRouteImport.update({
+  id: '/rendering',
+  path: '/rendering',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -71,16 +81,39 @@ const InvitationsAcceptRoute = InvitationsAcceptRouteImport.update({
   path: '/invitations/accept',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RenderingBenchmarkBaselineRoute =
+  RenderingBenchmarkBaselineRouteImport.update({
+    id: '/rendering-benchmark/baseline',
+    path: '/rendering-benchmark/baseline',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const RenderingErrorRoute = RenderingErrorRouteImport.update({
+  id: '/error',
+  path: '/error',
+  getParentRoute: () => RenderingRoute,
+} as any)
+const RenderingTargetRoute = RenderingTargetRouteImport.update({
+  id: '/target',
+  path: '/target',
+  getParentRoute: () => RenderingRoute,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RenderingBenchmarkProfileProfileRoute =
+  RenderingBenchmarkProfileProfileRouteImport.update({
+    id: '/rendering-benchmark/profile/$profile',
+    path: '/rendering-benchmark/profile/$profile',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/rendering': typeof RenderingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -88,12 +121,17 @@ export interface FileRoutesByFullPath {
   '/verify-email-change': typeof VerifyEmailChangeRoute
   '/api/$': typeof ApiSplatRoute
   '/invitations/accept': typeof InvitationsAcceptRoute
+  '/rendering-benchmark/baseline': typeof RenderingBenchmarkBaselineRoute
+  '/rendering/error': typeof RenderingErrorRoute
+  '/rendering/target': typeof RenderingTargetRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/rendering-benchmark/profile/$profile': typeof RenderingBenchmarkProfileProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/rendering': typeof RenderingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -101,13 +139,18 @@ export interface FileRoutesByTo {
   '/verify-email-change': typeof VerifyEmailChangeRoute
   '/api/$': typeof ApiSplatRoute
   '/invitations/accept': typeof InvitationsAcceptRoute
+  '/rendering-benchmark/baseline': typeof RenderingBenchmarkBaselineRoute
+  '/rendering/error': typeof RenderingErrorRoute
+  '/rendering/target': typeof RenderingTargetRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/rendering-benchmark/profile/$profile': typeof RenderingBenchmarkProfileProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/rendering': typeof RenderingRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -115,7 +158,11 @@ export interface FileRoutesById {
   '/verify-email-change': typeof VerifyEmailChangeRoute
   '/api/$': typeof ApiSplatRoute
   '/invitations/accept': typeof InvitationsAcceptRoute
+  '/rendering-benchmark/baseline': typeof RenderingBenchmarkBaselineRoute
+  '/rendering/error': typeof RenderingErrorRoute
+  '/rendering/target': typeof RenderingTargetRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/rendering-benchmark/profile/$profile': typeof RenderingBenchmarkProfileProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -123,6 +170,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/forgot-password'
+    | '/rendering'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
@@ -130,12 +178,17 @@ export interface FileRouteTypes {
     | '/verify-email-change'
     | '/api/$'
     | '/invitations/accept'
+    | '/rendering-benchmark/baseline'
+    | '/rendering/error'
+    | '/rendering/target'
     | '/api/auth/$'
+    | '/rendering-benchmark/profile/$profile'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
     | '/forgot-password'
+    | '/rendering'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
@@ -143,12 +196,17 @@ export interface FileRouteTypes {
     | '/verify-email-change'
     | '/api/$'
     | '/invitations/accept'
+    | '/rendering-benchmark/baseline'
+    | '/rendering/error'
+    | '/rendering/target'
     | '/api/auth/$'
+    | '/rendering-benchmark/profile/$profile'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
     | '/forgot-password'
+    | '/rendering'
     | '/reset-password'
     | '/sign-in'
     | '/sign-up'
@@ -156,13 +214,18 @@ export interface FileRouteTypes {
     | '/verify-email-change'
     | '/api/$'
     | '/invitations/accept'
+    | '/rendering-benchmark/baseline'
+    | '/rendering/error'
+    | '/rendering/target'
     | '/api/auth/$'
+    | '/rendering-benchmark/profile/$profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  RenderingRoute: typeof RenderingRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
@@ -170,7 +233,9 @@ export interface RootRouteChildren {
   VerifyEmailChangeRoute: typeof VerifyEmailChangeRoute
   ApiSplatRoute: typeof ApiSplatRoute
   InvitationsAcceptRoute: typeof InvitationsAcceptRoute
+  RenderingBenchmarkBaselineRoute: typeof RenderingBenchmarkBaselineRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  RenderingBenchmarkProfileProfileRoute: typeof RenderingBenchmarkProfileProfileRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -194,6 +259,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rendering': {
+      id: '/rendering'
+      path: '/rendering'
+      fullPath: '/rendering'
+      preLoaderRoute: typeof RenderingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -245,6 +317,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvitationsAcceptRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rendering-benchmark/baseline': {
+      id: '/rendering-benchmark/baseline'
+      path: '/rendering-benchmark/baseline'
+      fullPath: '/rendering-benchmark/baseline'
+      preLoaderRoute: typeof RenderingBenchmarkBaselineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rendering/error': {
+      id: '/rendering/error'
+      path: '/error'
+      fullPath: '/rendering/error'
+      preLoaderRoute: typeof RenderingErrorRouteImport
+      parentRoute: typeof RenderingRoute
+    }
+    '/rendering/target': {
+      id: '/rendering/target'
+      path: '/target'
+      fullPath: '/rendering/target'
+      preLoaderRoute: typeof RenderingTargetRouteImport
+      parentRoute: typeof RenderingRoute
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -252,13 +345,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rendering-benchmark/profile/$profile': {
+      id: '/rendering-benchmark/profile/$profile'
+      path: '/rendering-benchmark/profile/$profile'
+      fullPath: '/rendering-benchmark/profile/$profile'
+      preLoaderRoute: typeof RenderingBenchmarkProfileProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface RenderingRouteChildren {
+  RenderingErrorRoute: typeof RenderingErrorRoute
+  RenderingTargetRoute: typeof RenderingTargetRoute
+}
+
+const RenderingRouteChildren: RenderingRouteChildren = {
+  RenderingErrorRoute: RenderingErrorRoute,
+  RenderingTargetRoute: RenderingTargetRoute,
+}
+
+const RenderingRouteWithChildren = RenderingRoute._addFileChildren(
+  RenderingRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  RenderingRoute: RenderingRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
@@ -266,7 +381,9 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyEmailChangeRoute: VerifyEmailChangeRoute,
   ApiSplatRoute: ApiSplatRoute,
   InvitationsAcceptRoute: InvitationsAcceptRoute,
+  RenderingBenchmarkBaselineRoute: RenderingBenchmarkBaselineRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  RenderingBenchmarkProfileProfileRoute: RenderingBenchmarkProfileProfileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -2,13 +2,15 @@ import * as p from "@clack/prompts";
 
 import { AUTH_DATABASES, FRAMEWORKS, isFullStackFramework } from "./constants";
 
-import type { AuthDatabase, Framework, ProjectOptions } from "./types";
-
-import { toKebabCase } from "./utils/kebab-case";
+import { validateProjectConfiguration } from "./configuration";
 
 import { detectPackageManager } from "./utils/detect-package-manager";
 
-const getProjectOptions = async (): Promise<ProjectOptions | null> => {
+import type { AuthDatabase, Framework, ProjectConfiguration } from "./types";
+
+import { toKebabCase } from "./utils/kebab-case";
+
+const getProjectConfiguration = async (): Promise<ProjectConfiguration | null> => {
   p.intro("Create a Puzzle application");
 
   const name = await p.text({
@@ -28,8 +30,6 @@ const getProjectOptions = async (): Promise<ProjectOptions | null> => {
   if (p.isCancel(name)) {
     return null;
   }
-
-  const directory = toKebabCase(name);
 
   const framework = await p.select({
     message: "Which framework would you like to use?",
@@ -84,15 +84,14 @@ const getProjectOptions = async (): Promise<ProjectOptions | null> => {
     database = selectedDatabase as AuthDatabase;
   }
 
-  return {
-    name: directory,
-    directory,
+  return validateProjectConfiguration({
+    projectName: name,
     framework: framework as Framework,
-    packageManager: detectPackageManager(),
-    tailwind,
+    styling: tailwind ? "tailwind" : "none",
     auth,
     ...(database ? { database } : {}),
-  };
+    packageManager: detectPackageManager(),
+  });
 };
 
-export { getProjectOptions };
+export { getProjectConfiguration };

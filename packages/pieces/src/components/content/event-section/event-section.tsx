@@ -9,6 +9,9 @@ import {
   CarouselController,
   Card,
   CardContent,
+  Heading,
+  Text,
+  Select,
 } from "@puzzle-ui/ui";
 
 import {
@@ -50,14 +53,14 @@ const EventCard = ({
         <Badge content={isPast ? "Past" : "Upcoming"} color={isPast ? "secondary" : "info"} />
         {event.category ? <Badge content={event.category} /> : null}
       </div>
-      <h3>
+      <Heading level="headline3" as="h3">
         {event.href ? (
           <a href={event.href}>{event.title}</a>
         ) : (
           event.title
         )}
-      </h3>
-      <p className="puzzle-event-section__date">
+      </Heading>
+      <Text as="p" className="puzzle-event-section__date">
         <time dateTime={event.startDate}>
           {event.dateLabel ?? event.startDate}
         </time>
@@ -69,11 +72,11 @@ const EventCard = ({
             </time>
           </>
         ) : null}
-      </p>
+      </Text>
       {event.location ? (
-        <p className="puzzle-event-section__location">{event.location}</p>
+        <Text as="p" className="puzzle-event-section__location">{event.location}</Text>
       ) : null}
-      {event.description ? <p>{event.description}</p> : null}
+      {event.description ? <Text as="p">{event.description}</Text> : null}
       {event.price ? (
         <div className="puzzle-event-section__price">{event.price}</div>
       ) : null}
@@ -196,22 +199,20 @@ const EventSection = <C extends ElementType = "section">({
             ))}
           </div>
           {filter.categories.length ? (
-            <label>
-              Category
-              <select
-                value={filter.selectedCategory}
-                onChange={(event) =>
-                  filter.setSelectedCategory(event.currentTarget.value)
-                }
-              >
-                <option value="">All categories</option>
-                {filter.categories.map((category) => (
-                  <option value={category} key={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <Select
+              label="Category"
+              value={filter.selectedCategory}
+              options={[
+                { value: "", label: "All categories" },
+                ...filter.categories.map((category) => ({
+                  value: category,
+                  label: category,
+                })),
+              ]}
+              onChange={(category) =>
+                filter.setSelectedCategory(category ?? "")
+              }
+            />
           ) : null}
         </div>
       ) : null}

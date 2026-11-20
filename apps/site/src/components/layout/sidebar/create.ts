@@ -12,6 +12,11 @@ export const create: TreeViewItem = {
       href: folder,
     },
     {
+      id: "create-configuration",
+      label: "Automated configuration",
+      href: `${folder}/configuration`,
+    },
+    {
       id: "create-deployment",
       label: "Deployment",
       href: `${folder}/deployment`,

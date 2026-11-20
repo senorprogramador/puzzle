@@ -1,5 +1,5 @@
-.home {
-    --home-bg: var(--puzzle-background, #0c0d0f);
+.home-page {
+    --home-bg: var(--puzzle-color-background, #f7f4ea);
     --home-surface: var(--puzzle-surface, #151619);
     --home-text: var(--puzzle-text, #f5f5f3);
     --home-muted: var(--puzzle-text-muted, #92949b);
@@ -58,6 +58,14 @@
     .puzzle-section.home-hero {
         grid-template-columns: 0.95fr 1.05fr;
     }
+}
+
+.puzzle-hero.home-hero {
+    overflow: visible;
+}
+
+.puzzle-hero.home-hero .puzzle-hero__media {
+    overflow: visible;
 }
 
 .home-hero__background {
@@ -170,7 +178,7 @@
     border-radius: 15px;
     overflow: hidden;
     box-shadow:
-        0 35px 100px rgba(0, 0, 0, 0.4),
+        0 28px 80px rgba(0, 0, 0, 0.24),
         0 0 0 8px rgba(255, 255, 255, 0.015);
     transform: perspective(1400px) rotateY(-4deg) rotateX(2deg);
 }
@@ -399,6 +407,10 @@
     max-width: 500px;
 }
 
+.puzzle-card__header.home-getting-started__card-header {
+    row-gap: var(--puzzle-space-2, 0.5rem);
+}
+
 .home-feature-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -576,6 +588,8 @@
 }
 
 .home-code {
+    min-width: 0;
+    max-width: 100%;
     overflow: hidden;
     background: #111214;
     border: 1px solid #303136;
@@ -626,33 +640,6 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-}
-
-.home-footer {
-    width: min(1240px, calc(100% - 64px));
-    min-height: 100px;
-    margin: 0 auto;
-    border-top: 1px solid var(--home-border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-}
-
-.home-footer > span {
-    font-size: 11px;
-}
-
-.home-footer > div {
-    display: flex;
-    align-items: center;
-    gap: 22px;
-
-    font-size: 11px;
-}
-
-.home-footer a:hover {
-    color: var(--home-text);
 }
 
 @media (max-width: 1050px) {
@@ -731,10 +718,6 @@
         font-size: 9px;
     }
 
-    .home-footer {
-        flex-wrap: wrap;
-        padding: 25px 0;
-    }
 }
 
 @media (max-width: 520px) {
@@ -751,7 +734,11 @@
     }
 
     .home-hero h1 {
-        font-size: 53px;
+        font-size: clamp(
+            var(--puzzle-font-size-3xl),
+            9.5vw,
+            var(--puzzle-font-size-5xl)
+        );
     }
 
     .home-hero__description {
@@ -795,15 +782,6 @@
         font-size: 43px;
     }
 
-    .home-footer {
-        width: calc(100% - 40px);
-    }
-
-    .home-footer > div {
-        width: 100%;
-        flex-wrap: wrap;
-        gap: 15px;
-    }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://puzzle-ui.com/schemas/create-config-v1.json",
+  "title": "Puzzle Create project configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["projectName", "framework", "styling", "auth"],
+  "properties": {
+    "projectName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "framework": {
+      "enum": ["next", "tanstack", "react-router", "react"]
+    },
+    "styling": {
+      "enum": ["tailwind", "none"]
+    },
+    "auth": {
+      "type": "boolean"
+    },
+    "database": {
+      "enum": ["mongodb", "d1", "custom"]
+    },
+    "packageManager": {
+      "enum": ["bun", "npm", "pnpm", "yarn"]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "auth": {
+            "const": true
+          },
+          "framework": {
+            "enum": ["next", "tanstack", "react-router"]
+          }
+        },
+        "required": ["auth", "framework"]
+      },
+      "then": {
+        "required": ["database"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "auth": {
+            "const": false
+          }
+        },
+        "required": ["auth"]
+      },
+      "then": {
+        "not": {
+          "required": ["database"]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "framework": {
+            "const": "react"
+          }
+        },
+        "required": ["framework"]
+      },
+      "then": {
+        "not": {
+          "required": ["database"]
+        }
+      }
+    }
+  ]
+}

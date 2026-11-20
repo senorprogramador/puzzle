@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "FormActions",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "settings",
+      "subcategory": "settings",
+      "description": "Build consistent, accessible settings forms and security/profile sections with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/settings.mdx",
+      "source": "packages/pieces/src/components/settings/settings.tsx",
+      "useCases": [
+        "settings"
+      ],
+      "pageTypes": [
+        "settings",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "settings"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ProfileHeader",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "settings",
+      "subcategory": "settings",
+      "description": "Build consistent, accessible settings forms and security/profile sections with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/settings.mdx",
+      "source": "packages/pieces/src/components/settings/settings.tsx",
+      "useCases": [
+        "settings"
+      ],
+      "pageTypes": [
+        "settings",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "settings"
+      },
+      "requiredProps": [
+        "name"
+      ],
+      "mediaRequirements": [
+        "avatar (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SecurityMethodCard",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "settings",
+      "subcategory": "settings",
+      "description": "Build consistent, accessible settings forms and security/profile sections with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/settings.mdx",
+      "source": "packages/pieces/src/components/settings/settings.tsx",
+      "useCases": [
+        "settings"
+      ],
+      "pageTypes": [
+        "settings",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "settings"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SettingsGroup",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "settings",
+      "subcategory": "settings",
+      "description": "Build consistent, accessible settings forms and security/profile sections with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/settings.mdx",
+      "source": "packages/pieces/src/components/settings/settings.tsx",
+      "useCases": [
+        "settings"
+      ],
+      "pageTypes": [
+        "settings",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "settings"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "title (optional)",
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SettingsRow",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "settings",
+      "subcategory": "settings",
+      "description": "Build consistent, accessible settings forms and security/profile sections with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/settings.mdx",
+      "source": "packages/pieces/src/components/settings/settings.tsx",
+      "useCases": [
+        "settings"
+      ],
+      "pageTypes": [
+        "settings",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "settings"
+      },
+      "requiredProps": [
+        "label",
+        "control"
+      ],
+      "contentRequirements": [
+        "label (required)",
+        "description (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SettingsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "settings",
+      "subcategory": "settings",
+      "description": "Build consistent, accessible settings forms and security/profile sections with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/settings.mdx",
+      "source": "packages/pieces/src/components/settings/settings.tsx",
+      "useCases": [
+        "settings"
+      ],
+      "pageTypes": [
+        "settings",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "settings"
+      },
+      "requiredProps": [
+        "title",
+        "children"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)",
+        "navigationLabel (optional)",
+        "children (required)"
+      ],
+      "variants": [
+        {
+          "name": "list",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "grouped",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "cards",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "sidebar",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "tabs",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "accordion",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "profile",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "preferences",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "security",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "notifications",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        },
+        {
+          "name": "compact",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/settings/settings.tsx",
+          "prop": "variant",
+          "typeName": "SettingsSectionVariant"
+        }
+      ],
+      "aliases": []
+    }
+  ]
+}

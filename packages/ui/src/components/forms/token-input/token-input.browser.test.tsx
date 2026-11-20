@@ -357,6 +357,28 @@ describe("TokenInput (browser)", () => {
       );
     });
 
+    it("shrinks long token slots to fit a narrow form container", () => {
+      const { container } = render(
+        <div style={{ width: "310px" }}>
+          <TokenInput
+            label="Recovery code"
+            length={8}
+            mode="alphanumeric"
+          />
+        </div>,
+      );
+
+      const slots = container.querySelector(
+        ".puzzle-token-input__slots",
+      ) as HTMLElement;
+
+      expect(slots.scrollWidth).toBeLessThanOrEqual(slots.clientWidth);
+
+      for (const slot of getSlots()) {
+        expect(slot.getBoundingClientRect().width).toBeGreaterThan(0);
+      }
+    });
+
     it("keeps the visual layout consistent for different sizes", () => {
       const { rerender } = render(<TokenInput label="PIN" size="sm" />);
 

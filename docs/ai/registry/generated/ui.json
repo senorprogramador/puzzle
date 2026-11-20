@@ -1,0 +1,4224 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/ui"
+  ],
+  "components": [
+    {
+      "name": "Button",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "actions",
+      "subcategory": "button",
+      "description": "Trigger actions with clear sizes, variants, and loading states.",
+      "documentation": "apps/site/content/docs/ui/actions/button.mdx",
+      "source": "packages/ui/src/components/actions/button/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Button"
+      },
+      "contentRequirements": [
+        "children (optional)"
+      ],
+      "variants": [
+        {
+          "name": "primary",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "secondary",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "outline",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "ghost",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "danger",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "link",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "toggle",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "toggle-active",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "variant",
+          "typeName": "ButtonVariant"
+        },
+        {
+          "name": "xs",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        },
+        {
+          "name": "sm",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        },
+        {
+          "name": "md",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        },
+        {
+          "name": "lg",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        },
+        {
+          "name": "icon",
+          "kind": "prop",
+          "source": "packages/ui/src/components/actions/button/button.types.ts",
+          "prop": "size",
+          "typeName": "ButtonSize"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ButtonGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "actions",
+      "subcategory": "button-group",
+      "description": "Arrange related actions in a connected set of buttons.",
+      "documentation": "apps/site/content/docs/ui/actions/button-group.mdx",
+      "source": "packages/ui/src/components/actions/button-group/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Button Group"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ToggleGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "actions",
+      "subcategory": "toggle-group",
+      "description": "Select one or more options from a group of toggles.",
+      "documentation": "apps/site/content/docs/ui/actions/toggle-group.mdx",
+      "source": "packages/ui/src/components/actions/toggle-group/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Toggle Group"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Alert",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "alert",
+      "description": "Highlight important information, warnings, and errors.",
+      "documentation": "apps/site/content/docs/ui/data-display/alert.mdx",
+      "source": "packages/ui/src/components/data-display/alert/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Alert"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Avatar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "avatar",
+      "description": "Represent people with profile images or initials.",
+      "documentation": "apps/site/content/docs/ui/data-display/avatar.mdx",
+      "source": "packages/ui/src/components/data-display/avatar/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Avatar"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Badge",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "badge",
+      "description": "Annotate content with a count, label, or status.",
+      "documentation": "apps/site/content/docs/ui/data-display/badge.mdx",
+      "source": "packages/ui/src/components/data-display/badge/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Badge"
+      },
+      "requiredProps": [
+        "content"
+      ],
+      "contentRequirements": [
+        "content (required)",
+        "children (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "BusinessImageView",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Lazily renders a sized image from BusinessImage, or an accessible unavailable-image placeholder when no source exists.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "image"
+      ],
+      "mediaRequirements": [
+        "image (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "CaseStudyCard",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Presents a case study with optional media, client and industry details, challenge, solution, results, metrics, and link.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)"
+      ],
+      "dataRequirements": [
+        "metrics (optional)"
+      ],
+      "mediaRequirements": [
+        "media (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "CompanyInfo",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Displays a company name with optional logo, tagline, description, and linked-name behavior.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "name"
+      ],
+      "contentRequirements": [
+        "description (optional)"
+      ],
+      "mediaRequirements": [
+        "logo (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ContactDetails",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Renders labeled contact values as a definition list and links values when an item href is supplied.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "aliases": []
+    },
+    {
+      "name": "LogoCollection",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Renders a collection of organization logos or names with optional links, descriptions, labels, and scrolling.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "label (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "MetricList",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Displays labeled metric values and optional descriptions as a definition list.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ProfileCard",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Displays a person's avatar, name, role, optional biography, profile link, featured state, and social links.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "name",
+        "role"
+      ],
+      "dataRequirements": [
+        "socials (optional)"
+      ],
+      "mediaRequirements": [
+        "avatar (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ServiceCard",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Presents a service with optional number, icon, image, description, pricing, action, link, and featured state.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "requiredProps": [
+        "title"
+      ],
+      "contentRequirements": [
+        "title (required)",
+        "description (optional)"
+      ],
+      "mediaRequirements": [
+        "image (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SocialLinks",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "business",
+      "description": "Renders non-empty social-link data as an accessible list with optional external-link handling.",
+      "documentation": "apps/site/content/docs/ui/index.mdx",
+      "source": "packages/ui/src/components/business/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "business"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Card",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardAction",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardDescription",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardFooter",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardHeader",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardMedia",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CardTitle",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "card",
+      "description": "A composable part of Card. Compose content with headers, media, actions, and footers.",
+      "documentation": "apps/site/content/docs/ui/data-display/card.mdx",
+      "source": "packages/ui/src/components/data-display/card/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Card"
+      },
+      "aliases": []
+    },
+    {
+      "name": "DataTable",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "data-table",
+      "description": "Browse tabular data with asynchronous loading, pagination, local sorting, and search.",
+      "documentation": "apps/site/content/docs/ui/data-display/data-table.mdx",
+      "source": "packages/ui/src/components/data-display/data-table/data-table.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Data Table"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyState",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateDescription",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateHeader",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateMedia",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EmptyStateTitle",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "empty-state",
+      "description": "A composable part of EmptyState. Explain missing content and offer a useful next step.",
+      "documentation": "apps/site/content/docs/ui/data-display/empty-state.mdx",
+      "source": "packages/ui/src/components/data-display/empty-state/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "EmptyState"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Image",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "image",
+      "description": "Display responsive images with fitting and placeholders.",
+      "documentation": "apps/site/content/docs/ui/data-display/image.mdx",
+      "source": "packages/ui/src/components/data-display/image/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Image"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ImageBox",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "image-box",
+      "description": "Arrange photos in a responsive image collage.",
+      "documentation": "apps/site/content/docs/ui/data-display/image-box.mdx",
+      "source": "packages/ui/src/components/data-display/image-box/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Image Box"
+      },
+      "requiredProps": [
+        "images"
+      ],
+      "mediaRequirements": [
+        "images (required)",
+        "onImageClick (optional)"
+      ],
+      "interactiveBehavior": [
+        "onImageClick",
+        "onViewAll"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "MediaFrame",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "media-frame",
+      "description": "Frame images and product media in browser or device mockups.",
+      "documentation": "apps/site/content/docs/ui/data-display/media-frame.mdx",
+      "source": "packages/ui/src/components/data-display/media-frame/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Media Frame"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "title (optional)",
+        "caption (optional)",
+        "children (required)"
+      ],
+      "mediaRequirements": [
+        "frame (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Paper",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "paper",
+      "description": "Place content on a simple themed surface.",
+      "documentation": "apps/site/content/docs/ui/data-display/paper.mdx",
+      "source": "packages/ui/src/components/data-display/paper/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Paper"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CircularProgress",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "progress",
+      "description": "A composable part of Progress. Show activity with circular or linear progress indicators.",
+      "documentation": "apps/site/content/docs/ui/data-display/progress.mdx",
+      "source": "packages/ui/src/components/data-display/progress/circular-progress.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Progress"
+      },
+      "aliases": []
+    },
+    {
+      "name": "LinearProgress",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "progress",
+      "description": "A composable part of Progress. Show activity with circular or linear progress indicators.",
+      "documentation": "apps/site/content/docs/ui/data-display/progress.mdx",
+      "source": "packages/ui/src/components/data-display/progress/linear-progress.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Progress"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Rating",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "rating",
+      "description": "Display or collect a rating using familiar stars.",
+      "documentation": "apps/site/content/docs/ui/data-display/rating.mdx",
+      "source": "packages/ui/src/components/data-display/rating/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Rating"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Skeleton",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "data-display",
+      "subcategory": "skeleton",
+      "description": "Reserve space with placeholders while content loads.",
+      "documentation": "apps/site/content/docs/ui/data-display/skeleton.mdx",
+      "source": "packages/ui/src/components/data-display/skeleton/index.tsx",
+      "useCases": [
+        "data-display"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "generic"
+      ],
+      "capabilities": [
+        "data-display"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Skeleton"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TextEditor",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "editors",
+      "subcategory": "text-editor",
+      "description": "Edit rich text with a formatting toolbar and document renderer.",
+      "documentation": "apps/site/content/docs/ui/editors/text-editor.mdx",
+      "source": "packages/ui/src/components/editors/text-editor/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "TextEditor"
+      },
+      "interactiveBehavior": [
+        "onChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TextEditorToolbar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "editors",
+      "subcategory": "text-editor",
+      "description": "A composable part of TextEditor. Edit rich text with a formatting toolbar and document renderer.",
+      "documentation": "apps/site/content/docs/ui/editors/text-editor.mdx",
+      "source": "packages/ui/src/components/editors/text-editor/text-editor-toolbar.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "TextEditor"
+      },
+      "contentRequirements": [
+        "ariaLabel (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TextRenderer",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "editors",
+      "subcategory": "text-editor",
+      "description": "A composable part of TextEditor. Edit rich text with a formatting toolbar and document renderer.",
+      "documentation": "apps/site/content/docs/ui/editors/text-editor.mdx",
+      "source": "packages/ui/src/components/editors/text-editor/text-renderer.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "TextEditor"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Autocomplete",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "autocomplete",
+      "description": "Find and select options with searchable suggestions.",
+      "documentation": "apps/site/content/docs/ui/forms/autocomplete.mdx",
+      "source": "packages/ui/src/components/forms/autocomplete/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Autocomplete"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Checkbox",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "checkbox",
+      "description": "Select independent options with checked and mixed states.",
+      "documentation": "apps/site/content/docs/ui/forms/checkbox.mdx",
+      "source": "packages/ui/src/components/forms/checkbox/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Checkbox"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ColorPicker",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "color-picker",
+      "description": "Choose colors with swatches and editable color values.",
+      "documentation": "apps/site/content/docs/ui/forms/color-picker.mdx",
+      "source": "packages/ui/src/components/forms/color-picker/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Color Picker"
+      },
+      "aliases": []
+    },
+    {
+      "name": "DatePicker",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "date-picker",
+      "description": "Choose a date using a calendar and input field.",
+      "documentation": "apps/site/content/docs/ui/forms/date-picker.mdx",
+      "source": "packages/ui/src/components/forms/date-picker/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Date Picker"
+      },
+      "aliases": []
+    },
+    {
+      "name": "FileUpload",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "file-upload",
+      "description": "Select files and communicate upload progress and errors.",
+      "documentation": "apps/site/content/docs/ui/forms/file-upload.mdx",
+      "source": "packages/ui/src/components/forms/file-upload/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "File Upload"
+      },
+      "aliases": []
+    },
+    {
+      "name": "FormField",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "form-field",
+      "description": "Connect inputs to labels, descriptions, and validation feedback.",
+      "documentation": "apps/site/content/docs/ui/forms/form-field.mdx",
+      "source": "packages/ui/src/components/forms/form-field/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Form Field"
+      },
+      "aliases": []
+    },
+    {
+      "name": "InputGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "input-group",
+      "description": "Compose inputs with leading or trailing content.",
+      "documentation": "apps/site/content/docs/ui/forms/input-group.mdx",
+      "source": "packages/ui/src/components/forms/input-group/input-group.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Input Group"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Label",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "label",
+      "description": "Give form controls a clear, associated label.",
+      "documentation": "apps/site/content/docs/ui/forms/label.mdx",
+      "source": "packages/ui/src/components/forms/label/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Label"
+      },
+      "aliases": []
+    },
+    {
+      "name": "NumberInput",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "number-input",
+      "description": "Enter numeric values with increment and decrement controls.",
+      "documentation": "apps/site/content/docs/ui/forms/number-input.mdx",
+      "source": "packages/ui/src/components/forms/input/number-input.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Number Input"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Radio",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "radio-group",
+      "description": "A composable part of RadioGroup. Choose a single option from a set of radio controls.",
+      "documentation": "apps/site/content/docs/ui/forms/radio-group.mdx",
+      "source": "packages/ui/src/components/forms/radio-group/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "RadioGroup"
+      },
+      "aliases": []
+    },
+    {
+      "name": "RadioGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "radio-group",
+      "description": "Choose a single option from a set of radio controls.",
+      "documentation": "apps/site/content/docs/ui/forms/radio-group.mdx",
+      "source": "packages/ui/src/components/forms/radio-group/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "RadioGroup"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Select",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "select",
+      "description": "Choose one or more values from a dropdown list.",
+      "documentation": "apps/site/content/docs/ui/forms/select.mdx",
+      "source": "packages/ui/src/components/forms/select/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Select"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Slider",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "slider",
+      "description": "Adjust a value along a track with optional marks.",
+      "documentation": "apps/site/content/docs/ui/forms/slider.mdx",
+      "source": "packages/ui/src/components/forms/slider/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Slider"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Stepper",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "stepper",
+      "description": "Guide users through the steps of a multi-stage flow.",
+      "documentation": "apps/site/content/docs/ui/forms/stepper.mdx",
+      "source": "packages/ui/src/components/forms/stepper/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Stepper"
+      },
+      "requiredProps": [
+        "label"
+      ],
+      "contentRequirements": [
+        "label (required)",
+        "description (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Switch",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "switch",
+      "description": "Turn a setting on or off with a compact toggle.",
+      "documentation": "apps/site/content/docs/ui/forms/switch.mdx",
+      "source": "packages/ui/src/components/forms/switch/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Switch"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TextAreaInput",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "text-area-input",
+      "description": "Collect longer messages and multi-line text.",
+      "documentation": "apps/site/content/docs/ui/forms/text-area-input.mdx",
+      "source": "packages/ui/src/components/forms/input/text-area-input.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Text Area Input"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TextInput",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "text-input",
+      "description": "Collect single-line text with familiar input behavior.",
+      "documentation": "apps/site/content/docs/ui/forms/text-input.mdx",
+      "source": "packages/ui/src/components/forms/input/text-input.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Text Input"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TimePicker",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "time-picker",
+      "description": "Enter and select a time of day.",
+      "documentation": "apps/site/content/docs/ui/forms/time-picker.mdx",
+      "source": "packages/ui/src/components/forms/time-picker/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Time Picker"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TokenInput",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "token-input",
+      "description": "Enter verification codes in individual character slots.",
+      "documentation": "apps/site/content/docs/ui/forms/token-input.mdx",
+      "source": "packages/ui/src/components/forms/token-input/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Token Input"
+      },
+      "aliases": []
+    },
+    {
+      "name": "AppBar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "app-bar",
+      "description": "Compose an application header with branding and navigation.",
+      "documentation": "apps/site/content/docs/ui/layout/app-bar.mdx",
+      "source": "packages/ui/src/components/layout/app-bar/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "App Bar"
+      },
+      "aliases": []
+    },
+    {
+      "name": "AspectRatio",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "aspect-ratio",
+      "description": "Keep media and other content at a consistent aspect ratio.",
+      "documentation": "apps/site/content/docs/ui/layout/aspect-ratio.mdx",
+      "source": "packages/ui/src/components/layout/aspect-ratio/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Aspect Ratio"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Background",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "background",
+      "description": "Add themed patterns, fades, and mesh backgrounds.",
+      "documentation": "apps/site/content/docs/ui/layout/background.mdx",
+      "source": "packages/ui/src/components/layout/background/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Background"
+      },
+      "aliases": []
+    },
+    {
+      "name": "BottomNavigation",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "bottom-navigation",
+      "description": "Keep primary destinations within reach at the bottom of a view.",
+      "documentation": "apps/site/content/docs/ui/layout/bottom-navigation.mdx",
+      "source": "packages/ui/src/components/layout/bottom-navigation/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "BottomNavigation"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "ariaLabel (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "BottomNavigationItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "bottom-navigation",
+      "description": "A composable part of BottomNavigation. Keep primary destinations within reach at the bottom of a view.",
+      "documentation": "apps/site/content/docs/ui/layout/bottom-navigation.mdx",
+      "source": "packages/ui/src/components/layout/bottom-navigation/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "BottomNavigation"
+      },
+      "requiredProps": [
+        "icon",
+        "label"
+      ],
+      "contentRequirements": [
+        "label (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Breadcrumbs",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "breadcrumbs",
+      "description": "Show the current location within a page hierarchy.",
+      "documentation": "apps/site/content/docs/ui/layout/breadcrumbs.mdx",
+      "source": "packages/ui/src/components/layout/breadcrumbs/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Breadcrumbs"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "CollapsableSidebar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "collapsable-sidebar",
+      "description": "Organize navigation in an expandable side panel.",
+      "documentation": "apps/site/content/docs/ui/layout/collapsable-sidebar.mdx",
+      "source": "packages/ui/src/components/layout/collapsable-sidebar/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Collapsable Sidebar"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "ariaLabel (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "interactiveBehavior": [
+        "onCollapsedChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Container",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "container",
+      "description": "Constrain content width with consistent page gutters.",
+      "documentation": "apps/site/content/docs/ui/layout/container.mdx",
+      "source": "packages/ui/src/components/layout/container/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Container"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Grid",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "grid",
+      "description": "Arrange responsive columns and rows with optional item spans.",
+      "documentation": "apps/site/content/docs/ui/layout/grid.mdx",
+      "source": "packages/ui/src/components/layout/grid/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Grid"
+      },
+      "aliases": []
+    },
+    {
+      "name": "GridItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "grid",
+      "description": "A composable part of Grid. Arrange responsive columns and rows with optional item spans.",
+      "documentation": "apps/site/content/docs/ui/layout/grid.mdx",
+      "source": "packages/ui/src/components/layout/grid/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Grid"
+      },
+      "aliases": []
+    },
+    {
+      "name": "PageLayout",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "page-layout",
+      "description": "Compose page headers, sidebars, and main content regions.",
+      "documentation": "apps/site/content/docs/ui/layout/page-layout.mdx",
+      "source": "packages/ui/src/components/layout/page-layout/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Page Layout"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ResizableHandle",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "resizable-panels",
+      "description": "A composable part of ResizablePanels. Split content into panels with draggable resize handles.",
+      "documentation": "apps/site/content/docs/ui/layout/resizable-panels.mdx",
+      "source": "packages/ui/src/components/layout/resizable-panels/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ResizablePanels"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ResizablePanel",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "resizable-panels",
+      "description": "A composable part of ResizablePanels. Split content into panels with draggable resize handles.",
+      "documentation": "apps/site/content/docs/ui/layout/resizable-panels.mdx",
+      "source": "packages/ui/src/components/layout/resizable-panels/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ResizablePanels"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ResizablePanels",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "resizable-panels",
+      "description": "Split content into panels with draggable resize handles.",
+      "documentation": "apps/site/content/docs/ui/layout/resizable-panels.mdx",
+      "source": "packages/ui/src/components/layout/resizable-panels/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "ResizablePanels"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ScrollArea",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "scroll-area",
+      "description": "Contain overflowing content in a dedicated scroll region.",
+      "documentation": "apps/site/content/docs/ui/layout/scroll-area.mdx",
+      "source": "packages/ui/src/components/layout/scroll-area/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Scroll Area"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Section",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "section",
+      "description": "Define page sections with themed spacing and surfaces.",
+      "documentation": "apps/site/content/docs/ui/layout/section.mdx",
+      "source": "packages/ui/src/components/layout/section/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "SectionHeader",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "section-header",
+      "description": "Compose a section eyebrow, heading, description, and actions.",
+      "documentation": "apps/site/content/docs/ui/layout/section-header.mdx",
+      "source": "packages/ui/src/components/layout/section-header/section-header.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Section Header"
+      },
+      "contentRequirements": [
+        "description (optional)",
+        "eyebrow (optional)",
+        "title (optional)",
+        "titleId (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SectionStack",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "section-stack",
+      "description": "Arrange page sections with consistent separation.",
+      "documentation": "apps/site/content/docs/ui/layout/section-stack.mdx",
+      "source": "packages/ui/src/components/layout/section-stack/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Section Stack"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Separator",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "separator",
+      "description": "Separate related content horizontally or vertically.",
+      "documentation": "apps/site/content/docs/ui/layout/separator.mdx",
+      "source": "packages/ui/src/components/layout/separator/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Separator"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Sidebar",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "sidebar",
+      "description": "Place supporting content and navigation beside the main view.",
+      "documentation": "apps/site/content/docs/ui/layout/sidebar.mdx",
+      "source": "packages/ui/src/components/layout/sidebar/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Sidebar"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Stack",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "layout",
+      "subcategory": "stack",
+      "description": "Arrange content with responsive direction, alignment, and gaps.",
+      "documentation": "apps/site/content/docs/ui/layout/stack.mdx",
+      "source": "packages/ui/src/components/layout/stack/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Stack"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Accordion",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "accordion",
+      "description": "Expand and collapse related sections of content.",
+      "documentation": "apps/site/content/docs/ui/navigation/accordion.mdx",
+      "source": "packages/ui/src/components/navigation/accordion/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Accordion"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Carousel",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "carousel",
+      "description": "Browse items with slides, navigation, and pager controls.",
+      "documentation": "apps/site/content/docs/ui/navigation/carousel.mdx",
+      "source": "packages/ui/src/components/navigation/carousel/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Carousel"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CarouselController",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "carousel",
+      "description": "A composable part of Carousel. Browse items with slides, navigation, and pager controls.",
+      "documentation": "apps/site/content/docs/ui/navigation/carousel.mdx",
+      "source": "packages/ui/src/components/navigation/carousel/controller.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Carousel"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Link",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "link",
+      "description": "Navigate with themed links and optional router integration.",
+      "documentation": "apps/site/content/docs/ui/navigation/link.mdx",
+      "source": "packages/ui/src/components/navigation/link/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Link"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Pagination",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "pagination",
+      "description": "Navigate between pages of a larger collection.",
+      "documentation": "apps/site/content/docs/ui/navigation/pagination.mdx",
+      "source": "packages/ui/src/components/navigation/pagination/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Pagination"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Tabs",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "tabs",
+      "description": "Switch between related views using a tab list.",
+      "documentation": "apps/site/content/docs/ui/navigation/tabs.mdx",
+      "source": "packages/ui/src/components/navigation/tabs/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Tabs"
+      },
+      "requiredProps": [
+        "id",
+        "tab",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TabsTab",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "tabs",
+      "description": "A composable part of Tabs. Switch between related views using a tab list.",
+      "documentation": "apps/site/content/docs/ui/navigation/tabs.mdx",
+      "source": "packages/ui/src/components/navigation/tabs/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Tabs"
+      },
+      "requiredProps": [
+        "id",
+        "tab",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "TreeView",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "tree-view",
+      "description": "Browse and select items in a hierarchical tree.",
+      "documentation": "apps/site/content/docs/ui/navigation/tree-view.mdx",
+      "source": "packages/ui/src/components/navigation/tree-view/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Tree View"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Backdrop",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "backdrop",
+      "description": "Dim the surrounding view behind focused content.",
+      "documentation": "apps/site/content/docs/ui/overlays/backdrop.mdx",
+      "source": "packages/ui/src/components/overlays/backdrop/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Backdrop"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Command",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "command",
+      "description": "Find actions through a searchable command list or dialog.",
+      "documentation": "apps/site/content/docs/ui/overlays/command.mdx",
+      "source": "packages/ui/src/components/overlays/command/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Command"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CommandDialog",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "command",
+      "description": "A composable part of Command. Find actions through a searchable command list or dialog.",
+      "documentation": "apps/site/content/docs/ui/overlays/command.mdx",
+      "source": "packages/ui/src/components/overlays/command/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Command"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenu",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "ContextMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuCheckboxItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuLabel",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuRadioGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuRadioItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuSeparator",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuSub",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuSubContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuSubTrigger",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContextMenuTrigger",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "context-menu",
+      "description": "A composable part of ContextMenu. Offer contextual actions through a right-click menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/context-menu.mdx",
+      "source": "packages/ui/src/components/overlays/context-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "ContextMenu"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Dialog",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dialog",
+      "description": "Present focused modal content with dismissal controls.",
+      "documentation": "apps/site/content/docs/ui/overlays/dialog.mdx",
+      "source": "packages/ui/src/components/overlays/dialog/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Dialog"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Drawer",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "drawer",
+      "description": "Reveal supporting content in a sliding side panel.",
+      "documentation": "apps/site/content/docs/ui/overlays/drawer.mdx",
+      "source": "packages/ui/src/components/overlays/drawer/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Drawer"
+      },
+      "requiredProps": [
+        "open",
+        "onOpenChange"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenu",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuCheckboxItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuContent",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-content.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuLabel",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuRadioGroup",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-radio.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuRadioItem",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-radio.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuSeparator",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-items.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DropdownMenuTrigger",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "dropdown-menu",
+      "description": "A composable part of DropdownMenu. Offer grouped actions and choices in an anchored menu.",
+      "documentation": "apps/site/content/docs/ui/overlays/dropdown-menu.mdx",
+      "source": "packages/ui/src/components/overlays/dropdown-menu/dropdown-menu-trigger.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "DropdownMenu"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Notification",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "notification",
+      "description": "Deliver transient feedback with a provider and viewport.",
+      "documentation": "apps/site/content/docs/ui/overlays/notification.mdx",
+      "source": "packages/ui/src/components/overlays/notification/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Notification"
+      },
+      "requiredProps": [
+        "notification",
+        "onDismiss"
+      ],
+      "interactiveBehavior": [
+        "onDismiss"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "NotificationProvider",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "notification",
+      "description": "A composable part of Notification. Deliver transient feedback with a provider and viewport.",
+      "documentation": "apps/site/content/docs/ui/overlays/notification.mdx",
+      "source": "packages/ui/src/components/overlays/notification/notification-provider.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Notification"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "label (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "NotificationViewport",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "notification",
+      "description": "A composable part of Notification. Deliver transient feedback with a provider and viewport.",
+      "documentation": "apps/site/content/docs/ui/overlays/notification.mdx",
+      "source": "packages/ui/src/components/overlays/notification/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Notification"
+      },
+      "requiredProps": [
+        "notifications",
+        "position",
+        "label",
+        "onDismiss"
+      ],
+      "contentRequirements": [
+        "label (required)"
+      ],
+      "dataRequirements": [
+        "notifications (required)"
+      ],
+      "interactiveBehavior": [
+        "onDismiss"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Popout",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "popout",
+      "description": "Attach a contextual panel to a trigger.",
+      "documentation": "apps/site/content/docs/ui/overlays/popout.mdx",
+      "source": "packages/ui/src/components/overlays/popout/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Popout"
+      },
+      "requiredProps": [
+        "trigger",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "contentClassName (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Popover",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "popover",
+      "description": "Show interactive content in an anchored floating panel.",
+      "documentation": "apps/site/content/docs/ui/overlays/popover.mdx",
+      "source": "packages/ui/src/components/overlays/popover/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Popover"
+      },
+      "requiredProps": [
+        "trigger",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "title (optional)",
+        "closeLabel (optional)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Portal",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "portal",
+      "description": "Render content outside its parent into a portal target.",
+      "documentation": "apps/site/content/docs/ui/overlays/portal.mdx",
+      "source": "packages/ui/src/components/overlays/portal/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Portal"
+      },
+      "aliases": []
+    },
+    {
+      "name": "PortalTarget",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "portal",
+      "description": "A composable part of Portal. Render content outside its parent into a portal target.",
+      "documentation": "apps/site/content/docs/ui/overlays/portal.mdx",
+      "source": "packages/ui/src/components/overlays/portal/target.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Portal"
+      },
+      "requiredProps": [
+        "id"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Tooltip",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "overlays",
+      "subcategory": "tooltip",
+      "description": "Add a short explanation on hover or keyboard focus.",
+      "documentation": "apps/site/content/docs/ui/overlays/tooltip.mdx",
+      "source": "packages/ui/src/components/overlays/tooltip/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "overlay",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Tooltip"
+      },
+      "requiredProps": [
+        "trigger",
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "interactiveBehavior": [
+        "onOpenChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Heading",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "typography",
+      "subcategory": "heading",
+      "description": "Apply heading styles independently of semantic level.",
+      "documentation": "apps/site/content/docs/ui/typography/heading.mdx",
+      "source": "packages/ui/src/components/typography/heading.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Heading"
+      },
+      "requiredProps": [
+        "level"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "Text",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "typography",
+      "subcategory": "text",
+      "description": "Style body copy and supporting text with theme typography.",
+      "documentation": "apps/site/content/docs/ui/typography/text.mdx",
+      "source": "packages/ui/src/components/typography/text.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Text"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Preview",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "utilities",
+      "subcategory": "preview",
+      "description": "Present runnable component examples alongside their code.",
+      "documentation": "apps/site/content/docs/ui/utilities/preview.mdx",
+      "source": "packages/ui/src/components/utilities/preview/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-root",
+        "family": "Preview"
+      },
+      "requiredProps": [
+        "children"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "PreviewProvider",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "utilities",
+      "subcategory": "preview",
+      "description": "A composable part of Preview. Present runnable component examples alongside their code.",
+      "documentation": "apps/site/content/docs/ui/utilities/preview.mdx",
+      "source": "packages/ui/src/components/utilities/preview/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Preview"
+      },
+      "requiredProps": [
+        "children",
+        "loading"
+      ],
+      "contentRequirements": [
+        "children (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DeferredBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/deferred"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/deferred.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": [
+        {
+          "name": "NextDeferredBoundary",
+          "canonicalExport": "DeferredBoundary",
+          "entryPoints": [
+            "./next/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/next/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        },
+        {
+          "name": "TanStackDeferredBoundary",
+          "canonicalExport": "DeferredBoundary",
+          "entryPoints": [
+            "./tanstack/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "FoldBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/fold"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/fold-boundary.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": [
+        {
+          "name": "NextFoldBoundary",
+          "canonicalExport": "FoldBoundary",
+          "entryPoints": [
+            "./next/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/next/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        },
+        {
+          "name": "TanStackFoldBoundary",
+          "canonicalExport": "FoldBoundary",
+          "entryPoints": [
+            "./tanstack/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "FoldProvider",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/fold"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/hooks/src/rendering/fold-provider.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "dependencies": [
+        {
+          "package": "@puzzle-ui/hooks",
+          "export": "FoldProvider"
+        }
+      ],
+      "aliases": [
+        {
+          "name": "NextFoldProvider",
+          "canonicalExport": "FoldProvider",
+          "entryPoints": [
+            "./next/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/next/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        },
+        {
+          "name": "TanStackFoldProvider",
+          "canonicalExport": "FoldProvider",
+          "entryPoints": [
+            "./tanstack/client"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/client.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "NextSsrBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "./next/server"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/next/server.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": []
+    },
+    {
+      "name": "SsrBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/ssr"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/ssr.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": [
+        {
+          "name": "TanStackSsrBoundary",
+          "canonicalExport": "SsrBoundary",
+          "entryPoints": [
+            "./tanstack/server"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/server.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "StaticBoundary",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        ".",
+        "./rendering/static"
+      ],
+      "category": "utilities",
+      "subcategory": "rendering",
+      "description": "A composable part of Rendering Strategies. Preserve SSR, defer client loading, or render static content.",
+      "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx",
+      "source": "packages/ui/src/components/utilities/rendering/static.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "compound-part",
+        "family": "Rendering Strategies"
+      },
+      "aliases": [
+        {
+          "name": "NextStaticBoundary",
+          "canonicalExport": "StaticBoundary",
+          "entryPoints": [
+            "./next/server"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/next/server.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        },
+        {
+          "name": "TanStackStaticBoundary",
+          "canonicalExport": "StaticBoundary",
+          "entryPoints": [
+            "./tanstack/server"
+          ],
+          "source": "packages/ui/src/components/utilities/rendering/tanstack/server.tsx",
+          "documentation": "apps/site/content/docs/ui/utilities/rendering.mdx"
+        }
+      ]
+    },
+    {
+      "name": "ScrollLock",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "utilities",
+      "subcategory": "scroll-lock",
+      "description": "Prevent background scrolling while an overlay is active.",
+      "documentation": "apps/site/content/docs/ui/utilities/scroll-lock.mdx",
+      "source": "packages/ui/src/components/utilities/scroll-lock/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "utility",
+        "family": "Scroll Lock"
+      },
+      "aliases": []
+    },
+    {
+      "name": "Transition",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "utilities",
+      "subcategory": "transition",
+      "description": "Animate mounting and unmounting with transition templates.",
+      "documentation": "apps/site/content/docs/ui/utilities/transition.mdx",
+      "source": "packages/ui/src/components/utilities/transition/index.tsx",
+      "useCases": [
+        "application-shell"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "composition": {
+        "kind": "utility",
+        "family": "Transition"
+      },
+      "aliases": []
+    }
+  ]
+}

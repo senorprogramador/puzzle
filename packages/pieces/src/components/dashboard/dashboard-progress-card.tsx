@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { LinearProgress } from "@puzzle-ui/ui";
+import { LinearProgress, Heading, Text } from "@puzzle-ui/ui";
 
 import "./dashboard.css";
 
@@ -24,13 +24,13 @@ export const DashboardProgressCard = ({
     >
       <div className="puzzle-dashboard-progress-card__header">
         <div>
-          <h2 id={titleId} className="puzzle-dashboard-progress-card__title">
+          <Heading level="headline2" as="h2" id={titleId} className="puzzle-dashboard-progress-card__title">
             {title}
-          </h2>
+          </Heading>
           {description && (
-            <p className="puzzle-dashboard-progress-card__description">
+            <Text as="p" className="puzzle-dashboard-progress-card__description">
               {description}
-            </p>
+            </Text>
           )}
         </div>
         <span className="puzzle-dashboard-progress-card__value">{value}%</span>

@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "BookingSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "booking-section",
+      "description": "Compose booking dates, availability, pricing, and form submission without a booking or payment backend.",
+      "documentation": "apps/site/content/docs/pieces/components/booking-section.mdx",
+      "source": "packages/pieces/src/components/commerce/booking-section/booking-section.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "booking-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CartSummarySection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "cart-summary",
+      "description": "Present caller-supplied cart items, quantities, totals, discounts, shipping, and optional checkout actions without order logic.",
+      "documentation": "apps/site/content/docs/pieces/components/cart-summary.mdx",
+      "source": "packages/pieces/src/components/commerce/cart-summary/cart-summary.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "cart-summary"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CategoriesSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "categories",
+      "description": "Organize ecommerce category links into responsive image grids, featured collections, lists, and carousels.",
+      "documentation": "apps/site/content/docs/pieces/components/categories.mdx",
+      "source": "packages/pieces/src/components/commerce/categories/categories.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "categories"
+      },
+      "aliases": []
+    },
+    {
+      "name": "CommerceBenefitsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "commerce-benefits",
+      "description": "Display retailer-provided delivery, returns, warranty, checkout, and service information in responsive commerce layouts.",
+      "documentation": "apps/site/content/docs/pieces/components/commerce-benefits.mdx",
+      "source": "packages/pieces/src/components/commerce/commerce-benefits/commerce-benefits.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "commerce-benefits"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ProductDetailsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "product-details",
+      "description": "Present structured product descriptions, imagery, specifications, selectors, features, comparison data, and caller-supplied availability.",
+      "documentation": "apps/site/content/docs/pieces/components/product-details.mdx",
+      "source": "packages/pieces/src/components/commerce/product-details/product-details.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "product-details"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ProductGallerySection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "product-gallery",
+      "description": "Present structured product images in responsive ecommerce galleries with thumbnail navigation, keyboard controls, optional zoom, and a lightbox.",
+      "documentation": "apps/site/content/docs/pieces/components/product-gallery.mdx",
+      "source": "packages/pieces/src/components/commerce/product-gallery/product-gallery.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "product-gallery"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ProductGridSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "product-grid",
+      "description": "Display structured ecommerce products with responsive layouts, localized prices, optional ratings, labels, links, and actions.",
+      "documentation": "apps/site/content/docs/pieces/components/product-grid.mdx",
+      "source": "packages/pieces/src/components/commerce/product-grid/product-grid.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "product-grid"
+      },
+      "aliases": []
+    }
+  ]
+}

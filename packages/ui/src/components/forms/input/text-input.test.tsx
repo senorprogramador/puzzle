@@ -14,6 +14,15 @@ describe("TextInput", () => {
     expect(screen.getByLabelText("Phone")).toHaveAttribute("type", "tel");
   });
 
+  it("preserves the search input type", () => {
+    render(<TextInput type="search" aria-label="Search" />);
+
+    expect(screen.getByRole("searchbox", { name: "Search" })).toHaveAttribute(
+      "type",
+      "search",
+    );
+  });
+
   it("forwards change events and native attributes", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

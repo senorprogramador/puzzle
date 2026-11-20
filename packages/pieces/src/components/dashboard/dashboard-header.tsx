@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import "./dashboard.css";
 
 import type { DashboardHeaderProps } from "./dashboard.types";
@@ -14,11 +15,11 @@ export const DashboardHeader = ({
   >
     <div className="puzzle-dashboard-header__content">
       {eyebrow && (
-        <p className="puzzle-dashboard-header__eyebrow">{eyebrow}</p>
+        <Text as="p" className="puzzle-dashboard-header__eyebrow">{eyebrow}</Text>
       )}
-      <h1 className="puzzle-dashboard-header__title">{title}</h1>
+      <Heading level="headline1" as="h1" className="puzzle-dashboard-header__title">{title}</Heading>
       {description && (
-        <p className="puzzle-dashboard-header__description">{description}</p>
+        <Text as="p" className="puzzle-dashboard-header__description">{description}</Text>
       )}
     </div>
     {actions && (

@@ -73,6 +73,38 @@ describe("Image", () => {
     expect(image).toHaveAttribute("height", "800");
   });
 
+  it("preloads eagerly and reserves intrinsic dimensions through image failure", () => {
+    const { container } = render(
+      <Image
+        src="/images/product.webp"
+        alt="Product photograph"
+        width={800}
+        height={400}
+        preload
+        fallback={<span>Image unavailable</span>}
+      />,
+    );
+    const image = screen.getByRole("img", { name: "Product photograph" });
+    const imageContainer = container.querySelector<HTMLElement>(".puzzle-image");
+
+    expect(image).toHaveAttribute("loading", "eager");
+    expect(image).toHaveAttribute("fetchpriority", "high");
+    expect(imageContainer).toHaveStyle({
+      width: "800px",
+      aspectRatio: "800 / 400",
+    });
+
+    fireEvent.error(image);
+
+    expect(
+      screen.getByRole("img", { name: "Product photograph" }),
+    ).toHaveTextContent("Image unavailable");
+    expect(imageContainer).toHaveStyle({
+      width: "800px",
+      aspectRatio: "800 / 400",
+    });
+  });
+
   it("uses an explicitly configured framework image component", () => {
     render(
       <Image

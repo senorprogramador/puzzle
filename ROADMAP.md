@@ -15,7 +15,7 @@ published to npm; it is not a production-readiness or support guarantee.
 | SEO | Completed | `@puzzle-ui/seo` provides metadata, structured data, sitemap, robots, and related utilities. |
 | Authentication, sessions, and storage | Completed | `@puzzle-ui/auth`, `@puzzle-ui/session`, `@puzzle-ui/storage`, and the D1 and MongoDB adapters are published. |
 | Framework integrations | Completed | `@puzzle-ui/fullstack` publishes client, server, Next.js, and TanStack Start entry points. |
-| Project generator | Completed | `@puzzle-ui/create` offers React, Next.js App Router, and TanStack Start templates. |
+| Project generator | Completed | `@puzzle-ui/create` offers Next.js App Router, TanStack Start, React Router, and Basic React/Vite templates. |
 | Documentation and playground | Completed | The repository contains a documentation site and a Storybook playground. |
 
 These descriptions summarize package metadata and repository structure; consult

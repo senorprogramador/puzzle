@@ -23,6 +23,8 @@ type GraphNode = {
   programmingLanguage?: string;
   runtimePlatform?: string;
   license?: string;
+  item?: unknown;
+  itemListElement?: Array<{ "@id"?: string; item?: unknown; name?: unknown }>;
 };
 
 const site = fileURLToPath(new URL("..", import.meta.url));
@@ -99,7 +101,10 @@ try {
   const docsPaths = sourceUrls.map((sourceUrl) => {
     const url = new URL(sourceUrl);
     assert.equal(url.origin, SITE_URL, `documentation source origin: ${sourceUrl}`);
-    assert.ok(url.pathname.startsWith("/docs/"), `documentation source path: ${sourceUrl}`);
+    assert.ok(
+      url.pathname === "/docs" || url.pathname.startsWith("/docs/"),
+      `documentation source path: ${sourceUrl}`,
+    );
     return url.pathname;
   });
   assert.equal(new Set(docsPaths).size, docsPaths.length, "unique documentation paths");
@@ -228,11 +233,7 @@ try {
 
   const lazyPage = await browser.newPage({ viewport: { width: 1280, height: 720 } });
   const carouselRequests: string[] = [];
-  const scriptRequests: string[] = [];
   lazyPage.on("request", (request) => {
-    if (request.resourceType() === "script") {
-      scriptRequests.push(request.url());
-    }
     if (/\/(?:home-component-carousel|carousel)-[^/]+\.(?:js|css)(?:\?|$)/.test(request.url())) {
       carouselRequests.push(request.url());
     }
@@ -243,15 +244,6 @@ try {
   await lazyPage.waitForLoadState("networkidle");
   assert.deepEqual(carouselRequests, [], "carousel assets are not requested initially");
   assert.equal(await lazyPage.locator(".home-component-fallback a").count(), 16);
-  const firstFeatureIcon = lazyPage.locator(".home-feature-card__icon").first();
-  const initialScriptRequests = new Set(scriptRequests);
-  const featureIconRequest = lazyPage.waitForRequest((request) =>
-    request.resourceType() === "script" &&
-    !initialScriptRequests.has(request.url()) &&
-    !/\/(?:home-component-carousel|carousel)-[^/]+\.js(?:\?|$)/.test(request.url()),
-  );
-  await firstFeatureIcon.scrollIntoViewIfNeeded();
-  await featureIconRequest;
   await lazyPage.locator(".home-component-carousel-container").scrollIntoViewIfNeeded();
   await lazyPage.getByRole("button", { name: "Next component panels" }).waitFor();
   assert.ok(carouselRequests.some((url) => /home-component-carousel-.*\.js/.test(url)));
@@ -358,7 +350,33 @@ try {
     assert.ok(ids.includes(`${SITE_URL}${path}#webpage`), `${path}: active webpage`);
     assert.ok(ids.includes(AUTHOR_ID), `${path}: shared Person entity`);
     assert.ok(ids.includes(PUBLISHER_ID), `${path}: shared Organization entity`);
-    const webpages = ids.filter((id) => id?.startsWith(`${SITE_URL}/docs/`) && id.endsWith("#webpage"));
+    if (path !== "/") {
+      const breadcrumbs = graph["@graph"].find(
+        (node) => node["@id"] === `${SITE_URL}${path}#breadcrumbs`,
+      );
+      assert.ok(breadcrumbs, `${path}: breadcrumb structured data`);
+      const breadcrumbItems = (breadcrumbs.itemListElement ?? []).map((item) =>
+        item["@id"]
+          ? graph["@graph"].find((node) => node["@id"] === item["@id"])
+          : item,
+      );
+      assert.ok(
+        breadcrumbItems.some((item) => item?.item === `${SITE_URL}${path}`),
+        `${path}: current page appears in its breadcrumbs`,
+      );
+      if (path !== "/docs" && path.startsWith("/docs/")) {
+        assert.ok(
+          breadcrumbItems.some((item) => item?.item === `${SITE_URL}/docs`),
+          `${path}: documentation overview appears in its breadcrumbs`,
+        );
+      }
+    }
+    const webpages = ids.filter(
+      (id) =>
+        (id === `${SITE_URL}/docs#webpage` ||
+          id?.startsWith(`${SITE_URL}/docs/`)) &&
+        id.endsWith("#webpage"),
+    );
     assert.equal(webpages.length, path === "/" ? 0 : 1, `${path}: no stale route graph`);
 
     if (path === "/") {

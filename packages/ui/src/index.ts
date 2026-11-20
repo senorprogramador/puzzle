@@ -637,4 +637,31 @@ export {
   type TransitionTemplate,
 } from "./components/utilities/transition";
 
+export {
+  FoldBoundary,
+  FoldProvider,
+  type FoldBoundaryProps,
+  type FoldProviderProps,
+  type FoldProviderVisibilityOptions,
+} from "./components/utilities/rendering/fold";
+
+export {
+  DeferredBoundary,
+  type DeferredActivationStrategy,
+  type DeferredBoundaryProps,
+  type DeferredComponentLoader,
+  type DeferredComponentModule,
+  type DeferredErrorFallback,
+} from "./components/utilities/rendering/deferred";
+
+export {
+  SsrBoundary,
+  type SsrBoundaryProps,
+} from "./components/utilities/rendering/ssr";
+
+export {
+  StaticBoundary,
+  type StaticBoundaryProps,
+} from "./components/utilities/rendering/static";
+
 // #endregion Utilities

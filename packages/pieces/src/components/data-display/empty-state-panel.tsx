@@ -6,6 +6,7 @@ import {
   EmptyStateHeader,
   EmptyStateMedia,
   EmptyStateTitle,
+  Heading,
 } from "@puzzle-ui/ui";
 
 import "./data-display.css";
@@ -64,9 +65,9 @@ const EmptyStateView = ({
   const primary = primaryAction ?? action;
   const renderedTitle =
     headingLevel === 2 ? (
-      <h2 id={titleId} className="puzzle-empty-state__title">
+      <Heading level="headline2" as="h2" id={titleId} className="puzzle-empty-state__title">
         {title}
-      </h2>
+      </Heading>
     ) : (
       <EmptyStateTitle id={titleId}>{title}</EmptyStateTitle>
     );

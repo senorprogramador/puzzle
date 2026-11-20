@@ -1,4 +1,10 @@
-import { Badge } from "@puzzle-ui/ui";
+import {
+  Badge,
+  Heading,
+  Text,
+  TextInput,
+  Select,
+} from "@puzzle-ui/ui";
 import { useListFilter } from "@puzzle-ui/hooks";
 import type { ElementType } from "react";
 import {
@@ -128,29 +134,25 @@ const IntegrationsSection = <C extends ElementType = "section">({
         <div className="puzzle-integrations__filters">
           <label>
             <span>Search integrations</span>
-            <input
+            <TextInput
               type="search"
               value={query}
               onChange={(event) => setQuery(event.currentTarget.value)}
             />
           </label>
           {categories.length ? (
-            <label>
-              <span>Category</span>
-              <select
-                value={selectedCategory}
-                onChange={(event) =>
-                  setSelectedCategory(event.currentTarget.value)
-                }
-              >
-                <option value="">All categories</option>
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <Select
+              label="Category"
+              value={selectedCategory}
+              options={[
+                { value: "", label: "All categories" },
+                ...categories.map((category) => ({
+                  value: category,
+                  label: category,
+                })),
+              ]}
+              onChange={(category) => setSelectedCategory(category ?? "")}
+            />
           ) : null}
         </div>
       ) : null}
@@ -158,7 +160,7 @@ const IntegrationsSection = <C extends ElementType = "section">({
         <div className="puzzle-integrations__groups">
           {groups.map(([category, categoryItems]) => (
             <section key={category}>
-              <h3>{category}</h3>
+              <Heading level="headline3" as="h3">{category}</Heading>
               <IntegrationList items={categoryItems} variant={variant} />
             </section>
           ))}
@@ -167,7 +169,7 @@ const IntegrationsSection = <C extends ElementType = "section">({
         <div className="puzzle-integrations__grouped">
           {groups.map(([category, categoryItems]) => (
             <section key={category}>
-              <h3>{category}</h3>
+              <Heading level="headline3" as="h3">{category}</Heading>
               <IntegrationList items={categoryItems} variant={variant} />
             </section>
           ))}
@@ -196,8 +198,8 @@ const IntegrationsSection = <C extends ElementType = "section">({
           ) : null}
           {featuredItem ? (
             <aside>
-              <h3>{featuredItem.name}</h3>
-              {featuredItem.description ? <p>{featuredItem.description}</p> : null}
+              <Heading level="headline3" as="h3">{featuredItem.name}</Heading>
+              {featuredItem.description ? <Text as="p">{featuredItem.description}</Text> : null}
               {featuredItem.category ? (
                 <Badge content={featuredItem.category} />
               ) : null}
@@ -231,9 +233,9 @@ const IntegrationsSection = <C extends ElementType = "section">({
           <IntegrationList items={filteredItems} variant={variant} />
         </div>
       ) : items.length ? (
-        <p className="puzzle-integrations__empty" role="status">
+        <Text as="p" className="puzzle-integrations__empty" role="status">
           No integrations match your filters.
-        </p>
+        </Text>
       ) : null}
       {children}
     </MarketingSection>

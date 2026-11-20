@@ -3,7 +3,7 @@ title: Create
 description: Generate a React application with Puzzle UI, framework-aware theme setup, and optional Tailwind CSS and Puzzle Auth with a working database.
 ---
 
-<code>@puzzle-ui/create</code> is an interactive command-line generator for new Puzzle applications. It scaffolds a project, configures the Puzzle theme for your framework's router, and can add Tailwind CSS and Puzzle Auth backed by MongoDB or Cloudflare D1. For a guided walkthrough, see [Create a Project](/docs/developer/create-project).
+<code>@puzzle-ui/create</code> scaffolds new Puzzle applications interactively or from a validated JSON configuration. It configures the Puzzle theme for your framework's router and can add Tailwind CSS and Puzzle Auth backed by MongoDB or Cloudflare D1. For a guided walkthrough, see [Create a Project](/docs/developer/create-project).
 
 ## Install
 
@@ -48,7 +48,7 @@ Run the generator, answer the prompts, then change into the generated directory 
 
 ## Interactive setup
 
-The CLI asks the following questions. It has no command-line flags; setup is configured through these prompts.
+Running the CLI without arguments starts the interactive flow and asks the following questions. Automated projects can instead use the [JSON configuration interface](/docs/create/configuration).
 
 | Prompt | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -62,6 +62,10 @@ The CLI asks the following questions. It has no command-line flags; setup is con
 | Confirm password | Masked password | None | Must match the supplied password. |
 
 Canceling a prompt cancels project creation. The CLI refuses to create a project if the target directory already exists; it does not overwrite existing files.
+
+## Automated configuration
+
+Use a JSON file for repeatable or AI-driven scaffolding. The [configuration guide](/docs/create/configuration) documents the schema, supported combinations, validation and dry-run modes, and secure initial-user input. MongoDB and D1 passwords are supplied through stdin, never through the configuration file or command-line arguments. Configuration mode does not silently reset MongoDB volumes.
 
 ## Frameworks and generated structure
 
@@ -164,4 +168,4 @@ To go to production, follow [Deployment](/docs/create/deployment) for your frame
 
 ## CLI package details
 
-The package requires Node.js `>=20.19.0` and publishes one executable, `create-puzzle`, at `./dist/index.js`. It does not expose a JavaScript import API or package subpaths. The executable takes no flags; it always starts the interactive setup.
+The package requires Node.js `>=20.19.0` and publishes one executable, `create-puzzle`, at `./dist/index.js`. It does not expose a JavaScript import API or package subpaths. With no arguments it starts interactive setup; `--config` enables validated JSON configuration.

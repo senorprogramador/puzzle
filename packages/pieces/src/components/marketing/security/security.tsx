@@ -1,4 +1,4 @@
-import { Badge, Card } from "@puzzle-ui/ui";
+import { Badge, Card, Heading } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   MarketingSection,
@@ -115,7 +115,7 @@ const SecuritySection = <C extends ElementType = "section">({
         <div className="puzzle-security__groups">
           {groups.map(([category, categoryItems]) => (
             <section key={category}>
-              <h3>{category}</h3>
+              <Heading level="headline3" as="h3">{category}</Heading>
               <SecurityList items={categoryItems} variant={variant} />
             </section>
           ))}
@@ -149,7 +149,7 @@ const SecuritySection = <C extends ElementType = "section">({
           {items.length ? <SecurityList items={items} variant={variant} /> : null}
           {variant === "audit" && auditInfo ? (
             <aside className="puzzle-security__audit">
-              <h3>Audit information</h3>
+              <Heading level="headline3" as="h3">Audit information</Heading>
               {auditInfo}
             </aside>
           ) : null}

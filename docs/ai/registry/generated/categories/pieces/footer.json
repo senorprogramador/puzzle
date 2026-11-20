@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "FooterSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "footer",
+      "subcategory": "footer",
+      "description": "Compose semantic, responsive site footers with navigation groups, social links, newsletter content, and legal links.",
+      "documentation": "apps/site/content/docs/pieces/components/footer-section.mdx",
+      "source": "packages/pieces/src/components/footer/footer-section.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "footer"
+      },
+      "contentRequirements": [
+        "description (optional)",
+        "children (optional)",
+        "navigationLabel (optional)",
+        "socialLabel (optional)",
+        "legalLabel (optional)"
+      ],
+      "dataRequirements": [
+        "navigationGroups (optional)",
+        "socialLinks (optional)",
+        "legalLinks (optional)"
+      ],
+      "mediaRequirements": [
+        "logo (optional)"
+      ],
+      "variants": [
+        {
+          "name": "multi-column",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "minimal",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "large",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "newsletter",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "social",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "mega",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "editorial",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "dark",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "split",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "cta",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "portfolio",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "ecommerce",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        },
+        {
+          "name": "legal",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/footer/footer-section.types.ts",
+          "prop": "variant",
+          "typeName": "FooterSectionVariant"
+        }
+      ],
+      "aliases": []
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType, ReactNode } from "react";
 import {
   MarketingSection,
@@ -29,13 +30,13 @@ const PositionList = ({
             data-featured={position.featured || undefined}
             data-compact={compact || undefined}
           >
-            <h3>
+            <Heading level="headline3" as="h3">
               {position.href ? (
                 <a href={position.href}>{position.title}</a>
               ) : (
                 position.title
               )}
-            </h3>
+            </Heading>
             <ul
               className="puzzle-careers-section__metadata"
               aria-label={`${position.title} details`}
@@ -46,7 +47,7 @@ const PositionList = ({
                 <li>{position.employmentType}</li>
               ) : null}
             </ul>
-            {position.description ? <p>{position.description}</p> : null}
+            {position.description ? <Text as="p">{position.description}</Text> : null}
           </article>
         </li>
       ))}
@@ -80,7 +81,7 @@ const GroupedPositions = ({
     <div className="puzzle-careers-section__groups">
       {groups.map(([label, jobs]) => (
         <section className="puzzle-careers-section__group" key={label}>
-          <h3>{label}</h3>
+          <Heading level="headline3" as="h3">{label}</Heading>
           <PositionList items={jobs} />
         </section>
       ))}
@@ -94,8 +95,8 @@ const BenefitsList = ({ items }: { items: readonly BusinessBenefit[] }) =>
       {items.map((benefit) => (
         <li key={benefit.id}>
           <article>
-            <h3>{benefit.title}</h3>
-            {benefit.description ? <p>{benefit.description}</p> : null}
+            <Heading level="headline3" as="h3">{benefit.title}</Heading>
+            {benefit.description ? <Text as="p">{benefit.description}</Text> : null}
           </article>
         </li>
       ))}
@@ -129,7 +130,7 @@ const CareersSection = <C extends ElementType = "section">({
   let content: ReactNode = positions.length ? (
     <PositionList items={positions} compact={variant === "compact"} />
   ) : (
-    <p className="puzzle-careers-section__empty">{emptyState}</p>
+    <Text as="p" className="puzzle-careers-section__empty">{emptyState}</Text>
   );
 
   if (variant === "departments" || variant === "locations") {
@@ -140,7 +141,7 @@ const CareersSection = <C extends ElementType = "section">({
       />
     );
     if (!positions.length) {
-      content = <p className="puzzle-careers-section__empty">{emptyState}</p>;
+      content = <Text as="p" className="puzzle-careers-section__empty">{emptyState}</Text>;
     }
   } else if (variant === "featured" || variant === "hiring") {
     content = (
@@ -148,7 +149,7 @@ const CareersSection = <C extends ElementType = "section">({
         {featured ? <PositionList items={[featured]} /> : null}
         <PositionList items={remaining} compact={variant === "hiring"} />
         {!positions.length ? (
-          <p className="puzzle-careers-section__empty">{emptyState}</p>
+          <Text as="p" className="puzzle-careers-section__empty">{emptyState}</Text>
         ) : null}
       </div>
     );

@@ -1,11 +1,11 @@
 ---
 title: React Text Input Component
-description: Build React text fields for email, phone, and passwords with icons, prefixes, and suffixes. Explore password visibility, input types, and TypeScript props.
+description: Build React text fields for search, email, phone, and passwords with icons, prefixes, and suffixes. Explore password visibility, input types, and TypeScript props.
 ---
 
 import { Badge, FormField, Preview, Section, Stack, TextInput } from "@puzzle-ui/ui";
 
-Use the React TextInput component for single-line form fields, including email addresses, phone numbers, and passwords. It adds theme styling and optional affixes while keeping the underlying native input behavior.
+Use the React TextInput component for single-line form fields, including search, email addresses, phone numbers, and passwords. It adds theme styling and optional affixes while keeping the underlying native input behavior.
 
 <Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented public API is covered by tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
 
@@ -18,12 +18,13 @@ import { TextInput } from "@puzzle-ui/ui";
 
 ## Types and affixes
 
-`email` and `phone` provide default leading icons; `phone` renders a native `tel` input. Password fields include a show/hide button. Explicit `prefix` or `suffix` replaces the default affix; `null` removes it.
+`email` and `phone` provide default leading icons; `phone` renders a native `tel` input. `search` renders a native search input. Password fields include a show/hide button. Explicit `prefix` or `suffix` replaces the default affix; `null` removes it.
 
 <Preview
   hideDevices={true}
   code={`\
 <Stack>
+  <FormField label="Search"><TextInput type="search" placeholder="Search" /></FormField>
   <FormField label="Email"><TextInput type="email" placeholder="you@example.com" /></FormField>
   <FormField label="Password"><TextInput type="password" /></FormField>
   <FormField label="Phone"><TextInput type="phone" /></FormField>
@@ -33,6 +34,9 @@ import { TextInput } from "@puzzle-ui/ui";
 >
   <Section>
     <Stack>
+      <FormField label="Search">
+        <TextInput type="search" placeholder="Search" />
+      </FormField>
       <FormField label="Email">
         <TextInput type="email" placeholder="you@example.com" />
       </FormField>
@@ -53,7 +57,7 @@ import { TextInput } from "@puzzle-ui/ui";
 
 | Prop                    | Type                                         | Default       | Description                                    |
 | ----------------------- | -------------------------------------------- | ------------- | ---------------------------------------------- |
-| `type`                  | `"text" \| "email" \| "password" \| "phone"` | `"text"`      | Input purpose.                                 |
+| `type`                  | `"text" \| "email" \| "password" \| "phone" \| "search"` | `"text"`      | Input purpose.                                 |
 | `prefix`, `suffix`      | `ReactNode`                                  | Type-specific | Leading and trailing content.                  |
 | `value`, `defaultValue` | Native input value                           | -             | Controlled or initial value.                   |
 | `onChange`              | `ChangeEventHandler<HTMLInputElement>`       | -             | Native change event.                           |

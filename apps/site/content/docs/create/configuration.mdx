@@ -1,0 +1,73 @@
+---
+title: Automated configuration
+description: Configure create-puzzle with a validated JSON file for repeatable and non-interactive project scaffolding.
+---
+
+The `create-puzzle` command starts interactive prompts when called without arguments. For repeatable or automated scaffolding, pass a JSON configuration:
+
+```bash
+create-puzzle --config puzzle.config.json
+```
+
+If you invoke the package through a package-manager launcher, pass the options after the package name, for example `npx @puzzle-ui/create --config puzzle.config.json`.
+
+The published [`config.schema.json`](https://github.com/senorprogramador/puzzle/blob/main/packages/create/config.schema.json) is the source of truth for the configuration format. The runtime validates the same constraints before creating project files and rejects unknown fields.
+
+## Schema
+
+| Field | Required | Values |
+| --- | --- | --- |
+| `projectName` | Yes | A non-empty name of up to 120 characters. It is converted to kebab-case for the directory and package name. |
+| `framework` | Yes | `next`, `tanstack`, `react-router`, or `react`. |
+| `styling` | Yes | `tailwind` or `none`. |
+| `auth` | Yes | `true` or `false`. |
+| `database` | Conditional | `mongodb`, `d1`, or `custom`. Required for Auth on full-stack frameworks; unavailable for Basic React and when Auth is disabled. |
+| `packageManager` | No | `bun`, `npm`, `pnpm`, or `yarn`. Omitted values use package-manager detection and npm fallback. |
+
+Example:
+
+```json
+{
+  "projectName": "customer-portal",
+  "framework": "next",
+  "styling": "tailwind",
+  "auth": true,
+  "database": "d1",
+  "packageManager": "bun"
+}
+```
+
+Basic React can include client-side Auth UI, but it does not generate a database integration. A full-stack framework with Auth requires a database choice even when a custom adapter will be supplied.
+
+## Validate and preview
+
+`--validate` checks the JSON schema and supported combinations without checking the destination directory:
+
+```bash
+create-puzzle --config puzzle.config.json --validate
+```
+
+`--dry-run` also confirms the target directory does not already exist, then prints the selected generation options without writing project files:
+
+```bash
+create-puzzle --config puzzle.config.json --dry-run
+```
+
+The CLI never overwrites an existing project directory.
+
+## Initial-user credentials
+
+MongoDB and D1 Auth projects create a first application account. During automated generation, provide a JSON object with `email` and `password` on stdin:
+
+```bash
+trusted-secret-provider read puzzle/initial-user-json |
+  create-puzzle --config puzzle.config.json --credentials-stdin
+```
+
+Do not put the password in the config, command-line arguments, logs, or generated files. The stdin payload is bounded and validated with the same email and password limits as interactive setup. It must not include additional fields. `--credentials-stdin` is required only for MongoDB or D1 Auth and cannot be used with `--validate` or `--dry-run`.
+
+Configuration mode never assumes consent to destroy MongoDB data. If it finds a project-labeled volume from an earlier scaffold, it preserves that volume and cancels. Use interactive setup to inspect the prompt and explicitly approve a reset.
+
+## Supported workflow
+
+The interactive and JSON modes use the same typed configuration and project-generation flow. Both use the same framework generators, package installation, Auth templates, environment generation, and database safeguards. The CLI configuration guide is also available in the published [`@puzzle-ui/create` package](https://www.npmjs.com/package/@puzzle-ui/create).

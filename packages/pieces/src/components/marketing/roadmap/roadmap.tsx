@@ -1,4 +1,4 @@
-import { Badge } from "@puzzle-ui/ui";
+import { Badge, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   MarketingSection,
@@ -47,19 +47,19 @@ const RoadmapCard = ({
   <li data-status={item.status}>
     <article className="puzzle-roadmap__item">
       <div className="puzzle-roadmap__item-header">
-        <h3>{item.title}</h3>
+        <Heading level="headline3" as="h3">{item.title}</Heading>
         <Badge
           content={item.statusLabel ?? statusLabels[item.status]}
           className="puzzle-roadmap__status"
         />
       </div>
       {item.date != null ? (
-        <p className="puzzle-roadmap__date">{item.date}</p>
+        <Text as="p" className="puzzle-roadmap__date">{item.date}</Text>
       ) : null}
       {item.group ? (
-        <p className="puzzle-roadmap__group">{item.group}</p>
+        <Text as="p" className="puzzle-roadmap__group">{item.group}</Text>
       ) : null}
-      {item.description ? <p>{item.description}</p> : null}
+      {item.description ? <Text as="p">{item.description}</Text> : null}
       {variant === "progress" && item.progress !== undefined ? (
         <progress
           className="puzzle-roadmap__progress"
@@ -105,7 +105,7 @@ const GroupedRoadmap = ({
   >
     {groupItems(items, getGroup).map(([group, groupItems]) => (
       <section key={group} className="puzzle-roadmap__group">
-        <h3>{group}</h3>
+        <Heading level="headline3" as="h3">{group}</Heading>
         <ol className="puzzle-roadmap__list">
           {groupItems.map((item) => (
             <RoadmapCard key={item.id} item={item} variant={variant} />
@@ -144,7 +144,7 @@ const RoadmapSection = <C extends ElementType = "section">({
 
             return (
               <section key={status} aria-label={statusLabels[status]}>
-                <h3>{statusLabels[status]}</h3>
+                <Heading level="headline3" as="h3">{statusLabels[status]}</Heading>
                 <ol className="puzzle-roadmap__list">
                   {statusItems.map((item) => (
                     <RoadmapCard key={item.id} item={item} variant={variant} />

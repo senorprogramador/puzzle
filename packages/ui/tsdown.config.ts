@@ -1,7 +1,18 @@
 import { defineConfig } from "tsdown";
 
 export default defineConfig({
-  entry: ["src/index.ts"],
+  entry: [
+    "src/index.ts",
+    "src/components/utilities/rendering/deferred.tsx",
+    "src/components/utilities/rendering/fold.tsx",
+    "src/components/utilities/rendering/ssr.tsx",
+    "src/components/utilities/rendering/static.tsx",
+    "src/components/utilities/rendering/next/client.tsx",
+    "src/components/utilities/rendering/next/server.tsx",
+    "src/components/utilities/rendering/tanstack/client.tsx",
+    "src/components/utilities/rendering/tanstack/server.tsx",
+    "src/components/utilities/rendering/tanstack/shared.ts",
+  ],
   unbundle: true,
   format: ["esm", "cjs"],
   fixedExtension: false,
@@ -13,6 +24,7 @@ export default defineConfig({
   deps: {
     neverBundle: [
       "react",
+      "react-dom",
       "@puzzle-ui/core",
       "@puzzle-ui/theme",
       "@puzzle-ui/icons",

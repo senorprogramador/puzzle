@@ -1,0 +1,272 @@
+{
+  "schemaVersion": 1,
+  "packages": {
+    "@puzzle-ui/pieces": {
+      "directory": "packages/pieces",
+      "entryPoints": {
+        ".": "src/index.ts"
+      },
+      "aliases": {
+        "AccommodationHero": "FullScreenHero",
+        "ActivityTimeline": "DashboardActivityFeed",
+        "AppHero": "SplitHero",
+        "EditorialHero": "AsymmetricHero",
+        "PrintShopHero": "SplitHero",
+        "ProductHero": "SplitHero",
+        "ProgressOverview": "DashboardProgressCard",
+        "SaaSHero": "AsymmetricHero",
+        "StatCard": "DashboardStatCard",
+        "StatGroup": "DashboardStatGroup",
+        "StoreHero": "SplitHero"
+      },
+      "nonComponentExports": [],
+      "documentationOverrides": {
+        "DashboardOverviewSection": "apps/site/content/docs/pieces/components/application-dashboard.mdx",
+        "EmptyStatePanel": "apps/site/content/docs/pieces/components/empty-state.mdx",
+        "EmptyStateSection": "apps/site/content/docs/pieces/components/empty-state.mdx",
+        "FooterSection": "apps/site/content/docs/pieces/components/footer-section.mdx",
+        "MetricComparison": "apps/site/content/docs/pieces/components/data-display.mdx"
+      },
+      "compositionOverrides": {
+        "DashboardOverviewSection": "section"
+      },
+      "categoryMetadata": {
+        "hero": {
+          "useCases": ["marketing"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "section"
+        },
+        "dashboard": {
+          "useCases": ["dashboard"],
+          "pageTypes": ["dashboard"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "primitive"
+        },
+        "navigation": {
+          "useCases": ["navigation"],
+          "pageTypes": ["dashboard", "workspace"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "primitive"
+        },
+        "project": {
+          "useCases": ["dashboard", "data-display"],
+          "pageTypes": ["workspace"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "primitive"
+        },
+        "data-display": {
+          "useCases": ["data-display"],
+          "pageTypes": ["dashboard", "workspace"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "primitive"
+        },
+        "feedback": {
+          "useCases": ["feedback"],
+          "pageTypes": ["dashboard", "form"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "primitive"
+        },
+        "settings": {
+          "useCases": ["settings"],
+          "pageTypes": ["settings", "workspace"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "primitive"
+        },
+        "activity": {
+          "useCases": ["dashboard"],
+          "pageTypes": ["workspace"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "section"
+        },
+        "onboarding": {
+          "useCases": ["application-shell"],
+          "pageTypes": ["workspace", "form"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "section"
+        },
+        "footer": {
+          "useCases": ["marketing"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "section"
+        },
+        "marketing": {
+          "useCases": ["marketing"],
+          "pageTypes": ["landing", "product", "pricing"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "section"
+        },
+        "commerce": {
+          "useCases": ["commerce"],
+          "pageTypes": ["catalog", "product", "booking"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "section"
+        },
+        "content": {
+          "useCases": ["content"],
+          "pageTypes": ["blog", "article", "event"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "section"
+        },
+        "business": {
+          "useCases": ["business"],
+          "capabilities": ["responsive", "composable"],
+          "composition": "section"
+        }
+      }
+    },
+    "@puzzle-ui/ui": {
+      "directory": "packages/ui",
+      "entryPoints": {
+        ".": "src/index.ts",
+        "./rendering/deferred": "src/components/utilities/rendering/deferred.tsx",
+        "./rendering/ssr": "src/components/utilities/rendering/ssr.tsx",
+        "./rendering/static": "src/components/utilities/rendering/static.tsx",
+        "./rendering/fold": "src/components/utilities/rendering/fold.tsx",
+        "./next/client": "src/components/utilities/rendering/next/client.tsx",
+        "./next/server": "src/components/utilities/rendering/next/server.tsx",
+        "./tanstack/client": "src/components/utilities/rendering/tanstack/client.tsx",
+        "./tanstack/server": "src/components/utilities/rendering/tanstack/server.tsx",
+        "./tanstack/shared": "src/components/utilities/rendering/tanstack/shared.ts"
+      },
+      "aliases": {
+        "NextDeferredBoundary": "DeferredBoundary",
+        "NextFoldBoundary": "FoldBoundary",
+        "NextFoldProvider": "FoldProvider",
+        "NextStaticBoundary": "StaticBoundary",
+        "TanStackDeferredBoundary": "DeferredBoundary",
+        "TanStackFoldBoundary": "FoldBoundary",
+        "TanStackFoldProvider": "FoldProvider",
+        "TanStackSsrBoundary": "SsrBoundary",
+        "TanStackStaticBoundary": "StaticBoundary"
+      },
+      "nonComponentExports": [
+        "useCarouselContext",
+        "useFold",
+        "useFoldOptimization",
+        "useFoldState",
+        "useIsNearby",
+        "useIsVisible",
+        "useNotification",
+        "useVisibility"
+      ],
+      "categoryOverrides": {
+        "business": "data-display"
+      },
+      "businessDescriptions": {
+        "BusinessImageView": "Lazily renders a sized image from BusinessImage, or an accessible unavailable-image placeholder when no source exists.",
+        "CaseStudyCard": "Presents a case study with optional media, client and industry details, challenge, solution, results, metrics, and link.",
+        "CompanyInfo": "Displays a company name with optional logo, tagline, description, and linked-name behavior.",
+        "ContactDetails": "Renders labeled contact values as a definition list and links values when an item href is supplied.",
+        "LogoCollection": "Renders a collection of organization logos or names with optional links, descriptions, labels, and scrolling.",
+        "MetricList": "Displays labeled metric values and optional descriptions as a definition list.",
+        "ProfileCard": "Displays a person's avatar, name, role, optional biography, profile link, featured state, and social links.",
+        "ServiceCard": "Presents a service with optional number, icon, image, description, pricing, action, link, and featured state.",
+        "SocialLinks": "Renders non-empty social-link data as an accessible list with optional external-link handling."
+      },
+      "compoundFamilies": {
+        "BottomNavigationItem": "BottomNavigation",
+        "CardAction": "Card",
+        "CardContent": "Card",
+        "CardDescription": "Card",
+        "CardFooter": "Card",
+        "CardHeader": "Card",
+        "CardMedia": "Card",
+        "CardTitle": "Card",
+        "CarouselController": "Carousel",
+        "CommandDialog": "Command",
+        "ContextMenuCheckboxItem": "ContextMenu",
+        "ContextMenuContent": "ContextMenu",
+        "ContextMenuGroup": "ContextMenu",
+        "ContextMenuItem": "ContextMenu",
+        "ContextMenuLabel": "ContextMenu",
+        "ContextMenuRadioGroup": "ContextMenu",
+        "ContextMenuRadioItem": "ContextMenu",
+        "ContextMenuSeparator": "ContextMenu",
+        "ContextMenuSub": "ContextMenu",
+        "ContextMenuSubContent": "ContextMenu",
+        "ContextMenuSubTrigger": "ContextMenu",
+        "ContextMenuTrigger": "ContextMenu",
+        "CircularProgress": "Progress",
+        "DropdownMenuCheckboxItem": "DropdownMenu",
+        "DropdownMenuContent": "DropdownMenu",
+        "DropdownMenuGroup": "DropdownMenu",
+        "DropdownMenuItem": "DropdownMenu",
+        "DropdownMenuLabel": "DropdownMenu",
+        "DropdownMenuRadioGroup": "DropdownMenu",
+        "DropdownMenuRadioItem": "DropdownMenu",
+        "DropdownMenuSeparator": "DropdownMenu",
+        "DropdownMenuTrigger": "DropdownMenu",
+        "DeferredBoundary": "Rendering Strategies",
+        "EmptyStateContent": "EmptyState",
+        "EmptyStateDescription": "EmptyState",
+        "EmptyStateHeader": "EmptyState",
+        "EmptyStateMedia": "EmptyState",
+        "EmptyStateTitle": "EmptyState",
+        "FoldProvider": "Rendering Strategies",
+        "FoldBoundary": "Rendering Strategies",
+        "GridItem": "Grid",
+        "NotificationProvider": "Notification",
+        "NotificationViewport": "Notification",
+        "PortalTarget": "Portal",
+        "PreviewProvider": "Preview",
+        "Radio": "RadioGroup",
+        "ResizableHandle": "ResizablePanels",
+        "ResizablePanel": "ResizablePanels",
+        "TabsTab": "Tabs",
+        "TextEditorToolbar": "TextEditor",
+        "TextRenderer": "TextEditor",
+        "LinearProgress": "Progress",
+        "SsrBoundary": "Rendering Strategies",
+        "StaticBoundary": "Rendering Strategies",
+        "NextSsrBoundary": "Rendering Strategies"
+      },
+      "categoryMetadata": {
+        "actions": {
+          "useCases": ["application-shell"],
+          "pageTypes": ["generic"],
+          "capabilities": ["interactive"]
+        },
+        "data-display": {
+          "useCases": ["data-display"],
+          "pageTypes": ["dashboard", "generic"],
+          "capabilities": ["data-display"]
+        },
+        "editors": {
+          "useCases": ["data-entry"],
+          "pageTypes": ["form"],
+          "capabilities": ["interactive", "data-entry"]
+        },
+        "forms": {
+          "useCases": ["data-entry"],
+          "pageTypes": ["form"],
+          "capabilities": ["interactive", "data-entry"]
+        },
+        "layout": {
+          "useCases": ["application-shell"],
+          "pageTypes": ["generic"],
+          "capabilities": ["responsive", "composable"]
+        },
+        "navigation": {
+          "useCases": ["navigation"],
+          "pageTypes": ["generic"],
+          "capabilities": ["navigation", "interactive"]
+        },
+        "overlays": {
+          "useCases": ["application-shell"],
+          "pageTypes": ["generic"],
+          "capabilities": ["overlay", "interactive"]
+        },
+        "typography": {
+          "useCases": ["content"],
+          "pageTypes": ["generic"],
+          "capabilities": ["composable"]
+        },
+        "utilities": {
+          "useCases": ["application-shell"],
+          "pageTypes": ["generic"],
+          "capabilities": []
+        }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { CompanyInfo, LogoCollection } from "@puzzle-ui/ui";
+import { CompanyInfo, LogoCollection, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
 import {
   MarketingSection,
@@ -31,9 +31,9 @@ const AwardCard = ({
       className="puzzle-awards-section__organization"
     />
     <div className="puzzle-awards-section__award-content">
-      <p className="puzzle-awards-section__year">{award.year}</p>
-      <h3>{award.title}</h3>
-      {award.description ? <p>{award.description}</p> : null}
+      <Text as="p" className="puzzle-awards-section__year">{award.year}</Text>
+      <Heading level="headline3" as="h3">{award.title}</Heading>
+      {award.description ? <Text as="p">{award.description}</Text> : null}
       {award.href ? (
         <a
           href={award.href}

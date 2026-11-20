@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "BlogSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "blog-section",
+      "description": "Present editorial articles with responsive grids, featured stories, bylines, categories, and reading details.",
+      "documentation": "apps/site/content/docs/pieces/components/blog-section.mdx",
+      "source": "packages/pieces/src/components/content/blog-section/blog-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "blog-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ChangelogSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "changelog-section",
+      "description": "Publish versioned release notes with dates, release types, change categories, featured updates, and grouping.",
+      "documentation": "apps/site/content/docs/pieces/components/changelog-section.mdx",
+      "source": "packages/pieces/src/components/content/changelog-section/changelog-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "changelog-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ContentSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "content-section",
+      "description": "Compose semantic editorial content with flexible columns, media, image placement, quotations, and optional sidebars.",
+      "documentation": "apps/site/content/docs/pieces/components/content-section.mdx",
+      "source": "packages/pieces/src/components/content/content-section/content-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "content-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "EventSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "event-section",
+      "description": "Present upcoming and past events with date-aware filtering, venue details, categories, and links.",
+      "documentation": "apps/site/content/docs/pieces/components/event-section.mdx",
+      "source": "packages/pieces/src/components/content/event-section/event-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "event-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "GallerySection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "gallery-section",
+      "description": "Arrange responsive editorial images with captions, native links, masonry layouts, and an accessible keyboard-operable lightbox.",
+      "documentation": "apps/site/content/docs/pieces/components/gallery-section.mdx",
+      "source": "packages/pieces/src/components/content/gallery-section/gallery-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "gallery-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ResourceSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "resource-section",
+      "description": "Build searchable libraries of guides, downloads, templates, and webinars with caller-provided resources.",
+      "documentation": "apps/site/content/docs/pieces/components/resource-section.mdx",
+      "source": "packages/pieces/src/components/content/resource-section/resource-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "resource-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TimelineSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "timeline-section",
+      "description": "Show ordered milestones with semantic event lists, dates, descriptions, imagery, icons, and optional actions.",
+      "documentation": "apps/site/content/docs/pieces/components/timeline-section.mdx",
+      "source": "packages/pieces/src/components/content/timeline-section/timeline-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "timeline-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "VideoSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "video-section",
+      "description": "Present accessible video stories, tutorials, playlists, and lightboxes with native browser controls.",
+      "documentation": "apps/site/content/docs/pieces/components/video-section.mdx",
+      "source": "packages/pieces/src/components/content/video-section/video-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "video-section"
+      },
+      "aliases": []
+    }
+  ]
+}
