@@ -3,7 +3,7 @@ import type { StorageAdapter } from "../../src";
 
 export const runCapabilityConformance = (
   createAdapter: () => Promise<StorageAdapter>,
-) => {
+): void => {
   describe("capability conformance", () => {
     it("returns capabilities consistently", async () => {
       const adapter = await createAdapter();

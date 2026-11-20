@@ -13,7 +13,7 @@ import {
 export const runConstraintConformance = (
   createAdapter: () => Promise<StorageAdapter>,
   reset: () => Promise<void>,
-) => {
+): void => {
   describe("unique constraint conformance", () => {
     it("rejects duplicate primary keys", async () => {
       await reset();

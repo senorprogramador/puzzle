@@ -119,7 +119,10 @@ export {
   type WebCryptoAuthSecretProtectorOptions,
 } from "./providers/webcrypto-secret-protector";
 
-export { SimpleWebAuthnProvider } from "./providers/simplewebauthn-provider";
+export {
+  SimpleWebAuthnProvider,
+  type SimpleWebAuthnProviderOptions,
+} from "./providers/simplewebauthn-provider";
 
 export {
   AuthError,

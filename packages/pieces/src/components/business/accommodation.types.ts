@@ -2,6 +2,12 @@ import type { ReactNode } from "react";
 import type { CommerceMoney } from "../commerce/shared.types";
 import type { EditorialImage } from "../content/shared";
 
+export type GuestCount = {
+  adults: number;
+  children: number;
+  childAges?: readonly (number | null)[];
+};
+
 export type AccommodationStats = {
   capacity?: number;
   bedrooms?: number;

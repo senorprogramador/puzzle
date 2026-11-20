@@ -1,4 +1,4 @@
-import { cleanup, waitFor } from "@testing-library/react";
+import { cleanup, render, waitFor } from "@testing-library/react";
 import { act, type CSSProperties, type ReactNode } from "react";
 import { hydrateRoot, type Root } from "react-dom/client";
 import { renderToString } from "react-dom/server";
@@ -197,5 +197,15 @@ describe("AppBar server-rendered sticky offset", () => {
       await act(async () => root?.unmount());
       container.remove();
     }
+  });
+});
+
+describe("AppBar client-rendered sticky offset", () => {
+  it("omits the server-only initializer and avoids React's script warning", () => {
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    const { container } = render(<AppBar title="Client" sticky />);
+
+    expect(container.querySelector("script")).toBeNull();
+    expect(consoleError).not.toHaveBeenCalled();
   });
 });

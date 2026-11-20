@@ -11,6 +11,7 @@ export * from "./roadmap";
 export * from "./benefits";
 export * from "./stats";
 export * from "./testimonials";
+export * from "./guest-reviews-section";
 export * from "./cta";
 export * from "./faq";
 export * from "./how-it-works";

@@ -112,7 +112,7 @@ Search is a trimmed, case-insensitive substring match over title, text descripti
 ## Accessibility and customization
 
 - Search and category controls have visible labels and native keyboard behavior.
-- Resource titles are links, downloads use the browser `download` attribute, and media is supplied through the optional thumbnail slot.
+- Resource titles are links only when `href` is supplied; downloads use the browser `download` attribute, and media is supplied through the optional thumbnail slot.
 - Empty results use the shared `EmptyStatePanel` composition; pass `emptyState` to add context.
 - Theme colors, borders, spacing, and card surfaces come from Puzzle tokens and UI `Card`/`Badge`.
 - The `children` slot can add a call to action or resource-specific explanatory content.
@@ -123,13 +123,13 @@ Search is a trimmed, case-insensitive substring match over title, text descripti
 | -------------------- | ------------------------- | -------- | --------------------- | --------------------------------------------------- |
 | `items`              | `readonly ResourceItem[]` | Yes      | —                     | Resource records; IDs must be unique.               |
 | `variant`            | `ResourceSectionVariant`  | No       | `grid`                | Layout variant.                                     |
-| `featuredResourceId` | `string`                  | No       | First `featured` item | Explicit featured item ID.                          |
+| `featuredResourceId` | `string`                  | No       | First featured item, otherwise first item | Explicit featured item ID. |
 | `searchable`         | `boolean`                 | No       | `true`                | Render the search field.                            |
 | `filterable`         | `boolean`                 | No       | `true`                | Render the category selector when categories exist. |
 | `emptyState`         | `ReactNode`               | No       | —                     | Additional no-results content.                      |
 | `children`           | `ReactNode`               | No       | —                     | Additional content after the resources.             |
 
-`ResourceItem` supports `id`, `title`, `href`, `description`, `category`, `type`, `download`, `featured`, `thumbnail`, and `updatedAt`.
+`ResourceItem` supports `id`, `title`, optional `href`, `description`, `metadata`, `category`, `type`, `download`, `featured`, `thumbnail`, and `updatedAt`. Without `href`, the title is plain text rather than a link.
 
 ## Related components
 

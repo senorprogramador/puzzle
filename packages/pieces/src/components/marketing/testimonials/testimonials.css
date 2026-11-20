@@ -70,6 +70,14 @@
   margin-inline-start: auto;
 }
 
+.puzzle-testimonials__metadata {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-2, 0.5rem);
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
 .puzzle-testimonials__company img {
   max-width: var(--puzzle-space-20, 5rem);
   max-height: var(--puzzle-space-8, 2rem);

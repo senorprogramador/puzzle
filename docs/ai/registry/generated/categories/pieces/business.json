@@ -197,6 +197,54 @@
       "aliases": []
     },
     {
+      "name": "HostProfileSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "host-profile-section",
+      "description": "Present one hospitality host by reusing the existing TeamSection profile card with languages, a story, and a caller-owned contact action.",
+      "documentation": "apps/site/content/docs/pieces/components/host-profile.mdx",
+      "source": "packages/pieces/src/components/business/host-profile-section/host-profile-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "host-profile-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "HouseRulesSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "house-rules-section",
+      "description": "Present caller-supplied check-in, guest, pet, smoking, parking, payment, cancellation, and practical house rules.",
+      "documentation": "apps/site/content/docs/pieces/components/house-rules.mdx",
+      "source": "packages/pieces/src/components/business/house-rules-section/house-rules-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "house-rules-section"
+      },
+      "aliases": []
+    },
+    {
       "name": "LocationSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [
@@ -221,6 +269,30 @@
       "aliases": []
     },
     {
+      "name": "OpeningHoursSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "opening-hours-section",
+      "description": "Present a weekly restaurant schedule with multiple daily service periods, explicit closed days, date exceptions, seasonal hours, and timezone-aware status.",
+      "documentation": "apps/site/content/docs/pieces/components/opening-hours.mdx",
+      "source": "packages/pieces/src/components/business/opening-hours-section/opening-hours-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "opening-hours-section"
+      },
+      "aliases": []
+    },
+    {
       "name": "PartnersSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [
@@ -241,6 +313,30 @@
       "composition": {
         "kind": "section",
         "family": "partners-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ServiceOptionsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "service-options-section",
+      "description": "Present categorized hospitality services with supplied included or optional status, price content, and caller-owned actions.",
+      "documentation": "apps/site/content/docs/pieces/components/service-options.mdx",
+      "source": "packages/pieces/src/components/business/service-options-section/service-options-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "service-options-section"
       },
       "aliases": []
     },

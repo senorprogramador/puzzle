@@ -3,6 +3,18 @@
 All notable changes to `@puzzle-ui/pieces` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## Unreleased
+
+### Added
+
+- Added hospitality sections for accommodation discovery, availability search, rate plans, stay summaries, and house rules.
+- Added restaurant menu presentation with dietary information, dish cards, opening hours, and table reservation forms.
+- Added shared hospitality sections for guest reviews, local guides, host profiles, service options, and gift vouchers.
+
+### Changed
+
+- Extended testimonial items with optional metadata and resource items with optional destinations and metadata for reusable hospitality compositions.
+
 ## 0.12.0 - 2026-11-18
 
 - Added marketing sections: `Announcement`, `Benefits`, `CodeShowcase`, `Comparison`, `CTA`, `FAQ`, `Features`, `HowItWorks`, `Integrations`, `LogoCloud`, `Pricing`, `ProductShowcase`, `Roadmap`, `Security`, `Stats`, `Testimonials`, `UseCases` and `WaitlistSection`.

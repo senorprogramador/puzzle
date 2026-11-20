@@ -5,7 +5,7 @@ description: Present attributed customer quotes, ratings, logos, avatars, and me
 
 import { Badge } from "@puzzle-ui/ui";
 
-`TestimonialsSection` renders customer statements with required attribution. Items require a stable `id`, quote, and author; role, organization, avatar, company logo, rating, media, and featured styling are optional.
+`TestimonialsSection` renders customer statements with required attribution. Items require a stable `id`, quote, and author; role, organization, avatar, company logo, rating, media, featured styling, and caller-provided footer metadata are optional.
 
 <Badge content="Beta" color="primary" /> **API maturity: Beta.**
 
@@ -34,6 +34,7 @@ import { TestimonialsSectionVariantsExample } from "../../../../src/components/d
 | `TestimonialItem.rating` | `number` | Optional read-only rating. |
 | `TestimonialItem.avatar` / `companyLogo` | `ReactNode` | Optional consumer-provided identity nodes. |
 | `TestimonialItem.media` | `ReactNode` | Optional image, video, or other media. |
+| `TestimonialItem.metadata` | `ReactNode` | Optional caller-provided footer metadata, such as a date and source. |
 | `carouselLabel` | `string` | Accessible carousel name; defaults to `Customer testimonials`. |
 | Shared section props | `SectionRootProps` and heading props | Semantic root, theme, native attributes, heading, actions, and children. |
 

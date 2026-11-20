@@ -1,0 +1,139 @@
+---
+title: RestaurantMenuSection
+description: Compose multiple restaurant menus with categories, anchor navigation, responsive dish cards, caller-supplied dietary labels, and optional dietary filtering.
+---
+
+import { RestaurantMenuSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { RestaurantMenuSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/restaurant-menu";
+
+`RestaurantMenuSection` presents one or more menus from data supplied by the
+restaurant application. Categories use ordinary anchor links, and the menu
+content is rendered together rather than hidden behind JavaScript tabs.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## TypeScript example
+
+```tsx
+import {
+  RestaurantMenuSection,
+  type RestaurantMenu,
+} from "@puzzle-ui/pieces";
+
+const menus: RestaurantMenu[] = [
+  {
+    id: "lunch",
+    title: "Lunch",
+    categories: [
+      {
+        id: "mains",
+        title: "Mains",
+        dishes: [
+          {
+            id: "market-bowl",
+            name: "Market bowl",
+            price: { amount: 14, currency: "EUR" },
+          },
+        ],
+      },
+    ],
+  },
+];
+
+<RestaurantMenuSection menus={menus} locale="en-GB" />;
+```
+
+## Restaurant menu examples
+
+The live previews cover a café, a tapas restaurant, fine dining, separate
+lunch and dinner menus, caller-supplied dietary and allergen information, and a
+text-first menu without photos.
+
+<RestaurantMenuSectionVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `menus` | `readonly RestaurantMenu[]` | Yes | — | Menus with categories and caller-supplied dishes. |
+| `locale` | `string` | No | Runtime locale | BCP 47 locale used for dish prices. |
+| `cardVariant` | `DishCardVariant` | No | `"standard"` | Default card style; a dish marked `featured` uses the featured style. |
+| `dietaryInformationVariant` | `DietaryInformationVariant` | No | `"compact"` | Presentation passed to each dish's dietary information. |
+| `showDietaryDetailsPopover` | `boolean` | No | `false` | Adds an optional details popover to dishes with supplied labels. |
+| `featuredLabel`, `popularLabel` | `ReactNode` | No | `"Featured"`, `"Popular"` | Visible status labels forwarded to each card. |
+| `dietaryFilters` | `readonly RestaurantMenuDietaryFilter[]` | No | `[]` | Enables a native select to filter by supplied dietary-tag IDs. |
+| `selectedDietaryTagId` | `string \| null` | No | Uncontrolled, all dishes | Controls the filter when supplied; use `null` to show all dishes. |
+| `onDietaryFilterChange` | `(tagId: string \| null) => void` | No | — | Receives changes to the optional dietary filter. |
+| `categoryNavigationLabel` | `string` | No | `"Menu categories"` | Accessible name for the anchor-link navigation. |
+| `filterLabel` | `ReactNode` | No | `"Filter by dietary preference"` | Visible label for the native select. |
+| `allDishesLabel` | `ReactNode` | No | `"All dishes"` | Option that clears the dietary filter. |
+| `emptyState` | `ReactNode` | No | `"No menu dishes are available."` | Message when no menu dishes are supplied. |
+| `filterEmptyState` | `ReactNode` | No | `"No dishes match this filter."` | Message when the selected tag has no matching dishes. |
+| `title`, `description`, `eyebrow`, `actions`, `alignment`, `children`, `className` | Shared section props | No | — | Heading, composition slot, alignment, and additional styling. |
+
+### Menu and dish data
+
+- `RestaurantMenu` has a unique `id`, `title`, optional `description`, and a
+  `categories` array.
+- `RestaurantMenuCategory` has a unique `id`, `title`, optional `description`,
+  and a `dishes` array.
+- `RestaurantDish` has a unique `id`, `name`, required `CommerceMoney` `price`,
+  and optional description, image, portion size, dietary tags, allergens,
+  featured status, or popular status.
+- `DietaryTag` and `Allergen` each use a caller-provided `id`, visible `label`,
+  and optional decorative icon and description.
+- `RestaurantMenuDietaryFilter` uses a stable dietary-tag `id` and plain-text
+  `label` for the native select.
+
+IDs must be non-empty and unique within their menu, category, filter, dietary
+tag, or allergen list. Dish prices are formatted independently, so menus may
+contain different currencies. Pass an explicit locale for deterministic
+server/client price output.
+
+## Filtering and responsibility boundary
+
+Filtering only selects dishes whose supplied `dietaryTags` contain the chosen
+ID. It is presentation behavior: Pieces does not infer a tag from dish copy or
+ingredients, does not filter allergen data, and does not determine whether a
+dish is suitable for a particular person. The application must supply accurate
+allergen information and all dietary claims.
+
+Pieces does not create orders, carts, reservations, or payment flows. Links,
+actions, prices, hours, and menu availability remain application-owned.
+
+## Responsive behavior and accessibility
+
+- Category navigation wraps across rows and remains ordinary keyboard-accessible
+  links to rendered category headings; it does not become a wide menu table.
+- Dish and category grids use fluid `auto-fit` layouts and collapse naturally
+  to one column when the available width cannot fit another card.
+- Images are optional, text wraps, and dish cards have no fixed heights.
+- Prices use tabular numerals and can wrap rather than clip at narrow widths.
+- The native filter has a visible label. With no filter supplied, all categories
+  and dishes render without requiring client interaction; the menu and anchor
+  navigation remain present in server-rendered output.
+- When filters are enabled, the initial server-rendered menu shows all dishes;
+  selecting a dietary tag requires client-side interaction.
+
+## Theme support and customization
+
+The section, filter, navigation, cards, and information labels consume Puzzle
+Theme tokens and inherit scoped themes. Use `children` for page-specific
+content, `className` for scoped styling, and `DishCard` slots when an individual
+dish needs custom media, content, or actions.
+
+## Related components
+
+- [Dish Card](/docs/pieces/components/dish-card) for a standalone dish
+  presentation and its compact, standard, and featured variants.
+- [Dietary Information](/docs/pieces/components/dietary-information) for the
+  shared dietary-tag and allergen presentation.
+- [Restaurant Hero](/docs/pieces/components/hero) for the existing restaurant
+  page introduction.
+- [Product Grid](/docs/pieces/components/product-grid) for generic retail
+  catalog sections.
+
+Use the component in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

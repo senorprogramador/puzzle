@@ -1,0 +1,154 @@
+.puzzle-opening-hours-section {
+  min-width: 0;
+}
+
+.puzzle-opening-hours-section__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--puzzle-space-2, 0.5rem);
+  margin-block-end: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-opening-hours-section__status[data-status="open"] {
+  color: var(--puzzle-color-success);
+}
+
+.puzzle-opening-hours-section__status[data-status="closed"] {
+  color: var(--puzzle-color-danger);
+}
+
+.puzzle-opening-hours-section__status[data-status="unknown"] {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-opening-hours-section__status-indicator {
+  width: var(--puzzle-space-2, 0.5rem);
+  height: var(--puzzle-space-2, 0.5rem);
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.puzzle-opening-hours-section__time-zone {
+  margin: 0 0 var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+  overflow-wrap: anywhere;
+}
+
+.puzzle-opening-hours-section__week {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--puzzle-space-2, 0.5rem);
+  margin: 0;
+}
+
+.puzzle-opening-hours-section__day {
+  display: grid;
+  grid-template-columns: minmax(0, 0.65fr) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+  padding: var(--puzzle-space-3, 0.75rem);
+  background: var(--puzzle-color-surface);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-opening-hours-section__day dt,
+.puzzle-opening-hours-section__day dd {
+  min-width: 0;
+  margin: 0;
+}
+
+.puzzle-opening-hours-section__day dt {
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+  overflow-wrap: anywhere;
+}
+
+.puzzle-opening-hours-section__day dd {
+  color: var(--puzzle-color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.puzzle-opening-hours-section__intervals,
+.puzzle-opening-hours-section__periods > ul {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-opening-hours-section__intervals li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-opening-hours-section__interval-label {
+  color: var(--puzzle-color-text);
+}
+
+.puzzle-opening-hours-section__periods {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+  margin-block-start: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-opening-hours-section__periods h3 {
+  margin: 0;
+}
+
+.puzzle-opening-hours-section__periods > ul > li,
+.puzzle-opening-hours-section__season {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+  padding: var(--puzzle-space-4, 1rem);
+  background: var(--puzzle-color-surface);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+}
+
+.puzzle-opening-hours-section__periods > ul > li > div,
+.puzzle-opening-hours-section__period-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-4, 1rem);
+  min-width: 0;
+}
+
+.puzzle-opening-hours-section__periods span {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-opening-hours-section__period-heading h4 {
+  margin: 0;
+}
+
+.puzzle-opening-hours-section[data-variant="compact"] {
+  --puzzle-opening-hours-gap: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-opening-hours-section[data-variant="compact"] .puzzle-opening-hours-section__week {
+  gap: var(--puzzle-opening-hours-gap);
+}
+
+.puzzle-opening-hours-section[data-variant="compact"] .puzzle-opening-hours-section__day {
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-opening-hours-section__season .puzzle-opening-hours-section__week {
+  margin-block-start: var(--puzzle-space-2, 0.5rem);
+}
+
+@media (min-width: 48rem) {
+  .puzzle-opening-hours-section__week {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  }
+}

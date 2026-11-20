@@ -1,6 +1,6 @@
 ---
 title: Business & Corporate Sections
-description: Present organizational profiles, teams, services, case studies, careers, contact details, and partners.
+description: Present organizational profiles, teams, services, accommodation details, house rules, case studies, careers, contacts, and partners.
 ---
 
 import {
@@ -21,7 +21,9 @@ Business sections give organizations reusable ways to present people, work, serv
 | --- | --- | --- |
 | About Section | Explain organization purpose and history. | [About Section](/docs/pieces/components/about-section) |
 | Team Section | Introduce people and roles. | [Team Section](/docs/pieces/components/team-section) |
+| Host Profile | Introduce one hospitality host, languages, and a story. | [Host Profile](/docs/pieces/components/host-profile) |
 | Services Section | Describe services and outcomes. | [Services Section](/docs/pieces/components/services-section) |
+| Service Options | Show supplied included or optional hospitality services. | [Service Options](/docs/pieces/components/service-options) |
 | Case Studies Section | Share customer work and results. | [Case Studies](/docs/pieces/components/case-studies-section) |
 | Contact Section | Combine contact methods, department contacts, and form/map slots. | [Contact Section](/docs/pieces/components/contact-section) |
 | Careers Section | Present open roles and workplace information. | [Careers Section](/docs/pieces/components/careers-section) |
@@ -30,6 +32,8 @@ Business sections give organizations reusable ways to present people, work, serv
 | Accommodation Overview | Compare accommodation options and guest-facing details. | [Accommodation Overview](/docs/pieces/components/accommodation-overview) |
 | Accommodation Details | Compose one accommodation profile with media and facilities slots. | [Accommodation Details](/docs/pieces/components/accommodation-details) |
 | Amenity List | Group facilities in compact, expanded, grid, list, or collapsible layouts. | [Amenity List](/docs/pieces/components/amenity-list) |
+| House Rules | Present caller-supplied property rules by category. | [House Rules](/docs/pieces/components/house-rules) |
+| Opening Hours | Present weekly venue hours, exceptions, and seasonal schedules with optional timezone-aware status. | [Opening Hours](/docs/pieces/components/opening-hours) |
 
 ## About, services, and locations
 
@@ -134,7 +138,16 @@ with [Amenity List](/docs/pieces/components/amenity-list) and existing
 [Hero](/docs/pieces/components/hero) and
 [GallerySection](/docs/pieces/components/gallery-section). The complete
 [Accommodation Discovery example](/docs/pieces/components/accommodation-discovery)
-also includes guest reviews and a CTA.
+also includes guest reviews and a CTA. The [Hospitality Booking Flow](/docs/pieces/components/hospitality-booking-flow)
+adds a caller-data-driven availability form, rates, stay summary, and house
+rules without adding a booking engine.
+The [Restaurant Experience](/docs/pieces/components/restaurant-experience)
+composition combines caller-provided menu, hours, location, and reservation
+presentation.
+Use [Host Profile](/docs/pieces/components/host-profile) for one hospitality
+host rather than duplicating TeamSection profile cards, and
+[Service Options](/docs/pieces/components/service-options) when included or
+optional service status is part of the presentation.
 
 ## Composition and accessibility
 

@@ -16,6 +16,7 @@ import {
   useId,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from "react";
@@ -45,6 +46,10 @@ const DRAWER_RESOURCE: IdentifiedResourceDescriptor<"component-chunk"> =
 
 const useIsomorphicLayoutEffect =
   typeof window === "undefined" ? useEffect : useLayoutEffect;
+
+const subscribeToHydration = () => () => {};
+const getClientSnapshot = () => false;
+const getServerSnapshot = () => true;
 
 const getStickyOffsetScope = (appBar: HTMLElement) => {
   const pageLayout = appBar.closest<HTMLElement>("[data-puzzle-page-layout]");
@@ -125,6 +130,11 @@ const AppBar = <T,>({
 }: AppBarProps<T>) => {
   const [open, setOpen] = useState(false);
   const appBarRef = useRef<HTMLElement | null>(null);
+  const isServerRender = useSyncExternalStore(
+    subscribeToHydration,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
 
   const navigationId = `puzzle-app-bar-nav-${useId()}`;
 
@@ -329,7 +339,7 @@ const AppBar = <T,>({
           className="puzzle-app-bar__mobile"
         />
       )}
-      {sticky && (
+      {sticky && isServerRender && (
         <>
           <style nonce={nonce} />
           <script

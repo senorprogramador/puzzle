@@ -83,6 +83,11 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/testimonials`,
         },
         {
+          id: "pieces-guest-reviews",
+          label: "Guest Reviews",
+          href: `${componentsFolder}/guest-reviews`,
+        },
+        {
           id: "pieces-cta",
           label: "CTA",
           href: `${componentsFolder}/cta`,
@@ -115,6 +120,11 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/product-grid`,
         },
         {
+          id: "pieces-gift-voucher",
+          label: "Gift Voucher",
+          href: `${componentsFolder}/gift-voucher`,
+        },
+        {
           id: "pieces-categories",
           label: "Categories",
           href: `${componentsFolder}/categories`,
@@ -138,6 +148,51 @@ const components: TreeViewItem = {
           id: "pieces-booking-section",
           label: "Booking Section",
           href: `${componentsFolder}/booking-section`,
+        },
+        {
+          id: "pieces-availability-search",
+          label: "Availability Search",
+          href: `${componentsFolder}/availability-search`,
+        },
+        {
+          id: "pieces-rate-plans",
+          label: "Rate Plans",
+          href: `${componentsFolder}/rate-plans`,
+        },
+        {
+          id: "pieces-stay-summary",
+          label: "Stay Summary",
+          href: `${componentsFolder}/stay-summary`,
+        },
+        {
+          id: "pieces-restaurant-menu",
+          label: "Restaurant Menu",
+          href: `${componentsFolder}/restaurant-menu`,
+        },
+        {
+          id: "pieces-table-reservation",
+          label: "Table Reservation",
+          href: `${componentsFolder}/table-reservation`,
+        },
+        {
+          id: "pieces-hospitality-booking-flow",
+          label: "Hospitality Booking Flow",
+          href: `${componentsFolder}/hospitality-booking-flow`,
+        },
+        {
+          id: "pieces-restaurant-experience",
+          label: "Restaurant Experience",
+          href: `${componentsFolder}/restaurant-experience`,
+        },
+        {
+          id: "pieces-boutique-bnb",
+          label: "Boutique B&B",
+          href: `${componentsFolder}/boutique-bnb`,
+        },
+        {
+          id: "pieces-hospitality-overview",
+          label: "Hospitality Overview",
+          href: `${componentsFolder}/hospitality-overview`,
         },
         {
           id: "pieces-commerce-benefits",
@@ -187,6 +242,11 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/resource-section`,
         },
         {
+          id: "pieces-local-guide",
+          label: "Local Guide",
+          href: `${componentsFolder}/local-guide`,
+        },
+        {
           id: "pieces-event-section",
           label: "Event Section",
           href: `${componentsFolder}/event-section`,
@@ -209,9 +269,19 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/team-section`,
         },
         {
+          id: "pieces-host-profile",
+          label: "Host Profile",
+          href: `${componentsFolder}/host-profile`,
+        },
+        {
           id: "pieces-services-section",
           label: "Services Section",
           href: `${componentsFolder}/services-section`,
+        },
+        {
+          id: "pieces-service-options",
+          label: "Service Options",
+          href: `${componentsFolder}/service-options`,
         },
         {
           id: "pieces-case-studies-section",
@@ -227,6 +297,11 @@ const components: TreeViewItem = {
           id: "pieces-location-section",
           label: "Location Section",
           href: `${componentsFolder}/location-section`,
+        },
+        {
+          id: "pieces-opening-hours",
+          label: "Opening Hours",
+          href: `${componentsFolder}/opening-hours`,
         },
         {
           id: "pieces-accommodation-discovery",
@@ -247,6 +322,11 @@ const components: TreeViewItem = {
           id: "pieces-amenity-list",
           label: "Amenity List",
           href: `${componentsFolder}/amenity-list`,
+        },
+        {
+          id: "pieces-house-rules",
+          label: "House Rules",
+          href: `${componentsFolder}/house-rules`,
         },
         {
           id: "pieces-careers-section",

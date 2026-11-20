@@ -1,0 +1,101 @@
+---
+title: Restaurant Experience
+description: Compose a restaurant menu, opening hours, location, reservation form, and shared hospitality sections into one responsive page.
+---
+
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { RestaurantExperienceExample } from "../../../../src/components/doc-examples/pieces/restaurant-reservations";
+
+This reference composes the existing RestaurantHero, menu, location, and
+reservation sections with opening hours and the shared hospitality components.
+Every review, service, distance, and voucher is illustrative caller-provided
+content. No reservation service, route calculation, checkout, or availability
+check is involved.
+
+<Badge content="Beta" color="info" /> **Example composition: Beta components are marked in their individual references.**
+
+## Complete restaurant page preview
+
+<Preview
+  fit="device"
+  code={`<main><RestaurantHero /><RestaurantMenuSection menus={menus} /><OpeningHoursSection openingHours={hours} showStatus statusAt={exampleInstant} /><LocationSection locations={locations} /><TableReservationSection onSubmit={submitReservation} /><GuestReviewsSection reviews={reviews} summary={summary} /><HostProfileSection host={host} /><ServiceOptionsSection services={services} /><LocalGuideSection places={places} /><GiftVoucherSection vouchers={vouchers} /></main>`}
+>
+  <RestaurantExperienceExample />
+</Preview>
+
+The reservation preview only demonstrates local UI feedback. It does not send
+a request or claim that a table is available or confirmed.
+
+## Composition outline
+
+```tsx
+import {
+  GiftVoucherSection,
+  GuestReviewsSection,
+  HostProfileSection,
+  LocalGuideSection,
+  LocationSection,
+  OpeningHoursSection,
+  RestaurantHero,
+  RestaurantMenuSection,
+  ServiceOptionsSection,
+  TableReservationSection,
+} from "@puzzle-ui/pieces";
+
+export function RestaurantPage() {
+  return (
+    <main>
+      <RestaurantHero
+        title="Seasonal cooking, close to the neighborhood."
+        actions={<a href="#menu">See the menu</a>}
+      />
+      <RestaurantMenuSection id="menu" menus={menus} />
+      <OpeningHoursSection
+        openingHours={hours}
+        showStatus
+        statusAt={new Date("2026-12-15T18:30:00.000Z")}
+      />
+      <LocationSection locations={locations} />
+      <TableReservationSection onSubmit={submitReservation} />
+      <GuestReviewsSection reviews={reviews} summary={summary} />
+      <HostProfileSection host={host} />
+      <ServiceOptionsSection services={services} variant="categorized" />
+      <LocalGuideSection places={places} />
+      <GiftVoucherSection vouchers={vouchers} />
+    </main>
+  );
+}
+```
+
+The application owns the menu, location, and hours data, refreshes the supplied
+status instant when needed, validates any restaurant-specific constraints, and
+submits reservation data to its chosen provider. It also supplies review
+evidence, local distances and travel times, service prices, and any external
+voucher destinations. Pieces does not make availability, rating, or routing
+claims.
+
+## Responsive and accessibility notes
+
+Each section uses its own fluid layout and semantic headings. Menu category
+anchors remain links, hours become an auto-fitting schedule grid on wider
+screens, and reservation fields stack on small viewports. Choose heading levels
+and section order that match the surrounding page; wrap the reservation form
+with the existing UI `Dialog` when a modal flow is appropriate.
+
+The shared review, host, service, and voucher cards use their existing
+Testimonials, Team, Services, and Product Grid compositions. The local guide
+uses ResourceSection's existing category layout. Avoid making a second card,
+map, or gallery system for this page.
+
+## Related components
+
+- [Restaurant Menu](/docs/pieces/components/restaurant-menu)
+- [Opening Hours](/docs/pieces/components/opening-hours)
+- [Table Reservation](/docs/pieces/components/table-reservation)
+- [Location Section](/docs/pieces/components/location-section)
+- [Hospitality Overview](/docs/pieces/components/hospitality-overview)
+- [Boutique B&B](/docs/pieces/components/boutique-bnb)
+
+Use the composition in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

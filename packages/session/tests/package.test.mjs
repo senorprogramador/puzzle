@@ -19,12 +19,12 @@ test("package manifest exposes a buildable package", async () => {
   assert.ok(manifest.scripts.test);
 });
 
-test("package publishes only compiled output", async () => {
+test("package publishes compiled output and AI guidance", async () => {
   const manifest = JSON.parse(
     await readFile(resolve(packageRoot, "package.json"), "utf8"),
   );
 
-  assert.deepEqual(manifest.files, ["dist"]);
+  assert.deepEqual(manifest.files, ["dist", "ai"]);
 });
 
 test("package uses the Node built-in test runner", async () => {

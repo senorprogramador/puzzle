@@ -49,6 +49,9 @@ const TestimonialContent = ({ item }: { item: TestimonialItem }) => (
         {item.companyLogo ? (
           <span className="puzzle-testimonials__company">{item.companyLogo}</span>
         ) : null}
+        {item.metadata ? (
+          <span className="puzzle-testimonials__metadata">{item.metadata}</span>
+        ) : null}
       </footer>
     </blockquote>
   </article>

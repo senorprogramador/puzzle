@@ -208,6 +208,35 @@
       "aliases": []
     },
     {
+      "name": "GuestReviewsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "guest-reviews-section",
+      "description": "Present attributed guest reviews, caller-supplied ratings, review sources, dates, and score distributions.",
+      "documentation": "apps/site/content/docs/pieces/components/guest-reviews.mdx",
+      "source": "packages/pieces/src/components/marketing/guest-reviews-section/guest-reviews-section.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "guest-reviews-section"
+      },
+      "aliases": []
+    },
+    {
       "name": "HowItWorksSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [

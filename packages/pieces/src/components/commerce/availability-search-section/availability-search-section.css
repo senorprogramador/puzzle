@@ -1,0 +1,69 @@
+.puzzle-availability-search {
+  min-width: 0;
+}
+
+.puzzle-availability-search__form,
+.puzzle-availability-search__fields {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-availability-search__fields {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  align-items: start;
+}
+
+.puzzle-availability-search[data-variant="compact"]
+  .puzzle-availability-search__fields {
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-availability-search__fields > *,
+.puzzle-availability-search__guests,
+.puzzle-availability-search__guest-fields,
+.puzzle-availability-search__child-ages {
+  min-width: 0;
+}
+
+.puzzle-availability-search__guests {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.puzzle-availability-search__guests legend {
+  margin-block-end: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-availability-search__guest-fields,
+.puzzle-availability-search__child-ages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-availability-search__options {
+  display: flex;
+  align-items: center;
+}
+
+.puzzle-availability-search__submit {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.puzzle-availability-search__error {
+  margin: 0;
+  color: var(--puzzle-color-danger);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 36rem) {
+  .puzzle-availability-search__submit > button {
+    width: 100%;
+  }
+}

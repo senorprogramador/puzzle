@@ -15,7 +15,7 @@ import {
 export const runAtomicBatchConformance = (
   createAdapter: () => Promise<StorageAdapter>,
   reset: () => Promise<void>,
-) => {
+): void => {
   describe("atomicBatch conformance", () => {
     it("rejects atomicBatch when atomic rollback is unsupported", async () => {
       await reset();

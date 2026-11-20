@@ -1,0 +1,115 @@
+---
+title: Host Profile
+description: Present one hospitality host by reusing the existing TeamSection profile card with languages, a story, and a caller-owned contact action.
+---
+
+import { HostProfileSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { HostProfileSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/host-profile";
+
+`HostProfileSection` composes one profile through the existing `TeamSection` and UI `ProfileCard`. Use `TeamSection` for a general team or a collection of people.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  HostProfileSection,
+  type HospitalityHostProfile,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The compact and profile variants preserve the TeamSection profile-card
+presentation and add optional host-specific information.
+
+<HostProfileSectionVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default |
+| --- | --- | --- | --- |
+| `host` | `HospitalityHostProfile` | Yes | — |
+| `variant` | `"compact" \| "profile"` | No | `"profile"` |
+| `languagesLabel` | `string` | No | `"Languages"` |
+| `storyLabel` | `ReactNode` | No | `"A little about your host"` |
+| Shared section props | `MarketingSectionBaseProps` | No | — |
+
+### `HospitalityHostProfile`
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | Yes | Stable profile identifier. |
+| `name` | `string` | Yes | Host's displayed name. |
+| `role` | `ReactNode` | No | Role shown by the existing profile card; defaults to “Host”. |
+| `avatar` | `BusinessImage` from `@puzzle-ui/ui` | No | Optional image with caller-provided alternative text. |
+| `biography` | `ReactNode` | No | Short profile introduction. |
+| `languages` | `readonly string[]` | No | Languages supplied by the application. |
+| `story` | `ReactNode` | No | Optional hospitality story. |
+| `contactAction` | `ReactNode` | No | Caller-owned link, button, or action. |
+| Profile fields | `BusinessProfile` fields except `role` | No | Existing profile-card links and social properties. |
+
+## Usage
+
+```tsx
+<HostProfileSection
+  title="Meet your host"
+  host={{
+    id: "mara",
+    name: "Mara Jensen",
+    role: "Owner and host",
+    biography: "A local host who knows the quieter coastal paths.",
+    languages: ["Dutch", "English"],
+    story: "Mara restored the guest house with her family.",
+    contactAction: <a href="mailto:mara@example.test">Contact Mara</a>,
+  }}
+/>
+```
+
+## Responsive behavior
+
+The profile card inherits TeamSection's content-driven layout. Languages wrap
+as a list of labels, and long stories and contact actions remain within the
+section width. No fixed card height is imposed.
+
+## Accessibility
+
+The existing profile card renders the name and role as text. Language labels
+remain visible in a labeled list. Supply meaningful avatar alternatives and
+descriptive names for caller-provided actions.
+
+## Theme support
+
+The profile card and host details use the existing TeamSection and Puzzle
+semantic tokens, so active and scoped themes are inherited.
+
+## Customization
+
+Use `className`, shared section heading props, and caller-supplied `ReactNode`
+for story and contact content. The section does not provide messaging,
+navigation, or contact submission.
+
+## Composition
+
+Use `HostProfileSection` for one host and `TeamSection` for multiple staff
+members. See the [Boutique B&B](/docs/pieces/components/boutique-bnb) and
+[Restaurant Experience](/docs/pieces/components/restaurant-experience) compositions.
+
+## TypeScript example
+
+The profile type is public from the package root and builds on the existing
+`BusinessProfile` contract.
+
+## Framework compatibility
+
+The component is router-independent and server-renderable. Interactions in a
+caller-provided action belong to the application. See
+[Next.js and TanStack Start integration](/docs/pieces/framework-integration).
+
+## Related components
+
+- [Team Section](/docs/pieces/components/team-section)
+- [Guest Reviews](/docs/pieces/components/guest-reviews)
+- [Local Guide](/docs/pieces/components/local-guide)

@@ -1,0 +1,156 @@
+---
+title: OpeningHoursSection
+description: Present a weekly restaurant schedule with multiple daily service periods, explicit closed days, date exceptions, seasonal hours, and timezone-aware status.
+---
+
+import { OpeningHoursSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { OpeningHoursSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/restaurant-reservations";
+
+`OpeningHoursSection` displays the schedule supplied by the venue. It shows all
+seven weekdays: an explicitly empty interval list means closed, while an
+omitted weekday means the hours are unknown.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## TypeScript example
+
+```tsx
+import {
+  OpeningHoursSection,
+  type OpeningHours,
+} from "@puzzle-ui/pieces";
+
+const hours: OpeningHours = {
+  timeZone: "Europe/Amsterdam",
+  days: [
+    {
+      day: "monday",
+      intervals: [
+        { opensAt: "11:30", closesAt: "14:30", label: "Lunch" },
+        { opensAt: "17:00", closesAt: "22:00", label: "Dinner" },
+      ],
+    },
+    { day: "tuesday", intervals: [] },
+  ],
+};
+
+<OpeningHoursSection
+  title="Opening hours"
+  openingHours={hours}
+  showStatus
+  statusAt={new Date("2026-12-15T18:30:00.000Z")}
+  currentStatusLabel="Status at example time"
+  locale="en-GB"
+/>;
+```
+
+## Compact and expanded previews
+
+Both variants show the full weekly schedule. Expanded examples also make room
+for seasonal schedules and date exceptions; compact changes the spacing without
+discarding schedule information.
+
+<OpeningHoursSectionVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `openingHours` | `OpeningHours` | Yes | — | Weekly hours, optional seasonal schedules and date exceptions, and the venue timezone. |
+| `variant` | `"compact" \| "expanded"` | No | `"expanded"` | Selects denser or roomier spacing. |
+| `showStatus` | `boolean` | No | `false` | Displays a text-and-indicator status. |
+| `statusAt` | `Date` | No | — | Absolute instant used to evaluate status. Without it, status is unknown. |
+| `locale` | `string` | No | Runtime locale | Formats local wall-clock times and date ranges. Pass explicitly for deterministic server rendering. |
+| `openLabel`, `closedLabel` | `ReactNode` | No | `"Open"`, `"Closed"` | Visible labels for the computed status and closed periods. |
+| `unknownStatusLabel` | `ReactNode` | No | `"Status unknown"` | Visible status when the schedule, instant, or timezone is insufficient. |
+| `unknownHoursLabel` | `ReactNode` | No | `"Hours not provided"` | Visible label for an omitted weekday. |
+| `currentStatusLabel` | `ReactNode` | No | `"Current status"` | Text preceding the current status. |
+| `timeZoneLabel` | `ReactNode` | No | `"Venue time zone"` | Label shown with the supplied IANA timezone. |
+| `exceptionsLabel`, `seasonsLabel` | `ReactNode` | No | `"Exceptions"`, `"Seasonal hours"` | Headings for supplied schedule overrides. |
+| `className` | `string` | No | — | Additional class on the section. |
+
+The usual `MarketingSection` heading, description, actions, alignment, and
+children composition props are also supported.
+
+### Schedule data
+
+- `OpeningHours` contains the weekly `days`, optional `seasons` and
+  `exceptions`, and an optional IANA `timeZone`.
+- `OpeningHoursWeekday` is one of `monday` through `sunday`.
+- `OpeningHoursDay` identifies one weekday and contains its `intervals`.
+- `OpeningHoursInterval` provides local `opensAt` and `closesAt` strings and
+  an optional text label such as lunch or dinner.
+- `OpeningHoursSeason` has an ID, label, inclusive date range, and replacement
+  weekly days.
+- `OpeningHoursException` has an ID, label, inclusive date range, and
+  replacement intervals.
+- `OpeningHoursStatus` is `"open"`, `"closed"`, or `"unknown"`; the component
+  never presents an unknown status as open or closed.
+- `OpeningHoursVariant` is `"compact"` or `"expanded"`.
+- `OpeningHoursSectionProps` is the exported component props type.
+
+These types are exported from the `@puzzle-ui/pieces` package root.
+
+`OpeningHours.days` is the weekly schedule. Each weekday may be listed once;
+its `intervals` are rendered in the supplied order.
+- An empty `intervals` array means that weekday is closed. A weekday without an
+  entry is unknown, not closed.
+- `OpeningHoursInterval` uses 24-hour `HH:mm` local wall-clock strings in
+  `opensAt` and `closesAt`. A closing time may be `24:00`. Intervals must be
+  chronological and non-overlapping; overnight intervals are not represented.
+- `OpeningHoursSeason` supplies a label, inclusive `startDate` and `endDate`
+  (`YYYY-MM-DD` venue calendar dates), and its own weekly `days`.
+- `OpeningHoursException` supplies a label, inclusive date range, and the
+  intervals used for every date in that range. Use separate one-day exceptions
+  when dates have different schedules.
+- If an exception and season cover the same date, the exception wins. A season
+  replaces the weekly schedule for its date range. Overlapping ranges within
+  the exception list or within the season list are rejected.
+
+## Timezone and status behavior
+
+Schedule times and date ranges are venue-local calendar values; they are never
+interpreted as UTC. `OpeningHours.timeZone` must be an explicit IANA timezone
+such as `Europe/Amsterdam`. `statusAt` is an absolute `Date` instant; the
+component converts that instant into the venue's local weekday and wall-clock
+time using `Intl`.
+
+When `showStatus` is true but `timeZone`, `statusAt`, or the applicable weekday
+schedule is missing, the component displays the configurable unknown status.
+It never falls back to the browser or server timezone. Invalid timezone names,
+dates, interval values, and invalid `statusAt` values throw rather than
+producing a false open/closed claim. The component does not run a timer; pass a
+new `statusAt` when the application wants to refresh the status.
+
+## Responsive behavior and accessibility
+
+- The schedule is a vertical list on narrow screens and an auto-fitting grid
+  when wider columns are available; it does not require horizontal scrolling.
+- Multiple periods wrap independently and retain their labels, including lunch
+  and dinner.
+- Semantic description lists pair each weekday with its hours. Text always
+  identifies open, closed, and unknown states; color and the status dot are
+  supplemental.
+- The status uses a polite live region when it is rendered.
+
+## Theme support and customization
+
+The schedule uses Puzzle Theme surface, border, spacing, text, and status
+tokens. Supply custom labels and interval content through the data model and
+use `className` or the inherited section props for product-specific styling.
+
+## Related components
+
+- [Restaurant Menu](/docs/pieces/components/restaurant-menu) for dishes,
+  categories, and caller-supplied menu information.
+- [Table Reservation](/docs/pieces/components/table-reservation) for a
+  caller-owned reservation request form or provider link.
+- [Location Section](/docs/pieces/components/location-section) for address and
+  contact details.
+- [Restaurant Experience](/docs/pieces/components/restaurant-experience) for a
+  complete page composition.
+
+Use the component in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

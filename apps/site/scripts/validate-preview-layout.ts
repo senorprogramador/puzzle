@@ -64,6 +64,7 @@ const paths = [
     "benefits",
     "stats",
     "testimonials",
+    "guest-reviews",
     "cta",
     "faq",
     "how-it-works",
@@ -76,10 +77,17 @@ const paths = [
     "code-showcase",
     "roadmap",
     "product-grid",
+    "gift-voucher",
     "categories",
     "product-gallery",
     "cart-summary",
     "product-details",
+    "availability-search",
+    "rate-plans",
+    "stay-summary",
+    "dietary-information",
+    "dish-card",
+    "restaurant-menu",
     "commerce-benefits",
     "blog-section",
     "content-section",
@@ -88,7 +96,9 @@ const paths = [
     "changelog-section",
     "about-section",
     "team-section",
+    "host-profile",
     "services-section",
+    "service-options",
     "case-studies-section",
     "contact-section",
     "careers-section",
@@ -101,9 +111,20 @@ const paths = [
     "settings",
     "video-section",
     "booking-section",
+    "accommodation-overview",
+    "accommodation-details",
+    "amenity-list",
+    "accommodation-discovery",
+    "house-rules",
     "location-section",
+    "opening-hours",
+    "table-reservation",
+    "restaurant-experience",
+    "boutique-bnb",
+    "hospitality-booking-flow",
     "waitlist-section",
     "resource-section",
+    "local-guide",
     "event-section",
     "footer-section",
     "data-display",
@@ -120,16 +141,52 @@ const paths = [
   ].map((component) => `/docs/pieces/components/${component}`),
 ];
 
+const fullAuditWidths = new Set([320, 390, 768, 1280, 1920]);
+const hospitalityPaths = new Set(
+  [
+    "hero",
+    "cta",
+    "faq",
+    "testimonials",
+    "gallery-section",
+    "location-section",
+    "resource-section",
+    "guest-reviews",
+    "gift-voucher",
+    "availability-search",
+    "rate-plans",
+    "stay-summary",
+    "dietary-information",
+    "dish-card",
+    "restaurant-menu",
+    "host-profile",
+    "service-options",
+    "accommodation-overview",
+    "accommodation-details",
+    "amenity-list",
+    "accommodation-discovery",
+    "house-rules",
+    "opening-hours",
+    "table-reservation",
+    "restaurant-experience",
+    "boutique-bnb",
+    "hospitality-booking-flow",
+    "local-guide",
+  ].map((component) => `/docs/pieces/components/${component}`),
+);
+const hospitalityDocs = paths.filter((path) => hospitalityPaths.has(path));
+
 try {
-  for (const width of [320, 390, 768, 1280, 1920]) {
-    for (let batchStart = 0; batchStart < paths.length; batchStart += 10) {
+  for (const width of [320, 375, 390, 430, 768, 1024, 1152, 1280, 1440, 1600, 1920]) {
+    const widthPaths = fullAuditWidths.has(width) ? paths : hospitalityDocs;
+    for (let batchStart = 0; batchStart < widthPaths.length; batchStart += 10) {
       const { origin, server } = await startSite();
       activeServer = server;
       try {
         assert.equal((await fetch(origin)).status, 200);
         const viewportBrowser = await chromium.launch();
         browser = viewportBrowser;
-      for (const path of paths.slice(batchStart, batchStart + 10)) {
+      for (const path of widthPaths.slice(batchStart, batchStart + 10)) {
         const page = await viewportBrowser.newPage({
           viewport: { width, height: 1000 },
         });
@@ -256,9 +313,29 @@ try {
               const document = frame.contentDocument;
               if (!document) return [`preview ${index + 1}: no iframe document`];
               const root = document.documentElement;
+              const outOfBoundsElements = [
+                ...document.body.querySelectorAll<HTMLElement>("*"),
+              ]
+                .map((element) => ({
+                  element,
+                  bounds: element.getBoundingClientRect(),
+                }))
+                .filter(
+                  ({ bounds }) =>
+                    bounds.left < -1 || bounds.right > root.clientWidth + 1,
+                )
+                .sort((left, right) => right.bounds.right - left.bounds.right)
+                .slice(0, 8)
+                .map(({ element, bounds }) => {
+                  const className =
+                    typeof element.className === "string"
+                      ? `.${element.className.trim().replace(/\s+/g, ".")}`
+                      : "";
+                  return `${element.tagName.toLowerCase()}${className} ${Math.round(bounds.left)}..${Math.round(bounds.right)}px`;
+                });
               return root.scrollWidth > root.clientWidth + 1
                 ? [
-                    `preview ${index + 1}: ${root.scrollWidth}px content in ${root.clientWidth}px viewport`,
+                    `preview ${index + 1}: ${root.scrollWidth}px content in ${root.clientWidth}px viewport; out-of-bounds elements: ${outOfBoundsElements.join(", ")}`,
                   ]
                 : [];
             }),

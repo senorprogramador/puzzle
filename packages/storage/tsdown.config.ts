@@ -8,11 +8,13 @@ export default defineConfig({
   unbundle: false,
   format: ["esm", "cjs"],
   fixedExtension: false,
-  dts: true,
+  dts: {
+    generator: "oxc",
+  },
   clean: true,
   sourcemap: true,
   copy: ["../../LICENSE"],
   deps: {
-    neverBundle: [],
+    neverBundle: ["bun:test"],
   },
 });

@@ -1,0 +1,29 @@
+.puzzle-local-guide-section__metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-3, 0.75rem) var(--puzzle-space-5, 1.25rem);
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-local-guide-section__metadata > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-1, 0.25rem);
+  min-width: 0;
+}
+
+.puzzle-local-guide-section__metadata dd {
+  margin: 0;
+  color: var(--puzzle-color-text);
+}
+
+.puzzle-local-guide-section__map {
+  min-width: 0;
+  margin-block-start: var(--puzzle-space-6, 1.5rem);
+}
+
+.puzzle-local-guide-section__map > * {
+  max-width: 100%;
+}

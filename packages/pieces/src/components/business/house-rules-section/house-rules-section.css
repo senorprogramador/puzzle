@@ -1,0 +1,89 @@
+.puzzle-house-rules {
+  min-width: 0;
+}
+
+.puzzle-house-rules__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  align-items: start;
+  gap: var(--puzzle-space-4, 1rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-house-rules__grid > li,
+.puzzle-house-rules__card {
+  min-width: 0;
+}
+
+.puzzle-house-rules__card {
+  overflow-wrap: anywhere;
+}
+
+.puzzle-house-rules__card details {
+  min-width: 0;
+}
+
+.puzzle-house-rules__card summary {
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-house-rules__card summary:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-house-rules__category-description {
+  margin-block: var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-house-rules__items {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: var(--puzzle-space-4, 1rem) 0 0;
+}
+
+.puzzle-house-rules__items > div {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+}
+
+.puzzle-house-rules__items dt {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-house-rules__items dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-house-rules__description {
+  display: block;
+  margin-block-start: var(--puzzle-space-1, 0.25rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-house-rules__empty {
+  padding: var(--puzzle-space-4, 1rem);
+  color: var(--puzzle-color-text-muted);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 36rem) {
+  .puzzle-house-rules__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .puzzle-house-rules__items > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--puzzle-space-1, 0.25rem);
+  }
+}

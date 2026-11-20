@@ -1,0 +1,55 @@
+.puzzle-guest-reviews__metadata {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-guest-reviews__summary {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin-block-start: var(--puzzle-space-6, 1.5rem);
+  padding: var(--puzzle-space-5, 1.25rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  background: var(--puzzle-color-surface);
+}
+
+.puzzle-guest-reviews__summary h3,
+.puzzle-guest-reviews__distribution h4 {
+  margin: 0;
+}
+
+.puzzle-guest-reviews__score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-guest-reviews__distribution {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-guest-reviews__distribution ul {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+  max-width: 32rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-guest-reviews__distribution li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-guest-reviews__distribution meter {
+  width: 100%;
+  height: var(--puzzle-space-2, 0.5rem);
+  accent-color: var(--puzzle-color-primary);
+}

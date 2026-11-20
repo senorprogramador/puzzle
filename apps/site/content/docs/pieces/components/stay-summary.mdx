@@ -1,0 +1,95 @@
+---
+title: StaySummarySection
+description: Present accommodation details, dates, guests, supplied price lines, totals, and caller-owned edit or continue actions.
+---
+
+import { StaySummarySection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { StaySummarySectionVariantsExample } from "../../../../src/components/doc-examples/pieces/hospitality-booking";
+
+`StaySummarySection` presents a stay and a price breakdown received from the
+application. It formats each amount but does not calculate nights, discounts,
+fees, subtotals, or totals.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## TypeScript example
+
+```tsx
+import {
+  StaySummarySection,
+  type StaySummaryPriceLine,
+} from "@puzzle-ui/pieces";
+```
+
+## Default and compact variants
+
+Both variants pass each price line, night count, and total explicitly. The
+compact variant reduces spacing for denser layouts; it remains in normal
+document flow and does not become sticky. Change and continue actions are
+callbacks; they do not navigate or submit a booking.
+
+<StaySummarySectionVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `accommodation` | `StaySummaryAccommodation` | Yes | — | Caller-supplied name, optional description, and optional `CommerceImage`. |
+| `checkIn`, `checkOut` | `Date \| null` | Yes | — | Dates to display; null is shown as “Not selected.” |
+| `guests` | `GuestCount` | Yes | — | Supplied adult and child counts. |
+| `nights` | `number` | No | — | Supplied non-negative integer night count; never derived from dates. |
+| `priceLines` | `readonly StaySummaryPriceLine[]` | No | `[]` | Supplied charges, discounts, fees, or services with unique IDs. |
+| `subtotal` | `CommerceMoney` | No | — | Optional supplied subtotal. |
+| `total` | `CommerceMoney` | Yes | — | Supplied total; it is not summed from the lines. |
+| `variant` | `"default" \| "compact"` | No | `"default"` | Compact spacing for a denser summary. |
+| `locale` | `string` | No | Runtime locale | BCP 47 locale for dates, counts, and currencies. |
+| `timeZone` | `string` | No | Runtime time zone | Optional explicit date display time zone. |
+| `totalLabel` | `ReactNode` | No | `"Total"` | Total row label. |
+| `onEdit`, `onContinue` | `() => void` | No | — | Optional caller-owned actions. |
+| `editLabel`, `continueLabel` | `ReactNode` | No | `"Change stay"`, `"Continue"` | Labels for the corresponding buttons. |
+| `className` | `string` | No | — | Additional class on the section. |
+
+### Price line types
+
+`StaySummaryPriceLine` contains a unique `id`, a `label`, a `CommerceMoney`
+`amount`, and an optional `kind`: `"rate"`, `"discount"`, `"fee"`, or
+`"service"`. Negative discount amounts display with their sign; pass the amount
+in the form that should be shown. If `subtotal` is provided, supply only
+adjustments in `priceLines` when repeating the base amount would be confusing.
+
+`GuestCount` contains `adults`, `children`, and optional child ages. Guest and
+night counts must be non-negative safe integers. Currency amounts use
+locale-aware `Intl.NumberFormat`; each line and the total are displayed exactly
+as supplied, even if they use different currencies.
+
+## Responsive behavior and accessibility
+
+- The summary stacks on narrow viewports and uses a two-column details/price
+  layout when space allows. It does not use a sticky panel.
+- Price labels and amounts wrap, including long names and large currency
+  strings.
+- Stay details and amounts use definition lists; the summary is an `aside`
+  with a heading.
+- Callback actions use native buttons with visible keyboard focus.
+- Pass the same explicit locale and time zone on the server and client when
+  deterministic SSR output is required.
+
+## Theme support and customization
+
+The summary uses the active Puzzle Theme and UI Card tokens. Compose optional
+section headings through the shared `title`, `description`, `eyebrow`,
+`actions`, and `className` props.
+
+## Related components
+
+- [Rate Plans](/docs/pieces/components/rate-plans) for externally supplied
+  nightly and weekly rates.
+- [Availability Search](/docs/pieces/components/availability-search) for the
+  search controls.
+- [Cart Summary](/docs/pieces/components/cart-summary) for generic cart items
+  and caller-provided order totals.
+
+Use the component in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

@@ -1,0 +1,124 @@
+---
+title: Service Options
+description: Present categorized hospitality services with supplied included or optional status, price content, and caller-owned actions.
+---
+
+import { ServiceOptionsSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { ServiceOptionsSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/service-options";
+
+`ServiceOptionsSection` adapts the existing `ServicesSection` cards for hospitality services. Status and price are caller-provided presentation data; the component does not calculate or charge for services.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { ServiceOptionsSection, type ServiceOption } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The previews reuse ServicesSection's grid, categorized, and featured layouts.
+Included and optional status is shown as readable text, not color alone.
+
+<ServiceOptionsSectionVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default |
+| --- | --- | --- | --- |
+| `services` | `readonly ServiceOption[]` | Yes | — |
+| `featuredServiceId` | `string` | No | First featured item for the `featured` variant |
+| `variant` | `ServicesSectionVariant` | No | `"grid"` |
+| `includedLabel` | `ReactNode` | No | `"Included"` |
+| `optionalLabel` | `ReactNode` | No | `"Optional"` |
+| Shared section props | `MarketingSectionBaseProps` | No | — |
+
+### `ServiceOption`
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | Yes | Stable service identifier. |
+| `title` | `string` | Yes | Service name. |
+| `description` | `ReactNode` | No | Caller-provided details. |
+| `inclusion` | `"included" \| "optional"` | No | Status text rendered by the section. |
+| `price` | `ReactNode` | No | Supplied price text or a caller-rendered price component. |
+| `category` | `string` | No | Group name for the categorized variant. |
+| `icon`, `image` | `ReactNode` / `EditorialImage` | No | Optional existing ServiceCard media. |
+| `action`, `href` | `ReactNode` / `string` | No | Caller-owned action or destination. |
+| `external` | `boolean` | No | Marks a supplied service link as external for the existing ServiceCard. |
+| `number` | `ReactNode` | No | Optional number shown by supported ServicesSection layouts. |
+| `featured` | `boolean` | No | Marks a service for featured presentation. |
+
+## Usage
+
+```tsx
+const services: ServiceOption[] = [
+  {
+    id: "breakfast",
+    title: "Breakfast basket",
+    description: "Fresh bread and fruit delivered each morning.",
+    inclusion: "included",
+    category: "At the house",
+  },
+  {
+    id: "sauna",
+    title: "Private sauna",
+    inclusion: "optional",
+    price: "€24 per session",
+    category: "Wellness",
+    action: <a href="mailto:host@example.test">Ask about a session</a>,
+  },
+];
+
+<ServiceOptionsSection title="Stay extras" services={services} variant="categorized" />;
+```
+
+Pass a formatted `ReactNode` when the application needs locale-aware price
+display. Pieces does not infer a currency or calculate a price.
+
+## Responsive behavior
+
+The cards and categorized layout reuse ServicesSection's fluid responsive
+grid. Descriptions, prices, badges, and actions wrap without fixed heights.
+
+## Accessibility
+
+Included and optional states are exposed as text labels. Use descriptive
+actions and meaningful alternative text for any supplied image.
+
+## Theme support
+
+Service cards and status badges inherit existing Puzzle UI tokens and the
+active or scoped theme.
+
+## Customization
+
+Use shared section props, `className`, and the service `action` and `price`
+slots to adapt the composition. Existing ServicesSection variants remain
+available; this wrapper adds no new card system.
+
+## Composition
+
+Use `ServiceOptionsSection` for included or optional hospitality services.
+Use [ServicesSection](/docs/pieces/components/services-section) for general
+business service descriptions. The [Boutique B&B](/docs/pieces/components/boutique-bnb)
+and [Restaurant Experience](/docs/pieces/components/restaurant-experience)
+examples show both use cases.
+
+## TypeScript example
+
+`ServiceOption` is exported from the `@puzzle-ui/pieces` package root.
+
+## Framework compatibility
+
+The section is router-independent and server-renderable. Service actions and
+pricing remain caller-owned. See
+[Next.js and TanStack Start integration](/docs/pieces/framework-integration).
+
+## Related components
+
+- [Services Section](/docs/pieces/components/services-section)
+- [Gift Voucher](/docs/pieces/components/gift-voucher)
+- [Restaurant Menu](/docs/pieces/components/restaurant-menu)

@@ -20,6 +20,7 @@ Content sections render editorial and media data provided by the application. Th
 | Gallery Section | Present image collections. | [Gallery Section](/docs/pieces/components/gallery-section) |
 | Timeline Section | Show ordered milestones and stories. | [Timeline Section](/docs/pieces/components/timeline-section) |
 | Changelog Section | Communicate product releases. | [Changelog Section](/docs/pieces/components/changelog-section) |
+| Local Guide | Present nearby places and activities with caller-supplied distances and links. | [Local Guide](/docs/pieces/components/local-guide) |
 
 ## Editorial previews
 
@@ -61,9 +62,11 @@ Content sections render editorial and media data provided by the application. Th
 
 Use the [Video Section](/docs/pieces/components/video-section) for controlled
 video collections, [Resource Section](/docs/pieces/components/resource-section)
-for searchable learning libraries, and [Event Section](/docs/pieces/components/event-section)
-for dated programs. Provide stable IDs, meaningful image alternatives, captions,
-and display dates appropriate to the user's locale.
+for searchable learning libraries, [Local Guide](/docs/pieces/components/local-guide)
+for caller-supplied nearby recommendations, and [Event Section](/docs/pieces/components/event-section)
+for dated programs. Local-guide distances and travel times are displayed as
+provided; no routing or geocoding is performed. Provide stable IDs, meaningful
+image alternatives, captions, and display dates appropriate to the user's locale.
 
 Layouts use Puzzle Theme tokens and reflow at small widths. Caller-provided
 media, filters, and actions should also remain responsive.

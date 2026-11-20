@@ -1,0 +1,94 @@
+---
+title: RatePlansSection
+description: Compare accommodation rate plans with supplied nightly and weekly prices, inclusions, cancellation details, and caller-owned actions.
+---
+
+import { RatePlansSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { RatePlansSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/hospitality-booking";
+
+`RatePlansSection` presents one or more accommodation plans as responsive
+cards. Every price, inclusion, cancellation term, and action is supplied by the
+application; the component does not calculate a stay total or perform a
+reservation.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## TypeScript example
+
+```tsx
+import { RatePlansSection, type RatePlan } from "@puzzle-ui/pieces";
+```
+
+## Supplied-plan scenarios
+
+There is no global layout variant prop: the section presents the records it is
+given. These examples show a single rate and a comparison with a caller-marked
+recommendation.
+
+<RatePlansSectionVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `plans` | `readonly RatePlan[]` | Yes | — | Rate plans with unique IDs. |
+| `locale` | `string` | No | Runtime locale | BCP 47 locale used to format each supplied currency amount. |
+| `recommendedLabel` | `ReactNode` | No | `"Recommended"` | Default label for featured plans. |
+| `selectLabel` | `ReactNode` | No | `"Choose this rate"` | Default label for callback-based actions. |
+| `emptyState` | `ReactNode` | No | `"No rates are available."` | Message rendered for an empty list. |
+| `className` | `string` | No | — | Additional class on the section. |
+| `title`, `description`, `eyebrow`, `actions` | `ReactNode` | No | — | Shared section heading and action props. |
+
+### `RatePlan`
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | Yes | Stable, non-empty unique ID. |
+| `name` | `ReactNode` | Yes | Plan name. |
+| `description` | `ReactNode` | No | Supporting plan copy. |
+| `arrangement` | `ReactNode` | No | Caller-supplied board or package description. |
+| `pricePerNight` | `CommerceMoney` | Yes | Supplied nightly price. |
+| `weeklyPrice` | `CommerceMoney` | No | Supplied weekly price; it is not derived from the nightly amount. |
+| `includedServices` | `readonly RatePlanService[]` | No | Services with unique IDs, labels, and optional descriptions. |
+| `cancellation` | `ReactNode` | No | Caller-supplied cancellation terms. |
+| `featured` | `boolean` | No | Highlights the plan with a recommendation badge. |
+| `recommendedLabel` | `ReactNode` | No | Plan-specific featured label. |
+| `action` | `ReactNode` | One action required | Custom link or control; use for an external booking-engine redirect. |
+| `onSelect` | `() => void` | One action required | Callback-based selection. Mutually exclusive with `action`. |
+| `actionLabel` | `ReactNode` | No | Button label when `onSelect` is used. |
+| `disabled` | `boolean` | No | Disables a callback-based action button. |
+
+`CommerceMoney` is `{ amount: number; currency: string }`. Amounts are formatted
+with `Intl.NumberFormat` using the supplied locale or the runtime locale. The
+component does not convert currencies, derive a weekly price, add taxes, or
+combine plans. A custom `action` is rendered as provided, so its owner controls
+its disabled and navigation behavior.
+
+## Responsive behavior and accessibility
+
+- Plans use a fluid card grid that stacks on narrow screens; the component
+  avoids wide comparison tables and fixed card heights.
+- Long plan names, terms, and currency values can wrap without clipping.
+- Plans are a semantic list of articles with headings, definition-list prices,
+  and caller-named actions.
+- Featured status is communicated by a visible text badge, not color alone.
+
+## Theme support and customization
+
+Cards, borders, text, badges, and actions use Puzzle UI and Theme tokens. Pass
+caller-owned `ReactNode` content for arrangements and cancellation details.
+Shared section heading props and `className` are available for composition.
+
+## Related components
+
+- [Availability Search](/docs/pieces/components/availability-search) for
+  caller-owned date and guest input.
+- [Stay Summary](/docs/pieces/components/stay-summary) for supplied price
+  breakdowns and totals.
+- [Booking Section](/docs/pieces/components/booking-section) for a generic
+  form composition.
+
+Use the component in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

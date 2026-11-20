@@ -1,0 +1,105 @@
+.puzzle-stay-summary {
+  min-width: 0;
+}
+
+.puzzle-stay-summary__layout {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-stay-summary[data-variant="compact"] .puzzle-stay-summary__layout {
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-stay-summary__stay,
+.puzzle-stay-summary__price-card {
+  min-width: 0;
+}
+
+.puzzle-stay-summary__stay {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-stay-summary__accommodation {
+  display: grid;
+  grid-template-columns: minmax(0, 7rem) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-stay-summary__accommodation-copy {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-stay-summary__accommodation-copy p {
+  margin-block-start: var(--puzzle-space-2, 0.5rem);
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-stay-summary__details,
+.puzzle-stay-summary__prices {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0;
+}
+
+.puzzle-stay-summary__details > div,
+.puzzle-stay-summary__prices > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-stay-summary__details dt,
+.puzzle-stay-summary__prices dt {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-stay-summary__details dd,
+.puzzle-stay-summary__prices dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+.puzzle-stay-summary__prices [data-kind="discount"] dd {
+  color: var(--puzzle-color-success);
+}
+
+.puzzle-stay-summary__total {
+  padding-block-start: var(--puzzle-space-3, 0.75rem);
+  border-block-start: var(--puzzle-border-width, 1px) solid
+    var(--puzzle-color-border);
+}
+
+.puzzle-stay-summary__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-stay-summary__actions > button {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (min-width: 48rem) {
+  .puzzle-stay-summary__layout {
+    grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.8fr);
+    align-items: start;
+  }
+}
+
+@media (max-width: 24rem) {
+  .puzzle-stay-summary__accommodation {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

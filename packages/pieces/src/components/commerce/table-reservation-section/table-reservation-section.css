@@ -1,0 +1,75 @@
+.puzzle-table-reservation-section {
+  min-width: 0;
+}
+
+.puzzle-table-reservation-section__form,
+.puzzle-table-reservation-section__fields {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-table-reservation-section__fields {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  align-items: start;
+}
+
+.puzzle-table-reservation-section__fields > *,
+.puzzle-table-reservation-section__requests {
+  min-width: 0;
+}
+
+.puzzle-table-reservation-section__requests {
+  grid-column: 1 / -1;
+}
+
+.puzzle-table-reservation-section__actions,
+.puzzle-table-reservation-section__provider {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+}
+
+.puzzle-table-reservation-section__provider p {
+  flex: 1 1 15rem;
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-table-reservation-section__error,
+.puzzle-table-reservation-section__success {
+  margin: var(--puzzle-space-3, 0.75rem) 0 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-table-reservation-section__error {
+  color: var(--puzzle-color-danger);
+}
+
+.puzzle-table-reservation-section__success {
+  color: var(--puzzle-color-success);
+}
+
+.puzzle-table-reservation-section__success:focus {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+@media (max-width: 36rem) {
+  .puzzle-table-reservation-section__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .puzzle-table-reservation-section__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .puzzle-table-reservation-section__actions > button,
+  .puzzle-table-reservation-section__provider > button {
+    width: 100%;
+  }
+}

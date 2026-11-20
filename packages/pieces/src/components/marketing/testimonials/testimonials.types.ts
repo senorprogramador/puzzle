@@ -28,6 +28,7 @@ export type TestimonialItem = {
   rating?: number;
   media?: ReactNode;
   featured?: boolean;
+  metadata?: ReactNode;
 };
 
 export type TestimonialsSectionProps<C extends ElementType = "section"> =

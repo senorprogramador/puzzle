@@ -12,5 +12,5 @@ export default defineConfig({
   deps: {
     neverBundle: ["react", "@puzzle-ui/core"],
   },
-  suppressWarnings: [/MODULE_LEVEL_DIRECTIVE/],
+  suppressWarnings: [/MODULE_LEVEL_DIRECTIVE/, /EMPTY_IMPORT_META/],
 });

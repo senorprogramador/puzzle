@@ -20,6 +20,7 @@ Puzzle Pieces provides focused section compositions for common marketing and con
 | BenefitsSection | Communicate customer outcomes and product benefits. | [BenefitsSection](/docs/pieces/components/benefits) |
 | StatsSection | Present key metrics, trends, and progress values. | [StatsSection](/docs/pieces/components/stats) |
 | TestimonialsSection | Attribute customer quotes, ratings, and media. | [TestimonialsSection](/docs/pieces/components/testimonials) |
+| GuestReviewsSection | Present hospitality reviews with supplied dates, sources, and rating summaries. | [Guest Reviews](/docs/pieces/components/guest-reviews) |
 | CTASection | Invite visitors to take a consumer-defined next step. | [CTASection](/docs/pieces/components/cta) |
 | FAQSection | Answer common questions with accessible disclosure and search options. | [FAQSection](/docs/pieces/components/faq) |
 | HowItWorksSection | Explain a process using ordered steps or a carousel. | [HowItWorksSection](/docs/pieces/components/how-it-works) |
@@ -27,7 +28,7 @@ Puzzle Pieces provides focused section compositions for common marketing and con
 
 ## Shared design
 
-All ten sections accept the shared semantic root and heading props from `SectionRootProps`, including `as`, native and ARIA attributes, `className`, `style`, and the UI `Section` theme, padding, and width options. The common `eyebrow`, `title`, `titleAs`, `description`, `alignment`, `actions`, and `children` props compose an optional `SectionHeader` with the section-specific content. Empty header slots and empty item collections are omitted.
+All eleven sections accept the shared semantic root and heading props from `SectionRootProps`, including `as`, native and ARIA attributes, `className`, `style`, and the UI `Section` theme, padding, and width options. The common `eyebrow`, `title`, `titleAs`, `description`, `alignment`, `actions`, and `children` props compose an optional `SectionHeader` with the section-specific content. Empty header slots and empty item collections are omitted.
 
 Variants are family-specific string unions rather than one universal preset API. Some variants select a different content composition or native interaction, while others apply a focused layout treatment to the same semantic content. Actions, media, logos, icons, and custom children remain consumer-provided React nodes.
 

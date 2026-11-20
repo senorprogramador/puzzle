@@ -1,0 +1,134 @@
+---
+title: Local Guide
+description: Present caller-supplied nearby places and activities with categories, optional distances, travel times, links, and map content.
+---
+
+import { LocalGuideSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { LocalGuideEmptyExample, LocalGuideSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/local-guide";
+
+`LocalGuideSection` adapts the existing `ResourceSection` card and category-filter layout for nearby places and activities. It does not geocode locations or calculate distance or travel time.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { LocalGuideSection, type LocalGuideItem } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Grid, list, featured, and category layouts reuse ResourceSection. Links,
+distances, travel times, and the optional map are supplied by the application.
+
+<LocalGuideSectionVariantsExample />
+
+### Empty state
+
+<LocalGuideEmptyExample />
+
+## API
+
+| Prop | Type | Required | Default |
+| --- | --- | --- | --- |
+| `places` | `readonly LocalGuideItem[]` | Yes | — |
+| `featuredPlaceId` | `string` | No | First featured item, otherwise first place, for the `featured` variant |
+| `variant` | `ResourceSectionVariant` | No | `"grid"` |
+| `filterable` | `boolean` | No | `true` |
+| `mapSlot` | `ReactNode` | No | — |
+| `mapLabel` | `string` | No | `"Local guide map"` |
+| `distanceLabel` | `ReactNode` | No | `"Distance"` |
+| `travelTimeLabel` | `ReactNode` | No | `"Travel time"` |
+| `emptyState` | `ReactNode` | No | ResourceSection empty state |
+| Shared section props | `MarketingSectionBaseProps` | No | — |
+
+### `LocalGuideItem`
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | Yes | Stable item identifier. |
+| `title` | `string` | Yes | Place or activity name. |
+| `description` | `ReactNode` | No | Caller-provided description. |
+| `category` | `string` | No | Category used by the existing filter. |
+| `kind` | `string` | No | Visible type label, such as “Walk” or “Market”. |
+| `href` | `string` | No | Caller-provided destination; items without it are not rendered as links. |
+| `distance` | `ReactNode` | No | Supplied distance text or content. |
+| `travelTime` | `ReactNode` | No | Supplied travel-time text or content. |
+| `thumbnail` | `ReactNode` | No | Optional caller-rendered media with meaningful alternative text. |
+| `featured` | `boolean` | No | Marks an item for the featured layout. |
+
+## Usage
+
+```tsx
+const places: LocalGuideItem[] = [
+  {
+    id: "dune-path",
+    title: "Dune path",
+    description: "A gentle loop through the coastal grassland.",
+    kind: "Walk",
+    category: "Outdoors",
+    distance: "1.2 km",
+    travelTime: "15 minutes on foot",
+    href: "https://example.test/dune-path",
+  },
+  {
+    id: "market",
+    title: "Village market",
+    kind: "Market",
+    category: "Food",
+    distance: "800 m",
+  },
+];
+
+<LocalGuideSection title="Explore nearby" places={places} />;
+```
+
+## Responsive behavior
+
+The card layout and category filter inherit ResourceSection's responsive grid
+and wrapping behavior. The optional `mapSlot` is rendered after the list and
+constrained to its container; provide media that can shrink to the available
+width.
+
+## Accessibility
+
+Entries without an `href` remain headings rather than fake links. Supply
+meaningful image alternatives for thumbnails and an accessible name for
+interactive map content. Category filtering uses the existing native select
+control.
+
+## Theme support
+
+Cards, filters, and empty states inherit ResourceSection's Puzzle theme tokens,
+including in scoped themes.
+
+## Customization
+
+Pass caller-owned map content through `mapSlot`, and use shared section props
+and `className` for heading and layout customization. LocalGuide does not own
+map rendering, geocoding, or travel calculations.
+
+## Composition
+
+Use `LocationSection` for the venue's own address and contact information.
+Use `LocalGuideSection` for nearby places and activities. See the [Boutique
+B&B](/docs/pieces/components/boutique-bnb) and
+[Restaurant Experience](/docs/pieces/components/restaurant-experience) pages.
+
+## TypeScript example
+
+`LocalGuideItem` and `LocalGuideSection` are root exports from
+`@puzzle-ui/pieces`; no family subpath import is required.
+
+## Framework compatibility
+
+The section is router-independent. Category filtering uses React client
+behavior; server-rendered output is available before hydration. See
+[Next.js and TanStack Start integration](/docs/pieces/framework-integration).
+
+## Related components
+
+- [Resource Section](/docs/pieces/components/resource-section)
+- [Location Section](/docs/pieces/components/location-section)
+- [Event Section](/docs/pieces/components/event-section)

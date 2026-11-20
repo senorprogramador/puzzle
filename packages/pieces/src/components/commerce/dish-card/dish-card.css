@@ -1,0 +1,94 @@
+.puzzle-dish-card {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-4, 1rem);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-dish-card[data-variant="compact"] {
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-dish-card__media {
+  min-width: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-dish-card[data-dish-variant="featured"] .puzzle-dish-card__media {
+  aspect-ratio: 16 / 9;
+}
+
+.puzzle-dish-card[data-dish-variant="compact"] .puzzle-dish-card__media {
+  aspect-ratio: 3 / 2;
+}
+
+.puzzle-dish-card__media > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.puzzle-dish-card__content {
+  display: grid;
+  align-content: start;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+}
+
+.puzzle-dish-card[data-dish-variant="compact"] .puzzle-dish-card__content {
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-dish-card__name-price {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+}
+
+.puzzle-dish-card__name {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-dish-card__price {
+  flex: 0 1 auto;
+  margin-inline-start: auto;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-dish-card[data-dish-variant="featured"] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-dish-card__badges,
+.puzzle-dish-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-dish-card__description,
+.puzzle-dish-card__portion {
+  min-width: 0;
+  margin: 0;
+}
+
+.puzzle-dish-card__portion {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-dish-card__slot {
+  min-width: 0;
+}

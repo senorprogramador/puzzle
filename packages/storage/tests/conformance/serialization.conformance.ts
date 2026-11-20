@@ -9,7 +9,7 @@ import {
 export const runSerializationConformance = (
   createAdapter: () => Promise<StorageAdapter>,
   reset: () => Promise<void>,
-) => {
+): void => {
   describe("serialization conformance", () => {
     it("round-trips Date fields as Date objects", async () => {
       await reset();

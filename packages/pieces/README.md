@@ -58,17 +58,17 @@ exports.
 
 ## Available section families
 
-These are the 51 documented section families. `Hero` and existing dashboard,
+These are the 63 documented section families. `Hero` and existing dashboard,
 navigation, project, data-display, and feedback compositions are also
 available; see the [component catalog](https://puzzle-ui.com/docs/pieces).
 
 | Category | Families |
 | --- | --- |
-| Marketing & Conversion (10) | Announcement, Logo Cloud, Features, Benefits, Stats, Testimonials, CTA, FAQ, How It Works, Comparison |
+| Marketing & Conversion (11) | Announcement, Logo Cloud, Features, Benefits, Stats, Testimonials, Guest Reviews, CTA, FAQ, How It Works, Comparison |
 | SaaS & Product (7) | Product Showcase, Integrations, Use Cases, Security, Pricing, Code Showcase, Roadmap |
-| Commerce (6) | Product Grid, Categories, Product Gallery, Cart Summary, Product Details, Commerce Benefits |
-| Content & Editorial (5) | Blog, Content, Gallery, Timeline, Changelog |
-| Business & Corporate (11) | About, Team, Services, Case Studies, Contact, Careers, Partners, Awards, Accommodation Overview, Accommodation Details, Amenity List |
+| Commerce (12) | Product Grid, Gift Voucher, Categories, Product Gallery, Cart Summary, Product Details, Availability Search, Rate Plans, Stay Summary, Restaurant Menu, Table Reservation, Commerce Benefits |
+| Content & Editorial (6) | Blog, Content, Gallery, Timeline, Changelog, Local Guide |
+| Business & Corporate (15) | About, Team, Host Profile, Services, Service Options, Case Studies, Contact, Careers, Partners, Awards, Accommodation Overview, Accommodation Details, Amenity List, House Rules, Opening Hours |
 | Application & Dashboard (5) | Dashboard Overview, Activity, Onboarding, Empty State, Settings |
 | Specialized & Interactive (7) | Video, Booking, Location, Waitlist, Resource, Event, Footer |
 
@@ -87,12 +87,47 @@ to compare use cases:
 The accommodation sections are presentation-only: compose them with the
 existing `AccommodationHero`, `GallerySection`, `TestimonialsSection`, and
 `CTASection`. The [accommodation discovery example](https://puzzle-ui.com/docs/pieces/components/accommodation-discovery)
-shows the full composition; availability, booking, payments, and guest data
-remain application responsibilities.
+shows the presentation composition. Hospitality search, rates, summaries, and
+house rules are also caller-data-driven; availability checks, price
+calculations, reservations, payments, and persisted guest data remain
+application responsibilities. See the [booking flow example](https://puzzle-ui.com/docs/pieces/components/hospitality-booking-flow).
 
 - [AccommodationOverviewSection](https://puzzle-ui.com/docs/pieces/components/accommodation-overview)
 - [AccommodationDetailsSection](https://puzzle-ui.com/docs/pieces/components/accommodation-details)
 - [AmenityListSection](https://puzzle-ui.com/docs/pieces/components/amenity-list)
+- [AvailabilitySearchSection](https://puzzle-ui.com/docs/pieces/components/availability-search)
+- [RatePlansSection](https://puzzle-ui.com/docs/pieces/components/rate-plans)
+- [StaySummarySection](https://puzzle-ui.com/docs/pieces/components/stay-summary)
+- [HouseRulesSection](https://puzzle-ui.com/docs/pieces/components/house-rules)
+
+Restaurant menus are also presentation-only. `RestaurantMenuSection`,
+`DishCard`, and `DietaryInformation` render caller-supplied menu, price,
+dietary-tag, and allergen data. Filtering matches supplied dietary-tag IDs;
+allergen accuracy, ordering, and payment remain application responsibilities.
+See the [Restaurant Menu reference](https://puzzle-ui.com/docs/pieces/components/restaurant-menu).
+
+For restaurant hours, `OpeningHoursSection` requires an explicit venue timezone
+and supplied instant to show an open/closed status; it never assumes the
+server's or browser's timezone. `TableReservationSection` validates local form
+values and calls the supplied callback or links to an external provider. It
+does not check table availability or create a reservation. See the [Opening
+Hours](https://puzzle-ui.com/docs/pieces/components/opening-hours), [Table
+Reservation](https://puzzle-ui.com/docs/pieces/components/table-reservation),
+and [Restaurant Experience](https://puzzle-ui.com/docs/pieces/components/restaurant-experience)
+references.
+
+Shared hospitality presentation builds on existing `TestimonialsSection`,
+`ResourceSection`, `TeamSection`, `ServicesSection`, and `ProductGridSection`
+renderers. Use `GuestReviewsSection` for review dates, sources, and supplied
+score distributions; `LocalGuideSection` for caller-supplied places, distances,
+travel times, and optional map content; `HostProfileSection` for one host and
+their story; `ServiceOptionsSection` for included or optional services; and
+`GiftVoucherSection` for externally purchased vouchers and packages. These
+components do not calculate routes, prices, availability, ratings, or checkout.
+See the [Hospitality Overview](https://puzzle-ui.com/docs/pieces/components/hospitality-overview),
+[Boutique B&B](https://puzzle-ui.com/docs/pieces/components/boutique-bnb), and
+[Restaurant Experience](https://puzzle-ui.com/docs/pieces/components/restaurant-experience)
+compositions.
 
 ## Styling and themes
 

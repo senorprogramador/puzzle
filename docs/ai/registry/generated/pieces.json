@@ -305,6 +305,54 @@
       "aliases": []
     },
     {
+      "name": "HostProfileSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "host-profile-section",
+      "description": "Present one hospitality host by reusing the existing TeamSection profile card with languages, a story, and a caller-owned contact action.",
+      "documentation": "apps/site/content/docs/pieces/components/host-profile.mdx",
+      "source": "packages/pieces/src/components/business/host-profile-section/host-profile-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "host-profile-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "HouseRulesSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "house-rules-section",
+      "description": "Present caller-supplied check-in, guest, pet, smoking, parking, payment, cancellation, and practical house rules.",
+      "documentation": "apps/site/content/docs/pieces/components/house-rules.mdx",
+      "source": "packages/pieces/src/components/business/house-rules-section/house-rules-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "house-rules-section"
+      },
+      "aliases": []
+    },
+    {
       "name": "LocationSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [
@@ -329,6 +377,30 @@
       "aliases": []
     },
     {
+      "name": "OpeningHoursSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "opening-hours-section",
+      "description": "Present a weekly restaurant schedule with multiple daily service periods, explicit closed days, date exceptions, seasonal hours, and timezone-aware status.",
+      "documentation": "apps/site/content/docs/pieces/components/opening-hours.mdx",
+      "source": "packages/pieces/src/components/business/opening-hours-section/opening-hours-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "opening-hours-section"
+      },
+      "aliases": []
+    },
+    {
       "name": "PartnersSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [
@@ -349,6 +421,30 @@
       "composition": {
         "kind": "section",
         "family": "partners-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ServiceOptionsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "service-options-section",
+      "description": "Present categorized hospitality services with supplied included or optional status, price content, and caller-owned actions.",
+      "documentation": "apps/site/content/docs/pieces/components/service-options.mdx",
+      "source": "packages/pieces/src/components/business/service-options-section/service-options-section.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "service-options-section"
       },
       "aliases": []
     },
@@ -397,6 +493,35 @@
       "composition": {
         "kind": "section",
         "family": "team-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "AvailabilitySearchSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "availability-search-section",
+      "description": "Present an accessible accommodation search form with caller-owned dates, guest counts, validation, and external availability actions.",
+      "documentation": "apps/site/content/docs/pieces/components/availability-search.mdx",
+      "source": "packages/pieces/src/components/commerce/availability-search-section/availability-search-section.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "availability-search-section"
       },
       "aliases": []
     },
@@ -517,6 +642,154 @@
       "aliases": []
     },
     {
+      "name": "DietaryInformation",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "dietary-information",
+      "description": "Display caller-supplied dietary tags and allergen information with readable labels, optional icons, compact or expanded layouts, and an accessible popover.",
+      "documentation": "apps/site/content/docs/pieces/components/dietary-information.mdx",
+      "source": "packages/pieces/src/components/commerce/dietary-information/dietary-information.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "dietary-information"
+      },
+      "contentRequirements": [
+        "dietaryHeading (optional)",
+        "allergenHeading (optional)",
+        "detailsLabel (optional)",
+        "popoverTitle (optional)",
+        "closeLabel (optional)"
+      ],
+      "dataRequirements": [
+        "tags (optional)",
+        "allergens (optional)"
+      ],
+      "variants": [
+        {
+          "name": "compact",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/commerce/dietary-information/dietary-information.types.ts",
+          "prop": "variant",
+          "typeName": "DietaryInformationVariant"
+        },
+        {
+          "name": "expanded",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/commerce/dietary-information/dietary-information.types.ts",
+          "prop": "variant",
+          "typeName": "DietaryInformationVariant"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "DishCard",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "dish-card",
+      "description": "Present a restaurant dish with a readable price, optional image, portion size, featured or popular labels, dietary information, and composable content slots.",
+      "documentation": "apps/site/content/docs/pieces/components/dish-card.mdx",
+      "source": "packages/pieces/src/components/commerce/dish-card/dish-card.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "dish-card"
+      },
+      "requiredProps": [
+        "dish"
+      ],
+      "contentRequirements": [
+        "featuredLabel (optional)",
+        "popularLabel (optional)",
+        "contentSlot (optional)"
+      ],
+      "mediaRequirements": [
+        "mediaSlot (optional)"
+      ],
+      "variants": [
+        {
+          "name": "compact",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/commerce/dish-card/dish-card.types.ts",
+          "prop": "variant",
+          "typeName": "DishCardVariant"
+        },
+        {
+          "name": "standard",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/commerce/dish-card/dish-card.types.ts",
+          "prop": "variant",
+          "typeName": "DishCardVariant"
+        },
+        {
+          "name": "featured",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/commerce/dish-card/dish-card.types.ts",
+          "prop": "variant",
+          "typeName": "DishCardVariant"
+        }
+      ],
+      "aliases": []
+    },
+    {
+      "name": "GiftVoucherSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "gift-voucher-section",
+      "description": "Present hospitality gift vouchers and packages with the existing ProductGrid cards and caller-provided purchase destinations.",
+      "documentation": "apps/site/content/docs/pieces/components/gift-voucher.mdx",
+      "source": "packages/pieces/src/components/commerce/gift-voucher-section/gift-voucher-section.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "gift-voucher-section"
+      },
+      "aliases": []
+    },
+    {
       "name": "ProductDetailsSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [
@@ -600,6 +873,122 @@
       "composition": {
         "kind": "section",
         "family": "product-grid"
+      },
+      "aliases": []
+    },
+    {
+      "name": "RatePlansSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "rate-plans-section",
+      "description": "Compare accommodation rate plans with supplied nightly and weekly prices, inclusions, cancellation details, and caller-owned actions.",
+      "documentation": "apps/site/content/docs/pieces/components/rate-plans.mdx",
+      "source": "packages/pieces/src/components/commerce/rate-plans-section/rate-plans-section.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "rate-plans-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "RestaurantMenuSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "restaurant-menu-section",
+      "description": "Compose multiple restaurant menus with categories, anchor navigation, responsive dish cards, caller-supplied dietary labels, and optional dietary filtering.",
+      "documentation": "apps/site/content/docs/pieces/components/restaurant-menu.mdx",
+      "source": "packages/pieces/src/components/commerce/restaurant-menu-section/restaurant-menu-section.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "restaurant-menu-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "StaySummarySection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "stay-summary-section",
+      "description": "Present accommodation details, dates, guests, supplied price lines, totals, and caller-owned edit or continue actions.",
+      "documentation": "apps/site/content/docs/pieces/components/stay-summary.mdx",
+      "source": "packages/pieces/src/components/commerce/stay-summary-section/stay-summary-section.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "stay-summary-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "TableReservationSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "table-reservation-section",
+      "description": "Present an accessible restaurant reservation form or external booking link with controlled data, validation feedback, and caller-owned submission states.",
+      "documentation": "apps/site/content/docs/pieces/components/table-reservation.mdx",
+      "source": "packages/pieces/src/components/commerce/table-reservation-section/table-reservation-section.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "table-reservation-section"
       },
       "aliases": []
     },
@@ -745,6 +1134,35 @@
       "composition": {
         "kind": "section",
         "family": "gallery-section"
+      },
+      "aliases": []
+    },
+    {
+      "name": "LocalGuideSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "local-guide-section",
+      "description": "Present caller-supplied nearby places and activities with categories, optional distances, travel times, links, and map content.",
+      "documentation": "apps/site/content/docs/pieces/components/local-guide.mdx",
+      "source": "packages/pieces/src/components/content/local-guide-section/local-guide-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "local-guide-section"
       },
       "aliases": []
     },
@@ -3018,6 +3436,35 @@
       "composition": {
         "kind": "section",
         "family": "features"
+      },
+      "aliases": []
+    },
+    {
+      "name": "GuestReviewsSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "marketing",
+      "subcategory": "guest-reviews-section",
+      "description": "Present attributed guest reviews, caller-supplied ratings, review sources, dates, and score distributions.",
+      "documentation": "apps/site/content/docs/pieces/components/guest-reviews.mdx",
+      "source": "packages/pieces/src/components/marketing/guest-reviews-section/guest-reviews-section.tsx",
+      "useCases": [
+        "marketing"
+      ],
+      "pageTypes": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "guest-reviews-section"
       },
       "aliases": []
     },

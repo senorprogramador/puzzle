@@ -1,0 +1,68 @@
+---
+title: Boutique B&B Reference
+description: A responsive boutique bed-and-breakfast composition using existing accommodation, gallery, amenity, and CTA sections with shared hospitality Pieces.
+---
+
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { BoutiqueBnbReferenceExample } from "../../../../src/components/doc-examples/pieces/boutique-bnb";
+
+This reference page composes the existing accommodation Hero and Gallery with
+accommodation details, amenities, host information, guest reviews, services,
+local places, vouchers, and a CTA. It presents static example content and does
+not add booking, route, price, or payment behavior.
+
+<Badge content="Beta" color="primary" /> **Reference composition: individual component API maturity is documented on each component page.**
+
+## Complete page preview
+
+<Preview
+  fit="device"
+  code={`<main><AccommodationHero /><AccommodationDetailsSection /><GallerySection /><AmenityListSection /><HostProfileSection /><GuestReviewsSection /><ServiceOptionsSection /><LocalGuideSection /><GiftVoucherSection /><CTASection /></main>`}
+>
+  <BoutiqueBnbReferenceExample />
+</Preview>
+
+## Composition map
+
+| Page area | Component | Responsibility |
+| --- | --- | --- |
+| Introduction | Existing `AccommodationHero` | Set the property context and provide a caller-owned action. |
+| Property | Existing `AccommodationDetailsSection` | Present capacity, sleeping arrangements, and highlights. |
+| Media | Existing `GallerySection` | Reuse the existing gallery and optional lightbox. |
+| Facilities | Existing `AmenityListSection` | Group property facilities. |
+| Host | `HostProfileSection` | Introduce one host, languages, and a personal story. |
+| Reviews | `GuestReviewsSection` | Display supplied reviews, dates, sources, and rating summary. |
+| Services | `ServiceOptionsSection` | Distinguish included and optional services. |
+| Neighborhood | `LocalGuideSection` | Present supplied places, distance, travel time, and optional links. |
+| Gift | `GiftVoucherSection` | Display a package with a caller-provided purchase destination. |
+| Next step | Existing `CTASection` | Offer a consumer-owned contact action. |
+
+## Responsive behavior
+
+Sections retain content-driven heights and their existing fluid layouts. The
+gallery and optional media have stable aspect ratios, text and metadata wrap,
+and optional images do not change the required content. Validate the composed
+page at 320, 375, 430, 768, 1024, 1280, 1440, and 1920px, plus widths between
+those breakpoints.
+
+## Accessibility and theming
+
+The composition reuses the semantics and keyboard behavior of its existing
+Pieces and UI components. Supply meaningful image alternatives, keep headings
+in page order, and use descriptive names for actions. Components inherit
+active Puzzle themes and semantic tokens; no separate hospitality theme is
+introduced.
+
+## Ownership and limitations
+
+The schedule, reviews, facilities, distances, prices, and purchase links are
+fictional input data. Availability checks, booking, price calculations,
+geocoding, route calculation, checkout, and payment remain in the application.
+For restaurant composition, see [Restaurant Experience](/docs/pieces/components/restaurant-experience).
+
+## Related components
+
+- [Hospitality Overview](/docs/pieces/components/hospitality-overview)
+- [Accommodation Discovery](/docs/pieces/components/accommodation-discovery)
+- [Guest Reviews](/docs/pieces/components/guest-reviews)
+- [Local Guide](/docs/pieces/components/local-guide)

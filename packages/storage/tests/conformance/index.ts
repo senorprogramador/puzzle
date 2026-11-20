@@ -11,7 +11,9 @@ import type {
 } from "./storage-adapter.fixture";
 import { runMigrationConformance } from "./migrations.conformance";
 
-export const runStorageAdapterConformance = (fixture: ConformanceFixture) => {
+export const runStorageAdapterConformance = (
+  fixture: ConformanceFixture,
+): void => {
   runCapabilityConformance(fixture.createAdapter);
   runCrudConformance(fixture.createAdapter, fixture.reset);
   runSerializationConformance(fixture.createAdapter, fixture.reset);
@@ -23,6 +25,6 @@ export const runStorageAdapterConformance = (fixture: ConformanceFixture) => {
 
 export const runStorageMigrationConformance = (
   fixture: MigrationConformanceFixture,
-) => {
+): void => {
   runMigrationConformance(fixture.createMigrationAdapter, fixture.reset);
 };

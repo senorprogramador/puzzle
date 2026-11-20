@@ -1,0 +1,73 @@
+---
+title: Hospitality Components
+description: Choose and compose Puzzle Pieces for accommodation discovery, booking presentation, restaurant menus and reservations, reviews, local guides, hosts, services, and gift vouchers.
+---
+
+import { Badge } from "@puzzle-ui/ui";
+
+The hospitality surface composes existing Pieces and generic UI. It is a
+presentation layer: applications supply all content, data, validation,
+availability, prices, and actions. Start with a fit-for-purpose component
+below, and reuse existing Hero, Gallery, Location, Testimonials, Resource,
+Team, Services, and Product Grid components instead of building parallel
+systems.
+
+<Badge content="Beta" color="primary" /> **API maturity varies by component; check each reference.**
+
+## Component map
+
+| Area | Components | Use |
+| --- | --- | --- |
+| Accommodation presentation | [Accommodation Overview](/docs/pieces/components/accommodation-overview), [Accommodation Details](/docs/pieces/components/accommodation-details), [Amenity List](/docs/pieces/components/amenity-list) | Compare stays, explain one property, and group facilities. |
+| Stay planning | [Availability Search](/docs/pieces/components/availability-search), [Rate Plans](/docs/pieces/components/rate-plans), [Stay Summary](/docs/pieces/components/stay-summary), [House Rules](/docs/pieces/components/house-rules) | Present caller-provided search values, rate offers, price lines, and policies. |
+| Restaurant menu | [Restaurant Menu](/docs/pieces/components/restaurant-menu), [Dish Card](/docs/pieces/components/dish-card), [Dietary Information](/docs/pieces/components/dietary-information) | Render supplied menus, dishes, dietary tags, and allergen information. |
+| Restaurant operations | [Opening Hours](/docs/pieces/components/opening-hours), [Table Reservation](/docs/pieces/components/table-reservation) | Present supplied schedules and reservation forms or external provider links. |
+| Shared guest experience | [Guest Reviews](/docs/pieces/components/guest-reviews), [Local Guide](/docs/pieces/components/local-guide), [Host Profile](/docs/pieces/components/host-profile), [Service Options](/docs/pieces/components/service-options), [Gift Voucher](/docs/pieces/components/gift-voucher) | Show review evidence, local recommendations, a host, optional services, and externally purchased vouchers. |
+| Existing general sections | [Accommodation Hero](/docs/pieces/components/hero), [Restaurant Hero](/docs/pieces/components/hero), [Gallery](/docs/pieces/components/gallery-section), [Testimonials](/docs/pieces/components/testimonials), [Location](/docs/pieces/components/location-section), [Resource](/docs/pieces/components/resource-section), [Team](/docs/pieces/components/team-section), [Services](/docs/pieces/components/services-section), [Product Grid](/docs/pieces/components/product-grid), [CTA](/docs/pieces/components/cta) | Reuse the general component when hospitality-specific content is not needed. |
+
+## Responsibility boundaries
+
+- **Reviews:** the application supplies review text, dates, source, score, and
+  any aggregate distribution. Pieces does not verify reviews or calculate
+  averages.
+- **Local guide:** distances and travel times are displayed as supplied.
+  Pieces does not geocode, create maps, or calculate routes.
+- **Services and vouchers:** prices and purchase destinations are supplied.
+  Pieces does not provide checkout, voucher administration, or payment.
+- **Availability and reservations:** Pieces can present forms and callbacks.
+  The application or provider owns availability, confirmation, and
+  persistence.
+- **Menus:** allergen and dietary information must be explicitly supplied.
+  Filtering is presentation behavior; it does not infer ingredients or
+  determine suitability.
+- **Frameworks:** components stay router-independent and work in Next.js and
+  TanStack Start using their normal React client boundaries for interactions.
+
+## Complete reference compositions
+
+### Boutique B&B
+
+The [Boutique B&B page](/docs/pieces/components/boutique-bnb) composes the
+existing accommodation Hero, details, Gallery, and Amenity List with shared
+reviews, host, services, local guide, gift voucher, and CTA sections.
+
+### Restaurant
+
+The [Restaurant Experience page](/docs/pieces/components/restaurant-experience)
+combines an existing RestaurantHero, menu, opening hours, location, and
+reservation presentation with the five shared hospitality components.
+
+## Composition guidance
+
+Use one component for each distinct responsibility. `LocationSection` describes
+the venue; `LocalGuideSection` describes nearby places. `TestimonialsSection`
+handles generic quotes; `GuestReviewsSection` adds dated review metadata and a
+supplied score summary. `TeamSection` is for multiple people;
+`HostProfileSection` is a single host. `ServicesSection` handles general
+services; `ServiceOptionsSection` adds included/optional labels.
+
+## Related documentation
+
+- [Pieces component catalog](/docs/pieces)
+- [Next.js and TanStack Start integration](/docs/pieces/framework-integration)
+- [Pieces installation and API guidance](/docs/pieces)

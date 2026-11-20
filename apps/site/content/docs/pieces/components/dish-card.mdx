@@ -1,0 +1,106 @@
+---
+title: DishCard
+description: Present a restaurant dish with a readable price, optional image, portion size, featured or popular labels, dietary information, and composable content slots.
+---
+
+import { DishCard } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { DishCardVariantsExample } from "../../../../src/components/doc-examples/pieces/restaurant-menu";
+
+`DishCard` presents caller-supplied menu content. It does not add a cart,
+ordering action, or payment behavior.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## TypeScript example
+
+```tsx
+import {
+  DishCard,
+  type RestaurantDish,
+} from "@puzzle-ui/pieces";
+
+const dish: RestaurantDish = {
+  id: "garden-bowl",
+  name: "Garden bowl",
+  description: "Grains, vegetables, and herbs.",
+  price: { amount: 14.5, currency: "EUR" },
+};
+
+<DishCard dish={dish} locale="en-GB" />;
+```
+
+## Compact, standard, and featured variants
+
+The variants adjust visual emphasis without imposing a fixed card height.
+Featured dishes receive a visible text badge; a dish can also be marked
+popular independently.
+
+<DishCardVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `dish` | `RestaurantDish` | Yes | — | Caller-supplied dish data, including its price. |
+| `variant` | `"compact" \| "standard" \| "featured"` | No | `"standard"` | Controls card spacing and image treatment. |
+| `headingAs` | `"h3" \| "h4" \| "h5" \| "h6"` | No | `"h3"` | Sets the dish heading element for its page context. |
+| `locale` | `string` | No | Runtime locale | BCP 47 locale used to format the supplied currency. |
+| `featuredLabel` | `ReactNode` | No | `"Featured"` | Visible badge for a featured variant or dish. |
+| `popularLabel` | `ReactNode` | No | `"Popular"` | Visible badge for a popular dish. |
+| `dietaryInformationVariant` | `DietaryInformationVariant` | No | `"compact"` | Presentation passed to `DietaryInformation`. |
+| `showDietaryDetailsPopover` | `boolean` | No | `false` | Adds the shared dietary-details popover when data is supplied. |
+| `mediaSlot` | `ReactNode` | No | Dish image | Replaces the optional image with caller-provided media. |
+| `contentSlot` | `ReactNode` | No | — | Adds custom content after the dish details. |
+| `actions` | `ReactNode` | No | — | Adds caller-owned links or controls; no order behavior is implied. |
+| `className` | `string` | No | — | Additional class on the card. |
+
+### `RestaurantDish`
+
+`RestaurantDish` contains a unique `id`, `name`, and required
+`CommerceMoney` `price`. It also accepts optional `description`, `CommerceImage`,
+`dietaryTags`, `allergens`, `featured`, `popular`, and `portionSize`. An image
+uses the caller-provided `alt` text. Dietary and allergen values are displayed
+as supplied and are never inferred from the description.
+
+## Images, slots, and prices
+
+The image is optional; when present it keeps a consistent aspect ratio and
+uses the supplied alternative text. Without an image the card keeps its normal
+content flow. `mediaSlot` replaces the image area, while `contentSlot` and
+`actions` extend the body. The caller is responsible for accessible names and
+semantics within custom slots.
+
+Prices use locale-aware `Intl.NumberFormat` through the existing commerce
+formatter. Pass an explicit `locale` when server and browser output must be
+identical. The component displays one supplied amount and currency; it does not
+convert currencies or calculate taxes.
+
+## Responsive behavior and accessibility
+
+- Content wraps, images are optional, and cards have no forced height.
+- The price remains in a separate flexible row from long names and descriptions.
+- Featured and popular status is conveyed by visible text, not color alone.
+- `headingAs` lets the caller keep a logical heading hierarchy inside nested
+  menu sections.
+- `DietaryInformation` always displays text labels, even when custom icons are
+  supplied.
+
+## Theme support and customization
+
+Cards, borders, prices, badges, and dietary labels consume Puzzle UI and Theme
+tokens. Use `className` for product-specific styling and the three React slots
+for custom media, content, or caller-owned actions.
+
+## Related components
+
+- [Dietary Information](/docs/pieces/components/dietary-information) for
+  compact/expanded labels and allergen details.
+- [Restaurant Menu](/docs/pieces/components/restaurant-menu) for
+  category navigation, multiple menus, and dietary filters.
+- [Product Grid](/docs/pieces/components/product-grid) for generic retail
+  collections.
+
+Use the component in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

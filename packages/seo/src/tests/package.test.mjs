@@ -101,10 +101,10 @@ test("package has no unnecessary runtime dependencies", async () => {
   assert.equal(Object.keys(manifest.dependencies ?? {}).length, 0);
 });
 
-test("published files are restricted to dist", async () => {
+test("published files include build output and AI guidance", async () => {
   const manifest = await readManifest();
 
-  assert.deepEqual(manifest.files, ["dist"]);
+  assert.deepEqual(manifest.files, ["dist", "ai"]);
 });
 
 test("package documentation and license exist", async () => {
@@ -163,5 +163,16 @@ test("build output exists for every public entrypoint", async () => {
       cjsPath.startsWith(resolve(packageRoot, "dist")),
       `${name}: CJS must resolve inside dist`,
     );
+  }
+});
+
+test("React provider client directive is preserved in ESM and CJS output", async () => {
+  for (const extension of ["js", "cjs"]) {
+    const output = await readFile(
+      resolve(packageRoot, `dist/react/provider.${extension}`),
+      "utf8",
+    );
+
+    assert.match(output, /^["']use client["'];/);
   }
 });

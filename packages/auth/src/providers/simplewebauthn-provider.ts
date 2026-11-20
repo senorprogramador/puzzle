@@ -7,6 +7,7 @@ import {
   type RegistrationResponseJSON,
   type WebAuthnCredential,
 } from "@simplewebauthn/server";
+import { COSEALG } from "@simplewebauthn/server/helpers";
 
 import {
   AuthConfigurationError,
@@ -22,6 +23,44 @@ import type {
 
 const BASE64URL_ALPHABET =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+export type SimpleWebAuthnProviderOptions = {
+  readonly supportedAlgorithmIDs?: readonly COSEALG[];
+};
+
+const DEFAULT_SUPPORTED_ALGORITHM_IDS = [
+  COSEALG.EdDSA,
+  COSEALG.ES256,
+  COSEALG.RS256,
+] as const;
+
+const COSE_ALGORITHM_IDS = new Set(
+  Object.values(COSEALG).filter(
+    (value): value is COSEALG => typeof value === "number",
+  ),
+);
+
+const normalizeSupportedAlgorithmIDs = (
+  supportedAlgorithmIDs: readonly COSEALG[] | undefined,
+): COSEALG[] => {
+  const algorithms = supportedAlgorithmIDs ?? DEFAULT_SUPPORTED_ALGORITHM_IDS;
+
+  if (
+    !Array.isArray(algorithms) ||
+    algorithms.length === 0 ||
+    algorithms.some(
+      (algorithm) =>
+        !COSE_ALGORITHM_IDS.has(algorithm) || !Number.isInteger(algorithm),
+    ) ||
+    new Set(algorithms).size !== algorithms.length
+  ) {
+    throw new AuthConfigurationError(
+      "Supported WebAuthn algorithm IDs must be a non-empty list of unique COSE algorithm IDs.",
+    );
+  }
+
+  return [...algorithms];
+};
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -188,6 +227,14 @@ const validateRpId = (rpId: string): void => {
 };
 
 export class SimpleWebAuthnProvider implements WebAuthnProvider {
+  private readonly supportedAlgorithmIDs: readonly COSEALG[];
+
+  constructor(options: SimpleWebAuthnProviderOptions = {}) {
+    this.supportedAlgorithmIDs = normalizeSupportedAlgorithmIDs(
+      options.supportedAlgorithmIDs,
+    );
+  }
+
   async generateRegistrationOptions(input: {
     readonly challenge: string;
     readonly rpId: string;
@@ -236,6 +283,7 @@ export class SimpleWebAuthnProvider implements WebAuthnProvider {
         userVerification: "required",
       },
       excludeCredentials,
+      supportedAlgorithmIDs: [...this.supportedAlgorithmIDs],
     });
 
     if (options.challenge !== input.challenge) {
@@ -273,6 +321,7 @@ export class SimpleWebAuthnProvider implements WebAuthnProvider {
       expectedOrigin: input.expectedOrigin,
       expectedRPID: input.expectedRpId,
       requireUserVerification: true,
+      supportedAlgorithmIDs: [...this.supportedAlgorithmIDs],
     });
 
     if (!verification.verified) {

@@ -43,6 +43,9 @@ type DatePickerProps = Omit<
   /** Marks the date field as required. */
   required?: boolean;
 
+  /** Accessible description announced when the field is required. */
+  requiredDescription?: ReactNode;
+
   /** Allows the selected date to be cleared. */
   clearable?: boolean;
 

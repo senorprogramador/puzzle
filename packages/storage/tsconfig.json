@@ -9,6 +9,7 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "declaration": true,
+    "isolatedDeclarations": true,
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,

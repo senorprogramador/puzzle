@@ -4,7 +4,7 @@ import type { StorageMigration, StorageMigrationAdapter } from "../../src";
 export const runMigrationConformance = (
   createMigrationAdapter: () => Promise<StorageMigrationAdapter>,
   reset: () => Promise<void>,
-) => {
+): void => {
   describe("migration conformance", () => {
     it("starts at version zero for an empty database", async () => {
       await reset();

@@ -272,7 +272,7 @@ Unavailable days remain visible but disabled, and keyboard navigation skips them
 
 ## Required, error, and disabled states
 
-`required` marks the field required and enables native required validation. `error` displays a message and marks the trigger invalid; `error={true}` displays "Invalid date". External `aria-invalid` is combined with the error state.
+`required` enables native required validation and prevents clearing. The trigger exposes the required state through `requiredDescription` because `aria-required` is not supported on buttons; the description defaults to "Required" and can be localized. `error` displays a message and marks the trigger invalid; `error={true}` displays "Invalid date". External `aria-invalid` is combined with the error state.
 
 `disabled` prevents interaction and excludes the native input from form submission. Supporting description and error IDs are combined with any external `aria-describedby`.
 
@@ -363,6 +363,7 @@ return (
 | `error`        | `ReactNode \| boolean`            | -               | Error message; `true` uses "Invalid date".             |
 | `disabled`     | `boolean`                         | `false`         | Disables the control and native input.                 |
 | `required`     | `boolean`                         | `false`         | Enables required validation and prevents clearing.     |
+| `requiredDescription` | `ReactNode`                | `"Required"`    | Accessible description announced when required; localize as needed. |
 | `clearable`    | `boolean`                         | `false`         | Adds a clear action for a selected, non-required date. |
 | `clearLabel`   | `string`                          | `"Clear date"`  | Accessible name of the clear button.                   |
 | `name`         | `string`                          | -               | Native form field name.                                |

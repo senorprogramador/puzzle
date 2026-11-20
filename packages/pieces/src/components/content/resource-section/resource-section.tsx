@@ -48,15 +48,22 @@ const ResourceCard = ({
         <Badge content={resource.type} color="info" />
       ) : null}
       <Heading level="headline3" as="h3">
-        <a
-          href={resource.href}
-          download={resource.download}
-          className="puzzle-resource-section__link"
-        >
-          {resource.title}
-        </a>
+        {resource.href ? (
+          <a
+            href={resource.href}
+            download={resource.download}
+            className="puzzle-resource-section__link"
+          >
+            {resource.title}
+          </a>
+        ) : (
+          <span className="puzzle-resource-section__link">
+            {resource.title}
+          </span>
+        )}
       </Heading>
       {resource.description ? <Text as="p">{resource.description}</Text> : null}
+      {resource.metadata}
       {resource.updatedAt ? (
         <time dateTime={resource.updatedAt}>{resource.updatedAt}</time>
       ) : null}

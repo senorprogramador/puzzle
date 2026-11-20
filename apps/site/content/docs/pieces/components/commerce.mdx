@@ -1,12 +1,12 @@
 ---
 title: Commerce Sections
-description: Compose product catalogs, category navigation, product details, cart summaries, and commerce benefits.
+description: Compose product catalogs, restaurant menus, accommodation booking presentation, product details, cart summaries, and commerce benefits.
 ---
 
 import { ProductGridSection } from "@puzzle-ui/pieces";
 import { Badge, Preview } from "@puzzle-ui/ui";
 
-Commerce sections arrange data supplied by the store application. Product availability, pricing calculations, cart state, checkout, inventory, and payment remain outside Pieces.
+Commerce sections arrange data supplied by a store or restaurant application. Product availability, pricing calculations, cart state, checkout, inventory, orders, and payment remain outside Pieces.
 
 <Badge content="Beta" color="info" /> **API maturity: Beta.**
 
@@ -15,9 +15,15 @@ Commerce sections arrange data supplied by the store application. Product availa
 | Component | Use case | Reference |
 | --- | --- | --- |
 | Product Grid | Browse product collections. | [Product Grid](/docs/pieces/components/product-grid) |
+| Gift Voucher | Present externally purchased vouchers and hospitality packages. | [Gift Voucher](/docs/pieces/components/gift-voucher) |
 | Categories | Navigate product categories. | [Categories](/docs/pieces/components/categories) |
 | Product Gallery | Present product media. | [Product Gallery](/docs/pieces/components/product-gallery) |
 | Product Details | Compose product facts, options, and actions. | [Product Details](/docs/pieces/components/product-details) |
+| Availability Search | Present accommodation dates and guest input for an external availability provider. | [Availability Search](/docs/pieces/components/availability-search) |
+| Rate Plans | Compare caller-supplied accommodation prices and terms. | [Rate Plans](/docs/pieces/components/rate-plans) |
+| Stay Summary | Present caller-supplied dates, guests, price lines, and totals. | [Stay Summary](/docs/pieces/components/stay-summary) |
+| Restaurant Menu | Present restaurant menus with category navigation, dish cards, and optional dietary-tag filtering. | [Restaurant Menu](/docs/pieces/components/restaurant-menu) |
+| Table Reservation | Collect caller-owned reservation requests or link to an external provider. | [Table Reservation](/docs/pieces/components/table-reservation) |
 | Cart Summary | Review caller-calculated items and totals. | [Cart Summary](/docs/pieces/components/cart-summary) |
 | Commerce Benefits | Explain shipping, returns, and store policies. | [Commerce Benefits](/docs/pieces/components/commerce-benefits) |
 
@@ -61,6 +67,26 @@ Product grids and details adapt to available space. Use the Preview device
 control to inspect mobile and desktop layouts; keep product images sized and
 described by the application. Commerce sections consume semantic Puzzle Theme
 tokens and work inside scoped themes.
+
+The [Hospitality Booking Flow](/docs/pieces/components/hospitality-booking-flow)
+composes availability search, rate plans, a stay summary, and house rules. The
+application supplies availability and price data and owns all calculations,
+reservations, and payment behavior.
+
+The [Restaurant Menu](/docs/pieces/components/restaurant-menu) composes
+caller-supplied menus, categories, dishes, prices, dietary labels, and allergen
+information. Filtering only matches supplied dietary-tag IDs; it does not
+infer ingredients or determine allergen suitability. Ordering and payment are
+application responsibilities.
+The [Restaurant Experience](/docs/pieces/components/restaurant-experience)
+example composes the menu with opening hours, location, and a reservation
+request section. Reservation submission and availability remain application
+responsibilities.
+
+The [Hospitality Overview](/docs/pieces/components/hospitality-overview)
+compares accommodation, restaurant, and shared hospitality sections. Gift
+voucher purchase links are supplied by the application; Pieces does not
+provide checkout or payment.
 
 ## Related components
 

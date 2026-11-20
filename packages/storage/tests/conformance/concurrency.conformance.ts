@@ -13,7 +13,7 @@ import {
 export const runConcurrencyConformance = (
   createAdapter: () => Promise<StorageAdapter>,
   reset: () => Promise<void>,
-) => {
+): void => {
   describe("optimistic concurrency conformance", () => {
     it("increments revision on successful update", async () => {
       await reset();

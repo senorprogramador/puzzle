@@ -10,6 +10,7 @@ import userEvent from "@testing-library/user-event";
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { FormField } from "../form-field";
 import { DatePicker } from "./index";
 
 const createDate = (year: number, month: number, day: number): Date =>
@@ -58,6 +59,27 @@ describe("DatePicker", () => {
     expect(trigger).not.toHaveAttribute("aria-controls");
 
     expect(trigger).toHaveTextContent("Choose your birth date");
+  });
+
+  it("announces required state without applying aria-required to the button", () => {
+    render(
+      <FormField label="Appointment date" required>
+        <DatePicker
+          name="appointment"
+          requiredDescription="A date is required."
+        />
+      </FormField>,
+    );
+
+    const trigger = screen.getByRole("button", { name: "Appointment date" });
+    const nativeInput = document.querySelector<HTMLInputElement>(
+      'input[type="date"][name="appointment"]',
+    );
+
+    expect(trigger).not.toHaveAttribute("aria-required");
+    expect(trigger).toHaveAccessibleDescription("A date is required.");
+    expect(nativeInput).toBeRequired();
+    expect(nativeInput).toHaveAttribute("aria-hidden", "true");
   });
 
   it("supports an aria-label without a visible label", () => {

@@ -9,7 +9,7 @@ import {
 export const runPaginationConformance = (
   createAdapter: () => Promise<StorageAdapter>,
   reset: () => Promise<void>,
-) => {
+): void => {
   describe("cursor pagination conformance", () => {
     it("returns the first page and a continuation cursor", async () => {
       await reset();

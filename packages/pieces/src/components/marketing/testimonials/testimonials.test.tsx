@@ -50,4 +50,24 @@ describe("TestimonialsSection", () => {
     const { container } = render(<TestimonialsSection items={[]} />);
     expect(container.querySelector(".puzzle-testimonials__list")).toBeNull();
   });
+
+  it("renders caller-provided metadata in the author footer", () => {
+    render(
+      <TestimonialsSection
+        items={[
+          {
+            id: "guest",
+            quote: "A peaceful stay.",
+            author: "Jordan Lee",
+            metadata: <time dateTime="2026-03-08">8 March 2026</time>,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("8 March 2026")).toHaveAttribute(
+      "dateTime",
+      "2026-03-08",
+    );
+  });
 });

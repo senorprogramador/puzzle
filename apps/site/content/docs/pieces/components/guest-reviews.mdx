@@ -1,0 +1,146 @@
+---
+title: Guest Reviews
+description: Present attributed guest reviews, caller-supplied ratings, review sources, dates, and score distributions.
+---
+
+import { GuestReviewsSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { GuestReviewsSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/guest-reviews";
+
+`GuestReviewsSection` composes the existing testimonial renderer with hospitality review metadata and an optional supplied rating summary. Use `TestimonialsSection` for general customer quotes that do not need review dates, sources, or a score distribution.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import {
+  GuestReviewsSection,
+  type GuestReview,
+  type GuestRatingSummary,
+} from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+The previews compare grid, featured, and carousel presentations with the same
+caller-provided review data. The carousel reuses the existing Testimonials
+keyboard and button controls.
+
+<GuestReviewsSectionVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default |
+| --- | --- | --- | --- |
+| `reviews` | `readonly GuestReview[]` | Yes | — |
+| `summary` | `GuestRatingSummary` | No | — |
+| `labels` | `Partial<GuestReviewsLabels>` | No | Built-in English labels |
+| `variant` | `TestimonialsVariant` | No | `"grid"` |
+| `carouselLabel` | `string` | No | `"Guest reviews"` |
+| Shared section props | `MarketingSectionBaseProps` | No | — |
+
+### Data types
+
+| Type | Fields | Description |
+| --- | --- | --- |
+| `GuestReview` | `id`, `quote`, `author`, `role?`, `organization?`, `avatar?`, `companyLogo?`, `rating?`, `media?`, `featured?`, `date?`, `dateLabel?`, `source?` | One application-supplied review. `date` is passed to the native `<time>` element as its machine-readable value. |
+| `GuestRatingSummary` | `score`, `maxScore?`, `totalReviews?`, `distribution?` | Summary values supplied by the application; the component does not calculate an average. |
+| `GuestRatingDistributionEntry` | `score`, `count` | One supplied score/count pair in the distribution. |
+| `GuestReviewsLabels` | `overallRating`, `score`, `reviewCount`, `scoreDistribution`, `distributionEntry` | Localizable summary and accessible meter labels. |
+
+The `summary` score and distribution are displayed as supplied. Keep their
+source, date range, and calculation method accurate in the application. Review
+content is not fetched, verified, or inferred by Pieces.
+
+## Usage
+
+```tsx
+const reviews: GuestReview[] = [
+  {
+    id: "guest-1",
+    quote: "A peaceful stay and a very thoughtful welcome.",
+    author: "Morgan",
+    rating: 5,
+    date: "2026-05-04",
+    dateLabel: "4 May 2026",
+    source: "Guestbook",
+  },
+];
+
+const summary: GuestRatingSummary = {
+  score: 4.8,
+  totalReviews: 24,
+  distribution: [
+    { score: 5, count: 18 },
+    { score: 4, count: 6 },
+  ],
+};
+
+<GuestReviewsSection
+  title="Guest notes"
+  reviews={reviews}
+  summary={summary}
+/>;
+```
+
+For general quotes without hospitality-specific fields, use
+[TestimonialsSection](/docs/pieces/components/testimonials) instead.
+
+## Responsive behavior
+
+Layouts and carousel behavior come from `TestimonialsSection`; review
+descriptions wrap and cards retain content-driven heights. The summary
+distribution uses a fluid list and meter width rather than a fixed-width chart.
+Check small and intermediate widths when caller content includes long names or
+localized labels.
+
+## Accessibility
+
+Quotes retain blockquote attribution. Dates use `<time>` when an ISO-like
+machine-readable `date` is supplied, rating controls remain read-only, and each
+distribution meter has a text label and visible count. Do not use color or
+stars as the only source of score information. The carousel inherits its
+keyboard-operable controls from Testimonials.
+
+## Theme support
+
+The section reuses Testimonials and Puzzle semantic theme tokens for text,
+surface, borders, and primary emphasis. It inherits the active or scoped Theme.
+
+## Customization
+
+Use the shared `className`, section heading, actions, and `children` props.
+Customize labels through `labels` rather than translating internal UI text.
+Media and avatars remain caller-owned React nodes.
+
+## Composition
+
+Pair guest reviews with an accommodation or restaurant presentation. For a
+complete example, see [Boutique B&B](/docs/pieces/components/boutique-bnb) and
+[Restaurant Experience](/docs/pieces/components/restaurant-experience).
+
+## TypeScript example
+
+The component and data types are named exports from the package root:
+
+```tsx
+import {
+  GuestReviewsSection,
+  type GuestReview,
+} from "@puzzle-ui/pieces";
+
+const reviews: GuestReview[] = [];
+```
+
+## Framework compatibility
+
+The section is router-independent and supports server rendering. Carousel
+navigation uses React client behavior; place it within the framework's client
+boundary when required. See [Next.js and TanStack Start integration](/docs/pieces/framework-integration).
+
+## Related components
+
+- [TestimonialsSection](/docs/pieces/components/testimonials)
+- [Accommodation Details](/docs/pieces/components/accommodation-details)
+- [Restaurant Experience](/docs/pieces/components/restaurant-experience)

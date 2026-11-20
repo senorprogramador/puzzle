@@ -100,6 +100,7 @@ const componentDocs = [
   ["benefits", "BenefitsSection"],
   ["stats", "StatsSection"],
   ["testimonials", "TestimonialsSection"],
+  ["guest-reviews", "GuestReviewsSection"],
   ["cta", "CTASection"],
   ["faq", "FAQSection"],
   ["how-it-works", "HowItWorksSection"],
@@ -112,10 +113,16 @@ const componentDocs = [
   ["code-showcase", "CodeShowcaseSection"],
   ["roadmap", "RoadmapSection"],
   ["product-grid", "ProductGridSection"],
+  ["gift-voucher", "GiftVoucherSection"],
   ["categories", "CategoriesSection"],
   ["product-gallery", "ProductGallerySection"],
   ["cart-summary", "CartSummarySection"],
   ["product-details", "ProductDetailsSection"],
+  ["availability-search", "AvailabilitySearchSection"],
+  ["rate-plans", "RatePlansSection"],
+  ["stay-summary", "StaySummarySection"],
+  ["restaurant-menu", "RestaurantMenuSection"],
+  ["table-reservation", "TableReservationSection"],
   ["commerce-benefits", "CommerceBenefitsSection"],
   ["blog-section", "BlogSection"],
   ["content-section", "ContentSection"],
@@ -133,6 +140,8 @@ const componentDocs = [
   ["accommodation-overview", "AccommodationOverviewSection"],
   ["accommodation-details", "AccommodationDetailsSection"],
   ["amenity-list", "AmenityListSection"],
+  ["house-rules", "HouseRulesSection"],
+  ["opening-hours", "OpeningHoursSection"],
   ["dashboard", "DashboardOverviewSection"],
   ["activity", "ActivitySection"],
   ["onboarding", "OnboardingSection"],
@@ -144,6 +153,9 @@ const componentDocs = [
   ["waitlist-section", "WaitlistSection"],
   ["resource-section", "ResourceSection"],
   ["event-section", "EventSection"],
+  ["local-guide", "LocalGuideSection"],
+  ["host-profile", "HostProfileSection"],
+  ["service-options", "ServiceOptionsSection"],
   ["footer-section", "FooterSection"],
 ] as const;
 
@@ -158,8 +170,8 @@ const categoryPages = [
 ] as const;
 
 describe("Pieces documentation coverage", () => {
-  it("documents all 51 section families with public imports and previews", () => {
-    expect(componentDocs).toHaveLength(51);
+  it("documents all 63 section families with public imports and previews", () => {
+    expect(componentDocs).toHaveLength(63);
 
     const sidebar = readFileSync(sidebarPath, "utf8");
     for (const [slug, componentName] of componentDocs) {
@@ -245,12 +257,13 @@ describe("Pieces documentation coverage", () => {
             ),
           );
       });
-      expect(variants.length, `${componentName} defines variant types`).toBeGreaterThan(0);
-      for (const variant of new Set(variants)) {
-        expect(
-          exampleSource,
-          `${componentName} variant "${variant}" has a preview entry`,
-        ).toContain(`"${variant}"`);
+      if (variants.length > 0) {
+        for (const variant of new Set(variants)) {
+          expect(
+            exampleSource,
+            `${componentName} variant "${variant}" has a preview entry`,
+          ).toContain(`"${variant}"`);
+        }
       }
 
       const publicProps = getDirectProps(

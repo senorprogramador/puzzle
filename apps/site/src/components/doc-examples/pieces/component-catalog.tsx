@@ -17,11 +17,15 @@ const categoryOverviews = new Set([
 ]);
 const nonSectionPages = new Set([
   "accommodation-discovery",
+  "boutique-bnb",
   "data-display",
   "feedback",
   "hero",
+  "hospitality-overview",
+  "hospitality-booking-flow",
   "navigation",
   "project",
+  "restaurant-experience",
 ]);
 
 const flattenNavigation = (item: NavigationItem): NavigationItem[] => [

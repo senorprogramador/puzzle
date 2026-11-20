@@ -1,0 +1,117 @@
+---
+title: DietaryInformation
+description: Display caller-supplied dietary tags and allergen information with readable labels, optional icons, compact or expanded layouts, and an accessible popover.
+---
+
+import { DietaryInformation } from "@puzzle-ui/pieces";
+import { Badge, Preview } from "@puzzle-ui/ui";
+import {
+  DietaryInformationPopoverExample,
+  DietaryInformationVariantsExample,
+} from "../../../../src/components/doc-examples/pieces/restaurant-menu";
+
+`DietaryInformation` displays labels provided by the restaurant or application.
+It never infers ingredients, allergens, or dietary suitability from a dish name
+or description.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## TypeScript example
+
+```tsx
+import {
+  DietaryInformation,
+  type Allergen,
+  type DietaryTag,
+} from "@puzzle-ui/pieces";
+
+const tags: DietaryTag[] = [
+  { id: "plant-based", label: "Plant-based" },
+];
+const allergens: Allergen[] = [
+  { id: "sesame", label: "Sesame" },
+];
+
+<DietaryInformation tags={tags} allergens={allergens} />;
+```
+
+## Compact and expanded variants
+
+Both variants always display the supplied text labels. Expanded mode also shows
+the supplied item descriptions. Icons are optional and decorative; they never
+replace the label.
+
+<DietaryInformationVariantsExample />
+
+## Optional details popover
+
+Use the existing Puzzle UI `Popover` when descriptions should be available on
+demand. The text labels remain visible outside the popover.
+
+<Preview
+  fit="device"
+  code={`<DietaryInformation tags={tags} allergens={allergens} showDetailsPopover />`}
+>
+  <DietaryInformationPopoverExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `tags` | `readonly DietaryTag[]` | No | `[]` | Dietary labels explicitly supplied by the caller. |
+| `allergens` | `readonly Allergen[]` | No | `[]` | Allergen labels explicitly supplied by the caller. |
+| `variant` | `"compact" \| "expanded"` | No | `"compact"` | Compact labels or labels with descriptions. |
+| `dietaryHeading` | `ReactNode` | No | `"Dietary"` | Visible heading for the dietary tags. |
+| `allergenHeading` | `ReactNode` | No | `"Allergens"` | Visible heading for the allergens. |
+| `showDetailsPopover` | `boolean` | No | `false` | Adds a button that opens the existing UI Popover with supplied details. |
+| `detailsLabel` | `ReactNode` | No | `"Details"` | Accessible button content for the popover trigger. |
+| `popoverTitle` | `ReactNode` | No | `"Dietary and allergen information"` | Visible and accessible popover title. |
+| `closeLabel` | `string` | No | `"Close"` | Accessible name for the popover close button. |
+| `className` | `string` | No | — | Additional class on the wrapper. |
+
+### Shared item types
+
+`DietaryTag` and `Allergen` share the extensible `DietaryInformationItem`
+shape: a unique `id`, a caller-configured `label`, and optional `icon` and
+`description`. Labels and descriptions accept `ReactNode`; filter options use
+plain text labels so native select controls remain accessible. The component
+returns no wrapper when both arrays are empty and rejects duplicate or empty
+IDs within either array.
+
+## Safety and responsibility boundary
+
+The application must provide accurate, current allergen and dietary
+information from its own source. Pieces does not inspect ingredients, make
+medical claims, certify that a dish is safe for a person, or infer missing
+information. Keep labels visible even when icons are supplied, and do not use
+color as the only distinction.
+
+## Responsive behavior and accessibility
+
+- Labels wrap in compact and expanded layouts without fixed widths.
+- Semantic lists and visible group headings communicate dietary tags and
+  allergens separately.
+- Decorative icons are hidden from assistive technology because the visible
+  text label conveys the information.
+- The optional popover uses the existing keyboard-accessible UI primitive;
+  disclosure details are not required to understand the visible labels.
+
+## Theme support and customization
+
+The component uses Puzzle Theme border, surface, text, spacing, and focus-ring
+tokens. Pass custom labels and icon React nodes through each item; icons are
+decorative, while labels remain visible. `showDetailsPopover` composes the
+existing UI Popover rather than introducing a new overlay system.
+
+## Related components
+
+- [Dish Card](/docs/pieces/components/dish-card) for presenting dietary details
+  with a menu item.
+- [Restaurant Menu](/docs/pieces/components/restaurant-menu) for categories,
+  menu navigation, and caller-supplied dietary filtering.
+- [Popover](/docs/ui/overlays/popover) for the underlying interactive primitive.
+
+Use the component in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

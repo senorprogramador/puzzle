@@ -9,7 +9,7 @@ import {
 export const runCrudConformance = (
   createAdapter: () => Promise<StorageAdapter>,
   reset: () => Promise<void>,
-) => {
+): void => {
   describe("CRUD and query conformance", () => {
     let adapter: StorageAdapter;
 

@@ -25,4 +25,5 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   copy: ["../../LICENSE"],
+  suppressWarnings: [/MODULE_LEVEL_DIRECTIVE/],
 });

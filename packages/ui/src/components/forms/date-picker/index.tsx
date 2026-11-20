@@ -70,6 +70,7 @@ const DatePicker = ({
   error,
   disabled = false,
   required = false,
+  requiredDescription = "Required",
   clearable = false,
   clearLabel = "Clear date",
   name,
@@ -112,6 +113,7 @@ const DatePicker = ({
   const triggerId = id ?? `${baseId}-trigger`;
   const labelId = `${baseId}-label`;
   const descriptionId = `${baseId}-description`;
+  const requiredDescriptionId = `${baseId}-required-description`;
   const errorId = `${baseId}-error`;
   const calendarId = `${baseId}-calendar`;
   const gridId = `${baseId}-grid`;
@@ -731,6 +733,9 @@ const DatePicker = ({
     [
       ariaDescribedBy,
       description != null ? descriptionId : undefined,
+      required && requiredDescription != null
+        ? requiredDescriptionId
+        : undefined,
       hasError ? errorId : undefined,
     ]
       .filter(Boolean)
@@ -754,7 +759,6 @@ const DatePicker = ({
       aria-haspopup="dialog"
       aria-expanded={isOpen}
       aria-controls={isOpen ? calendarId : undefined}
-      aria-required={required || undefined}
       aria-invalid={resolvedAriaInvalid}
     >
       <span
@@ -982,6 +986,15 @@ const DatePicker = ({
         <div id={descriptionId} className="puzzle-date-picker__description">
           {description}
         </div>
+      )}
+
+      {required && requiredDescription != null && (
+        <span
+          id={requiredDescriptionId}
+          className="puzzle-date-picker__required-description"
+        >
+          {requiredDescription}
+        </span>
       )}
 
       {hasError && (

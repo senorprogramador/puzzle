@@ -54,6 +54,8 @@ await auth.initialize();
 
 Use a 32-byte `Uint8Array` encryption key sourced from a secret manager, not a literal in application code. If passkeys are disabled, omit both the `webAuthn` option and `webAuthnProvider`. If enabled, configure both together and use the exact production origin and RP ID.
 
+`SimpleWebAuthnProvider` advertises EdDSA, ES256, and RS256 by default. Pass `supportedAlgorithmIDs` to opt into other COSE algorithms supported by your WebAuthn server and authenticators; experimental ML-DSA support should be enabled only where the runtime supports it.
+
 ## MFA policy and enrollment
 
 MFA is optional by default. `AuthMfaPolicy.required` requires every user to have and use an active factor; `requiredFor(user)` can require it for selected users. Existing active factors are challenged at sign-in even when MFA policy is optional. A policy that requires MFA without configuring an MFA manager fails closed.

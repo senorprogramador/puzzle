@@ -1,0 +1,95 @@
+.puzzle-dietary-information {
+  display: grid;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-dietary-information__groups,
+.puzzle-dietary-information__popover {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+  min-width: 0;
+}
+
+.puzzle-dietary-information__group {
+  display: grid;
+  gap: var(--puzzle-space-1, 0.25rem);
+  min-width: 0;
+}
+
+.puzzle-dietary-information__heading {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+}
+
+.puzzle-dietary-information__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-dietary-information__item {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--puzzle-space-1, 0.25rem);
+  min-width: 0;
+  padding: var(--puzzle-space-1, 0.25rem) var(--puzzle-space-2, 0.5rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface);
+  overflow-wrap: anywhere;
+}
+
+.puzzle-dietary-information__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  color: var(--puzzle-color-primary);
+}
+
+.puzzle-dietary-information__copy {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-dietary-information__description {
+  color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-dietary-information[data-variant="expanded"]
+  .puzzle-dietary-information__items {
+  display: grid;
+  justify-items: start;
+}
+
+.puzzle-dietary-information__details-trigger {
+  justify-self: start;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  color: var(--puzzle-color-primary);
+  background: transparent;
+  font: inherit;
+  text-align: start;
+  text-decoration: underline;
+  text-underline-offset: var(--puzzle-space-1, 0.25rem);
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.puzzle-dietary-information__details-trigger:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-dietary-information__popover {
+  max-width: 100%;
+}

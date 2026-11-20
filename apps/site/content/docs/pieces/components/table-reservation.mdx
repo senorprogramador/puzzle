@@ -1,0 +1,158 @@
+---
+title: TableReservationSection
+description: Present an accessible restaurant reservation form or external booking link with controlled data, validation feedback, and caller-owned submission states.
+---
+
+import { TableReservationSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { TableReservationSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/restaurant-reservations";
+
+`TableReservationSection` collects restaurant reservation details and passes
+them to an application callback. It also supports a direct external booking
+link when the application uses a reservation provider.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## TypeScript example
+
+```tsx
+import {
+  TableReservationSection,
+  type TableReservationValues,
+} from "@puzzle-ui/pieces";
+
+const reservation: TableReservationValues = {
+  date: "2026-07-15",
+  time: "19:00",
+  partySize: 2,
+  seating: "any",
+  seatingPreference: "",
+  specialRequests: "",
+  guestName: "",
+  email: "",
+  phone: "",
+};
+
+<TableReservationSection
+  value={reservation}
+  onChange={setReservation}
+  onSubmit={submitToYourReservationService}
+/>;
+```
+
+## Inline, dialog, provider, and status previews
+
+The form composes Puzzle UI `FormField`, `DatePicker`, `TimePicker`,
+`NumberInput`, `Select`, `TextInput`, `TextAreaInput`, and `Button`. Use an
+existing UI `Dialog` when the form belongs in an overlay.
+
+<TableReservationSectionVariantsExample />
+
+The submit callbacks and success messages in these previews are local
+demonstrations only; they do not contact a restaurant or create a reservation.
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `value` | `TableReservationValues` | No | Uncontrolled | Controlled field values. |
+| `defaultValue` | `Partial<TableReservationValues>` | No | Date/time empty, party size `2`, seating `"any"`, other fields empty | Initial uncontrolled values. |
+| `minPartySize`, `maxPartySize` | `number` | No | `1`, `20` | Positive integer bounds used for form validation, not table availability. |
+| `locale` | `string` | No | Runtime locale | Locale for the existing date picker. |
+| `dateFormat` | `Intl.DateTimeFormatOptions` | No | Date picker default | Date display format. |
+| `requiredDescription` | `ReactNode` | No | `"Required"` | Accessible required-state description for the date field; localize as needed. |
+| `errors` | `TableReservationErrors` | No | — | Caller-provided per-field validation messages. |
+| `error`, `success` | `ReactNode` | No | Callback result messages | Caller-controlled submission feedback. |
+| `loading`, `disabled` | `boolean` | No | `false` | Disable the form controls and submit action. |
+| `dateLabel`, `timeLabel`, `partySizeLabel`, `seatingLabel` | `ReactNode` | No | English labels | Visible field labels for date, time, party size, and seating. |
+| `anySeatingLabel`, `indoorLabel`, `outdoorLabel` | `string` | No | `"No preference"`, `"Indoors"`, `"Outdoors"` | Text for the seating select. |
+| `seatingPreferenceLabel`, `specialRequestsLabel`, `guestNameLabel`, `emailLabel`, `phoneLabel` | `ReactNode` | No | English labels | Visible labels for optional preferences and contact fields. |
+| `submitLabel`, `loadingLabel` | `ReactNode` | No | `"Request a table"`, `"Sending request…"` | Submit button content for idle and loading states. |
+| `bookingHref` | `string` | No | — | External provider URL. Without `onSubmit`, renders a provider CTA instead of a form. |
+| `bookingLinkLabel`, `bookingLinkDescription` | `ReactNode` | No | Provider CTA text | Content for the external booking link. |
+| `calendarLabel` | `string` | No | `"Choose reservation date"` | Accessible name for the date picker calendar. |
+| `onChange` | `(value: TableReservationValues) => void` | No | — | Called with the complete next value after a field changes. |
+| `onSubmit` | `(value: TableReservationValues) => void \| Promise<void>` | No | — | Receives validated values. Rejections are shown as errors. |
+| `onValidationError` | `(errors: TableReservationErrors) => void` | No | — | Receives built-in and caller-supplied field errors. |
+| `className` | `string` | No | — | Additional class on the section. |
+
+The usual `MarketingSection` heading, description, actions, alignment, and
+children composition props are also supported.
+
+### Values and controlled state
+
+`TableReservationValues` contains an ISO calendar date string or `null`, a
+local `HH:mm` time string or `null`, party size, seating, a free-form seating
+preference, special requests, guest name, email, and phone. Date, time, party
+size, guest name, and email are required for submission; phone and the
+preference/request fields are optional.
+
+The exported `TableReservationSeating` union is `"any"`, `"indoor"`, or
+`"outdoor"`. `TableReservationInitialValue` is a partial values object used by
+`defaultValue`. `TableReservationField` is the key union for
+`TableReservationValues`, and `TableReservationErrors` maps those keys to
+caller-provided messages. `TableReservationSectionProps` is the exported
+component props type. All types are available from the `@puzzle-ui/pieces`
+package root.
+
+Dates and times remain venue-local values; Pieces does not convert them to UTC
+or infer a venue timezone.
+
+Pass `value` with `onChange` for controlled forms. Otherwise use `defaultValue`
+for initial state. The callback receives the full next object so the caller can
+persist or validate it. Built-in validation checks the date and time formats,
+party-size bounds, name, and email. Caller rules can be supplied through
+`errors`; submission is blocked while any built-in or external field error is
+present, and `onValidationError` receives the combined errors.
+
+## Submission and external integration
+
+When `onSubmit` is provided, the component renders a form. The async callback is
+the only submission action; the component does not call APIs. Its pending,
+success, or rejection state is presented locally, while the `loading`, `error`,
+and `success` props allow the application to control displayed state.
+
+When `onSubmit` is omitted, pass `bookingHref` to render a direct provider
+button. The component does not check table availability or link status. Both
+the form and link can be shown when an application offers both flows.
+
+Pieces does not own reservation storage, table availability, email delivery,
+payments, or provider integrations. Do not treat a successful callback as
+confirmation unless the application has confirmed it with its own service.
+
+## Responsive behavior and accessibility
+
+- The form grid collapses to one column on narrow screens; fields remain
+  full-width and action buttons become easy-to-reach full-width controls.
+- Date and time use native accessible inputs through the existing Puzzle UI
+  pickers. Seating uses the shared keyboard-operable `Select`.
+- Each control has a visible label and field-level errors are associated by
+  `FormField`. Invalid submit focuses the first invalid control; a successful
+  callback moves focus to the status message.
+- The section can be placed inside the existing `Dialog`; the dialog remains
+  responsible for its own viewport sizing and focus trap.
+- The form has client-side interaction and should be rendered within the
+  framework's client boundary when needed. Its static section markup remains
+  server-renderable.
+
+## Theme support and customization
+
+Controls and the section inherit Puzzle Theme tokens. Use the label props,
+`className`, and inherited section composition props for localization and
+product-specific styling; keep any custom controls accessible and pass
+application-owned errors and actions through props.
+
+## Related components
+
+- [Restaurant Menu](/docs/pieces/components/restaurant-menu) for caller-owned
+  dishes and categories.
+- [Opening Hours](/docs/pieces/components/opening-hours) for the venue's
+  weekly, seasonal, and exception schedule.
+- [Booking Section](/docs/pieces/components/booking-section) for a generic
+  booking composition with application-provided form slots.
+- [Restaurant Experience](/docs/pieces/components/restaurant-experience) for a
+  complete restaurant page example.
+
+Use the component in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

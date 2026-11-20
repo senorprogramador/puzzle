@@ -1,0 +1,20 @@
+.puzzle-gift-voucher-section__action {
+  display: inline-flex;
+  max-width: 100%;
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-4, 1rem);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  color: var(--puzzle-color-primary);
+  font-weight: var(--puzzle-font-weight-semibold, 600);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.puzzle-gift-voucher-section__action:hover {
+  text-decoration: underline;
+}
+
+.puzzle-gift-voucher-section__action:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-primary);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}

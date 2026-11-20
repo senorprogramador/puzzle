@@ -1,0 +1,79 @@
+---
+title: HouseRulesSection
+description: Present caller-supplied check-in, guest, pet, smoking, parking, payment, cancellation, and practical house rules.
+---
+
+import { HouseRulesSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { HouseRulesSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/hospitality-booking";
+
+`HouseRulesSection` organizes house rules supplied by the accommodation owner
+or application. It presents policy content only; it does not determine or
+enforce booking terms.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## TypeScript example
+
+```tsx
+import {
+  HouseRulesSection,
+  type HouseRuleCategory,
+} from "@puzzle-ui/pieces";
+```
+
+## Expanded and compact variants
+
+Expanded groups can include category descriptions and supporting copy for each
+rule. The examples cover arrival, pets, children, smoking, parking, payment,
+cancellation, and practical arrangements. Compact mode shows the rule label
+and value without supporting descriptions; optional native disclosures remain
+keyboard operable.
+
+<HouseRulesSectionVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `categories` | `readonly HouseRuleCategory[]` | Yes | — | Category records with unique IDs and rule lists. |
+| `variant` | `"compact" \| "expanded"` | No | `"expanded"` | Whether supporting descriptions are shown. |
+| `collapsible` | `boolean` | No | `false` | Wraps category content in native disclosure elements. |
+| `defaultOpen` | `boolean` | No | `false` | Initial disclosure state when `collapsible` is enabled. |
+| `emptyState` | `ReactNode` | No | `"No house rules provided."` | Message for an empty category list. |
+| `className` | `string` | No | — | Additional class on the section. |
+| `title`, `description`, `eyebrow`, `actions` | `ReactNode` | No | — | Shared section heading and action props. |
+
+### Data types
+
+`HouseRuleCategory` contains an `id`, a `title`, optional `description`, and a
+`rules` array. Each `HouseRule` contains a unique `id`, `label`, `value`, and
+optional `description`. Rule labels and values accept `ReactNode`, so the
+application can provide links or other semantic content where appropriate.
+
+## Responsive behavior and accessibility
+
+- Categories use a fluid grid that becomes a single column on narrow screens.
+- Rule labels and values wrap instead of clipping.
+- Category content uses semantic headings and definition lists.
+- Collapsible groups use native disclosure controls, which are keyboard
+  operable and expose their expanded state to assistive technology.
+
+## Theme support and customization
+
+Cards, borders, and text consume Puzzle Theme tokens and inherit scoped themes.
+Pass caller-owned labels and values as React content; do not encode policy
+decisions in this presentation component.
+
+## Related components
+
+- [Amenity List](/docs/pieces/components/amenity-list) for accommodation
+  facilities rather than policies.
+- [Accommodation Details](/docs/pieces/components/accommodation-details) for
+  one accommodation profile.
+- [Availability Search](/docs/pieces/components/availability-search) for
+  caller-owned search input.
+
+Use the component in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

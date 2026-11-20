@@ -1,0 +1,11 @@
+.puzzle-service-options-section__pricing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+}
+
+.puzzle-service-options-section__price {
+  overflow-wrap: anywhere;
+}

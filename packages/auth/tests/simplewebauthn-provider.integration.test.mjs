@@ -1,6 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+import { COSEALG } from "@simplewebauthn/server/helpers";
+
 import { SimpleWebAuthnProvider } from "../dist/index.js";
 
 const provider = new SimpleWebAuthnProvider();
@@ -27,6 +29,35 @@ test("generates registration options with the supplied challenge", async () => {
   assert.equal(options.user.name, "user@example.com");
   assert.equal(options.authenticatorSelection.userVerification, "required");
   assert.equal(options.authenticatorSelection.residentKey, "required");
+  assert.deepEqual(
+    options.pubKeyCredParams.map(({ alg }) => alg),
+    [COSEALG.EdDSA, COSEALG.ES256, COSEALG.RS256],
+  );
+});
+
+test("supports a configured WebAuthn algorithm allowlist", async () => {
+  const configuredProvider = new SimpleWebAuthnProvider({
+    supportedAlgorithmIDs: [COSEALG.ES256],
+  });
+
+  const options = await configuredProvider.generateRegistrationOptions({
+    ...baseInput,
+    userId: "user-1",
+    userName: "user@example.com",
+    excludeCredentialIds: [],
+  });
+
+  assert.deepEqual(
+    options.pubKeyCredParams.map(({ alg }) => alg),
+    [COSEALG.ES256],
+  );
+});
+
+test("rejects an empty WebAuthn algorithm allowlist", () => {
+  assert.throws(
+    () => new SimpleWebAuthnProvider({ supportedAlgorithmIDs: [] }),
+    /non-empty list/,
+  );
 });
 
 test("excludes previously registered credentials", async () => {

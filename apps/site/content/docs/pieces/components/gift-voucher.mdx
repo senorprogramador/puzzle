@@ -1,0 +1,125 @@
+---
+title: Gift Voucher
+description: Present hospitality gift vouchers and packages with the existing ProductGrid cards and caller-provided purchase destinations.
+---
+
+import { GiftVoucherSection } from "@puzzle-ui/pieces";
+import { Badge } from "@puzzle-ui/ui";
+import { GiftVoucherSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/gift-voucher";
+
+`GiftVoucherSection` adapts `ProductGridSection` for vouchers, values, and stay or dining arrangements. Each option is a presentation card; checkout, voucher issuance, and payment remain application responsibilities.
+
+<Badge content="Beta" color="primary" /> **API maturity: Beta.**
+
+## Installation
+
+```tsx
+import { GiftVoucherSection, type GiftVoucherOption } from "@puzzle-ui/pieces";
+```
+
+## Variant previews
+
+Grid, featured, and category variants reuse the existing ProductGrid layout.
+Purchase links are supplied by the application; cards without a destination
+remain informational.
+
+<GiftVoucherSectionVariantsExample />
+
+## API
+
+| Prop | Type | Required | Default |
+| --- | --- | --- | --- |
+| `vouchers` | `readonly GiftVoucherOption[]` | Yes | — |
+| `variant` | `ProductGridVariant` | No | `"grid"` |
+| `locale` | `string` | No | `"en-US"` |
+| `purchaseLabel` | `ReactNode` | No | `"View gift voucher"` |
+| `emptyState` | `ReactNode` | No | — |
+| Shared section props | `MarketingSectionBaseProps` | No | — |
+
+### `GiftVoucherOption`
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | Yes | Stable option identifier. |
+| `name` | `string` | Yes | Voucher or package name. |
+| `price` | `CommerceMoney` | Yes | Caller-supplied amount and currency. |
+| `description` | `ReactNode` | No | Description of the value or arrangement. |
+| `image` | `CommerceImage` | No | Optional image and meaningful alternative text. |
+| `compareAtPrice` | `CommerceMoney` | No | Optional caller-supplied comparison price. |
+| `labels` | `readonly ProductGridLabel[]` | No | Optional labels provided by the application. |
+| `rating` | `CommerceRating` | No | Optional supplied rating; no rating is calculated. |
+| `arrangement` | `ReactNode` | No | Optional package or experience label. |
+| `category` | `string` | No | Supplied category for the ProductGrid category layout. |
+| `collection` | `string` | No | Supplied grouping for the ProductGrid collection layout. |
+| `purchaseHref` | `string` | No | Destination owned by the application or its purchase provider. |
+| `purchaseAction` | `ReactNode` | No | Alternative caller-owned action. |
+| `purchaseLabel` | `ReactNode` | No | Per-option override for the default link label. |
+| `featured` | `boolean` | No | Marks an option for the featured variant. |
+
+Each denomination or arrangement should be a separate `GiftVoucherOption`.
+Use an externally owned destination or action when purchase behavior is
+available; Pieces does not provide checkout.
+
+## Usage
+
+```tsx
+const vouchers: GiftVoucherOption[] = [
+  {
+    id: "weekend",
+    name: "A weekend for two",
+    description: "Two nights with breakfast.",
+    price: { amount: 260, currency: "EUR" },
+    arrangement: "Two nights with breakfast",
+    purchaseHref: "https://example.test/vouchers/weekend",
+  },
+];
+
+<GiftVoucherSection title="Give a slower weekend" vouchers={vouchers} locale="en-GB" />;
+```
+
+## Responsive behavior
+
+All variants use ProductGrid's fluid layouts and content-driven cards.
+Images are optional, names and descriptions wrap, and long amounts use the
+existing commerce price display.
+
+## Accessibility
+
+The component uses ProductGrid's semantic cards and named links. Provide
+descriptive purchase labels and meaningful image alternatives. A custom
+`purchaseAction` should also have an accessible name.
+
+## Theme support
+
+Product cards and actions inherit ProductGrid and Puzzle UI semantic tokens,
+including scoped themes.
+
+## Customization
+
+Use shared section props, `className`, the `purchaseAction` slot, and optional
+images. Labels, price values, destinations, and checkout behavior are supplied
+by the application.
+
+## Composition
+
+Pair a voucher section with [Service Options](/docs/pieces/components/service-options)
+or an existing menu, accommodation, or CTA section. See the [Boutique B&B](/docs/pieces/components/boutique-bnb)
+and [Restaurant Experience](/docs/pieces/components/restaurant-experience)
+references.
+
+## TypeScript example
+
+`GiftVoucherOption` and `GiftVoucherSection` are package-root exports.
+`CommerceMoney` and `CommerceImage` are shared existing Pieces types.
+
+## Framework compatibility
+
+The section is router-independent and server-renderable. Purchase navigation,
+checkout, voucher administration, and payment are outside Pieces. See
+[Next.js and TanStack Start integration](/docs/pieces/framework-integration).
+
+## Related components
+
+- [Product Grid](/docs/pieces/components/product-grid)
+- [Service Options](/docs/pieces/components/service-options)
+- [Commerce Benefits](/docs/pieces/components/commerce-benefits)

@@ -17,9 +17,10 @@ export type ResourceItem = {
   id: string;
   title: string;
   description?: ReactNode;
+  metadata?: ReactNode;
   category?: string;
   type?: string;
-  href: string;
+  href?: string;
   download?: boolean | string;
   featured?: boolean;
   thumbnail?: ReactNode;

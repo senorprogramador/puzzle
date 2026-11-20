@@ -1,0 +1,151 @@
+---
+title: AvailabilitySearchSection
+description: Present an accessible accommodation search form with caller-owned dates, guest counts, validation, and external availability actions.
+---
+
+import { AvailabilitySearchSection } from "@puzzle-ui/pieces";
+import { Badge, Preview } from "@puzzle-ui/ui";
+import {
+  AvailabilitySearchSectionVariantsExample,
+  AvailabilitySearchControlledDatesExample,
+  AvailabilitySearchControlledGuestsExample,
+  AvailabilitySearchLoadingErrorExample,
+} from "../../../../src/components/doc-examples/pieces/hospitality-booking";
+
+`AvailabilitySearchSection` presents check-in and check-out dates, guest counts,
+optional child ages, an optional accommodation choice, and flexible-date
+preferences. It does not check inventory, calculate availability, or contact a
+service.
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.**
+
+## TypeScript example
+
+```tsx
+import {
+  AvailabilitySearchSection,
+  type AvailabilitySearchValues,
+} from "@puzzle-ui/pieces";
+```
+
+## Compact and expanded variants
+
+Compact search keeps the form dense; expanded search gives the fields more
+space. Both variants retain the same fields and validation behavior.
+
+<AvailabilitySearchSectionVariantsExample />
+
+The submit callback receives values after local date and guest validation; the
+application decides whether and how to query an external provider.
+
+## Controlled state
+
+Pass the complete `AvailabilitySearchValues` object to control dates, guests,
+the selected accommodation, and flexible-date state. `onChange` reports the
+next complete object.
+
+<Preview
+  fit="device"
+  code={`<AvailabilitySearchSection value={search} onChange={setSearch} onSubmit={submitSearch} />`}
+>
+  <AvailabilitySearchControlledDatesExample />
+</Preview>
+
+<Preview
+  fit="device"
+  code={`<AvailabilitySearchSection value={search} onChange={setSearch} childAgeOptions={ageOptions} onSubmit={submitSearch} />`}
+>
+  <AvailabilitySearchControlledGuestsExample />
+</Preview>
+
+## External loading and errors
+
+The component shows its own pending state while an async `onSubmit` callback is
+running. Pass `loading` and `error` when the surrounding application owns those
+states, or use `errors` to connect application validation to individual fields.
+
+<Preview
+  fit="device"
+  code={`<AvailabilitySearchSection loading={isSearching} error={searchError} onSubmit={search} />`}
+>
+  <AvailabilitySearchLoadingErrorExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `"compact" \| "expanded"` | No | `"compact"` | Controls field spacing. |
+| `value` | `AvailabilitySearchValues` | No | — | Complete controlled search value. |
+| `defaultValue` | `AvailabilitySearchInitialValue` | No | Dates unset, 2 adults, 0 children, no accommodation, inflexible dates | Initial uncontrolled value; guest fields can be initialized partially. |
+| `accommodations` | `readonly AvailabilityAccommodationOption[]` | No | `[]` | Options supplied by the application. |
+| `childAgeOptions` | `readonly AvailabilityChildAgeOption[]` | No | `[]` | Adds one optional age selector per child. |
+| `accommodationRequired` | `boolean` | No | `false` | Requires an option when the search is submitted. |
+| `minAdults`, `maxAdults` | `number` | No | `1`, `20` | Inclusive guest-count bounds. |
+| `minChildren`, `maxChildren` | `number` | No | `0`, `20` | Inclusive guest-count bounds. |
+| `locale` | `string` | No | Runtime locale | BCP 47 locale forwarded to the date pickers. |
+| `dateFormat` | `Intl.DateTimeFormatOptions` | No | UI DatePicker default | Date display options, including an explicit `timeZone` if needed. |
+| `requiredDescription` | `ReactNode` | No | `"Required"` | Accessible required-state description for both date fields; localize as needed. |
+| `errors` | `AvailabilitySearchErrors` | No | — | Caller-provided per-field errors. These prevent submit until cleared. |
+| `error` | `ReactNode` | No | — | Caller-provided form-level error content. |
+| `loading` | `boolean` | No | `false` | External pending state; disables the controls. |
+| `disabled` | `boolean` | No | `false` | Disables the controls and submit button. |
+| `submitLabel`, `loadingLabel` | `ReactNode` | No | `"Search availability"`, `"Searching..."` | Submit button labels. |
+| `onChange` | `(value: AvailabilitySearchValues) => void` | No | — | Receives every updated complete value. |
+| `onSubmit` | `(value: AvailabilitySearchValues) => void \| Promise<void>` | Yes | — | Receives locally valid values; the application provides any availability action. |
+| `onValidationError` | `(errors: AvailabilitySearchErrors) => void` | No | — | Notifies the application when local or supplied field errors prevent submit. |
+
+`AvailabilitySearchValues` contains `checkIn` and `checkOut` (`Date | null`),
+`guests` (`GuestCount`), `accommodationId` (`string | null`), and
+`flexibleDates` (`boolean`). `GuestCount` contains integer `adults` and
+`children` counts plus optional `childAges` entries (`number | null`). Child
+age selectors appear only when `childAgeOptions` are supplied; age values are
+not required.
+
+The component rejects invalid configured bounds and duplicate option IDs. On
+submit, it requires both dates, requires checkout to be on a later calendar
+day, checks the configured guest bounds, and optionally checks the
+accommodation choice. It does not assume future-date limits, check actual
+availability, or validate provider-specific rules.
+
+## Integration boundary
+
+All accommodation options, child-age labels, and external errors are supplied
+through props. The application owns the availability request, provider-specific
+validation, persistence, route changes, rate lookup, reservations, and payment.
+Use [BookingSection](/docs/pieces/components/booking-section) instead when a
+generic booking layout with caller-provided form slots is a better fit.
+
+## Responsive behavior and accessibility
+
+- The field grid shrinks to one column when the viewport cannot fit its
+  minimum field width; no fixed-width date fields or sticky elements are used.
+- UI `DatePicker`, `Select`, `NumberInput`, `Checkbox`, and `FormField` provide
+  the calendar, popover, guest controls, labels, and field error relationships.
+- Check-in and check-out labels are required; errors are associated with their
+  field and the form-level error uses an alert role.
+- The form uses `noValidate` so the component can report its own date and guest
+  errors consistently without native validation blocking its callback.
+- Use an explicit `locale` and a matching `dateFormat.timeZone` when server and
+  client environments need identical date output.
+
+## Theme support and customization
+
+The section and controls consume Puzzle Theme tokens and inherit scoped themes.
+Use the shared `title`, `description`, `eyebrow`, `actions`, `alignment`, and
+`className` section props to compose it with a page; the form controls remain
+Puzzle UI components rather than caller-rebuilt inputs.
+
+## Related components
+
+- [Booking Section](/docs/pieces/components/booking-section) for a generic
+  caller-owned form and booking layout.
+- [Rate Plans](/docs/pieces/components/rate-plans) for caller-supplied rates.
+- [Stay Summary](/docs/pieces/components/stay-summary) for caller-supplied
+  totals and line items.
+- [Date Picker](/docs/ui/forms/date-picker), [Select](/docs/ui/forms/select),
+  and [Form Field](/docs/ui/forms/form-field) for the underlying controls.
+
+Use the component in either supported framework; see
+[Framework Integration](/docs/pieces/framework-integration) for Next.js and
+TanStack Start guidance.

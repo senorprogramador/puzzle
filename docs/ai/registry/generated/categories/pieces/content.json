@@ -150,6 +150,35 @@
       "aliases": []
     },
     {
+      "name": "LocalGuideSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "content",
+      "subcategory": "local-guide-section",
+      "description": "Present caller-supplied nearby places and activities with categories, optional distances, travel times, links, and map content.",
+      "documentation": "apps/site/content/docs/pieces/components/local-guide.mdx",
+      "source": "packages/pieces/src/components/content/local-guide-section/local-guide-section.tsx",
+      "useCases": [
+        "content"
+      ],
+      "pageTypes": [
+        "blog",
+        "article",
+        "event"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "local-guide-section"
+      },
+      "aliases": []
+    },
+    {
       "name": "ResourceSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [

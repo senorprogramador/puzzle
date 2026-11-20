@@ -19,5 +19,8 @@ export default defineConfig({
   deps: {
     neverBundle: ["react", "@puzzle-ui/core"],
   },
+  checks: {
+    legacyCjs: false,
+  },
   suppressWarnings: [/MODULE_LEVEL_DIRECTIVE/],
 });

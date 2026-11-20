@@ -1,0 +1,47 @@
+---
+title: Hospitality Booking Flow
+description: Compose accommodation search, rate plans, a stay summary, and house rules with data and actions supplied by the application.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { BookingFlowExample } from "../../../../src/components/doc-examples/pieces/hospitality-booking";
+
+This example composes existing and new Pieces for an accommodation booking
+journey. The search form, rates, summary, and house rules all use supplied
+props. The demo has no booking backend, availability calculation, price
+calculation, database, or payment flow.
+
+<Preview
+  fit="device"
+  code={`<BookingFlowExample />`}
+>
+  <BookingFlowExample />
+</Preview>
+
+## Composition
+
+1. `AvailabilitySearchSection` presents dates, guest counts, and an optional
+   accommodation choice. Its callback hands the values to application code.
+2. `RatePlansSection` displays the rate data returned by the application's
+   external source. It does not derive weekly prices from nightly prices.
+3. `StaySummarySection` displays the supplied guest/date details, price lines,
+   and total. It does not calculate nights or sum the breakdown.
+4. `HouseRulesSection` presents property terms provided by the owner or app.
+5. Existing [Accommodation Details](/docs/pieces/components/accommodation-details),
+   [Gallery](/docs/pieces/components/gallery-section), and
+   [Testimonials](/docs/pieces/components/testimonials) can be composed around
+   the booking information where appropriate.
+
+## Integration boundary
+
+The application owns the availability provider, validation beyond the
+component's local date/guest checks, the source of each rate, currency
+conversion, price arithmetic, reservation state, external navigation, and
+payment. Supply explicit locale and time-zone values when server-rendered date
+and price strings must match the browser.
+
+See the individual references for
+[Availability Search](/docs/pieces/components/availability-search),
+[Rate Plans](/docs/pieces/components/rate-plans),
+[Stay Summary](/docs/pieces/components/stay-summary), and
+[House Rules](/docs/pieces/components/house-rules).
