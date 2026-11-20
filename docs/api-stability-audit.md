@@ -2,7 +2,7 @@
 
 ## Scope and method
 
-Audited all 70 individually documented components in `@puzzle-ui/ui`, all 20
+Audited all 71 individually documented components in `@puzzle-ui/ui`, all 20
 individually exported hero components documented by `@puzzle-ui/pieces`, and 46
 other React components documented by the Theme (2), Icons (1), Fullstack (7),
 and SEO (36) package guides. Aliases are recorded with their canonical
@@ -12,10 +12,11 @@ page are documentation pages, not additional components.
 The public API below is taken from the package entry points and component
 exports, not inferred from examples. Validation evidence is based on
 component-local test files and the public package peer dependencies. The site
-package declares React and React DOM 19 as peers. All 136 components in this
-inventory are now classified Stable, with documented backward-compatibility
-intent within a major version. Package-level utility and adapter APIs retain
-their separate maturity classifications below.
+package declares React and React DOM 19 as peers. The component inventory
+contains 137 APIs: 136 Stable and `SectionHeader` Beta. Stable classifications
+include documented backward-compatibility intent within a major version.
+Package-level utility and adapter APIs retain their separate maturity
+classifications below.
 
 No `@deprecated` annotations or deprecated component exports were found in the
 audited component APIs.
@@ -86,6 +87,7 @@ The test count is the number of test files in the component source directory
 | Scroll Area | `ScrollArea`, `ScrollAreaProps`, `ScrollAreaOrientation` | Stable | 3 local test files. Uses native browser scrolling; within-major backward-compatibility intent documented. |
 | Section Stack | `SectionStack`, `SectionStackProps` | Stable | 1 local test file. React 19 peer; within-major backward-compatibility intent documented. |
 | Section | `Section`, `SectionProps`, `SectionTheme` | Stable | 1 local test file. React 19 peer; within-major backward-compatibility intent documented. |
+| SectionHeader | `SectionHeader`, `SectionHeaderAlignment`, `SectionHeaderProps` | Beta | The shared section API is still being exercised by upcoming Pieces families; a Stable compatibility commitment is not yet made. |
 | Separator | `Separator`, `SeparatorProps`, `SeparatorOrientation` | Stable | 3 local test files. React 19 peer; within-major backward-compatibility intent documented. |
 | Sidebar | `Sidebar`, `SidebarProps` | Stable | 1 local test file covers layout and landmark behavior; the component API now has within-major backward-compatibility intent. |
 | Stack | `Stack`, `StackProps`, responsive direction and alignment types | Stable | 2 local test files. Responsive layout props; within-major backward-compatibility intent documented. |

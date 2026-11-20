@@ -63,6 +63,9 @@ jobs:
       - name: Check component registry
         run: bun run registry:check
 
+      - name: Check API stability labels
+        run: bun run api-stability:check
+
       - name: Build packages
         run: bun run build
 
@@ -78,6 +81,12 @@ jobs:
 
       - name: Build documentation site
         run: bun run --filter '@puzzle-ui/site' build
+
+      - name: Run site SEO unit tests
+        run: bun run --filter '@puzzle-ui/site' test:seo
+
+      - name: Run rendered site SEO smoke checks
+        run: bun run --filter '@puzzle-ui/site' test:seo:smoke
 
   changes:
     name: Detect website changes

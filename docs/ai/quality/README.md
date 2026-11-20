@@ -35,9 +35,11 @@ Read [Playwright strategy](./playwright.md), [visual testing](./visual-testing.m
 - The documentation site has Playwright validators for preview layout,
   hydration, and SEO endpoints.
 - `apps/playground` is the client-side reference website and Storybook app. Its
-  production-preview tests use Node's test runner and Playwright.
-- Storybook's a11y addon is present, but its current `test: "todo"` setting
-  reports findings in the test UI rather than failing CI.
+  production-preview tests use Node's test runner and Playwright. The e2e
+  command also runs axe-core checks and screenshot comparisons across the
+  reference route and viewport matrix.
+- Storybook's a11y addon is configured in error mode, but there is no dedicated
+  Storybook CI test project.
 
 Reuse these runners and utilities. Do not introduce a second browser runner or
 snapshot system without a demonstrated gap and an explicit maintenance plan.
@@ -63,7 +65,7 @@ decide whether the visual hierarchy, typography, image treatment, contrast, or
 content density looks right. Use the screenshot workflow and manual keyboard
 inspection in the linked guides, and state which manual checks were performed.
 
-No repository-wide screenshot comparison or visual-regression baseline is
-configured. Capturing a screenshot is not evidence that it passed visual
-inspection. Do not add or update baselines without reviewing the rendered
-differences.
+The reference site has 63 full-page screenshot baselines across nine routes and
+seven viewports, alongside automated axe-core checks. A passing comparison
+does not establish that the overall design is correct; manually inspect
+representative screenshots and review each proposed baseline update.

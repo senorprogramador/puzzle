@@ -17,6 +17,7 @@
     "check:dependency-specs": "node scripts/check-dependency-specs.mjs",
     "registry:generate": "node scripts/component-registry/generate.mjs",
     "registry:check": "node scripts/component-registry/generate.mjs --check",
+    "api-stability:check": "node scripts/check-api-stability.mjs",
     "build": "bun run schema:check && bun run --filter './packages/*' build",
     "typecheck": "bun run --filter './packages/*' --filter './apps/site' --filter '@puzzle-ui/playground' typecheck",
     "seo:validate": "bun run --filter '@puzzle-ui/site' validate:seo",

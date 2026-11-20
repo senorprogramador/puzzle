@@ -31,6 +31,12 @@ const stories = [
     excerpt:
       "A practical way to decide between a reusable primitive, a composed section, and ordinary React.",
     category: "Composition",
+    image: {
+      src: "/images/journal-composition.jpg",
+      alt: "Layered interface components illustrating how to choose the right abstraction.",
+      width: 1440,
+      height: 960,
+    },
     href: "/journal/choosing-the-right-layer",
     body: [
       "Start with the behavior and content your page needs. A UI primitive is a good fit when you need a focused interaction or control. A Piece is useful when its complete section composition matches the page. Ordinary React remains the right choice for layout and behavior that are specific to your application.",
@@ -43,6 +49,12 @@ const stories = [
     excerpt:
       "How a shared theme can keep an interface coherent while its pages and components vary.",
     category: "Design systems",
+    image: {
+      src: "/images/journal-tokens.jpg",
+      alt: "A design system illustration of interface elements and shared theme tokens.",
+      width: 1440,
+      height: 960,
+    },
     href: "/journal/from-tokens-to-interface",
     body: [
       "A design system is more than a palette. Semantic tokens give components a shared language for surfaces, text, borders, and emphasis while allowing a theme to change those values in one place.",
@@ -55,6 +67,12 @@ const stories = [
     excerpt:
       "A focused browser checklist for navigation, forms, keyboard use, responsive layouts, and runtime errors.",
     category: "Quality",
+    image: {
+      src: "/images/journal-testing.jpg",
+      alt: "A browser interface illustration representing checks across a user journey.",
+      width: 1440,
+      height: 960,
+    },
     href: "/journal/testing-the-user-journey",
     body: [
       "Automated tests are most useful when they exercise behavior a person depends on: opening a menu, completing a form, following a link, or using a control with a keyboard.",
@@ -110,9 +128,23 @@ const SiteHeader = () => {
   return (
     <header className="site-header">
       <div className="site-header__inner">
-        <a className="site-brand" href="/" aria-label="Puzzle home">
+        <a className="site-brand" href="/">
           <span className="site-brand__mark" aria-hidden="true">
-            P
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              focusable="false"
+            >
+              <path
+                d="M4 13V3h4.5a3 3 0 1 1 0 6H4"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+              />
+            </svg>
           </span>
           <span>Puzzle</span>
         </a>
@@ -121,10 +153,9 @@ const SiteHeader = () => {
           type="button"
           aria-controls="primary-navigation"
           aria-expanded={menuOpen}
-          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
           onClick={() => setMenuOpen((open) => !open)}
         >
-          <span aria-hidden="true">{menuOpen ? "Close" : "Menu"}</span>
+          <span>{menuOpen ? "Close" : "Menu"}</span>
         </button>
         <nav
           id="primary-navigation"
@@ -210,7 +241,21 @@ const HomePage = () => (
           </Button>
         </div>
       }
-      media={<ProductPreview />}
+      media={
+        <div className="home-hero__visual">
+          <img
+            className="home-hero__image"
+            src="/images/puzzle-composition-hero.jpg"
+            alt="A colorful composition of layered interface panels and theme tokens."
+            width={1440}
+            height={960}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+          <ProductPreview />
+        </div>
+      }
     />
     <BenefitsSection
       className="home-benefits"
@@ -507,6 +552,15 @@ const ArticlePage = ({ story }: { story: Story }) => (
     <p className="article-page__category">{story.category} · Sample article</p>
     <h1>{story.title}</h1>
     <p className="article-page__intro">{story.excerpt}</p>
+    <img
+      className="article-page__image"
+      src={story.image.src}
+      alt={story.image.alt}
+      width={story.image.width}
+      height={story.image.height}
+      loading="lazy"
+      decoding="async"
+    />
     <div className="article-page__body">
       {story.body.map((paragraph) => (
         <p key={paragraph}>{paragraph}</p>

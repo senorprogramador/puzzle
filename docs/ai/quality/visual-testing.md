@@ -5,11 +5,12 @@ Automated route and overflow checks do not replace review of the rendered page.
 
 ## Current infrastructure
 
-The repository does not have a configured Playwright screenshot matcher or
-maintained screenshot baselines. Storybook and Chromatic packages are present,
-but their presence alone does not establish a CI visual-regression workflow.
-The reference-site suite can capture optional screenshots for inspection; it
-does not perform pixel comparison.
+The reference site uses Playwright screenshot comparisons with 63 committed
+full-page baselines across nine routes and seven viewport projects. Run
+`bun run --filter "@puzzle-ui/playground" test:visual` to compare them, and
+update them intentionally with
+`bun run --filter "@puzzle-ui/playground" test:visual:update`. The e2e suite
+includes these comparisons; CI does not update baselines.
 
 Do not add snapshots or update a baseline without identifying a stable test
 data source, browser version, fonts, viewport, and animation policy. Inspect each

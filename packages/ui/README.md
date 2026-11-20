@@ -14,8 +14,8 @@ Component API maturity is listed on each component's documentation page.
 and backward-compatibility intent within a major version.
 `SectionHeader` is Beta while its shared section API is exercised by upcoming
 Pieces families.
-Paper, Skeleton, Label, Background, Breadcrumbs, Sidebar, and Backdrop are
-Experimental because their current validation evidence is limited. Review
+Paper, Skeleton, Label, Background, Breadcrumbs, Sidebar, and Backdrop also have
+Stable public APIs with within-major backward-compatibility intent. Review
 documented accessibility and framework details when integrating components.
 
 `@puzzle-ui/ui` provides composable, router-independent React components:

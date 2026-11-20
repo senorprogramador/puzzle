@@ -39,7 +39,7 @@ export default defineConfig({
         ),
       },
       {
-        find: /^@puzzle-ui\/icons$/,
+        find: /^@puzzle-ui\/icons(?=\/|$)/,
         replacement: fileURLToPath(
           new URL("../../packages/icons/src", import.meta.url),
         ),

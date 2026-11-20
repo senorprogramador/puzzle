@@ -8,6 +8,7 @@ visual-contrast, or screen-reader-oriented inspection.
 
 The reference-site Playwright suite checks:
 
+- axe-core violations across nine routes and seven viewport projects.
 - A skip link, header, primary navigation, one main landmark, and a contentinfo
   footer.
 - A single level-one page heading and accessible names for navigation,
@@ -17,10 +18,9 @@ The reference-site Playwright suite checks:
 - Native required-field validation and an announced form confirmation.
 - Reduced-motion browser context and responsive layout behavior.
 
-The app's Storybook config includes `@storybook/addon-a11y`, but its setting is
-currently `test: "todo"`. Inspect its findings in Storybook; it is not a CI
-failure gate. Do not describe this as an enforced automated accessibility
-suite.
+The app's Storybook config includes `@storybook/addon-a11y` in error mode, but
+there is no dedicated Storybook CI test project. The reference-site axe checks
+are enforced through the playground e2e suite.
 
 ## Manual review
 

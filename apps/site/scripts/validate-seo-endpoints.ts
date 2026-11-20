@@ -392,7 +392,10 @@ const run = async () => {
         continue;
       }
 
-      if (target.origin !== canonicalOrigin || !target.pathname.startsWith("/docs/")) {
+      if (
+        target.origin !== canonicalOrigin ||
+        (target.pathname !== "/docs" && !target.pathname.startsWith("/docs/"))
+      ) {
         continue;
       }
       if (target.search) failures.push(`${page.canonicalUrl}: internal docs link has query ${href}`);

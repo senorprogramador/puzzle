@@ -14,7 +14,7 @@ Keep the reference site's routes, navigation, content, and browser tests synchro
 
 ## Accessibility and browser behavior
 
-Use semantic elements and accessible names in stories and pages. Check keyboard operation, visible focus, contrast across theme modes, responsive behavior, and reduced motion where applicable. The reference-site Playwright suite checks navigation, interactive controls, form labels and validation, browser diagnostics, and horizontal overflow at the documented viewport matrix. Storybook's a11y addon is configured with `test: "todo"` and reports findings in its test UI; it is not configured to fail CI.
+Use semantic elements and accessible names in stories and pages. Check keyboard operation, visible focus, contrast across theme modes, responsive behavior, and reduced motion where applicable. The reference-site Playwright suite checks navigation, interactive controls, form labels and validation, browser diagnostics, and horizontal overflow at the documented viewport matrix. It also runs axe-core accessibility checks and full-page screenshot comparisons across the shared route/viewport matrix; these are CI gates and snapshot updates must be intentional, never automated in CI. Storybook's a11y addon is configured in error mode, but no Storybook-specific CI test project is configured.
 
 ## Validation
 
@@ -23,6 +23,8 @@ Run commands from `apps/playground/`:
 - `bun run typecheck`
 - `bun run build`
 - `bun run test:e2e` (requires a production build; run `bun run build` at the repository root and `bun run build` here first)
+- `bun run test:a11y` (requires a production build)
+- `bun run test:visual` (requires a production build; update baselines intentionally with `bun run test:visual:update`)
 - `bun run dev`
 - `bun run preview`
 - `bun run storybook`

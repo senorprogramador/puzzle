@@ -14,7 +14,9 @@ not replace package documentation or duplicate package instructions.
 | Model data or add persistence | [Data architecture](./reference/data-architecture.md), [database integration](./workflows/database-integration.md) |
 | Choose a framework integration | [Framework overview](./frameworks/overview.md), [compatibility matrix](./frameworks/compatibility.md) |
 | Develop or validate a component/package | [Component workflow](./workflows/component-development.md), [package workflow](./workflows/package-development.md), [testing strategy](./reference/testing-strategy.md) |
+| Review component maturity or registry data | [API stability audit](../api-stability-audit.md), [component registry](./registry/README.md) |
 | Run browser QA or assess a generated/reference website | [Quality overview](./quality/README.md), [Playwright strategy](./quality/playwright.md), [visual testing](./quality/visual-testing.md), [responsive testing](./quality/responsive-testing.md), [accessibility](./quality/accessibility.md) |
+| Review evidence from the current quality initiative | [Initiative assessment](./quality/initiative-assessment.md) |
 | Plan and generate a website | [Website planning engine](./website/README.md), [15-phase workflow](./website/generation-workflow.md) |
 | Change documentation-site content or navigation | [Site instructions](../../apps/site/AGENTS.md) |
 | Work on auth security | [Auth security guide](../../apps/site/content/docs/auth/security.mdx), [security policy](../../SECURITY.md) |

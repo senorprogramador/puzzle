@@ -12,7 +12,10 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "typecheck": "tsc --noEmit -p .",
-    "test:e2e": "node --test tests/reference-site.test.mjs",
+    "test:e2e": "node --test tests/reference-site.test.mjs && playwright test",
+    "test:a11y": "playwright test --grep @a11y",
+    "test:visual": "playwright test --grep @visual",
+    "test:visual:update": "playwright test --grep @visual --update-snapshots",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -28,20 +31,22 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@chromatic-com/storybook": "5.6.0",
+    "@playwright/test": "^1.65.1",
+    "@storybook/addon-a11y": "^10.6.2",
+    "@storybook/addon-docs": "^10.6.2",
+    "@storybook/addon-vitest": "^10.6.2",
+    "@storybook/react-vite": "^10.6.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^6.1.2",
-    "typescript": "^7.0.2",
-    "vite": "8.3.8",
-    "storybook": "^10.6.2",
-    "@storybook/react-vite": "^10.6.2",
-    "@chromatic-com/storybook": "5.6.0",
-    "@storybook/addon-vitest": "^10.6.2",
-    "@storybook/addon-a11y": "^10.6.2",
-    "@storybook/addon-docs": "^10.6.2",
-    "vitest": "5.1.1",
     "@vitest/browser-playwright": "5.1.1",
     "@vitest/coverage-v8": "5.1.1",
-    "playwright": "1.65.1"
+    "playwright": "1.65.1",
+    "storybook": "^10.6.2",
+    "typescript": "^7.0.2",
+    "vite": "8.3.8",
+    "vitest": "5.1.1"
   }
 }
