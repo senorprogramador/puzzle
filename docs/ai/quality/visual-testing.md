@@ -5,8 +5,10 @@ Automated route and overflow checks do not replace review of the rendered page.
 
 ## Current infrastructure
 
-The reference site uses Playwright screenshot comparisons with 63 committed
-full-page baselines across nine routes and seven viewport projects. Run
+The reference site uses Playwright screenshot comparisons with 63 full-page
+baselines across nine routes and seven viewport projects. Linux baselines are
+kept separately under `apps/playground/tests/__screenshots__/linux/` because
+system font rendering differs from the existing local baselines. Run
 `bun run --filter "@puzzle-ui/playground" test:visual` to compare them, and
 update them intentionally with
 `bun run --filter "@puzzle-ui/playground" test:visual:update`. The e2e suite
