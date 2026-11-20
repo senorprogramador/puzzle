@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/fullstack` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.13.0 - 2026-11-20
+
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
 ## 0.12.0 - 2026-11-18
 
 - Added auth lifecycle routes and handlers for requesting and verifying an email change, updating the profile name and image, listing sessions and revoking other sessions.

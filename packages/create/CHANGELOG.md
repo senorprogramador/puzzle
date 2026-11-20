@@ -3,6 +3,14 @@
 All notable changes to `@puzzle-ui/create` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.13.0 - 2026-11-20
+
+- Added non-interactive configuration mode: `create-puzzle --config <file>` with `--validate` and `--dry-run`. It is backed by a published `config.schema.json` and documented in `CONFIGURATION.md`.
+- Added `--credentials-stdin` for MongoDB and D1 Auth projects. Initial-user credentials are read from validated stdin JSON, and the password is never accepted in the config file or arguments.
+- Added `create-puzzle ai init`, `ai update` and `ai check`. They generate offline, package-aware AI instructions for Copilot, Claude, Cursor and AGENTS.md from installed Puzzle packages, and track managed output in `.puzzle/ai/manifest.json`.
+- The generator and prompts now share one validated project configuration. Package files now include the `ai` folder, `CONFIGURATION.md` and `config.schema.json`.
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
 ## 0.12.0 - 2026-11-18
 
 - No changes; version bumped in lockstep.

@@ -3,17 +3,14 @@
 All notable changes to `@puzzle-ui/pieces` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
-## Unreleased
+## 0.13.0 - 2026-11-20
 
-### Added
-
-- Added hospitality sections for accommodation discovery, availability search, rate plans, stay summaries, and house rules.
-- Added restaurant menu presentation with dietary information, dish cards, opening hours, and table reservation forms.
-- Added shared hospitality sections for guest reviews, local guides, host profiles, service options, and gift vouchers.
-
-### Changed
-
-- Extended testimonial items with optional metadata and resource items with optional destinations and metadata for reusable hospitality compositions.
+- Added hospitality sections for accommodation discovery: `AccommodationOverviewSection`, `AccommodationDetailsSection`, `AmenityListSection`, `AvailabilitySearchSection`, `RatePlansSection`, `StaySummarySection`, `HouseRulesSection`, `HostProfileSection`, `ServiceOptionsSection`, `GuestReviewsSection`, `LocalGuideSection` and `GiftVoucherSection`.
+- Added restaurant sections: `RestaurantMenuSection`, `DishCard`, `DietaryInformation`, `OpeningHoursSection` and `TableReservationSection`.
+- Extended testimonial items with optional `metadata`. Resource items now have optional `href` and `metadata`, for reusable hospitality compositions.
+- Marketing, content, business, commerce, dashboard, footer and other sections now use `Heading`, `Text`, `Select`, `Slider` and `RadioGroup` from `@puzzle-ui/ui`, replacing raw HTML elements. The Pricing billing interval is now a `RadioGroup` and its calculator uses `Slider`.
+- `HowItWorks` now lazy-loads its carousel and falls back to a static ordered list. The footer has a background change and better wrapping of long group headings.
+- Added packaged AI guidance (`ai/` instructions and manifest) and updated the README.
 
 ## 0.12.0 - 2026-11-18
 

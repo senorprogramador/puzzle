@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/storage` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.13.0 - 2026-11-20
+
+- Enabled `isolatedDeclarations` and oxc declaration generation for the build, and kept `bun:test` external. Conformance suites were adjusted to match.
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
 ## 0.12.0 - 2026-11-18
 
 - No changes; version bumped in lockstep.

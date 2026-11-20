@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/seo` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.13.0 - 2026-11-20
+
+- Preserved the React provider's `"use client"` directive in ESM and CJS build output.
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
 ## 0.12.0 - 2026-11-18
 
 - Changed generated Schema.org definitions to be split into smaller chunk modules, and the generator now checks for and removes stale chunks.

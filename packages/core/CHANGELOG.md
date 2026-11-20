@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/core` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.13.0 - 2026-11-20
+
+- Added `formatCurrency`, `formatDate`, `formatDateRange`, `formatNumber` and `formatTime`, plus the `DateRange` type. They use `Intl` with an explicit locale and caller-supplied options such as `timeZone`.
+- Added the framework-neutral `@puzzle-ui/core/rendering` subpath, also re-exported from the root. It covers fold strategies, render modes, optimization profiles (conservative, balanced, aggressive, custom), configuration and policy resolution, component classification, fold-position prediction, deferred-load lifecycle, and typed rendering diagnostic events.
+- Added the framework-neutral `@puzzle-ui/core/resources` subpath with `createResourceScheduler`. It provides prioritized, abortable, deduplicated loading of chunks, data and images, with retries, concurrency and prefetch budgets.
+- Added packaged AI guidance (`ai/` instructions and manifest) for consumer instruction generation.
+
 ## 0.12.0 - 2026-11-18
 
 - No changes; version bumped in lockstep.

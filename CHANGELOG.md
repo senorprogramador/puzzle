@@ -18,6 +18,92 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.13.0 - 2026-11-20
+
+### `@puzzle-ui/core`
+
+- Added `formatCurrency`, `formatDate`, `formatDateRange`, `formatNumber` and `formatTime`, plus the `DateRange` type. They use `Intl` with an explicit locale and caller-supplied options such as `timeZone`.
+- Added the framework-neutral `@puzzle-ui/core/rendering` subpath, also re-exported from the root. It covers fold strategies, render modes, optimization profiles (conservative, balanced, aggressive, custom), configuration and policy resolution, component classification, fold-position prediction, deferred-load lifecycle, and typed rendering diagnostic events.
+- Added the framework-neutral `@puzzle-ui/core/resources` subpath with `createResourceScheduler`. It provides prioritized, abortable, deduplicated loading of chunks, data and images, with retries, concurrency and prefetch budgets.
+- Added packaged AI guidance (`ai/` instructions and manifest) for consumer instruction generation.
+
+### `@puzzle-ui/theme`
+
+- Exported the `ColorThemes` type.
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
+### `@puzzle-ui/hooks`
+
+- Added `useColorScheme` to read an element's computed light or dark scheme. It updates when the element's class, style or `data-theme` changes.
+- Added visibility-driven rendering hooks: `FoldProvider`, `useFold`, `useFoldOptimization`, `useVisibility`, `useFoldState`, `useIsVisible` and `useIsNearby`. They share one `IntersectionObserver` engine for viewport and proximity tracking.
+- Added `useResourcePrefetch` for abortable, deduplicated prefetching by visibility, proximity, idle time or explicit request, without mounting components.
+- Added opt-in local rendering diagnostics through `FoldProvider`'s `onDiagnosticEvent`. Diagnostics are off by default and nothing is transmitted.
+- Added packaged AI guidance (`ai/` instructions and manifest). Reorganized source into interaction, state, preferences and rendering folders; the public exports are unchanged.
+
+### `@puzzle-ui/icons`
+
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
+### `@puzzle-ui/ui`
+
+- Added rendering boundaries: `FoldBoundary`, `FoldProvider`, `DeferredBoundary`, `SsrBoundary` and `StaticBoundary`. They add Next.js and TanStack Start client/server adapters and support fold-aware, deferred and static rendering with streaming SSR.
+- Added subpath exports `./rendering/deferred`, `./rendering/ssr`, `./rendering/static`, `./rendering/fold`, `./next/client`, `./next/server`, `./tanstack/client`, `./tanstack/server` and `./tanstack/shared`.
+- `AppBar` now lazy-loads its mobile navigation drawer on demand. It prefetches the drawer when idle and shows loading and retry states.
+- `Image` now infers an aspect ratio from width and height when none is given. A `preload` image now defaults to eager loading and high fetch priority.
+- `DatePicker` has a new `requiredDescription` prop. It gives required fields an accessible description, "Required" by default.
+- `TextInput` now supports `type="search"`.
+- `Section` now constrains its content width by default unless `fullWidth` is set, including for the default theme.
+- Fixed `Badge` so it no longer stretches in flex layouts, increased `Card` header row spacing, and let `TokenInput` tokens shrink.
+- Added packaged AI guidance (`ai/` instructions and manifest). Updated the README and API stability notes.
+
+### `@puzzle-ui/pieces`
+
+- Added hospitality sections for accommodation discovery: `AccommodationOverviewSection`, `AccommodationDetailsSection`, `AmenityListSection`, `AvailabilitySearchSection`, `RatePlansSection`, `StaySummarySection`, `HouseRulesSection`, `HostProfileSection`, `ServiceOptionsSection`, `GuestReviewsSection`, `LocalGuideSection` and `GiftVoucherSection`.
+- Added restaurant sections: `RestaurantMenuSection`, `DishCard`, `DietaryInformation`, `OpeningHoursSection` and `TableReservationSection`.
+- Extended testimonial items with optional `metadata`. Resource items now have optional `href` and `metadata`, for reusable hospitality compositions.
+- Marketing, content, business, commerce, dashboard, footer and other sections now use `Heading`, `Text`, `Select`, `Slider` and `RadioGroup` from `@puzzle-ui/ui`, replacing raw HTML elements. The Pricing billing interval is now a `RadioGroup` and its calculator uses `Slider`.
+- `HowItWorks` now lazy-loads its carousel and falls back to a static ordered list. The footer has a background change and better wrapping of long group headings.
+- Added packaged AI guidance (`ai/` instructions and manifest) and updated the README.
+
+### `@puzzle-ui/create`
+
+- Added non-interactive configuration mode: `create-puzzle --config <file>` with `--validate` and `--dry-run`. It is backed by a published `config.schema.json` and documented in `CONFIGURATION.md`.
+- Added `--credentials-stdin` for MongoDB and D1 Auth projects. Initial-user credentials are read from validated stdin JSON, and the password is never accepted in the config file or arguments.
+- Added `create-puzzle ai init`, `ai update` and `ai check`. They generate offline, package-aware AI instructions for Copilot, Claude, Cursor and AGENTS.md from installed Puzzle packages, and track managed output in `.puzzle/ai/manifest.json`.
+- The generator and prompts now share one validated project configuration. Package files now include the `ai` folder, `CONFIGURATION.md` and `config.schema.json`.
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
+### `@puzzle-ui/storage`
+
+- Enabled `isolatedDeclarations` and oxc declaration generation for the build, and kept `bun:test` external. Conformance suites were adjusted to match.
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
+### `@puzzle-ui/session`
+
+- Added packaged AI guidance (`ai/` instructions and manifest), now included in the published files.
+
+### `@puzzle-ui/storage-d1`
+
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
+### `@puzzle-ui/storage-mongodb`
+
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
+### `@puzzle-ui/auth`
+
+- `SimpleWebAuthnProvider` now accepts `supportedAlgorithmIDs`, a list of COSE algorithm IDs. It is validated as a non-empty list of unique IDs and applied to registration and verification. The default is EdDSA, ES256 and RS256. The `SimpleWebAuthnProviderOptions` type is exported.
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
+### `@puzzle-ui/fullstack`
+
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
+### `@puzzle-ui/seo`
+
+- Preserved the React provider's `"use client"` directive in ESM and CJS build output.
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
 ## 0.12.0 - 2026-11-18
 
 ### `@puzzle-ui/theme`

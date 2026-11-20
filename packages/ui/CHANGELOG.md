@@ -3,6 +3,18 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.13.0 - 2026-11-20
+
+- Added rendering boundaries: `FoldBoundary`, `FoldProvider`, `DeferredBoundary`, `SsrBoundary` and `StaticBoundary`. They add Next.js and TanStack Start client/server adapters and support fold-aware, deferred and static rendering with streaming SSR.
+- Added subpath exports `./rendering/deferred`, `./rendering/ssr`, `./rendering/static`, `./rendering/fold`, `./next/client`, `./next/server`, `./tanstack/client`, `./tanstack/server` and `./tanstack/shared`.
+- `AppBar` now lazy-loads its mobile navigation drawer on demand. It prefetches the drawer when idle and shows loading and retry states.
+- `Image` now infers an aspect ratio from width and height when none is given. A `preload` image now defaults to eager loading and high fetch priority.
+- `DatePicker` has a new `requiredDescription` prop. It gives required fields an accessible description, "Required" by default.
+- `TextInput` now supports `type="search"`.
+- `Section` now constrains its content width by default unless `fullWidth` is set, including for the default theme.
+- Fixed `Badge` so it no longer stretches in flex layouts, increased `Card` header row spacing, and let `TokenInput` tokens shrink.
+- Added packaged AI guidance (`ai/` instructions and manifest). Updated the README and API stability notes.
+
 ## 0.12.0 - 2026-11-18
 
 - Added `SectionHeader` layout component for consistent eyebrow, title, description and actions headers with alignment options.

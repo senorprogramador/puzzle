@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/auth` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.13.0 - 2026-11-20
+
+- `SimpleWebAuthnProvider` now accepts `supportedAlgorithmIDs`, a list of COSE algorithm IDs. It is validated as a non-empty list of unique IDs and applied to registration and verification. The default is EdDSA, ES256 and RS256. The `SimpleWebAuthnProviderOptions` type is exported.
+- Added packaged AI guidance (`ai/` instructions and manifest).
+
 ## 0.12.0 - 2026-11-18
 
 - Added an optional `demoTotpBypass` MFA manager option that accepts a fixed TOTP code for a single demo account; invalid configuration throws an `AuthConfigurationError`.
