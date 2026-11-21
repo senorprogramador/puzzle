@@ -13,6 +13,7 @@ published to npm; it is not a production-readiness or support guarantee.
 | UI and theme | Completed | `@puzzle-ui/ui` components and `@puzzle-ui/theme` tokens/provider are published. |
 | Core, hooks, icons, and sections | Completed | `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, and `@puzzle-ui/pieces` provide shared utilities and React building blocks. |
 | SEO | Completed | `@puzzle-ui/seo` provides metadata, structured data, sitemap, robots, and related utilities. |
+| Multilingual support | Completed | `@puzzle-ui/i18n` provides locale resolution, ICU translations, Intl formatting, localized routing, catalog tooling, React bindings, and framework adapters. |
 | Authentication, sessions, and storage | Completed | `@puzzle-ui/auth`, `@puzzle-ui/session`, `@puzzle-ui/storage`, and the D1 and MongoDB adapters are published. |
 | Framework integrations | Completed | `@puzzle-ui/fullstack` publishes client, server, Next.js, and TanStack Start entry points. |
 | Project generator | Completed | `@puzzle-ui/create` offers Next.js App Router, TanStack Start, React Router, and Basic React/Vite templates. |
@@ -34,10 +35,9 @@ The following are discussion topics, not scheduled or promised work:
 
 ## Planning status
 
-No public open issues or milestones were returned by the repository's GitHub
-API during the latest documentation review. The repository has Discussions
-enabled, but no public project board could be verified. No work is therefore
-marked Planned or In Progress here. Follow
+As of 2026-11-21, the repository's public GitHub API returned no open issues or
+milestones. Discussions are enabled, but no public project board could be
+verified. No work is therefore marked Planned or In Progress here. Follow
 [GitHub Issues](https://github.com/senorprogramador/puzzle/issues) and
 [Discussions](https://github.com/senorprogramador/puzzle/discussions) for
 proposals and maintainer-confirmed priorities.

@@ -13,6 +13,13 @@ Compose a page from purpose-fit sections, UI primitives, and semantic Theme
 tokens. Keep layouts fluid and mobile-first; supply meaningful alternative text
 and consumer-owned actions, links, copy, and media.
 
+## API maturity
+
+All canonical public component APIs and published aliases are Stable, with
+backward compatibility intended within a major version. Use only documented
+props and variants; breaking API changes require a major release. Stable is an
+API compatibility commitment, not a production-readiness guarantee.
+
 For accommodation booking presentation, use `AvailabilitySearchSection`,
 `RatePlansSection`, and `StaySummarySection` with application-provided values;
 use `HouseRulesSection` for owner-provided policies. These components perform

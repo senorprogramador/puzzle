@@ -4,13 +4,15 @@ description: Present upcoming and past events with date-aware filtering, venue d
 ---
 
 import { EventSection } from "@puzzle-ui/pieces";
-import { Preview } from "@puzzle-ui/ui";
+import { Badge, Preview } from "@puzzle-ui/ui";
 import {
   EventFilteringExample,
   EventSectionVariantsExample,
 } from "../../../../src/components/doc-examples/pieces/event-section";
 
 `EventSection` renders event data supplied by the application. It does not create events, manage registrations, or reserve tickets.
+
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented API is covered by package tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
 
 ## Basic usage
 

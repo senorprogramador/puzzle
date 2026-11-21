@@ -4,13 +4,15 @@ description: Present accessible, application-controlled onboarding steps, progre
 ---
 
 import { OnboardingSection } from "@puzzle-ui/pieces";
-import { Button, Preview } from "@puzzle-ui/ui";
+import { Badge, Button, Preview } from "@puzzle-ui/ui";
 import {
   OnboardingInteractiveExample,
   OnboardingSectionVariantsExample,
 } from "../../../../src/components/doc-examples/pieces/onboarding-section";
 
 `OnboardingSection` presents step state supplied by your application. It does not own business logic, persistence, or completion rules.
+
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented API is covered by package tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
 
 <Preview
   fit="device"

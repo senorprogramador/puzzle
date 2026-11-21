@@ -25,7 +25,20 @@
 
 The CI workflow builds packages, type-checks the workspace, runs package tests, and builds the documentation site. Build and test results are part of the same workflow rather than separate status checks.
 
-## Introduction
+## A React ecosystem for building real applications.
+
+Puzzle started with a simple idea: the tools I use to
+build applications should work well together.
+
+It has grown into a collection of TypeScript packages
+for building interfaces, managing themes, composing
+pages and handling application infrastructure.
+
+You can use just the UI components, or bring in more
+of the ecosystem when you need it.
+
+No need to install everything. No need to use a
+framework you don't want.
 
 Puzzle UI is a TypeScript-first ecosystem of independently installable React
 packages. Its UI component library and theme system provide interface
@@ -47,7 +60,7 @@ package or component level. The UI packages target React 19.
 - **Accessibility** — component-specific semantics and interaction guidance;
   behavior and coverage vary by component and consuming application.
 - **SEO** — metadata, structured data, sitemap, and robots utilities.
-- **Multilingual (pre-release)** — locale resolution, ICU translations,
+- **Multilingual (pre-1.0)** — locale resolution, ICU translations,
   Intl formatting, locale-prefixed paths, catalog checks, and React bindings.
 - **Authentication and sessions** — authentication primitives and session
   management, with client, server, and framework integration entry points.
@@ -67,26 +80,23 @@ details.
 The packages below are published to npm and can be installed independently.
 They are pre-1.0; check each package's documentation before adopting it.
 
-| Package | Availability | Purpose | Install | Documentation |
-| --- | --- | --- | --- | --- |
-| [`@puzzle-ui/core`](https://www.npmjs.com/package/@puzzle-ui/core) | npm | Framework-independent shared utilities | `npm install @puzzle-ui/core` | [Getting started](https://puzzle-ui.com/docs/getting-started) |
-| [`@puzzle-ui/hooks`](https://www.npmjs.com/package/@puzzle-ui/hooks) | npm | Reusable React hooks | `npm install @puzzle-ui/hooks` | [Hooks](https://puzzle-ui.com/docs/hooks) |
-| [`@puzzle-ui/icons`](https://www.npmjs.com/package/@puzzle-ui/icons) | npm | Iconify-powered React SVG icons | `npm install @puzzle-ui/icons` | [Icons](https://puzzle-ui.com/docs/icons) |
-| [`@puzzle-ui/theme`](https://www.npmjs.com/package/@puzzle-ui/theme) | npm | Theme provider, tokens, colors, and typography | `npm install @puzzle-ui/theme` | [Theme](https://puzzle-ui.com/docs/theme) |
-| [`@puzzle-ui/ui`](https://www.npmjs.com/package/@puzzle-ui/ui) | npm | Composable React UI components | `npm install @puzzle-ui/ui` | [UI components](https://puzzle-ui.com/docs/ui) |
-| [`@puzzle-ui/pieces`](https://www.npmjs.com/package/@puzzle-ui/pieces) | npm | Composed React sections and page layouts | `npm install @puzzle-ui/pieces` | [Pieces](https://puzzle-ui.com/docs/pieces/components/hero) |
-| [`@puzzle-ui/seo`](https://www.npmjs.com/package/@puzzle-ui/seo) | npm | Metadata, structured data, sitemaps, and robots utilities | `npm install @puzzle-ui/seo` | [SEO](https://puzzle-ui.com/docs/seo) |
-| [`@puzzle-ui/auth`](https://www.npmjs.com/package/@puzzle-ui/auth) | npm | Framework-independent authentication primitives | `npm install @puzzle-ui/auth` | [Authentication](https://puzzle-ui.com/docs/auth) |
-| [`@puzzle-ui/session`](https://www.npmjs.com/package/@puzzle-ui/session) | npm | Session management for Puzzle Auth | `npm install @puzzle-ui/session` | [Authentication](https://puzzle-ui.com/docs/auth) |
-| [`@puzzle-ui/storage`](https://www.npmjs.com/package/@puzzle-ui/storage) | npm | Storage contracts for authentication and sessions | `npm install @puzzle-ui/storage` | [Storage](https://puzzle-ui.com/docs/storage) |
-| [`@puzzle-ui/storage-d1`](https://www.npmjs.com/package/@puzzle-ui/storage-d1) | npm | Cloudflare D1 storage adapter | `npm install @puzzle-ui/storage-d1` | [Storage](https://puzzle-ui.com/docs/storage) |
-| [`@puzzle-ui/storage-mongodb`](https://www.npmjs.com/package/@puzzle-ui/storage-mongodb) | npm | MongoDB storage adapter | `npm install @puzzle-ui/storage-mongodb` | [Storage](https://puzzle-ui.com/docs/storage) |
-| [`@puzzle-ui/fullstack`](https://www.npmjs.com/package/@puzzle-ui/fullstack) | npm | Auth client, server handlers, and Next.js/TanStack Start adapters | `npm install @puzzle-ui/fullstack react react-dom` | [Full-stack auth](https://puzzle-ui.com/docs/fullstack) |
-| [`@puzzle-ui/create`](https://www.npmjs.com/package/@puzzle-ui/create) | npm | Interactive React project generator | `npx @puzzle-ui/create` | [Create a project](https://puzzle-ui.com/docs/create) |
-
-The `@puzzle-ui/i18n` workspace is in development and is not published to npm.
-Its current scope and limitations are documented in the
-[Multilingual guide](https://puzzle-ui.com/docs/multilingual).
+| Package                                                                                  | Availability | Purpose                                                           | Install                                            | Documentation                                                 |
+| ---------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------- |
+| [`@puzzle-ui/core`](https://www.npmjs.com/package/@puzzle-ui/core)                       | npm          | Framework-independent shared utilities                            | `npm install @puzzle-ui/core`                      | [Getting started](https://puzzle-ui.com/docs/getting-started) |
+| [`@puzzle-ui/hooks`](https://www.npmjs.com/package/@puzzle-ui/hooks)                     | npm          | Reusable React hooks                                              | `npm install @puzzle-ui/hooks`                     | [Hooks](https://puzzle-ui.com/docs/hooks)                     |
+| [`@puzzle-ui/icons`](https://www.npmjs.com/package/@puzzle-ui/icons)                     | npm          | Iconify-powered React SVG icons                                   | `npm install @puzzle-ui/icons`                     | [Icons](https://puzzle-ui.com/docs/icons)                     |
+| [`@puzzle-ui/theme`](https://www.npmjs.com/package/@puzzle-ui/theme)                     | npm          | Theme provider, tokens, colors, and typography                    | `npm install @puzzle-ui/theme`                     | [Theme](https://puzzle-ui.com/docs/theme)                     |
+| [`@puzzle-ui/ui`](https://www.npmjs.com/package/@puzzle-ui/ui)                           | npm          | Composable React UI components                                    | `npm install @puzzle-ui/ui`                        | [UI components](https://puzzle-ui.com/docs/ui)                |
+| [`@puzzle-ui/pieces`](https://www.npmjs.com/package/@puzzle-ui/pieces)                   | npm          | Composed React sections and page layouts                          | `npm install @puzzle-ui/pieces`                    | [Pieces](https://puzzle-ui.com/docs/pieces/components/hero)   |
+| [`@puzzle-ui/seo`](https://www.npmjs.com/package/@puzzle-ui/seo)                         | npm          | Metadata, structured data, sitemaps, and robots utilities         | `npm install @puzzle-ui/seo`                       | [SEO](https://puzzle-ui.com/docs/seo)                         |
+| [`@puzzle-ui/auth`](https://www.npmjs.com/package/@puzzle-ui/auth)                       | npm          | Framework-independent authentication primitives                   | `npm install @puzzle-ui/auth`                      | [Authentication](https://puzzle-ui.com/docs/auth)             |
+| [`@puzzle-ui/session`](https://www.npmjs.com/package/@puzzle-ui/session)                 | npm          | Session management for Puzzle Auth                                | `npm install @puzzle-ui/session`                   | [Authentication](https://puzzle-ui.com/docs/auth)             |
+| [`@puzzle-ui/storage`](https://www.npmjs.com/package/@puzzle-ui/storage)                 | npm          | Storage contracts for authentication and sessions                 | `npm install @puzzle-ui/storage`                   | [Storage](https://puzzle-ui.com/docs/storage)                 |
+| [`@puzzle-ui/storage-d1`](https://www.npmjs.com/package/@puzzle-ui/storage-d1)           | npm          | Cloudflare D1 storage adapter                                     | `npm install @puzzle-ui/storage-d1`                | [Storage](https://puzzle-ui.com/docs/storage)                 |
+| [`@puzzle-ui/storage-mongodb`](https://www.npmjs.com/package/@puzzle-ui/storage-mongodb) | npm          | MongoDB storage adapter                                           | `npm install @puzzle-ui/storage-mongodb`           | [Storage](https://puzzle-ui.com/docs/storage)                 |
+| [`@puzzle-ui/fullstack`](https://www.npmjs.com/package/@puzzle-ui/fullstack)             | npm          | Auth client, server handlers, and Next.js/TanStack Start adapters | `npm install @puzzle-ui/fullstack react react-dom` | [Full-stack auth](https://puzzle-ui.com/docs/fullstack)       |
+| [`@puzzle-ui/i18n`](https://www.npmjs.com/package/@puzzle-ui/i18n)                       | npm          | Multilingual runtime, tooling, React bindings, and framework adapters | `npm install @puzzle-ui/i18n`                  | [Multilingual](https://puzzle-ui.com/docs/multilingual)       |
+| [`@puzzle-ui/create`](https://www.npmjs.com/package/@puzzle-ui/create)                   | npm          | Interactive React project generator                               | `npx @puzzle-ui/create`                          | [Create a project](https://puzzle-ui.com/docs/create)         |
 
 The repository also contains the [documentation site](apps/site) and a
 [Storybook playground](apps/playground). See the

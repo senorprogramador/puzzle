@@ -84,6 +84,14 @@ to compare use cases:
 - [Application & Dashboard](https://puzzle-ui.com/docs/pieces/components/application-dashboard)
 - [Specialized & Interactive](https://puzzle-ui.com/docs/pieces/components/specialized-interactive)
 
+## API maturity
+
+All 109 canonical component APIs and their published aliases are **Stable**.
+Their documented contracts are intended to remain backward-compatible within
+a major version; breaking changes require a major release. Stable describes API
+compatibility, not production readiness or suitability for a particular
+application.
+
 The accommodation sections are presentation-only: compose them with the
 existing `AccommodationHero`, `GallerySection`, `TestimonialsSection`, and
 `CTASection`. The [accommodation discovery example](https://puzzle-ui.com/docs/pieces/components/accommodation-discovery)

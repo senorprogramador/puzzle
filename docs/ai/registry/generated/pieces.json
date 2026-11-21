@@ -1342,8 +1342,8 @@
       ],
       "category": "dashboard",
       "subcategory": "dashboard",
-      "description": "Compose dashboard overviews, activity, onboarding, empty states, settings, and project administration screens.",
-      "documentation": "apps/site/content/docs/pieces/components/application-dashboard.mdx",
+      "description": "Compose accessible dashboard headers, statistics, activity feeds, progress cards, and layouts with Puzzle Pieces.",
+      "documentation": "apps/site/content/docs/pieces/components/dashboard.mdx",
       "source": "packages/pieces/src/components/dashboard/dashboard-overview-section.tsx",
       "useCases": [
         "dashboard"

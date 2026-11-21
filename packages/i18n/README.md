@@ -3,12 +3,15 @@
 Framework-agnostic locale, translation, formatting, routing, catalog validation,
 and multilingual SEO primitives, with an optional React integration.
 
-This workspace package is pre-release and has not been published to npm.
+This package is published to npm but remains pre-1.0; its API may change.
 
 ## Install
 
-After publication, install with `bun add @puzzle-ui/i18n`. In this repository,
-the package is available through the Bun workspace.
+Install from npm:
+
+```bash
+npm install @puzzle-ui/i18n
+```
 
 Install React 19 when using the `@puzzle-ui/i18n/react` entry point.
 

@@ -29,7 +29,7 @@
         "GiftVoucherSection": "apps/site/content/docs/pieces/components/gift-voucher.mdx",
         "HostProfileSection": "apps/site/content/docs/pieces/components/host-profile.mdx",
         "LocalGuideSection": "apps/site/content/docs/pieces/components/local-guide.mdx",
-        "DashboardOverviewSection": "apps/site/content/docs/pieces/components/application-dashboard.mdx",
+        "DashboardOverviewSection": "apps/site/content/docs/pieces/components/dashboard.mdx",
         "DietaryInformation": "apps/site/content/docs/pieces/components/dietary-information.mdx",
         "DishCard": "apps/site/content/docs/pieces/components/dish-card.mdx",
         "EmptyStatePanel": "apps/site/content/docs/pieces/components/empty-state.mdx",

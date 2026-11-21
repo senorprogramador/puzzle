@@ -2,9 +2,11 @@
 
 `@puzzle-ui/pieces` contains composed, reusable page sections built on Puzzle UI.
 This document preserves the historical E0 architecture audit, E1 shared
-foundations, and the original family catalog. Its implementation sequence and
-completion records describe the state at each milestone, not the current
-package inventory; see [`README.md`](./README.md) for the current package guide.
+foundations, and the original family catalog. Its maturity labels,
+implementation sequence, and completion records describe the state at each
+milestone, not the current API inventory. See [`README.md`](./README.md) for the
+current package guide and [`API stability audit`](../../docs/api-stability-audit.md)
+for current maturity.
 
 ## E1 shared foundations
 

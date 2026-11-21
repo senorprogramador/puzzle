@@ -4,6 +4,9 @@ const root = new URL("../", import.meta.url);
 const read = (path) => readFileSync(new URL(path, root), "utf8");
 const readme = read("packages/ui/README.md");
 const audit = read("docs/api-stability-audit.md");
+const piecesReadme = read("packages/pieces/README.md");
+const piecesInstructions = read("packages/pieces/ai/instructions.md");
+const piecesRegistry = JSON.parse(read("docs/ai/registry/generated/pieces.json"));
 
 const components = [
   {
@@ -80,10 +83,58 @@ for (const component of components) {
 }
 
 const inventorySummary =
-  /137 APIs: 136 Stable and `SectionHeader` Beta/.test(audit);
+  /226 APIs: 225 Stable and `SectionHeader` Beta/.test(audit);
 
 if (!inventorySummary) {
-  throw new Error("API stability audit must summarize all 137 component APIs.");
+  throw new Error("API stability audit must summarize all 226 component APIs.");
 }
 
-console.log("Validated stability labels for 8 UI APIs across package, audit, and component documentation.");
+if (piecesRegistry.components.length !== 109) {
+  throw new Error(
+    `Expected 109 canonical Pieces components, found ${piecesRegistry.components.length}. Update the stability audit.`,
+  );
+}
+
+if (
+  !piecesReadme.includes(
+    "All 109 canonical component APIs and their published aliases are **Stable**.",
+  )
+) {
+  throw new Error("Pieces README must classify all canonical component APIs as Stable.");
+}
+
+if (
+  !piecesInstructions.includes(
+    "All canonical public component APIs and published aliases are Stable",
+  )
+) {
+  throw new Error("Pieces AI instructions must classify its public component APIs as Stable.");
+}
+
+for (const component of piecesRegistry.components) {
+  const auditRow = audit
+    .split("\n")
+    .find((line) => line.startsWith(`| ${component.name} |`));
+  const auditStatus = auditRow?.match(/\| (Experimental|Beta|Stable|Deprecated) \|/)?.[1];
+  if (auditStatus !== "Stable") {
+    throw new Error(
+      `${component.name}: API stability audit says ${auditStatus ?? "no status"}, expected Stable.`,
+    );
+  }
+
+  const page = read(component.documentation);
+  if (!page.includes("API maturity: Stable")) {
+    throw new Error(
+      `${component.name}: component documentation must declare Stable maturity.`,
+    );
+  }
+}
+
+const piecesInventorySummary = /226 APIs: 225 Stable and `SectionHeader` Beta/.test(audit);
+if (!piecesInventorySummary) {
+  throw new Error("API stability audit must summarize the complete UI and Pieces component inventory.");
+}
+
+console.log(
+  `Validated stability labels for 8 UI APIs and ${piecesRegistry.components.length} Pieces APIs across package, audit, and component documentation.`,
+);
