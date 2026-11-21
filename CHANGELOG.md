@@ -36,6 +36,69 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.15.0 - 2026-11-21
+
+### `@puzzle-ui/commerce`
+
+- Added safe minor-unit money and currency utilities.
+- Added provider-independent order, payment, refund, booking, capability, idempotency, and webhook contracts.
+
+### `@puzzle-ui/storage`
+
+- Documented that CMS content and media metadata can use the storage record contract, while file bytes belong in the separate `@puzzle-ui/media` object-storage adapter.
+
+### `@puzzle-ui/media`
+
+- Added workspace-only provider-neutral media metadata, object storage, processing, browser image/video preparation, and test adapter APIs.
+- Added policy-protected, tenant-scoped Media audit storage; audit writes are not atomic with media mutations.
+- Fixed guarded permanent deletion of soft-deleted media assets.
+
+### `@puzzle-ui/cms`
+
+- Added workspace-only CMS schemas, content lifecycle, revisions, policies, scheduling, media references, and audit APIs.
+- Added an opt-in transactional change-event outbox with webhook subscriptions, signed delivery, retry/history, and replay-verification primitives; hosts provide secret storage, a safe transport, and worker scheduling.
+- Fixed non-finite JSON draft handling.
+
+### `@puzzle-ui/ui`
+
+- Added `ImageUpload`, `VideoUpload`, `ImageCropper`, and `ImageHotspotEditor` controls for image and video upload and editing, plus CMS-oriented `FieldArray` and `JsonEditor` components.
+- Expanded `TextEditor` with a serializable `TextDocument` model, nested lists, checklists, icon lists, block formatting, an accessible command toolbar, and parser/renderer improvements.
+- `ImageBox` can request unoptimized rendering from configured framework image components, used by Media previews for temporary URLs.
+- Improved `Popout` and `Popover` with nested popout handling, stable trigger refs, and fewer open-state callback re-registrations, and refined `ColorPicker`, `DatePicker`, and `NumberInput` behavior and stepper icon sizing.
+- Fixed JSON formatting so non-finite parsed values are rejected instead of silently converted to `null`.
+- Fixed point-hotspot persistence and media preview sizing with framework image overrides, including Next.js.
+- Prevented retrying a single upload with an expired target.
+
+### `@puzzle-ui/pieces`
+
+- Added caller-data-driven Media compositions: `MediaLibrary`, `AssetPickerDialog`, `AssetDetailsPanel`, and `MediaField`, with sanitized Media audit presentation.
+- Added CMS authoring compositions: `CmsShell`, `ContentList`, `ContentEditor`, `BlockEditor`, `ContentTypeBuilder`, `LocalizationEditor`, `RelationshipField`, `RevisionHistory`, `PublishScheduler`, `EditorialCalendar`, `AuditLogViewer`, and `WebhookManagement`.
+- Added remote content-list controls, draft protection, revision comparisons, and relationship search with removable previews.
+- Added commerce `CheckoutSection` and `PaymentMethodSelector` pieces.
+- Refactored carousel-based and grid sections (categories, product grid/gallery, product showcase, gallery, testimonials, logo cloud, integrations, how-it-works, and others) onto a shared carousel primitive and trimmed styles.
+- Marked all canonical component APIs and aliases as Stable, with updated registry and docs.
+- Fixed point-hotspot persistence and media preview sizing with framework image overrides, including Next.js.
+
+### `@puzzle-ui/storage-d1`
+
+- Fixed registration of hyphenated index names without relaxing validation of table and other SQL identifiers.
+
+### `@puzzle-ui/fullstack`
+
+- Added workspace-only CMS and Media client/server, Next.js, and TanStack integrations with tenant authorization and sanitized contracts.
+- Added optional CMS webhook administration and Media audit callbacks; hosts must provide policies, audit storage, and a safe webhook transport.
+- Added payment server and shared entry points.
+- Added an opt-in completed-upload content verification callback so a host content inspector can run before an asset is created.
+- Fixed guarded permanent deletion for soft-deleted media assets and prevented single-upload retries from using expired targets.
+
+### `@puzzle-ui/payment-providers`
+
+- Added server-only fetch adapters for Stripe, Mollie, PayPal, and Adyen with capability declarations, idempotency headers, lifecycle operations, and webhook verification.
+
+### `@puzzle-ui/i18n`
+
+- Documented that the package is published to npm and remains pre-1.0, with npm install instructions.
+
 ## 0.14.0 - 2026-11-20
 
 ### `@puzzle-ui/theme`

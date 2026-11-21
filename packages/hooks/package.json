@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/hooks",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Reusable interaction and rendering hooks for React applications",
   "homepage": "https://puzzle-ui.com/docs/hooks",
   "keywords": [
@@ -51,7 +51,7 @@
     "prepack": "tsdown"
   },
   "dependencies": {
-    "@puzzle-ui/core": "^0.14.0"
+    "@puzzle-ui/core": "^0.15.0"
   },
   "peerDependencies": {
     "react": "^19.0.0"

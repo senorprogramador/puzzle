@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/theme` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.15.0 - 2026-11-21
+
+- No changes; version bumped in lockstep.
+
 ## 0.14.0 - 2026-11-20
 
 - Added the `GOOGLE_FONT_FAMILIES` catalog and `GoogleFontFamily` type as public exports for font pickers and tooling.

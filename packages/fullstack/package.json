@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/fullstack",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Browser Auth, Media, and CMS clients, server handlers, and Next.js and TanStack Start adapters for Puzzle.",
   "homepage": "https://puzzle-ui.com/docs/fullstack",
   "keywords": [
@@ -214,7 +214,7 @@
     "prepack": "tsdown"
   },
   "devDependencies": {
-    "@puzzle-ui/storage": "^0.14.0",
+    "@puzzle-ui/storage": "^0.15.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
@@ -227,12 +227,12 @@
     "vitest": "5.1.1"
   },
   "dependencies": {
-    "@puzzle-ui/commerce": "^0.14.0",
-    "@puzzle-ui/cms": "^0.14.0",
-    "@puzzle-ui/ui": "^0.14.0",
-    "@puzzle-ui/auth": "^0.14.0",
-    "@puzzle-ui/media": "^0.14.0",
-    "@puzzle-ui/session": "^0.14.0",
+    "@puzzle-ui/commerce": "^0.15.0",
+    "@puzzle-ui/cms": "^0.15.0",
+    "@puzzle-ui/ui": "^0.15.0",
+    "@puzzle-ui/auth": "^0.15.0",
+    "@puzzle-ui/media": "^0.15.0",
+    "@puzzle-ui/session": "^0.15.0",
     "@simplewebauthn/browser": "^14.0.0"
   },
   "peerDependencies": {

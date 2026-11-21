@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/storage` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.15.0 - 2026-11-21
+
+- Documented that CMS content and media metadata can use the storage record contract, while file bytes belong in the separate `@puzzle-ui/media` object-storage adapter.
+
 ## 0.14.0 - 2026-11-20
 
 - No changes; version bumped in lockstep.

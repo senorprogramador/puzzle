@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.15.0 - 2026-11-21
+
+- Documented that the package is published to npm and remains pre-1.0, with npm install instructions.
+
 ## 0.14.0 - 2026-11-20
 
 - Added the pre-release `@puzzle-ui/i18n` package with an SSR-safe multilingual runtime, typed translations and formatting, and React bindings.

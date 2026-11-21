@@ -3,6 +3,16 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.15.0 - 2026-11-21
+
+- Added `ImageUpload`, `VideoUpload`, `ImageCropper`, and `ImageHotspotEditor` controls for image and video upload and editing, plus CMS-oriented `FieldArray` and `JsonEditor` components.
+- Expanded `TextEditor` with a serializable `TextDocument` model, nested lists, checklists, icon lists, block formatting, an accessible command toolbar, and parser/renderer improvements.
+- `ImageBox` can request unoptimized rendering from configured framework image components, used by Media previews for temporary URLs.
+- Improved `Popout` and `Popover` with nested popout handling, stable trigger refs, and fewer open-state callback re-registrations, and refined `ColorPicker`, `DatePicker`, and `NumberInput` behavior and stepper icon sizing.
+- Fixed JSON formatting so non-finite parsed values are rejected instead of silently converted to `null`.
+- Fixed point-hotspot persistence and media preview sizing with framework image overrides, including Next.js.
+- Prevented retrying a single upload with an expired target.
+
 ## [Unreleased]
 
 - Added image and video upload/editing controls and CMS-oriented field-array and

@@ -3,6 +3,16 @@
 All notable changes to `@puzzle-ui/pieces` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.15.0 - 2026-11-21
+
+- Added caller-data-driven Media compositions: `MediaLibrary`, `AssetPickerDialog`, `AssetDetailsPanel`, and `MediaField`, with sanitized Media audit presentation.
+- Added CMS authoring compositions: `CmsShell`, `ContentList`, `ContentEditor`, `BlockEditor`, `ContentTypeBuilder`, `LocalizationEditor`, `RelationshipField`, `RevisionHistory`, `PublishScheduler`, `EditorialCalendar`, `AuditLogViewer`, and `WebhookManagement`.
+- Added remote content-list controls, draft protection, revision comparisons, and relationship search with removable previews.
+- Added commerce `CheckoutSection` and `PaymentMethodSelector` pieces.
+- Refactored carousel-based and grid sections (categories, product grid/gallery, product showcase, gallery, testimonials, logo cloud, integrations, how-it-works, and others) onto a shared carousel primitive and trimmed styles.
+- Marked all canonical component APIs and aliases as Stable, with updated registry and docs.
+- Fixed point-hotspot persistence and media preview sizing with framework image overrides, including Next.js.
+
 ## [Unreleased]
 
 - Added caller-data-driven Media and CMS authoring compositions, including
