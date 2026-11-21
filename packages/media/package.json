@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/media",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Provider-neutral media contracts, storage ports, processing services, and browser utilities for Puzzle.",
   "homepage": "https://puzzle-ui.com/docs/media",
   "keywords": [
@@ -81,6 +81,6 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@puzzle-ui/storage": "^0.15.0"
+    "@puzzle-ui/storage": "^0.16.0"
   }
 }

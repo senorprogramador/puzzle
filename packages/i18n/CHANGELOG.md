@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.0 - 2026-11-21
+
+- No changes; version bumped in lockstep.
+
 ## 0.15.0 - 2026-11-21
 
 - Documented that the package is published to npm and remains pre-1.0, with npm install instructions.

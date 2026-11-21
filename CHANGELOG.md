@@ -36,6 +36,8 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.16.0 - 2026-11-21
+
 ## 0.15.0 - 2026-11-21
 
 ### `@puzzle-ui/commerce`

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.16.0 - 2026-11-21
+
+- No changes; version bumped in lockstep.
+
 ## 0.15.0 - 2026-11-21
 
 - Added workspace-only CMS schemas, content lifecycle, revisions, policies, scheduling, media references, and audit APIs.

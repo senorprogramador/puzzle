@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/fullstack` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.16.0 - 2026-11-21
+
+- No changes; version bumped in lockstep.
+
 ## 0.15.0 - 2026-11-21
 
 - Added workspace-only CMS and Media client/server, Next.js, and TanStack integrations with tenant authorization and sanitized contracts.

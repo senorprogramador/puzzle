@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.16.0 - 2026-11-21
+
+- No changes; version bumped in lockstep.
+
 ## 0.15.0 - 2026-11-21
 
 - Added `ImageUpload`, `VideoUpload`, `ImageCropper`, and `ImageHotspotEditor` controls for image and video upload and editing, plus CMS-oriented `FieldArray` and `JsonEditor` components.
