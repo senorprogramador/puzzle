@@ -24,7 +24,7 @@ export const multilingual: TreeViewItem = {
     },
     {
       id: "multilingual-react",
-      label: "React Integration",
+      label: "React Integration for Multilingual Apps",
       href: `${folder}/react`,
     },
     {

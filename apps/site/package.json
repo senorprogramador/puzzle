@@ -13,7 +13,7 @@
     "build": "bun run fonts:download && vite build",
     "start": "node .output/server/index.mjs",
     "fonts:download": "bun ../../packages/theme/src/cli.ts fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
-    "test:seo": "bun test src/lib/seo.test.ts src/lib/homepage.test.ts src/lib/mdx-to-markdown.test.ts src/lib/seo-routes.test.ts src/lib/faq.test.ts src/lib/search-intents.test.ts",
+    "test:seo": "bun test src/lib/seo.test.ts src/lib/homepage.test.ts src/lib/mdx-to-markdown.test.ts src/lib/seo-routes.test.ts src/lib/faq.test.ts src/lib/search-intents.test.ts src/lib/content-pages.test.ts",
     "test:sitemap": "bun test src/lib/seo-routes.test.ts",
     "test:seo:smoke": "bun scripts/validate-seo-endpoints.ts",
     "test:catalog": "bun test src/components/component-catalog.test.ts",

@@ -23,7 +23,7 @@ export const seo: TreeViewItem = {
     },
     {
       id: "seo-react",
-      label: "React Integration",
+      label: "React Integration for SEO",
       href: `${folder}/react`,
     },
     {

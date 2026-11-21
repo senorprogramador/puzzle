@@ -85,9 +85,6 @@ jobs:
       - name: Run site SEO unit tests
         run: bun run --filter '@puzzle-ui/site' test:seo
 
-      - name: Run rendered site SEO smoke checks
-        run: bun run --filter '@puzzle-ui/site' test:seo:smoke
-
       - name: Upload homepage theme screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -274,3 +271,6 @@ jobs:
               docker compose up -d --no-deps --force-recreate puzzle-site
 
             echo "Puzzle deployment complete!"
+
+      - name: Run deployed site SEO smoke checks
+        run: bun run --filter '@puzzle-ui/site' test:seo:smoke
