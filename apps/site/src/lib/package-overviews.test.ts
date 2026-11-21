@@ -24,6 +24,7 @@ const exportedPackages = [
 
 const packagePages = [
   ["core", "/docs/core"],
+  ["commerce", "/docs/commerce"],
   ["hooks", "/docs/hooks"],
   ["icons", "/docs/icons"],
   ["theme", "/docs/theme"],
@@ -37,6 +38,7 @@ const packagePages = [
   ["cms", "/docs/cms"],
   ["media", "/docs/media"],
   ["fullstack", "/docs/fullstack"],
+  ["payment-providers", "/docs/payment-providers"],
   ["seo", "/docs/seo"],
   ["i18n", "/docs/multilingual"],
   ["create", "/docs/create"],

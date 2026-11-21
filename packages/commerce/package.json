@@ -1,0 +1,55 @@
+{
+  "name": "@puzzle-ui/commerce",
+  "version": "0.14.0",
+  "description": "Provider-independent commerce contracts and safe monetary utilities for Puzzle.",
+  "homepage": "https://puzzle-ui.com/docs/commerce",
+  "keywords": [
+    "puzzle-ui",
+    "commerce",
+    "payments",
+    "orders",
+    "money"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "ai"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
+    "prepack": "tsdown",
+    "vitest": "bunx vitest run --passWithNoTests",
+    "vitest:watch": "bunx vitest run --watch --passWithNoTests"
+  },
+  "devDependencies": {
+    "tsdown": "^0.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

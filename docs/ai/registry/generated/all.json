@@ -1170,6 +1170,35 @@
       "aliases": []
     },
     {
+      "name": "CheckoutSection",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "checkout-section",
+      "description": "Compose a provider-neutral checkout flow from caller-owned details, payment, review, and order-summary slots.",
+      "documentation": "apps/site/content/docs/pieces/components/checkout.mdx",
+      "source": "packages/pieces/src/components/commerce/checkout-section/checkout-section.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "checkout-section"
+      },
+      "aliases": []
+    },
+    {
       "name": "CommerceBenefitsSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [
@@ -1344,6 +1373,48 @@
         "kind": "section",
         "family": "gift-voucher-section"
       },
+      "aliases": []
+    },
+    {
+      "name": "PaymentMethodSelector",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "payment-method-selector",
+      "description": "Render provider-neutral payment method choices with accessible radio-group behavior.",
+      "documentation": "apps/site/content/docs/pieces/components/payment-method-selector.mdx",
+      "source": "packages/pieces/src/components/commerce/payment-method-selector/payment-method-selector.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "payment-method-selector"
+      },
+      "requiredProps": [
+        "methods"
+      ],
+      "contentRequirements": [
+        "label (optional)",
+        "description (optional)"
+      ],
+      "dataRequirements": [
+        "methods (required)"
+      ],
+      "interactiveBehavior": [
+        "onValueChange"
+      ],
       "aliases": []
     },
     {

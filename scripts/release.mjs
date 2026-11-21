@@ -11,6 +11,7 @@ const dryRun = process.argv.includes("--dry-run");
 
 const releaseOrder = [
   "core",
+  "commerce",
   "theme",
   "hooks",
   "icons",
@@ -25,6 +26,7 @@ const releaseOrder = [
   "storage-mongodb",
   "auth",
   "fullstack",
+  "payment-providers",
   "seo",
   "i18n",
 ];

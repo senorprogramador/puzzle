@@ -186,6 +186,15 @@
         "typescript": "^7.0.2",
       },
     },
+    "packages/commerce": {
+      "name": "@puzzle-ui/commerce",
+      "version": "0.14.0",
+      "devDependencies": {
+        "tsdown": "^0.23.1",
+        "typescript": "^7.0.2",
+        "vitest": "^5.1.0",
+      },
+    },
     "packages/core": {
       "name": "@puzzle-ui/core",
       "version": "0.14.0",
@@ -218,6 +227,7 @@
       "dependencies": {
         "@puzzle-ui/auth": "^0.14.0",
         "@puzzle-ui/cms": "^0.14.0",
+        "@puzzle-ui/commerce": "^0.14.0",
         "@puzzle-ui/media": "^0.14.0",
         "@puzzle-ui/session": "^0.14.0",
         "@puzzle-ui/ui": "^0.14.0",
@@ -334,6 +344,19 @@
         "bun": "^1.4.4",
         "tsdown": "^0.23.1",
         "typescript": "^7.0.2",
+      },
+    },
+    "packages/payment-providers": {
+      "name": "@puzzle-ui/payment-providers",
+      "version": "0.14.0",
+      "dependencies": {
+        "@puzzle-ui/commerce": "^0.14.0",
+      },
+      "devDependencies": {
+        "@types/node": "^26.6.6",
+        "tsdown": "^0.23.1",
+        "typescript": "^7.0.2",
+        "vitest": "^5.1.0",
       },
     },
     "packages/pieces": {
@@ -1016,6 +1039,8 @@
 
     "@puzzle-ui/cms": ["@puzzle-ui/cms@workspace:packages/cms"],
 
+    "@puzzle-ui/commerce": ["@puzzle-ui/commerce@workspace:packages/commerce"],
+
     "@puzzle-ui/core": ["@puzzle-ui/core@workspace:packages/core"],
 
     "@puzzle-ui/create": ["@puzzle-ui/create@workspace:packages/create"],
@@ -1029,6 +1054,8 @@
     "@puzzle-ui/icons": ["@puzzle-ui/icons@workspace:packages/icons"],
 
     "@puzzle-ui/media": ["@puzzle-ui/media@workspace:packages/media"],
+
+    "@puzzle-ui/payment-providers": ["@puzzle-ui/payment-providers@workspace:packages/payment-providers"],
 
     "@puzzle-ui/pieces": ["@puzzle-ui/pieces@workspace:packages/pieces"],
 

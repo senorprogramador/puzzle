@@ -1,0 +1,127 @@
+---
+title: CheckoutSection
+description: Compose a provider-neutral checkout flow from caller-owned details, payment, review, and order-summary slots.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { Badge } from "@puzzle-ui/ui";
+import { CheckoutSectionVariantsExample } from "../../../../src/components/doc-examples/pieces/checkout";
+
+`CheckoutSection` is a presentation-only checkout shell. It composes
+customer, billing, shipping, payment, review, terms, actions, and summary
+content supplied by the application. It does not calculate prices, validate
+inventory, create orders, or call a payment provider.
+
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** The
+component API is covered by package tests and is intended to remain
+backward-compatible within a major version.
+
+<Preview fit="device" code={`<CheckoutSectionVariantsExample />`}>
+  <CheckoutSectionVariantsExample />
+</Preview>
+
+## Installation
+
+```tsx
+import {
+  CheckoutSection,
+  PaymentMethodSelector,
+} from "@puzzle-ui/pieces";
+```
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `variant` | `"form" \| "split" \| "compact" \| "multi-step" \| "sidebar"` | Controls the layout; defaults to `"form"`. |
+| `customerDetails` | `ReactNode` | Application-owned customer fields. |
+| `billingDetails` | `ReactNode` | Application-owned billing fields. |
+| `shippingDetails` | `ReactNode` | Application-owned shipping fields. |
+| `payment` | `ReactNode` | Provider-specific payment UI or application-owned payment fields. |
+| `review` | `ReactNode` | Review content before submission. |
+| `summary` | `ReactNode` | Application-calculated order summary. |
+| `paymentMethods` | `readonly PaymentMethodOption[]` | Optional provider-neutral methods rendered by the section. |
+| `selectedPaymentMethod` | `string` | Controlled selected payment method. |
+| `defaultPaymentMethod` | `string` | Initial payment method for uncontrolled usage. |
+| `paymentMethodName` | `string` | Native radio-group name for payment methods. |
+| `onPaymentMethodChange` | `(value: string) => void` | Called when the method changes. |
+| `steps` | `readonly CheckoutStep[]` | Optional composable progress steps. |
+| `currentStepId` | `string` | Active step identifier. |
+| `onStepChange` | `(stepId: string) => void` | Application-owned step navigation. |
+| `terms` | `ReactNode` | Terms or privacy consent controls. |
+| `actions` | `ReactNode` | Optional application-owned additional actions. |
+| `onSubmit` | `(formData: FormData) => void \| Promise<void>` | Application-owned submit action. |
+| `submitLabel` | `ReactNode` | Submit button content; defaults to `"Place order"`. |
+| `loading` | `boolean` | Disables submit while the application is processing. |
+| `success` | `ReactNode` | Success feedback supplied by the application. |
+| `error` | `ReactNode` | Error feedback supplied by the application. |
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `variant` | No | `"form"` |
+| `onSubmit` | No | — |
+| `loading` | No | `false` |
+
+The component renders a named semantic form and exposes loading, error, and
+success states. All price, tax, discount, shipping, availability, and payment
+status values must come from trusted application/server state.
+
+## Payment providers
+
+`CheckoutSection` and `PaymentMethodSelector` do not contain Stripe, Mollie,
+PayPal, Adyen, or other provider branches. Applications can render a
+provider-specific client widget in the `payment` slot while keeping provider
+credentials and authoritative payment operations on the server.
+
+## Accessibility and responsive behavior
+
+The component uses labelled sections, a semantic form, progress semantics, a
+keyboard-accessible payment radio group, visible error feedback, and a
+responsive summary layout. Application-provided fields and controls remain
+responsible for their own labels, validation, and accessible descriptions.
+
+## Theme support
+
+The section consumes semantic Puzzle Theme variables for surfaces, borders,
+spacing, text, focus rings, and status colors. It inherits the active or
+scoped theme and does not require provider-specific styling.
+
+## Data and business logic
+
+Keep order resolution, server-side totals, discounts, tax, payment status,
+idempotency, webhook processing, and fulfillment outside this Piece. Use the
+shared commerce contracts and a server integration for those responsibilities.
+
+## Customization and composition
+
+Replace individual slots, provide custom steps, omit irrelevant address
+sections, or render a provider-specific client widget in `payment`. Keep
+validation, routing, data loading, and order orchestration in the application.
+
+## TypeScript example
+
+Derive wrapper props from the public component rather than duplicating its
+contract:
+
+```tsx
+import type { ComponentProps } from "react";
+import { CheckoutSection } from "@puzzle-ui/pieces";
+
+type CheckoutProps = ComponentProps<typeof CheckoutSection>;
+
+export const BrandedCheckout = (props: CheckoutProps) => (
+  <CheckoutSection {...props} className="brand-checkout" />
+);
+```
+
+## Framework integration
+
+The Piece is router-independent and can be rendered by any React application.
+See [Pieces framework integration](/docs/pieces/framework-integration) for
+Next.js, TanStack Start, and SSR boundary guidance.
+
+## Related components
+
+- [Cart Summary](/docs/pieces/components/cart-summary)
+- [Payment Method Selector](/docs/pieces/components/payment-method-selector)
+- [Booking Section](/docs/pieces/components/booking-section)

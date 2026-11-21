@@ -10,6 +10,7 @@ not replace package documentation or duplicate package instructions.
 | --- | --- |
 | Understand the monorepo or locate a workspace | [Architecture overview](./architecture/overview.md), [package map](./architecture/package-map.md) |
 | Trace package dependencies or change a shared contract | [Dependency map](./architecture/dependency-map.md), [cross-package workflow](./workflows/cross-package-changes.md) |
+| Plan hospitality, commerce, checkout, booking, or payment work | [Hospitality and commerce capability audit](./architecture/hospitality-commerce-audit.md) |
 | Choose a Piece, UI component, or custom React | [Component selection](./reference/component-selection.md) |
 | Model data or add persistence | [Data architecture](./reference/data-architecture.md), [database integration](./workflows/database-integration.md) |
 | Work on CMS content or media assets | [Package map](./architecture/package-map.md), [data architecture](./reference/data-architecture.md), [CMS package instructions](../../packages/cms/AGENTS.md), [media package instructions](../../packages/media/AGENTS.md) |

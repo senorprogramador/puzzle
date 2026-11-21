@@ -1,0 +1,73 @@
+---
+title: Commerce and Payments
+description: Provider-independent money, orders, payment lifecycles, refunds, booking contracts, idempotency, and webhook foundations.
+---
+
+`@puzzle-ui/commerce` is the framework-neutral domain foundation for Puzzle
+commerce, checkout, payments, and booking integrations. It has no React,
+router, database, or payment-provider dependency.
+
+## Install
+
+```bash
+npm install @puzzle-ui/commerce
+```
+
+## Money
+
+Money uses safe integer minor units and validates ISO currency minor-unit
+conventions:
+
+```ts
+import {
+  addMoney,
+  createMoney,
+  formatMoney,
+} from "@puzzle-ui/commerce";
+
+const total = addMoney(
+  createMoney(1250, "USD"),
+  createMoney(250, "USD"),
+);
+
+formatMoney(total, "en-US"); // "$15.00"
+```
+
+Operations reject incompatible currencies, unsafe amounts, invalid currency
+codes, and non-finite multipliers. Use explicit currency overrides for
+application-defined currencies.
+
+## Orders, payments, and refunds
+
+Orders support products, services, accommodation, deposits, vouchers, and
+custom line items without requiring a booking. Totals are calculated from
+server-owned line items and distinguish subtotal, discounts, tax, shipping, and
+total.
+
+Payment attempts have explicit transitions for pending, processing,
+requires-action, authorization, capture/success, failure, cancellation, and
+refund states. Refund validation prevents cumulative refunds from exceeding
+the captured amount. Provider-specific IDs remain separate from internal IDs.
+
+Use `ProviderRegistry` to select among multiple adapters without module-global
+configuration. Capabilities and optional operations allow providers to expose
+only the lifecycle features they support.
+
+## Booking contracts
+
+Booking is an independent domain. `AvailabilityQuery`, guest validation,
+date-range constraints, `calculateBookingTotals`, payment policies, and
+booking lifecycle transitions can be used without enabling online payment.
+Applications remain responsible for authoritative availability and persistence.
+
+## Reliability and security
+
+Use `executeIdempotently` for payment, capture, cancellation, refund, and
+fulfillment mutations. Use `processWebhook` with a durable store to reject
+duplicate event IDs. Verify provider signatures before parsing or applying
+events, keep secrets outside the package, and never trust client totals or
+payment status.
+
+The package provides contracts only. Use
+`@puzzle-ui/fullstack/payments/server` for orchestration and
+`@puzzle-ui/payment-providers/*` for server-only provider adapters.

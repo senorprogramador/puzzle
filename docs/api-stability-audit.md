@@ -2,7 +2,7 @@
 
 ## Scope and method
 
-Audited all 71 individually documented components in `@puzzle-ui/ui`, all 125
+Audited all 71 individually documented components in `@puzzle-ui/ui`, all 127
 canonical components documented by `@puzzle-ui/pieces` (including 14 canonical
 Hero components; the package also exposes 11 aliases that are not double-counted), and 46 other React components documented by the Theme (2), Icons
 (1), Fullstack (7), and SEO (36) package guides. Aliases are recorded with
@@ -13,7 +13,7 @@ The public API below is taken from the package entry points and component
 exports, not inferred from examples. Validation evidence is based on
 component-local test files and the public package peer dependencies. The site
 package declares React and React DOM 19 as peers. The component inventory
-contains 242 APIs: 241 Stable and `SectionHeader` Beta. Stable classifications
+contains 244 APIs: 243 Stable and `SectionHeader` Beta. Stable classifications
 include documented backward-compatibility intent within a major version.
 Package-level utility and adapter APIs retain their separate maturity
 classifications below.
@@ -158,6 +158,7 @@ specialized required-media prop types.
 | CTASection | `CTASection` and its exported props/types | Stable | Source: `src/components/marketing/cta/cta.tsx`; reference: `pieces/components/cta.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | CareersSection | `CareersSection` and its exported props/types | Stable | Source: `src/components/business/careers-section/careers-section.tsx`; reference: `pieces/components/careers-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | CartSummarySection | `CartSummarySection` and its exported props/types | Stable | Source: `src/components/commerce/cart-summary/cart-summary.tsx`; reference: `pieces/components/cart-summary.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
+| CheckoutSection | `CheckoutSection` and its exported props/types | Stable | Source: `src/components/commerce/checkout-section/checkout-section.tsx`; reference: `pieces/components/checkout.mdx`. The complete Pieces suite passed 836 tests; within-major compatibility is committed. |
 | CaseStudiesSection | `CaseStudiesSection` and its exported props/types | Stable | Source: `src/components/business/case-studies-section/case-studies-section.tsx`; reference: `pieces/components/case-studies-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | CategoriesSection | `CategoriesSection` and its exported props/types | Stable | Source: `src/components/commerce/categories/categories.tsx`; reference: `pieces/components/categories.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | ChangelogSection | `ChangelogSection` and its exported props/types | Stable | Source: `src/components/content/changelog-section/changelog-section.tsx`; reference: `pieces/components/changelog-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
@@ -212,6 +213,7 @@ specialized required-media prop types.
 | ProductDetailsSection | `ProductDetailsSection` and its exported props/types | Stable | Source: `src/components/commerce/product-details/product-details.tsx`; reference: `pieces/components/product-details.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | ProductGallerySection | `ProductGallerySection` and its exported props/types | Stable | Source: `src/components/commerce/product-gallery/product-gallery.tsx`; reference: `pieces/components/product-gallery.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | ProductGridSection | `ProductGridSection` and its exported props/types | Stable | Source: `src/components/commerce/product-grid/product-grid.tsx`; reference: `pieces/components/product-grid.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
+| PaymentMethodSelector | `PaymentMethodSelector` and its exported props/types | Stable | Source: `src/components/commerce/payment-method-selector/payment-method-selector.tsx`; reference: `pieces/components/payment-method-selector.mdx`. The complete Pieces suite passed 836 tests; within-major compatibility is committed. |
 | ProductShowcaseSection | `ProductShowcaseSection` and its exported props/types | Stable | Source: `src/components/marketing/product-showcase/product-showcase.tsx`; reference: `pieces/components/product-showcase.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | ProfileHeader | `ProfileHeader` and its exported props/types | Stable | Source: `src/components/settings/settings.tsx`; reference: `pieces/components/settings.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | ProjectCard | `ProjectCard` and its exported props/types | Stable | Source: `src/components/project/project.tsx`; reference: `pieces/components/project.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |

@@ -1,0 +1,16 @@
+.puzzle-payment-method-selector {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-payment-method-selector__label {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-payment-method-selector__provider {
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}

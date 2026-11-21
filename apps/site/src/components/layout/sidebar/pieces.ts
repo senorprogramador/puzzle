@@ -140,6 +140,16 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/cart-summary`,
         },
         {
+          id: "pieces-checkout",
+          label: "Checkout",
+          href: `${componentsFolder}/checkout`,
+        },
+        {
+          id: "pieces-payment-method-selector",
+          label: "Payment Method Selector",
+          href: `${componentsFolder}/payment-method-selector`,
+        },
+        {
           id: "pieces-product-details",
           label: "Product Details",
           href: `${componentsFolder}/product-details`,

@@ -13,6 +13,8 @@ export * from "./dish-card";
 export * from "./restaurant-menu-section";
 export * from "./table-reservation-section";
 export * from "./commerce-benefits";
+export * from "./checkout-section";
+export * from "./payment-method-selector";
 export type {
   CommerceImage,
   CommerceMoney,

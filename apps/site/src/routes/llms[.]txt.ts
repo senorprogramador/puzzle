@@ -56,6 +56,7 @@ const buildLlmsTxt = (): string => {
   const startPage = getPage("/docs/getting-started");
   const packageOverviews = [
     "/docs/core",
+    "/docs/commerce",
     "/docs/hooks",
     "/docs/icons",
     "/docs/theme",
@@ -67,6 +68,7 @@ const buildLlmsTxt = (): string => {
     "/docs/cms",
     "/docs/media",
     "/docs/fullstack",
+    "/docs/payment-providers",
     "/docs/seo",
     "/docs/multilingual",
     "/docs/create",

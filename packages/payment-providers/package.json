@@ -1,0 +1,99 @@
+{
+  "name": "@puzzle-ui/payment-providers",
+  "version": "0.14.0",
+  "description": "Server-only payment provider adapters for Puzzle Commerce.",
+  "homepage": "https://puzzle-ui.com/docs/payments",
+  "keywords": [
+    "puzzle-ui",
+    "payments",
+    "stripe",
+    "mollie",
+    "paypal",
+    "adyen"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./stripe": {
+      "import": {
+        "types": "./dist/stripe.d.ts",
+        "default": "./dist/stripe.js"
+      },
+      "require": {
+        "types": "./dist/stripe.d.cts",
+        "default": "./dist/stripe.cjs"
+      }
+    },
+    "./mollie": {
+      "import": {
+        "types": "./dist/mollie.d.ts",
+        "default": "./dist/mollie.js"
+      },
+      "require": {
+        "types": "./dist/mollie.d.cts",
+        "default": "./dist/mollie.cjs"
+      }
+    },
+    "./paypal": {
+      "import": {
+        "types": "./dist/paypal.d.ts",
+        "default": "./dist/paypal.js"
+      },
+      "require": {
+        "types": "./dist/paypal.d.cts",
+        "default": "./dist/paypal.cjs"
+      }
+    },
+    "./adyen": {
+      "import": {
+        "types": "./dist/adyen.d.ts",
+        "default": "./dist/adyen.js"
+      },
+      "require": {
+        "types": "./dist/adyen.d.cts",
+        "default": "./dist/adyen.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "ai"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
+    "prepack": "tsdown",
+    "vitest": "bunx vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@puzzle-ui/commerce": "^0.14.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "tsdown": "^0.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}

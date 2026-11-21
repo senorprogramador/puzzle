@@ -103,6 +103,12 @@ export const foundations: TreeViewItem = {
   label: "Foundations",
   children: [
     { id: "core", label: "Core Utilities", href: "/docs/core" },
+    { id: "commerce", label: "Commerce and Payments", href: "/docs/commerce" },
+    {
+      id: "payment-providers",
+      label: "Payment Providers",
+      href: "/docs/payment-providers",
+    },
     theme,
     { id: "icons", label: "Icons", href: "/docs/icons" },
     hooks,

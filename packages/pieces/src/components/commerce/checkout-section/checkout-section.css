@@ -1,0 +1,110 @@
+.puzzle-checkout-section {
+  min-width: 0;
+}
+
+.puzzle-checkout-section__form,
+.puzzle-checkout-section__layout,
+.puzzle-checkout-section__main,
+.puzzle-checkout-section__slot {
+  display: grid;
+  min-width: 0;
+  gap: var(--puzzle-space-5, 1.25rem);
+}
+
+.puzzle-checkout-section__steps {
+  display: grid;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-checkout-section__steps > p {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-checkout-section__steps ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-checkout-section__steps button,
+.puzzle-checkout-section__steps li > span {
+  display: inline-flex;
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-surface);
+  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-lg, 0.75rem);
+  font: inherit;
+}
+
+.puzzle-checkout-section__steps button {
+  cursor: pointer;
+}
+
+.puzzle-checkout-section__steps [aria-current="step"] {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-checkout-section__steps button:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-checkout-section__layout {
+  align-items: start;
+}
+
+.puzzle-checkout-section__summary {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-checkout-section__summary h2 {
+  margin: 0;
+}
+
+.puzzle-checkout-section__terms,
+.puzzle-checkout-section__actions,
+.puzzle-checkout-section__submit {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-checkout-section__submit {
+  justify-content: flex-end;
+}
+
+.puzzle-checkout-section__error {
+  margin: 0;
+  color: var(--puzzle-color-danger);
+}
+
+.puzzle-checkout-section__success {
+  margin: 0;
+  color: var(--puzzle-color-success);
+}
+
+.puzzle-checkout-section[data-variant="split"] .puzzle-checkout-section__layout,
+.puzzle-checkout-section[data-variant="sidebar"] .puzzle-checkout-section__layout {
+  grid-template-columns: minmax(0, 1.5fr) minmax(14rem, 0.7fr);
+}
+
+.puzzle-checkout-section[data-variant="compact"] .puzzle-checkout-section__form,
+.puzzle-checkout-section[data-variant="compact"] .puzzle-checkout-section__layout,
+.puzzle-checkout-section[data-variant="compact"] .puzzle-checkout-section__main,
+.puzzle-checkout-section[data-variant="compact"] .puzzle-checkout-section__slot {
+  gap: var(--puzzle-space-3, 0.75rem);
+}
+
+@media (max-width: 48rem) {
+  .puzzle-checkout-section[data-variant="split"] .puzzle-checkout-section__layout,
+  .puzzle-checkout-section[data-variant="sidebar"] .puzzle-checkout-section__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

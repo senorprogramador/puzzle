@@ -31,6 +31,18 @@
       "contentHash": "e5cb7c26b709ae307a0d4ca1c9fc2d602e356c1ed8657a162e6d6c0edf09b578"
     },
     {
+      "name": "@puzzle-ui/commerce",
+      "version": "0.14.0",
+      "instructionVersion": 1,
+      "files": [
+        "ai/manifest.json",
+        "ai/instructions.md"
+      ],
+      "instructionDependencies": [],
+      "documentationUrl": "https://puzzle-ui.com/docs/commerce",
+      "contentHash": "95f2f75207fab14eab42967fe01ca849d2656016b9808b5069dd034d384e710a"
+    },
+    {
       "name": "@puzzle-ui/core",
       "version": "0.14.0",
       "instructionVersion": 1,
@@ -71,7 +83,7 @@
         "@puzzle-ui/ui"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/fullstack",
-      "contentHash": "21a822836044fd4eca54b1a909763fa074628aafb8c77a939f043b7c034d41f2"
+      "contentHash": "db1fd7a58ab25368fb84b86217aaf801c0499237e7dde55579e0aa2d0358772a"
     },
     {
       "name": "@puzzle-ui/hooks",
@@ -128,6 +140,18 @@
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/media",
       "contentHash": "69bdf6fdb0bc2e8992f197c5cceedd1217aaee6f2934fbe232161b6ad7c6b841"
+    },
+    {
+      "name": "@puzzle-ui/payment-providers",
+      "version": "0.14.0",
+      "instructionVersion": 1,
+      "files": [
+        "ai/manifest.json",
+        "ai/instructions.md"
+      ],
+      "instructionDependencies": [],
+      "documentationUrl": "https://puzzle-ui.com/docs/payment-providers",
+      "contentHash": "7dd568b29e8eee7a739ba9844c8a9e6948708d15136bc0a46a9af31417b0b8c6"
     },
     {
       "name": "@puzzle-ui/pieces",

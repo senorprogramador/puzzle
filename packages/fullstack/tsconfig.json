@@ -31,6 +31,9 @@
       ],
       "@puzzle-ui/ui": [
         "../ui/src/index.ts"
+      ],
+      "@puzzle-ui/commerce": [
+        "../commerce/src/index.ts"
       ]
     }
   },

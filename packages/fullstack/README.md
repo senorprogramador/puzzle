@@ -2,7 +2,12 @@
 
 [Documentation: https://puzzle-ui.com/docs/fullstack](https://puzzle-ui.com/docs/fullstack)
 
-`@puzzle-ui/fullstack` connects Puzzle Auth, Media, and CMS services to browser clients, server routes, and framework adapters. Use its explicit subpaths for browser-safe clients, serializable contracts, server handlers, or framework dispatchers; configure auth policy, storage, media processing, CMS access policy, and sessions with the lower-level packages.
+`@puzzle-ui/fullstack` connects Puzzle Auth, Media, CMS, and commerce/payment
+services to browser clients, server routes, and framework adapters. Use its
+explicit subpaths for browser-safe clients, serializable contracts, server
+handlers, or framework dispatchers; configure auth policy, storage, media
+processing, CMS access policy, sessions, and payment providers with the
+lower-level packages.
 
 ## Install
 
@@ -16,6 +21,35 @@ The existing npm release contains the Auth subpaths. The new `/media/*` and
 `/cms/*` subpaths are available in this repository as workspace source and
 require a coordinated release with `@puzzle-ui/media` and `@puzzle-ui/cms`
 before they can be installed from npm.
+
+## Payments
+
+The payments server subpath orchestrates the provider-independent contracts
+from `@puzzle-ui/commerce`. It resolves order totals from trusted server-side
+storage and never accepts client-supplied amounts or payment status:
+
+```ts
+import { PaymentServer } from "@puzzle-ui/fullstack/payments/server";
+
+export const payments = new PaymentServer({
+  registry,
+  store,
+  idempotency,
+  webhooks,
+  resolveWebhookSecret: (provider) => secrets.get(`payments/${provider}`),
+});
+```
+
+Use `createPayment` for a payment attempt, `createCheckoutSession` for hosted
+checkout, and the capture, cancel, refund, and webhook methods for subsequent
+server operations. Every mutation requires a caller-owned idempotency key.
+Webhook authenticity must be verified by the configured provider adapter before
+events are deduplicated and applied.
+
+Provider implementations are intentionally separate:
+`@puzzle-ui/payment-providers/stripe`, `/mollie`, `/paypal`, and `/adyen`.
+These adapters are server-only and use platform `fetch`; keep credentials and
+webhook secrets in the host's secret manager.
 
 ## Client
 

@@ -1,0 +1,101 @@
+---
+title: PaymentMethodSelector
+description: Render provider-neutral payment method choices with accessible radio-group behavior.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { Badge } from "@puzzle-ui/ui";
+import { PaymentMethodSelectorVariantsExample } from "../../../../src/components/doc-examples/pieces/checkout";
+
+`PaymentMethodSelector` presents caller-supplied payment methods without
+depending on a payment provider. Each option can include a label, description,
+provider name, icon, disabled state, and a stable identifier.
+
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** The
+component API is covered by package tests and is intended to remain
+backward-compatible within a major version.
+
+<Preview fit="device" code={`<PaymentMethodSelectorVariantsExample />`}>
+  <PaymentMethodSelectorVariantsExample />
+</Preview>
+
+## Installation
+
+```tsx
+import {
+  PaymentMethodSelector,
+  type PaymentMethodOption,
+} from "@puzzle-ui/pieces";
+```
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `methods` | `readonly PaymentMethodOption[]` | Required options with unique, non-empty IDs. |
+| `value` | `string` | Controlled selected method. |
+| `defaultValue` | `string` | Initial selected method for uncontrolled usage. |
+| `name` | `string` | Native radio-group name. |
+| `label` | `ReactNode` | Visible group label; defaults to `"Payment method"`. |
+| `description` | `ReactNode` | Supporting group description. |
+| `error` | `ReactNode` | Validation feedback. |
+| `required` | `boolean` | Marks the group as required. |
+| `disabled` | `boolean` | Disables all methods. |
+| `onValueChange` | `(value: string) => void` | Called after a method is selected. |
+
+| Prop | Required | Default |
+| --- | --- | --- |
+| `methods` | Yes | — |
+| `label` | No | `"Payment method"` |
+| `disabled` | No | `false` |
+
+The component validates option identifiers and delegates keyboard navigation,
+focus behavior, and native radio semantics to `@puzzle-ui/ui`.
+
+## Responsive behavior
+
+Options wrap their labels and provider metadata naturally. Use the selector
+inside the checkout layout at mobile, tablet, and desktop widths; keep
+application-provided icons and descriptions compact enough to avoid overflow.
+
+## Theme support
+
+The selector delegates control styling to `@puzzle-ui/ui` and consumes the
+active Puzzle Theme tokens, including text, surface, border, and focus colors.
+
+## Customization and composition
+
+Use the `icon`, `provider`, `description`, and `disabled` fields to adapt each
+option, or compose the selector inside `CheckoutSection`. The component does
+not select a provider, fetch availability, or submit a payment.
+
+## TypeScript example
+
+```tsx
+import type { ComponentProps } from "react";
+import { PaymentMethodSelector } from "@puzzle-ui/pieces";
+
+type SelectorProps = ComponentProps<typeof PaymentMethodSelector>;
+
+export const BrandedPaymentMethods = (props: SelectorProps) => (
+  <PaymentMethodSelector {...props} />
+);
+```
+
+## Framework integration
+
+The selector is router-independent and can be rendered inside any React
+application. See [Pieces framework integration](/docs/pieces/framework-integration)
+for SSR and client-boundary guidance.
+
+## Related components
+
+- [Checkout](/docs/pieces/components/checkout)
+- [Cart Summary](/docs/pieces/components/cart-summary)
+- [Radio Group](/docs/ui/forms/radio-group)
+
+## Provider independence
+
+Use server-derived availability to determine which methods are shown. Do not
+infer provider support from client input, and do not expose provider secrets in
+option metadata or labels.

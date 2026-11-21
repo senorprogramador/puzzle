@@ -117,6 +117,10 @@ const componentDocs = [
   ["categories", "CategoriesSection"],
   ["product-gallery", "ProductGallerySection"],
   ["cart-summary", "CartSummarySection"],
+  ["checkout", "CheckoutSection"],
+  ["payment-method-selector", "PaymentMethodSelector"],
+  ["dietary-information", "DietaryInformation"],
+  ["dish-card", "DishCard"],
   ["product-details", "ProductDetailsSection"],
   ["availability-search", "AvailabilitySearchSection"],
   ["rate-plans", "RatePlansSection"],
@@ -194,8 +198,8 @@ const cmsWorkflowDocs = [
 ] as const;
 
 describe("Pieces documentation coverage", () => {
-  it("documents all 63 section families with public imports and previews", () => {
-    expect(componentDocs).toHaveLength(63);
+  it("documents all 67 section families with public imports and previews", () => {
+    expect(componentDocs).toHaveLength(67);
 
     const sidebar = readFileSync(sidebarPath, "utf8");
     for (const [slug, componentName] of componentDocs) {

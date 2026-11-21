@@ -1,0 +1,54 @@
+---
+title: Payment Provider Adapters
+description: Server-only Stripe, Mollie, PayPal, and Adyen adapters for Puzzle Commerce.
+---
+
+`@puzzle-ui/payment-providers` provides optional server-only adapters for the
+provider-independent contracts in `@puzzle-ui/commerce`. The adapters use the
+platform `fetch` API and do not bundle provider SDKs.
+
+## Install
+
+```bash
+npm install @puzzle-ui/commerce @puzzle-ui/payment-providers
+```
+
+## Adapters
+
+| Provider | Import | Main capabilities |
+| --- | --- | --- |
+| Stripe | `@puzzle-ui/payment-providers/stripe` | Payment Intents, hosted Checkout Sessions, capture, cancellation, refunds, signature verification, payment methods. |
+| Mollie | `@puzzle-ui/payment-providers/mollie` | Hosted payments, authoritative webhook retrieval, refunds, recurring-capable payment flow, payment methods. |
+| PayPal | `@puzzle-ui/payment-providers/paypal` | Orders, buyer approval, authorization/capture, capture refunds, request IDs, official webhook verification. |
+| Adyen | `@puzzle-ui/payment-providers/adyen` | Payments, sessions, additional-action results, capture, cancellation, refunds, HMAC webhook verification. |
+
+```ts
+import { createStripeAdapter } from "@puzzle-ui/payment-providers/stripe";
+
+const stripe = createStripeAdapter({
+  secretKey: process.env.STRIPE_SECRET_KEY!,
+  webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+});
+```
+
+Register multiple adapters in an application-scoped registry:
+
+```ts
+import { createProviderRegistry } from "@puzzle-ui/commerce";
+
+const registry = createProviderRegistry({
+  providers: [stripe, mollie, paypal],
+  defaultProvider: "stripe",
+});
+```
+
+## Security requirements
+
+Provider credentials and webhook secrets are server-only. Resolve order
+amounts from trusted server storage, supply idempotency keys for every
+mutation, verify signatures before processing, and use the provider's
+authoritative status rather than a browser redirect or success URL.
+
+The adapters are tested with mocked provider responses. Complete each
+provider's sandbox, webhook retry, asynchronous method, 3DS/additional-action,
+refund, and production credential verification before deployment.

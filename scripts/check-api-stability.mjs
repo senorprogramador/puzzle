@@ -83,21 +83,21 @@ for (const component of components) {
 }
 
 const inventorySummary =
-  /242 APIs: 241 Stable and `SectionHeader` Beta/.test(audit);
+  /244 APIs: 243 Stable and `SectionHeader` Beta/.test(audit);
 
 if (!inventorySummary) {
-  throw new Error("API stability audit must summarize all 242 component APIs.");
+  throw new Error("API stability audit must summarize all 244 component APIs.");
 }
 
-if (piecesRegistry.components.length !== 125) {
+if (piecesRegistry.components.length !== 127) {
   throw new Error(
-    `Expected 125 canonical Pieces components, found ${piecesRegistry.components.length}. Update the stability audit.`,
+    `Expected 127 canonical Pieces components, found ${piecesRegistry.components.length}. Update the stability audit.`,
   );
 }
 
 if (
   !piecesReadme.includes(
-    "All 125 canonical component APIs and their published aliases are **Stable**.",
+    "All 127 canonical component APIs and their published aliases are **Stable**.",
   )
 ) {
   throw new Error("Pieces README must classify all canonical component APIs as Stable.");
@@ -130,7 +130,7 @@ for (const component of piecesRegistry.components) {
   }
 }
 
-const piecesInventorySummary = /242 APIs: 241 Stable and `SectionHeader` Beta/.test(audit);
+const piecesInventorySummary = /244 APIs: 243 Stable and `SectionHeader` Beta/.test(audit);
 if (!piecesInventorySummary) {
   throw new Error("API stability audit must summarize the complete UI and Pieces component inventory.");
 }

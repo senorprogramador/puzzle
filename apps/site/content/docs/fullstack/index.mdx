@@ -1,9 +1,9 @@
 ---
-title: Fullstack Client and Server Integrations
-description: Connect Puzzle Auth, Media, and CMS clients to authorized server handlers and Next.js or TanStack Start adapters.
+title: Full-Stack React Authentication
+description: Connect React authentication experiences to server handlers and Next.js or TanStack Start adapters with a browser-safe auth client.
 ---
 
-`@puzzle-ui/fullstack` connects Puzzle Auth, Media, and CMS services to browser
+`@puzzle-ui/fullstack` connects Puzzle Auth, Media, CMS, and commerce services to browser
 applications and server routes. Its explicit subpaths separate browser-safe
 clients, serializable shared contracts, server handlers, and Next.js/TanStack
 Start adapters. The package complements `@puzzle-ui/auth`, `@puzzle-ui/session`,
@@ -79,6 +79,7 @@ Create and configure an `AuthServer` from your server-side auth and session mana
 | Next.js adapter | `GET` and `POST` handlers for a Next.js route handler. | [Next.js](/docs/fullstack/next) |
 | TanStack Start adapter | A Request dispatcher or explicit route map for TanStack Start. | [TanStack Start](/docs/fullstack/tanstack) |
 | Shared contracts | Serializable client snapshots, inputs, and result types shared across runtimes. | [Shared types](/docs/fullstack/shared) |
+| Payments | Server-only order total resolution, payment lifecycle orchestration, idempotency, refunds, and verified webhook processing. | [Commerce and payments](/docs/commerce), [Payment providers](/docs/payment-providers) |
 
 ## Package entry points
 
@@ -99,6 +100,8 @@ Create and configure an `AuthServer` from your server-side auth and session mana
 | `@puzzle-ui/fullstack/cms/server` | Authorized CMS admin and published-content handlers. |
 | `@puzzle-ui/fullstack/cms/next` | Next.js CMS route-handler adapter. |
 | `@puzzle-ui/fullstack/cms/tanstack` | TanStack Start CMS dispatcher. |
+| `@puzzle-ui/fullstack/payments/shared` | Serializable payment request and response contracts. |
+| `@puzzle-ui/fullstack/payments/server` | Server-only payment orchestration, idempotency, refunds, and webhook processing. |
 
 There is no package-root import; use one of the exported subpaths above. Keep auth policy and storage configuration in the appropriate lower-level packages, and use Fullstack to connect them to your app. For the end-to-end app setup, continue with the [developer authentication guide](/docs/developer/authentication).
 

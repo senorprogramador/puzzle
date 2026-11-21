@@ -4,7 +4,7 @@ Puzzle is a TypeScript and React ecosystem designed for both human developers an
 
 ## Monorepo organization
 
-The root [`package.json`](../../../package.json) defines the Bun workspaces. Expanding those patterns discovers 24 workspaces: 5 applications and 19 packages. The root manifest and each matched package manifest are authoritative; package names come from each manifest's `name`, not its directory.
+The root [`package.json`](../../../package.json) defines the Bun workspaces. Expanding those patterns discovers 26 workspaces: 5 applications and 21 packages. The root manifest and each matched package manifest are authoritative; package names come from each manifest's `name`, not its directory.
 
 - [`apps/`](../../../apps/) contains the documentation site, component playground, two Workspace examples, and a React Router SSR/i18n example.
 - [`packages/`](../../../packages/) contains public library workspaces (including packages awaiting release) and private packages shared by the sample apps.
@@ -15,10 +15,10 @@ The [package map](./package-map.md) records each current workspace's responsibil
 
 ## Architectural layers
 
-1. **Shared foundations:** `@puzzle-ui/core` supplies framework-independent utilities and rendering contracts; `@puzzle-ui/hooks` supplies React hooks; `@puzzle-ui/icons` supplies React icons.
+1. **Shared foundations:** `@puzzle-ui/core` supplies framework-independent utilities and rendering contracts; `@puzzle-ui/commerce` supplies provider-independent commerce contracts and money utilities; `@puzzle-ui/hooks` supplies React hooks; `@puzzle-ui/icons` supplies React icons.
 2. **Design system:** `@puzzle-ui/theme` owns theme tokens and providers; `@puzzle-ui/ui` provides reusable components and uses the browser-safe Media subpath for image/video preparation; `@puzzle-ui/pieces` composes larger page sections from the design system and uses framework-neutral CMS contracts for optional authoring compositions.
 3. **Application services:** `@puzzle-ui/storage` defines database-neutral record contracts; `@puzzle-ui/storage-d1` and `@puzzle-ui/storage-mongodb` implement adapters; `@puzzle-ui/session` and `@puzzle-ui/auth` provide session and authentication services; `@puzzle-ui/media` provides provider-neutral media and object-storage contracts; `@puzzle-ui/cms` provides content schemas and publishing services.
-4. **Integration and tooling:** `@puzzle-ui/fullstack` separates Auth, Media, and CMS client, server, and framework adapter entry points; `@puzzle-ui/seo` provides metadata, structured data, sitemap, robots, and framework entry points; `@puzzle-ui/i18n` provides a pre-release locale, ICU, routing, catalog, and SEO toolkit; `@puzzle-ui/create` scaffolds applications.
+4. **Integration and tooling:** `@puzzle-ui/fullstack` separates Auth, Media, CMS, and Payments client, server, and framework adapter entry points; `@puzzle-ui/payment-providers` provides optional server-only provider adapters; `@puzzle-ui/seo` provides metadata, structured data, sitemap, robots, and framework entry points; `@puzzle-ui/i18n` provides a pre-release locale, ICU, routing, catalog, and SEO toolkit; `@puzzle-ui/create` scaffolds applications.
 5. **Workspace examples:** private `@puzzle-ui/workspace` shares Workspace domain contracts/services; `@puzzle-ui/workspace-ui` provides its React UI. The Next.js and TanStack Start apps provide framework-specific application wiring.
 
 ## Direct runtime workspace dependencies
@@ -37,6 +37,7 @@ flowchart LR
 
   subgraph Packages
     core["@puzzle-ui/core"]
+    commerce["@puzzle-ui/commerce"]
     hooks["@puzzle-ui/hooks"]
     icons["@puzzle-ui/icons"]
     theme["@puzzle-ui/theme"]
@@ -50,6 +51,7 @@ flowchart LR
     session["@puzzle-ui/session"]
     auth["@puzzle-ui/auth"]
     fullstack["@puzzle-ui/fullstack"]
+    paymentproviders["@puzzle-ui/payment-providers"]
     seo["@puzzle-ui/seo"]
     i18n["@puzzle-ui/i18n"]
     create["@puzzle-ui/create"]
@@ -123,6 +125,8 @@ flowchart LR
   fullstack --> session
   fullstack --> media
   fullstack --> cms
+  fullstack --> commerce
+  paymentproviders --> commerce
   workspace --> storage
   workspace --> session
   workspaceui --> fullstack
@@ -131,7 +135,7 @@ flowchart LR
   workspaceui --> workspace
 ```
 
-`@puzzle-ui/seo`, `@puzzle-ui/i18n`, `@puzzle-ui/create`, and `@puzzle-ui/storage` have no direct runtime dependency on another workspace package; their external dependencies and public exports are listed in the [package map](./package-map.md).
+`@puzzle-ui/commerce`, `@puzzle-ui/seo`, `@puzzle-ui/i18n`, `@puzzle-ui/create`, and `@puzzle-ui/storage` have no direct runtime dependency on another workspace package; their external dependencies and public exports are listed in the [package map](./package-map.md).
 
 ## Application architecture
 
@@ -145,7 +149,7 @@ The Workspace apps are parity-focused examples, not evidence that every package 
 
 ## Framework integrations and client/server boundaries
 
-- `@puzzle-ui/fullstack` exports separate Auth, Media, and CMS client/shared/server entries, plus Next.js and TanStack Start adapters. React is required; Next.js and TanStack Start are optional framework peers. The new Media and CMS subpaths are awaiting a coordinated package release.
+- `@puzzle-ui/fullstack` exports separate Auth, Media, CMS, and Payments client/shared/server entries, plus Next.js and TanStack Start adapters. React is required; Next.js and TanStack Start are optional framework peers. The new Media, CMS, and Payments subpaths are awaiting a coordinated package release.
 - `@puzzle-ui/ui` exposes generic rendering entries plus explicit Next.js and TanStack client/server/shared subpaths. Use the entry point matching the rendering environment.
 - `@puzzle-ui/workspace` keeps client-safe contracts at its root and `/client` entry; server storage initialization and services are available only from `/server`. The Workspace apps inject verified identity and configured storage.
 - `@puzzle-ui/auth`, `@puzzle-ui/session`, and database adapters are server-side infrastructure. Do not import them into browser bundles.

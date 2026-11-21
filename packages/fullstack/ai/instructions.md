@@ -1,9 +1,10 @@
 # @puzzle-ui/fullstack
 
-Use Fullstack to connect Puzzle Auth, Media, and CMS with browser clients,
-server handlers, and framework adapters. It adapts the Auth, Session, Media,
-and CMS packages; it does not own authentication policy, storage, media
-processing, or CMS schemas/publishing.
+Use Fullstack to connect Puzzle Auth, Media, CMS, and Commerce with browser
+clients, server handlers, and framework adapters. It adapts the Auth, Session,
+Media, CMS, and Commerce packages; it does not own authentication policy,
+storage, media processing, CMS schemas/publishing, or payment-provider
+credentials.
 
 Install with `npm install @puzzle-ui/fullstack`. There is intentionally no
 package-root import. Use only declared subpaths. The current npm release
@@ -23,9 +24,15 @@ coordinated release with their domain packages.
 - `@puzzle-ui/fullstack/cms/shared` for serializable CMS API contracts.
 - `@puzzle-ui/fullstack/cms/server` for authorized admin and published-content handlers.
 - `@puzzle-ui/fullstack/cms/next` or `/tanstack` only in the matching framework.
+- `@puzzle-ui/fullstack/payments/shared` for serializable payment API contracts.
+- `@puzzle-ui/fullstack/payments/server` for trusted order resolution, payment
+  orchestration, idempotency, and webhook processing.
 
 Keep server managers, cookies, storage, media object keys, provider upload IDs,
 permanent credentials, and server-only types out of client/shared imports.
+Payment server code must resolve totals from trusted orders, never accept
+client-supplied amounts or status, and verify webhook authenticity before
+deduplicating or applying events.
 Protect server resources independently of browser auth state. Resolve actor and
 tenant from trusted server context and authorize every server action; never
 accept tenant identity or object references from browser input. Next.js and

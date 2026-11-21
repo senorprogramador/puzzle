@@ -14,12 +14,14 @@ This map records direct dependency relationships among workspaces. The root [`pa
 | `packages/auth` (`@puzzle-ui/auth`) | `@puzzle-ui/session`, `@puzzle-ui/storage` |
 | `packages/cms` (`@puzzle-ui/cms`) | `@puzzle-ui/storage` |
 | `packages/core` (`@puzzle-ui/core`) | None |
+| `packages/commerce` (`@puzzle-ui/commerce`) | None |
 | `packages/create` (`@puzzle-ui/create`) | None |
-| `packages/fullstack` (`@puzzle-ui/fullstack`) | `@puzzle-ui/auth`, `@puzzle-ui/cms`, `@puzzle-ui/media`, `@puzzle-ui/session`, `@puzzle-ui/ui` |
+| `packages/fullstack` (`@puzzle-ui/fullstack`) | `@puzzle-ui/auth`, `@puzzle-ui/cms`, `@puzzle-ui/commerce`, `@puzzle-ui/media`, `@puzzle-ui/session`, `@puzzle-ui/ui` |
 | `packages/hooks` (`@puzzle-ui/hooks`) | `@puzzle-ui/core` |
 | `packages/i18n` (`@puzzle-ui/i18n`) | None |
 | `packages/icons` (`@puzzle-ui/icons`) | `@puzzle-ui/core` |
 | `packages/media` (`@puzzle-ui/media`) | `@puzzle-ui/storage` |
+| `packages/payment-providers` (`@puzzle-ui/payment-providers`) | `@puzzle-ui/commerce` |
 | `packages/pieces` (`@puzzle-ui/pieces`) | `@puzzle-ui/cms`, `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/theme`, `@puzzle-ui/ui` |
 | `packages/seo` (`@puzzle-ui/seo`) | None |
 | `packages/session` (`@puzzle-ui/session`) | `@puzzle-ui/storage` |
