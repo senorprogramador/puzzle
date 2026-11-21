@@ -7,6 +7,7 @@ import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import { CommerceImageView } from "../commerce-image";
 import type {
   ProductGalleryImage,
@@ -55,14 +56,14 @@ const ProductGallerySection = <C extends ElementType = "section">({
   );
   const [requestedIndex, setRequestedIndex] = useState(initialIndex);
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [zoomed, setZoomed] = useState(false);
+  const [zoomedImageId, setZoomedImageId] = useState<string | null>(null);
   const selectedIndex = Math.min(requestedIndex, images.length - 1);
   const selectedImage = images[selectedIndex];
   const lightboxEnabled = lightbox ?? variant === "fullscreen";
 
   const selectImage = (index: number) => {
     setRequestedIndex(Math.max(0, Math.min(index, images.length - 1)));
-    setZoomed(false);
+    setZoomedImageId(null);
   };
 
   const handleDialogKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -88,7 +89,7 @@ const ProductGallerySection = <C extends ElementType = "section">({
   const renderMainImage = (image: ProductGalleryImage, index: number) => (
     <figure
       className="puzzle-product-gallery__main"
-      data-zoomed={zoomed || undefined}
+      data-zoomed={zoomedImageId === image.id || undefined}
     >
       <CommerceImageView
         image={image}
@@ -109,18 +110,27 @@ const ProductGallerySection = <C extends ElementType = "section">({
         {zoom ? (
           <button
             type="button"
-            aria-pressed={zoomed}
-            aria-label={zoomed ? "Reset image zoom" : "Zoom image"}
-            onClick={() => setZoomed((value) => !value)}
+            aria-pressed={zoomedImageId === image.id}
+            aria-label={
+              zoomedImageId === image.id ? "Reset image zoom" : "Zoom image"
+            }
+            onClick={() =>
+              setZoomedImageId((current) =>
+                current === image.id ? null : image.id,
+              )
+            }
           >
-            {zoomed ? "Reset zoom" : "Zoom"}
+            {zoomedImageId === image.id ? "Reset zoom" : "Zoom"}
           </button>
         ) : null}
         {lightboxEnabled ? (
           <button
             type="button"
             aria-label={`Open ${image.alt || `image ${index + 1}`} in lightbox`}
-            onClick={() => setLightboxOpen(true)}
+            onClick={() => {
+              selectImage(index);
+              setLightboxOpen(true);
+            }}
           >
             View larger
           </button>
@@ -188,7 +198,24 @@ const ProductGallerySection = <C extends ElementType = "section">({
       family="product-gallery"
       variant={variant}
     >
-      {selectedImage ? (
+      {selectedImage && variant === "carousel" ? (
+        <PiecesCarousel
+          itemKeys={images.map((image) => image.id)}
+          slides={images.map((image, index) => (
+            <div key={image.id} className="puzzle-product-gallery__slide">
+              {renderMainImage(image, index)}
+              {renderActions(image, index)}
+            </div>
+          ))}
+          ariaLabel="Product images"
+          itemLabel="image"
+          className="puzzle-product-gallery__carousel"
+          panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+          gap="var(--puzzle-space-4, 1rem)"
+          currentPanel={selectedIndex}
+          onPanelChange={selectImage}
+        />
+      ) : selectedImage ? (
         <div
           className="puzzle-product-gallery__layout"
           role="region"
@@ -234,29 +261,6 @@ const ProductGallerySection = <C extends ElementType = "section">({
                 {renderMainImage(selectedImage, selectedIndex)}
                 {renderActions(selectedImage, selectedIndex)}
               </div>
-              {variant === "carousel" ? (
-                <div className="puzzle-product-gallery__controls">
-                  <button
-                    type="button"
-                    aria-label="Previous image"
-                    disabled={selectedIndex === 0}
-                    onClick={() => selectImage(selectedIndex - 1)}
-                  >
-                    Previous
-                  </button>
-                  <span>
-                    {selectedIndex + 1} of {images.length}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label="Next image"
-                    disabled={selectedIndex === images.length - 1}
-                    onClick={() => selectImage(selectedIndex + 1)}
-                  >
-                    Next
-                  </button>
-                </div>
-              ) : null}
               {variant !== "fullscreen" ? renderImageButtons() : null}
             </>
           )}

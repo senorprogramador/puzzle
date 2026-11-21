@@ -1,16 +1,12 @@
 "use client";
 
-import { Button, Carousel, CarouselController, Heading } from "@puzzle-ui/ui";
-import { Icon } from "@puzzle-ui/icons";
-import {
-  useState,
-  type ElementType,
-  type KeyboardEvent,
-} from "react";
+import { Heading } from "@puzzle-ui/ui";
+import { type ElementType } from "react";
 import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import type { LogoCloudItem, LogoCloudSectionProps } from "./logo-cloud.types";
 import "./logo-cloud.css";
 
@@ -53,22 +49,11 @@ const LogoCloudSection = <C extends ElementType = "section">(
   props: LogoCloudSectionProps<C>,
 ) => {
   const variant = props.variant ?? "grid";
-  const [currentPanel, setCurrentPanel] = useState(0);
   const sectionProps = { ...props };
   delete (sectionProps as Partial<LogoCloudSectionProps<C>>).variant;
   delete (sectionProps as Partial<LogoCloudSectionProps<C>>).logos;
   const logos = props.logos;
   const isCarousel = variant === "carousel";
-  const handleCarouselKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    event.preventDefault();
-    setCurrentPanel((current) =>
-      Math.min(
-        Math.max(0, logos.length - 1),
-        current + (event.key === "ArrowRight" ? 1 : -1),
-      ),
-    );
-  };
   const groups =
     variant === "grouped"
       ? groupLogos(logos)
@@ -82,42 +67,19 @@ const LogoCloudSection = <C extends ElementType = "section">(
       variant={variant}
     >
       {isCarousel && logos.length ? (
-        <div
-          className="puzzle-logo-cloud__keyboard"
-          role="group"
-          tabIndex={0}
-          aria-label="Partner logos. Use the left and right arrow keys to navigate."
-          onKeyDown={handleCarouselKeyDown}
-        >
-          <CarouselController
-            items={[...logos]}
-            currentPanel={currentPanel}
-            onPanelChange={setCurrentPanel}
-          >
-            <Carousel<LogoCloudItem>
-              ariaLabel="Partner logos"
-              className="puzzle-logo-cloud__carousel"
-              gap="var(--puzzle-space-6, 1.5rem)"
-              panelsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
-              renderItem={(logo) => (
-                <span className="puzzle-logo-cloud__mark">
-                  <LogoMark logo={logo} />
-                </span>
-              )}
-              getItemKey={(logo) => logo.id}
-              backButton={
-                <Button variant="primary" size="sm" aria-label="Previous logos">
-                  <Icon name="bx:caret-left" aria-hidden="true" />
-                </Button>
-              }
-              nextButton={
-                <Button variant="primary" size="sm" aria-label="Next logos">
-                  <Icon name="bx:caret-right" aria-hidden="true" />
-                </Button>
-              }
-            />
-          </CarouselController>
-        </div>
+        <PiecesCarousel
+          itemKeys={logos.map((logo) => logo.id)}
+          slides={logos.map((logo) => (
+            <span className="puzzle-logo-cloud__mark" key={logo.id}>
+              <LogoMark logo={logo} />
+            </span>
+          ))}
+          ariaLabel="Partner logos"
+          itemLabel="logos"
+          className="puzzle-logo-cloud__carousel"
+          gap="var(--puzzle-space-6, 1.5rem)"
+          panelsPerView={{ mobile: 2, tablet: 4, desktop: 6 }}
+        />
       ) : variant === "grouped" && logos.length ? (
         <div className="puzzle-logo-cloud__groups">
           {groups.map(([group, groupLogos]) => (

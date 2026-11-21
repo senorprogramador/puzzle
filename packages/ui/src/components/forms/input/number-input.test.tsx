@@ -142,4 +142,14 @@ describe("NumberInput", () => {
     expect(screen.getByRole("button", { name: "Minder" }).tabIndex).toBe(-1);
     expect(screen.getByRole("button", { name: "Meer" }).tabIndex).toBe(-1);
   });
+
+  it("uses compact icons in the stepper buttons", () => {
+    render(<NumberInput aria-label="Qty" />);
+
+    for (const label of ["Decrease value", "Increase value"]) {
+      const icon = screen.getByRole("button", { name: label }).querySelector("svg");
+      expect(icon?.getAttribute("width")).toBe("14");
+      expect(icon?.getAttribute("height")).toBe("14");
+    }
+  });
 });

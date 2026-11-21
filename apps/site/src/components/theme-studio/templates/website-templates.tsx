@@ -174,7 +174,9 @@ const TemplateFrame = ({
     data-template-view={view}
     data-preview-page={view === "detail" ? "home" : view}
   >
-    <header className="theme-studio-template__header">
+    <header
+      className={`theme-studio-template__header theme-studio-template__header--${template}`}
+    >
       <Button
         className="theme-studio-template__identity"
         variant="ghost"
@@ -231,7 +233,7 @@ const TemplateFrame = ({
 
     <footer className="theme-studio-template__footer">
       <span>{brand}</span>
-      <span>Website preview · Built with Puzzle</span>
+      <span>{tagline}</span>
       <Button
         variant="link"
         size="sm"

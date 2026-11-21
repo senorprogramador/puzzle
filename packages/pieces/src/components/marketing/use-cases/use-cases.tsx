@@ -12,6 +12,7 @@ import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import type {
   UseCaseItem,
   UseCasesSectionProps,
@@ -200,20 +201,16 @@ const UseCasesSection = <C extends ElementType = "section">({
           ) : null}
         </div>
       ) : filteredItems.length && variant === "carousel" ? (
-        <div
-          className="puzzle-use-cases__carousel"
-          role="region"
-          aria-label="Use cases"
-          tabIndex={0}
-        >
-          <ul className="puzzle-use-cases__list">
-            {filteredItems.map((item) => (
-              <li key={item.id}>
-                <UseCaseCard item={item} variant={variant} />
-              </li>
-            ))}
-          </ul>
-        </div>
+        <PiecesCarousel
+          itemKeys={filteredItems.map((item) => item.id)}
+          slides={filteredItems.map((item) => (
+            <UseCaseCard key={item.id} item={item} variant={variant} />
+          ))}
+          ariaLabel="Use cases"
+          itemLabel="use case"
+          panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+          gap="var(--puzzle-space-6, 1.5rem)"
+        />
       ) : filteredItems.length ? (
         <ul className="puzzle-use-cases__list">
           {filteredItems.map((item) => (

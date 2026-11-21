@@ -22,15 +22,25 @@ Run commands from `apps/playground/`:
 
 - `bun run typecheck`
 - `bun run build`
-- `bun run test:e2e` (requires a production build; run `bun run build` at the repository root and `bun run build` here first)
-- `bun run test:a11y` (requires a production build)
-- `bun run test:visual` (requires a production build; update baselines intentionally with `bun run test:visual:update`)
+- `bun run test:e2e` (runs reference behavior, accessibility, and visual tests in the canonical Docker image)
+- `bun run test:reference:behavior`
+- `bun run test:a11y`
+- `bun run test:visual`
+- `bun run test:visual:update` (updates Linux baselines intentionally in the canonical image)
+- `bun run test:visual:diagnostics`
 - `bun run dev`
 - `bun run preview`
 - `bun run storybook`
 - `bun run build-storybook`
 
-`build` runs TypeScript checking before Vite production bundling. From the repository root, `bun run test:reference` builds packages and the app before running its browser suite. Use the visual QA guides in [`docs/ai/quality/`](../../docs/ai/quality/); package-level tests remain authoritative for package behavior.
+`build` runs TypeScript checking before Vite production bundling. The browser
+test commands require Docker and network access for the pinned Linux ARM64
+Playwright image and frozen Bun dependency install; they build the workspace
+and production preview inside that environment. On Apple Silicon, Docker runs
+the same ARM64 architecture as CI. From the repository root,
+`bun run test:reference` runs the full canonical browser suite. Use the visual
+QA guides in [`docs/ai/quality/`](../../docs/ai/quality/); package-level tests
+remain authoritative for package behavior.
 
 ## Context-efficient workflow
 

@@ -5,6 +5,7 @@ import {
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
 import { validateContentIds } from "../../content/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import type { BusinessPartner } from "../shared.types";
 import type {
   PartnersSectionProps,
@@ -14,15 +15,11 @@ import type {
 import "../shared.css";
 import "./partners-section.css";
 
-const renderPartners = (
-  items: readonly BusinessPartner[],
-  scrollable = false,
-) => (
+const renderPartners = (items: readonly BusinessPartner[]) => (
   <LogoCollection
     items={items}
     label="Partners"
     className="puzzle-partners-section__logos"
-    scrollable={scrollable}
   />
 );
 
@@ -71,7 +68,23 @@ const PartnersSection = <C extends ElementType = "section">({
   const content =
     variant === "categories"
       ? renderCategories(partners)
-      : renderPartners(partners, variant === "carousel");
+      : variant === "carousel" ? (
+        <PiecesCarousel
+          itemKeys={partners.map((partner) => partner.id)}
+          slides={partners.map((partner) => (
+            <LogoCollection
+              key={partner.id}
+              items={[partner]}
+              label="Partner"
+              className="puzzle-partners-section__logos"
+            />
+          ))}
+          ariaLabel="Partners"
+          itemLabel="partner"
+          panelsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
+          gap="var(--puzzle-space-4, 1rem)"
+        />
+      ) : renderPartners(partners);
   const nativeProps = sectionProps as MarketingSectionBaseProps<C>;
 
   return (

@@ -1,53 +1,52 @@
 .theme-studio {
-  min-height: 100vh;
-  padding: var(--puzzle-space-8) var(--puzzle-space-5);
-  background: var(--puzzle-color-background);
+  min-width: 0;
+  padding: clamp(var(--puzzle-space-4), 2vw, var(--puzzle-space-8))
+    clamp(var(--puzzle-space-3), 3vw, var(--puzzle-space-8))
+    var(--puzzle-space-12);
   color: var(--puzzle-color-text);
+  background: var(--puzzle-color-background);
 }
 
-.theme-studio__container {
-  width: min(100%, var(--puzzle-container-width));
-  margin-inline: auto;
+.theme-studio__content {
   display: grid;
-  gap: var(--puzzle-space-8);
+  gap: clamp(var(--puzzle-space-4), 2vw, var(--puzzle-space-6));
 }
 
-.theme-studio__header,
-.theme-studio__section-heading,
-.theme-studio__panel-heading {
+.theme-studio__page-heading,
+.theme-studio__page-heading > div {
+  min-width: 0;
+}
+
+.theme-studio__page-heading {
   display: flex;
-  align-items: flex-start;
+  align-items: end;
   justify-content: space-between;
   gap: var(--puzzle-space-4);
 }
 
-.theme-studio__header h1,
-.theme-studio__section h2,
-.theme-studio__panel h2 {
+.theme-studio__page-heading h1,
+.theme-studio__page-heading p {
   margin: 0;
-  font-family: var(--puzzle-font-family-heading);
-  color: var(--puzzle-color-text);
 }
 
-.theme-studio__header h1 {
-  font-size: var(--puzzle-font-size-4xl);
+.theme-studio__page-heading h1 {
+  font-family: var(--puzzle-font-family-heading);
+  font-size: clamp(var(--puzzle-font-size-2xl), 3vw, var(--puzzle-font-size-4xl));
   line-height: var(--puzzle-font-line-height-tight);
 }
 
-.theme-studio__header p,
-.theme-studio__section-heading p,
-.theme-studio__panel-heading p {
-  margin: var(--puzzle-space-2) 0 0;
+.theme-studio__page-heading p:last-child {
+  margin-top: var(--puzzle-space-1);
   color: var(--puzzle-color-text-muted);
   font-size: var(--puzzle-font-size-sm);
 }
 
-.theme-studio__header > div {
-  max-width: 48rem;
+.theme-studio__page-heading .theme-studio__eyebrow {
+  margin: 0 0 var(--puzzle-space-1);
 }
 
 .theme-studio__eyebrow {
-  margin: 0 0 var(--puzzle-space-2);
+  margin-bottom: var(--puzzle-space-1);
   color: var(--puzzle-color-primary);
   font-size: var(--puzzle-font-size-xs);
   font-weight: var(--puzzle-font-weight-semibold);
@@ -56,640 +55,376 @@
 }
 
 .theme-studio__status {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--puzzle-space-2);
+  max-width: 100%;
   padding: var(--puzzle-space-2) var(--puzzle-space-3);
   border: var(--puzzle-border-width) solid var(--puzzle-color-border);
   border-radius: var(--puzzle-radius-full);
   background: var(--puzzle-color-surface);
   color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-sm);
-  white-space: nowrap;
+  font-size: var(--puzzle-font-size-xs);
 }
 
-.theme-studio__section,
-.theme-studio__panel,
-.theme-studio__preview-panel {
-  min-width: 0;
+.theme-studio__status > span {
+  width: 0.5rem;
+  aspect-ratio: 1;
+  border-radius: var(--puzzle-radius-full);
+  background: var(--puzzle-color-success);
 }
 
-.theme-studio__section {
-  display: grid;
-  gap: var(--puzzle-space-4);
-}
-
-.theme-studio__section h2,
-.theme-studio__panel h2 {
-  font-size: var(--puzzle-font-size-xl);
-}
-
-.theme-studio__template-list {
+.theme-studio-output-dock {
+  position: sticky;
+  z-index: calc(var(--puzzle-z-index-navigation, 250) - 1);
+  top: var(--puzzle-sticky-offset, 5rem);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--puzzle-space-3);
+  min-width: 0;
+  padding: var(--puzzle-space-3);
+  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-xl);
+  background: var(--puzzle-color-surface);
+  box-shadow: var(--puzzle-shadow-sm);
+  backdrop-filter: blur(0.75rem);
 }
 
-.theme-studio__template-button,
-.theme-studio__preset-card,
-.theme-studio__spacing-card {
+.theme-studio-output-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   min-width: 0;
+  overflow: hidden;
   border: var(--puzzle-border-width) solid var(--puzzle-color-border);
   border-radius: var(--puzzle-radius-lg);
   background: var(--puzzle-color-surface);
-  color: var(--puzzle-color-text);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color var(--puzzle-duration-fast) var(--puzzle-easing-standard),
-    box-shadow var(--puzzle-duration-fast) var(--puzzle-easing-standard),
-    transform var(--puzzle-duration-fast) var(--puzzle-easing-standard);
 }
 
-.theme-studio__template-button {
+.theme-studio-output-panel__heading {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--puzzle-space-3);
-  min-height: 4.25rem;
-  padding: var(--puzzle-space-3);
+  min-width: 0;
+  padding: var(--puzzle-space-2) var(--puzzle-space-3);
+}
+
+.theme-studio-output-panel__heading > div {
+  min-width: 0;
+}
+
+.theme-studio-output-panel__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--puzzle-space-2);
+}
+
+.theme-studio-output-panel__toggle {
+  display: none;
+}
+
+.theme-studio-output-panel__content {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+}
+
+.theme-studio-output-panel__heading h2,
+.theme-studio-output-panel__heading p {
+  margin: 0;
+}
+
+.theme-studio-output-panel__heading h2 {
+  font-size: var(--puzzle-font-size-sm);
   font-weight: var(--puzzle-font-weight-semibold);
 }
 
-.theme-studio__template-button:hover,
-.theme-studio__preset-card:hover,
-.theme-studio__spacing-card:hover {
-  border-color: var(--puzzle-color-primary);
-  transform: translateY(-1px);
+.theme-studio-output-panel__heading p {
+  margin-top: var(--puzzle-space-0-5, 0.125rem);
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-xs);
 }
 
-.theme-studio__template-button[aria-pressed="true"],
-.theme-studio__preset-card[aria-pressed="true"],
-.theme-studio__spacing-card[aria-pressed="true"] {
+.theme-studio-output-panel__code {
+  max-height: 8.5rem;
+  min-width: 0;
+  overflow: auto;
+  margin: 0;
+  padding: var(--puzzle-space-2) var(--puzzle-space-3);
+  border-block: var(--puzzle-border-width) solid var(--puzzle-color-border);
+  background: var(--puzzle-color-surface-sunken);
+  color: var(--puzzle-color-text);
+  font-size: var(--puzzle-font-size-xs);
+  line-height: var(--puzzle-font-line-height-relaxed);
+  tab-size: 2;
+  scrollbar-color: var(--puzzle-color-border-strong) transparent;
+}
+
+.theme-studio-output-panel__status {
+  min-height: 1.25rem;
+  margin: 0;
+  padding: var(--puzzle-space-1) var(--puzzle-space-3);
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-xs);
+}
+
+.theme-studio-templates {
+  min-width: 0;
+}
+
+.theme-studio-templates__list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--puzzle-space-2);
+  min-width: 0;
+}
+
+.theme-studio-templates__option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--puzzle-space-2);
+  min-width: 0;
+  padding: var(--puzzle-space-2);
+  font-size: var(--puzzle-font-size-xs);
+  font-weight: var(--puzzle-font-weight-semibold);
+}
+
+.theme-studio-templates__option[aria-pressed="true"] {
   border-color: var(--puzzle-color-primary);
   box-shadow: 0 0 0 var(--puzzle-border-width-strong) var(--puzzle-color-primary);
 }
 
-.theme-studio__template-button:focus-visible,
-.theme-studio__preset-card:focus-visible,
-.theme-studio__spacing-card:focus-visible,
-.theme-studio__mode-toggle button:focus-visible,
-.theme-studio__text-button:focus-visible,
-.theme-studio__website button:focus-visible,
-.theme-studio__website a:focus-visible,
-.theme-studio__website input:focus-visible {
-  outline: var(--puzzle-border-width-strong) solid var(--puzzle-color-ring);
-  outline-offset: var(--puzzle-space-1);
-}
-
-.theme-studio__template-icon {
-  width: 2rem;
-  height: 2rem;
-  display: grid;
-  place-items: center;
-  border-radius: var(--puzzle-radius-md);
+.theme-studio-templates__thumbnail {
+  width: 100%;
+  height: clamp(2.5rem, 5vw, 4rem);
+  min-width: 0;
+  border-radius: var(--puzzle-radius-sm);
   background: var(--puzzle-color-surface-sunken);
-  color: var(--puzzle-color-primary);
+  object-fit: cover;
 }
 
-.theme-studio__text-button {
-  border: 0;
-  background: none;
-  color: var(--puzzle-color-primary);
-  font: inherit;
-  font-size: var(--puzzle-font-size-sm);
-  font-weight: var(--puzzle-font-weight-semibold);
-  cursor: pointer;
-}
-
-.theme-studio__text-button:disabled {
-  color: var(--puzzle-color-text-subtle);
-  cursor: not-allowed;
-}
-
-.theme-studio__preset-list {
-  display: grid;
-  grid-auto-columns: minmax(10.5rem, 1fr);
-  grid-auto-flow: column;
-  gap: var(--puzzle-space-3);
-  overflow-x: auto;
-  padding: var(--puzzle-space-1) var(--puzzle-space-1) var(--puzzle-space-3);
-  scroll-snap-type: x proximity;
-  scrollbar-color: var(--puzzle-color-border-strong) transparent;
-}
-
-.theme-studio__preset-card {
-  display: grid;
-  align-content: start;
-  gap: var(--puzzle-space-2);
-  min-height: 9.5rem;
-  padding: var(--puzzle-space-3);
-  scroll-snap-align: start;
-}
-
-.theme-studio__preset-name {
+.theme-studio-templates__option span {
   overflow: hidden;
-  color: var(--puzzle-color-text);
-  font-size: var(--puzzle-font-size-sm);
-  font-weight: var(--puzzle-font-weight-semibold);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.theme-studio__preset-description,
-.theme-studio__preset-caption {
-  color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-xs);
-}
-
-.theme-studio__spacing-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
-  gap: var(--puzzle-space-2);
-  padding: 0 var(--puzzle-space-4) var(--puzzle-space-4);
-}
-
-.theme-studio__spacing-card {
-  display: grid;
-  align-content: center;
-  gap: var(--puzzle-space-1);
-  min-width: 0;
-  min-height: 3.75rem;
-  padding: var(--puzzle-space-2);
-}
-
-.theme-studio__spacing-card span:first-child {
-  color: var(--puzzle-color-text);
-  font-size: var(--puzzle-font-size-sm);
-  font-weight: var(--puzzle-font-weight-semibold);
-}
-
-.theme-studio__spacing-card span:last-child,
-.theme-studio__spacing-status {
-  color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-xs);
-}
-
-.theme-studio__spacing-status {
-  flex: none;
-}
-
-.theme-studio__swatches {
-  display: flex;
-  gap: var(--puzzle-space-1);
-}
-
-.theme-studio__swatch {
-  width: 1.25rem;
-  height: 1.25rem;
-  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
-  border-radius: var(--puzzle-radius-full);
-}
-
-.theme-studio__preset-surfaces {
-  display: flex;
-  height: 0.75rem;
-  overflow: hidden;
-  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
-  border-radius: var(--puzzle-radius-full);
-}
-
-.theme-studio__preset-surfaces span {
-  flex: 1;
 }
 
 .theme-studio__workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(20rem, 26rem);
-  grid-template-areas: "preview sidebar";
+  grid-template-columns: minmax(0, 1.65fr) minmax(22rem, 1fr);
   align-items: start;
-  gap: var(--puzzle-space-5);
-}
-
-.theme-studio__preview-panel {
-  grid-area: preview;
-}
-
-.theme-studio__sidebar {
-  grid-area: sidebar;
-  display: grid;
   gap: var(--puzzle-space-4);
   min-width: 0;
 }
 
-.theme-studio__sidebar-scrollarea {
-  position: sticky;
-  top: calc(var(--puzzle-space-16) + var(--puzzle-space-2));
-  display: grid;
-  grid-auto-rows: max-content;
-  align-content: start;
-  gap: var(--puzzle-space-4);
-  max-height: calc(100vh - var(--puzzle-space-16) - var(--puzzle-space-8));
-  overflow: auto;
-  padding: var(--puzzle-space-1);
-  overscroll-behavior: contain;
-  scrollbar-color: var(--puzzle-color-border-strong) transparent;
-}
-
-.theme-studio__preview-panel,
-.theme-studio__panel {
-  overflow: hidden;
+.theme-studio__preview,
+.theme-studio-settings {
+  min-width: 0;
   border: var(--puzzle-border-width) solid var(--puzzle-color-border);
   border-radius: var(--puzzle-radius-xl);
   background: var(--puzzle-color-surface);
 }
 
-.theme-studio__panel-heading {
-  align-items: center;
-  padding: var(--puzzle-space-4);
+.theme-studio__preview {
+  overflow: hidden;
 }
 
-.theme-studio__page-picker {
-  display: grid;
-  gap: var(--puzzle-space-1);
-  margin-top: var(--puzzle-space-3);
-  color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-xs);
-}
-
-.theme-studio__page-picker button {
-  max-width: 14rem;
-}
-
-.theme-studio__page-picker button:focus-visible {
-  outline: var(--puzzle-border-width-strong) solid var(--puzzle-color-ring);
-  outline-offset: var(--puzzle-space-1);
-}
-
-.theme-studio__mode-toggle {
-  display: inline-flex;
-  gap: var(--puzzle-space-1);
-  padding: var(--puzzle-space-1);
-  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
-  border-radius: var(--puzzle-radius-full);
-  background: var(--puzzle-color-surface-sunken);
-}
-
-.theme-studio__preview-frame {
-  overflow: auto;
-  border-top: var(--puzzle-border-width) solid var(--puzzle-color-border);
-}
-
-.theme-studio__website {
-  min-height: 38rem;
-  padding: 0 var(--puzzle-space-5);
-  background: var(--puzzle-color-background);
-  color: var(--puzzle-color-text);
-  font-family: var(--puzzle-font-family-body);
-}
-
-.theme-studio__website-header,
-.theme-studio__website-footer {
+.theme-studio__preview-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--puzzle-space-4);
-}
-
-.theme-studio__website-header {
-  min-height: 4.5rem;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-3);
+  padding: var(--puzzle-space-3) var(--puzzle-space-4);
   border-bottom: var(--puzzle-border-width) solid var(--puzzle-color-border);
 }
 
-.theme-studio__brand {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--puzzle-space-2);
-  color: var(--puzzle-color-text);
-  text-decoration: none;
-}
-
-.theme-studio__brand > span:last-child {
-  display: grid;
-  gap: var(--puzzle-space-0-5, 0.125rem);
-}
-
-.theme-studio__brand strong {
-  font-family: var(--puzzle-font-family-heading);
-  font-size: var(--puzzle-font-size-sm);
-}
-
-.theme-studio__brand small {
-  color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-xs);
-}
-
-.theme-studio__brand-mark {
-  width: 2.25rem;
-  height: 2.25rem;
-  display: grid;
-  place-items: center;
-  border-radius: var(--puzzle-radius-md);
-  background: var(--puzzle-color-primary);
-  color: var(--puzzle-color-primary-foreground);
-  font-family: var(--puzzle-font-family-heading);
-  font-weight: var(--puzzle-font-weight-bold);
-}
-
-.theme-studio__website-nav {
-  display: flex;
-  align-items: center;
-  gap: var(--puzzle-space-4);
-}
-
-.theme-studio__website-nav > button:not(.theme-studio__button) {
-  border: 0;
-  background: transparent;
-  color: var(--puzzle-color-text-muted);
-  font: inherit;
-  font-size: var(--puzzle-font-size-xs);
-  cursor: pointer;
-}
-
-.theme-studio__website-nav > button[aria-current="page"] {
-  color: var(--puzzle-color-primary);
-}
-
-.theme-studio__button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 2.5rem;
-  padding: var(--puzzle-space-2) var(--puzzle-space-4);
-  border: var(--puzzle-border-width) solid transparent;
-  border-radius: var(--puzzle-radius-md);
-  font: inherit;
-  font-size: var(--puzzle-font-size-xs);
-  font-weight: var(--puzzle-font-weight-semibold);
-  cursor: pointer;
-}
-
-.theme-studio__button--primary {
-  background: var(--puzzle-color-primary);
-  color: var(--puzzle-color-primary-foreground);
-}
-
-.theme-studio__hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(10rem, 0.9fr);
-  align-items: center;
-  gap: var(--puzzle-space-6);
-  min-height: 18rem;
-  padding: var(--puzzle-space-8) 0;
-}
-
-.theme-studio__hero-copy {
-  max-width: 38rem;
-}
-
-.theme-studio__hero h2 {
-  max-width: 15ch;
+.theme-studio__preview-heading h2 {
   margin: 0;
-  font-family: var(--puzzle-font-family-heading);
-  font-size: var(--puzzle-font-size-4xl);
-  font-weight: var(--puzzle-font-weight-bold);
-  letter-spacing: var(--puzzle-font-letter-spacing-tight);
-  line-height: var(--puzzle-font-line-height-tight);
-}
-
-.theme-studio__hero-description {
-  max-width: 38rem;
-  margin: var(--puzzle-space-3) 0 var(--puzzle-space-4);
-  color: var(--puzzle-color-text-muted);
   font-size: var(--puzzle-font-size-sm);
-  line-height: var(--puzzle-font-line-height-relaxed);
 }
 
-.theme-studio__hero-art {
-  position: relative;
-  min-height: 12rem;
-  display: grid;
-  place-items: center;
+.theme-studio__page-picker {
+  min-width: 9rem;
+}
+
+.theme-studio__page-picker > label {
+  font-size: var(--puzzle-font-size-xs);
+}
+
+.theme-studio__preview-content,
+.theme-studio__website {
+  min-width: 0;
+}
+
+.theme-studio__website {
+  width: 100%;
+  color: var(--puzzle-color-text);
+  background: var(--puzzle-color-background);
+  font-family: var(--puzzle-font-family-body);
+}
+
+.theme-studio-settings {
   overflow: hidden;
-  border-radius: var(--puzzle-radius-2xl);
-  background: var(--puzzle-color-surface-sunken);
 }
 
-.theme-studio__art-orbit {
-  position: absolute;
-  width: 9rem;
-  height: 9rem;
-  border: var(--puzzle-border-width-strong) solid var(--puzzle-color-accent);
-  border-radius: var(--puzzle-radius-full);
-  opacity: 0.65;
-}
-
-.theme-studio__art-card {
-  z-index: 1;
-  width: 65%;
-  display: grid;
-  gap: var(--puzzle-space-3);
-  padding: var(--puzzle-space-4);
-  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
-  border-radius: var(--puzzle-radius-lg);
-  background: var(--puzzle-color-surface);
-  box-shadow: var(--puzzle-shadow-md);
-  transform: rotate(-4deg);
-}
-
-.theme-studio__art-line {
-  height: var(--puzzle-space-2);
-  border-radius: var(--puzzle-radius-full);
-  background: var(--puzzle-color-border);
-}
-
-.theme-studio__art-line:first-child {
-  width: 72%;
-  background: var(--puzzle-color-primary);
-}
-
-.theme-studio__art-chip {
-  width: 42%;
-  height: 1.5rem;
-  border-radius: var(--puzzle-radius-full);
-  background: var(--puzzle-color-accent);
-}
-
-.theme-studio__feature-section {
-  padding: var(--puzzle-space-6) 0;
-  border-top: var(--puzzle-border-width) solid var(--puzzle-color-border);
-}
-
-.theme-studio__feature-heading {
-  margin-bottom: var(--puzzle-space-4);
-}
-
-.theme-studio__feature-heading h3,
-.theme-studio__contact-card h3 {
-  margin: 0;
-  font-family: var(--puzzle-font-family-heading);
-  font-size: var(--puzzle-font-size-2xl);
-  line-height: var(--puzzle-font-line-height-snug);
-}
-
-.theme-studio__feature-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--puzzle-space-3);
-}
-
-.theme-studio__feature-card {
-  padding: var(--puzzle-space-4);
-  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
-  border-radius: var(--puzzle-radius-lg);
-  background: var(--puzzle-color-surface);
-}
-
-.theme-studio__feature-number {
-  color: var(--puzzle-color-accent);
-  font-size: var(--puzzle-font-size-xs);
-  font-weight: var(--puzzle-font-weight-bold);
-}
-
-.theme-studio__feature-card h4 {
-  margin: var(--puzzle-space-3) 0 var(--puzzle-space-2);
-  font-family: var(--puzzle-font-family-heading);
-  font-size: var(--puzzle-font-size-lg);
-}
-
-.theme-studio__feature-card p {
-  margin: 0 0 var(--puzzle-space-3);
-  color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-xs);
-  line-height: var(--puzzle-font-line-height-relaxed);
-}
-
-.theme-studio__feature-card a,
-.theme-studio__website-footer a {
-  color: var(--puzzle-color-primary);
-  font-size: var(--puzzle-font-size-xs);
-  font-weight: var(--puzzle-font-weight-semibold);
-}
-
-.theme-studio__contact-card {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: var(--puzzle-space-5);
-  margin: var(--puzzle-space-4) 0;
-  padding: var(--puzzle-space-5);
-  border-radius: var(--puzzle-radius-xl);
-  background: var(--puzzle-color-surface-sunken);
-}
-
-.theme-studio__contact-form label {
-  display: block;
-  margin-bottom: var(--puzzle-space-2);
-  color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-xs);
-}
-
-.theme-studio__form-row {
-  display: flex;
-  gap: var(--puzzle-space-2);
-}
-
-.theme-studio__form-row input {
-  min-width: 0;
-  flex: 1;
-  padding: var(--puzzle-space-2) var(--puzzle-space-3);
-  border: var(--puzzle-border-width) solid var(--puzzle-color-border-strong);
-  border-radius: var(--puzzle-radius-md);
-  background: var(--puzzle-color-surface);
-  color: var(--puzzle-color-text);
-  font: inherit;
-  font-size: var(--puzzle-font-size-xs);
-}
-
-.theme-studio__form-row input::placeholder {
-  color: var(--puzzle-color-text-subtle);
-}
-
-.theme-studio__website-footer {
-  min-height: 4rem;
-  border-top: var(--puzzle-border-width) solid var(--puzzle-color-border);
-  color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-xs);
-}
-
-.theme-studio__color-fields {
-  padding: 0 var(--puzzle-space-4) var(--puzzle-space-4);
-}
-
-.theme-studio__font-fields {
-  display: grid;
-  gap: var(--puzzle-space-4);
-  padding: 0 var(--puzzle-space-4) var(--puzzle-space-4);
-}
-
-.theme-studio__font-picker {
-  min-width: 0;
-}
-
-.theme-studio__font-option {
+.theme-studio-settings__heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--puzzle-space-3);
+  padding: var(--puzzle-space-3) var(--puzzle-space-4);
+}
+
+.theme-studio-settings__heading h2 {
+  margin: 0;
+  font-size: var(--puzzle-font-size-sm);
+}
+
+.theme-studio-settings__tabs {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
-.theme-studio__font-option > span:first-child {
+.theme-studio-settings__tabs .puzzle-tabs__list {
+  flex: none;
+  gap: 0;
+  padding-inline: var(--puzzle-space-2);
+}
+
+.theme-studio-settings__tabs .puzzle-tabs__trigger {
+  padding: var(--puzzle-space-3) var(--puzzle-space-2);
+  font-size: var(--puzzle-font-size-xs);
+}
+
+.theme-studio-settings__tabs .puzzle-tabs__content {
+  min-width: 0;
+}
+
+.theme-studio-settings__tabs .puzzle-tabs__panel {
+  min-width: 0;
+  padding: var(--puzzle-space-4);
+}
+
+.theme-studio-settings__tab-content,
+.theme-studio-settings__section {
+  display: grid;
+  gap: var(--puzzle-space-3);
+  min-width: 0;
+}
+
+.theme-studio-settings__section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-2);
+}
+
+.theme-studio-settings__section-heading h3 {
+  margin: 0;
+  font-size: var(--puzzle-font-size-sm);
+}
+
+.theme-studio-settings__section-heading > span,
+.theme-studio-settings__hint {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-xs);
+}
+
+.theme-studio-settings__preset-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--puzzle-space-2);
+}
+
+.theme-studio-settings__preset-card {
+  display: grid;
+  align-content: space-between;
+  gap: var(--puzzle-space-2);
+  min-width: 0;
+  min-height: 4.25rem;
+  padding: var(--puzzle-space-2);
+  text-align: start;
+}
+
+.theme-studio-settings__preset-card strong {
   overflow: hidden;
+  font-size: var(--puzzle-font-size-xs);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.theme-studio__font-option-badge {
-  flex: none;
-  color: var(--puzzle-color-text-muted);
-  font-family: var(--puzzle-font-family-body);
-  font-size: var(--puzzle-font-size-xs);
+.theme-studio-settings__preset-card[aria-pressed="true"],
+.theme-studio-settings__spacing-card[aria-pressed="true"] {
+  border-color: var(--puzzle-color-primary);
+  box-shadow: 0 0 0 var(--puzzle-border-width-strong) var(--puzzle-color-primary);
 }
 
-.theme-studio__font-preview-note {
-  margin: var(--puzzle-space-1) 0 0;
-  color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-xs);
+.theme-studio-settings__swatches {
+  display: flex;
+  gap: var(--puzzle-space-1);
 }
 
-.theme-studio__color-field {
+.theme-studio-settings__swatches span {
+  width: 0.75rem;
+  aspect-ratio: 1;
+  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-full);
+}
+
+.theme-studio-settings__mode-toggle {
+  display: flex;
+  width: fit-content;
+  gap: var(--puzzle-space-1);
+  padding: var(--puzzle-space-1);
+  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-full);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.theme-studio-settings__color-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--puzzle-space-3);
+}
+
+.theme-studio-settings__color-field {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--puzzle-space-3);
-  padding: var(--puzzle-space-2) 0;
+  gap: var(--puzzle-space-2);
+  min-width: 0;
+  padding-block: var(--puzzle-space-2);
   border-top: var(--puzzle-border-width) solid var(--puzzle-color-border);
 }
 
-.theme-studio__color-field > span {
+.theme-studio-settings__color-field > div:first-child {
   display: grid;
   gap: var(--puzzle-space-1);
+  min-width: 0;
+  font-size: var(--puzzle-font-size-xs);
 }
 
-.theme-studio__color-picker {
-  display: grid;
-  justify-items: end;
-  gap: var(--puzzle-space-1);
-}
-
-.theme-studio__color-picker .puzzle-color-picker__label {
-  color: var(--puzzle-color-text);
-  font-size: var(--puzzle-font-size-sm);
-  font-weight: var(--puzzle-font-weight-medium);
-}
-
-.theme-studio__color-field code {
+.theme-studio-settings__color-field code {
   color: var(--puzzle-color-text-muted);
   font-size: var(--puzzle-font-size-xs);
 }
 
-.theme-studio__color-trigger {
-  min-height: var(--puzzle-space-8);
+.theme-studio-settings__color-picker {
+  flex: none;
 }
 
-.theme-studio__advanced-colors {
+.theme-studio-settings__all-colors {
   border-top: var(--puzzle-border-width) solid var(--puzzle-color-border);
 }
 
-.theme-studio__advanced-colors summary {
+.theme-studio-settings__all-colors summary {
   padding-block: var(--puzzle-space-3);
   color: var(--puzzle-color-primary);
   font-size: var(--puzzle-font-size-sm);
@@ -697,267 +432,285 @@
   cursor: pointer;
 }
 
-.theme-studio__advanced-colors summary:focus-visible {
-  outline: var(--puzzle-border-width-strong) solid var(--puzzle-color-ring);
-  outline-offset: var(--puzzle-space-1);
+.theme-studio-settings__font-fields {
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.theme-studio__token-groups {
+.theme-studio-settings__spacing-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--puzzle-space-2);
+}
+
+.theme-studio-settings__spacing-card {
+  min-width: 0;
+  min-height: 3rem;
+  padding: var(--puzzle-space-2);
+  font-size: var(--puzzle-font-size-xs);
+}
+
+.theme-studio-token-editor,
+.theme-studio-token-editor__toolbar,
+.theme-studio-token-editor__fields {
+  display: grid;
+  gap: var(--puzzle-space-3);
+  min-width: 0;
+}
+
+.theme-studio-token-editor__toolbar {
+  align-items: center;
+}
+
+.theme-studio-token-editor__search {
+  display: grid;
+  gap: var(--puzzle-space-1);
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-xs);
+}
+
+.theme-studio-token-editor__toolbar > button {
+  justify-self: start;
+}
+
+.theme-studio-token-editor__groups {
   display: grid;
   gap: var(--puzzle-space-2);
-  padding: 0 var(--puzzle-space-4) var(--puzzle-space-4);
 }
 
-.theme-studio__token-group {
-  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
-  border-radius: var(--puzzle-radius-md);
-  background: var(--puzzle-color-surface);
+.theme-studio-token-editor__groups .puzzle-accordion__heading {
+  margin: 0;
 }
 
-.theme-studio__token-group summary {
+.theme-studio-token-editor__groups .puzzle-accordion__trigger {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--puzzle-space-3);
+  gap: var(--puzzle-space-2);
+  width: 100%;
   padding: var(--puzzle-space-3);
+  border: var(--puzzle-border-width) solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md);
+  background: var(--puzzle-color-surface-sunken);
   color: var(--puzzle-color-text);
-  font-size: var(--puzzle-font-size-sm);
-  font-weight: var(--puzzle-font-weight-semibold);
+  text-align: start;
   cursor: pointer;
-  list-style-position: inside;
 }
 
-.theme-studio__token-group summary span:last-child {
+.theme-studio-token-editor__group-title,
+.theme-studio-token-editor__group-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--puzzle-space-2);
+  min-width: 0;
+}
+
+.theme-studio-token-editor__group-title {
+  width: 100%;
+  justify-content: space-between;
+  font-size: var(--puzzle-font-size-sm);
+}
+
+.theme-studio-token-editor__group-meta {
+  flex: none;
   color: var(--puzzle-color-text-muted);
   font-size: var(--puzzle-font-size-xs);
   font-weight: var(--puzzle-font-weight-normal);
 }
 
-.theme-studio__token-group-content {
+.theme-studio-token-editor__group-content {
   display: grid;
   gap: var(--puzzle-space-2);
-  padding: 0 var(--puzzle-space-3) var(--puzzle-space-3);
+  padding: var(--puzzle-space-3);
 }
 
-.theme-studio__token-field {
+.theme-studio-token-editor__group-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.theme-studio-token-editor__fields {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.theme-studio-token-editor__empty {
+  margin: 0;
+  padding: var(--puzzle-space-4);
+  border: var(--puzzle-border-width) dashed var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md);
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm);
+}
+
+.theme-studio-token-field {
   display: grid;
   gap: var(--puzzle-space-1);
-  padding-top: var(--puzzle-space-2);
+  min-width: 0;
+  padding-block: var(--puzzle-space-2);
   border-top: var(--puzzle-border-width) solid var(--puzzle-color-border);
 }
 
-.theme-studio__token-field-heading {
+.theme-studio-token-field--complex {
+  grid-column: 1 / -1;
+}
+
+.theme-studio-token-field__heading {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: var(--puzzle-space-2);
 }
 
-.theme-studio__token-label {
+.theme-studio-token-field__heading label {
+  display: grid;
+  gap: var(--puzzle-space-1);
   min-width: 0;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--puzzle-space-2);
 }
 
-.theme-studio__token-field-heading .theme-studio__text-button {
-  flex: none;
-  padding: 0;
-  font-size: var(--puzzle-font-size-xs);
-}
-
-.theme-studio__token-label strong {
-  color: var(--puzzle-color-text);
+.theme-studio-token-field__heading strong {
   font-size: var(--puzzle-font-size-xs);
   font-weight: var(--puzzle-font-weight-medium);
 }
 
-.theme-studio__token-label code {
-  overflow: hidden;
+.theme-studio-token-field__heading code,
+.theme-studio-token-field__default {
+  overflow-wrap: anywhere;
   color: var(--puzzle-color-text-muted);
   font-size: var(--puzzle-font-size-xs);
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.theme-studio__token-field input {
-  width: 100%;
-  min-width: 0;
-  padding: var(--puzzle-space-2) var(--puzzle-space-3);
-  border: var(--puzzle-border-width) solid var(--puzzle-color-border-strong);
-  border-radius: var(--puzzle-radius-md);
-  background: var(--puzzle-color-surface);
-  color: var(--puzzle-color-text);
-  font: inherit;
-  font-size: var(--puzzle-font-size-sm);
+.theme-studio-token-field__heading button {
+  flex: none;
+  padding: 0;
 }
 
-.theme-studio__token-field input:focus-visible,
-.theme-studio__token-group summary:focus-visible {
-  outline: var(--puzzle-border-width-strong) solid var(--puzzle-color-ring);
-  outline-offset: var(--puzzle-space-1);
+.theme-studio-token-field__default {
+  margin: 0;
 }
 
-.theme-studio__token-field input[aria-invalid="true"] {
+.theme-studio-token-field__numeric {
+  display: grid;
+  grid-template-columns: minmax(7rem, 1fr) minmax(5rem, 0.8fr);
+  align-items: end;
+  gap: var(--puzzle-space-2);
+}
+
+.theme-studio-token-field__numeric > .puzzle-input--number {
+  min-height: 2rem;
+}
+
+.theme-studio-token-field__numeric > .puzzle-input--number .puzzle-input__control {
+  min-height: 1.875rem;
+}
+
+.theme-studio-token-field__numeric > .puzzle-input--number .puzzle-input__stepper {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.theme-studio-token-field__numeric > :only-child {
+  grid-column: 1 / -1;
+}
+
+.theme-studio-token-field input[aria-invalid="true"] {
   border-color: var(--puzzle-color-danger);
 }
 
-.theme-studio__token-error {
+.theme-studio-token-field__error {
   color: var(--puzzle-color-danger);
   font-size: var(--puzzle-font-size-xs);
 }
 
-.theme-studio__code-panel pre {
-  max-height: 22rem;
-  overflow: auto;
-  margin: 0;
-  padding: var(--puzzle-space-4);
-  border-top: var(--puzzle-border-width) solid var(--puzzle-color-border);
-  background: var(--puzzle-color-surface-sunken);
-  color: var(--puzzle-color-text);
-  font-size: var(--puzzle-font-size-xs);
-  line-height: var(--puzzle-font-line-height-relaxed);
-  tab-size: 2;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
 }
 
-.theme-studio__code-empty,
-.theme-studio__copy-status {
-  margin: 0;
-  padding: 0 var(--puzzle-space-4) var(--puzzle-space-4);
-  color: var(--puzzle-color-text-muted);
-  font-size: var(--puzzle-font-size-xs);
+@media (max-width: 75rem) {
+  .theme-studio__workspace {
+    grid-template-columns: minmax(0, 1.2fr) minmax(19rem, 0.8fr);
+  }
 }
 
-.theme-studio__copy-status {
-  padding-top: var(--puzzle-space-2);
-}
-
-.theme-studio__copy-status[role="alert"] {
-  color: var(--puzzle-color-danger);
-}
-
-@media (max-width: 64rem) {
+@media (max-width: 60rem) {
   .theme-studio__workspace {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "sidebar"
-      "preview";
-  }
-
-  .theme-studio__sidebar-scrollarea {
-    position: static;
-    top: auto;
-    max-height: none;
-    overflow: visible;
-    padding: 0;
-  }
-
-  .theme-studio__template-list {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 42rem) {
-  .theme-studio {
-    padding: var(--puzzle-space-5) var(--puzzle-space-3);
-  }
-
-  .theme-studio__header,
-  .theme-studio__section-heading {
-    flex-direction: column;
-  }
-
-  .theme-studio__header h1 {
-    font-size: var(--puzzle-font-size-3xl);
-  }
-
-  .theme-studio__status {
-    white-space: normal;
-  }
-
-  .theme-studio__template-list {
-    grid-auto-columns: minmax(9rem, 1fr);
-    grid-auto-flow: column;
-    grid-template-columns: none;
-    overflow-x: auto;
-    padding-bottom: var(--puzzle-space-2);
-  }
-
-  .theme-studio__template-button {
-    min-height: 3.75rem;
-  }
-
-  .theme-studio__template-list {
-    grid-auto-columns: minmax(9rem, 1fr);
-    grid-auto-flow: column;
-    grid-template-columns: none;
-    overflow-x: auto;
-    padding-bottom: var(--puzzle-space-2);
-  }
-
-  .theme-studio__website {
-    padding-inline: var(--puzzle-space-3);
-  }
-
-  .theme-studio__website-header {
+  .theme-studio__page-heading {
     align-items: flex-start;
     flex-direction: column;
-    padding-block: var(--puzzle-space-3);
   }
 
-  .theme-studio__website-nav {
-    width: 100%;
-    justify-content: space-between;
+  .theme-studio-output-dock {
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--puzzle-space-2);
+    padding: var(--puzzle-space-2);
   }
 
-  .theme-studio__website-nav > button:not(.theme-studio__button) {
-    padding: var(--puzzle-space-1);
+  .theme-studio-output-panel__code {
+    max-height: 7rem;
   }
 
-  .theme-studio__nav-action {
+  .theme-studio-output-panel__toggle {
+    display: inline-flex;
+  }
+
+  .theme-studio-output-panel__content[data-collapsed="true"] {
+    display: none;
+  }
+
+  .theme-studio-templates__list {
+    grid-auto-columns: minmax(8.5rem, 1fr);
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    overflow-x: auto;
+    padding: var(--puzzle-space-1) var(--puzzle-space-1) var(--puzzle-space-2);
+    scroll-snap-type: x proximity;
+    scrollbar-color: var(--puzzle-color-border-strong) transparent;
+  }
+
+  .theme-studio-templates__option {
+    scroll-snap-align: start;
+  }
+
+  .theme-studio-settings__color-grid,
+  .theme-studio-token-editor__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .theme-studio-settings__spacing-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .theme-studio-settings__tabs .puzzle-tabs__trigger {
     padding-inline: var(--puzzle-space-2);
-    font-size: var(--puzzle-font-size-xs);
+  }
+}
+
+@media (min-width: 90rem) {
+  .theme-studio-settings__font-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .theme-studio__hero {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--puzzle-space-4);
-    padding-block: var(--puzzle-space-5);
-  }
-
-  .theme-studio__hero h2 {
-    font-size: var(--puzzle-font-size-3xl);
-  }
-
-  .theme-studio__hero-art {
-    min-height: 9rem;
-  }
-
-  .theme-studio__feature-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .theme-studio__contact-card {
-    grid-template-columns: minmax(0, 1fr);
-    padding: var(--puzzle-space-4);
-  }
-
-  .theme-studio__form-row {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .theme-studio__website-footer {
-    flex-wrap: wrap;
-    padding-block: var(--puzzle-space-3);
+  .theme-studio-settings__font-fields > :first-child {
+    grid-column: 1 / -1;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-studio__template-button,
-  .theme-studio__preset-card {
-    transition: none;
+  .theme-studio *,
+  .theme-studio *::before,
+  .theme-studio *::after {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
   }
 }

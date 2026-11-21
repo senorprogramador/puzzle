@@ -89,14 +89,20 @@ describe("ProductShowcaseSection", () => {
     expect(screen.getByText("Automate routine handoffs.")).toBeVisible();
   });
 
-  it("moves through carousel items without wrapping", async () => {
-    const user = userEvent.setup();
-    render(<ProductShowcaseSection variant="carousel" items={items} />);
+  it("uses responsive UI carousel controls and pagination", () => {
+    const { container } = render(
+      <ProductShowcaseSection variant="carousel" items={items} />,
+    );
 
-    expect(screen.getByRole("button", { name: "Previous product" })).toBeDisabled();
-    await user.click(screen.getByRole("button", { name: "Next product" }));
-    expect(screen.getByRole("heading", { name: "Workflows" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Next product" })).toBeDisabled();
+    const carousel = container.querySelector(".puzzle-carousel");
+    expect(carousel).toHaveAttribute("data-button-mobile", "aside");
+    expect(carousel).toHaveAttribute("data-pager-mobile", "under");
+    expect(
+      screen.getByRole("button", { name: "Previous product" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Next product" }),
+    ).toBeVisible();
   });
 
   it("omits empty lists and renders large item collections", () => {

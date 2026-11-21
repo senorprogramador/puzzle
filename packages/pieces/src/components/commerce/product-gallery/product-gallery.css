@@ -165,7 +165,7 @@
   aspect-ratio: 16 / 10;
 }
 
-.puzzle-product-gallery[data-variant="carousel"] .puzzle-product-gallery__layout {
+.puzzle-product-gallery__carousel {
   max-width: 56rem;
   margin-inline: auto;
 }

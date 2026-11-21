@@ -1,0 +1,37 @@
+.puzzle-component-catalog {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.puzzle-component-catalog__item {
+  min-width: 0;
+}
+
+.puzzle-component-catalog__card {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.puzzle-component-catalog__card:focus-visible {
+  outline: 2px solid var(--puzzle-color-primary, #2563eb);
+  outline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+  .puzzle-component-catalog {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .puzzle-component-catalog {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

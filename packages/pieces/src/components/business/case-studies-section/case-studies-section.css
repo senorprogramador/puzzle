@@ -19,7 +19,6 @@
   break-inside: avoid;
 }
 
-.puzzle-case-studies-section[data-variant="carousel"] .puzzle-case-studies-section__items,
 .puzzle-case-studies-section[data-variant="horizontal"] .puzzle-case-studies-section__items {
   grid-auto-columns: minmax(min(80vw, 22rem), 1fr);
   grid-auto-flow: column;
@@ -30,7 +29,6 @@
   scroll-snap-type: inline mandatory;
 }
 
-.puzzle-case-studies-section[data-variant="carousel"] .puzzle-case-studies-section__items > li,
 .puzzle-case-studies-section[data-variant="horizontal"] .puzzle-case-studies-section__items > li {
   scroll-snap-align: start;
 }

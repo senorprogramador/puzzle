@@ -2,11 +2,11 @@
 
 import { Badge, Card, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
-import { useState } from "react";
 import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import {
   CommercePrice,
   formatRating,
@@ -123,49 +123,23 @@ const ProductCarousel = ({
   items: readonly ProductGridItem[];
   locale: string;
   variant: ProductGridVariant;
-}) => {
-  const [requestedIndex, setRequestedIndex] = useState(0);
-  const activeIndex = Math.min(requestedIndex, items.length - 1);
-  const item = items[activeIndex];
-
-  if (!item) {
-    return null;
-  }
-
-  return (
-    <div
-      className="puzzle-product-grid__carousel"
-      role="region"
-      aria-label="Products"
-      aria-roledescription="carousel"
-    >
-      <div aria-live="polite" aria-atomic="true">
-        <ProductCard item={item} locale={locale} variant={variant} />
-        <Text as="p" className="puzzle-product-grid__position">
-          {activeIndex + 1} of {items.length}
-        </Text>
-      </div>
-      <div className="puzzle-product-grid__carousel-controls">
-        <button
-          type="button"
-          aria-label="Previous product"
-          disabled={activeIndex === 0}
-          onClick={() => setRequestedIndex(activeIndex - 1)}
-        >
-          Previous
-        </button>
-        <button
-          type="button"
-          aria-label="Next product"
-          disabled={activeIndex === items.length - 1}
-          onClick={() => setRequestedIndex(activeIndex + 1)}
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-};
+}) => (
+  <PiecesCarousel
+    itemKeys={items.map((item) => item.id)}
+    slides={items.map((item) => (
+      <ProductCard
+        key={item.id}
+        item={item}
+        locale={locale}
+        variant={variant}
+      />
+    ))}
+    ariaLabel="Products"
+    itemLabel="product"
+    panelsPerView={{ mobile: 1, tablet: 2, desktop: 4 }}
+    gap="var(--puzzle-space-5, 1.25rem)"
+  />
+);
 
 const ProductGridSection = <C extends ElementType = "section">({
   variant = "grid",

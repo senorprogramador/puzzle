@@ -54,42 +54,6 @@
   scroll-snap-align: start;
 }
 
-.puzzle-categories__carousel {
-  display: grid;
-  gap: var(--puzzle-space-4, 1rem);
-  max-width: 40rem;
-  margin-inline: auto;
-}
-
-.puzzle-categories__carousel > div:first-child {
-  min-width: 0;
-}
-
-.puzzle-categories__position {
-  margin: var(--puzzle-space-3, 0.75rem) 0 0;
-  color: var(--puzzle-color-text-muted);
-}
-
-.puzzle-categories__controls {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--puzzle-space-3, 0.75rem);
-}
-
-.puzzle-categories__controls button {
-  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
-  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
-  border-radius: var(--puzzle-radius-md, 0.5rem);
-  color: var(--puzzle-color-text);
-  background: var(--puzzle-color-surface);
-  cursor: pointer;
-}
-
-.puzzle-categories__controls button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
 .puzzle-categories__featured,
 .puzzle-categories__split,
 .puzzle-categories__editorial {

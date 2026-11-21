@@ -14,16 +14,19 @@ pure logic and component contracts in their existing unit and component tests.
 | Documentation site | Targeted Playwright scripts for preview-layout, hydration, and homepage theme QA |
 | Reference website | Node's test runner with Playwright against the built Vite preview |
 
-Use the affected package or app manifest for exact commands. Root
-`bun run test:reference` builds workspace packages and the playground before
-running `apps/playground/tests/reference-site.test.mjs`. The test can also be
-run from the app after the workspace packages and app have been built:
+Use the affected package or app manifest for exact commands. The reference-site
+browser commands run in the pinned Playwright Docker image and perform the
+workspace and playground builds there:
 
 ```sh
-bun run build
-bun run --filter "@puzzle-ui/playground" build
 bun run --filter "@puzzle-ui/playground" test:e2e
+bun run --filter "@puzzle-ui/playground" test:reference:behavior
+bun run --filter "@puzzle-ui/playground" test:a11y
+bun run --filter "@puzzle-ui/playground" test:visual
 ```
+
+See [visual testing](./visual-testing.md) for the canonical Linux ARM64 image,
+diagnostics, baseline updates, and artifact inspection.
 
 ## Reference-site coverage
 

@@ -5,8 +5,6 @@ import { useListFilter } from "@puzzle-ui/hooks";
 import {
   Badge,
   Button,
-  Carousel,
-  CarouselController,
   Card,
   CardContent,
   Heading,
@@ -19,6 +17,7 @@ import {
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
 import { validateContentIds } from "../shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import { EmptyStatePanel } from "../../data-display/empty-state-panel";
 import type {
   EventItem,
@@ -223,23 +222,16 @@ const EventSection = <C extends ElementType = "section">({
       ) : null}
       {orderedEvents.length ? (
         variant === "carousel" ? (
-          <CarouselController items={displayedEvents}>
-            <Carousel
-              ariaLabel="Events"
-              getItemKey={(event) => event.id}
-              renderItem={renderEvent}
-              backButton={
-                <Button variant="outline" aria-label="Previous event">
-                  Previous
-                </Button>
-              }
-              nextButton={
-                <Button variant="outline" aria-label="Next event">
-                  Next
-                </Button>
-              }
-            />
-          </CarouselController>
+          <PiecesCarousel
+            itemKeys={displayedEvents.map((event) => event.id)}
+            slides={displayedEvents.map((event) => (
+              <div key={event.id}>{renderEvent(event)}</div>
+            ))}
+            ariaLabel="Events"
+            itemLabel="event"
+            panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+            gap="var(--puzzle-space-5, 1.25rem)"
+          />
         ) : (
           <ol className="puzzle-event-section__items" aria-label="Events">
             {displayedEvents.map((event) => (

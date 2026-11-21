@@ -176,4 +176,15 @@ For a documentation change:
 2. Run the site type check.
 3. Build the documentation site.
 
+For changes to the documentation component catalog, run the production browser
+check across mobile, tablet, and desktop viewport widths:
+
+```bash
+bun run --filter "@puzzle-ui/site" test:catalog:responsive
+```
+
+This checks catalog routes, the 1/2/3-column layout, horizontal overflow,
+semantic links, and visible keyboard focus. Build the site first; the check
+serves the generated production output.
+
 For changes affecting shared packages or public APIs, run the broader repository checks.

@@ -1,10 +1,10 @@
 import { MediaFrame, Tabs, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
-import { useState } from "react";
 import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import type {
   ProductShowcaseItem,
   ProductShowcaseSectionProps,
@@ -85,53 +85,18 @@ const ProductCarousel = ({
 }: {
   items: readonly ProductShowcaseItem[];
   variant: ProductShowcaseVariant;
-}) => {
-  const [requestedIndex, setRequestedIndex] = useState(0);
-  const activeIndex = Math.min(requestedIndex, items.length - 1);
-  const activeItem = items[activeIndex];
-
-  if (!activeItem) {
-    return null;
-  }
-
-  return (
-    <div
-      className="puzzle-product-showcase__carousel"
-      role="region"
-      aria-label="Product showcase"
-      aria-roledescription="carousel"
-    >
-      <div
-        className="puzzle-product-showcase__carousel-slide"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        <ProductCard item={activeItem} variant={variant} />
-        <Text as="p" className="puzzle-product-showcase__carousel-position">
-          {activeIndex + 1} of {items.length}
-        </Text>
-      </div>
-      <div className="puzzle-product-showcase__carousel-controls">
-        <button
-          type="button"
-          aria-label="Previous product"
-          disabled={activeIndex === 0}
-          onClick={() => setRequestedIndex(activeIndex - 1)}
-        >
-          Previous
-        </button>
-        <button
-          type="button"
-          aria-label="Next product"
-          disabled={activeIndex === items.length - 1}
-          onClick={() => setRequestedIndex(activeIndex + 1)}
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-};
+}) => (
+  <PiecesCarousel
+    itemKeys={items.map((item) => item.id)}
+    slides={items.map((item) => (
+      <ProductCard key={item.id} item={item} variant={variant} />
+    ))}
+    ariaLabel="Product showcase"
+    itemLabel="product"
+    panelsPerView={{ mobile: 1, tablet: 1, desktop: 2 }}
+    gap="var(--puzzle-space-6, 1.5rem)"
+  />
+);
 
 const ProductShowcaseSection = <C extends ElementType = "section">({
   variant = "split",

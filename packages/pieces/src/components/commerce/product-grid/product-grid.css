@@ -62,42 +62,9 @@
   margin: 0 0 var(--puzzle-space-4, 1rem);
 }
 
-.puzzle-product-grid__carousel {
-  display: grid;
-  gap: var(--puzzle-space-4, 1rem);
-  max-width: 36rem;
-  margin-inline: auto;
-}
-
-.puzzle-product-grid__position {
-  margin: var(--puzzle-space-3, 0.75rem) 0 0;
-  color: var(--puzzle-color-text-muted);
-}
-
-.puzzle-product-grid__carousel-controls {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--puzzle-space-3, 0.75rem);
-}
-
-.puzzle-product-grid__carousel-controls button {
-  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
-  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
-  border-radius: var(--puzzle-radius-md, 0.5rem);
-  color: var(--puzzle-color-text);
-  background: var(--puzzle-color-surface);
-  cursor: pointer;
-}
-
-.puzzle-product-grid__carousel-controls button:focus-visible,
 .puzzle-product-grid__horizontal:focus-visible {
   outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
   outline-offset: var(--puzzle-space-2, 0.5rem);
-}
-
-.puzzle-product-grid__carousel-controls button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
 }
 
 .puzzle-product-grid__featured,

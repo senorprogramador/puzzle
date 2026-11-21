@@ -15,8 +15,7 @@
 }
 
 .puzzle-product-showcase__copy h3,
-.puzzle-product-showcase__copy p,
-.puzzle-product-showcase__carousel-position {
+.puzzle-product-showcase__copy p {
   margin: 0;
 }
 
@@ -61,44 +60,6 @@
 
 .puzzle-product-showcase__tabs {
   width: 100%;
-}
-
-.puzzle-product-showcase__carousel {
-  display: grid;
-  gap: var(--puzzle-space-4, 1rem);
-}
-
-.puzzle-product-showcase__carousel-slide {
-  display: grid;
-  gap: var(--puzzle-space-3, 0.75rem);
-}
-
-.puzzle-product-showcase__carousel-position {
-  color: var(--puzzle-color-text-muted);
-}
-
-.puzzle-product-showcase__carousel-controls {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--puzzle-space-3, 0.75rem);
-}
-
-.puzzle-product-showcase__carousel-controls button {
-  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
-  border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
-  border-radius: var(--puzzle-radius-md, 0.5rem);
-  color: var(--puzzle-color-text);
-  background: var(--puzzle-color-surface);
-}
-
-.puzzle-product-showcase__carousel-controls button:focus-visible {
-  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
-  outline-offset: var(--puzzle-space-2, 0.5rem);
-}
-
-.puzzle-product-showcase__carousel-controls button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
 }
 
 .puzzle-product-showcase__sticky-layout,

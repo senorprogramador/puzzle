@@ -4,6 +4,7 @@ import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import { validateContentIds } from "../../content/shared";
 import { BusinessFigure } from "../shared";
 import type { BusinessCaseStudy } from "../shared.types";
@@ -56,13 +57,27 @@ const CaseStudiesSection = <C extends ElementType = "section">({
   const cases = featured
     ? [featured, ...items.filter((item) => item.id !== featured.id)]
     : items;
-  const content = cases.length ? (
+  const content = cases.length && variant === "carousel" ? (
+    <PiecesCarousel
+      itemKeys={cases.map((item) => item.id)}
+      slides={cases.map((item) => (
+        <CaseStudyCard
+          key={item.id}
+          {...item}
+          media={renderCaseMedia(item, variant)}
+          featured={item.featured || item.id === featured?.id}
+        />
+      ))}
+      ariaLabel="Case studies"
+      itemLabel="case study"
+      panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+      gap="var(--puzzle-space-5, 1.25rem)"
+    />
+  ) : cases.length ? (
     <ul
       className="puzzle-business-section__list puzzle-case-studies-section__items"
       aria-label="Case studies"
-      tabIndex={
-        variant === "carousel" || variant === "horizontal" ? 0 : undefined
-      }
+      tabIndex={variant === "horizontal" ? 0 : undefined}
     >
       {cases.map((item) => (
         <li key={item.id}>

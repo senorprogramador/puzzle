@@ -14,12 +14,14 @@ the repository's reference website without adding a parallel test system.
 | Framework rendering or hydration | The affected app's rendering tests and the site's hydration validator |
 | Broad release or cross-package change | `bun run test:all` |
 
-`bun run test:reference` builds workspace packages and the playground, then runs
-Playwright against the production preview. It requires the Playwright Chromium
-browser. `bun run test:all` includes this suite and the repository's package,
-browser, and MongoDB integration tests; it also builds the documentation site
-and checks the homepage's dark/light theme, contrast, and responsive layout.
-MongoDB tests require Docker Compose.
+`bun run test:reference` builds workspace packages and the playground inside the
+pinned Playwright Docker image, then runs the reference behavioral,
+accessibility, and visual suites. It requires Docker and network access for the
+image and frozen dependency install, not a locally installed browser.
+`bun run test:all` includes this suite and the repository's package, browser,
+and MongoDB integration tests; it also builds the documentation site and checks
+the homepage's dark/light theme, contrast, and responsive layout. MongoDB tests
+require Docker Compose.
 The separate `bun run test:e2e` command exercises generated CLI projects and
 requires Docker and network access.
 
@@ -38,9 +40,9 @@ Read [Playwright strategy](./playwright.md), [visual testing](./visual-testing.m
 - The documentation site has Playwright validators for preview layout,
   hydration, SEO endpoints, and homepage theme/contrast screenshots.
 - `apps/playground` is the client-side reference website and Storybook app. Its
-  production-preview tests use Node's test runner and Playwright. The e2e
-  command also runs axe-core checks and screenshot comparisons across the
-  reference route and viewport matrix.
+  production-preview tests use Node's test runner and Playwright in the
+  canonical Linux ARM64 image. The e2e command also runs axe-core checks and
+  screenshot comparisons across the reference route and viewport matrix.
 - Storybook's a11y addon is configured in error mode, but there is no dedicated
   Storybook CI test project.
 

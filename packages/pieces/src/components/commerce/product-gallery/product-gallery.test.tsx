@@ -55,7 +55,9 @@ describe("ProductGallerySection", () => {
     expect(
       container.querySelectorAll(".puzzle-product-gallery__thumbnails > li"),
     ).toHaveLength(
-      variant === "thumbnails" || variant === "fullscreen" ? 0 : 3,
+      variant === "thumbnails" || variant === "fullscreen" || variant === "carousel"
+        ? 0
+        : 3,
     );
   });
 
@@ -81,20 +83,26 @@ describe("ProductGallerySection", () => {
     ).toHaveAttribute("alt", "Pendant lamp viewed from the side");
   });
 
-  it("supports keyboard carousel navigation and optional zoom", async () => {
+  it("uses the UI carousel with consistent controls and optional zoom", async () => {
     const user = userEvent.setup();
     const { container } = render(
       <ProductGallerySection variant="carousel" images={images} zoom />,
     );
-    const gallery = screen.getByRole("region", { name: "Product gallery" });
-    gallery.focus();
-    await user.keyboard("{ArrowRight}");
+    const gallery = screen.getByRole("group", {
+      name: "Product images. Use the left and right arrow keys to navigate.",
+    });
 
     expect(
-      container.querySelector(".puzzle-product-gallery__main img"),
-    ).toHaveAttribute("alt", "Pendant lamp viewed from the side");
-    const zoom = screen.getByRole("button", { name: "Zoom image" });
+      container.querySelectorAll(".puzzle-carousel__item"),
+    ).toHaveLength(images.length);
+    expect(
+      screen.getByRole("button", { name: "Previous image" }),
+    ).toBeVisible();
+    expect(screen.getByRole("button", { name: "Next image" })).toBeVisible();
+    expect(gallery).toHaveAttribute("tabindex", "0");
+    const zoom = screen.getAllByRole("button", { name: "Zoom image" })[0]!;
     await user.click(zoom);
+    expect(screen.getAllByRole("button", { name: "Reset image zoom" })).toHaveLength(1);
     expect(screen.getByRole("button", { name: "Reset image zoom" })).toHaveAttribute(
       "aria-pressed",
       "true",

@@ -51,20 +51,6 @@
   padding-inline: 0;
 }
 
-.puzzle-services-section[data-variant="carousel"] .puzzle-services-section__items {
-  grid-auto-columns: minmax(min(80vw, 22rem), 1fr);
-  grid-auto-flow: column;
-  grid-template-columns: none;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  padding-block-end: var(--puzzle-space-2, 0.5rem);
-  scroll-snap-type: inline mandatory;
-}
-
-.puzzle-services-section[data-variant="carousel"] .puzzle-services-section__items > li {
-  scroll-snap-align: start;
-}
-
 .puzzle-services-section__items:focus-visible {
   outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
   outline-offset: var(--puzzle-space-2, 0.5rem);

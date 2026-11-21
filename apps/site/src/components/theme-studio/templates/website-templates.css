@@ -316,7 +316,7 @@
 }
 
 .theme-studio-template[data-template="bnb"] .theme-studio-template__hero {
-  min-height: 60vh;
+  min-height: clamp(24rem, 42vw, 34rem);
   border-radius: var(--puzzle-radius-2xl);
 }
 
@@ -380,6 +380,128 @@
   border-radius: var(--puzzle-radius-md);
 }
 
+.theme-studio-template[data-template="marketing"] .theme-studio-template__header {
+  border-bottom-width: var(--puzzle-border-width-strong);
+}
+
+.theme-studio-template[data-template="bnb"] .theme-studio-template__header {
+  flex-direction: column;
+  align-items: center;
+  padding-block: var(--puzzle-space-5);
+  border-bottom: 0;
+  text-align: center;
+}
+
+.theme-studio-template[data-template="bnb"] .theme-studio-template__mark {
+  border-radius: var(--puzzle-radius-lg);
+}
+
+.theme-studio-template[data-template="bnb"] .theme-studio-template__navigation {
+  justify-content: center;
+}
+
+.theme-studio-template[data-template="bnb"] .theme-studio-template__footer {
+  justify-content: center;
+  border-block-start: 0;
+  text-align: center;
+}
+
+.theme-studio-template[data-template="restaurant"] .theme-studio-template__header {
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--puzzle-space-2);
+  padding-block: var(--puzzle-space-5);
+  border-block: var(--puzzle-border-width-strong) double var(--puzzle-color-border);
+  text-align: center;
+}
+
+.theme-studio-template[data-template="restaurant"] .theme-studio-template__mark {
+  border-radius: 0;
+  background: var(--puzzle-color-surface);
+  color: var(--puzzle-color-accent);
+}
+
+.theme-studio-template[data-template="restaurant"] .theme-studio-template__identity-copy strong {
+  font-family: var(--puzzle-font-family-accent);
+  font-size: var(--puzzle-font-size-2xl);
+  letter-spacing: var(--puzzle-font-letter-spacing-wide);
+}
+
+.theme-studio-template[data-template="restaurant"] .theme-studio-template__identity-copy > span {
+  letter-spacing: var(--puzzle-font-letter-spacing-wide);
+}
+
+.theme-studio-template[data-template="restaurant"] .theme-studio-template__navigation {
+  justify-content: center;
+}
+
+.theme-studio-template[data-template="restaurant"] .theme-studio-template__footer {
+  border-block-start: 0;
+}
+
+.theme-studio-template[data-template="blog"] .theme-studio-template__header {
+  flex-direction: column;
+  align-items: stretch;
+  padding-block: var(--puzzle-space-5);
+  border-bottom-width: var(--puzzle-border-width-strong);
+}
+
+.theme-studio-template[data-template="blog"] .theme-studio-template__identity {
+  align-self: center;
+  flex-direction: column;
+  gap: var(--puzzle-space-1);
+  text-align: center;
+}
+
+.theme-studio-template[data-template="blog"] .theme-studio-template__mark {
+  display: none;
+}
+
+.theme-studio-template[data-template="blog"] .theme-studio-template__identity-copy strong {
+  font-family: var(--puzzle-font-family-accent);
+  font-size: var(--puzzle-font-size-3xl);
+  font-weight: var(--puzzle-font-weight-normal);
+}
+
+.theme-studio-template[data-template="blog"] .theme-studio-template__navigation {
+  justify-content: center;
+  padding-top: var(--puzzle-space-2);
+  border-top: var(--puzzle-border-width) solid var(--puzzle-color-border);
+}
+
+.theme-studio-template[data-template="blog"] .theme-studio-template__footer {
+  border-block-start: 0;
+}
+
+.theme-studio-template[data-template="corporate"] .theme-studio-template__header {
+  border-inline: var(--puzzle-border-width) solid var(--puzzle-color-border);
+}
+
+.theme-studio-template[data-template="corporate"] .theme-studio-template__mark {
+  border-radius: var(--puzzle-radius-sm);
+  background: var(--puzzle-color-secondary);
+  color: var(--puzzle-color-secondary-foreground);
+}
+
+.theme-studio-template[data-template="corporate"] .theme-studio-template__footer {
+  border-block-start-width: var(--puzzle-border-width-strong);
+}
+
+.theme-studio-template[data-template="blog"] .theme-studio-template__page-intro h1,
+.theme-studio-template[data-template="restaurant"] .theme-studio-template__page-intro h1 {
+  font-family: var(--puzzle-font-family-accent);
+}
+
+.theme-studio-template[data-template="corporate"] .theme-studio-template__page-intro {
+  border-inline-start: var(--puzzle-border-width-strong) solid var(--puzzle-color-primary);
+  padding-inline-start: var(--puzzle-space-4);
+}
+
+.theme-studio-template :is(button, a):focus-visible {
+  outline: var(--puzzle-border-width-strong) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1);
+}
+
 @media (max-width: 48rem) {
   .theme-studio-template__header {
     align-items: flex-start;
@@ -396,6 +518,32 @@
 
   .theme-studio-template__main {
     gap: var(--puzzle-space-6);
+    padding-inline: var(--puzzle-space-3);
+  }
+
+  .theme-studio-template[data-template="bnb"] .theme-studio-template__header,
+  .theme-studio-template[data-template="restaurant"] .theme-studio-template__header,
+  .theme-studio-template[data-template="blog"] .theme-studio-template__header {
+    align-items: center;
+  }
+
+  .theme-studio-template[data-template="bnb"] .theme-studio-template__navigation,
+  .theme-studio-template[data-template="restaurant"] .theme-studio-template__navigation,
+  .theme-studio-template[data-template="blog"] .theme-studio-template__navigation {
+    justify-content: center;
+  }
+
+  .theme-studio-template__navigation button {
+    padding-inline: var(--puzzle-space-2);
+    font-size: var(--puzzle-font-size-xs);
+  }
+
+  .theme-studio-template[data-template="restaurant"] .theme-studio-template__identity-copy strong {
+    font-size: var(--puzzle-font-size-xl);
+  }
+
+  .theme-studio-template[data-template="blog"] .theme-studio-template__identity-copy strong {
+    font-size: var(--puzzle-font-size-2xl);
   }
 
   .theme-studio-template__hero-media--marketing,
@@ -403,5 +551,16 @@
   .theme-studio-template__hero-media--corporate {
     min-height: var(--puzzle-space-20);
     aspect-ratio: 4 / 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-studio-template *,
+  .theme-studio-template *::before,
+  .theme-studio-template *::after {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
   }
 }

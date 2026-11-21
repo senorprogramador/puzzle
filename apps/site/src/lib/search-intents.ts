@@ -86,6 +86,177 @@ export const searchIntentMap = {
       `${SITE_URL}/docs/getting-started`,
     ],
   },
+  "/docs/ui/actions": {
+    intent: "Choose React components for actions and toggle selection.",
+    primaryKeyword: "React action components",
+    secondaryKeywords: [
+      "React buttons",
+      "React toggle group",
+      "TypeScript React actions",
+    ],
+    title: "React Action Components",
+    description:
+      "Choose React buttons and toggle groups for clear actions, grouped commands, and single- or multiple-selection controls.",
+    canonical: getCanonicalUrl("/docs/ui/actions"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/ui/navigation`,
+      `${SITE_URL}/docs/getting-started`,
+    ],
+  },
+  "/docs/ui/data-display": {
+    intent: "Present application data with reusable React display components.",
+    primaryKeyword: "React data display components",
+    secondaryKeywords: [
+      "React data table",
+      "React status components",
+      "React empty state",
+    ],
+    title: "React Data Display Components",
+    description:
+      "Present React application data with cards, status indicators, tables, images, progress, ratings, and empty states.",
+    canonical: getCanonicalUrl("/docs/ui/data-display"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/ui/layout`,
+      `${SITE_URL}/docs/ui/forms`,
+    ],
+  },
+  "/docs/ui/editors": {
+    intent: "Add rich-text editing to a React application.",
+    primaryKeyword: "React rich text editor component",
+    secondaryKeywords: [
+      "TypeScript React text editor",
+      "React content editor",
+      "Puzzle Text Editor",
+    ],
+    title: "React Text Editors",
+    description:
+      "Add a rich-text editing surface to React applications with Puzzle's text editor and its documented formatting and rendering APIs.",
+    canonical: getCanonicalUrl("/docs/ui/editors"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/ui/forms`,
+      `${SITE_URL}/docs/ui/editors/text-editor`,
+    ],
+  },
+  "/docs/ui/forms": {
+    intent: "Build React forms with typed inputs and selection controls.",
+    primaryKeyword: "React form components",
+    secondaryKeywords: [
+      "React form inputs",
+      "React form controls",
+      "TypeScript React form components",
+    ],
+    title: "React Form Components",
+    description:
+      "Build React forms with typed inputs, selection controls, date and time pickers, file upload, validation feedback, and accessible field composition.",
+    canonical: getCanonicalUrl("/docs/ui/forms"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/ui/forms/form-field`,
+      `${SITE_URL}/docs/tutorials`,
+    ],
+  },
+  "/docs/ui/layout": {
+    intent: "Structure responsive React pages with layout primitives.",
+    primaryKeyword: "React layout components",
+    secondaryKeywords: [
+      "React responsive layout",
+      "React layout primitives",
+      "TypeScript React layout",
+    ],
+    title: "React Layout Components",
+    description:
+      "Structure responsive React interfaces with Puzzle containers, grids, stacks, page regions, sidebars, and resizable panels.",
+    canonical: getCanonicalUrl("/docs/ui/layout"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/ui/layout/page-layout`,
+      `${SITE_URL}/docs/pieces`,
+    ],
+  },
+  "/docs/ui/navigation": {
+    intent: "Choose React components for navigation and related views.",
+    primaryKeyword: "React navigation components",
+    secondaryKeywords: [
+      "React tabs component",
+      "React pagination component",
+      "React router-independent links",
+    ],
+    title: "React Navigation Components",
+    description:
+      "Organize React navigation and in-page choices with links, tabs, accordions, carousels, pagination, and tree views.",
+    canonical: getCanonicalUrl("/docs/ui/navigation"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/ui/navigation/link`,
+      `${SITE_URL}/docs/ui/actions`,
+    ],
+  },
+  "/docs/ui/overlays": {
+    intent: "Present modal and contextual content with React overlays.",
+    primaryKeyword: "React overlay components",
+    secondaryKeywords: [
+      "React dialog component",
+      "React popover component",
+      "React notification component",
+    ],
+    title: "React Overlay Components",
+    description:
+      "Present focused and contextual React interface layers with dialogs, drawers, menus, popovers, tooltips, and notifications.",
+    canonical: getCanonicalUrl("/docs/ui/overlays"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/ui/overlays/dialog`,
+      `${SITE_URL}/docs/ui/navigation`,
+    ],
+  },
+  "/docs/ui/typography": {
+    intent: "Style semantic React headings and text with theme-aware components.",
+    primaryKeyword: "React typography components",
+    secondaryKeywords: [
+      "React heading component",
+      "React text component",
+      "themed React typography",
+    ],
+    title: "React Typography Components",
+    description:
+      "Apply consistent React heading and text styles with Puzzle's theme-aware typography components.",
+    canonical: getCanonicalUrl("/docs/ui/typography"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/ui/typography/heading`,
+      `${SITE_URL}/docs/theme/typography`,
+    ],
+  },
+  "/docs/ui/utilities": {
+    intent: "Use rendering and interaction utilities in React UI.",
+    primaryKeyword: "React UI utilities",
+    secondaryKeywords: [
+      "React rendering strategies",
+      "React scroll lock",
+      "React transition utility",
+    ],
+    title: "React UI Utilities",
+    description:
+      "Explore Puzzle UI utilities for component previews, rendering strategies, scroll locking, and transitions in React applications.",
+    canonical: getCanonicalUrl("/docs/ui/utilities"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/ui/utilities/rendering`,
+      `${SITE_URL}/docs/pieces/framework-integration`,
+    ],
+  },
   "/docs/pieces": {
     intent: "Find responsive React website sections and compositions.",
     primaryKeyword: "React website sections",
@@ -104,6 +275,139 @@ export const searchIntentMap = {
       `${SITE_URL}/docs/ui`,
       `${SITE_URL}/docs/theme`,
       `${SITE_URL}/docs/pieces/components/hero`,
+    ],
+  },
+  "/docs/pieces/components/marketing": {
+    intent: "Choose composed React sections for marketing and conversion pages.",
+    primaryKeyword: "React marketing sections",
+    secondaryKeywords: [
+      "React landing page sections",
+      "React conversion components",
+      "Puzzle marketing components",
+    ],
+    title: "Marketing & Conversion Sections",
+    description:
+      "Compose responsive marketing sections for product discovery, customer proof, conversion, FAQs, and comparisons with Puzzle Pieces.",
+    canonical: getCanonicalUrl("/docs/pieces/components/marketing"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/pieces`,
+      `${SITE_URL}/docs/pieces/components/features`,
+      `${SITE_URL}/docs/pieces/components/cta`,
+    ],
+  },
+  "/docs/pieces/components/saas-product": {
+    intent: "Compose React sections for SaaS product information and pricing.",
+    primaryKeyword: "React SaaS website sections",
+    secondaryKeywords: [
+      "SaaS product showcase React",
+      "React pricing sections",
+      "React integration sections",
+    ],
+    title: "SaaS & Product Sections",
+    description:
+      "Explore product showcases, integrations, use cases, pricing, security, code, and roadmap sections.",
+    canonical: getCanonicalUrl("/docs/pieces/components/saas-product"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/pieces`,
+      `${SITE_URL}/docs/pieces/components/product-showcase`,
+      `${SITE_URL}/docs/pieces/components/pricing`,
+    ],
+  },
+  "/docs/pieces/components/commerce": {
+    intent: "Present product catalogs and commerce content with React sections.",
+    primaryKeyword: "React commerce sections",
+    secondaryKeywords: [
+      "React product grid",
+      "React product details components",
+      "React restaurant menu components",
+    ],
+    title: "Commerce Sections",
+    description:
+      "Compose product catalogs, restaurant menus, accommodation booking presentation, product details, cart summaries, and commerce benefits.",
+    canonical: getCanonicalUrl("/docs/pieces/components/commerce"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/pieces`,
+      `${SITE_URL}/docs/pieces/components/product-grid`,
+      `${SITE_URL}/docs/pieces/components/product-details`,
+    ],
+  },
+  "/docs/pieces/components/content": {
+    intent: "Present editorial and publication content with React sections.",
+    primaryKeyword: "React editorial website sections",
+    secondaryKeywords: [
+      "React blog sections",
+      "React timeline section",
+      "React content components",
+    ],
+    title: "Content & Editorial Sections",
+    description:
+      "Arrange articles, galleries, timelines, changelogs, video, resources, and event content.",
+    canonical: getCanonicalUrl("/docs/pieces/components/content"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/pieces`,
+      `${SITE_URL}/docs/pieces/components/blog-section`,
+      `${SITE_URL}/docs/pieces/components/gallery-section`,
+    ],
+  },
+  "/docs/pieces/components/business": {
+    intent: "Build organizational and corporate pages with React sections.",
+    primaryKeyword: "React corporate website sections",
+    secondaryKeywords: [
+      "React team sections",
+      "React agency website components",
+      "React business profile sections",
+    ],
+    title: "Business & Corporate Sections",
+    description:
+      "Present organizational profiles, teams, services, accommodation details, house rules, case studies, careers, contacts, and partners.",
+    canonical: getCanonicalUrl("/docs/pieces/components/business"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/pieces`,
+      `${SITE_URL}/docs/pieces/components/team-section`,
+      `${SITE_URL}/docs/pieces/components/case-studies-section`,
+    ],
+  },
+  "/docs/pieces/components/application-dashboard": {
+    intent: "Compose React application dashboards and administration screens.",
+    primaryKeyword: "React dashboard sections",
+    secondaryKeywords: [
+      "React admin dashboard components",
+      "React onboarding section",
+      "React application settings UI",
+    ],
+    title: "Application & Dashboard Sections",
+    description:
+      "Compose dashboard overviews, activity, onboarding, empty states, settings, and project administration screens.",
+    canonical: getCanonicalUrl("/docs/pieces/components/application-dashboard"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/pieces`,
+      `${SITE_URL}/docs/pieces/components/dashboard`,
+      `${SITE_URL}/docs/pieces/components/settings`,
+    ],
+  },
+  "/docs/pieces/components/specialized-interactive": {
+    intent: "Choose specialized interactive React website sections.",
+    primaryKeyword: "React interactive website sections",
+    secondaryKeywords: [
+      "React booking sections",
+      "React event sections",
+      "React resource sections",
+    ],
+    title: "Specialized & Interactive Sections",
+    description:
+      "Explore video, booking, location, waitlist, resource, event, and footer sections with app-owned interactions.",
+    canonical: getCanonicalUrl("/docs/pieces/components/specialized-interactive"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/pieces`,
+      `${SITE_URL}/docs/pieces/components/availability-search`,
+      `${SITE_URL}/docs/pieces/components/event-section`,
     ],
   },
   "/docs/seo": {
@@ -188,6 +492,120 @@ export const searchIntentMap = {
       `${SITE_URL}/docs/ui`,
       `${SITE_URL}/docs/pieces`,
       `${SITE_URL}/docs/theme`,
+    ],
+  },
+  "/docs/core": {
+    intent: "Use framework-independent TypeScript utilities shared by Puzzle.",
+    primaryKeyword: "TypeScript utility library",
+    secondaryKeywords: [
+      "framework-independent TypeScript utilities",
+      "responsive value utilities",
+      "TypeScript resource scheduler",
+    ],
+    title: "Core Utilities",
+    description:
+      "Use Puzzle's framework-independent TypeScript helpers for class names, responsive values, formatting, rendering, and resource scheduling.",
+    canonical: getCanonicalUrl("/docs/core"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/hooks`,
+      `${SITE_URL}/docs/theme`,
+      `${SITE_URL}/docs/ui`,
+    ],
+  },
+  "/docs/icons": {
+    intent: "Render and style typed icon sets in React applications.",
+    primaryKeyword: "React SVG icon library",
+    secondaryKeywords: [
+      "Iconify React icons",
+      "TypeScript React icons",
+      "theme-aware React icons",
+    ],
+    title: "Icons",
+    description:
+      "Render Iconify icons as React SVG components and style them with CSS, currentColor, or Puzzle theme tokens.",
+    canonical: getCanonicalUrl("/docs/icons"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/ui`,
+      `${SITE_URL}/docs/theme`,
+      `${SITE_URL}/docs/getting-started`,
+    ],
+  },
+  "/docs/session": {
+    intent: "Manage secure server-side sessions in TypeScript applications.",
+    primaryKeyword: "TypeScript session management",
+    secondaryKeywords: [
+      "secure server-side sessions",
+      "session rotation and revocation",
+      "HttpOnly cookie sessions",
+    ],
+    title: "Session Management",
+    description:
+      "Create, validate, rotate, and revoke secure server-side sessions with Puzzle Storage and HttpOnly cookies.",
+    canonical: getCanonicalUrl("/docs/session"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/auth`,
+      `${SITE_URL}/docs/storage`,
+      `${SITE_URL}/docs/tutorials/auth`,
+    ],
+  },
+  "/docs/storage": {
+    intent: "Choose database-neutral TypeScript storage contracts and adapters.",
+    primaryKeyword: "TypeScript storage adapters",
+    secondaryKeywords: [
+      "MongoDB storage adapter",
+      "Cloudflare D1 storage adapter",
+      "database-neutral persistence contracts",
+    ],
+    title: "Storage",
+    description:
+      "Vendor-neutral persistence contracts, migrations, adapter conformance testing, and database adapters for Puzzle.",
+    canonical: getCanonicalUrl("/docs/storage"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/auth`,
+      `${SITE_URL}/docs/session`,
+      `${SITE_URL}/docs/tutorials/storage`,
+    ],
+  },
+  "/docs/multilingual": {
+    intent: "Add typed translations and locale-aware behavior with Puzzle i18n.",
+    primaryKeyword: "TypeScript internationalization library",
+    secondaryKeywords: [
+      "React ICU translations",
+      "locale-aware React routes",
+      "typed translation catalogs",
+    ],
+    title: "Puzzle Multilingual",
+    description:
+      "Type-safe locale management, ICU translations, localized paths, React bindings, and SEO metadata with Puzzle.",
+    canonical: getCanonicalUrl("/docs/multilingual"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/core`,
+      `${SITE_URL}/docs/seo`,
+      `${SITE_URL}/docs/getting-started`,
+    ],
+  },
+  "/docs/create": {
+    intent: "Scaffold a React application with Puzzle packages and integrations.",
+    primaryKeyword: "React project generator",
+    secondaryKeywords: [
+      "Next.js starter generator",
+      "TanStack Start starter",
+      "React application scaffolding",
+    ],
+    title: "Create",
+    description:
+      "Generate a React application with Puzzle UI, framework-aware theme setup, and optional Tailwind CSS and Puzzle Auth with a working database.",
+    canonical: getCanonicalUrl("/docs/create"),
+    structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
+    internalLinks: [
+      `${SITE_URL}/docs/getting-started`,
+      `${SITE_URL}/docs/create/configuration`,
+      `${SITE_URL}/docs/developer`,
     ],
   },
   "/docs/getting-started": {

@@ -1,16 +1,12 @@
 "use client";
 
-import { Button, Carousel, CarouselController, Rating, Text } from "@puzzle-ui/ui";
-import { Icon } from "@puzzle-ui/icons";
-import {
-  useState,
-  type ElementType,
-  type KeyboardEvent,
-} from "react";
+import { Rating, Text } from "@puzzle-ui/ui";
+import { type ElementType } from "react";
 import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import type {
   TestimonialItem,
   TestimonialsSectionProps,
@@ -65,18 +61,6 @@ const TestimonialsSection = <C extends ElementType = "section">({
   className,
   ...sectionProps
 }: TestimonialsSectionProps<C>) => {
-  const [currentPanel, setCurrentPanel] = useState(0);
-  const handleCarouselKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
-    event.preventDefault();
-    setCurrentPanel((current) =>
-      Math.min(
-        Math.max(0, items.length - 1),
-        current + (event.key === "ArrowRight" ? 1 : -1),
-      ),
-    );
-  };
-
   return (
     <MarketingSection<C>
       {...(sectionProps as MarketingSectionBaseProps<C>)}
@@ -85,37 +69,17 @@ const TestimonialsSection = <C extends ElementType = "section">({
       variant={variant}
     >
       {items.length && variant === "carousel" ? (
-        <div
-          className="puzzle-testimonials__keyboard"
-          role="group"
-          tabIndex={0}
-          aria-label={`${carouselLabel}. Use the left and right arrow keys to navigate.`}
-          onKeyDown={handleCarouselKeyDown}
-        >
-          <CarouselController
-            items={[...items]}
-            currentPanel={currentPanel}
-            onPanelChange={setCurrentPanel}
-          >
-            <Carousel<TestimonialItem>
-              ariaLabel={carouselLabel}
-              className="puzzle-testimonials__carousel"
-              panelsPerView={1}
-              renderItem={(item) => <TestimonialContent item={item} />}
-              getItemKey={(item) => item.id}
-              backButton={
-                <Button variant="primary" size="sm" aria-label="Previous testimonial">
-                  <Icon name="bx:caret-left" aria-hidden="true" />
-                </Button>
-              }
-              nextButton={
-                <Button variant="primary" size="sm" aria-label="Next testimonial">
-                  <Icon name="bx:caret-right" aria-hidden="true" />
-                </Button>
-              }
-            />
-          </CarouselController>
-        </div>
+        <PiecesCarousel
+          itemKeys={items.map((item) => item.id)}
+          slides={items.map((item) => (
+            <TestimonialContent key={item.id} item={item} />
+          ))}
+          ariaLabel={carouselLabel}
+          itemLabel="testimonial"
+          className="puzzle-testimonials__carousel"
+          panelsPerView={{ mobile: 1, tablet: 1, desktop: 2 }}
+          gap="var(--puzzle-space-6, 1.5rem)"
+        />
       ) : items.length ? (
         <ul className="puzzle-testimonials__list">
           {items.map((item) => (

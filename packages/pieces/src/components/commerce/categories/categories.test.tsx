@@ -1,5 +1,4 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import { CategoriesSection } from "./categories";
 import type {
@@ -68,15 +67,20 @@ describe("CategoriesSection", () => {
     ).toBeVisible();
   });
 
-  it("moves through the category carousel with keyboard-accessible controls", async () => {
-    const user = userEvent.setup();
-    render(<CategoriesSection variant="carousel" items={items} />);
+  it("uses responsive UI carousel controls and pagination", () => {
+    const { container } = render(
+      <CategoriesSection variant="carousel" items={items} />,
+    );
 
-    const next = screen.getByRole("button", { name: "Next category" });
-    next.focus();
-    await user.keyboard("{Enter}");
-    expect(screen.getByRole("heading", { name: "Textiles" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Next category" })).toBeDisabled();
+    const carousel = container.querySelector(".puzzle-carousel");
+    expect(carousel).toHaveAttribute("data-button-mobile", "aside");
+    expect(carousel).toHaveAttribute("data-pager-mobile", "under");
+    expect(
+      screen.getByRole("button", { name: "Previous category" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "Next category" }),
+    ).toBeVisible();
   });
 
   it("omits empty collections and handles large category sets", () => {

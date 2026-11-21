@@ -1,3 +1,4 @@
+import { assertSafeCssValue } from "@puzzle-ui/core";
 import {
   COLOR_THEMES,
   DEFAULT_COLOR_SCHEME,
@@ -7,9 +8,12 @@ import {
   type GoogleFontFamily,
   type ThemeFonts,
   type ThemeColorSchemeTokens,
+  type ThemeMode,
   type ThemeTokenOverrides,
   type ThemeTokenRegistryEntry,
 } from "@puzzle-ui/theme";
+
+import projectFonts from "../../puzzle-fonts.json";
 
 export const WEBSITE_TEMPLATES = [
   { id: "marketing", label: "Marketing" },
@@ -39,17 +43,37 @@ export type ThemeStudioState = {
   template: WebsiteTemplate;
   page: PreviewPage;
   colorTheme: ColorThemes | null;
-  mode: "light" | "dark";
+  mode: ThemeMode;
   fonts: ThemeFonts;
   tokens: ThemeTokenOverrides;
 };
+
+const DEFAULT_FONT_CONFIGURATION = projectFonts as unknown as ThemeFonts;
+
+const cloneFontConfiguration = (fonts: ThemeFonts): ThemeFonts =>
+  Object.fromEntries(
+    Object.entries(fonts).map(([role, config]) => [
+      role,
+      config
+        ? {
+            ...config,
+            ...(config.weights ? { weights: [...config.weights] } : {}),
+            ...(config.weightRange
+              ? { weightRange: [...config.weightRange] }
+              : {}),
+            ...(config.styles ? { styles: [...config.styles] } : {}),
+            ...(config.fallback ? { fallback: [...config.fallback] } : {}),
+          }
+        : config,
+    ]),
+  ) as ThemeFonts;
 
 export const INITIAL_THEME_STUDIO_STATE: ThemeStudioState = {
   template: "marketing",
   page: "home",
   colorTheme: null,
   mode: "light",
-  fonts: {},
+  fonts: cloneFontConfiguration(DEFAULT_FONT_CONFIGURATION),
   tokens: {},
 };
 
@@ -67,12 +91,101 @@ export const FEATURED_COLOR_ROLES = [
 
 export type EditableColorRole = keyof ThemeColorSchemeTokens;
 
+export type ThemeStudioAction =
+  | { type: "template"; template: WebsiteTemplate }
+  | { type: "page"; page: PreviewPage }
+  | { type: "mode"; mode: ThemeMode }
+  | {
+      type: "font";
+      role: FontRole;
+      family: GoogleFontFamily | undefined;
+    }
+  | { type: "preset"; colorTheme: ColorThemes | null }
+  | { type: "spacing-preset"; spacingPreset: SpacingPreset }
+  | {
+      type: "color";
+      scheme: "light" | "dark";
+      role: EditableColorRole;
+      value: string;
+    }
+  | { type: "token"; path: readonly string[]; value: string }
+  | { type: "reset-token"; path: readonly string[] }
+  | { type: "reset-token-group"; path: readonly string[] }
+  | { type: "reset-design-tokens" }
+  | { type: "restore-preset" }
+  | { type: "reset-default" };
+
+export type ParsedCssNumber = {
+  value: number;
+  unit: string;
+};
+
+const DIMENSION_UNITS = new Set([
+  "",
+  "px",
+  "rem",
+  "em",
+  "ch",
+  "%",
+  "vw",
+  "vh",
+  "vmin",
+  "vmax",
+  "pt",
+]);
+
+const parseNumberWithUnit = (
+  value: string,
+  units: ReadonlySet<string>,
+): ParsedCssNumber | null => {
+  const match = /^([+-]?(?:\d+(?:\.\d*)?|\.\d+))([a-z%]*)$/i.exec(
+    value.trim(),
+  );
+  if (!match) return null;
+
+  const amount = Number(match[1]);
+  const unit = match[2]?.toLowerCase() ?? "";
+
+  return Number.isFinite(amount) && units.has(unit)
+    ? { value: amount, unit }
+    : null;
+};
+
+export const parseDimensionValue = (
+  value: string,
+): ParsedCssNumber | null => parseNumberWithUnit(value, DIMENSION_UNITS);
+
+export const parseDurationValue = (
+  value: string,
+): ParsedCssNumber | null => parseNumberWithUnit(value, new Set(["ms", "s"]));
+
+export const formatDimensionValue = (
+  value: number,
+  unit: string,
+): string | null =>
+  Number.isFinite(value) && DIMENSION_UNITS.has(unit)
+    ? `${String(value)}${unit}`
+    : null;
+
+export const formatDurationValue = (
+  value: number,
+  unit: string,
+): string | null =>
+  Number.isFinite(value) && (unit === "ms" || unit === "s")
+    ? `${String(value)}${unit}`
+    : null;
+
 export const getThemeTokenPath = (
   entry: ThemeTokenRegistryEntry,
 ): readonly string[] => [...entry.group.split("."), entry.name];
 
 export const getThemeTokenGroups = (): readonly string[] =>
   [...new Set(THEME_TOKEN_REGISTRY.map((entry) => entry.group))];
+
+export const getThemeTokenEntries = (
+  group: string,
+): readonly ThemeTokenRegistryEntry[] =>
+  THEME_TOKEN_REGISTRY.filter((entry) => entry.group === group);
 
 const getSpacingEntries = () =>
   THEME_TOKEN_REGISTRY.filter((entry) => entry.group === "spacing");
@@ -105,8 +218,7 @@ export const getSelectedSpacingPreset = (
 ): SpacingPreset | null => {
   const entries = getSpacingEntries();
   const hasSpacingOverrides = entries.some(
-    (entry) =>
-      getThemeTokenValue(tokens, entry) !== entry.defaultValue,
+    (entry) => getThemeTokenValue(tokens, entry) !== entry.defaultValue,
   );
   if (!hasSpacingOverrides) return "default";
 
@@ -231,10 +343,15 @@ const hasOverrides = (value: unknown): boolean => {
   return Object.values(value).some(hasOverrides);
 };
 
+const fontConfigurationsEqual = (left: ThemeFonts, right: ThemeFonts) =>
+  JSON.stringify(left) === JSON.stringify(right);
+
 export const isThemeCustomized = (
   tokens: ThemeTokenOverrides,
-  fonts: ThemeFonts = {},
-): boolean => hasOverrides(tokens) || Object.keys(fonts).length > 0;
+  fonts: ThemeFonts = DEFAULT_FONT_CONFIGURATION,
+): boolean =>
+  hasOverrides(tokens) ||
+  !fontConfigurationsEqual(fonts, DEFAULT_FONT_CONFIGURATION);
 
 export const hasColorOverrides = (
   tokens: ThemeTokenOverrides,
@@ -242,25 +359,18 @@ export const hasColorOverrides = (
 
 export const getSelectedFontConfiguration = (
   state: Pick<ThemeStudioState, "fonts">,
-): ThemeFonts => {
-  const fonts: ThemeFonts = {};
-
-  for (const role of ["heading", "body", "accent"] as const) {
-    const config = state.fonts[role];
-    if (config) fonts[role] = { ...config };
-  }
-
-  return fonts;
-};
+): ThemeFonts => cloneFontConfiguration(state.fonts);
 
 export const createPuzzleFontsJson = (
   state: Pick<ThemeStudioState, "fonts">,
-): string | undefined => {
-  const fonts = getSelectedFontConfiguration(state);
+): string => {
+  const configuredFonts = getSelectedFontConfiguration(state);
+  const fonts =
+    Object.keys(configuredFonts).length > 0
+      ? configuredFonts
+      : cloneFontConfiguration(DEFAULT_FONT_CONFIGURATION);
 
-  return Object.keys(fonts).length === 0
-    ? undefined
-    : JSON.stringify(fonts, null, 2);
+  return `${JSON.stringify(fonts, null, 2)}\n`;
 };
 
 const withoutColorOverrides = (
@@ -270,30 +380,20 @@ const withoutColorOverrides = (
   return remainingTokens;
 };
 
+const getEntryAtPath = (
+  path: readonly string[],
+): ThemeTokenRegistryEntry | undefined =>
+  THEME_TOKEN_REGISTRY.find((entry) => {
+    const entryPath = getThemeTokenPath(entry);
+    return (
+      entryPath.length === path.length &&
+      entryPath.every((segment, index) => segment === path[index])
+    );
+  });
+
 export const themeStudioReducer = (
   state: ThemeStudioState,
-  action:
-    | { type: "template"; template: WebsiteTemplate }
-    | { type: "page"; page: PreviewPage }
-    | { type: "mode"; mode: "light" | "dark" }
-    | {
-        type: "font";
-        role: FontRole;
-        family: GoogleFontFamily | undefined;
-      }
-    | { type: "preset"; colorTheme: ColorThemes | null }
-    | { type: "spacing-preset"; spacingPreset: SpacingPreset }
-    | {
-        type: "color";
-        role: EditableColorRole;
-        value: string;
-      }
-    | { type: "token"; path: readonly string[]; value: string }
-    | { type: "reset-token"; path: readonly string[] }
-    | { type: "reset-token-group"; path: readonly string[] }
-    | { type: "reset-design-tokens" }
-    | { type: "restore-preset" }
-    | { type: "reset-default" },
+  action: ThemeStudioAction,
 ): ThemeStudioState => {
   switch (action.type) {
     case "template":
@@ -303,12 +403,16 @@ export const themeStudioReducer = (
     case "mode":
       return { ...state, mode: action.mode };
     case "font": {
-      const fonts = { ...state.fonts };
+      const fonts = cloneFontConfiguration(state.fonts);
 
       if (action.family === undefined) {
+        if (Object.keys(fonts).length <= 1 || !fonts[action.role]) return state;
         delete fonts[action.role];
       } else {
-        fonts[action.role] = { family: action.family };
+        const current = fonts[action.role];
+        fonts[action.role] = current
+          ? { ...current, family: action.family }
+          : { family: action.family };
       }
 
       return { ...state, fonts };
@@ -346,15 +450,25 @@ export const themeStudioReducer = (
         ...state,
         tokens: withoutColorOverrides(state.tokens),
       };
-    case "token":
+    case "token": {
+      const entry = getEntryAtPath(action.path);
+      if (!entry) {
+        throw new TypeError(`Unknown Theme token path "${action.path.join(".")}".`);
+      }
+
+      const value = assertSafeCssValue(
+        action.value,
+        `Theme Studio ${entry.group}.${entry.name}`,
+      );
       return {
         ...state,
         tokens: updateNestedToken(
           state.tokens,
           action.path,
-          action.value,
+          value === entry.defaultValue ? undefined : value,
         ) as ThemeTokenOverrides,
       };
+    }
     case "reset-token":
     case "reset-token-group":
       return {
@@ -374,27 +488,32 @@ export const themeStudioReducer = (
       return {
         ...state,
         colorTheme: null,
-        fonts: {},
+        mode: "light",
+        fonts: cloneFontConfiguration(DEFAULT_FONT_CONFIGURATION),
         tokens: {},
       };
     case "color": {
-      const base = getBaseColorScheme(state.colorTheme, state.mode);
+      const base = getBaseColorScheme(state.colorTheme, action.scheme);
+      const value = assertSafeCssValue(
+        action.value,
+        `Theme Studio colorSchemes.${action.scheme}.${action.role}`,
+      );
       const schemeOverrides = {
-        ...(state.tokens.colorSchemes?.[state.mode] ?? {}),
+        ...(state.tokens.colorSchemes?.[action.scheme] ?? {}),
       };
 
-      if (action.value.toLowerCase() === base[action.role].toLowerCase()) {
+      if (value.toLowerCase() === base[action.role].toLowerCase()) {
         delete schemeOverrides[action.role];
       } else {
-        schemeOverrides[action.role] = action.value;
+        schemeOverrides[action.role] = value;
       }
 
       const colorSchemes = { ...state.tokens.colorSchemes };
 
       if (Object.keys(schemeOverrides).length > 0) {
-        colorSchemes[state.mode] = schemeOverrides;
+        colorSchemes[action.scheme] = schemeOverrides;
       } else {
-        delete colorSchemes[state.mode];
+        delete colorSchemes[action.scheme];
       }
 
       return {

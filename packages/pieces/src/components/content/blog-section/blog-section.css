@@ -96,7 +96,6 @@
   break-inside: avoid;
 }
 
-.puzzle-blog-section[data-variant="carousel"] .puzzle-blog-section__items,
 .puzzle-blog-section[data-variant="horizontal"] .puzzle-blog-section__items {
   grid-auto-columns: minmax(min(80vw, 20rem), 1fr);
   grid-auto-flow: column;
@@ -106,7 +105,6 @@
   scroll-snap-type: inline mandatory;
 }
 
-.puzzle-blog-section[data-variant="carousel"] .puzzle-blog-section__items > li,
 .puzzle-blog-section[data-variant="horizontal"] .puzzle-blog-section__items > li {
   scroll-snap-align: start;
 }

@@ -1,0 +1,4 @@
+.puzzle-pieces-carousel:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}

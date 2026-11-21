@@ -6,6 +6,7 @@ const folder = "/docs/ui" as const;
 const actions: TreeViewItem = {
   id: "ui-actions",
   label: "Actions",
+  href: `${folder}/actions`,
   children: [
     {
       id: "ui-button-group",
@@ -30,6 +31,7 @@ const actions: TreeViewItem = {
 const dataDisplay: TreeViewItem = {
   id: "ui-data-display",
   label: "Data Display",
+  href: `${folder}/data-display`,
   children: [
     {
       id: "ui-alert",
@@ -103,6 +105,7 @@ const dataDisplay: TreeViewItem = {
 const editors: TreeViewItem = {
   id: "ui-editors",
   label: "Editors",
+  href: `${folder}/editors`,
   children: [
     {
       id: "ui-text-editor",
@@ -116,6 +119,7 @@ const editors: TreeViewItem = {
 const forms: TreeViewItem = {
   id: "ui-forms",
   label: "Forms",
+  href: `${folder}/forms`,
   children: [
     {
       id: "ui-autocomplete",
@@ -215,6 +219,7 @@ const forms: TreeViewItem = {
 const layout: TreeViewItem = {
   id: "ui-layout",
   label: "Layout",
+  href: `${folder}/layout`,
   children: [
     {
       id: "ui-app-bar",
@@ -309,6 +314,7 @@ const layout: TreeViewItem = {
 const navigation: TreeViewItem = {
   id: "ui-navigation",
   label: "Navigation",
+  href: `${folder}/navigation`,
   children: [
     {
       id: "ui-accordion",
@@ -348,6 +354,7 @@ const navigation: TreeViewItem = {
 const overlays: TreeViewItem = {
   id: "ui-overlays",
   label: "Overlays",
+  href: `${folder}/overlays`,
   children: [
     {
       id: "ui-backdrop",
@@ -412,6 +419,7 @@ const overlays: TreeViewItem = {
 const typography: TreeViewItem = {
   id: "ui-typography",
   label: "Typography",
+  href: `${folder}/typography`,
   children: [
     {
       id: "ui-heading",
@@ -431,6 +439,7 @@ const typography: TreeViewItem = {
 const utilities: TreeViewItem = {
   id: "ui-utilities",
   label: "Utilities",
+  href: `${folder}/utilities`,
   children: [
     {
       id: "ui-preview",

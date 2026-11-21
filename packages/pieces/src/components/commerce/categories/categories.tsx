@@ -2,11 +2,11 @@
 
 import { Card, Heading, Text } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
-import { useState } from "react";
 import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import { CommerceImageView } from "../commerce-image";
 import type {
   CategoriesSectionProps,
@@ -60,49 +60,18 @@ const CategoryCarousel = ({
 }: {
   items: readonly CategoryItem[];
   variant: CategoriesVariant;
-}) => {
-  const [requestedIndex, setRequestedIndex] = useState(0);
-  const activeIndex = Math.min(requestedIndex, items.length - 1);
-  const item = items[activeIndex];
-
-  if (!item) {
-    return null;
-  }
-
-  return (
-    <div
-      className="puzzle-categories__carousel"
-      role="region"
-      aria-label="Product categories"
-      aria-roledescription="carousel"
-    >
-      <div aria-live="polite" aria-atomic="true">
-        <CategoryCard item={item} variant={variant} />
-        <Text as="p" className="puzzle-categories__position">
-          {activeIndex + 1} of {items.length}
-        </Text>
-      </div>
-      <div className="puzzle-categories__controls">
-        <button
-          type="button"
-          aria-label="Previous category"
-          disabled={activeIndex === 0}
-          onClick={() => setRequestedIndex(activeIndex - 1)}
-        >
-          Previous
-        </button>
-        <button
-          type="button"
-          aria-label="Next category"
-          disabled={activeIndex === items.length - 1}
-          onClick={() => setRequestedIndex(activeIndex + 1)}
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-};
+}) => (
+  <PiecesCarousel
+    itemKeys={items.map((item) => item.id)}
+    slides={items.map((item) => (
+      <CategoryCard key={item.id} item={item} variant={variant} />
+    ))}
+    ariaLabel="Product categories"
+    itemLabel="category"
+    panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+    gap="var(--puzzle-space-4, 1rem)"
+  />
+);
 
 const CategoriesSection = <C extends ElementType = "section">({
   variant = "grid",

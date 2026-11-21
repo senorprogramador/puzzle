@@ -2,10 +2,7 @@
 
 import {
   Badge,
-  Button,
   Card,
-  Carousel,
-  CarouselController,
   Heading,
   Text,
 } from "@puzzle-ui/ui";
@@ -14,6 +11,7 @@ import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import { CommercePrice } from "../../commerce/shared";
 import { validateContentIds } from "../../content/shared";
 import { BusinessFigure } from "../shared";
@@ -124,31 +122,18 @@ const AccommodationOverviewSection = <C extends ElementType = "section">({
       family="accommodation-overview"
       variant={variant satisfies AccommodationOverviewVariant}
     >
-      {items.length > 1 && variant === "carousel" ? (
-        <CarouselController items={[...items]}>
-          <Carousel
-            ariaLabel="Accommodations"
-            panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
-            gap="var(--puzzle-space-4, 1rem)"
-            getItemKey={(item) => item.id}
-            backButton={
-              <Button type="button" variant="secondary">
-                Previous
-              </Button>
-            }
-            nextButton={
-              <Button type="button" variant="secondary">
-                Next
-              </Button>
-            }
-            renderPager={(currentPage, numberOfPages) => (
-              <span>
-                Slide {currentPage + 1} of {numberOfPages}
-              </span>
-            )}
-            renderItem={renderCard}
-          />
-        </CarouselController>
+      {items.length && variant === "carousel" ? (
+        <PiecesCarousel
+          itemKeys={items.map((item) => item.id)}
+          slides={items.map((item) => (
+            <div key={item.id}>{renderCard(item)}</div>
+          ))}
+          ariaLabel="Accommodations"
+          itemLabel="accommodation"
+          className="puzzle-accommodation-overview__carousel"
+          panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+          gap="var(--puzzle-space-4, 1rem)"
+        />
       ) : items.length ? (
         <ul className="puzzle-accommodation-overview__items">
           {items.map((item) => (

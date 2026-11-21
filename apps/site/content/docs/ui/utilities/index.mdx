@@ -1,0 +1,33 @@
+---
+title: React UI Utilities
+description: Explore Puzzle UI utilities for component previews, rendering strategies, scroll locking, and transitions in React applications.
+---
+
+import { UIComponentCatalog } from "../../../../src/components/doc-examples/ui/component-catalog";
+
+UI utilities support component composition and rendering behavior rather than
+representing a particular content category. The available utilities document
+preview rendering, SSR and deferred strategies, scroll locking, and transitions.
+
+## When to use UI utilities
+
+Use a utility when its documented behavior matches a specific rendering or
+interaction need. Check the rendering guide before adding client-only
+boundaries, and use scroll locking only when an overlay or equivalent
+interaction requires it.
+
+## Components
+
+<UIComponentCatalog category="utilities" />
+
+## Start here
+
+- [Rendering Strategies](/docs/ui/utilities/rendering) for SSR, deferred, and
+  static rendering patterns.
+- [Scroll Lock](/docs/ui/utilities/scroll-lock) for controlling background
+  scrolling.
+- [Preview](/docs/ui/utilities/preview) for runnable documentation examples.
+
+See the [UI overview](/docs/ui) for package setup and the
+[Pieces integration guide](/docs/pieces/framework-integration) for composed
+sections.

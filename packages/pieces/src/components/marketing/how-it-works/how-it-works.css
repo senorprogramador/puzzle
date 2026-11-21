@@ -8,11 +8,6 @@
   counter-reset: steps;
 }
 
-.puzzle-how-it-works__keyboard:focus-visible {
-  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-primary);
-  outline-offset: var(--puzzle-space-1, 0.25rem);
-}
-
 .puzzle-how-it-works__step {
   position: relative;
   display: grid;

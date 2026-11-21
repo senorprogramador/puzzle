@@ -4,6 +4,7 @@ import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import { validateContentIds } from "../../content/shared";
 import type { BusinessDepartment, BusinessProfile } from "../shared.types";
 import type {
@@ -121,11 +122,24 @@ const TeamSection = <C extends ElementType = "section">({
         )}
       </div>
     ) : null;
-  } else if (variant === "horizontal" || variant === "carousel") {
+  } else if (variant === "horizontal") {
     content = renderMemberList(
       members,
       "puzzle-team-section__members",
       true,
+    );
+  } else if (variant === "carousel") {
+    content = (
+      <PiecesCarousel
+        itemKeys={members.map((member) => member.id)}
+        slides={members.map((member) => (
+          <ProfileCard key={member.id} {...member} />
+        ))}
+        ariaLabel="Team members"
+        itemLabel="team member"
+        panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+        gap="var(--puzzle-space-5, 1.25rem)"
+      />
     );
   }
 

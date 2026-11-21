@@ -216,24 +216,6 @@
   content: "";
 }
 
-.puzzle-integrations[data-variant="carousel"] .puzzle-integrations__list {
-  display: flex;
-  overflow-x: auto;
-  gap: var(--puzzle-space-4, 1rem);
-  padding-block: var(--puzzle-space-2, 0.5rem);
-  scroll-snap-type: inline mandatory;
-}
-
-.puzzle-integrations[data-variant="carousel"] .puzzle-integrations__list > li {
-  flex: 0 0 min(82vw, 20rem);
-  scroll-snap-align: start;
-}
-
-.puzzle-integrations[data-variant="carousel"] .puzzle-integrations__carousel:focus-visible {
-  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
-  outline-offset: var(--puzzle-space-2, 0.5rem);
-}
-
 .puzzle-integrations[data-variant="list"] .puzzle-integrations__list {
   grid-template-columns: 1fr;
   gap: 0;

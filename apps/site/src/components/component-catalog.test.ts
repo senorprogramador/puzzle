@@ -7,6 +7,18 @@ import {
 } from "./component-catalog";
 
 describe("component catalog", () => {
+  const categories = [
+    "actions",
+    "data-display",
+    "editors",
+    "forms",
+    "layout",
+    "navigation",
+    "overlays",
+    "typography",
+    "utilities",
+  ] as const;
+
   it("groups eight random components into nonempty carousel panels", () => {
     const original = [...components];
     const panels = randomComponentsOfLength(8);
@@ -42,12 +54,63 @@ describe("component catalog", () => {
 
   it("links to every component documentation page exactly once", () => {
     const docs = new URL("../../content/docs/ui/", import.meta.url);
-    const pages = readdirSync(docs, { recursive: true, encoding: "utf8" })
+    const componentPages = readdirSync(docs, { recursive: true, encoding: "utf8" })
       .filter((path) => path.endsWith(".mdx") && path !== "index.mdx")
+      .filter((path) => !path.endsWith("/index.mdx"))
       .map((path) => `/docs/ui/${path.replace(/\.mdx$/, "")}`)
       .sort();
 
-    expect(pages).toEqual(components.map((component) => component.href).sort());
+    expect(componentPages).toEqual(
+      components.map((component) => component.href).sort(),
+    );
+  });
+
+  it("provides a unique, linked category landing page for every UI group", () => {
+    const sidebar = readFileSync(
+      new URL("./layout/sidebar/ui.ts", import.meta.url),
+      "utf8",
+    );
+
+    for (const category of categories) {
+      const page = readFileSync(
+        new URL(`../../content/docs/ui/${category}/index.mdx`, import.meta.url),
+        "utf8",
+      );
+      const categoryComponents = components.filter((component) =>
+        component.href.startsWith(`/docs/ui/${category}/`),
+      );
+
+      expect(page, `${category} has a standalone introduction`).toMatch(
+        /When to use[\s\S]*<UIComponentCatalog/,
+      );
+      expect(page, `${category} documents its category`).toContain(
+        `category="${category}"`,
+      );
+      expect(categoryComponents.length, `${category} is not empty`).toBeGreaterThan(
+        0,
+      );
+      expect(sidebar, `${category} category is directly linked`).toContain(
+        `href: \`\${folder}/${category}\``,
+      );
+    }
+  });
+
+  it("uses a one, two, then three-column responsive catalog with linked cards", () => {
+    const styles = readFileSync(
+      new URL("./doc-examples/ui/component-catalog.css", import.meta.url),
+      "utf8",
+    );
+    const catalog = readFileSync(
+      new URL("./doc-examples/ui/component-catalog.tsx", import.meta.url),
+      "utf8",
+    );
+
+    expect(styles).toMatch(/grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+    expect(styles).toMatch(/min-width:\s*768px[\s\S]*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
+    expect(styles).toMatch(/min-width:\s*1024px[\s\S]*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
+    expect(catalog).toContain('as="a"');
+    expect(catalog).toContain("href={component.href}");
+    expect(catalog).toContain("component.description");
   });
 
   it("covers every exported component family", () => {

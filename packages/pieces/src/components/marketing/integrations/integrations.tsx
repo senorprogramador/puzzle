@@ -11,6 +11,7 @@ import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import type {
   IntegrationItem,
   IntegrationsSectionProps,
@@ -53,22 +54,23 @@ const IntegrationTile = ({
   );
   const className = "puzzle-integrations__tile";
 
-  return (
-    <li data-featured={item.featured || undefined}>
-      {item.href ? (
-        <a
-          className={className}
-          href={item.href}
-          data-layout={variant}
-        >
-          {content}
-        </a>
-      ) : (
-        <div className={className} data-layout={variant}>
-          {content}
-        </div>
-      )}
-    </li>
+  return item.href ? (
+    <a
+      className={className}
+      href={item.href}
+      data-layout={variant}
+      data-featured={item.featured || undefined}
+    >
+      {content}
+    </a>
+  ) : (
+    <div
+      className={className}
+      data-layout={variant}
+      data-featured={item.featured || undefined}
+    >
+      {content}
+    </div>
   );
 };
 
@@ -92,7 +94,9 @@ const IntegrationList = ({
 }) => (
   <ul className="puzzle-integrations__list">
     {items.map((item) => (
-      <IntegrationTile key={item.id} item={item} variant={variant} />
+      <li key={item.id}>
+        <IntegrationTile item={item} variant={variant} />
+      </li>
     ))}
   </ul>
 );
@@ -219,17 +223,19 @@ const IntegrationsSection = <C extends ElementType = "section">({
           <div className="puzzle-integrations__center">{centerLabel}</div>
           <IntegrationList items={filteredItems} variant={variant} />
         </div>
+      ) : filteredItems.length && variant === "carousel" ? (
+        <PiecesCarousel
+          itemKeys={filteredItems.map((item) => item.id)}
+          slides={filteredItems.map((item) => (
+            <IntegrationTile key={item.id} item={item} variant={variant} />
+          ))}
+          ariaLabel="Integrations"
+          itemLabel="integration"
+          panelsPerView={{ mobile: 2, tablet: 3, desktop: 4 }}
+          gap="var(--puzzle-space-4, 1rem)"
+        />
       ) : filteredItems.length ? (
-        <div
-          className={
-            variant === "carousel"
-              ? "puzzle-integrations__carousel"
-              : undefined
-          }
-          role={variant === "carousel" ? "region" : undefined}
-          aria-label={variant === "carousel" ? "Integrations" : undefined}
-          tabIndex={variant === "carousel" ? 0 : undefined}
-        >
+        <div>
           <IntegrationList items={filteredItems} variant={variant} />
         </div>
       ) : items.length ? (

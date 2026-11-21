@@ -7,8 +7,11 @@ import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import { after, before, test } from "node:test";
-
 import { chromium } from "playwright";
+import {
+  BROWSER_LAUNCH_ARGS,
+  settlePage,
+} from "./visual-support.mjs";
 
 const appRoot = fileURLToPath(new URL("..", import.meta.url));
 const viteCli = join(appRoot, "node_modules", "vite", "bin", "vite.js");
@@ -124,8 +127,18 @@ before(async () => {
   server.stderr.on("data", appendServerOutput);
 
   await waitForServer();
-  browser = await chromium.launch({ headless: true });
-  page = await browser.newPage({ reducedMotion: "reduce" });
+  browser = await chromium.launch({
+    headless: true,
+    args: BROWSER_LAUNCH_ARGS,
+  });
+  page = await browser.newPage({
+    colorScheme: "light",
+    deviceScaleFactor: 1,
+    locale: "en-US",
+    reducedMotion: "reduce",
+    timezoneId: "UTC",
+    viewport: { width: 1280, height: 800 },
+  });
   page.on("console", (message) => {
     if (message.type() === "error") {
       diagnostics.push(`console error: ${message.text()}`);
@@ -173,7 +186,7 @@ test("every page renders without runtime errors or horizontal overflow across th
         route.path,
         `Unexpected redirect while opening ${route.path}`,
       );
-      await page.evaluate(() => document.fonts.ready.then(() => undefined));
+      await settlePage(page);
       await page.getByRole("main").waitFor();
 
       const heading = page.getByRole("heading", { level: 1 });
@@ -211,6 +224,8 @@ test("every page renders without runtime errors or horizontal overflow across th
           ),
           fullPage: true,
           animations: "disabled",
+          caret: "hide",
+          scale: "css",
         });
       }
 

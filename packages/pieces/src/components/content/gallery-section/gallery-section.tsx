@@ -11,6 +11,7 @@ import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import type {
   GalleryItem,
   GallerySectionProps,
@@ -54,7 +55,7 @@ const GallerySection = <C extends ElementType = "section">({
     }
   };
 
-  const renderItem = (item: GalleryItem, index: number) => {
+  const renderFigure = (item: GalleryItem, index: number) => {
     const caption = item.caption ?? item.image.caption;
     const label = item.image.alt || `Gallery image ${index + 1}`;
     const image = (
@@ -65,41 +66,47 @@ const GallerySection = <C extends ElementType = "section">({
     );
 
     return (
-      <li
-        key={item.id}
+      <figure
         className="puzzle-gallery-section__item"
         data-featured={item.featured || undefined}
       >
-        <figure>
-          {lightboxEnabled ? (
-            <button
-              type="button"
-              className="puzzle-gallery-section__open"
-              aria-label={`Open ${label} in lightbox`}
-              onClick={() => setSelectedId(item.id)}
-            >
-              {image}
-            </button>
-          ) : item.href ? (
-            <a href={item.href} aria-label={label}>
-              {image}
-            </a>
-          ) : (
-            image
-          )}
-          {caption ? (
-            <figcaption className="puzzle-editorial-caption">
-              {item.href && lightboxEnabled ? (
-                <a href={item.href}>{caption}</a>
-              ) : (
-                caption
-              )}
-            </figcaption>
-          ) : null}
-        </figure>
-      </li>
+        {lightboxEnabled ? (
+          <button
+            type="button"
+            className="puzzle-gallery-section__open"
+            aria-label={`Open ${label} in lightbox`}
+            onClick={() => setSelectedId(item.id)}
+          >
+            {image}
+          </button>
+        ) : item.href ? (
+          <a href={item.href} aria-label={label}>
+            {image}
+          </a>
+        ) : (
+          image
+        )}
+        {caption ? (
+          <figcaption className="puzzle-editorial-caption">
+            {item.href && lightboxEnabled ? (
+              <a href={item.href}>{caption}</a>
+            ) : (
+              caption
+            )}
+          </figcaption>
+        ) : null}
+      </figure>
     );
   };
+  const renderItem = (item: GalleryItem, index: number) => (
+    <li
+      key={item.id}
+      className="puzzle-gallery-section__item"
+      data-featured={item.featured || undefined}
+    >
+      {renderFigure(item, index)}
+    </li>
+  );
 
   return (
     <MarketingSection<C>
@@ -109,11 +116,22 @@ const GallerySection = <C extends ElementType = "section">({
       variant={variant satisfies GallerySectionVariant}
       title={title}
     >
-      {items.length ? (
+      {items.length && variant === "carousel" ? (
+        <PiecesCarousel
+          itemKeys={items.map((item) => item.id)}
+          slides={items.map((item, index) => (
+            <div key={item.id}>{renderFigure(item, index)}</div>
+          ))}
+          ariaLabel="Gallery images"
+          itemLabel="image"
+          panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+          gap="var(--puzzle-space-4, 1rem)"
+        />
+      ) : items.length ? (
         <ul
           className="puzzle-gallery-section__items"
           aria-label="Gallery images"
-          tabIndex={variant === "carousel" || variant === "horizontal" ? 0 : undefined}
+          tabIndex={variant === "horizontal" ? 0 : undefined}
         >
           {items.map(renderItem)}
         </ul>

@@ -41,20 +41,6 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
 }
 
-.puzzle-partners-section[data-variant="carousel"] .puzzle-business-logo-collection {
-  grid-auto-columns: minmax(min(80vw, 14rem), 1fr);
-  grid-auto-flow: column;
-  grid-template-columns: none;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  padding-block-end: var(--puzzle-space-2, 0.5rem);
-  scroll-snap-type: inline mandatory;
-}
-
-.puzzle-partners-section[data-variant="carousel"] .puzzle-business-logo-collection > li {
-  scroll-snap-align: start;
-}
-
 .puzzle-partners-section[data-variant="split"] .puzzle-business-logo-collection {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
 }

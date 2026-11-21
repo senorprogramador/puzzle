@@ -1,59 +1,38 @@
-import { pieces } from "../../layout/sidebar/pieces";
+import { Card, CardDescription, CardHeader, CardTitle } from "@puzzle-ui/ui";
+import { source } from "../../../lib/source";
+import { getPiecesCatalogEntries } from "./catalog-data";
 
-type NavigationItem = {
-  label: unknown;
-  href?: string;
-  children?: readonly NavigationItem[];
+import "../ui/component-catalog.css";
+
+export const PiecesComponentCatalog = () => {
+  const components = getPiecesCatalogEntries().map((component) => {
+    const slug = component.href.slice("/docs/".length).split("/");
+    const description = source.getPage(slug)?.data.description;
+
+    if (!description) {
+      throw new Error(`Missing Pieces documentation description for ${component.href}.`);
+    }
+
+    return { ...component, description };
+  });
+
+  return (
+    <ul className="puzzle-component-catalog">
+      {components.map((component) => (
+        <li key={component.href} className="puzzle-component-catalog__item">
+          <Card
+            as="a"
+            href={component.href}
+            interactive
+            className="puzzle-component-catalog__card"
+          >
+            <CardHeader>
+              <CardTitle>{component.label}</CardTitle>
+              <CardDescription>{component.description}</CardDescription>
+            </CardHeader>
+          </Card>
+        </li>
+      ))}
+    </ul>
+  );
 };
-
-const categoryOverviews = new Set([
-  "marketing",
-  "saas-product",
-  "commerce",
-  "content",
-  "business",
-  "application-dashboard",
-  "specialized-interactive",
-]);
-const nonSectionPages = new Set([
-  "accommodation-discovery",
-  "boutique-bnb",
-  "data-display",
-  "feedback",
-  "hero",
-  "hospitality-overview",
-  "hospitality-booking-flow",
-  "navigation",
-  "project",
-  "restaurant-experience",
-]);
-
-const flattenNavigation = (item: NavigationItem): NavigationItem[] => [
-  item,
-  ...(item.children ?? []).flatMap(flattenNavigation),
-];
-
-const isComponentEntry = (
-  item: NavigationItem,
-): item is NavigationItem & { href: string; label: string } => {
-  if (typeof item.label !== "string") return false;
-  if (!item.href?.startsWith("/docs/pieces/components/")) return false;
-  const slug = item.href.slice("/docs/pieces/components/".length);
-  return !categoryOverviews.has(slug) && !nonSectionPages.has(slug);
-};
-
-export const getPiecesCatalogEntries = () =>
-  flattenNavigation(pieces)
-    .filter(isComponentEntry)
-    .sort((left, right) => left.label.localeCompare(right.label))
-    .map(({ label, href }) => ({ label, href }));
-
-export const PiecesComponentCatalog = () => (
-  <ul>
-    {getPiecesCatalogEntries().map((component) => (
-      <li key={component.href}>
-        <a href={component.href}>{component.label}</a>
-      </li>
-    ))}
-  </ul>
-);

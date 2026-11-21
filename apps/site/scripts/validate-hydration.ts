@@ -492,74 +492,93 @@ try {
     await studioPage.locator('a[href="/docs/getting-started"]').isVisible(),
     "Theme Studio renders the shared site app bar",
   );
-  const sidebar = studioPage.locator(".theme-studio__sidebar");
-  const sidebarScrollarea = studioPage.locator(
-    ".theme-studio__sidebar-scrollarea",
+  const outputDock = studioPage.locator(".theme-studio-output-dock");
+  const settings = studioPage.locator(".theme-studio-settings");
+  const templateList = studioPage.locator(".theme-studio-templates__list");
+  assert.equal(
+    await outputDock.locator(".theme-studio-output-panel").count(),
+    2,
+    "both generated configuration panels are always visible",
   );
   assert.equal(
-    await sidebar.locator(".theme-studio__template-list").count(),
+    await studioPage.getByRole("heading", { name: "Theme implementation" }).count(),
     1,
-    "template selection is inside the sidebar",
+    "Theme implementation output is visible above the workspace",
   );
   assert.equal(
-    await sidebar.locator(".theme-studio__preset-list").count(),
+    await studioPage.getByRole("heading", { name: "puzzle-fonts.json" }).count(),
     1,
-    "color presets are inside the sidebar",
+    "font JSON output is visible above the workspace",
   );
-  const desktopSidebarBox = await sidebar.boundingBox();
-  const desktopPreviewBox = await studioPage
-    .locator(".theme-studio__preview-panel")
-    .boundingBox();
+  assert.equal(
+    await settings.locator(".theme-studio-templates__list").count(),
+    0,
+    "template selection is outside the settings panel",
+  );
+  const desktopSettingsBox = await settings.boundingBox();
+  const desktopPreviewBox = await studioPage.locator(".theme-studio__preview").boundingBox();
+  const desktopTemplateBox = await templateList.boundingBox();
   assert.ok(
-    desktopSidebarBox &&
+    desktopSettingsBox &&
       desktopPreviewBox &&
-      desktopSidebarBox.x > desktopPreviewBox.x,
-    "desktop sidebar is positioned beside the website preview",
+      desktopSettingsBox.x > desktopPreviewBox.x,
+    "desktop settings are positioned beside the dominant website preview",
   );
-  const desktopSidebarScroll = await sidebarScrollarea.evaluate((element) => ({
-    maxHeight: getComputedStyle(element).maxHeight,
-    overflowY: getComputedStyle(element).overflowY,
-    scrollHeight: element.scrollHeight,
-    clientHeight: element.clientHeight,
-  }));
-  assert.equal(desktopSidebarScroll.overflowY, "auto");
   assert.ok(
-    desktopSidebarScroll.scrollHeight > desktopSidebarScroll.clientHeight,
-    "desktop sidebar controls scroll independently",
+    desktopTemplateBox &&
+      desktopTemplateBox.y < desktopPreviewBox!.y,
+    "template selection appears between the output dock and workspace",
   );
   assert.equal(
-    await studioPage.locator(".theme-studio__preset-card").count(),
+    await outputDock.evaluate((element) => getComputedStyle(element).position),
+    "sticky",
+    "generated output remains sticky during document scrolling",
+  );
+  assert.equal(
+    await settings.evaluate((element) => getComputedStyle(element).maxHeight),
+    "none",
+    "settings use normal document scrolling rather than a fixed-height sidebar",
+  );
+  assert.equal(
+    await studioPage.locator(".theme-studio-settings__preset-card").count(),
     Object.keys(COLOR_THEMES).length + 1,
     "Theme Studio displays every registry entry and the package default",
   );
+  await studioPage.getByRole("tab", { name: "CSS variables" }).click();
   assert.equal(
-    await studioPage.locator(".theme-studio__token-group").count(),
+    await studioPage.locator(".theme-studio-token-editor__group-title").count(),
     getThemeTokenGroups().length,
     "Theme Studio displays each registry token group",
   );
   for (const group of getThemeTokenGroups()) {
-    const tokenGroup = studioPage.locator(
-      `.theme-studio__token-group[data-token-group="${group}"]`,
+    const heading = studioPage.locator(
+      `.theme-studio-token-editor__group-title[data-token-group="${group}"]`,
     );
-    await tokenGroup.locator("summary").click();
+    const trigger = heading.locator("xpath=..");
+    if ((await trigger.getAttribute("aria-expanded")) !== "true") {
+      await heading.click();
+    }
+    const tokenGroup = studioPage.locator(
+      `.theme-studio-token-editor__group-content[data-token-group-content="${group}"]`,
+    );
+    await tokenGroup.waitFor({ state: "visible" });
     assert.equal(
-      await tokenGroup.locator(".theme-studio__token-field").count(),
+      await tokenGroup.locator(".theme-studio-token-field").count(),
       THEME_TOKEN_REGISTRY.filter((entry) => entry.group === group).length,
       `${group}: Theme Studio displays every registered token`,
     );
-    await tokenGroup.locator("summary").click();
   }
-  assert.deepEqual(
-    fontPreviewRequests,
-    [],
-    "Google Font preview stylesheets are not requested before opening a picker",
+  assert.ok(
+    fontPreviewRequests.some((url) => url.includes("Geist")),
+    "configured project fonts load for the live preview",
   );
+  await studioPage.getByRole("tab", { name: "Theme" }).click();
   const rootThemeStyle = await studioPage
     .locator('style[data-puzzle-theme="true"]')
     .textContent();
   await studioPage.getByRole("button", { name: "Restaurant", exact: true }).click();
   await studioPage.getByRole("button", { name: "About", exact: true }).click();
-  await studioPage.locator(".theme-studio__preset-card").nth(1).click();
+  await studioPage.locator(".theme-studio-settings__preset-card").nth(1).click();
 
   const firstThemeId = Object.keys(COLOR_THEMES)[0];
   if (firstThemeId === undefined) {
@@ -570,7 +589,7 @@ try {
   assert.equal(await preview.getAttribute("data-template"), "restaurant");
   assert.equal(await preview.getAttribute("data-preview-page"), "about");
   assert.equal(
-    await studioPage.locator(".theme-studio__preset-card").nth(1).getAttribute("aria-pressed"),
+    await studioPage.locator(".theme-studio-settings__preset-card").nth(1).getAttribute("aria-pressed"),
     "true",
   );
 
@@ -611,24 +630,36 @@ try {
     "custom token overrides update the live preview",
   );
   assert.match(
-    await studioPage.locator(".theme-studio__code-panel pre").innerText(),
+    await studioPage.locator(".theme-studio-output-panel__code").first().innerText(),
     /"primary": "#123456"/,
     "custom token overrides appear in generated code",
   );
 
-  const spacingGroup = studioPage.locator(
-    '.theme-studio__token-group[data-token-group="spacing"]',
+  await studioPage.getByRole("tab", { name: "CSS variables" }).click();
+  const spacingHeading = studioPage.locator(
+    '.theme-studio-token-editor__group-title[data-token-group="spacing"]',
   );
+  const spacingTrigger = spacingHeading.locator("xpath=..");
+  if ((await spacingTrigger.getAttribute("aria-expanded")) !== "true") {
+    await spacingHeading.click();
+  }
+  const spacingGroup = studioPage.locator(
+    '.theme-studio-token-editor__group-content[data-token-group-content="spacing"]',
+  );
+  const spacingInput = spacingGroup.locator('input[aria-label="4"]');
+  const spacingControls = spacingInput.locator("xpath=../..");
+  const updateSpacingToken = async () => {
+    await spacingInput.fill("1.5");
+    await spacingControls.getByRole("combobox", { name: "Unit" }).click();
+    await studioPage.getByRole("option", { name: "rem", exact: true }).click();
+  };
   const spacingToken = THEME_TOKEN_REGISTRY.find(
     (entry) => entry.group === "spacing" && entry.name === "4",
   );
   if (!spacingToken) {
     throw new Error("The Theme package has no spacing token 4.");
   }
-  await spacingGroup.locator("summary").click();
-  await studioPage
-    .getByRole("textbox", { name: "4 (--puzzle-space-4)" })
-    .fill("1.5rem");
+  await updateSpacingToken();
   await studioPage.waitForFunction(
     () =>
       document
@@ -637,7 +668,7 @@ try {
     undefined,
   );
   assert.match(
-    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
+    await studioPage.locator(".theme-studio-output-panel__code").first().innerText(),
     /"4": "1.5rem"/,
     "design-token overrides appear in generated Theme code",
   );
@@ -657,13 +688,11 @@ try {
     },
   );
   assert.doesNotMatch(
-    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
+    await studioPage.locator(".theme-studio-output-panel__code").first().innerText(),
     /"spacing":/,
     "resetting one token removes only its override",
   );
-  await studioPage
-    .getByRole("textbox", { name: "4 (--puzzle-space-4)" })
-    .fill("1.5rem");
+  await updateSpacingToken();
   await studioPage.waitForFunction(
     () =>
       document
@@ -677,11 +706,10 @@ try {
     "Theme Studio leaves the parent site theme unchanged",
   );
 
-  await studioPage
-    .getByRole("button", { name: "Restore preset colors" })
-    .click();
+  await studioPage.getByRole("tab", { name: "Theme" }).click();
+  await studioPage.getByRole("button", { name: "Restore colors" }).click();
   assert.match(
-    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
+    await studioPage.locator(".theme-studio-output-panel__code").first().innerText(),
     /"spacing":/,
     "restoring preset colors preserves design-token overrides",
   );
@@ -689,11 +717,13 @@ try {
     .getByRole("button", { name: "Reset group" })
     .click();
   assert.doesNotMatch(
-    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
+    await studioPage.locator(".theme-studio-output-panel__code").first().innerText(),
     /tokens=/,
     "resetting a token group removes its generated override",
   );
 
+  await studioPage.getByRole("tab", { name: "Typography" }).click();
+  const fontPreviewRequestCount = fontPreviewRequests.length;
   const bodyFontPicker = studioPage.getByRole("combobox", {
     name: "Body font",
   });
@@ -702,22 +732,24 @@ try {
   await studioPage.waitForFunction(
     () =>
       document
-        .querySelector(".theme-studio__code-panel pre")
+        .querySelector(".theme-studio-output-panel__code")
         ?.textContent?.includes('"family": "Inter"'),
     undefined,
     { timeout: 5000 },
   );
   assert.ok(
-    fontPreviewRequests.length > 0,
+    fontPreviewRequests
+      .slice(fontPreviewRequestCount)
+      .some((url) => url.includes("Inter")),
     "opening a font picker lazily requests a visible font preview",
   );
   assert.match(
-    await studioPage.locator(".theme-studio__code-panel pre").first().innerText(),
+    await studioPage.locator(".theme-studio-output-panel__code").first().innerText(),
     /"body": \{\s+"family": "Inter"/,
     "selected Google Fonts appear in generated Theme code",
   );
   assert.match(
-    await studioPage.locator(".theme-studio__code-panel pre").nth(1).innerText(),
+    await studioPage.locator(".theme-studio-output-panel__code").nth(1).innerText(),
     /"body": \{\s+"family": "Inter"/,
     "selected Google Fonts appear in puzzle-fonts.json",
   );
@@ -733,7 +765,7 @@ try {
     );
     assert.equal(
       await studioPage
-        .locator(".theme-studio__preset-card")
+        .locator(".theme-studio-settings__preset-card")
         .nth(selectedThemeIndex + 1)
         .getAttribute("aria-pressed"),
       "true",
@@ -742,7 +774,7 @@ try {
 
     for (const [index, identifier] of Object.keys(COLOR_THEMES).entries()) {
       await studioPage
-        .locator(".theme-studio__preset-card")
+        .locator(".theme-studio-settings__preset-card")
         .nth(index + 1)
         .click();
       selectedThemeIndex = index;
@@ -796,71 +828,70 @@ try {
     );
   }
 
-  await studioPage.setViewportSize({ width: 768, height: 1024 });
-  const tabletTemplateBox = await studioPage
-    .locator(".theme-studio__template-list")
-    .boundingBox();
-  const tabletPreviewBox = await studioPage
-    .locator(".theme-studio__preview-panel")
-    .boundingBox();
-  assert.ok(
-    tabletTemplateBox &&
-      tabletPreviewBox &&
-      tabletTemplateBox.y < tabletPreviewBox.y,
-    "tablet sidebar controls appear before the preview",
-  );
-  assert.equal(
-    await sidebarScrollarea.evaluate(
-      (element) => getComputedStyle(element).overflowY,
-    ),
-    "visible",
-    "tablet sidebar controls do not get trapped in a constrained scroll area",
-  );
+  for (const width of [320, 430, 768, 1280, 1920]) {
+    await studioPage.setViewportSize({ width, height: 1000 });
+    const responsiveTemplateBox = await templateList.boundingBox();
+    const responsivePreviewBox = await preview.boundingBox();
+    const responsiveSettingsBox = await settings.boundingBox();
 
-  await studioPage.setViewportSize({ width: 390, height: 844 });
-  const mobileTemplateBox = await studioPage
-    .locator(".theme-studio__template-list")
-    .boundingBox();
-  const mobilePreviewBox = await studioPage
-    .locator(".theme-studio__preview-panel")
-    .boundingBox();
-  assert.ok(
-    mobileTemplateBox &&
-      mobilePreviewBox &&
-      mobileTemplateBox.y < mobilePreviewBox.y,
-    "mobile sidebar controls appear before the preview",
-  );
-  const presetCardBox = await studioPage
-    .locator(".theme-studio__preset-card")
-    .nth(1)
-    .boundingBox();
-  assert.ok(
-    presetCardBox && presetCardBox.width >= 160 && presetCardBox.height >= 140,
-    "mobile preset cards remain large enough to select",
-  );
-  const presetListSize = await studioPage
-    .locator(".theme-studio__preset-list")
-    .evaluate((element) => ({
-      scrollWidth: element.scrollWidth,
-      clientWidth: element.clientWidth,
-    }));
-  assert.ok(
-    presetListSize.scrollWidth > presetListSize.clientWidth,
-    "mobile presets are available in a horizontally scrollable collection",
-  );
-  const templateListSize = await studioPage
-    .locator(".theme-studio__template-list")
-    .evaluate((element) => ({
-      scrollWidth: element.scrollWidth,
-      clientWidth: element.clientWidth,
-    }));
-  assert.ok(
-    templateListSize.scrollWidth > templateListSize.clientWidth,
-    "mobile website templates remain horizontally scrollable",
-  );
-  await studioPage.getByRole("button", { name: "Reset to package default" }).click();
+    assert.ok(
+      responsiveTemplateBox &&
+        responsivePreviewBox &&
+        responsiveTemplateBox.y < responsivePreviewBox.y,
+      `${width}px: template selection remains before the workspace`,
+    );
+    assert.ok(
+      responsivePreviewBox &&
+        responsiveSettingsBox &&
+        (width <= 960
+          ? responsiveSettingsBox.y > responsivePreviewBox.y
+          : responsiveSettingsBox.x > responsivePreviewBox.x),
+      `${width}px: preview and settings use the intended responsive order`,
+    );
+    assert.ok(
+      await studioPage.evaluate(
+        () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+      ),
+      `${width}px: the page has no horizontal overflow`,
+    );
+    assert.equal(
+      await outputDock.locator(".theme-studio-output-panel").count(),
+      2,
+      `${width}px: both output panels remain available`,
+    );
+
+    if (width <= 430) {
+      const templateListSize = await templateList.evaluate((element) => ({
+        scrollWidth: element.scrollWidth,
+        clientWidth: element.clientWidth,
+      }));
+      assert.ok(
+        templateListSize.scrollWidth > templateListSize.clientWidth,
+        `${width}px: template options remain horizontally scrollable`,
+      );
+    }
+
+    for (const template of WEBSITE_TEMPLATES) {
+      await studioPage
+        .getByRole("button", { name: template.label, exact: true })
+        .click();
+      assert.equal(
+        await preview.getAttribute("data-template"),
+        template.id,
+        `${width}px: ${template.label} remains selectable`,
+      );
+      assert.ok(
+        await studioPage.evaluate(
+          () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+        ),
+        `${width}px ${template.label}: no horizontal overflow`,
+      );
+    }
+  }
+
+  await studioPage.getByRole("button", { name: "Reset theme" }).click();
   assert.doesNotMatch(
-    await studioPage.locator(".theme-studio__code-panel pre").innerText(),
+    await studioPage.locator(".theme-studio-output-panel__code").first().innerText(),
     /colorTheme=/,
     "resetting to the package default removes built-in preset selection",
   );

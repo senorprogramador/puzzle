@@ -331,7 +331,7 @@ const NumberInput = ({
         onPointerCancel={stopHold}
         onKeyDown={handleStepperKeyDown(-1)}
       >
-        <Icon name="lucide:minus" />
+        <Icon name="lucide:minus" size={14} />
       </button>
 
       <input
@@ -369,7 +369,7 @@ const NumberInput = ({
         onPointerCancel={stopHold}
         onKeyDown={handleStepperKeyDown(1)}
       >
-        <Icon name="lucide:plus" />
+        <Icon name="lucide:plus" size={14} />
       </button>
     </div>
   );

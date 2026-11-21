@@ -4,6 +4,7 @@ import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import { validateContentIds } from "../../content/shared";
 import { BusinessFigure } from "../shared";
 import type { BusinessService } from "../shared.types";
@@ -23,7 +24,6 @@ const renderServices = (
     <ul
       className="puzzle-business-section__list puzzle-services-section__items"
       aria-label="Services"
-      tabIndex={variant === "carousel" ? 0 : undefined}
     >
       {items.map((service, index) => (
         <li key={service.id}>
@@ -88,9 +88,28 @@ const ServicesSection = <C extends ElementType = "section">({
     : items;
 
   const content =
-    variant === "categorized"
-      ? renderCategories(services)
-      : renderServices(services, variant);
+    variant === "categorized" ? (
+      renderCategories(services)
+    ) : variant === "carousel" ? (
+      <PiecesCarousel
+        itemKeys={services.map((service) => service.id)}
+        slides={services.map((service, index) => (
+          <ServiceCard
+            key={service.id}
+            {...service}
+            image={
+              service.image ? <BusinessFigure image={service.image} /> : undefined
+            }
+          />
+        ))}
+        ariaLabel="Services"
+        itemLabel="service"
+        panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+        gap="var(--puzzle-space-5, 1.25rem)"
+      />
+    ) : (
+      renderServices(services, variant)
+    );
   const nativeProps = sectionProps as MarketingSectionBaseProps<C>;
 
   return (

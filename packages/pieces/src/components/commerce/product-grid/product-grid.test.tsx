@@ -1,5 +1,4 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it } from "vitest";
 import { ProductGridSection } from "./product-grid";
 import type {
@@ -138,16 +137,18 @@ describe("ProductGridSection", () => {
     ).toBeVisible();
   });
 
-  it("supports keyboard carousel controls and collection grouping", async () => {
-    const user = userEvent.setup();
-    render(<ProductGridSection variant="carousel" items={items} />);
+  it("uses responsive UI carousel controls and pagination", () => {
+    const { container } = render(
+      <ProductGridSection variant="carousel" items={items} />,
+    );
+    const carousel = container.querySelector(".puzzle-carousel");
+    expect(carousel).toHaveAttribute("data-button-mobile", "aside");
+    expect(carousel).toHaveAttribute("data-pager-mobile", "under");
+    expect(screen.getByRole("button", { name: "Previous product" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Next product" })).toBeVisible();
+  });
 
-    const next = screen.getByRole("button", { name: "Next product" });
-    next.focus();
-    await user.keyboard("{Enter}");
-    expect(screen.getByRole("heading", { name: "Day Pack" })).toBeVisible();
-    expect(screen.getByRole("button", { name: "Next product" })).toBeDisabled();
-
+  it("groups products by collection", () => {
     const { container, rerender } = render(
       <ProductGridSection variant="collection" items={items} />,
     );

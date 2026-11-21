@@ -100,27 +100,6 @@
   background: var(--puzzle-color-surface-sunken);
 }
 
-.puzzle-use-cases__carousel {
-  overflow-x: auto;
-  padding-block: var(--puzzle-space-2, 0.5rem);
-  scroll-snap-type: inline mandatory;
-}
-
-.puzzle-use-cases__carousel:focus-visible {
-  outline: var(--puzzle-border-width, 1px) solid var(--puzzle-color-primary);
-  outline-offset: var(--puzzle-space-2, 0.5rem);
-}
-
-.puzzle-use-cases__carousel .puzzle-use-cases__list {
-  display: flex;
-  gap: var(--puzzle-space-4, 1rem);
-}
-
-.puzzle-use-cases__carousel .puzzle-use-cases__list > li {
-  flex: 0 0 min(82vw, 22rem);
-  scroll-snap-align: start;
-}
-
 .puzzle-use-cases__empty {
   padding: var(--puzzle-space-5, 1.25rem);
   border: var(--puzzle-border-width, 1px) dashed var(--puzzle-color-border);

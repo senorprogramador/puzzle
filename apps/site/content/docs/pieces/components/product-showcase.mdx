@@ -84,7 +84,11 @@ const items: ProductShowcaseItem[] = [
 />;
 ```
 
-`browser`, `desktop`, and `mobile` apply a default frame to each item. An item's `frame` can override that default. The `carousel` variant has explicit previous/next buttons and does not auto-advance. The `interactive` variant renders annotations as native `<details>` disclosures.
+`browser`, `desktop`, and `mobile` apply a default frame to each item. An item's
+`frame` can override that default. The `carousel` variant uses the UI Carousel,
+showing one item on mobile and tablet and two on desktop, with caret controls
+beside the content and a page indicator below. It does not auto-advance. The
+`interactive` variant renders annotations as native `<details>` disclosures.
 
 ## Accessibility
 

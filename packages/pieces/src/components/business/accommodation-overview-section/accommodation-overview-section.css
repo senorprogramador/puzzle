@@ -117,9 +117,7 @@
   background: transparent;
 }
 
-.puzzle-accommodation-overview[data-variant="carousel"]
-  .puzzle-accommodation-overview__items {
-  grid-template-columns: minmax(0, 1fr);
+.puzzle-accommodation-overview__carousel {
   max-width: 32rem;
   margin-inline: auto;
 }

@@ -48,8 +48,7 @@ import { useMDXComponents } from "@/components/mdx";
 
 import { RootProvider } from "fumadocs-ui/provider/tanstack";
 
-import { PageLayout } from "@puzzle-ui/ui/components/layout/page-layout";
-import { PreviewProvider } from "@puzzle-ui/ui/components/utilities/preview";
+import { PageLayout, PreviewProvider } from "@puzzle-ui/ui";
 
 import { Sidebar } from "@/components/layout/sidebar";
 

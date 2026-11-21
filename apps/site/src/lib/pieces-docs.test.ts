@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { getPiecesCatalogEntries } from "../components/doc-examples/pieces/component-catalog";
+import { getPiecesCatalogEntries } from "../components/doc-examples/pieces/catalog-data";
 
 const docsDirectory = fileURLToPath(
   new URL("../../content/docs/pieces/components/", import.meta.url),
@@ -316,6 +316,14 @@ describe("Pieces documentation coverage", () => {
   it("lists every documented section family on the Pieces overview", () => {
     const entries = getPiecesCatalogEntries();
     const overview = readFileSync(join(piecesContentDirectory, "index.mdx"), "utf8");
+    const catalog = readFileSync(
+      new URL("../components/doc-examples/pieces/component-catalog.tsx", import.meta.url),
+      "utf8",
+    );
+    const catalogStyles = readFileSync(
+      new URL("../components/doc-examples/ui/component-catalog.css", import.meta.url),
+      "utf8",
+    );
 
     expect(entries).toHaveLength(componentDocs.length);
     expect(new Set(entries.map((entry) => entry.href)).size).toBe(
@@ -327,6 +335,12 @@ describe("Pieces documentation coverage", () => {
         .sort(),
     );
     expect(overview).toContain("<PiecesComponentCatalog />");
+    expect(catalog).toContain("source.getPage(slug)?.data.description");
+    expect(catalog).toContain("component.description");
+    expect(catalog).toContain('as="a"');
+    expect(catalogStyles).toMatch(/grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+    expect(catalogStyles).toMatch(/min-width:\s*768px[\s\S]*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
+    expect(catalogStyles).toMatch(/min-width:\s*1024px[\s\S]*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
   });
 
   it("resolves internal Pieces documentation links", () => {

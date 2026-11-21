@@ -1,5 +1,11 @@
 export const ecosystem = [
   {
+    name: "Core utilities",
+    href: "/docs/core",
+    description:
+      "Framework-independent TypeScript helpers for responsive values, formatting, rendering, and resources.",
+  },
+  {
     name: "UI components",
     href: "/docs/ui",
     description: "Composable React components with typed props and examples.",
@@ -36,6 +42,12 @@ export const ecosystem = [
       "Framework-independent account, session, MFA, and lifecycle primitives.",
   },
   {
+    name: "Session management",
+    href: "/docs/session",
+    description:
+      "Create, validate, rotate, and revoke secure server-side sessions.",
+  },
+  {
     name: "Fullstack",
     href: "/docs/fullstack",
     description:
@@ -51,6 +63,12 @@ export const ecosystem = [
     name: "Project scaffolding",
     href: "/docs/create",
     description: "Generate a React application configured for Puzzle.",
+  },
+  {
+    name: "Multilingual (pre-release)",
+    href: "/docs/multilingual",
+    description:
+      "Type-safe translations and locale-aware paths; this package is in development and not yet published.",
   },
   {
     name: "Developer tools",

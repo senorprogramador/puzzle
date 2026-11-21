@@ -11,6 +11,7 @@ import {
   MarketingSection,
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import type {
   BlogArticle,
   BlogSectionProps,
@@ -169,12 +170,21 @@ const BlogSection = <C extends ElementType = "section">({
   }
 
   const articles = getArticles(items, featuredArticle);
-  let content = articles.length ? (
-    <BlogList
-      items={articles}
-      scrollable={variant === "carousel" || variant === "horizontal"}
-    />
-  ) : null;
+  let content =
+    variant === "carousel" && articles.length ? (
+      <PiecesCarousel
+        itemKeys={articles.map((article) => article.id)}
+        slides={articles.map((article) => (
+          <BlogArticleCard key={article.id} article={article} />
+        ))}
+        ariaLabel="Blog articles"
+        itemLabel="article"
+        panelsPerView={{ mobile: 1, tablet: 2, desktop: 3 }}
+        gap="var(--puzzle-space-5, 1.25rem)"
+      />
+    ) : articles.length ? (
+      <BlogList items={articles} scrollable={variant === "horizontal"} />
+    ) : null;
 
   if (
     variant === "featured" ||

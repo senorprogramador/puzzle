@@ -3,9 +3,6 @@
 import { useId, useState, type ElementType } from "react";
 import { useReducedMotion } from "@puzzle-ui/hooks";
 import {
-  Button,
-  Carousel,
-  CarouselController,
   Dialog,
   Heading,
   Text,
@@ -16,6 +13,7 @@ import {
   type MarketingSectionBaseProps,
 } from "../../marketing/shared";
 import { validateContentIds } from "../shared";
+import { PiecesCarousel } from "../../shared/pieces-carousel";
 import { EmptyStatePanel } from "../../data-display/empty-state-panel";
 import type {
   VideoItem,
@@ -208,34 +206,26 @@ const VideoSection = <C extends ElementType = "section">({
     );
   } else if (variant === "carousel") {
     content = (
-      <CarouselController<VideoItem> items={[...videos]}>
-        <Carousel<VideoItem>
-          ariaLabel="Video collection"
-          getItemKey={(video) => video.id}
-          renderItem={(video) => (
-            <VideoCard
-              video={video}
-              controls={controls}
-              autoplay={false}
-              muted={muted}
-              loop={loop}
-              preload={preload}
-              aspectRatio={aspectRatio}
-              prefersReducedMotion={prefersReducedMotion}
-            />
-          )}
-          backButton={
-            <Button variant="outline" aria-label="Previous video">
-              Previous
-            </Button>
-          }
-          nextButton={
-            <Button variant="outline" aria-label="Next video">
-              Next
-            </Button>
-          }
-        />
-      </CarouselController>
+      <PiecesCarousel
+        itemKeys={videos.map((video) => video.id)}
+        slides={videos.map((video) => (
+          <VideoCard
+            key={video.id}
+            video={video}
+            controls={controls}
+            autoplay={false}
+            muted={muted}
+            loop={loop}
+            preload={preload}
+            aspectRatio={aspectRatio}
+            prefersReducedMotion={prefersReducedMotion}
+          />
+        ))}
+        ariaLabel="Video collection"
+        itemLabel="video"
+        panelsPerView={{ mobile: 1, tablet: 1, desktop: 2 }}
+        gap="var(--puzzle-space-6, 1.5rem)"
+      />
     );
   } else if (variant === "grid") {
     content = (
