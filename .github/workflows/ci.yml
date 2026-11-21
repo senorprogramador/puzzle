@@ -272,5 +272,10 @@ jobs:
 
             echo "Puzzle deployment complete!"
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+
       - name: Run deployed site SEO smoke checks
         run: bun run --filter '@puzzle-ui/site' test:seo:smoke
