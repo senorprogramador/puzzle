@@ -3,7 +3,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { items } from "../components/layout/constants";
+import { items } from "../components/layout/sidebar/index";
 
 type PackageManifest = {
   name: string;
@@ -12,8 +12,10 @@ type PackageManifest = {
 };
 
 const exportedPackages = [
+  ["cms", "cms"],
   ["core", "core"],
   ["session", "session"],
+  ["media", "media"],
   ["seo", "seo"],
   ["fullstack", "fullstack"],
   ["theme", "theme"],
@@ -32,6 +34,8 @@ const packagePages = [
   ["storage", "/docs/storage"],
   ["storage-d1", "/docs/storage#cloudflare-d1-adapter"],
   ["storage-mongodb", "/docs/storage#mongodb-adapter"],
+  ["cms", "/docs/cms"],
+  ["media", "/docs/media"],
   ["fullstack", "/docs/fullstack"],
   ["seo", "/docs/seo"],
   ["i18n", "/docs/multilingual"],

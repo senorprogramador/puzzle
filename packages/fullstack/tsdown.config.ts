@@ -2,6 +2,16 @@ import { defineConfig } from "tsdown";
 
 export default defineConfig({
   entry: [
+    "src/cms/shared/index.ts",
+    "src/cms/server/index.ts",
+    "src/cms/client/index.ts",
+    "src/cms/next/index.ts",
+    "src/cms/tanstack/index.ts",
+    "src/media/shared/index.ts",
+    "src/media/server/index.ts",
+    "src/media/client/index.ts",
+    "src/media/next/index.ts",
+    "src/media/tanstack/index.ts",
     "src/auth/client/index.ts",
     "src/auth/server/index.ts",
     "src/auth/shared/index.ts",
@@ -23,6 +33,8 @@ export default defineConfig({
     neverBundle: [
       "@puzzle-ui/ui",
       "@puzzle-ui/auth",
+      "@puzzle-ui/cms",
+      "@puzzle-ui/media",
       "@puzzle-ui/session",
       "@simplewebauthn/browser",
       "react",

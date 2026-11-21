@@ -24,6 +24,12 @@
             "@testing-library/jest-dom"
         ],
         "paths": {
+            "@puzzle-ui/cms": [
+                "../cms/src/index.ts"
+            ],
+            "@puzzle-ui/cms/*": [
+                "../cms/src/*"
+            ],
             "@puzzle-ui/core": [
                 "../core/src/index.ts"
             ],

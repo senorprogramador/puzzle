@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { ThemeComponentsProvider } from "@puzzle-ui/theme/components-context";
 import { ImageBox, type ImageBoxImage } from "./index";
 
 afterEach(cleanup);
@@ -61,6 +62,26 @@ describe("ImageBox", () => {
     expect(images[1]).toHaveAttribute("loading", "lazy");
     expect(images[1]).toHaveAttribute("decoding", "async");
     expect(images[0]).toHaveStyle({ objectFit: "cover" });
+  });
+
+  it("forwards unoptimized to configured framework images", () => {
+    const options: Array<boolean | undefined> = [];
+    const FrameworkImage = ({ src, alt, unoptimized }: {
+      src: string;
+      alt: string;
+      unoptimized?: boolean;
+    }) => {
+      options.push(unoptimized);
+      return <img src={src} alt={alt} />;
+    };
+
+    render(
+      <ThemeComponentsProvider components={{ image: FrameworkImage }}>
+        <ImageBox images={createImages(2)} unoptimized />
+      </ThemeComponentsProvider>,
+    );
+
+    expect(options).toEqual([true, true]);
   });
 
   it.each([

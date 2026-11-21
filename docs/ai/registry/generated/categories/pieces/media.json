@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "AssetDetailsPanel",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "media",
+      "subcategory": "media",
+      "description": "Inspect caller-provided asset metadata, variants, and usage, then edit metadata, crop, and hotspot values through callbacks.",
+      "documentation": "apps/site/content/docs/pieces/components/asset-details-panel.mdx",
+      "source": "packages/pieces/src/components/media/asset-details-panel.tsx",
+      "useCases": [
+        "media",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "media",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "media"
+      },
+      "requiredProps": [
+        "asset",
+        "assetId",
+        "patch"
+      ],
+      "mediaRequirements": [
+        "asset (required)",
+        "folders (optional)",
+        "patch (required)"
+      ],
+      "interactiveBehavior": [
+        "onClose"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "AssetPickerDialog",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "media",
+      "subcategory": "media",
+      "description": "Select one or multiple existing media asset IDs in a responsive dialog backed by MediaLibrary.",
+      "documentation": "apps/site/content/docs/pieces/components/asset-picker-dialog.mdx",
+      "source": "packages/pieces/src/components/media/asset-picker-dialog.tsx",
+      "useCases": [
+        "media",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "media",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "media"
+      },
+      "aliases": []
+    },
+    {
+      "name": "MediaField",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "media",
+      "subcategory": "media",
+      "description": "Use an accessible media picker as a form field whose value is a caller-owned asset ID.",
+      "documentation": "apps/site/content/docs/pieces/components/media-field.mdx",
+      "source": "packages/pieces/src/components/media/media-field.tsx",
+      "useCases": [
+        "media",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "media",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "media"
+      },
+      "requiredProps": [
+        "label",
+        "onChange",
+        "assetId",
+        "patch",
+        "libraryProps"
+      ],
+      "contentRequirements": [
+        "label (required)",
+        "description (optional)"
+      ],
+      "mediaRequirements": [
+        "asset (optional)",
+        "patch (required)",
+        "libraryProps (required)",
+        "allowedKinds (optional)"
+      ],
+      "interactiveBehavior": [
+        "onChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "MediaLibrary",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "media",
+      "subcategory": "media",
+      "description": "Browse, search, filter, sort, paginate, select, upload, and organize caller-provided media assets and folders.",
+      "documentation": "apps/site/content/docs/pieces/components/media-library.mdx",
+      "source": "packages/pieces/src/components/media/media-library.tsx",
+      "useCases": [
+        "media",
+        "data-display"
+      ],
+      "pageTypes": [
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "media",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "media"
+      },
+      "aliases": []
+    }
+  ]
+}

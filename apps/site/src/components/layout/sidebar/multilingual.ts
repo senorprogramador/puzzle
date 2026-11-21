@@ -1,4 +1,4 @@
-import type { TreeViewItem } from "@puzzle-ui/ui/components/navigation/tree-view";
+import type { TreeViewItem } from "./types";
 
 const folder = "/docs/multilingual" as const;
 
@@ -24,7 +24,7 @@ export const multilingual: TreeViewItem = {
     },
     {
       id: "multilingual-react",
-      label: "React Integration for Multilingual Apps",
+      label: "React Integration",
       href: `${folder}/react`,
     },
     {

@@ -1,0 +1,55 @@
+---
+title: CmsShell
+description: Compose responsive CMS navigation and page content using caller-provided links and actions.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { CmsShellExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { CmsShell } from "@puzzle-ui/pieces";
+
+`CmsShell` composes the existing dashboard shell with CMS navigation, optional breadcrumbs, a page heading, description, topbar, and caller actions. It does not own routes or decide which links a user may access.
+
+<Preview fit="device" code={`<CmsShell title="Editorial workspace" navigation={navigation} activeNavigationId="articles" breadcrumbs={[{ label: "CMS", href: "/admin" }, { label: "Articles" }]}><ContentList items={entries} /></CmsShell>`}>
+  <CmsShellExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `children` | `ReactNode` | Yes | — |
+| `title` | `ReactNode` | Yes | — |
+| `description` | `ReactNode` | No | — |
+| `navigation` | `readonly CmsNavigationItem[]` | Yes | — |
+| `activeNavigationId` | `string` | No | — |
+| `breadcrumbs` | `BreadcrumbsProps["items"]` | No | — |
+| `topbar` / `actions` | `ReactNode` | No | — |
+| `className` | `string` | No | — |
+
+`CmsNavigationItem` contains a stable `id`, visible `label`, and caller-owned `href`. The current link receives `aria-current="page"`.
+Breadcrumbs use the public UI `Breadcrumbs` item contract: linked ancestors followed by a current item without an `href`.
+
+```tsx
+import { CmsShell } from "@puzzle-ui/pieces";
+
+<CmsShell
+  title="Articles"
+  navigation={[{ id: "articles", label: "Articles", href: "/admin/articles" }]}
+  activeNavigationId="articles"
+>
+  <ArticleList />
+</CmsShell>;
+```
+
+## Behavior and accessibility
+
+The page heading is semantic `h1`; dashboard layout is provided by the existing `DashboardShell`. Navigation links are native anchors with visible focus. The host should render only links appropriate to the current user's authorized application context.
+
+## Related
+
+- [DashboardShell and dashboard compositions](/docs/pieces/components/dashboard)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

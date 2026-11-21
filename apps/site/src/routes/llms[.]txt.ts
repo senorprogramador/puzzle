@@ -64,6 +64,8 @@ const buildLlmsTxt = (): string => {
     "/docs/auth",
     "/docs/session",
     "/docs/storage",
+    "/docs/cms",
+    "/docs/media",
     "/docs/fullstack",
     "/docs/seo",
     "/docs/multilingual",

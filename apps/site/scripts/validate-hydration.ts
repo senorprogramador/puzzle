@@ -132,6 +132,21 @@ try {
     assert.ok(sitemapUrls.includes(sourceUrl), `sitemap includes ${sourceUrl}`);
   }
 
+  for (const path of ["/", "/theme-studio"]) {
+    const response = await fetch(`${origin}${path}`);
+    assert.equal(response.status, 200, `${path}: direct HTTP status`);
+    assert.match(
+      response.headers.get("content-type") ?? "",
+      /^text\/html/,
+      `${path}: HTML content type`,
+    );
+    assert.equal(
+      response.headers.get("cache-control"),
+      "no-cache",
+      `${path}: HTML must be revalidated`,
+    );
+  }
+
   for (const path of docsPaths) {
     const response = await fetch(`${origin}${path}`);
     assert.equal(response.status, 200, `${path}: direct HTTP status`);
@@ -142,8 +157,8 @@ try {
     );
     assert.equal(
       response.headers.get("cache-control"),
-      "public, max-age=86400, s-maxage=86400",
-      `${path}: CDN cache policy`,
+      "no-cache",
+      `${path}: HTML must be revalidated`,
     );
     const html = await response.text();
     assert.equal((html.match(/<title>/g) ?? []).length, 1, `${path}: SSR title`);
@@ -194,6 +209,45 @@ try {
 
   assert.equal((await fetch(`${origin}/docs/getting-started`)).status, 200);
   browser = await chromium.launch();
+  const preloadRecoveryPage = await browser.newPage();
+  await preloadRecoveryPage.goto(origin, { waitUntil: "networkidle" });
+  const preloadErrorMessage =
+    "Unable to preload CSS for /assets/theme-studio-stale.css";
+  const recoveryNavigation = preloadRecoveryPage.waitForNavigation({
+    waitUntil: "domcontentloaded",
+  });
+  const preloadErrorPrevented = await preloadRecoveryPage.evaluate((message) => {
+    const event = new Event("vite:preloadError", { cancelable: true }) as Event & {
+      payload: Error;
+    };
+    Object.defineProperty(event, "payload", { value: new Error(message) });
+    window.dispatchEvent(event);
+    return event.defaultPrevented;
+  }, preloadErrorMessage);
+  assert.equal(preloadErrorPrevented, true, "first Vite preload error is intercepted");
+  await recoveryNavigation;
+  assert.equal(
+    await preloadRecoveryPage.evaluate(() =>
+      sessionStorage.getItem("puzzle:vite-preload-error"),
+    ),
+    preloadErrorMessage,
+    "stale Vite asset triggers one recovery reload",
+  );
+  const repeatedPreloadErrorPrevented = await preloadRecoveryPage.evaluate((message) => {
+    const event = new Event("vite:preloadError", { cancelable: true }) as Event & {
+      payload: Error;
+    };
+    Object.defineProperty(event, "payload", { value: new Error(message) });
+    window.dispatchEvent(event);
+    return event.defaultPrevented;
+  }, preloadErrorMessage);
+  assert.equal(
+    repeatedPreloadErrorPrevented,
+    false,
+    "repeated Vite preload error is not suppressed or reloaded indefinitely",
+  );
+  await preloadRecoveryPage.close();
+
   for (const component of [undefined, "code-showcase", "product-showcase"]) {
     const path = component ? `/docs/pieces/components/${component}` : "/docs/getting-started";
     const page = await browser.newPage();
@@ -252,7 +306,11 @@ try {
   const homeHtml = await homeResponse!.text();
   assert.match(homeHtml, /home-component-fallback/, "component links are server-rendered");
   await lazyPage.waitForLoadState("networkidle");
-  assert.deepEqual(carouselRequests, [], "carousel assets are not requested initially");
+  assert.deepEqual(
+    carouselRequests.filter((url) => /home-component-carousel-.*\.js/.test(url)),
+    [],
+    "component carousel JavaScript is not requested initially",
+  );
   assert.equal(await lazyPage.locator(".home-component-fallback a").count(), 16);
   await lazyPage.locator(".home-component-carousel-container").scrollIntoViewIfNeeded();
   await lazyPage.getByRole("button", { name: "Next component panels" }).waitFor();
@@ -713,6 +771,10 @@ try {
     /"spacing":/,
     "restoring preset colors preserves design-token overrides",
   );
+  await studioPage.getByRole("tab", { name: "CSS variables" }).click();
+  if ((await spacingTrigger.getAttribute("aria-expanded")) !== "true") {
+    await spacingHeading.click();
+  }
   await spacingGroup
     .getByRole("button", { name: "Reset group" })
     .click();
@@ -753,6 +815,7 @@ try {
     /"body": \{\s+"family": "Inter"/,
     "selected Google Fonts appear in puzzle-fonts.json",
   );
+  await studioPage.getByRole("tab", { name: "Theme" }).click();
   let selectedThemeIndex = 0;
   for (const template of WEBSITE_TEMPLATES) {
     await studioPage

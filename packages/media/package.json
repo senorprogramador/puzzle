@@ -1,0 +1,86 @@
+{
+  "name": "@puzzle-ui/media",
+  "version": "0.14.0",
+  "description": "Provider-neutral media contracts, storage ports, processing services, and browser utilities for Puzzle.",
+  "homepage": "https://puzzle-ui.com/docs/media",
+  "keywords": [
+    "puzzle-ui",
+    "media",
+    "object-storage",
+    "image-processing",
+    "video"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./browser": {
+      "import": {
+        "types": "./dist/browser/index.d.ts",
+        "default": "./dist/browser/index.js"
+      },
+      "require": {
+        "types": "./dist/browser/index.d.cts",
+        "default": "./dist/browser/index.cjs"
+      }
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js",
+      "require": "./dist/testing/index.cjs"
+    },
+    "./testing/adapters": {
+      "import": {
+        "types": "./dist/testing/adapters.d.ts",
+        "default": "./dist/testing/adapters.js"
+      },
+      "require": {
+        "types": "./dist/testing/adapters.d.cts",
+        "default": "./dist/testing/adapters.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "ai"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
+    "vitest": "bun test",
+    "test": "bun test",
+    "test:browser": "bun run build && node --test tests/browser.integration.mjs",
+    "clean": "rm -rf dist",
+    "prepack": "tsdown"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "bun": "^1.4.4",
+    "tsdown": "^0.23.1",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@puzzle-ui/storage": "^0.14.0"
+  }
+}

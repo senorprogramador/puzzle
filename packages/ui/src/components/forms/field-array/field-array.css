@@ -1,0 +1,101 @@
+.puzzle-field-array {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-3, 0.75rem);
+
+    min-width: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    color: var(--puzzle-color-text);
+    font: inherit;
+}
+
+.puzzle-field-array__legend {
+    padding: 0;
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+}
+
+.puzzle-field-array__description,
+.puzzle-field-array__empty,
+.puzzle-field-array__error {
+    margin: 0;
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-field-array__description,
+.puzzle-field-array__empty {
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-field-array__items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-3, 0.75rem);
+    min-width: 0;
+}
+
+.puzzle-field-array__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--puzzle-space-3, 0.75rem);
+
+    min-width: 0;
+    margin: 0;
+    padding: var(--puzzle-space-3, 0.75rem);
+
+    border: 1px solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+    background: var(--puzzle-color-surface);
+}
+
+.puzzle-field-array__item-legend {
+    padding: 0 var(--puzzle-space-1, 0.25rem);
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+}
+
+.puzzle-field-array__item-content {
+    min-width: 0;
+}
+
+.puzzle-field-array__item-actions,
+.puzzle-field-array__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-field-array__item-actions {
+    justify-content: flex-end;
+}
+
+.puzzle-field-array__error {
+    color: var(--puzzle-color-danger);
+}
+
+.puzzle-field-array[data-disabled="true"] {
+    cursor: not-allowed;
+}
+
+.puzzle-field-array[data-disabled="true"] .puzzle-field-array__legend,
+.puzzle-field-array[data-disabled="true"] .puzzle-field-array__description {
+    color: var(--puzzle-color-text-muted);
+}
+
+@media (forced-colors: active) {
+    .puzzle-field-array__item {
+        border-color: CanvasText;
+    }
+
+    .puzzle-field-array__error {
+        color: Mark;
+    }
+}

@@ -1,9 +1,12 @@
 import auth from "../../../../packages/auth/package.json";
+import cms from "../../../../packages/cms/package.json";
 import core from "../../../../packages/core/package.json";
 import create from "../../../../packages/create/package.json";
 import fullstack from "../../../../packages/fullstack/package.json";
 import hooks from "../../../../packages/hooks/package.json";
+import i18n from "../../../../packages/i18n/package.json";
 import icons from "../../../../packages/icons/package.json";
+import media from "../../../../packages/media/package.json";
 import pieces from "../../../../packages/pieces/package.json";
 import seo from "../../../../packages/seo/package.json";
 import session from "../../../../packages/session/package.json";
@@ -27,11 +30,13 @@ type PublicManifest = {
 
 // Explicitly select public fields rather than serializing package manifests.
 const manifests: PublicManifest[] = [
-  auth, core, create, fullstack, hooks, icons, pieces, seo, session, storage,
+  auth, cms, core, create, fullstack, hooks, i18n, icons, media, pieces, seo, session, storage,
   storageD1, storageMongodb, theme, ui,
 ];
 
 const repository = root.repository.url.replace(/^git\+/, "").replace(/\.git$/, "");
+// Do not advertise npm URLs until these new workspace packages are released.
+const unpublishedPackages = new Set([cms.name, i18n.name, media.name]);
 
 const publicPeers = (manifest: PublicManifest): Record<string, string> =>
   Object.fromEntries(
@@ -53,7 +58,9 @@ export const projectInformationGET = (): Response =>
           name: manifest.name,
           description: manifest.description,
           documentation: manifest.homepage,
-          npm: `https://www.npmjs.com/package/${manifest.name}`,
+          ...(unpublishedPackages.has(manifest.name)
+            ? { availability: "workspace" as const }
+            : { npm: `https://www.npmjs.com/package/${manifest.name}` }),
           license: manifest.license,
           ...(manifest.engines?.node && { node: manifest.engines.node }),
           ...(Object.keys(peers).length > 0 && { peers }),

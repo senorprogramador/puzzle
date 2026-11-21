@@ -16,7 +16,7 @@ import {
 
 import { cn, resolveResponsiveValue } from "@puzzle-ui/core";
 
-import { Popout, type PopoutTriggerProps } from "../../overlays/popout";
+import { Popout, usePopoutPositioned, type PopoutTriggerProps } from "../../overlays/popout";
 
 import {
   addDays,
@@ -58,6 +58,14 @@ const findDateFromInput = (value: string): Date | null => {
   const date = new Date(year, month - 1, day);
 
   return isValidDate(date) && toDateKey(date) === value ? date : null;
+};
+
+const CalendarFocus = ({ open, onReady }: { open: boolean; onReady: () => void }) => {
+  const positioned = usePopoutPositioned();
+  useEffect(() => {
+    if (open && positioned) onReady();
+  }, [open, positioned, onReady]);
+  return null;
 };
 
 const DatePicker = ({
@@ -674,18 +682,9 @@ const DatePicker = ({
     );
   }, [selectedKey, isDateDisabled, selectedDate]);
 
-  // Move focus into the calendar when it opens or the active day changes.
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-
+  const focusActiveDate = useCallback(() => {
     const ownerDocument = triggerRef.current?.ownerDocument;
-    const ownerWindow = ownerDocument?.defaultView;
-
-    if (!ownerDocument || !ownerWindow) {
-      return;
-    }
+    if (!ownerDocument) return;
 
     let focusDate = activeDate;
 
@@ -705,26 +704,11 @@ const DatePicker = ({
       }
     }
 
-    const focusActiveDate = () => {
-      const dayButton = ownerDocument.getElementById(
-        `${gridId}-day-${toDateKey(focusDate)}`,
-      );
-
-      dayButton?.focus({ preventScroll: true });
-    };
-
-    // Popout mounts its portal after its first effect.
-    // requestAnimationFrame also covers an initially open calendar.
-    if (typeof ownerWindow.requestAnimationFrame === "function") {
-      const frame = ownerWindow.requestAnimationFrame(focusActiveDate);
-
-      return () => {
-        ownerWindow.cancelAnimationFrame(frame);
-      };
-    }
-
-    focusActiveDate();
-  }, [isOpen, activeDate, gridId, isDateDisabled, findNearestAvailableDate]);
+    const dayButton = ownerDocument.getElementById(
+      `${gridId}-day-${toDateKey(focusDate)}`,
+    );
+    dayButton?.focus({ preventScroll: true });
+  }, [activeDate, gridId, isDateDisabled, findNearestAvailableDate]);
 
   const resolvedLabelledBy =
     ariaLabelledBy ?? (label != null ? labelId : undefined);
@@ -835,6 +819,7 @@ const DatePicker = ({
               }
             }}
           >
+            <CalendarFocus open={isOpen} onReady={focusActiveDate} />
             <div className="puzzle-date-picker__header">
               <button
                 type="button"

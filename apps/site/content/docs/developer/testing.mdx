@@ -89,7 +89,7 @@ Docker with Compose and network access are required. The suite builds the worksp
 
 Run it when changing the generator, its templates, or packages used by generated projects.
 
-### Fullstack authentication
+### Fullstack Auth, media, and CMS APIs
 
 Run server-side and unit tests:
 
@@ -103,6 +103,20 @@ Run browser tests:
 bun run --filter "@puzzle-ui/fullstack" test:browser
 ```
 
+After building workspace packages, run the CMS and Media browser journeys in
+temporary copies of the Next.js and TanStack Workspace examples:
+
+```bash
+bun run build
+bun run --filter "@puzzle-ui/fullstack" test:e2e:frameworks
+```
+
+These tests need Playwright Chromium and the installed Workspace app
+dependencies. They add test-only routes and an in-memory service fixture to
+each copy, stub the unrelated Workspace auth-state request, and use a
+synthetic processor that copies bytes rather than performing real transcoding.
+They do not change production app routes or validate a production provider.
+
 ### Authentication and storage
 
 Several backend packages use Node's built-in test runner.
@@ -113,6 +127,24 @@ bun run --filter "@puzzle-ui/session" test
 bun run --filter "@puzzle-ui/storage" vitest
 bun run --filter "@puzzle-ui/storage-d1" test
 ```
+
+### Media and CMS domains
+
+Run the provider-neutral contract and domain-service tests:
+
+```bash
+bun run --filter "@puzzle-ui/media" test
+bun run --filter "@puzzle-ui/cms" test
+```
+
+The media package also exercises its browser-only image/video helpers in
+Chromium:
+
+```bash
+bun run --filter "@puzzle-ui/media" test:browser
+```
+
+Playwright Chromium must be installed for this check.
 
 ## MongoDB integration tests
 
@@ -175,6 +207,30 @@ For a documentation change:
 1. Verify all imports and links.
 2. Run the site type check.
 3. Build the documentation site.
+
+For documentation navigation changes, run the source-derived inventory tests
+and production browser checks:
+
+```bash
+bun run --filter "@puzzle-ui/site" test:navigation
+bun run --filter "@puzzle-ui/site" build
+bun run --filter "@puzzle-ui/site" test:navigation:browser
+```
+
+The navigation checks cover every Markdown and MDX route, unique links and IDs,
+source page titles, active ancestors, category links, keyboard interaction,
+mobile dismissal, search, canonical breadcrumbs, and sitemap coverage.
+The browser check requires Playwright Chromium and serves the production output
+on a temporary local port. Set `PUZZLE_NAVIGATION_SCREENSHOT_DIR` to capture
+desktop and mobile navigation with light and dark Theme tokens. The documentation
+shell currently uses light mode; the check applies the public Theme's dark
+styles temporarily to verify token compatibility, not a site theme switch.
+
+To compare a refactor against an original inventory, set
+`PUZZLE_NAVIGATION_BASELINE` to a JSON file with `pages` (`path`, `url`, `title`)
+and `entries` (`id`, optional `href`) arrays. Capture it before changing the
+navigation; the browser check verifies that source routes, page titles, IDs,
+and existing link destinations remain unchanged.
 
 For changes to the documentation component catalog, run the production browser
 check across mobile, tablet, and desktop viewport widths:

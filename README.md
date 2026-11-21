@@ -94,9 +94,18 @@ They are pre-1.0; check each package's documentation before adopting it.
 | [`@puzzle-ui/storage`](https://www.npmjs.com/package/@puzzle-ui/storage)                 | npm          | Storage contracts for authentication and sessions                 | `npm install @puzzle-ui/storage`                   | [Storage](https://puzzle-ui.com/docs/storage)                 |
 | [`@puzzle-ui/storage-d1`](https://www.npmjs.com/package/@puzzle-ui/storage-d1)           | npm          | Cloudflare D1 storage adapter                                     | `npm install @puzzle-ui/storage-d1`                | [Storage](https://puzzle-ui.com/docs/storage)                 |
 | [`@puzzle-ui/storage-mongodb`](https://www.npmjs.com/package/@puzzle-ui/storage-mongodb) | npm          | MongoDB storage adapter                                           | `npm install @puzzle-ui/storage-mongodb`           | [Storage](https://puzzle-ui.com/docs/storage)                 |
-| [`@puzzle-ui/fullstack`](https://www.npmjs.com/package/@puzzle-ui/fullstack)             | npm          | Auth client, server handlers, and Next.js/TanStack Start adapters | `npm install @puzzle-ui/fullstack react react-dom` | [Full-stack auth](https://puzzle-ui.com/docs/fullstack)       |
+| [`@puzzle-ui/fullstack`](https://www.npmjs.com/package/@puzzle-ui/fullstack)             | npm          | Auth, Media, and CMS clients, server handlers, and adapters      | `npm install @puzzle-ui/fullstack react react-dom` | [Fullstack](https://puzzle-ui.com/docs/fullstack)             |
 | [`@puzzle-ui/i18n`](https://www.npmjs.com/package/@puzzle-ui/i18n)                       | npm          | Multilingual runtime, tooling, React bindings, and framework adapters | `npm install @puzzle-ui/i18n`                  | [Multilingual](https://puzzle-ui.com/docs/multilingual)       |
 | [`@puzzle-ui/create`](https://www.npmjs.com/package/@puzzle-ui/create)                   | npm          | Interactive React project generator                               | `npx @puzzle-ui/create`                          | [Create a project](https://puzzle-ui.com/docs/create)         |
+
+### Workspace packages in development
+
+`@puzzle-ui/media` and `@puzzle-ui/cms` are implemented as workspace packages
+but are not published to npm yet. See the [Media](https://puzzle-ui.com/docs/media)
+and [CMS](https://puzzle-ui.com/docs/cms) guides for their current repository
+APIs; external applications can install them after a release. The new
+`@puzzle-ui/fullstack/media/*` and `/cms/*` subpaths also await a Fullstack
+release.
 
 The repository also contains the [documentation site](apps/site) and a
 [Storybook playground](apps/playground). See the
@@ -136,6 +145,11 @@ App checks are available with
 For production Docker images, the private shared MongoDB replica set,
 reverse-proxy integration, SHA-tagged deploys, rollback, and troubleshooting,
 see the [Workspace deployment guide](docs/workspace/deployment.md).
+
+`apps/workspace-react-router` is a separate React Router 7 SSR example that
+exercises locale-prefixed routes and metadata with `@puzzle-ui/i18n`; it does
+not use the private Workspace domain package. See the
+[React Router integration guide](docs/ai/frameworks/react-router.md).
 
 ## Installation
 

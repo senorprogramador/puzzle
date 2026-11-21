@@ -167,6 +167,30 @@ const categoryPages = [
   "business",
   "application-dashboard",
   "specialized-interactive",
+  "media",
+  "cms",
+] as const;
+
+const mediaWorkflowDocs = [
+  ["media-library", "MediaLibrary", "MediaLibraryExample"],
+  ["asset-picker-dialog", "AssetPickerDialog", "AssetPickerDialogExample"],
+  ["asset-details-panel", "AssetDetailsPanel", "AssetDetailsPanelExample"],
+  ["media-field", "MediaField", "MediaFieldExample"],
+] as const;
+
+const cmsWorkflowDocs = [
+  ["cms-shell", "CmsShell"],
+  ["content-list", "ContentList"],
+  ["content-editor", "ContentEditor"],
+  ["block-editor", "BlockEditor"],
+  ["content-type-builder", "ContentTypeBuilder"],
+  ["localization-editor", "LocalizationEditor"],
+  ["relationship-field", "RelationshipField"],
+  ["revision-history", "RevisionHistory"],
+  ["publish-scheduler", "PublishScheduler"],
+  ["editorial-calendar", "EditorialCalendar"],
+  ["audit-log-viewer", "AuditLogViewer"],
+  ["webhook-management", "WebhookManagement"],
 ] as const;
 
 describe("Pieces documentation coverage", () => {
@@ -293,7 +317,47 @@ describe("Pieces documentation coverage", () => {
     }
   });
 
-  it("provides all seven category overviews and framework examples", () => {
+  it("documents all four public media workflows with previews and API maturity", () => {
+    const sidebar = readFileSync(sidebarPath, "utf8");
+    const examplePath = join(examplesDirectory, "media-workflows.tsx");
+    const exampleSource = readFileSync(examplePath, "utf8");
+
+    for (const [slug, componentName, exampleName] of mediaWorkflowDocs) {
+      const pagePath = join(docsDirectory, `${slug}.mdx`);
+      expect(existsSync(pagePath), `${slug}.mdx exists`).toBe(true);
+      const page = readFileSync(pagePath, "utf8");
+      expect(page).toContain(`from "@puzzle-ui/pieces"`);
+      expect(page).toContain(componentName);
+      expect(page).toContain("<Preview");
+      expect(page).toContain("API maturity: Stable");
+      expect(page).toContain("/docs/pieces/components/media");
+      expect(sidebar).toContain(`\${componentsFolder}/${slug}`);
+      expect(exampleSource).toContain(`export const ${exampleName}`);
+    }
+
+    const mediaOverview = readFileSync(join(docsDirectory, "media.mdx"), "utf8");
+    for (const [slug] of mediaWorkflowDocs) {
+      expect(mediaOverview).toContain(`/docs/pieces/components/${slug}`);
+    }
+  });
+
+  it("documents CMS workflows with public imports, previews and navigation", () => {
+    const sidebar = readFileSync(sidebarPath, "utf8");
+    const overview = readFileSync(join(docsDirectory, "cms.mdx"), "utf8");
+    const examples = readFileSync(join(examplesDirectory, "cms-workflows.tsx"), "utf8");
+    for (const [slug, componentName] of cmsWorkflowDocs) {
+      const page = readFileSync(join(docsDirectory, `${slug}.mdx`), "utf8");
+      expect(page).toContain('from "@puzzle-ui/pieces"');
+      expect(page).toContain(componentName);
+      expect(page).toContain("<Preview");
+      expect(page).toContain("API maturity:");
+      expect(sidebar).toContain(`\${componentsFolder}/${slug}`);
+      expect(overview).toContain(`/docs/pieces/components/${slug}`);
+      expect(examples).toContain(`export const ${componentName}Example`);
+    }
+  });
+
+  it("provides all nine category overviews and framework examples", () => {
     const sidebar = readFileSync(sidebarPath, "utf8");
     for (const slug of categoryPages) {
       expect(existsSync(join(docsDirectory, `${slug}.mdx`)), `${slug}.mdx exists`).toBe(

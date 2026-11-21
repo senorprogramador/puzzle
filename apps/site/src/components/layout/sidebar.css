@@ -15,6 +15,28 @@
     min-height: 0;
 }
 
+.puzzle-site-sidebar__tree {
+    --puzzle-tree-indentation: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-site-sidebar__tree > .puzzle-tree__item + .puzzle-tree__item {
+    margin-block-start: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-site-sidebar__tree > .puzzle-tree__item > .puzzle-tree__row {
+    min-height: var(--puzzle-space-9, 2.25rem);
+}
+
+.puzzle-site-sidebar__tree .puzzle-tree__label {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.puzzle-site-sidebar__tree .puzzle-tree__item:has([data-active="true"])
+    > .puzzle-tree__row .puzzle-tree__label {
+    color: var(--puzzle-color-primary);
+}
+
 /* Mobile: full-width, collapsible menu above the page content. */
 @media (max-width: 767.98px) {
     .puzzle-page-layout.puzzle-site-docs-layout {
@@ -35,7 +57,18 @@
     }
 
     .puzzle-site-sidebar__panel-inner {
-        overflow: hidden;
+        max-height: 65svh;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .puzzle-site-sidebar__tree .puzzle-tree__row {
+        min-height: 2.75rem;
+    }
+
+    .puzzle-site-sidebar__tree {
+        --puzzle-tree-toggle-size: 2.75rem;
     }
 
     .puzzle-site-sidebar__panel-inner > * {

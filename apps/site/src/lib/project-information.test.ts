@@ -5,7 +5,7 @@ import { projectInformationGET } from "./project-information";
 import { getCanonicalUrl } from "./seo";
 
 describe("project information route", () => {
-  it("serves only public project facts and published package fields", async () => {
+  it("serves public project facts and accurate package availability", async () => {
     const response = projectInformationGET();
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toContain("application/json");
@@ -32,17 +32,24 @@ describe("project information route", () => {
         .filter((entry) => entry.isDirectory())
         .map(async (entry) => JSON.parse(await readFile(new URL(`${entry.name}/package.json`, packagesDir), "utf8"))),
     );
-    const published = manifests.filter((manifest) => !manifest.private);
+    const publicPackages = manifests.filter((manifest) => !manifest.private);
     expect(data.packages.map((pkg: { name: string }) => pkg.name).sort()).toEqual(
-      published.map((manifest) => manifest.name).sort(),
+      publicPackages.map((manifest) => manifest.name).sort(),
     );
-    expect(new Set(data.packages.map((pkg: { name: string }) => pkg.name)).size).toBe(published.length);
+    expect(new Set(data.packages.map((pkg: { name: string }) => pkg.name)).size).toBe(publicPackages.length);
+    for (const name of ["@puzzle-ui/cms", "@puzzle-ui/i18n", "@puzzle-ui/media"]) {
+      const pkg = data.packages.find((item: { name: string }) => item.name === name);
+      expect(pkg?.availability).toBe("workspace");
+      expect(pkg?.npm).toBeUndefined();
+    }
 
     for (const pkg of data.packages) {
-      const manifest = published.find((item) => item.name === pkg.name);
+      const manifest = publicPackages.find((item) => item.name === pkg.name);
       expect(manifest).toBeDefined();
       expect(Object.keys(pkg).sort()).toEqual([
-        "name", "description", "documentation", "npm", "license",
+        "name", "description", "documentation",
+        ...(pkg.availability === "workspace" ? ["availability"] : ["npm"]),
+        "license",
         ...(manifest.engines?.node ? ["node"] : []),
         ...(["react", "next", "@tanstack/react-start"].some((key) => manifest.peerDependencies?.[key]) ? ["peers"] : []),
       ].sort());
@@ -51,7 +58,12 @@ describe("project information route", () => {
       expect(pkg.documentation).toBe(manifest.homepage);
       expect(pkg.documentation).toMatch(/^https:\/\/puzzle-ui\.com\/docs\/[a-z0-9/-]+$/);
       expect(pkg.documentation).toBe(getCanonicalUrl(pkg.documentation));
-      expect(pkg.npm).toBe(`https://www.npmjs.com/package/${manifest.name}`);
+      if (pkg.availability === "workspace") {
+        expect(pkg.availability).toBe("workspace");
+        expect(pkg.npm).toBeUndefined();
+      } else {
+        expect(pkg.npm).toBe(`https://www.npmjs.com/package/${manifest.name}`);
+      }
       if (pkg.node) expect(pkg.node).toBe(manifest.engines.node);
       if (pkg.peers) {
         const expectedPeers = Object.fromEntries(

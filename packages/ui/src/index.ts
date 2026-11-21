@@ -161,9 +161,22 @@ export {
 // #region Editors
 
 export {
+  JsonEditor,
+  type JsonEditorError,
+  type JsonEditorProps,
+  type JsonEditorResult,
+  type JsonValue,
+} from "./components/editors/json-editor";
+
+export {
   TextEditor,
   type TextEditorProps,
 } from "./components/editors/text-editor";
+export { useTextEditor } from "./components/editors/text-editor";
+export type {
+  TextEditorHandle,
+  TextEditorCommands,
+} from "./components/editors/text-editor/editor";
 export {
   TextEditorToolbar,
   type TextEditorToolbarProps,
@@ -172,6 +185,41 @@ export {
   TextRenderer,
   type TextRendererProps,
 } from "./components/editors/text-editor/text-renderer";
+export {
+  MAX_TEXT_LIST_INDENT,
+  createTextDocument,
+  normalizeTextDocument,
+  normalizeTextSelection,
+  validateTextDocument,
+  setBlockType,
+  insertHorizontalRule,
+  clearFormatting,
+  deleteTextAtSelection,
+  getTextStatistics,
+  getSlashCommandAtSelection,
+  findTextInDocument,
+  replaceAllText,
+  applyListType,
+  setListType,
+  removeList,
+  setListAttributes,
+  setListChecked,
+  setListInteractive,
+  setListIndent,
+  setBlockIndent,
+  toggleListItemChecked,
+  splitListItemAtSelection,
+  mergeListItemBackward,
+  applyMarkdownShortcut,
+  getListType,
+  getListSelectionState,
+} from "./components/editors/text-editor/text-document";
+export {
+  parseHtmlToDocument,
+  parseMarkdownToDocument,
+  serializeTextDocumentToHtml,
+  serializeTextDocumentToMarkdown,
+} from "./components/editors/text-editor/text-parser";
 export type {
   TextMark,
   TextLink,
@@ -179,11 +227,24 @@ export type {
   TextBlockType,
   TextAlign,
   TextListType,
+  TextListIcon,
+  TextListAttributes,
+  TextHeadingLevel,
   TextBlock,
   TextDocument,
   TextPoint,
   TextSelection,
   TextTransaction,
+  TextDocumentValidationIssue,
+  TextDocumentValidationResult,
+  TextListSelectionState,
+  TextDocumentStatistics,
+  TextSearchOptions,
+  TextSearchMatch,
+  TextSlashCommandMatch,
+  TextEditorShortcutCommand,
+  TextEditorShortcutModifier,
+  TextEditorShortcut,
   TextBlockVariant,
 } from "./components/editors/text-editor/text-editor.types";
 
@@ -223,6 +284,13 @@ export {
 } from "./components/forms/date-picker";
 
 export {
+  FieldArray,
+  RepeaterField,
+  type FieldArrayItemContext,
+  type FieldArrayProps,
+} from "./components/forms/field-array";
+
+export {
   FileUpload,
   type FileUploadProps,
   type FileUploadItem,
@@ -232,6 +300,55 @@ export {
   type FileUploadUploadContext,
   type FileUploadUploadHandler,
 } from "./components/forms/file-upload";
+
+export {
+  ImageCropper,
+  type ImageCrop,
+  type ImageCropAspectRatio,
+  type ImageCropAspectRatioPreset,
+  type ImageCropperProps,
+} from "./components/forms/image-cropper";
+
+export {
+  ImageHotspotEditor,
+  type ImageHotspot,
+  type ImageHotspotEditorProps,
+  type ImageHotspotEditorValue,
+  type ImageHotspotData,
+  type NormalizedImagePoint,
+  type NormalizedImageRect,
+} from "./components/forms/image-hotspot-editor";
+
+export {
+  ImageUpload,
+  type ImageUploadContext,
+  type ImageUploadHandler,
+  type ImageUploadProps,
+  type ImageUploadResult,
+  type ImageUploadStatus,
+} from "./components/forms/image-upload";
+
+export type {
+  ImageOutputFormat,
+  ImageProcessingResult,
+  ImageVariantProfile,
+} from "@puzzle-ui/media/browser";
+
+export {
+  VideoUpload,
+  type VideoUploadContext,
+  type VideoUploadHandler,
+  type VideoUploadProps,
+  type VideoUploadServerStatus,
+  type VideoUploadSession,
+  type VideoUploadStatus,
+} from "./components/forms/video-upload";
+
+export type {
+  CreateVideoPosterOptions,
+  VideoMetadata,
+  VideoPosterResult,
+} from "@puzzle-ui/media/browser";
 
 export { FormField, type FormFieldProps } from "./components/forms/form-field";
 

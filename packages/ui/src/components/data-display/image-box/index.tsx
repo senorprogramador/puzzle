@@ -31,6 +31,7 @@ const ImageBox = ({
   gap,
   radius,
   className,
+  unoptimized,
   onImageClick,
   onViewAll,
 }: ImageBoxProps) => {
@@ -71,6 +72,7 @@ const ImageBox = ({
         fetchPriority={main ? "high" : "auto"}
         decoding="async"
         preload={main}
+        unoptimized={unoptimized}
         className="puzzle-image-box__media"
         fallback={<span className="puzzle-image-box__fallback" aria-hidden="true" />}
       />

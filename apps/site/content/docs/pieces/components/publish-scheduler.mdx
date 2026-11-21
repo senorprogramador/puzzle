@@ -1,0 +1,50 @@
+---
+title: PublishScheduler
+description: Capture a publication date/time with an explicit IANA timezone and hand it to the host scheduler.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { PublishSchedulerExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { PublishScheduler } from "@puzzle-ui/pieces";
+
+`PublishScheduler` collects a local date/time and explicit IANA timezone, then calls the supplied callback with an absolute `Date` and timezone. It is not a worker and never publishes content by itself.
+
+<Preview fit="device" code={`<PublishScheduler timeZone="Europe/Amsterdam" onSchedule={scheduleEntry} onCancelSchedule={cancelSchedule} />`}>
+  <PublishSchedulerExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `onSchedule` | `(publishAt: Date, timeZone: string) => void \| Promise<void>` | Yes | — |
+| `scheduledAt` | `Date \| string \| null` | No | `null` |
+| `timeZone` | `string` | No | Browser IANA timezone |
+| `onCancelSchedule` | `() => void \| Promise<void>` | No | — |
+| `disabled` / `scheduling` | `boolean` | No | `false` |
+| `className` | `string` | No | — |
+
+```tsx
+import { PublishScheduler } from "@puzzle-ui/pieces";
+
+<PublishScheduler
+  scheduledAt={entry.scheduledAt}
+  timeZone={entry.scheduledTimeZone ?? "UTC"}
+  onSchedule={(publishAt, timeZone) =>
+    cmsClient.schedule(entry.id, publishAt, timeZone, entry.revision)
+  }
+  onCancelSchedule={() => cmsClient.unschedule(entry.id, entry.revision)}
+/>;
+```
+
+Nonexistent daylight-saving local times are rejected visibly. If a local time occurs twice during a clock rollback, the earlier instant is selected. The CMS service still requires an explicit scheduler and revision-bound job; server authorization and execution remain mandatory.
+
+## Related
+
+- [CMS scheduling contract](/docs/cms)
+- [EditorialCalendar](/docs/pieces/components/editorial-calendar)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

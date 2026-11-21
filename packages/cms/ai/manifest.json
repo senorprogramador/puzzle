@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "packageName": "@puzzle-ui/cms",
+  "instructionVersion": 1,
+  "contentFile": "instructions.md",
+  "instructionDependencies": [
+    "@puzzle-ui/storage"
+  ],
+  "documentationUrl": "https://puzzle-ui.com/docs/cms"
+}

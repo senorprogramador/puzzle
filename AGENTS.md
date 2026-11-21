@@ -4,7 +4,7 @@ These are the repository-wide entry instructions for AI coding agents. Use the a
 
 ## 1. Project identity and purpose
 
-Puzzle is a TypeScript and React 19 ecosystem for human developers and AI-assisted application development. It provides reusable UI primitives, composable page sections, design tokens and theming, shared hooks and utilities, authentication and sessions, database-neutral storage contracts and adapters, framework integrations, SEO tooling, and application scaffolding.
+Puzzle is a TypeScript and React 19 ecosystem for human developers and AI-assisted application development. It provides reusable UI primitives, composable page sections, design tokens and theming, shared hooks and utilities, authentication and sessions, media asset and headless CMS domains, database-neutral storage contracts and adapters, framework integrations, SEO tooling, and application scaffolding.
 
 ## 2. Repository structure
 
@@ -12,17 +12,19 @@ The root `package.json` defines Bun workspaces. Expand its workspace patterns an
 
 ## 3. Package architecture
 
-Packages are independently adoptable and organized by responsibility: Core provides shared utilities; Hooks and Icons provide React capabilities; Theme owns design tokens; UI provides components; Pieces composes sections; Auth, Session, Storage, and storage adapters provide identity and persistence; Fullstack and SEO expose integration layers; Create scaffolds applications. Private Workspace packages support the sample apps. See the [package map](docs/ai/architecture/package-map.md) and [dependency map](docs/ai/architecture/dependency-map.md) before changing boundaries.
+Packages are independently adoptable and organized by responsibility: Core provides shared utilities; Hooks and Icons provide React capabilities; Theme owns design tokens; UI provides components; Pieces composes sections; Auth and Session provide identity services; Storage and its adapters persist records; Media owns provider-neutral asset and binary-object contracts; CMS owns content schemas and publishing services; Fullstack adapts Auth, Media, and CMS to browser clients and framework routes; SEO provides metadata and framework integrations; Create scaffolds applications. Private Workspace packages support the sample apps. See the [package map](docs/ai/architecture/package-map.md) and [dependency map](docs/ai/architecture/dependency-map.md) before changing boundaries.
 
 ## 4. Application architecture
 
-Applications live under `apps/`: the documentation site, the client-side reference website and Storybook playground, and Next.js and TanStack Start Workspace examples. The site uses the component packages to document them; the Workspace apps share a private domain package and UI package. They are examples and applications, not package APIs. Confirm current routes, dependencies, and local instructions in the app manifest and package map.
+Applications live under `apps/`: the documentation site, the client-side reference website and Storybook playground, Next.js and TanStack Start Workspace examples, and a React Router SSR/i18n example. The site uses the component packages to document them; the Workspace apps share a private domain package and UI package. They are examples and applications, not package APIs. Confirm current routes, dependencies, and local instructions in the app manifest and package map.
 
 ## 5. Dependency boundaries
 
 - Theme is the source of design tokens; UI and Pieces consume its public tokens and components.
 - Keep framework-neutral packages independent of React, routers, and database vendors unless their manifest and public API explicitly establish otherwise.
 - Storage contracts are separate from database adapters. Auth and Session depend on contracts, not concrete database drivers.
+- Store media metadata through `@puzzle-ui/storage`, but store file bytes through `@puzzle-ui/media` object-storage adapters. CMS media fields hold asset references, not object keys or signed URLs.
+- UI may use only the browser-safe `@puzzle-ui/media/browser` helpers for local media preparation; keep Media services, object-storage references, and Fullstack server APIs out of UI/Pieces.
 - Keep browser and server imports separated. Respect explicit client/server entry points; never pull server handlers, secrets, database drivers, or server-only code into client bundles.
 - Use only declared public exports. Do not rely on deep source imports or infer compatibility from a package's directory structure.
 
@@ -82,7 +84,7 @@ mandate to use every Puzzle package or build a generator application.
 
 ## 12. Testing and validation
 
-Read the relevant manifest before choosing a command. Root checks are `bun run build`, `bun run typecheck`, `bun run test:all`, and `bun run test:reference`. Run `bun run registry:check` and `bun run api-stability:check` to verify component metadata and stability labels. `typecheck` covers packages, the site, and playground, not every application. `test:all` includes package tests, browser tests, MongoDB integration tests, and the reference-site browser suite. `test:reference` builds workspace packages and the playground before testing the production preview. `bun run test:e2e` covers generated project shapes and requires Docker and network access; run it for generator/template changes and changes to packages used by generated projects. Browser tests require Playwright Chromium; MongoDB tests require Docker Compose. Run app-specific checks with their manifest names (currently `workspace-next` and `workspace-tanstack`) when those apps are affected. For documentation changes, run `bun run --filter "@puzzle-ui/site" build`; use the [testing guide](apps/site/content/docs/developer/testing.mdx) and [AI quality guides](docs/ai/quality/README.md) for test selection and requirements.
+Read the relevant manifest before choosing a command. Root checks are `bun run build`, `bun run typecheck`, `bun run test:all`, and `bun run test:reference`. Run `bun run registry:check` and `bun run api-stability:check` to verify component metadata and stability labels. `typecheck` covers packages, the site, and playground, not every application. `test:all` includes package tests, browser tests, MongoDB integration tests, and the reference-site browser suite. `test:reference` builds workspace packages and the playground before testing the production preview. `bun run test:e2e` covers generated project shapes and requires Docker and network access; run it for generator/template changes and changes to packages used by generated projects. Browser tests require Playwright Chromium; MongoDB tests require Docker Compose. Run app-specific checks with their manifest names (currently `workspace-next`, `workspace-tanstack`, and `workspace-react-router`) when those apps are affected. For documentation changes, run `bun run --filter "@puzzle-ui/site" build`; use the [testing guide](apps/site/content/docs/developer/testing.mdx) and [AI quality guides](docs/ai/quality/README.md) for test selection and requirements.
 
 ## 13. Context and token efficiency
 

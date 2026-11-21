@@ -1,0 +1,88 @@
+---
+title: MediaLibrary
+description: Browse, search, filter, sort, paginate, select, upload, and organize caller-provided media assets and folders.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { MediaLibraryExample } from "../../../../src/components/doc-examples/pieces/media-workflows";
+import { MediaLibrary } from "@puzzle-ui/pieces";
+
+`MediaLibrary` is a responsive file-manager composition for application-owned media data. It reuses UI `TreeView`, `DataTable`, `Autocomplete`, `Image`, `MediaFrame`, `ImageUpload`, `VideoUpload`, and `FileUpload`; it does not implement a second tree, table, or uploader.
+
+<Preview fit="device" code={`<MediaLibrary assets={assets} folders={folders} selectionMode="multiple" onSelectionChange={setSelectedIds} />`}>
+  <MediaLibraryExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `assets` | `readonly MediaLibraryAsset[]` | Yes | — |
+| `folders` | `readonly MediaLibraryFolder[]` | No | `[]` |
+| `selectionMode` | `"none" \| "single" \| "multiple"` | No | `"multiple"` |
+| `selectedAssetIds` / `defaultSelectedAssetIds` | `readonly string[]` | No | `[]` |
+| `onSelectionChange` | `(assetIds: string[]) => void` | No | — |
+| `query` / `defaultQuery` | `MediaLibraryQuery` / `Partial<MediaLibraryQuery>` | No | All assets, grid view |
+| `onQueryChange` | `(query: MediaLibraryQuery) => void` | No | — |
+| `loading` / `loadingNextPage` | `boolean` | No | `false` |
+| `error` / `permissionDenied` | `ReactNode` / `boolean` | No | — / `false` |
+| `canUpload` | `boolean` | No | Inferred from `upload` callbacks |
+| `upload` | `MediaLibraryUploadActions` | No | — |
+| `onCreateFolder` / `onRenameFolder` / `onMoveFolder` | Caller callbacks | No | — |
+| `onCopyReference` | `(assetId: string) => void \| Promise<void>` | No | — |
+| `onBulkAction` | `(assetIds, action) => result \| void \| Promise<result \| void>` | No | — |
+| `onSaveAsset` / `showDetailsPanel` | Metadata callback / `boolean` | No | — / `false` |
+
+`MediaLibraryAsset` is a client-safe projection containing public display metadata and optional previews. It excludes storage-object keys, tenant/audit internals, and processing errors. Set preview URLs explicitly from the caller; they are ephemeral authorized image or poster URLs, not asset references.
+Media previews request unoptimized rendering from configured framework image components, avoiding an image optimizer for these temporary URLs. The caller must still authorize each URL and control its lifetime.
+
+```tsx
+import { MediaLibrary } from "@puzzle-ui/pieces";
+import type { MediaLibraryAsset, MediaLibraryFolder } from "@puzzle-ui/pieces";
+
+const assets: MediaLibraryAsset[] = getBrowserSafeAssets();
+const folders: MediaLibraryFolder[] = getBrowserSafeFolders();
+
+<MediaLibrary
+  assets={assets}
+  folders={folders}
+  selectionMode="multiple"
+  onSelectionChange={(assetIds) => setSelectedIds(assetIds)}
+  onQueryChange={(query) => setQueryForCallerOwnedData(query)}
+/>;
+```
+
+### Filtering, pagination, and state
+
+The default query browses all supplied assets (`folderId: null`); selecting a folder limits results to that folder. Search, kind/status/tag filters, sorting, grid/list mode, and local pagination operate over the supplied `assets`. If the caller supplies a new controlled `query`, it should also supply matching assets. `onQueryChange` reports intent; Pieces never fetches a page. Use `loadingNextPage` while the application updates data.
+
+The component distinguishes an empty library, empty folder, no matching results, initial loading, next-page loading, errors, and permission denial. Optional folder callbacks provide create, rename, and move controls. Optional bulk actions report per-asset success and failure IDs/messages. `onCopyReference` receives one asset ID so the application can copy an authorized reference without exposing a URL through the selection API.
+
+### Uploads
+
+Pass caller-owned `upload.image`, `upload.video`, or `upload.file` actions to enable their corresponding existing UI uploader and drop zone. Image processing and video metadata/poster preparation are handled by UI; transfer and server processing remain caller-owned. A successful upload action may return an asset ID, which is forwarded to `upload.onAssetUploaded`.
+
+### Responsive behavior, keyboard, and theming
+
+Folder navigation uses UI `TreeView` keyboard behavior. Native buttons and controls support keyboard selection and visible focus; the layout collapses to one column on narrow screens and wraps filters without horizontal overflow. Scoped CSS uses semantic `--puzzle-*` Theme tokens. Wrap the component in `Theme` for themed colors, spacing, borders, and typography.
+
+## Customization and composition
+
+Use `selectionMode="none"` for browse-only use or controlled `selectedAssetIds` when the parent owns the selection. Add `onSaveAsset` and `showDetailsPanel` to compose an `AssetDetailsPanel` for the single selected asset. Supply only actions the current user may perform; the component does not infer permissions or persist callbacks.
+
+## TypeScript example
+
+See the example above for a controlled selection and query. The caller maps any selected IDs to its own data model.
+
+## Related components
+
+- [AssetPickerDialog](/docs/pieces/components/asset-picker-dialog) for confirmed form selection.
+- [AssetDetailsPanel](/docs/pieces/components/asset-details-panel) for metadata and image editing.
+- [MediaField](/docs/pieces/components/media-field) for form integration.
+- [Media workflows overview](/docs/pieces/components/media).
+
+## API maturity
+
+API maturity: Stable.
+
+See the [framework integration guide](/docs/pieces/framework-integration) for client and SSR boundaries.

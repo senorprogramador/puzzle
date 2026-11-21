@@ -37,12 +37,28 @@
         "FooterSection": "apps/site/content/docs/pieces/components/footer-section.mdx",
         "HouseRulesSection": "apps/site/content/docs/pieces/components/house-rules.mdx",
         "OpeningHoursSection": "apps/site/content/docs/pieces/components/opening-hours.mdx",
+        "AssetDetailsPanel": "apps/site/content/docs/pieces/components/asset-details-panel.mdx",
+        "AssetPickerDialog": "apps/site/content/docs/pieces/components/asset-picker-dialog.mdx",
+        "AuditLogViewer": "apps/site/content/docs/pieces/components/audit-log-viewer.mdx",
+        "BlockEditor": "apps/site/content/docs/pieces/components/block-editor.mdx",
+        "CmsShell": "apps/site/content/docs/pieces/components/cms-shell.mdx",
+        "ContentEditor": "apps/site/content/docs/pieces/components/content-editor.mdx",
+        "ContentList": "apps/site/content/docs/pieces/components/content-list.mdx",
+        "ContentTypeBuilder": "apps/site/content/docs/pieces/components/content-type-builder.mdx",
+        "EditorialCalendar": "apps/site/content/docs/pieces/components/editorial-calendar.mdx",
+        "LocalizationEditor": "apps/site/content/docs/pieces/components/localization-editor.mdx",
+        "MediaField": "apps/site/content/docs/pieces/components/media-field.mdx",
+        "MediaLibrary": "apps/site/content/docs/pieces/components/media-library.mdx",
         "MetricComparison": "apps/site/content/docs/pieces/components/data-display.mdx",
+        "PublishScheduler": "apps/site/content/docs/pieces/components/publish-scheduler.mdx",
         "RatePlansSection": "apps/site/content/docs/pieces/components/rate-plans.mdx",
+        "RelationshipField": "apps/site/content/docs/pieces/components/relationship-field.mdx",
+        "RevisionHistory": "apps/site/content/docs/pieces/components/revision-history.mdx",
         "RestaurantMenuSection": "apps/site/content/docs/pieces/components/restaurant-menu.mdx",
         "StaySummarySection": "apps/site/content/docs/pieces/components/stay-summary.mdx",
         "ServiceOptionsSection": "apps/site/content/docs/pieces/components/service-options.mdx",
-        "TableReservationSection": "apps/site/content/docs/pieces/components/table-reservation.mdx"
+        "TableReservationSection": "apps/site/content/docs/pieces/components/table-reservation.mdx",
+        "WebhookManagement": "apps/site/content/docs/pieces/components/webhook-management.mdx"
       },
       "compositionOverrides": {
         "DashboardOverviewSection": "section"
@@ -128,6 +144,31 @@
           "useCases": ["business"],
           "capabilities": ["responsive", "composable"],
           "composition": "section"
+        },
+        "media": {
+          "useCases": ["media", "data-display"],
+          "pageTypes": ["workspace", "form"],
+          "capabilities": [
+            "responsive",
+            "interactive",
+            "keyboard-navigation",
+            "media",
+            "data-entry",
+            "composable"
+          ],
+          "composition": "primitive"
+        },
+        "cms": {
+          "useCases": ["content", "dashboard"],
+          "pageTypes": ["dashboard", "workspace", "form"],
+          "capabilities": [
+            "responsive",
+            "interactive",
+            "keyboard-navigation",
+            "data-entry",
+            "composable"
+          ],
+          "composition": "primitive"
         }
       }
     },
@@ -150,6 +191,7 @@
         "NextFoldBoundary": "FoldBoundary",
         "NextFoldProvider": "FoldProvider",
         "NextStaticBoundary": "StaticBoundary",
+        "RepeaterField": "FieldArray",
         "TanStackDeferredBoundary": "DeferredBoundary",
         "TanStackFoldBoundary": "FoldBoundary",
         "TanStackFoldProvider": "FoldProvider",
@@ -157,6 +199,38 @@
         "TanStackStaticBoundary": "StaticBoundary"
       },
       "nonComponentExports": [
+        "MAX_TEXT_LIST_INDENT",
+        "applyMarkdownShortcut",
+        "applyListType",
+        "createTextDocument",
+        "getListSelectionState",
+        "getListType",
+        "mergeListItemBackward",
+        "normalizeTextDocument",
+        "normalizeTextSelection",
+        "parseHtmlToDocument",
+        "parseMarkdownToDocument",
+        "removeList",
+        "serializeTextDocumentToHtml",
+        "serializeTextDocumentToMarkdown",
+        "setListAttributes",
+        "setListChecked",
+        "setListIndent",
+        "setBlockIndent",
+        "setListInteractive",
+        "setListType",
+        "setBlockType",
+        "insertHorizontalRule",
+        "clearFormatting",
+        "deleteTextAtSelection",
+        "getTextStatistics",
+        "getSlashCommandAtSelection",
+        "findTextInDocument",
+        "replaceAllText",
+        "splitListItemAtSelection",
+        "toggleListItemChecked",
+        "useTextEditor",
+        "validateTextDocument",
         "useCarouselContext",
         "useFold",
         "useFoldOptimization",

@@ -1209,6 +1209,33 @@
       "aliases": []
     },
     {
+      "name": "JsonEditor",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "editors",
+      "subcategory": "json-editor",
+      "description": "Edit, format, and validate serialized JSON.",
+      "documentation": "apps/site/content/docs/ui/editors/json-editor.mdx",
+      "source": "packages/ui/src/components/editors/json-editor/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "JSON Editor"
+      },
+      "aliases": []
+    },
+    {
       "name": "TextEditor",
       "package": "@puzzle-ui/ui",
       "entryPoints": [
@@ -1233,6 +1260,9 @@
         "kind": "compound-root",
         "family": "TextEditor"
       },
+      "dataRequirements": [
+        "shortcuts (optional)"
+      ],
       "interactiveBehavior": [
         "onChange"
       ],
@@ -1293,6 +1323,12 @@
         "kind": "compound-part",
         "family": "TextEditor"
       },
+      "requiredProps": [
+        "document"
+      ],
+      "interactiveBehavior": [
+        "onChecklistChange"
+      ],
       "aliases": []
     },
     {
@@ -1404,6 +1440,43 @@
       "aliases": []
     },
     {
+      "name": "FieldArray",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "field-array",
+      "description": "Manage controlled repeated and nested form fields.",
+      "documentation": "apps/site/content/docs/ui/forms/field-array.mdx",
+      "source": "packages/ui/src/components/forms/field-array/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "FieldArray"
+      },
+      "aliases": [
+        {
+          "name": "RepeaterField",
+          "canonicalExport": "FieldArray",
+          "entryPoints": [
+            "."
+          ],
+          "source": "packages/ui/src/index.ts",
+          "documentation": "apps/site/content/docs/ui/forms/field-array.mdx"
+        }
+      ]
+    },
+    {
       "name": "FileUpload",
       "package": "@puzzle-ui/ui",
       "entryPoints": [
@@ -1454,6 +1527,87 @@
       "composition": {
         "kind": "primitive",
         "family": "Form Field"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ImageCropper",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "image-cropper",
+      "description": "Select, resize, and zoom a normalized image crop.",
+      "documentation": "apps/site/content/docs/ui/forms/image-cropper.mdx",
+      "source": "packages/ui/src/components/forms/image-cropper/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Image Cropper"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ImageHotspotEditor",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "image-hotspot-editor",
+      "description": "Place normalized image focal points and hotspot areas.",
+      "documentation": "apps/site/content/docs/ui/forms/image-hotspot-editor.mdx",
+      "source": "packages/ui/src/components/forms/image-hotspot-editor/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Image Hotspot Editor"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ImageUpload",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "image-upload",
+      "description": "Resize images, prepare variants, and inject upload handling.",
+      "documentation": "apps/site/content/docs/ui/forms/image-upload.mdx",
+      "source": "packages/ui/src/components/forms/image-upload/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Image Upload"
       },
       "aliases": []
     },
@@ -1812,6 +1966,33 @@
       "composition": {
         "kind": "primitive",
         "family": "Token Input"
+      },
+      "aliases": []
+    },
+    {
+      "name": "VideoUpload",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "video-upload",
+      "description": "Preview video metadata and compose resumable uploads.",
+      "documentation": "apps/site/content/docs/ui/forms/video-upload.mdx",
+      "source": "packages/ui/src/components/forms/video-upload/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Video Upload"
       },
       "aliases": []
     },

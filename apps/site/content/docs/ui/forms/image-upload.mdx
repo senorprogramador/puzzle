@@ -1,0 +1,80 @@
+---
+title: React Image Upload Component
+description: Prepare image uploads with orientation-aware resizing, named variants, previews, optional cropping, hotspots, and an injected upload action.
+---
+
+import { Badge, ImageUpload, Preview, Section } from "@puzzle-ui/ui";
+import { ImageUploadExample } from "../../../../src/components/doc-examples/ui/media-uploads";
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This component is new and may evolve as its usage is validated.
+
+`ImageUpload` combines the generic [`FileUpload`](/docs/ui/forms/file-upload) selection and validation behavior with local image preparation. It shows a source preview, dimensions, sizes, and named variants. It does not choose a server, persist an asset, or send a request itself.
+
+## Prepare images locally
+
+Select one or more images. The default processed file is resized without upscaling; optional named `profiles` create additional outputs. Browser orientation is applied and re-encoded outputs do not retain source metadata.
+
+<Preview
+  align="start"
+  hideDevices
+  code={`\
+<ImageUpload
+  maxWidth={2048}
+  maxHeight={2048}
+  quality={0.85}
+  profiles={[
+    { name: "thumbnail", maxWidth: 480, maxHeight: 480 },
+    { name: "hero", maxWidth: 1600, maxHeight: 900 },
+  ]}
+  onUpload={async (result, { signal, onProgress }) => {
+    await uploadToYourService(result.file, {
+      original: result.original,
+      variants: result.variants,
+      signal,
+      onProgress,
+    });
+  }}
+/>\
+`}
+>
+  <Section>
+    <ImageUploadExample />
+  </Section>
+</Preview>
+
+Without `onUpload`, files are prepared locally and remain in the component; no upload is attempted. With a handler and no editing controls, the handler is called after local processing. When crop or hotspot editing is enabled, preparation stays local until the user confirms with **Upload image**. Pass the supplied `AbortSignal` to the transport and report transfer progress from `0` to `100`.
+
+The original is **not** included by default. Set `retainOriginal` only when your application explicitly needs it: the retained file can still contain EXIF/GPS metadata. The `processed` result includes the default output's dimensions, format, and byte size; each named variant includes the same metadata. The UI shows the source and processed dimensions and their size difference.
+
+Each item reports `processing`, `uploading`, `ready`, `uploaded`, `failed`, or `cancelled` through its visible status. Failed uploads can be retried without reprocessing a prepared result; cancelled or failed processing can be prepared again.
+
+## Crop and hotspot composition
+
+`enableCrop` adds `ImageCropper` before processing. The crop is applied to the generated output; the returned normalized crop remains in the original source coordinate space. `enableHotspots` adds `ImageHotspotEditor`; its normalized focal point and hotspots use that same source coordinate space. The values are returned separately as `crop` and `hotspots`; the component does not infer a focal point, transform hotspot values, or persist the annotations.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `accept` | `readonly string[]` | `["image/*"]` | Accepted MIME types. |
+| `multiple` | `boolean` | `false` | Allow selecting multiple images. |
+| `maxFiles` | `number` | — | Maximum selected image count in multiple mode. |
+| `maxFileSize` | `number` | — | Maximum source size in bytes per image. |
+| `maxTotalSize` | `number` | — | Maximum combined selected size in bytes. |
+| `maxWidth`, `maxHeight` | `number` | `2048` each | Maximum default output dimensions; images are not upscaled. |
+| `quality` | `number` | `0.85` | Encoding quality from `0` to `1`. |
+| `format` | `"image/jpeg" \| "image/png" \| "image/webp" \| "image/avif"` | Source format or PNG | Requested output format. |
+| `profiles` | `{ name: string; maxWidth?: number; maxHeight?: number; format?: string; quality?: number }[]` | — | Optional named responsive variants. Each profile needs a name and at least one maximum dimension. |
+| `retainOriginal` | `boolean` | `false` | Include the unmodified source `File` in the upload result. |
+| `enableCrop` | `boolean` | `false` | Show an optional normalized crop editor and require explicit upload confirmation. |
+| `cropAspectRatio` | `number \| "free"` | `"free"` | Aspect ratio for the crop editor. |
+| `enableHotspots` | `boolean` | `false` | Show focal-point and hotspot editing; requires explicit upload confirmation. |
+| `onUpload` | `ImageUploadHandler` | — | Receives processed file, processing metadata, optional original and named variants, crop/hotspots, and an abortable progress context. |
+| `onChange` | `(files: File[]) => void` | — | Called when selection changes. |
+| `onProgress` | `(file, progress) => void` | — | Called for local processing and upload progress. |
+| `onCropChange` | `(file, crop) => void` | — | Receives normalized crop changes. |
+| `onHotspotsChange` | `(file, value) => void` | — | Receives normalized focal point and hotspot changes. |
+
+Other selection, validation, accessibility, and presentation props follow [`FileUploadProps`](/docs/ui/forms/file-upload#props). The public types `ImageUploadProps`, `ImageUploadResult`, `ImageUploadContext`, `ImageUploadHandler`, and `ImageUploadStatus` are exported from `@puzzle-ui/ui`.
+
+The browser helpers are used only after a user selects an image. Importing the UI package remains SSR-safe; do not call browser processing helpers during server rendering.

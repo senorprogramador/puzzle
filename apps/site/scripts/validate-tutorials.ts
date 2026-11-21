@@ -3,7 +3,7 @@ import { access, cp, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "no
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { Glob } from "bun";
-import { items } from "../src/components/layout/constants";
+import { items } from "../src/components/layout/sidebar/index";
 
 const site = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const root = resolve(site, "../..");

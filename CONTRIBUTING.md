@@ -52,8 +52,10 @@ The packages are grouped by responsibility:
 | `hooks`, `icons` | React hooks and icon components |
 | `theme`, `ui`, `pieces` | Theme system, UI components, and composed sections |
 | `seo` | Metadata, structured data, sitemap, and robots utilities |
-| `auth`, `session`, `fullstack` | Authentication, sessions, and framework integrations |
-| `storage`, `storage-d1`, `storage-mongodb` | Storage contracts and adapters |
+| `auth`, `session`, `fullstack` | Authentication, sessions, media/CMS APIs, and framework integrations |
+| `storage`, `storage-d1`, `storage-mongodb` | Record storage contracts and adapters |
+| `media` | Media asset, binary object-storage, and processing contracts |
+| `cms` | Content schemas, entries, revisions, and publishing services |
 | `create` | Interactive application generator |
 
 ## Getting started

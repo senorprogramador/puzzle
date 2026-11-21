@@ -30,7 +30,7 @@ const routerCoreResolution: Plugin = {
 const DAY = 60 * 60 * 24;
 const YEAR = DAY * 365;
 
-const cachedForADay = ["/", "/docs", "/docs/**"];
+const revalidatedRoutes = ["/", "/docs", "/docs/**", "/theme-studio"];
 
 const cachedForAYear = [
   "/assets/**",
@@ -46,9 +46,9 @@ const cachedForAYear = [
   "/web-app-manifest-512x512.png",
 ];
 
-const dayCache = {
+const revalidatedCache = {
   headers: {
-    "cache-control": `public, max-age=${DAY}, s-maxage=${DAY}`,
+    "cache-control": "no-cache",
   },
 };
 
@@ -146,7 +146,7 @@ export default defineConfig({
       compressPublicAssets: true,
       routeRules: {
         ...Object.fromEntries([
-          ...cachedForADay.map((path) => [path, dayCache]),
+          ...revalidatedRoutes.map((path) => [path, revalidatedCache]),
           ...cachedForAYear.map((path) => [path, immutableCache]),
         ]),
         ...createFontRouteRules(),

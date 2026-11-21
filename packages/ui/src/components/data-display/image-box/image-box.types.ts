@@ -12,6 +12,8 @@ type ImageBoxProps = {
   gap?: number | string;
   radius?: number | string;
   className?: string;
+  /** Forward unoptimized to a configured framework image component. */
+  unoptimized?: boolean;
   onImageClick?: (image: ImageBoxImage, index: number) => void;
   onViewAll?: () => void;
 };

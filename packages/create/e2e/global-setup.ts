@@ -24,6 +24,8 @@ const PACKED_PACKAGES = [
   "icons",
   "theme",
   "ui",
+  "media",
+  "cms",
   "storage",
   "session",
   "auth",

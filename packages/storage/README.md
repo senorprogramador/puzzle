@@ -2,6 +2,10 @@
 
 Vendor-neutral storage contracts for Puzzle Auth and other packages. This package defines the typed adapter API, query language, migration protocol, and reusable adapter conformance suites; it does not bundle a database implementation.
 
+CMS content and media metadata can use this record contract. Do not store file
+bytes here; `@puzzle-ui/media` defines a separate object-storage adapter for
+binary data.
+
 **Documentation: [puzzle-ui.com/docs/storage](https://puzzle-ui.com/docs/storage)**
 
 ## Install

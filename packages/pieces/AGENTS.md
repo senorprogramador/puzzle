@@ -16,13 +16,21 @@ Compose several families where the page needs them, with visual and layout varie
 
 ## 4. Dependencies
 
-Runtime Puzzle dependencies are Core, Hooks, Icons, Theme, and UI; React and React DOM 19 are peers. Pieces must remain router- and backend-independent. Do not add database, authentication, payment, booking, or third-party map-service dependencies.
+Runtime Puzzle dependencies are Core, Hooks, Icons, Theme, and UI; React and React DOM 19 are peers. Pieces must remain router- and backend-independent. Do not add database, authentication, payment, booking, or third-party map-service dependencies. The optional CMS authoring family uses framework-neutral `@puzzle-ui/cms` types only; data access, authorization, and persistence remain caller-owned.
 
 ## 5. Implementation conventions
 
 Use mobile-first, fluid layouts; allow content to wrap; handle image sizing/cropping and meaningful caller-supplied `alt`; use consistent tokenized spacing and semantic Theme tokens. Use UI responsive primitives where they fit. Preserve semantic headings, native controls, keyboard/focus access, reduced motion, and client boundaries for interactive forms, filters, selectors, and dialogs.
 
 Keep all data and actions presentation-only. Do not add persistence, business rules, fetches, navigation, or service calls to a Piece.
+
+Media workflows use the Pieces-owned `MediaLibraryAsset` browser projection,
+not media-domain records. Keep storage object keys, tenant/audit internals, and
+processing errors out of the projection; preview URLs are temporary and
+caller-authorized. Reuse public UI media, navigation, table, and overlay
+components rather than implementing duplicates.
+Webhook management receives sanitized caller-owned projections and callbacks;
+secret values and references must remain server-side.
 
 ## 6. Testing
 

@@ -28,10 +28,15 @@ const nonSectionPages = new Set([
   "restaurant-experience",
 ]);
 
-const flattenNavigation = (item: NavigationItem): NavigationItem[] => [
-  item,
-  ...(item.children ?? []).flatMap(flattenNavigation),
-];
+const workflowCategories = new Set([
+  "/docs/pieces/components/media",
+  "/docs/pieces/components/cms",
+]);
+
+const flattenNavigation = (item: NavigationItem): NavigationItem[] =>
+  item.href && workflowCategories.has(item.href)
+    ? []
+    : [item, ...(item.children ?? []).flatMap(flattenNavigation)];
 
 const isComponentEntry = (
   item: NavigationItem,

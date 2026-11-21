@@ -14,6 +14,8 @@ import type { StorageAdapter } from "@puzzle-ui/storage";
 Choose a database adapter separately and check the capabilities it actually
 reports. Use the shared query and migration contracts; treat
 `StorageSchema` only as documented, not as automatic input validation.
+Use Storage for media metadata and CMS records, not binary file bytes; media
+bytes belong in the separate `@puzzle-ui/media` object-storage contract.
 
 Do not put database-specific options or authentication policy in the shared
 contract, or assume transactional, conditional-write, or TTL guarantees. See

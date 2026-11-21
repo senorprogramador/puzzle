@@ -1,19 +1,20 @@
 ---
-title: React Text Editors
-description: Add a rich-text editing surface to React applications with Puzzle's text editor and its documented formatting and rendering APIs.
+title: React Editors
+description: Edit serialized JSON and rich-text documents with Puzzle's React editor controls.
 ---
 
 import { UIComponentCatalog } from "../../../../src/components/doc-examples/ui/component-catalog";
 
-The editor category currently contains Puzzle's rich-text editor. It is
-intended for authoring formatted content, rather than ordinary single-line or
-multi-line form input.
+The editor category contains a JSON source editor and a rich-text editor. They
+support distinct serialized formats and should not be used interchangeably.
 
 ## When to use an editor
 
-Use the text editor when people need formatting controls for authored content.
-For plain text fields, prefer the smaller controls in [Forms](/docs/ui/forms);
-for displaying already-authored content, use a display component instead.
+Use `JsonEditor` to edit serialized JSON with caller-provided validation. Use
+`TextEditor` when people need formatting controls for authored content. For
+ordinary plain text fields, prefer the smaller controls in
+[Forms](/docs/ui/forms); for displaying authored content, use a display
+component instead.
 
 ## Components
 
@@ -21,7 +22,8 @@ for displaying already-authored content, use a display component instead.
 
 ## Start here
 
-Read the [Text Editor reference](/docs/ui/editors/text-editor) for setup,
-supported content, and the editor's public API. For text entry without rich
+Read the [JSON Editor reference](/docs/ui/editors/json-editor) for serialized
+source editing and validation, or the [Text Editor reference](/docs/ui/editors/text-editor)
+for rich text and its structured document API. For text entry without rich
 formatting, compare [Text Input](/docs/ui/forms/text-input) and
 [Text Area Input](/docs/ui/forms/text-area-input).

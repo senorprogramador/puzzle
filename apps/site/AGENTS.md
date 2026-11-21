@@ -10,7 +10,7 @@ This is Puzzle's documentation and component-catalog site, built with TanStack S
 - UI pages belong under `ui/<category>/<component>.mdx`; Pieces pages belong in the established `pieces/` catalog structure. For package overviews, follow an existing overview and the package-overview checks rather than inventing a second catalog format.
 - Use Fumadocs `<Preview>` for runnable examples. Import components explicitly from their public package entry points and use nearby MDX pages as the source of truth for imports and prop examples.
 - Keep stateful/reusable examples in the site's existing `doc-examples` modules and import them using the nearby page's relative-path pattern. Do not put application-only state or package internals in a published example.
-- Add each new documentation route to [`src/components/layout/sidebar.tsx`](./src/components/layout/sidebar.tsx) in the appropriate section. Keep its `href` aligned with the route slug.
+- Add each new documentation route to the appropriate group under [`src/components/layout/sidebar/`](./src/components/layout/sidebar/). Its index exports the six navigation groups; large package catalogs remain separate modules. Keep each `href` aligned with the existing route slug and include a page only once. Contributing and Testing belong in Project, not Developer Guide.
 
 ## Catalog, search, and SEO
 
@@ -27,6 +27,8 @@ The root layout configures `@puzzle-ui/theme` and framework-aware link/image com
 Run commands from `apps/site/`:
 
 - `bun run typecheck`
+- `bun run test:navigation`
+- `bun run test:navigation:browser` (after building the production site)
 - `bun run test:seo`
 - `bun run test:sitemap`
 - `bun run test:seo:smoke`

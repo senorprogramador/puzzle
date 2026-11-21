@@ -1,0 +1,129 @@
+---
+title: React FieldArray and RepeaterField
+description: Build accessible repeatable and nested React form fields with caller-controlled values, add/remove constraints, ordering, and typed validation.
+---
+
+import { Badge, Preview, Section } from "@puzzle-ui/ui";
+import { FieldArrayExample } from "../../../../src/components/doc-examples/ui/field-array";
+
+Use `FieldArray` to render a controlled list of repeated form fields. It supplies
+semantic groups and add, remove, and optional reorder actions; the caller owns
+each item’s data, nested fields, validation rules, and submission. `RepeaterField`
+is an alias for the same component and props.
+
+<Badge content="Beta" color="warning" /> **API maturity: Beta.** The API is
+available for evaluation and may change before it is considered stable.
+
+## Import
+
+```tsx
+import { FieldArray, RepeaterField } from "@puzzle-ui/ui";
+```
+
+## Repeatable fields
+
+Provide `items`, `onChange`, a `createItem` factory, and a `renderItem`
+function. The rendering function receives the current item, index, and total
+count so you can compose any UI controls, including another `FieldArray` for
+nested values.
+
+<Preview
+  align="start"
+  code={`\
+<FieldArrayExample />
+`}
+>
+  <Section>
+    <FieldArrayExample />
+  </Section>
+</Preview>
+
+The `RepeaterField` name is an equivalent alias for teams that prefer that
+terminology:
+
+```tsx
+import { useState } from "react";
+import { FormField, RepeaterField, TextInput } from "@puzzle-ui/ui";
+
+const Tags = () => {
+  const [tags, setTags] = useState(["news"]);
+
+  return (
+    <RepeaterField
+      label="Tags"
+      items={tags}
+      onChange={setTags}
+      createItem={() => ""}
+      renderItem={({ item, index }) => (
+        <FormField label={`Tag ${index + 1}`}>
+          <TextInput
+            value={item}
+            onChange={(event) =>
+              setTags((current) =>
+                current.map((tag, tagIndex) =>
+                  tagIndex === index ? event.currentTarget.value : tag,
+                ),
+              )
+            }
+          />
+        </FormField>
+      )}
+    />
+  );
+};
+```
+
+Use `getItemKey` when entries have a stable identifier, especially when
+reordering. By default, the array index is used as the React key.
+
+## Validation and bounds
+
+Use `minItems` and `maxItems` to disable removal or addition at the configured
+limits. The optional synchronous `validate` callback returns an error string
+or `null`; `error` can carry a caller-owned server or form error. Error state is
+associated with the fieldset through `aria-describedby` and `aria-invalid`.
+Your application remains the source of truth for validation and submission.
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `items` | `readonly T[]` | Current controlled array value. |
+| `onChange` | `(items: T[]) => void` | Receives the next array after an action. |
+| `createItem` | `() => T` | Creates the value appended by the add action. |
+| `renderItem` | `(context: FieldArrayItemContext<T>) => React.ReactNode` | Renders one item’s fields. The context contains `item`, `index`, and `count`. |
+| `label` | `ReactNode` | Visible group label, rendered as the fieldset legend. |
+| `description` | `ReactNode` | Supporting text associated with the array. |
+| `itemLabel` | `(item: T, index: number) => ReactNode` | Item legend; defaults to `Item {index + 1}`. |
+| `getItemKey` | `(item: T, index: number) => React.Key` | Stable React key for each item. |
+| `minItems`, `maxItems` | `number` | Bounds that disable remove or add actions. |
+| `reorderable` | `boolean` | Shows keyboard-operable move-up and move-down buttons. |
+| `validate` | `(items: readonly T[]) => string \| null` | Optional synchronous caller-provided validation. |
+| `error` | `ReactNode \| boolean` | External validation message; `true` uses a default message. |
+| `invalid` | `boolean` | Explicit invalid state. |
+| `addLabel`, `removeLabel`, `moveUpLabel`, `moveDownLabel` | `string` or callback | Accessible action labels. |
+| `emptyMessage` | `ReactNode` | Message displayed when there are no items. |
+| `disabled` | `boolean` | Disables the fieldset and its controls. |
+| `className` and native fieldset attributes | - | Applied to the outer fieldset. |
+
+`FieldArrayItemContext<T>` and `FieldArrayProps<T>` are exported from
+`@puzzle-ui/ui`; `T` remains the caller's item type.
+
+## Accessibility and compatibility
+
+The outer and item groups use native `fieldset` and `legend` elements. Actions
+are native buttons and remain keyboard operable; their labels identify the
+affected item. Descriptions and errors are programmatically associated with
+the outer group. Use labels for each nested input, and supply stable item keys
+when ordering values.
+
+The component renders without browser APIs and uses Puzzle theme tokens. UI
+targets React 19; verify framework-specific SSR and hydration behavior in your
+application.
+
+## Related documentation
+
+- [Form Field](/docs/ui/forms/form-field)
+- [Text Input](/docs/ui/forms/text-input)
+- [JSON Editor](/docs/ui/editors/json-editor)
+- [UI component index](/docs/ui)

@@ -16,13 +16,19 @@ Components are grouped under `src/components/<category>/<component>/`; a typical
 
 ## 4. Dependencies
 
-Runtime dependencies are `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, and `@puzzle-ui/theme`; React and React DOM 19 are peer dependencies. Use Theme's link/image overrides for framework components rather than importing a router.
+Runtime dependencies are `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/theme`, and `@puzzle-ui/media`. UI imports only the SSR-safe `@puzzle-ui/media/browser` entry point for image/video preparation; never import the media root, server handlers, or storage adapters into UI. React and React DOM 19 are peer dependencies. Use Theme's link/image overrides for framework components rather than importing a router.
 
 ## 5. Implementation conventions
 
 Use semantic HTML and native browser behavior first. Preserve keyboard and focus behavior, accessible relationships, disabled/loading/error states, responsive layouts, and reduced-motion preferences. Keep CSS scoped to the component and use existing `--puzzle-*` tokens. Keep UI state limited to interaction; follow each component's documented controlled/uncontrolled API rather than adding application state.
 
 Maintain server/client isolation and SSR-safe initial output. Interactive modules should follow existing client boundaries; do not access browser APIs at module load.
+
+TextEditor list configuration must retain the saved editor selection while
+popovers have focus. Icon-color previews use the editor's preview transaction:
+cancel or dismissal restores the baseline without adding history; confirmation
+adds one undo step. Keep nested popouts independent and cover these interactions
+in the TextEditor Chromium browser tests.
 
 ## 6. Testing
 

@@ -14,6 +14,8 @@
     "start": "node .output/server/index.mjs",
     "fonts:download": "bun ../../packages/theme/src/cli.ts fonts download --config src/puzzle-fonts.json --subsets latin,latin-ext",
     "test:seo": "bun test src/lib/seo.test.ts src/lib/homepage.test.ts src/lib/mdx-to-markdown.test.ts src/lib/seo-routes.test.ts src/lib/faq.test.ts src/lib/search-intents.test.ts src/lib/content-pages.test.ts",
+    "test:navigation": "bun test src/components/layout/sidebar/navigation.test.ts",
+    "test:navigation:browser": "bun scripts/validate-navigation.ts",
     "test:sitemap": "bun test src/lib/seo-routes.test.ts",
     "test:seo:smoke": "bun scripts/validate-seo-endpoints.ts",
     "test:catalog": "bun test src/components/component-catalog.test.ts",
@@ -24,7 +26,7 @@
     "test:theme-studio": "bun test src/components/theme-studio",
     "test:homepage:theme": "bun scripts/validate-homepage-theme.ts",
     "test:preview-layout": "bun scripts/validate-preview-layout.ts",
-    "validate:seo": "bun run test:seo && bun run test:catalog && bun run test:mdx && bun run test:tutorials && bun run typecheck && bun run build && bun run test:homepage:theme && bun run test:hydration && bun run test:seo:smoke",
+    "validate:seo": "bun run test:seo && bun run test:navigation && bun run test:catalog && bun run test:mdx && bun run test:tutorials && bun run typecheck && bun run build && bun run test:navigation:browser && bun run test:homepage:theme && bun run test:hydration && bun run test:seo:smoke",
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {

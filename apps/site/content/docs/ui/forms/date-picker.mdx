@@ -348,6 +348,31 @@ return (
   <Section><DatePickerFormExample /></Section>
 </Preview>
 
+## Selecting a date range
+
+For a start and end date without a shared range highlight, compose two
+controlled `DatePicker` fields. Let the caller own both values and constrain
+each endpoint with the other's `minDate` or `maxDate`:
+
+```tsx
+<DatePicker
+  label="Start date"
+  value={startDate}
+  onChange={setStartDate}
+  maxDate={endDate ?? undefined}
+/>
+<DatePicker
+  label="End date"
+  value={endDate}
+  onChange={setEndDate}
+  minDate={startDate ?? undefined}
+/>
+```
+
+This composition supports separate endpoint selection and bounds. It does not
+render a continuous range highlight or manage range state; keep those needs in
+the application until a dedicated range interaction is required.
+
 ## API
 
 ### Selection and field props

@@ -1,13 +1,13 @@
 # Puzzle repository architecture
 
-Puzzle is a TypeScript and React ecosystem designed for both human developers and AI-assisted application development. Its independently adoptable packages cover UI primitives, composed page sections, design tokens and theming, hooks and utilities, authentication and sessions, database-neutral storage contracts and adapters, framework integrations, SEO, and application scaffolding.
+Puzzle is a TypeScript and React ecosystem designed for both human developers and AI-assisted application development. Its independently adoptable packages cover UI primitives, composed page sections, design tokens and theming, hooks and utilities, authentication and sessions, media asset management, headless CMS content, database-neutral storage contracts and adapters, framework integrations, SEO, and application scaffolding.
 
 ## Monorepo organization
 
-The root [`package.json`](../../../package.json) defines the Bun workspaces. At the time this index was written, expanding those patterns discovers 21 workspaces: 4 applications and 17 packages. The root manifest and each matched package manifest are authoritative; package names come from each manifest's `name`, not its directory.
+The root [`package.json`](../../../package.json) defines the Bun workspaces. Expanding those patterns discovers 24 workspaces: 5 applications and 19 packages. The root manifest and each matched package manifest are authoritative; package names come from each manifest's `name`, not its directory.
 
-- [`apps/`](../../../apps/) contains the documentation site, component playground, and two Workspace examples.
-- [`packages/`](../../../packages/) contains published libraries and private packages shared by the sample apps.
+- [`apps/`](../../../apps/) contains the documentation site, component playground, two Workspace examples, and a React Router SSR/i18n example.
+- [`packages/`](../../../packages/) contains public library workspaces (including packages awaiting release) and private packages shared by the sample apps.
 - [`docs/`](../../) contains repository architecture and engineering notes.
 - [`.github/workflows/`](../../../.github/workflows/) contains CI and project-generation E2E workflows.
 
@@ -16,9 +16,9 @@ The [package map](./package-map.md) records each current workspace's responsibil
 ## Architectural layers
 
 1. **Shared foundations:** `@puzzle-ui/core` supplies framework-independent utilities and rendering contracts; `@puzzle-ui/hooks` supplies React hooks; `@puzzle-ui/icons` supplies React icons.
-2. **Design system:** `@puzzle-ui/theme` owns theme tokens and providers; `@puzzle-ui/ui` provides reusable components; `@puzzle-ui/pieces` composes larger page sections from the design system.
-3. **Application services:** `@puzzle-ui/storage` defines database-neutral contracts; `@puzzle-ui/storage-d1` and `@puzzle-ui/storage-mongodb` implement adapters; `@puzzle-ui/session` and `@puzzle-ui/auth` provide session and authentication services.
-4. **Integration and tooling:** `@puzzle-ui/fullstack` separates auth client, server, and framework adapter entry points; `@puzzle-ui/seo` provides metadata, structured data, sitemap, robots, and framework entry points; `@puzzle-ui/i18n` provides a pre-release locale, ICU, routing, catalog, and SEO toolkit; `@puzzle-ui/create` scaffolds applications.
+2. **Design system:** `@puzzle-ui/theme` owns theme tokens and providers; `@puzzle-ui/ui` provides reusable components and uses the browser-safe Media subpath for image/video preparation; `@puzzle-ui/pieces` composes larger page sections from the design system and uses framework-neutral CMS contracts for optional authoring compositions.
+3. **Application services:** `@puzzle-ui/storage` defines database-neutral record contracts; `@puzzle-ui/storage-d1` and `@puzzle-ui/storage-mongodb` implement adapters; `@puzzle-ui/session` and `@puzzle-ui/auth` provide session and authentication services; `@puzzle-ui/media` provides provider-neutral media and object-storage contracts; `@puzzle-ui/cms` provides content schemas and publishing services.
+4. **Integration and tooling:** `@puzzle-ui/fullstack` separates Auth, Media, and CMS client, server, and framework adapter entry points; `@puzzle-ui/seo` provides metadata, structured data, sitemap, robots, and framework entry points; `@puzzle-ui/i18n` provides a pre-release locale, ICU, routing, catalog, and SEO toolkit; `@puzzle-ui/create` scaffolds applications.
 5. **Workspace examples:** private `@puzzle-ui/workspace` shares Workspace domain contracts/services; `@puzzle-ui/workspace-ui` provides its React UI. The Next.js and TanStack Start apps provide framework-specific application wiring.
 
 ## Direct runtime workspace dependencies
@@ -32,6 +32,7 @@ flowchart LR
     site["apps/site"]
     nextapp["apps/workspace-next"]
     tanapp["apps/workspace-tanstack"]
+    reactrouterapp["apps/workspace-react-router"]
   end
 
   subgraph Packages
@@ -41,6 +42,8 @@ flowchart LR
     theme["@puzzle-ui/theme"]
     ui["@puzzle-ui/ui"]
     pieces["@puzzle-ui/pieces"]
+    media["@puzzle-ui/media"]
+    cms["@puzzle-ui/cms"]
     storage["@puzzle-ui/storage"]
     d1["@puzzle-ui/storage-d1"]
     mongo["@puzzle-ui/storage-mongodb"]
@@ -91,19 +94,25 @@ flowchart LR
   tanapp --> workspace
   tanapp --> workspaceui
 
+  reactrouterapp --> i18n
+
   hooks --> core
   icons --> core
   theme --> core
   ui --> core
   ui --> hooks
   ui --> icons
+  ui --> media
   ui --> theme
   pieces --> core
+  pieces --> cms
   pieces --> hooks
   pieces --> icons
   pieces --> theme
   pieces --> ui
 
+  media --> storage
+  cms --> storage
   d1 --> storage
   mongo --> storage
   session --> storage
@@ -112,6 +121,8 @@ flowchart LR
   fullstack --> ui
   fullstack --> auth
   fullstack --> session
+  fullstack --> media
+  fullstack --> cms
   workspace --> storage
   workspace --> session
   workspaceui --> fullstack
@@ -128,22 +139,23 @@ flowchart LR
 - **`apps/playground` (`@puzzle-ui/playground`):** a client-side Vite reference website composed from UI and Pieces, alongside Storybook for isolated package examples. It has no SSR, database, or Auth; its production-preview browser suite exercises routes, interactions, runtime diagnostics, and responsive overflow.
 - **`apps/workspace-next` (`workspace-next`):** the Next.js App Router example, with server routes and browser UI backed by the shared Workspace packages and MongoDB adapter.
 - **`apps/workspace-tanstack` (`workspace-tanstack`):** the TanStack Start counterpart, using the same domain and UI packages.
+- **`apps/workspace-react-router` (`workspace-react-router`):** a React Router SSR and localization example; it is not backed by the private Workspace domain package.
 
 The Workspace apps are parity-focused examples, not evidence that every package supports every framework or deployment. See [`docs/workspace/architecture.md`](../../workspace/architecture.md) and [`docs/workspace/apps.md`](../../workspace/apps.md) for their shared domain and application boundaries.
 
 ## Framework integrations and client/server boundaries
 
-- `@puzzle-ui/fullstack` exports separate `auth/client`, `auth/shared`, and `auth/server` entries, plus `auth/next` and `auth/tanstack` adapters. React is required; Next.js and TanStack Start are optional framework peers.
+- `@puzzle-ui/fullstack` exports separate Auth, Media, and CMS client/shared/server entries, plus Next.js and TanStack Start adapters. React is required; Next.js and TanStack Start are optional framework peers. The new Media and CMS subpaths are awaiting a coordinated package release.
 - `@puzzle-ui/ui` exposes generic rendering entries plus explicit Next.js and TanStack client/server/shared subpaths. Use the entry point matching the rendering environment.
 - `@puzzle-ui/workspace` keeps client-safe contracts at its root and `/client` entry; server storage initialization and services are available only from `/server`. The Workspace apps inject verified identity and configured storage.
 - `@puzzle-ui/auth`, `@puzzle-ui/session`, and database adapters are server-side infrastructure. Do not import them into browser bundles.
-- `@puzzle-ui/pieces` is router-independent and can render static sections on the server; interactive sections require an appropriate client boundary in frameworks that distinguish server and client components.
+- `@puzzle-ui/pieces` is router-independent and can render static sections on the server; its CMS authoring compositions use caller-provided data/actions and do not replace CMS authorization or persistence. Interactive sections require an appropriate client boundary in frameworks that distinguish server and client components.
 - `@puzzle-ui/seo` separates its shared, React, server, and framework-specific public subpaths. Consult its manifest and docs instead of assuming an adapter's dependency requirements.
 
 ## Build and test infrastructure
 
 - **Workspace/package builds:** Bun workspaces orchestrate package scripts. Most libraries use `tsdown` to emit ESM, CommonJS, and declarations. The root `bun run build` first checks generated SEO schema data, then builds packages under `packages/`.
-- **Applications:** Vite builds the site, playground, and TanStack Start app; Next.js builds the Next app. App-level scripts are defined in each app manifest. Root `bun run typecheck` covers packages and the site, not every application.
+- **Applications:** Vite builds the site, playground, and TanStack Start app; Next.js builds the Next app; the React Router example has its own Vite SSR build. App-level scripts are defined in each app manifest. Root `bun run typecheck` covers packages and the site, not every application.
 - **Tests:** package suites use Vitest, Node's test runner, or Bun's test runner. UI and Pieces include Playwright-backed browser projects; Workspace apps have rendering tests; the playground uses Node's test runner with Playwright against its production preview; site scripts test docs, SEO, tutorials, and hydration. MongoDB adapter integration tests use Docker Compose. `@puzzle-ui/create` has a generated-project E2E suite that also requires network access.
 - **CI:** [`.github/workflows/ci.yml`](../../../.github/workflows/ci.yml) builds, type-checks, installs Chromium, runs `bun run test:all`, and builds the site. The separate Create E2E workflow is in [`.github/workflows/create-e2e.yml`](../../../.github/workflows/create-e2e.yml).
 

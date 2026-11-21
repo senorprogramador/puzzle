@@ -1,0 +1,564 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    "@puzzle-ui/pieces"
+  ],
+  "components": [
+    {
+      "name": "AuditLogViewer",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Filter, inspect, and paginate through caller-authorized CMS audit events.",
+      "documentation": "apps/site/content/docs/pieces/components/audit-log-viewer.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "events"
+      ],
+      "dataRequirements": [
+        "events (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "BlockEditor",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Add, duplicate, remove, and reorder schema-defined serializable content blocks.",
+      "documentation": "apps/site/content/docs/pieces/components/block-editor.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "label",
+        "definitions",
+        "value",
+        "onChange"
+      ],
+      "contentRequirements": [
+        "label (required)"
+      ],
+      "dataRequirements": [
+        "definitions (required)",
+        "value (required)",
+        "onChange (required)"
+      ],
+      "interactiveBehavior": [
+        "onChange",
+        "onInvalidDraftChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "CmsShell",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Compose responsive CMS navigation and page content using caller-provided links and actions.",
+      "documentation": "apps/site/content/docs/pieces/components/cms-shell.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "children",
+        "title",
+        "navigation"
+      ],
+      "contentRequirements": [
+        "children (required)",
+        "title (required)",
+        "description (optional)"
+      ],
+      "dataRequirements": [
+        "navigation (required)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ContentEditor",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Edit CMS fields as controlled values and separate draft saves from publish actions.",
+      "documentation": "apps/site/content/docs/pieces/components/content-editor.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "contentType",
+        "value",
+        "onChange",
+        "onSaveDraft"
+      ],
+      "dataRequirements": [
+        "validationErrors (optional)"
+      ],
+      "interactiveBehavior": [
+        "onChange",
+        "onDiscard",
+        "onInvalidDraftChange",
+        "onPublish",
+        "onSaveDraft"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ContentList",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Search, filter, paginate, and act on caller-provided CMS entries.",
+      "documentation": "apps/site/content/docs/pieces/components/content-list.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "items"
+      ],
+      "contentRequirements": [
+        "title (optional)",
+        "contentTypeName (optional)"
+      ],
+      "dataRequirements": [
+        "items (required)",
+        "locales (optional)"
+      ],
+      "interactiveBehavior": [
+        "onArchive",
+        "onCreate",
+        "onDuplicate",
+        "onEdit"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "ContentTypeBuilder",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Edit content type identity, locales, and ordered field definitions.",
+      "documentation": "apps/site/content/docs/pieces/components/content-type-builder.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "value",
+        "onChange"
+      ],
+      "interactiveBehavior": [
+        "onChange",
+        "onSave"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "EditorialCalendar",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "View caller-supplied scheduled entries on a month grid in an explicit timezone.",
+      "documentation": "apps/site/content/docs/pieces/components/editorial-calendar.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "items",
+        "timeZone"
+      ],
+      "dataRequirements": [
+        "items (required)"
+      ],
+      "interactiveBehavior": [
+        "onMonthChange",
+        "onSelectItem"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "LocalizationEditor",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Switch between explicitly configured locales and edit each locale's independent field values.",
+      "documentation": "apps/site/content/docs/pieces/components/localization-editor.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "contentType",
+        "values",
+        "onChange"
+      ],
+      "dataRequirements": [
+        "values (required)"
+      ],
+      "interactiveBehavior": [
+        "onActiveLocaleChange",
+        "onChange",
+        "onInvalidDraftChange"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "PublishScheduler",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Capture a publication date/time with an explicit IANA timezone and hand it to the host scheduler.",
+      "documentation": "apps/site/content/docs/pieces/components/publish-scheduler.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "onSchedule"
+      ],
+      "interactiveBehavior": [
+        "onCancelSchedule",
+        "onSchedule"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "RelationshipField",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Search and select related CMS entries from caller-provided options under relation constraints.",
+      "documentation": "apps/site/content/docs/pieces/components/relationship-field.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "label",
+        "relation",
+        "options",
+        "value",
+        "onChange"
+      ],
+      "contentRequirements": [
+        "label (required)"
+      ],
+      "dataRequirements": [
+        "options (required)",
+        "value (required)",
+        "onChange (required)"
+      ],
+      "interactiveBehavior": [
+        "onChange",
+        "onSearch"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "RevisionHistory",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Review immutable CMS revisions and request restoration as a new revision.",
+      "documentation": "apps/site/content/docs/pieces/components/revision-history.mdx",
+      "source": "packages/pieces/src/components/cms/cms-components.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "revisions"
+      ],
+      "dataRequirements": [
+        "revisions (required)"
+      ],
+      "interactiveBehavior": [
+        "onRestore"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "WebhookManagement",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "cms",
+      "subcategory": "cms",
+      "description": "Edit caller-authorized webhook subscriptions and inspect delivery attempts.",
+      "documentation": "apps/site/content/docs/pieces/components/webhook-management.mdx",
+      "source": "packages/pieces/src/components/cms/webhook-management.tsx",
+      "useCases": [
+        "content",
+        "dashboard"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace",
+        "form"
+      ],
+      "capabilities": [
+        "responsive",
+        "interactive",
+        "keyboard-navigation",
+        "data-entry",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "cms"
+      },
+      "requiredProps": [
+        "subscriptions",
+        "eventTypes",
+        "deliveries",
+        "onSelectSubscription",
+        "onCreate",
+        "onUpdate",
+        "subscriptionId",
+        "onRetry"
+      ],
+      "dataRequirements": [
+        "subscriptions (required)",
+        "eventTypes (required)",
+        "deliveries (required)",
+        "attemptsByDelivery (optional)"
+      ],
+      "interactiveBehavior": [
+        "onCreate",
+        "onDirtyChange",
+        "onRequestAttempts",
+        "onRetry",
+        "onSelectSubscription"
+      ],
+      "aliases": []
+    }
+  ]
+}

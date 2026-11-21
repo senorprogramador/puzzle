@@ -37,4 +37,6 @@ export type ColorPickerProps = Omit<
 
   rootClassName?: string;
   popoverClassName?: string;
+  /** Optional actions rendered inside the color selection dialog. */
+  footer?: ReactNode;
 };

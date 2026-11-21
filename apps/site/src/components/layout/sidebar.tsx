@@ -1,17 +1,21 @@
-import { useId, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import { Sidebar as PuzzleSidebar } from "@puzzle-ui/ui/components/layout/sidebar";
-import {
-  TreeView,
-  type TreeViewItem,
-} from "@puzzle-ui/ui/components/navigation/tree-view";
+import { TreeView } from "@puzzle-ui/ui/components/navigation/tree-view";
 import { useLocation, useNavigate } from "@tanstack/react-router";
 import { Autocomplete, Button, Stack, Transition } from "@puzzle-ui/ui";
 import { Icon } from "@puzzle-ui/icons";
 import { BREAKPOINTS } from "@puzzle-ui/theme";
 
-import { items } from "./constants";
-import { stringWithCasing } from "@puzzle-ui/core/string";
+import { items } from "./sidebar/index";
+import {
+  findNavigationPath,
+  getDocumentationSearchOptions,
+  getPathExpandedIds,
+  mergeExpandedIds,
+  normalizePath,
+} from "./sidebar/helpers";
+import type { DocumentationPage } from "./sidebar/types";
 
 import "./sidebar.css";
 
@@ -32,61 +36,8 @@ const useIsMobile = () =>
     () => false,
   );
 
-const normalizePath = (path: string) => path.replace(/\/+$/, "") || "/";
-
-const findAncestorIds = (
-  nodes: TreeViewItem[],
-  pathname: string,
-  ancestors: string[] = [],
-): string[] | null => {
-  for (const node of nodes) {
-    if (node.href && normalizePath(node.href) === pathname) {
-      return ancestors;
-    }
-
-    if (node.children) {
-      const found = findAncestorIds(node.children, pathname, [
-        ...ancestors,
-        node.id,
-      ]);
-
-      if (found) {
-        return found;
-      }
-    }
-  }
-
-  return null;
-};
-
-const getPathExpandedIds = (pathname: string) =>
-  findAncestorIds(items, normalizePath(pathname)) ?? [];
-
-const findComponentItems = (
-  items: TreeViewItem[] | TreeViewItem,
-): TreeViewItem[] => {
-  if (Array.isArray(items)) {
-    return items.flatMap((item) => findComponentItems(item));
-  }
-
-  if (items.children) {
-    return findComponentItems(items.children).flat();
-  }
-
-  return [items];
-};
-
-const componentItems = findComponentItems(items).map((item) => ({
-  label:
-    typeof item.label === "string"
-      ? item.label
-      : stringWithCasing(item.id, "pascalcase"),
-  value: item.href,
-}));
-
-const Sidebar = () => {
+const Sidebar = ({ pages }: { pages: DocumentationPage[] }) => {
   const navigate = useNavigate();
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const pathname = useLocation({ select: (location) => location.pathname });
   const [expandedIds, setExpandedIds] = useState(() =>
     getPathExpandedIds(pathname),
@@ -95,6 +46,11 @@ const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
   const panelId = useId();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const searchOptions = useMemo(
+    () => getDocumentationSearchOptions(pages),
+    [pages],
+  );
 
   if (pathname !== expandedPathname) {
     setExpandedPathname(pathname);
@@ -102,12 +58,32 @@ const Sidebar = () => {
     const pathIds = getPathExpandedIds(pathname);
 
     if (pathIds.some((id) => !expandedIds.includes(id))) {
-      setExpandedIds([...new Set([...expandedIds, ...pathIds])]);
+      setExpandedIds(mergeExpandedIds(expandedIds, pathname));
     }
   }
 
+  useEffect(() => {
+    if (isMobile) return;
+
+    const active = panelRef.current?.querySelector<HTMLElement>(
+      '[data-active="true"] > .puzzle-tree__row',
+    );
+    const sidebar = panelRef.current?.closest<HTMLElement>(".puzzle-site-sidebar");
+    if (!active || !sidebar) return;
+
+    const row = active.getBoundingClientRect();
+    const viewport = sidebar.getBoundingClientRect();
+    if (row.top < viewport.top) sidebar.scrollTop += row.top - viewport.top;
+    else if (row.bottom > viewport.bottom)
+      sidebar.scrollTop += row.bottom - viewport.bottom;
+  }, [pathname, expandedIds, isMobile]);
+
   return (
-    <PuzzleSidebar className="puzzle-site-sidebar">
+    <PuzzleSidebar
+      as="nav"
+      aria-label="Documentation"
+      className="puzzle-site-sidebar"
+    >
       <Button
         variant="ghost"
         fullWidth
@@ -136,24 +112,41 @@ const Sidebar = () => {
         className="puzzle-site-sidebar__panel"
         inert={isMobile && !open}
       >
-        <div className="puzzle-site-sidebar__panel-inner">
+        <div
+          ref={panelRef}
+          className="puzzle-site-sidebar__panel-inner"
+          onClickCapture={(event) => {
+            if (
+              event.target instanceof Element &&
+              event.target.closest("a[href]") &&
+              !event.target.closest("[data-tree-toggle]") &&
+              !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey
+            ) {
+              setOpen(false);
+            }
+          }}
+        >
           <Stack direction="col">
             <Autocomplete
               placeholder="Search"
-              options={componentItems}
+              aria-label="Search documentation"
+              options={searchOptions}
               onChange={(value) => {
-                navigate({ to: value });
+                if (value !== undefined) {
+                  setOpen(false);
+                  void navigate({ to: value });
+                }
               }}
             />
 
             <TreeView
-              aria-label="Navigation"
+              aria-label="Documentation pages"
+              className="puzzle-site-sidebar__tree"
               items={items}
-              selectionMode="single"
+              selectionMode="none"
+              defaultFocusedId={findNavigationPath(items, pathname).at(-1)?.id}
               expandedIds={expandedIds}
               onExpandedChange={setExpandedIds}
-              selectedIds={selectedIds}
-              onSelectionChange={setSelectedIds}
               getItemActive={(item) =>
                 item.href !== undefined &&
                 normalizePath(item.href) === normalizePath(pathname)

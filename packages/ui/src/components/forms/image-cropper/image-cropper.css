@@ -1,0 +1,176 @@
+.puzzle-image-cropper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--puzzle-space-3, 0.75rem);
+  width: 100%;
+  min-width: 0;
+  color: var(--puzzle-color-text);
+}
+
+.puzzle-image-cropper__presets,
+.puzzle-image-cropper__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-image-cropper__preset,
+.puzzle-image-cropper__reset {
+  min-height: 2.25rem;
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
+  border: 1px solid var(--puzzle-color-border);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface);
+  color: var(--puzzle-color-text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.puzzle-image-cropper__preset:hover,
+.puzzle-image-cropper__reset:hover {
+  border-color: var(--puzzle-color-primary);
+}
+
+.puzzle-image-cropper__preset[aria-pressed="true"] {
+  border-color: var(--puzzle-color-primary);
+  background: color-mix(in srgb, var(--puzzle-color-primary), transparent 92%);
+  color: var(--puzzle-color-primary);
+}
+
+.puzzle-image-cropper button:focus-visible,
+.puzzle-image-cropper__selection:focus-visible,
+.puzzle-image-cropper__zoom input:focus-visible {
+  outline: 2px solid var(--puzzle-color-ring);
+  outline-offset: 3px;
+}
+
+.puzzle-image-cropper__stage {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface-secondary, var(--puzzle-color-border));
+  line-height: 0;
+  touch-action: none;
+}
+
+.puzzle-image-cropper__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+.puzzle-image-cropper__overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.puzzle-image-cropper__selection {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid white;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--puzzle-color-text), transparent 35%),
+    0 0 0 9999px color-mix(in srgb, black, transparent 55%);
+  cursor: move;
+  line-height: normal;
+  touch-action: none;
+  user-select: none;
+}
+
+.puzzle-image-cropper__selection:focus-visible {
+  z-index: 1;
+  outline-offset: 4px;
+}
+
+.puzzle-image-cropper__grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to right,
+      transparent calc(33.333% - 0.5px),
+      color-mix(in srgb, white, transparent 35%) 33.333%,
+      color-mix(in srgb, white, transparent 35%) calc(33.333% + 1px),
+      transparent calc(33.333% + 1.5px),
+      transparent calc(66.666% - 0.5px),
+      color-mix(in srgb, white, transparent 35%) 66.666%,
+      color-mix(in srgb, white, transparent 35%) calc(66.666% + 1px),
+      transparent calc(66.666% + 1.5px)
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(33.333% - 0.5px),
+      color-mix(in srgb, white, transparent 35%) 33.333%,
+      color-mix(in srgb, white, transparent 35%) calc(33.333% + 1px),
+      transparent calc(33.333% + 1.5px),
+      transparent calc(66.666% - 0.5px),
+      color-mix(in srgb, white, transparent 35%) 66.666%,
+      color-mix(in srgb, white, transparent 35%) calc(66.666% + 1px),
+      transparent calc(66.666% + 1.5px)
+    );
+}
+
+.puzzle-image-cropper__resize {
+  position: absolute;
+  inset-inline-end: -0.5rem;
+  inset-block-end: -0.5rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: 2px solid var(--puzzle-color-primary);
+  border-radius: var(--puzzle-radius-sm, 0.25rem);
+  background: var(--puzzle-color-surface);
+  cursor: nwse-resize;
+  touch-action: none;
+}
+
+.puzzle-image-cropper__zoom {
+  display: flex;
+  flex: 1 1 12rem;
+  align-items: center;
+  gap: var(--puzzle-space-2, 0.5rem);
+  min-width: 0;
+  color: var(--puzzle-color-text);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-image-cropper__zoom input {
+  flex: 1;
+  min-width: 4rem;
+  accent-color: var(--puzzle-color-primary);
+}
+
+.puzzle-image-cropper__zoom output {
+  min-width: 2.5rem;
+  color: var(--puzzle-color-text-muted);
+  text-align: end;
+}
+
+.puzzle-image-cropper__help {
+  margin: 0;
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-xs, 0.75rem);
+  line-height: 1.5;
+}
+
+.puzzle-image-cropper[data-disabled="true"] {
+  opacity: 0.6;
+}
+
+.puzzle-image-cropper [disabled] {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .puzzle-image-cropper * {
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
+}

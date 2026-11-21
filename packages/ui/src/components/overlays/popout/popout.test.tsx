@@ -77,6 +77,29 @@ const renderPopout = (
 };
 
 describe("Popout", () => {
+  it("keeps a stable trigger ref attached when its element is rerendered", () => {
+    const ref = vi.fn();
+    const { rerender } = render(
+      <Popout trigger={<button ref={ref}>Trigger</button>}>Content</Popout>,
+    );
+    ref.mockClear();
+    rerender(<Popout trigger={<button ref={ref}>Updated</button>}>Content</Popout>);
+    expect(ref).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Updated" })).toBeInTheDocument();
+  });
+
+  it("transfers the trigger node when the supplied ref changes", () => {
+    const firstRef = vi.fn();
+    const nextRef = vi.fn();
+    const { rerender } = render(
+      <Popout trigger={<button ref={firstRef}>Trigger</button>}>Content</Popout>,
+    );
+    const button = screen.getByRole("button", { name: "Trigger" });
+    rerender(<Popout trigger={<button ref={nextRef}>Trigger</button>}>Content</Popout>);
+    expect(firstRef).toHaveBeenLastCalledWith(null);
+    expect(nextRef).toHaveBeenLastCalledWith(button);
+  });
+
   it("opens when its trigger is clicked", async () => {
     const user = userEvent.setup();
 

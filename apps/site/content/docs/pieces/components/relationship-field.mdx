@@ -1,0 +1,60 @@
+---
+title: RelationshipField
+description: Search and select related CMS entries from caller-provided options under relation constraints.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { RelationshipFieldExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { RelationshipField } from "@puzzle-ui/pieces";
+
+`RelationshipField` filters supplied options by allowed target types, locale, and statuses from the relation configuration. Search filters option labels locally by default. Set `searchMode="remote"` and provide `onSearch` to use caller-fetched search results without filtering them again by label; the component itself does not fetch.
+
+The preview simulates a remote search using in-memory options.
+
+<Preview fit="device" code={`<RelationshipField label="Related articles" relation={field.relation} options={options} value={value} searchMode="remote" onSearch={searchEntries} onChange={setValue} />`}>
+  <RelationshipFieldExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `label` | `ReactNode` | Yes | — |
+| `relation` | `CmsRelationshipConfig` | Yes | — |
+| `options` | `readonly RelationshipOption[]` | Yes | — |
+| `value` | `string \| readonly string[] \| null` | Yes | — |
+| `onChange` | `(value: string \| string[] \| null) => void` | Yes | — |
+| `locale` | `string` | No | — |
+| `onSearch` | `(query: string) => void` | No | — |
+| `searchMode` | `"local" \| "remote"` | No | `"local"` |
+| `loading` / `disabled` | `boolean` | No | `false` |
+| `error` / `className` | `ReactNode` / `string` | No | — |
+
+`RelationshipOption` contains an entry ID, display label, content type, locale, and status. Values returned to the caller are IDs, not copied entry data.
+
+```tsx
+import { RelationshipField } from "@puzzle-ui/pieces";
+
+<RelationshipField
+  label="Related articles"
+  relation={field.relation!}
+  options={authorizedOptions}
+  value={relatedEntryIds}
+  locale={entry.locale}
+  searchMode="remote"
+  onSearch={searchAuthorizedEntries}
+  onChange={setRelatedEntryIds}
+/>;
+```
+
+Selected IDs are listed separately so they can be removed even when they are not in the current options. An unavailable label can mean a deleted, inaccessible, or simply off-page entry; the host decides how to resolve it. When `relation.sameLocale` is enabled, supply the source `locale`; no options are offered without it. The host must revalidate target type, status, locale, tenant, and permission on every server mutation. A displayed or selected ID is not authorization.
+
+## Related
+
+- [ContentEditor](/docs/pieces/components/content-editor)
+- [CMS access policy and relationship validation](/docs/cms)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

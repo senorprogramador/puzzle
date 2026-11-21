@@ -1,0 +1,44 @@
+---
+title: Media & Asset Management
+description: Compose caller-owned media libraries, asset pickers, metadata panels, and form fields from safe asset IDs and temporary preview URLs.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { MediaLibraryExample } from "../../../../src/components/doc-examples/pieces/media-workflows";
+
+These application-oriented Pieces help teams browse, select, and describe existing media. They compose the UI package's tree, table, upload, image-editing, and overlay components; they do not provide a storage service, CMS, router, or network client.
+
+**Scope:** all data and actions come from the caller. Selection and form values are asset IDs. A preview is shown only when the caller provides an authorized, temporary preview URL.
+
+## Components
+
+| Component | Purpose | Reference |
+|---|---|---|
+| MediaLibrary | Browse and organize caller-provided assets and folders. | [MediaLibrary](/docs/pieces/components/media-library) |
+| AssetPickerDialog | Select one or more asset IDs in a responsive dialog. | [AssetPickerDialog](/docs/pieces/components/asset-picker-dialog) |
+| AssetDetailsPanel | Inspect metadata and edit caller-owned metadata, crop, and hotspots. | [AssetDetailsPanel](/docs/pieces/components/asset-details-panel) |
+| MediaField | Connect a form control to a selected asset ID. | [MediaField](/docs/pieces/components/media-field) |
+
+## Working preview
+
+<Preview fit="device" code={`<MediaLibrary assets={assets} folders={folders} selectionMode="multiple" onSelectionChange={setSelectedIds} />`}>
+  <MediaLibraryExample />
+</Preview>
+
+## Safe browser data
+
+Pass a `MediaLibraryAsset` projection rather than a storage-domain record. The projection deliberately does not include storage object keys, tenant or audit internals, processing errors, or server-only data. `previewUrl` and variant preview URLs are caller-supplied ephemeral authorized image/poster URLs; Pieces never creates, refreshes, stores, or derives them.
+
+Selection and reference callbacks use asset IDs. Applications should map IDs to their own records, authorize each preview request, and keep persistence and permission checks on their server.
+
+## Composition and accessibility
+
+`MediaLibrary` reuses UI `TreeView`, `DataTable`, `Autocomplete`, `Image`, `MediaFrame`, `ImageUpload`, `VideoUpload`, and `FileUpload`. `AssetPickerDialog` composes UI `Dialog` and `Drawer`; `AssetDetailsPanel` uses `ImageBox`, `ImageCropper`, and `ImageHotspotEditor`. Do not add a competing uploader, tree, table, or dialog around these Pieces.
+
+Interactive pieces are client components. Keep the containing boundary client-side when using a framework with server components. Native controls, visible keyboard focus, UI overlay keyboard behavior, and mobile layouts are provided; applications still own validation policy, authorization, upload transport, metadata persistence, and conflict handling.
+
+## API maturity
+
+API maturity: Stable.
+
+See the [framework integration guide](/docs/pieces/framework-integration) for client and SSR boundaries.

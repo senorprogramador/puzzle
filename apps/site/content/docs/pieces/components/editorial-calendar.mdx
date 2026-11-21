@@ -1,0 +1,50 @@
+---
+title: EditorialCalendar
+description: View caller-supplied scheduled entries on a month grid in an explicit timezone.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { EditorialCalendarExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { EditorialCalendar } from "@puzzle-ui/pieces";
+
+`EditorialCalendar` groups scheduled items by the provided calendar timezone and presents month navigation, a status filter, and selectable entries. Pass the server-authorized schedule page; the component does not query or schedule entries.
+
+<Preview fit="device" code={`<EditorialCalendar items={scheduledItems} timeZone="Europe/Amsterdam" onSelectItem={openEntry} />`}>
+  <EditorialCalendarExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `items` | `readonly EditorialCalendarItem[]` | Yes | — |
+| `timeZone` | `string` | Yes | — |
+| `initialMonth` | `Date` | No | Current month |
+| `loading` | `boolean` | No | `false` |
+| `onSelectItem` | `(item: EditorialCalendarItem) => void` | No | — |
+| `onMonthChange` | `(month: Date) => void` | No | — |
+| `className` | `string` | No | — |
+
+`EditorialCalendarItem` contains `id`, `title`, `contentType`, `locale`, `status`, and `scheduledAt` (`Date` or ISO string), plus optional item timezone. Display and grouping use the calendar's `timeZone`.
+
+```tsx
+import { EditorialCalendar } from "@puzzle-ui/pieces";
+
+<EditorialCalendar
+  items={scheduledItems}
+  timeZone="Europe/Amsterdam"
+  onSelectItem={(item) => openEditor(item.id)}
+/>;
+```
+
+The calendar uses an accessible grid with native month navigation and entry buttons. On narrow screens the grid remains readable in a horizontally scrollable region. Applications own month-range querying and scheduler correctness.
+
+## Related
+
+- [PublishScheduler](/docs/pieces/components/publish-scheduler)
+- [CMS scheduling contract](/docs/cms)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

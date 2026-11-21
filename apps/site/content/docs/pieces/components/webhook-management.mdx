@@ -1,0 +1,53 @@
+---
+title: WebhookManagement
+description: Edit caller-authorized webhook subscriptions and inspect delivery attempts.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { WebhookManagementExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { WebhookManagement } from "@puzzle-ui/pieces";
+
+`WebhookManagement` presents sanitized CMS webhook subscriptions and delivery
+history. Use it with an application-owned client and workers, not as a delivery
+service or authorization boundary.
+
+<Preview fit="device" code={`<WebhookManagement subscriptions={subscriptions} eventTypes={events} deliveries={deliveries} deliverySubscriptionId={selectedId} onSelectSubscription={loadDeliveries} onCreate={createWebhook} onUpdate={updateWebhook} onRetry={retryDelivery} />`}>
+  <WebhookManagementExample />
+</Preview>
+
+## API
+
+| Prop | Purpose |
+|---|---|
+| `subscriptions`, `eventTypes` | Authorized subscription projections and supported event names. |
+| `deliveries`, `deliverySubscriptionId` | Deliveries and the subscription they belong to; stale data for another selection is hidden. |
+| `attemptsByDelivery`, `onRequestAttempts` | Optional attempt history and caller-owned loading callback. |
+| `onSelectSubscription` | Load authorized deliveries for the selected subscription. |
+| `onCreate`, `onUpdate` | Persist values and return the saved sanitized subscription; updates include the expected revision and rotation request. |
+| `onRetry` | Retry a failed delivery using its expected revision. |
+| `onDirtyChange` | Track unsaved form state for host-router and unload guards. |
+| `loading`, `error`, `className` | Loading/error presentation and custom styling. |
+
+Existing subscribed events remain available in the editor even if omitted from
+`eventTypes`, so they can be removed or reselected before saving.
+
+```tsx
+import { WebhookManagement } from "@puzzle-ui/pieces";
+```
+
+The host controls all fetching, authorization, validation, secret provisioning,
+and background delivery. Never pass signing secrets or secret references.
+Rotation is a request to the host, not a secret input. Handle stale responses
+and display sanitized errors; callbacks may reject to show an error without
+discarding the draft. The component confirms before switching away from a dirty
+form, but the host must guard navigation and page unload using `onDirtyChange`.
+
+## Accessibility and responsive behavior
+
+Native labeled controls and a confirmation dialog support keyboard use. Status
+and failure information is textual rather than color-only, and long endpoints
+wrap at narrow widths.
+
+## API maturity
+
+API maturity: Stable.

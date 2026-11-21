@@ -80,15 +80,199 @@ const [document, setDocument] = useState<TextDocument>({
 <TextRenderer document={document} />
 ```
 
-Documents support paragraphs, headings, and list items with theme typography
-variants. Inline marks include bold, italic, underline, and strike. Select text
-and use the Link toolbar button to open a popover and add or edit a URL for
-the selection; choose Remove link to remove the link while keeping its text.
-The Link button is disabled when no text is selected, including when the cursor
-is inside a link. Pressing Enter in an empty list item
-exits the list. Links accept relative URLs and the `http`, `https`, `mailto`, or
-`tel` schemes; unsafe schemes are discarded. `TextRenderer` renders text with
-semantic elements rather than inserting raw HTML.
+Documents support paragraphs, headings, and bullet, ordered, checklist, and
+icon list items with theme typography variants. Block formatting also includes
+blockquotes, code blocks, and horizontal rules. Nested lists use the numeric
+`indent` level on each list item. Inline marks include bold, italic, underline,
+strike, and inline code. Code formatting is exclusive with other marks and
+links. Select text and use the Link toolbar button to open a popover and
+add or edit a URL for the selection; choose Remove link to remove the link
+while keeping its text. The Link button is disabled when no text is selected,
+including when the cursor is inside a link. Links accept relative URLs and the
+`http`, `https`, `mailto`, or `tel` schemes; unsafe schemes are discarded.
+`TextRenderer` renders text with semantic elements rather than inserting raw
+HTML. Enter splits a list item; Enter in an empty top-level item exits the
+list, while an empty nested item outdents. Tab and Shift+Tab change list
+and block indentation. Enter on an empty line exits a blockquote or code block,
+preserving any surrounding content. Typing `# ` through `#### `, `> `, `- `, `1. `,
+`[ ] `, or `[x] ` followed by a space applies the corresponding heading,
+quote, or list formatting. Typing three backticks starts a code block.
+
+## Lists
+
+The toolbar's **List** dropdown applies Bullet, Ordered, Checklist, or Icon
+formatting and has a separate **Remove list** action. The list state is derived
+from the current selection; mixed list types or configurations are shown as
+mixed rather than marking one type active.
+
+Checklist items store `checked` independently. Their `listAttributes`
+configuration controls whether checkboxes can be toggled in the editor. The
+Checklist settings panel can also mark all selected checklist items checked or
+unchecked. Icon lists store a validated Iconify identifier, size, and color in
+`listAttributes.icon`; icon search is requested on demand and is not required
+to render saved documents. Selecting Icon immediately opens its settings.
+New icon lists use `mdi:circle` at 18px in the default theme's light primary
+blue. Search for an Iconify identifier, choose a result, or enter a size from
+8 to 64 pixels; changes apply immediately. Existing saved colors, including
+`currentColor`, are preserved.
+
+The icon color picker previews changes in the document immediately. **Apply
+color** confirms the preview as one undoable change; **Cancel color**, Escape,
+or closing the picker discards it. Closing the color picker leaves the icon
+settings open. The icon search uses Iconify over the network and reports
+loading, empty, and error states.
+
+<Preview
+  align="start"
+  loading="eager"
+  code={`\
+    <TextEditor
+      toolbar={<TextEditorToolbar />}
+      defaultValue={{
+        type: "doc",
+        content: [
+          {
+            type: "listItem",
+            variant: "body1",
+            listType: "checklist",
+            listAttributes: { interactive: true },
+            checked: false,
+            children: [{ text: "Review the draft" }],
+          },
+          {
+            type: "listItem",
+            variant: "body1",
+            listType: "bullet",
+            indent: 1,
+            children: [{ text: "Check the nested item" }],
+          },
+        ],
+      }}
+    />
+`}
+>
+  <TextEditor
+    toolbar={<TextEditorToolbar />}
+    defaultValue={{
+      type: "doc",
+      content: [
+        {
+          type: "listItem",
+          variant: "body1",
+          listType: "checklist",
+          listAttributes: { interactive: true },
+          checked: false,
+          children: [{ text: "Review the draft" }],
+        },
+        {
+          type: "listItem",
+          variant: "body1",
+          listType: "bullet",
+          indent: 1,
+          children: [{ text: "Check the nested item" }],
+        },
+      ],
+    }}
+  />
+</Preview>
+
+```tsx
+const document: TextDocument = {
+  type: "doc",
+  content: [
+    {
+      type: "listItem",
+      variant: "body1",
+      listType: "checklist",
+      listAttributes: { interactive: true },
+      checked: false,
+      children: [{ text: "Review the draft" }],
+    },
+    {
+      type: "listItem",
+      variant: "body1",
+      listType: "bullet",
+      indent: 1,
+      children: [{ text: "Check the nested item" }],
+    },
+  ],
+};
+
+<TextRenderer
+  document={document}
+  interactiveLists
+  onChecklistChange={(blockIndex, checked) => {
+    // Persist the updated state through your document transaction.
+  }}
+/>;
+```
+
+`TextRenderer` checkboxes are disabled by default. Interaction requires
+`interactiveLists`, a checklist configured with `interactive: true`, and an
+`onChecklistChange` callback. Icon search uses the Iconify search endpoint from
+the browser; it does not run during server rendering.
+
+Normalization supplies deterministic defaults for legacy documents, clamps
+indentation to 0–8 and icon sizes to 8–64px, and discards unsafe list
+attributes. Icon defaults are `mdi:circle`, 18px, and `currentColor`. The
+document schema remains additive and intentionally has no schema-version field.
+`validateTextDocument` distinguishes valid, recoverable, and invalid input.
+`serializeTextDocumentToHtml` emits escaped, deterministic HTML with Puzzle
+list metadata. Markdown serialization preserves task state and degrades icon
+lists to ordinary bullets because Markdown has no standard icon-list syntax.
+Markdown also has no standard representation for text alignment, generic block
+indentation, or underline; those presentation details are omitted on export.
+Pure document helpers are exported from `@puzzle-ui/ui`; use `applyListType` to
+apply a type without toggling it off, and `removeList` for explicit removal.
+`setListType` retains its existing toggle behavior for compatibility.
+
+## Block formatting and commands
+
+The toolbar starts with a **Block style** selector for Paragraph and the
+available display and headline typography roles from Theme. Inline style,
+list, alignment, history, block formatting, indentation, and insertion
+controls follow. Blockquote and Code block are mutually exclusive toggles;
+clicking an active toggle returns to a paragraph. Indent and Outdent use the
+current block or list selection; shifting multiple list items preserves their
+relative nesting where the surrounding list permits it. The Clear formatting button removes selected
+inline marks and links without flattening blocks or lists; the existing
+`clearFormatting` command retains its broader block-reset behavior. Inline
+code is available as a text-style control. Code blocks preserve whitespace and
+line breaks in the document model, editable surface, renderer, and serialization.
+
+The toolbar uses one keyboard tab stop; arrow keys move between enabled
+controls. Its popovers provide keyboard-accessible controls and Escape closes
+the topmost popover.
+
+Inserting a horizontal rule replaces the current selection, splitting the
+surrounding content at the insertion point. The caret moves to the editable
+block immediately after the rule.
+
+Use the public `useTextEditor` hook inside a custom toolbar or editor control to
+access the command handle. The same document helpers are available independently
+of React for server-side transformations. `getTextStatistics` returns word and
+Unicode code-point character counts; `findTextInDocument` returns block-relative
+matches, and `replaceAllText` applies replacements in one transaction.
+`getSlashCommandAtSelection` detects a `/query` token so custom slash-command
+interfaces can remain separate from the toolbar.
+
+```tsx
+import { TextEditor, useTextEditor } from "@puzzle-ui/ui";
+
+const SearchToolbar = () => {
+  const { getTextStatistics, findText } = useTextEditor();
+  const statistics = getTextStatistics?.();
+  const matches = findText?.("draft", { wholeWord: true }) ?? [];
+  return <output>{statistics?.wordCount} words, {matches.length} matches</output>;
+};
+
+<TextEditor toolbar={<SearchToolbar />} />;
+```
+
+Register application-specific key bindings with the `shortcuts` prop. Each
+entry supplies a stable `id`, a `key`, required modifiers (`mod`, `ctrl`,
+`meta`, `alt`, or `shift`), and a command name such as `code` or
+`clearFormatting`. Shortcuts are ignored during IME composition.
 
 ## API reference
 
@@ -100,6 +284,8 @@ semantic elements rather than inserting raw HTML.
 | `defaultValue` | `TextDocument`                     | Initial uncontrolled document.                                                                                              |
 | `onChange`     | `(document: TextDocument) => void` | Called when the document changes.                                                                                           |
 | `toolbar`      | `ReactNode`                        | Optional toolbar rendered in the editor context.                                                                            |
+| `readOnly`     | `boolean`                          | Prevents editing and disables document-changing toolbar actions.                                                             |
+| `shortcuts`    | `readonly TextEditorShortcut[]`    | Optional editor command shortcuts.                                                                                           |
 
 ### TextEditorToolbar
 
@@ -115,12 +301,17 @@ semantic elements rather than inserting raw HTML.
 | ----------- | -------------- | ------------------------------ |
 | `document`  | `TextDocument` | Document to display. Required. |
 | `className` | `string`       | Additional renderer classes.   |
+| `interactiveLists` | `boolean` | Enables configured interactive checklists when a change callback is supplied. |
+| `onChecklistChange` | `(blockIndex: number, checked: boolean) => void` | Receives renderer checkbox changes. |
 
 ## Accessibility
 
 The formatting toolbar uses labeled buttons, pressed states, and arrow-key
-navigation. Keep it inside the editor's `toolbar` prop and provide an
-`ariaLabel` when multiple formatting toolbars need distinct names.
+navigation. The List dropdown is keyboard-operable, supports Escape
+dismissal, and restores focus. Keep the toolbar inside the editor's `toolbar`
+prop and provide an `ariaLabel` when multiple formatting toolbars need
+distinct names. `readOnly` disables document-changing toolbar actions as well
+as content editing.
 
 **Framework compatibility:** `TextEditor` is a client component and does not
 depend on a router. `TextRenderer` can render saved documents without editing
@@ -129,6 +320,7 @@ SSR/hydration integration, so verify those integrations in the consuming app.
 
 ## Related documentation
 
+- [JSON Editor](/docs/ui/editors/json-editor)
 - [Text](/docs/ui/typography/text)
 - [Card](/docs/ui/data-display/card)
 - [Theme design tokens](/docs/theme/tokens)

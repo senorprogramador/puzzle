@@ -105,6 +105,10 @@ The picker is clearable by default. Set `clearable={false}` to remove the clear 
 
 `position` selects the preferred side of the trigger (`top`, `right`, `bottom`, or `left`); `align` selects `start`, `center`, or `end` alignment. The popup closes when users press Escape or click outside. Use `open` with `onOpenChange` to control popup visibility, or `defaultOpen` for its initial state.
 
+Use `footer` to place additional actions inside the color selection dialog.
+For confirmation or cancellation, manage the draft value and open state in the
+caller; `onChange` continues to report each color selection.
+
 ## API
 
 | Prop                 | Type                                     | Default          | Description                                                         |
@@ -123,6 +127,7 @@ The picker is clearable by default. Set `clearable={false}` to remove the clear 
 | `open`               | `boolean`                                | -                | Controlled popup visibility.                                        |
 | `defaultOpen`        | `boolean`                                | `false`          | Initial popup visibility when uncontrolled.                         |
 | `onOpenChange`       | `(open: boolean) => void`                | -                | Called when popup visibility changes.                               |
+| `footer`             | `ReactNode`                              | -                | Additional actions rendered inside the color selection dialog.      |
 | `position`           | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"`       | Preferred popup side.                                               |
 | `align`              | `"start" \| "center" \| "end"`           | `"start"`        | Popup alignment relative to the trigger.                            |
 | `className`, `style` | Native button props                      | -                | Applied to the trigger button.                                      |
@@ -136,6 +141,8 @@ Other native button attributes, including `id`, `name`, and `aria-*`, are forwar
 - Always provide a `label`; without one, the trigger uses the generic accessible name “Choose color.”
 - Preset swatches are buttons with accessible names and pressed states. Give swatches a descriptive `label` when the raw color value is not meaningful.
 - The saturation/brightness area supports arrow keys; hold Shift to adjust in larger increments. Hue and opacity use native range inputs and support their standard keyboard controls.
+- When the popup is open, Tab from the trigger moves into the picker; Shift+Tab
+  from its first control returns to the trigger.
 - Use Escape to close the popup; clicking outside also closes it.
 
 **Framework compatibility:** The UI package declares React and React DOM 19 as peers. Components do not require a router; framework-specific and server-rendering compatibility are not guaranteed, so verify behavior in your target framework.

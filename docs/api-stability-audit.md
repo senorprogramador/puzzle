@@ -2,7 +2,7 @@
 
 ## Scope and method
 
-Audited all 71 individually documented components in `@puzzle-ui/ui`, all 109
+Audited all 71 individually documented components in `@puzzle-ui/ui`, all 125
 canonical components documented by `@puzzle-ui/pieces` (including 14 canonical
 Hero components; the package also exposes 11 aliases that are not double-counted), and 46 other React components documented by the Theme (2), Icons
 (1), Fullstack (7), and SEO (36) package guides. Aliases are recorded with
@@ -13,7 +13,7 @@ The public API below is taken from the package entry points and component
 exports, not inferred from examples. Validation evidence is based on
 component-local test files and the public package peer dependencies. The site
 package declares React and React DOM 19 as peers. The component inventory
-contains 226 APIs: 225 Stable and `SectionHeader` Beta. Stable classifications
+contains 242 APIs: 241 Stable and `SectionHeader` Beta. Stable classifications
 include documented backward-compatibility intent within a major version.
 Package-level utility and adapter APIs retain their separate maturity
 classifications below.
@@ -116,8 +116,8 @@ The test count is the number of test files in the component source directory
 
 ### `@puzzle-ui/pieces`
 
-All components are exported from `packages/pieces/src/index.ts` through the
-hero barrel. The generic component and every preset use the `HeroProps`
+All components are re-exported from family indexes through
+`packages/pieces/src/index.ts`. The generic Hero and every preset use the `HeroProps`
 composition API. `ImageHero` and `VideoHero` additionally export their
 specialized required-media prop types.
 
@@ -148,6 +148,8 @@ specialized required-media prop types.
 | ActivitySection | `ActivitySection` and its exported props/types | Stable | Source: `src/components/activity/activity-section.tsx`; reference: `pieces/components/activity.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | AmenityListSection | `AmenityListSection` and its exported props/types | Stable | Source: `src/components/business/amenity-list-section/amenity-list-section.tsx`; reference: `pieces/components/amenity-list.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | AnnouncementSection | `AnnouncementSection` and its exported props/types | Stable | Source: `src/components/marketing/announcement/announcement.tsx`; reference: `pieces/components/announcement.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
+| AssetDetailsPanel | `AssetDetailsPanel`, `AssetDetailsPanelProps`, and safe metadata patch types | Stable | Source: `src/components/media/asset-details-panel.tsx`; reference: `pieces/components/asset-details-panel.mdx`. Focused component tests cover metadata editing and crop/hotspot composition; callers own persistence and conflict handling. |
+| AssetPickerDialog | `AssetPickerDialog`, discriminated single/multiple props, and picker types | Stable | Source: `src/components/media/asset-picker-dialog.tsx`; reference: `pieces/components/asset-picker-dialog.mdx`. Component/browser tests cover ID selection, kind filtering, narrow Drawer presentation, and Escape; UI overlays own focus management. |
 | AvailabilitySearchSection | `AvailabilitySearchSection` and its exported props/types | Stable | Source: `src/components/commerce/availability-search-section/availability-search-section.tsx`; reference: `pieces/components/availability-search.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | AwardsSection | `AwardsSection` and its exported props/types | Stable | Source: `src/components/business/awards-section/awards-section.tsx`; reference: `pieces/components/awards-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | BenefitsSection | `BenefitsSection` and its exported props/types | Stable | Source: `src/components/marketing/benefits/benefits.tsx`; reference: `pieces/components/benefits.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
@@ -198,6 +200,8 @@ specialized required-media prop types.
 | LocalGuideSection | `LocalGuideSection` and its exported props/types | Stable | Source: `src/components/content/local-guide-section/local-guide-section.tsx`; reference: `pieces/components/local-guide.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | LocationSection | `LocationSection` and its exported props/types | Stable | Source: `src/components/business/location-section/location-section.tsx`; reference: `pieces/components/location-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | LogoCloudSection | `LogoCloudSection` and its exported props/types | Stable | Source: `src/components/marketing/logo-cloud/logo-cloud.tsx`; reference: `pieces/components/logo-cloud.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
+| MediaField | `MediaField`, `MediaFieldProps`, and asset-ID value contract | Stable | Source: `src/components/media/media-field.tsx`; reference: `pieces/components/media-field.mdx`. Component tests cover required/error relationships, selection IDs, and read-only state; validation policy remains caller-owned. |
+| MediaLibrary | `MediaLibrary`, safe `MediaLibraryAsset` projection, query, folder, and action types | Stable | Source: `src/components/media/media-library.tsx`; reference: `pieces/components/media-library.mdx`. Unit, component, and browser tests cover filters, folders, ID selection, partial bulk failures, upload composition, responsive layout, and keyboard use. |
 | MetricComparison | `MetricComparison` and its exported props/types | Stable | Source: `src/components/data-display/metric-comparison.tsx`; reference: `pieces/components/data-display.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | NotificationItem | `NotificationItem` and its exported props/types | Stable | Source: `src/components/feedback/feedback.tsx`; reference: `pieces/components/feedback.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | NotificationList | `NotificationList` and its exported props/types | Stable | Source: `src/components/feedback/feedback.tsx`; reference: `pieces/components/feedback.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
@@ -237,6 +241,23 @@ specialized required-media prop types.
 | UseCasesSection | `UseCasesSection` and its exported props/types | Stable | Source: `src/components/marketing/use-cases/use-cases.tsx`; reference: `pieces/components/use-cases.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | VideoSection | `VideoSection` and its exported props/types | Stable | Source: `src/components/content/video-section/video-section.tsx`; reference: `pieces/components/video-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | WaitlistSection | `WaitlistSection` and its exported props/types | Stable | Source: `src/components/marketing/waitlist-section/waitlist-section.tsx`; reference: `pieces/components/waitlist-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
+
+### CMS authoring Pieces
+
+| Component | Current public API | Status | Evidence and outstanding issues |
+|---|---|---|---|
+| AuditLogViewer | `AuditLogViewer`, `AuditLogViewerProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/audit-log-viewer.mdx`. Focused component tests cover filtering and pagination; the caller must authorize and tenant-scope audit data. |
+| WebhookManagement | `WebhookManagement`, `WebhookManagementProps` | Stable | Source: `src/components/cms/webhook-management.tsx`; reference: `pieces/components/webhook-management.mdx`. Component and browser tests cover editing, retry, draft protection, and keyboard/responsiveness; authorization and delivery are caller-owned. |
+| BlockEditor | `BlockEditor`, `BlockEditorProps`, `CmsBlockValue` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/block-editor.mdx`. Focused component tests cover schema-based add and invalid-value preservation; persistence and schema validation remain server-owned. |
+| CmsShell | `CmsShell`, `CmsShellProps`, `CmsNavigationItem` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/cms-shell.mdx`. Component tests cover active navigation and composition; routes remain caller-owned. |
+| ContentEditor | `ContentEditor`, `ContentEditorProps`, `ContentEditorFieldContext` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/content-editor.mdx`. Component tests cover controlled fields, action separation, and visible failures; server validation and revision checks remain required. |
+| ContentList | `ContentList`, `ContentListProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/content-list.mdx`. Component tests cover filters, row actions, loading, error, empty, and permission-denied states. |
+| ContentTypeBuilder | `ContentTypeBuilder`, `ContentTypeBuilderProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/content-type-builder.mdx`. Component tests cover field addition; server schema validation and migrations remain authoritative. |
+| EditorialCalendar | `EditorialCalendar`, `EditorialCalendarProps`, `EditorialCalendarItem` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/editorial-calendar.mdx`. Component tests cover timezone grouping and selection; schedule data is caller-owned. |
+| LocalizationEditor | `LocalizationEditor`, `LocalizationEditorProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/localization-editor.mdx`. Component tests cover missing translation state and locale selection; fallback behavior remains explicit. |
+| PublishScheduler | `PublishScheduler`, `PublishSchedulerProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/publish-scheduler.mdx`. Component and unit tests cover explicit timezones and daylight-saving transitions; a host scheduler must execute revision-bound jobs. |
+| RelationshipField | `RelationshipField`, `RelationshipFieldProps`, `RelationshipOption` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/relationship-field.mdx`. Component tests cover target type, status, locale constraints, and ID selection; the server must revalidate every reference. |
+| RevisionHistory | `RevisionHistory`, `RevisionHistoryProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/revision-history.mdx`. Component tests cover restore callbacks; restoration must create a new revision on the server. |
 ### Other documented React components
 
 These components are documented in package guides rather than under the UI or
@@ -294,8 +315,8 @@ their component names and usage.
 
 ## Findings and follow-up
 
-- **Stable: 225; Beta: 1; Experimental: 0 (226 components total).** The sole
-  Beta component is UI `SectionHeader`; all 109 canonical Pieces components
+- **Stable: 241; Beta: 1; Experimental: 0 (242 components total).** The sole
+  Beta component is UI `SectionHeader`; all 125 canonical Pieces components
   have a within-major backward-compatibility commitment. Component-specific
   limitations and framework boundaries remain documented; Stable does not
   mean production readiness.

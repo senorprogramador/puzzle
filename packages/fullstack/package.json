@@ -1,11 +1,14 @@
 {
   "name": "@puzzle-ui/fullstack",
   "version": "0.14.0",
-  "description": "Browser auth client, React UI, server handlers, and Next.js and TanStack Start adapters for Puzzle Auth.",
+  "description": "Browser Auth, Media, and CMS clients, server handlers, and Next.js and TanStack Start adapters for Puzzle.",
   "homepage": "https://puzzle-ui.com/docs/fullstack",
   "keywords": [
     "puzzle-ui",
     "authentication",
+    "media",
+    "cms",
+    "uploads",
     "react",
     "nextjs",
     "tanstack-start",
@@ -22,6 +25,106 @@
   },
   "type": "module",
   "exports": {
+    "./cms/shared": {
+      "import": {
+        "types": "./dist/cms/shared/index.d.ts",
+        "default": "./dist/cms/shared/index.js"
+      },
+      "require": {
+        "types": "./dist/cms/shared/index.d.cts",
+        "default": "./dist/cms/shared/index.cjs"
+      }
+    },
+    "./cms/server": {
+      "import": {
+        "types": "./dist/cms/server/index.d.ts",
+        "default": "./dist/cms/server/index.js"
+      },
+      "require": {
+        "types": "./dist/cms/server/index.d.cts",
+        "default": "./dist/cms/server/index.cjs"
+      }
+    },
+    "./cms/client": {
+      "import": {
+        "types": "./dist/cms/client/index.d.ts",
+        "default": "./dist/cms/client/index.js"
+      },
+      "require": {
+        "types": "./dist/cms/client/index.d.cts",
+        "default": "./dist/cms/client/index.cjs"
+      }
+    },
+    "./cms/next": {
+      "import": {
+        "types": "./dist/cms/next/index.d.ts",
+        "default": "./dist/cms/next/index.js"
+      },
+      "require": {
+        "types": "./dist/cms/next/index.d.cts",
+        "default": "./dist/cms/next/index.cjs"
+      }
+    },
+    "./cms/tanstack": {
+      "import": {
+        "types": "./dist/cms/tanstack/index.d.ts",
+        "default": "./dist/cms/tanstack/index.js"
+      },
+      "require": {
+        "types": "./dist/cms/tanstack/index.d.cts",
+        "default": "./dist/cms/tanstack/index.cjs"
+      }
+    },
+    "./media/shared": {
+      "import": {
+        "types": "./dist/media/shared/index.d.ts",
+        "default": "./dist/media/shared/index.js"
+      },
+      "require": {
+        "types": "./dist/media/shared/index.d.cts",
+        "default": "./dist/media/shared/index.cjs"
+      }
+    },
+    "./media/server": {
+      "import": {
+        "types": "./dist/media/server/index.d.ts",
+        "default": "./dist/media/server/index.js"
+      },
+      "require": {
+        "types": "./dist/media/server/index.d.cts",
+        "default": "./dist/media/server/index.cjs"
+      }
+    },
+    "./media/client": {
+      "import": {
+        "types": "./dist/media/client/index.d.ts",
+        "default": "./dist/media/client/index.js"
+      },
+      "require": {
+        "types": "./dist/media/client/index.d.cts",
+        "default": "./dist/media/client/index.cjs"
+      }
+    },
+    "./media/next": {
+      "import": {
+        "types": "./dist/media/next/index.d.ts",
+        "default": "./dist/media/next/index.js"
+      },
+      "require": {
+        "types": "./dist/media/next/index.d.cts",
+        "default": "./dist/media/next/index.cjs"
+      }
+    },
+    "./media/tanstack": {
+      "import": {
+        "types": "./dist/media/tanstack/index.d.ts",
+        "default": "./dist/media/tanstack/index.js"
+      },
+      "require": {
+        "types": "./dist/media/tanstack/index.d.cts",
+        "default": "./dist/media/tanstack/index.cjs"
+      }
+    },
     "./auth/client": {
       "import": {
         "types": "./dist/auth/client/index.d.ts",
@@ -83,13 +186,15 @@
   "scripts": {
     "build": "tsdown",
     "typecheck": "tsc --noEmit -p .",
-    "test": "node --import ./tests/setup.mjs --test",
-    "vitest": "node --import ./tests/setup.mjs --test && vitest run --config vitest.config.ts",
+    "test": "node --experimental-strip-types --import ./tests/setup.mjs --test",
+    "test:e2e:frameworks": "node --test e2e/frameworks.e2e.mjs",
+    "vitest": "node --experimental-strip-types --import ./tests/setup.mjs --test && vitest run --config vitest.config.ts",
     "test:browser": "vitest run --config vitest.config.ts",
     "clean": "rm -rf dist",
     "prepack": "tsdown"
   },
   "devDependencies": {
+    "@puzzle-ui/storage": "^0.14.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",
@@ -102,8 +207,10 @@
     "vitest": "5.1.1"
   },
   "dependencies": {
+    "@puzzle-ui/cms": "^0.14.0",
     "@puzzle-ui/ui": "^0.14.0",
     "@puzzle-ui/auth": "^0.14.0",
+    "@puzzle-ui/media": "^0.14.0",
     "@puzzle-ui/session": "^0.14.0",
     "@simplewebauthn/browser": "^14.0.0"
   },

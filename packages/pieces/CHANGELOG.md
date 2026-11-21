@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/pieces` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## [Unreleased]
+
+- Added caller-data-driven Media and CMS authoring compositions, including
+  `AuditLogViewer` and `WebhookManagement`.
+- Added remote content-list controls, draft protection, revision comparisons,
+  relationship search, and sanitized Media audit presentation.
+
 ## 0.14.0 - 2026-11-20
 
 - No changes; version bumped in lockstep.

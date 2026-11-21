@@ -1,23 +1,24 @@
 # @puzzle-ui/pieces
 
-Composable React sections for marketing sites, product experiences, commerce,
-business pages, dashboards, and interactive application flows. Pieces provides
-presentation and accessible structure; your application owns routing, data,
-validation, persistence, payments, availability, and backend behavior.
+Composable React sections and application workflows for marketing sites,
+products, commerce, content, business pages, dashboards, and media libraries.
+Pieces provides presentation and accessible structure; your application owns
+routing, data, validation, persistence, uploads, payments, availability, and
+backend behavior.
 
 **Documentation:** [puzzle-ui.com/docs/pieces](https://puzzle-ui.com/docs/pieces)
 
 ## Install
 
 ```sh
-npm install @puzzle-ui/pieces @puzzle-ui/ui @puzzle-ui/theme
-# or: bun add @puzzle-ui/pieces @puzzle-ui/ui @puzzle-ui/theme
-# or: pnpm add @puzzle-ui/pieces @puzzle-ui/ui @puzzle-ui/theme
-# or: yarn add @puzzle-ui/pieces @puzzle-ui/ui @puzzle-ui/theme
+npm install @puzzle-ui/pieces @puzzle-ui/ui @puzzle-ui/theme @puzzle-ui/cms
+# or: bun add @puzzle-ui/pieces @puzzle-ui/ui @puzzle-ui/theme @puzzle-ui/cms
+# or: pnpm add @puzzle-ui/pieces @puzzle-ui/ui @puzzle-ui/theme @puzzle-ui/cms
+# or: yarn add @puzzle-ui/pieces @puzzle-ui/ui @puzzle-ui/theme @puzzle-ui/cms
 ```
 
 React and React DOM `^19.0.0` are peer dependencies. Pieces depends on Puzzle
-Core, Hooks, Icons, Theme, and UI; no router, database, authentication,
+Core, CMS (for the CMS authoring family), Hooks, Icons, Theme, and UI; no router, database, authentication,
 payment, booking, or map-service dependency is required.
 
 ## Usage
@@ -72,6 +73,38 @@ available; see the [component catalog](https://puzzle-ui.com/docs/pieces).
 | Application & Dashboard (5) | Dashboard Overview, Activity, Onboarding, Empty State, Settings |
 | Specialized & Interactive (7) | Video, Booking, Location, Waitlist, Resource, Event, Footer |
 
+Media & Asset Management adds four app-owned data compositions:
+[`MediaLibrary`](https://puzzle-ui.com/docs/pieces/components/media-library),
+[`AssetPickerDialog`](https://puzzle-ui.com/docs/pieces/components/asset-picker-dialog),
+[`AssetDetailsPanel`](https://puzzle-ui.com/docs/pieces/components/asset-details-panel),
+and [`MediaField`](https://puzzle-ui.com/docs/pieces/components/media-field).
+They accept a safe client projection and caller-provided temporary preview
+URLs; they do not include storage keys, tenant internals, processing errors,
+upload transport, or persistence.
+
+CMS authoring adds caller-data-driven admin compositions: `CmsShell`,
+`ContentList`, `ContentEditor`, `BlockEditor`, `ContentTypeBuilder`,
+`LocalizationEditor`, `RelationshipField`, `RevisionHistory`,
+`PublishScheduler`, `EditorialCalendar`, `AuditLogViewer`, and
+`WebhookManagement`. These components
+do not fetch data, authorize actions, or persist content; the host application
+must use the CMS and Fullstack APIs for those responsibilities.
+`ContentList` supports local filtering and pagination by default, or a
+caller-controlled `remote` query and cursor navigation for server-driven pages.
+The host owns server sorting, cursor history, authorization, and stale responses.
+Optional controlled selection spans pages; bulk action callbacks report
+per-entry success and failure and remain authorized by the host.
+`ContentEditor` can opt into dirty-discard confirmation and browser unload
+warnings; client-side navigation blocking remains the host router's job. The
+built-in JSON editors in `ContentEditor`, `BlockEditor`, and `LocalizationEditor`
+report invalid local text through `onInvalidDraftChange` so hosts can guard
+save and navigation actions.
+`RelationshipField` supports caller-backed remote search and retains removable
+previews for selected IDs outside the current results.
+`WebhookManagement` accepts sanitized subscriptions and delivery history;
+secret provisioning, authorized API calls, and background delivery remain
+host-owned.
+
 Each component has a dedicated reference with variants, previews, API details,
 accessibility notes, and practical examples. Start with the category overview
 to compare use cases:
@@ -86,7 +119,7 @@ to compare use cases:
 
 ## API maturity
 
-All 109 canonical component APIs and their published aliases are **Stable**.
+All 125 canonical component APIs and their published aliases are **Stable**.
 Their documented contracts are intended to remain backward-compatible within
 a major version; breaking changes require a major release. Stable describes API
 compatibility, not production readiness or suitability for a particular

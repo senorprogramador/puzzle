@@ -5,6 +5,33 @@
   ],
   "components": [
     {
+      "name": "JsonEditor",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "editors",
+      "subcategory": "json-editor",
+      "description": "Edit, format, and validate serialized JSON.",
+      "documentation": "apps/site/content/docs/ui/editors/json-editor.mdx",
+      "source": "packages/ui/src/components/editors/json-editor/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "JSON Editor"
+      },
+      "aliases": []
+    },
+    {
       "name": "TextEditor",
       "package": "@puzzle-ui/ui",
       "entryPoints": [
@@ -29,6 +56,9 @@
         "kind": "compound-root",
         "family": "TextEditor"
       },
+      "dataRequirements": [
+        "shortcuts (optional)"
+      ],
       "interactiveBehavior": [
         "onChange"
       ],
@@ -89,6 +119,12 @@
         "kind": "compound-part",
         "family": "TextEditor"
       },
+      "requiredProps": [
+        "document"
+      ],
+      "interactiveBehavior": [
+        "onChecklistChange"
+      ],
       "aliases": []
     }
   ]

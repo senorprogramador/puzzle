@@ -1,4 +1,4 @@
-import { TreeViewItem } from "@puzzle-ui/ui/components/navigation/tree-view";
+import type { TreeViewItem } from "./types";
 
 const folder = "/docs/ui" as const;
 
@@ -108,6 +108,11 @@ const editors: TreeViewItem = {
   href: `${folder}/editors`,
   children: [
     {
+      id: "ui-json-editor",
+      label: "JSON Editor",
+      href: `${folder}/editors/json-editor`,
+    },
+    {
       id: "ui-text-editor",
       label: "Text Editor",
       href: `${folder}/editors/text-editor`,
@@ -142,9 +147,34 @@ const forms: TreeViewItem = {
       href: `${folder}/forms/date-picker`,
     },
     {
+      id: "ui-field-array",
+      label: "FieldArray",
+      href: `${folder}/forms/field-array`,
+    },
+    {
       id: "ui-file-upload",
       label: "File Upload",
       href: `${folder}/forms/file-upload`,
+    },
+    {
+      id: "ui-image-upload",
+      label: "Image Upload",
+      href: `${folder}/forms/image-upload`,
+    },
+    {
+      id: "ui-image-cropper",
+      label: "Image Cropper",
+      href: `${folder}/forms/image-cropper`,
+    },
+    {
+      id: "ui-image-hotspot-editor",
+      label: "Image Hotspot Editor",
+      href: `${folder}/forms/image-hotspot-editor`,
+    },
+    {
+      id: "ui-video-upload",
+      label: "Video Upload",
+      href: `${folder}/forms/video-upload`,
     },
     {
       id: "ui-form-field",

@@ -1,0 +1,117 @@
+---
+title: Media
+description: Provider-neutral media assets, object storage contracts, processing pipelines, and browser-side image and video preparation.
+---
+
+`@puzzle-ui/media` provides the media domain layer for Puzzle. It keeps asset
+metadata and lifecycle management separate from binary object storage, and
+lets applications provide their own storage, processing, and transcoding
+adapters.
+
+Use the package when an application needs tenant-scoped assets and folders,
+upload sessions, image/video metadata, variants, processing status, or media
+references. It does not provide a hosted object store, queue, image codec,
+transcoder, HTTP API, or React components.
+
+## Availability
+
+`@puzzle-ui/media` is available in this repository as a workspace package but
+has not been published to npm. Installing it into an external application
+requires a release. The existing `@puzzle-ui/storage` dependency is available
+from npm.
+
+The `@puzzle-ui/storage` adapter stores media metadata and revisions. File bytes
+belong in a separate `MediaObjectStorageAdapter`; do not store them in the
+record adapter.
+
+## Entry points
+
+| Import | Use |
+| --- | --- |
+| `@puzzle-ui/media` | Serializable media contracts, validation, asset/folder and audit services, processing contracts, and cleanup helpers. |
+| `@puzzle-ui/media/browser` | Optional browser image crop/resize/variants and local video metadata/poster utilities. |
+| `@puzzle-ui/media/testing` | In-memory adapters and Bun conformance helpers for tests. |
+| `@puzzle-ui/media/testing/adapters` | In-memory adapters without the Bun test runtime, including for Node.js tests. |
+
+```ts
+import { createMediaAssetService, createMediaFolderService } from "@puzzle-ui/media";
+import { createImageVariants } from "@puzzle-ui/media/browser";
+
+const assets = createMediaAssetService({ storage, objectStorage });
+const folders = createMediaFolderService({ storage });
+await Promise.all([assets.ready, folders.ready]);
+
+const variants = await createImageVariants(file, {
+  retainOriginal: true,
+  profiles: [
+    { name: "mobile", maxWidth: 480 },
+    { name: "desktop", maxWidth: 1600 },
+  ],
+});
+```
+
+The storage adapter must support the conditional writes required by the media
+services. Unsupported capabilities produce errors rather than weaker
+concurrency guarantees. Configure tenant scoping, authorization, file signature
+checks, quotas, and signed upload/read targets in the host server; browser
+metadata is not trusted.
+
+Point hotspots may omit width and height or set both to zero. Area hotspots
+require positive dimensions within the image bounds. When mapping points with
+omitted dimensions into Pieces media components, provide zeros for both.
+
+## Object-storage adapter contract
+
+The server creates a short-lived upload intent, the browser sends bytes
+directly to the provider target, and the server validates the completed object
+before creating or marking an asset as ready. Provider object keys, multipart
+IDs, and permanent credentials remain server-only. Signed targets are
+short-lived bearer credentials and must not be persisted or logged.
+
+`MediaProcessor`, `VideoTranscoder`, and `MediaProcessingQueueAdapter` are
+provider-neutral contracts. The application supplies workers and a queue;
+the package reports failures when a required processor or output object is
+missing instead of marking a no-op as successful. See the
+[CMS integration](/docs/cms) for persistence and content references.
+
+Soft-deleted assets are hidden by `assets.get` by default. Authorized server
+workflows can pass `{ includeDeleted: true }` to retrieve them within the tenant
+before a restore or permanent deletion. Applications must also guard permanent
+deletion against CMS and other host-owned references and coordinate those
+checks with reference changes.
+
+## Audit storage
+
+`createMediaAuditService` persists sanitized audit events in the metadata
+adapter. Supply a tenant-aware policy for `audit:write` and `audit:read`,
+resolve principals on the server, and use a trusted service actor for writes.
+Queries support resource and result filters and ID-ordered cursor pages, not
+chronological ordering. Restart a completed scan to find later inserts that
+sort before its cursor. The host owns retention and authorized presentation.
+
+The [Fullstack Media audit hook](/docs/fullstack/media#audit-and-operations)
+can write to this service. Audit and mutation writes are not atomic, and
+direct domain or worker operations need their own audit integration.
+
+## Browser utilities
+
+`cropImage` exports a normalized crop relative to the original, oriented image,
+including values from [ImageCropper](/docs/ui/forms/image-cropper). It can
+optionally limit output dimensions; crops smaller than one source pixel in
+either dimension are rejected. `resizeImage`, `cropImage`, and
+`createImageVariants` preserve aspect ratio and do not upscale images. They
+accept output format options, abort signals, and progress
+callbacks. The API does not access browser globals during module import, so the
+package can be imported in an SSR application; invoke these helpers only in a
+browser environment.
+
+The ESM build uses a module worker with `OffscreenCanvas` when available.
+CommonJS uses the current thread. If worker startup or decoding is unavailable,
+the ESM build also falls back to the current thread; startup failures produce a
+console warning. Allow the emitted worker
+asset and its imports in your bundler and `worker-src` Content Security Policy,
+and verify the deployed configuration. An abort terminates an active worker.
+
+`readVideoMetadata` and `createVideoPoster` provide local preflight and preview
+only. They do not transcode video. Use the asynchronous `VideoTranscoder`
+contract for server/worker renditions.

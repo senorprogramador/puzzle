@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/storage-d1` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## [Unreleased]
+
+- Allow hyphens in index names without relaxing validation of table and other
+  SQL identifiers.
+
 ## 0.14.0 - 2026-11-20
 
 - No changes; version bumped in lockstep.

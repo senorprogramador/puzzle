@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { chmod, copyFile, mkdir, mkdtemp, readFile, readdir, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
@@ -244,7 +244,29 @@ test("release retains a root version heading when no packages have changes", asy
       .map((line) => JSON.parse(line));
     const published = commands.filter(({ command, args }) => command === "npm" && args[0] === "publish");
     for (const name of ["workspace", "workspace-ui"]) {
-      assert.equal(published.some(({ cwd }) => cwd === join(directory, "packages", name)), false);
+      assert.equal(published.some(({ cwd }) => basename(cwd) === name), false);
+    }
+    const order = new Map();
+    const manifests = [];
+    for (const [index, { cwd }] of published.entries()) {
+      const name = basename(cwd);
+      const manifest = JSON.parse(await readFile(join(root, "packages", name, "package.json"), "utf8"));
+      order.set(manifest.name, index);
+      manifests.push(manifest);
+    }
+    assert.ok(order.has("@puzzle-ui/media"));
+    assert.ok(order.has("@puzzle-ui/cms"));
+    for (const manifest of manifests) {
+      for (const dependency of Object.keys({
+        ...manifest.dependencies,
+        ...manifest.optionalDependencies,
+        ...manifest.peerDependencies,
+      })) {
+        if (order.has(dependency)) {
+          assert.ok(order.get(dependency) < order.get(manifest.name),
+            `${dependency} must be published before ${manifest.name}`);
+        }
+      }
     }
     const rootChangelog = await readFile(join(directory, "CHANGELOG.md"), "utf8");
     assert.match(rootChangelog, /## 0\.5\.0 - \d{4}-\d{2}-\d{2}\n\n## 0\.4\.0/);

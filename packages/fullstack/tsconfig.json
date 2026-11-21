@@ -14,8 +14,17 @@
     "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
+      "@puzzle-ui/cms": [
+        "../cms/src/index.ts"
+      ],
       "@puzzle-ui/auth": [
         "../auth/src/index.ts"
+      ],
+      "@puzzle-ui/media": [
+        "../media/src/index.ts"
+      ],
+      "@puzzle-ui/storage": [
+        "../storage/src/index.ts"
       ],
       "@puzzle-ui/session": [
         "../session/src/index.ts"

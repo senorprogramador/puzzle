@@ -5,6 +5,10 @@ description: Vendor-neutral persistence contracts, migrations, adapter conforman
 
 <code>@puzzle-ui/storage</code> defines the persistence contract used by <code>@puzzle-ui/auth</code> and other Puzzle packages. It keeps application storage code independent of a database vendor; separate adapters implement the contract for Cloudflare D1 and MongoDB.
 
+The headless CMS uses this contract for content records and media metadata.
+Media file bytes use the separate `MediaObjectStorageAdapter` from
+[@puzzle-ui/media](/docs/media), not `StorageAdapter`.
+
 Use the core package to type an adapter or build your own. Add an adapter package when you want a ready-made database implementation. For authentication wiring, see [Authentication](/docs/auth); for a broader application stack, see [Fullstack](/docs/fullstack).
 
 ## Install

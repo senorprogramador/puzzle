@@ -151,6 +151,7 @@
     "@puzzle-ui/core": "^0.14.0",
     "@puzzle-ui/hooks": "^0.14.0",
     "@puzzle-ui/icons": "^0.14.0",
+    "@puzzle-ui/media": "^0.14.0",
     "@puzzle-ui/theme": "^0.14.0"
   },
   "peerDependencies": {

@@ -86,4 +86,33 @@ describe("Popover (browser)", () => {
     await user.click(screen.getByRole("button", { name: "Elsewhere" }));
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
   });
+
+  it("keeps a parent open while interacting with a nested popover", async () => {
+    const user = userEvent.setup();
+    render(
+      <>
+        <Popover title="Parent" trigger={<button type="button">Open parent</button>}>
+          <Popover title="Child" trigger={<button type="button">Open child</button>}>
+            <button type="button">Child action</button>
+          </Popover>
+          <button type="button">Parent action</button>
+        </Popover>
+        <button type="button">Outside</button>
+      </>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Open parent" }));
+    await user.click(await screen.findByRole("button", { name: "Open child" }));
+    const child = await screen.findByRole("dialog", { name: "Child" });
+    await waitFor(() => expect(child).toBeVisible());
+    await user.click(screen.getByRole("button", { name: "Child action" }));
+    expect(screen.getByRole("dialog", { name: "Parent" })).toBeVisible();
+    expect(screen.getByRole("dialog", { name: "Child" })).toBeVisible();
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Child" })).toBeNull());
+    expect(screen.getByRole("dialog", { name: "Parent" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Open child" })).toHaveFocus();
+    await user.click(screen.getByRole("button", { name: "Outside" }));
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Parent" })).toBeNull());
+  });
 });

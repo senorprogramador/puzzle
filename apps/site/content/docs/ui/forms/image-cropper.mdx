@@ -1,0 +1,131 @@
+---
+title: React Image Cropper Component
+description: Select, resize, zoom, and pan a normalized image crop with an accessible, responsive React control.
+---
+
+import { Badge, ImageCropper, Preview, Section } from "@puzzle-ui/ui";
+import { ImageCropperExample } from "../../../../src/components/doc-examples/ui/image-editors";
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This component is new and may evolve as its usage is validated.
+
+`ImageCropper` is a presentation-only control for selecting a crop from an image. It supports aspect-ratio presets, free resizing, zoom, pointer/touch panning, reset, and keyboard operation. It does not create a cropped file, upload the source, or persist crop data.
+
+## Import
+
+```tsx
+import {
+  ImageCropper,
+  type ImageCrop,
+  type ImageCropAspectRatioPreset,
+} from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+`value` and `onChange` make the crop controlled. Use `defaultValue` and `onChange` when the crop should be initialized and then managed by the control.
+
+<Preview
+  align="start"
+  hideDevices
+  code={`\
+const [crop, setCrop] = useState<ImageCrop>({
+  x: 0.1,
+  y: 0.1,
+  width: 0.8,
+  height: 0.8,
+});
+
+<ImageCropper
+  src={imageUrl}
+  alt="Sunlit living room"
+  label="Crop the room photo"
+  value={crop}
+  onChange={setCrop}
+/>
+`}
+>
+  <Section>
+    <ImageCropperExample />
+  </Section>
+</Preview>
+
+The preview displays the serializable crop object as you edit it. Provide a meaningful `alt` text for the image and a `label` for the cropper group.
+
+## Normalized crop values
+
+`ImageCrop` has `{ x, y, width, height }` fields. Each value is normalized to the source image bounds in the inclusive `0..1` range, so the contract is independent of source pixel dimensions:
+
+```ts
+const crop: ImageCrop = {
+  x: 0.1,
+  y: 0.1,
+  width: 0.8,
+  height: 0.8,
+};
+```
+
+The rectangle is relative to the complete, oriented image passed in `src`. The
+public type is a local structural value type and can be passed to the separate
+browser utility `cropImage`, along with the same original image file:
+
+```ts
+import { cropImage } from "@puzzle-ui/media/browser";
+
+const result = await cropImage(originalFile, {
+  crop,
+  maxWidth: 1200,
+  format: "image/webp",
+  signal: abortController.signal,
+});
+// result.blob contains the re-encoded crop; the original file is unchanged.
+```
+
+Invoke this utility in a browser, not during server rendering. It can only crop
+files supplied by the caller; the cropper itself does not fetch or upload the
+image. Browser codec support and EXIF orientation handling vary.
+
+## Aspect ratio, zoom, and reset
+
+The initial aspect ratio is `1` (square). Set `aspectRatio` to a positive number or `"free"`. `aspectRatioPresets` replaces the default `1:1`, `4:3`, `16:9`, and `Free` buttons; each preset has a visible label and ratio value. `onAspectRatioChange` reports a selected preset.
+
+```tsx
+<ImageCropper
+  src={imageUrl}
+  alt="Sunlit living room"
+  aspectRatio="free"
+  aspectRatioPresets={[
+    { label: "Square", value: 1 },
+    { label: "Portrait", value: 3 / 4 },
+    { label: "Free", value: "free" },
+  ]}
+  maxZoom={4}
+/>
+```
+
+Drag the selection to pan it, drag its corner handle to resize, and use the Zoom range input to zoom around the current crop center. A preset constrains resizing to that output ratio; `"free"` allows independent width and height changes. **Reset crop** restores the largest crop that fits the active preset.
+
+## Keyboard, touch, and responsive behavior
+
+- Tab to the crop selection or resize handle. Arrow keys move the crop by 1%; `Alt` plus an arrow moves it by 10%.
+- `Shift` plus an arrow resizes the crop. The zoom input and aspect-ratio buttons are native keyboard-accessible controls.
+- The selection and corner handle support pointer input, including touch. The crop area scales with its image container and keeps the same normalized values.
+- Focus indicators remain visible, and the control disables transitions when reduced motion is requested.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `src` | `string` | — | Image URL to show and crop. |
+| `alt` | `string` | — | Alternative text for the source image. |
+| `label` | `string` | `"Image cropper"` | Accessible name for the cropper group. |
+| `value` | `ImageCrop` | — | Controlled normalized crop. |
+| `defaultValue` | `ImageCrop` | Largest available crop | Initial uncontrolled crop. |
+| `onChange` | `(crop: ImageCrop) => void` | — | Receives normalized crop changes. |
+| `aspectRatio` | `number \| "free"` | First preset (`1`) | Active output ratio. |
+| `aspectRatioPresets` | `ImageCropAspectRatioPreset[]` | `1:1`, `4:3`, `16:9`, `Free` | Selectable ratios. |
+| `onAspectRatioChange` | `(ratio: number \| "free") => void` | — | Called when a preset is selected. |
+| `maxZoom` | `number` | `3` | Maximum zoom level. |
+| `disabled` | `boolean` | `false` | Disables editing controls. |
+| `className`, `style`, `id` | Standard `<div>` props | — | Outer element attributes. |
+
+Use the [Image Hotspot Editor](/docs/ui/forms/image-hotspot-editor) separately for focal points and image annotations. The two controls do not transform or synchronize each other's values.

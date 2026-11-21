@@ -70,6 +70,11 @@ describe("component catalog", () => {
       new URL("./layout/sidebar/ui.ts", import.meta.url),
       "utf8",
     );
+    const overview = readFileSync(
+      new URL("../../content/docs/ui/index.mdx", import.meta.url),
+      "utf8",
+    );
+    expect(overview).not.toMatch(/^#{1,6}\s+\[/m);
 
     for (const category of categories) {
       const page = readFileSync(
@@ -91,6 +96,9 @@ describe("component catalog", () => {
       );
       expect(sidebar, `${category} category is directly linked`).toContain(
         `href: \`\${folder}/${category}\``,
+      );
+      expect(overview, `${category} is linked from the overview`).toContain(
+        `](/docs/ui/${category})`,
       );
     }
   });

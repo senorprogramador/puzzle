@@ -40,6 +40,17 @@ request handlers and from UI. Use deterministic seed fixtures for development
 and tests; make reset scope explicit, refuse production/remote targets, and
 never seed real user data or production credentials.
 
+For content-managed applications, use [`@puzzle-ui/cms`](../../../packages/cms/README.md)
+for content schemas, entries, revisions, and publishing lifecycle. It persists
+content metadata through `@puzzle-ui/storage`; the host application supplies
+the access policy and any scheduler.
+
+For media, persist metadata through Storage but send binary bytes through the
+separate [`@puzzle-ui/media` object-storage contract](../../../packages/media/README.md).
+Do not store file bytes in `StorageAdapter` records. CMS media fields contain
+asset IDs; tenant checks, authorization, signed reads, and upload validation
+remain server responsibilities.
+
 ## Content, facts, and secrets
 
 - Model content according to its owner and update lifecycle; use static

@@ -42,6 +42,33 @@ UI.
 - **Good fit:** A custom application form needs shared accessible controls.
   Compose UI primitives and keep validation, submission, and business rules in
   the application.
+- **Good fit:** A form repeats or nests caller-owned entries. Use `FieldArray`
+  (or its `RepeaterField` alias) for accessible add/remove/order controls and
+  render the nested inputs with the existing form primitives.
+- **Good fit:** An application edits serialized JSON. Use `JsonEditor` for
+  parsing, formatting, and caller-defined validation; use `TextEditor` for its
+  structured rich-text document contract instead.
+- **Good fit:** An application needs a specialized image or video file input.
+  Use `ImageUpload` for orientation-aware local resizing, named variants, and
+  optional crop/hotspot editors, or `VideoUpload` for metadata, a poster, and an
+  injected resumable client. Neither component chooses a backend or sends data
+  without a supplied upload handler. Use `FileUpload` for generic files and
+  documents.
+- **Simpler fit:** A form needs a start and end date without shared range
+  highlighting. Compose two controlled `DatePicker` components and pass
+  `minDate`/`maxDate` constraints between them. A separate `DateRangePicker`
+  is not needed for this composed behavior.
+- **Good fit:** An application needs a standalone image crop or focal
+  point/hotspot editor. Use `ImageCropper` and `ImageHotspotEditor` from
+  `@puzzle-ui/ui`; their normalized values are source-relative presentation
+  contracts. Use `ImageUpload` when those edits need to compose with local
+  image processing and an injected upload action.
+- **Good fit:** A CMS application needs an authoring shell, content list,
+  schema-driven form, block list, locale switcher, relationship picker,
+  revision history, publication scheduling controls, calendar, or audit table.
+  Compose the CMS Pieces with caller-provided data and Fullstack CMS actions;
+  keep authorization, validation, revisions, persistence, and job execution on
+  the server.
 - **Good fit:** A lodging page needs date/guest search presentation, rate cards,
   a stay summary, or house rules. Use the hospitality Pieces with values and
   actions supplied by the application; the app still owns provider-specific

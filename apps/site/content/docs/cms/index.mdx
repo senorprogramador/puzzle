@@ -1,0 +1,111 @@
+---
+title: Headless CMS
+description: Framework-neutral content schemas, validation, tenant-scoped entries, localization, revisions, publishing, and access policies.
+---
+
+`@puzzle-ui/cms` provides a framework-neutral content domain for applications
+that need configurable content types, entries, localized values, relationships,
+drafts, revisions, and publishing. It uses `@puzzle-ui/storage` for metadata
+and can validate media references through an injected policy.
+
+The package does not provide a database, router, React admin interface, role
+management, or scheduler. The host application supplies persistence, identity,
+tenant context, authorization policy, and a scheduler for scheduled publishing.
+
+For caller-data-driven React administration compositions, use the optional
+[`@puzzle-ui/pieces` CMS authoring family](/docs/pieces/components/cms). Those
+components do not replace the CMS server policy, storage, revision checks, or
+scheduler.
+
+## Availability
+
+`@puzzle-ui/cms` is available in this repository as a workspace package but
+has not been published to npm. Installing it into an external application
+requires a release. `@puzzle-ui/storage` is available from npm;
+`@puzzle-ui/media` is also workspace-only until its release.
+
+Add `@puzzle-ui/media` as a workspace dependency when content types use media
+fields and the host application needs to validate or track asset references.
+
+## Define a content type
+
+```ts
+import { CmsService } from "@puzzle-ui/cms";
+import type { StorageAdapter } from "@puzzle-ui/storage";
+
+const cms = new CmsService({
+  storage: getStorageAdapter(),
+  accessPolicy: async ({ tenantId, actor, action }) =>
+    actor !== null && canEditContent(actor, tenantId, action),
+});
+
+const articleType = await cms.registerContentType({
+  tenantId: "tenant_1",
+  actor: { id: "editor_1" },
+  definition: {
+    slug: "article",
+    name: "Article",
+    version: 1,
+    locales: ["en-US", "fr-FR"],
+    defaultLocale: "en-US",
+    fields: [
+      { key: "title", type: "text", label: "Title", required: true, localized: true },
+      { key: "slug", type: "slug", label: "Slug", required: true, localized: true },
+    ],
+  },
+});
+```
+
+The storage adapter must provide the atomic, conditional, and uniqueness
+capabilities needed by CMS mutations. Every operation receives tenant and
+actor context, and the supplied access policy must explicitly authorize it.
+Denied or unauthenticated operations must not be treated as successful reads
+or writes.
+
+## Entries and publishing
+
+`CmsService` validates fields against registered schemas, normalizes locales
+and slugs, checks relationship targets, and applies revision conditions to
+mutations. Use the returned revision as `expectedRevision` for subsequent
+updates, publishes, restores, and schedule operations; stale writes return a
+conflict rather than overwriting newer content.
+
+Public queries return only published snapshots. Admin reads are separately
+authorized. Scheduling requires an injected `CmsScheduler`; a timestamp alone
+does not publish an entry. Scheduled jobs are revision-bound, so a stale job
+cannot publish a newer draft.
+
+Media fields store asset IDs, not object keys or signed URLs. Supply
+`mediaReferenceValidator.assertCanReference` to verify tenant, access, and
+asset lifecycle before accepting a media value. The CMS service records media
+usage so applications can avoid deleting referenced assets.
+
+## Change events
+
+Set `emitChangeEvents: true` on every CMS writer to atomically store
+metadata-only events for successful mutations. An authorized server-side
+worker can page through `listChangeEvents` and call
+`acknowledgeChangeEvent` after durable processing; the policy must grant
+`change-event:read` and `change-event:ack`. Follow every cursor, including
+through empty filtered pages, and restart scans to find events created during
+a scan. Workers must coordinate and handle events idempotently: delivery can
+be repeated after a crash. The outbox alone does not deliver HTTP requests.
+
+## Webhook delivery
+
+`signCmsWebhook` and `verifyCmsWebhook` separately provide HMAC-SHA256
+signatures for host-built transports. Verification requires an atomic replay
+store and supports a limited secret-rotation overlap. Couple replay
+reservation to durable processing. `CmsWebhookService` persists subscriptions,
+delivery retries, and history, but requires a host transport that enforces
+connection-time SSRF defenses and a server-side secret resolver. The host must
+schedule fanout and delivery workers. See the package README for the wire
+format, rotation, and transport requirements.
+
+## Public API and boundaries
+
+The package exports its schema registry and validators, typed content and
+revision contracts, migration checks, errors, and `CmsService` from
+`@puzzle-ui/cms`. It is independent of React, Next.js, TanStack Start, and
+database vendors. See the [Media package](/docs/media) for object storage and
+the [Fullstack package](/docs/fullstack) for the application HTTP boundary.

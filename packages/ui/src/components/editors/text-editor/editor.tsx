@@ -10,7 +10,9 @@ import {
   useState,
 } from "react";
 import type { ClipboardEvent, FormEvent, KeyboardEvent } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@puzzle-ui/core";
+import { Icon } from "@puzzle-ui/icons";
 import {
   applyMark,
   createTextDocument,
@@ -18,28 +20,61 @@ import {
   getOrderedSelection,
   insertDocumentAtSelection,
   insertTextAtSelection,
+  exitEmptyTextBlock,
+  deleteTextAtSelection,
   isCollapsedSelection,
-  getBlockText,
+  getBlockLength,
   getTextLink,
   normalizeTextDocument,
+  normalizeTextSelection,
   normalizeLinkHref,
   setTextLink,
   setTextVariant,
+  setBlockType,
+  insertHorizontalRule,
+  clearFormatting,
+  clearInlineFormatting,
   setTextAlign,
   setListType,
+  applyListType,
   getListType,
+  getListSelectionState,
+  removeList,
+  setListAttributes,
+  setListChecked,
+  setListIndent,
+  shiftListIndent,
+  setBlockIndent,
+  setListInteractive,
+  toggleListItemChecked,
+  splitListItemAtSelection,
+  mergeListItemBackward,
+  applyMarkdownShortcut,
+  findTextInDocument,
+  getTextStatistics,
+  getSlashCommandAtSelection,
+  replaceAllText as replaceAllTextTransaction,
   getTextAlign,
 } from "./text-document";
 import { parseHtmlToDocument, parseMarkdownToDocument } from "./text-parser";
+import { createTextListTree } from "./text-list-tree";
 import type {
+  TextBlock,
   TextBlockVariant,
   TextDocument,
   TextMark,
   TextPoint,
   TextSelection,
   TextAlign,
+  TextListAttributes,
+  TextListSelectionState,
   TextListType,
   TextTransaction,
+  TextDocumentStatistics,
+  TextSearchMatch,
+  TextSearchOptions,
+  TextSlashCommandMatch,
+  TextEditorShortcut,
 } from "./text-editor.types";
 import "./text-editor.css";
 
@@ -53,19 +88,47 @@ type TextEditorHandle = {
   isTextVariantActive: (variant: TextBlockVariant) => boolean;
   toggleMark: (mark: TextMark) => void;
   setTextVariant: (variant: TextBlockVariant) => void;
+  setBlockStyle: (variant: TextBlockVariant) => void;
+  setBlockType: (blockType: "paragraph" | "blockquote" | "codeBlock") => void;
+  insertHorizontalRule: () => void;
+  clearFormatting: () => void;
+  clearInlineFormatting: () => void;
   setTextAlign: (align: TextAlign) => void;
   isTextAlignActive: (align: TextAlign) => boolean;
   setListType: (listType: TextListType | null) => void;
+  applyListType: (listType: TextListType) => void;
   isListTypeActive: (listType: TextListType) => boolean;
+  getListSelectionState: () => TextListSelectionState;
+  removeList: () => void;
+  setListAttributes: (attributes: TextListAttributes, options?: { preserveFocus?: boolean }) => void;
+  beginListAttributePreview: () => void;
+  previewListAttributes: (attributes: TextListAttributes) => void;
+  finishListAttributePreview: (commit: boolean) => void;
+  setListChecked: (checked: boolean) => void;
+  setListInteractive: (interactive: boolean) => void;
+  setListIndent: (indent: number) => void;
+  shiftListIndent: (direction: -1 | 1) => void;
+  setBlockIndent: (indent: number) => void;
+  toggleListItemChecked: () => void;
   getActiveLink: () => string | null;
   setLink: (href: string | null) => boolean;
   insertText: (text: string) => void;
   replaceSelection: (document: TextDocument) => void;
+  getTextStatistics: () => TextDocumentStatistics;
+  getSlashCommand: () => TextSlashCommandMatch | null;
+  findText: (query: string, options?: TextSearchOptions) => TextSearchMatch[];
+  replaceAllText: (
+    query: string,
+    replacement: string,
+    options?: TextSearchOptions,
+  ) => void;
   undo: () => void;
   redo: () => void;
   canUndo: () => boolean;
   canRedo: () => boolean;
 };
+
+type TextEditorCommands = TextEditorHandle;
 
 type EditorProps = {
   /** Controlled document. Structurally equal updates preserve the current selection. */
@@ -81,6 +144,7 @@ type EditorProps = {
   readOnly?: boolean;
   autoFocus?: boolean;
   "aria-label"?: string;
+  shortcuts?: readonly TextEditorShortcut[];
 };
 
 type HistoryEntry = {
@@ -106,16 +170,32 @@ type ApplyTransactionOptions = {
   skipIfDocumentEqual?: boolean;
 };
 
+type CommitTransactionOptions = {
+  groupInputType?: string;
+  renderDom?: boolean;
+};
+
 const isInside = (root: HTMLElement, node: Node | null): node is Node =>
   node != null && (node === root || root.contains(node));
 
 const isElementNode = (node: Node): node is Element =>
   node.nodeType === Node.ELEMENT_NODE;
 
+const getEditorBlocks = (root: HTMLElement): HTMLElement[] =>
+  Array.from(root.querySelectorAll<HTMLElement>("[data-puzzle-editor-block]"));
+
 const nodeTextLength = (node: Node): number => {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent?.length ?? 0;
-  if (isElementNode(node) && node.tagName.toLowerCase() === "br") {
-    return node.hasAttribute("data-puzzle-placeholder") ? 0 : 1;
+  if (isElementNode(node)) {
+    if (
+      node.hasAttribute("data-puzzle-editor-control") ||
+      ["ul", "ol"].includes(node.tagName.toLowerCase())
+    ) {
+      return 0;
+    }
+    if (node.tagName.toLowerCase() === "br") {
+      return node.hasAttribute("data-puzzle-placeholder") ? 0 : 1;
+    }
   }
 
   return Array.from(node.childNodes).reduce(
@@ -162,13 +242,27 @@ const pointFromDom = (
   if (!isInside(root, node)) return null;
 
   if (node === root) {
-    const blocks = Array.from(root.children) as HTMLElement[];
+    const blocks = getEditorBlocks(root);
     if (!blocks.length) return null;
-    const blockIndex = Math.max(0, Math.min(offset, blocks.length - 1));
-    const blockElement = blocks[blockIndex]!;
+    const child = root.childNodes.item(offset);
+    const blockElement =
+      child && isElementNode(child)
+        ? child.matches("[data-puzzle-editor-block]")
+          ? (child as HTMLElement)
+          : child.querySelector<HTMLElement>("[data-puzzle-editor-block]")
+        : null;
+    const mappedIndex = blockElement ? blocks.indexOf(blockElement) : -1;
+    const blockIndex =
+      offset >= root.childNodes.length
+        ? blocks.length - 1
+        : mappedIndex >= 0
+          ? mappedIndex
+          : Math.max(0, Math.min(offset, blocks.length - 1));
+    const resolvedBlock = blocks[blockIndex]!;
     return {
       block: blockIndex,
-      offset: offset >= blocks.length ? nodeTextLength(blockElement) : 0,
+      offset:
+        offset >= root.childNodes.length ? nodeTextLength(resolvedBlock) : 0,
     };
   }
 
@@ -176,23 +270,13 @@ const pointFromDom = (
   const markedBlock = element?.closest<HTMLElement>(
     "[data-puzzle-editor-block]",
   );
-  let directChild: Node | null = node;
-  while (directChild && directChild.parentNode !== root) {
-    directChild = directChild.parentNode;
-  }
-  const blockElement =
-    markedBlock ??
-    (directChild?.nodeType === Node.ELEMENT_NODE
-      ? (directChild as HTMLElement)
-      : null);
+  if (!markedBlock || !root.contains(markedBlock)) return null;
 
-  if (!blockElement || !root.contains(blockElement)) return null;
-
-  const block = Array.from(root.children).indexOf(blockElement);
+  const block = getEditorBlocks(root).indexOf(markedBlock);
   if (block < 0) return null;
 
-  const measured = measureBeforePoint(blockElement, node, offset);
-  const contentLength = nodeTextLength(blockElement);
+  const measured = measureBeforePoint(markedBlock, node, offset);
+  const contentLength = nodeTextLength(markedBlock);
   return {
     block,
     offset: Math.max(0, Math.min(measured ?? 0, contentLength)),
@@ -238,6 +322,13 @@ const collectDomPoints = (
   let length = 0;
 
   const visit = (node: Node) => {
+    if (
+      isElementNode(node) &&
+      (node.hasAttribute("data-puzzle-editor-control") ||
+        ["ul", "ol"].includes(node.tagName.toLowerCase()))
+    ) {
+      return;
+    }
     if (node.nodeType === Node.TEXT_NODE) {
       const nodeLength = node.textContent?.length ?? 0;
       if (nodeLength) {
@@ -302,12 +393,9 @@ const domPointFromPoint = (
 };
 
 const setDomSelection = (root: HTMLElement, selection: TextSelection) => {
-  const anchorBlock = root.children.item(
-    selection.anchor.block,
-  ) as HTMLElement | null;
-  const focusBlock = root.children.item(
-    selection.focus.block,
-  ) as HTMLElement | null;
+  const blocks = getEditorBlocks(root);
+  const anchorBlock = blocks[selection.anchor.block] ?? null;
+  const focusBlock = blocks[selection.focus.block] ?? null;
   if (!anchorBlock || !focusBlock) return;
 
   const anchor = domPointFromPoint(anchorBlock, selection.anchor.offset);
@@ -328,12 +416,8 @@ const setDomSelection = (root: HTMLElement, selection: TextSelection) => {
 
     const range = root.ownerDocument.createRange();
     const ordered = getOrderedSelection(selection);
-    const startBlock = root.children.item(
-      ordered.start.block,
-    ) as HTMLElement | null;
-    const endBlock = root.children.item(
-      ordered.end.block,
-    ) as HTMLElement | null;
+    const startBlock = blocks[ordered.start.block] ?? null;
+    const endBlock = blocks[ordered.end.block] ?? null;
     if (!startBlock || !endBlock) return;
     const start = domPointFromPoint(startBlock, ordered.start.offset);
     const end = domPointFromPoint(endBlock, ordered.end.offset);
@@ -352,14 +436,24 @@ const setDomSelection = (root: HTMLElement, selection: TextSelection) => {
  * editing (for example, Backspace may remove a placeholder <br> itself). React
  * must therefore not reconcile those descendants as React-owned nodes.
  */
-const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
+const renderDocumentToDom = (
+  root: HTMLElement,
+  textDocument: TextDocument,
+  readOnly = false,
+) => {
   const ownerDocument = root.ownerDocument;
   const fragment = ownerDocument.createDocumentFragment();
 
-  for (const block of textDocument.content) {
-    const blockElement = ownerDocument.createElement("p");
+  const createBlockElement = (
+    block: TextBlock,
+    blockIndex: number,
+    tagName: "p" | "li" | "blockquote" | "pre" | "hr",
+  ) => {
+    const blockElement = ownerDocument.createElement(tagName);
     blockElement.className = `puzzle-text-editor__block puzzle-typography-${block.variant}`;
     blockElement.dataset.puzzleEditorBlock = "true";
+    blockElement.dataset.puzzleBlockIndex = String(blockIndex);
+    blockElement.dataset.puzzleBlockType = block.type;
     blockElement.dataset.puzzleVariant = block.variant;
     if (block.headingLevel) {
       blockElement.dataset.puzzleHeadingLevel = String(block.headingLevel);
@@ -368,7 +462,16 @@ const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
       blockElement.dataset.puzzleAlign = block.align;
       blockElement.style.textAlign = block.align;
     }
-    if (block.listType) blockElement.dataset.puzzleListType = block.listType;
+    if (block.indent && !block.listType) {
+      blockElement.dataset.puzzleIndent = String(block.indent);
+      blockElement.style.marginInlineStart = `calc(${block.indent} * var(--puzzle-space-4, 1rem))`;
+    }
+    if (block.type === "horizontalRule") {
+      blockElement.setAttribute("role", "separator");
+      blockElement.setAttribute("aria-label", "Horizontal rule");
+      blockElement.contentEditable = "false";
+      return blockElement;
+    }
 
     if (!block.children.length) {
       const placeholder = ownerDocument.createElement("br");
@@ -378,12 +481,15 @@ const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
       for (const inline of block.children) {
         const inlineElement = ownerDocument.createElement("span");
         const content = ownerDocument.createDocumentFragment();
-        const parts = inline.text.split("\n");
-
-        parts.forEach((part, index) => {
-          if (index > 0) content.appendChild(ownerDocument.createElement("br"));
-          if (part) content.appendChild(ownerDocument.createTextNode(part));
-        });
+        if (block.type === "codeBlock") {
+          content.appendChild(ownerDocument.createTextNode(inline.text));
+        } else {
+          const parts = inline.text.split("\n");
+          parts.forEach((part, index) => {
+            if (index > 0) content.appendChild(ownerDocument.createElement("br"));
+            if (part) content.appendChild(ownerDocument.createTextNode(part));
+          });
+        }
 
         let node: Node = content;
         for (const mark of [...(inline.marks ?? [])].reverse()) {
@@ -394,7 +500,9 @@ const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
                 ? "em"
                 : mark === "underline"
                   ? "u"
-                  : "s";
+                  : mark === "strike"
+                    ? "s"
+                    : "code";
           const wrapper = ownerDocument.createElement(tagName);
           wrapper.appendChild(node);
           node = wrapper;
@@ -411,10 +519,102 @@ const renderDocumentToDom = (root: HTMLElement, textDocument: TextDocument) => {
         blockElement.appendChild(inlineElement);
       }
     }
+    return blockElement;
+  };
 
-    fragment.appendChild(blockElement);
+  const appendEntries = (
+    parent: DocumentFragment | HTMLElement,
+    entries: ReturnType<typeof createTextListTree>,
+  ) => {
+    for (const entry of entries) {
+      if (entry.type === "block") {
+        const tagName =
+          entry.block.type === "blockquote"
+            ? "blockquote"
+            : entry.block.type === "codeBlock"
+              ? "pre"
+              : entry.block.type === "horizontalRule"
+                ? "hr"
+                : "p";
+        parent.appendChild(
+          createBlockElement(entry.block, entry.blockIndex, tagName),
+        );
+        continue;
+      }
+
+      const listElement = ownerDocument.createElement(
+        entry.listType === "ordered" ? "ol" : "ul",
+      );
+      listElement.className = `puzzle-text-editor__list puzzle-text-editor__list--${entry.listType}`;
+      listElement.dataset.puzzleListType = entry.listType;
+      if (entry.attributes?.interactive !== undefined) {
+        listElement.dataset.puzzleListInteractive = String(
+          entry.attributes.interactive,
+        );
+      }
+      if (entry.attributes?.icon) {
+        listElement.dataset.puzzleListIcon = entry.attributes.icon.name;
+        listElement.dataset.puzzleListIconSize = String(
+          entry.attributes.icon.size,
+        );
+        listElement.dataset.puzzleListIconColor = entry.attributes.icon.color;
+      }
+
+      for (const item of entry.items) {
+        const { block, blockIndex } = item;
+        const itemElement = createBlockElement(block, blockIndex, "li");
+        itemElement.dataset.puzzleListType = entry.listType;
+        if (entry.listType === "checklist") {
+          itemElement.dataset.puzzleChecked = String(block.checked === true);
+          const checkbox = ownerDocument.createElement("button");
+          checkbox.type = "button";
+          checkbox.setAttribute("role", "checkbox");
+          checkbox.setAttribute(
+            "aria-checked",
+            String(block.checked === true),
+          );
+          checkbox.setAttribute(
+            "aria-label",
+            block.checked
+              ? "Mark checklist item incomplete"
+              : "Mark checklist item complete",
+          );
+          checkbox.dataset.puzzleEditorControl = "checklist";
+          checkbox.dataset.puzzleBlockIndex = String(blockIndex);
+          checkbox.contentEditable = "false";
+          checkbox.disabled =
+            readOnly || block.listAttributes?.interactive !== true;
+          checkbox.className = "puzzle-text-editor__checkbox";
+          itemElement.insertBefore(checkbox, itemElement.firstChild);
+        }
+        if (entry.listType === "icon") {
+          const marker = ownerDocument.createElement("span");
+          marker.className = "puzzle-text-editor__icon";
+          marker.dataset.puzzleEditorControl = "icon";
+          marker.setAttribute("aria-hidden", "true");
+          marker.contentEditable = "false";
+          marker.dataset.puzzleIconName =
+            block.listAttributes?.icon?.name ?? "mdi:circle";
+          marker.dataset.puzzleIconSize = String(
+            block.listAttributes?.icon?.size ?? 18,
+          );
+          marker.dataset.puzzleIconColor =
+            block.listAttributes?.icon?.color ?? "currentColor";
+          itemElement.insertBefore(marker, itemElement.firstChild);
+        }
+
+        listElement.appendChild(itemElement);
+        appendEntries(itemElement, item.children);
+      }
+
+      parent.appendChild(listElement);
+    }
   }
 
+  appendEntries(
+    fragment,
+    createTextListTree(textDocument.content),
+  );
   root.replaceChildren(fragment);
 };
 
@@ -422,7 +622,8 @@ const isMark = (value: string): value is TextMark =>
   value === "bold" ||
   value === "italic" ||
   value === "underline" ||
-  value === "strike";
+  value === "strike" ||
+  value === "code";
 
 const documentsEqual = (left: TextDocument, right: TextDocument): boolean =>
   JSON.stringify(left) === JSON.stringify(right);
@@ -514,6 +715,7 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       readOnly = false,
       autoFocus = false,
       "aria-label": ariaLabel = "Text editor",
+      shortcuts = [],
     },
     forwardedRef,
   ) => {
@@ -521,6 +723,7 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       normalizeTextDocument(value ?? defaultValue ?? createTextDocument()),
     );
     const editableRef = useRef<HTMLDivElement | null>(null);
+    const [iconMarkers, setIconMarkers] = useState<HTMLElement[]>([]);
     const documentRef = useRef(documentState);
     const selectionRef = useRef(createTextSelection());
     const restoreSelectionRef = useRef<TextSelection | null>(null);
@@ -532,12 +735,17 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
     const selectionBeforeInputRef = useRef<TextSelection>(selectionRef.current);
     const pendingMarksRef = useRef<TextMark[]>([]);
     const pendingMarksOverrideRef = useRef(false);
+    const compositionRef = useRef<{
+      document: TextDocument;
+      selection: TextSelection;
+    } | null>(null);
     const historyRef = useRef<HistoryState>({
       undo: [],
       redo: [],
       lastInputType: "",
       lastInputAt: 0,
     });
+    const listPreviewRef = useRef<HistoryEntry | null>(null);
 
     const updateSelection = useCallback(
       (nextSelection: TextSelection) => {
@@ -619,15 +827,35 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
     );
 
     const commitTransaction = useCallback(
-      (transaction: TextTransaction) => {
+      (
+        transaction: TextTransaction,
+        {
+          groupInputType,
+          renderDom = true,
+        }: CommitTransactionOptions = {},
+      ) => {
         if (documentsEqual(documentRef.current, transaction.document)) {
           updateSelection(transaction.selection);
           restoreSelectionRef.current = transaction.selection;
           return;
         }
 
-        pushHistory(documentRef.current, selectionRef.current);
-        applyTransaction(transaction);
+        const now = Date.now();
+        const canGroup =
+          groupInputType !== undefined &&
+          isCollapsedSelection(selectionRef.current) &&
+          historyRef.current.lastInputType === groupInputType &&
+          now - historyRef.current.lastInputAt < 800;
+        if (canGroup) {
+          historyRef.current.redo = [];
+        } else {
+          pushHistory(documentRef.current, selectionRef.current);
+        }
+        if (groupInputType) {
+          historyRef.current.lastInputType = groupInputType;
+          historyRef.current.lastInputAt = now;
+        }
+        applyTransaction(transaction, { renderDom });
       },
       [applyTransaction, pushHistory, updateSelection],
     );
@@ -693,9 +921,25 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         const selection = selectionRef.current;
         if (isCollapsedSelection(selection)) {
           const pending = new Set(getActiveMarks());
-          if (pending.has(mark)) pending.delete(mark);
-          else pending.add(mark);
-          pendingMarksRef.current = ["bold", "italic", "underline", "strike"]
+          if (mark === "code") {
+            if (pending.has(mark)) pending.delete(mark);
+            else {
+              pending.clear();
+              pending.add(mark);
+            }
+          } else if (pending.has(mark)) {
+            pending.delete(mark);
+          } else {
+            pending.delete("code");
+            pending.add(mark);
+          }
+          pendingMarksRef.current = [
+            "bold",
+            "italic",
+            "underline",
+            "strike",
+            "code",
+          ]
             .filter(isMark)
             .filter((item) => pending.has(item));
           pendingMarksOverrideRef.current = true;
@@ -724,6 +968,59 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       },
       [commitTransaction, focus],
     );
+
+    const changeBlockStyle = useCallback(
+      (variant: TextBlockVariant) => {
+        focus();
+        const paragraph = setBlockType(documentRef.current, selectionRef.current, "paragraph");
+        commitTransaction(setTextVariant(paragraph.document, paragraph.selection, variant));
+      },
+      [commitTransaction, focus],
+    );
+
+    const changeBlockType = useCallback(
+      (blockType: "paragraph" | "blockquote" | "codeBlock") => {
+        focus();
+        commitTransaction(
+          setBlockType(
+            documentRef.current,
+            selectionRef.current,
+            blockType,
+          ),
+        );
+      },
+      [commitTransaction, focus],
+    );
+
+    const insertRule = useCallback(() => {
+      focus();
+      commitTransaction(
+        insertHorizontalRule(
+          documentRef.current,
+          selectionRef.current,
+        ),
+      );
+    }, [commitTransaction, focus]);
+
+    const clearAllFormatting = useCallback(() => {
+      focus();
+      commitTransaction(
+        clearFormatting(documentRef.current, selectionRef.current),
+      );
+    }, [commitTransaction, focus]);
+
+    const clearInline = useCallback(() => {
+      focus();
+      if (isCollapsedSelection(selectionRef.current)) {
+        pendingMarksRef.current = [];
+        pendingMarksOverrideRef.current = true;
+        onActiveMarksChange?.([]);
+        return;
+      }
+      commitTransaction(
+        clearInlineFormatting(documentRef.current, selectionRef.current),
+      );
+    }, [commitTransaction, focus, onActiveMarksChange]);
 
     const changeAlign = useCallback(
       (align: TextAlign) => {
@@ -754,6 +1051,179 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       },
       [commitTransaction, focus],
     );
+
+    const applyCurrentListType = useCallback(
+      (listType: TextListType) => {
+        commitTransaction(
+          applyListType(
+            documentRef.current,
+            selectionRef.current,
+            listType,
+          ),
+        );
+      },
+      [commitTransaction],
+    );
+
+    const changeListAttributes = useCallback(
+      (attributes: TextListAttributes, options?: { preserveFocus?: boolean }) => {
+        if (!options?.preserveFocus) focus();
+        commitTransaction(
+          setListAttributes(
+            documentRef.current,
+            selectionRef.current,
+            attributes,
+          ),
+        );
+      },
+      [commitTransaction, focus],
+    );
+
+    const beginListAttributePreview = useCallback(() => {
+      if (!listPreviewRef.current) {
+        listPreviewRef.current = {
+          document: documentRef.current,
+          selection: selectionRef.current,
+        };
+      }
+    }, []);
+
+    const previewListAttributes = useCallback((attributes: TextListAttributes) => {
+      const preview = listPreviewRef.current;
+      if (!preview) return;
+      const transaction = setListAttributes(
+        preview.document,
+        preview.selection,
+        attributes,
+      );
+      applyTransaction(transaction, { skipIfDocumentEqual: true });
+    }, [applyTransaction]);
+
+    const finishListAttributePreview = useCallback((commit: boolean) => {
+      const preview = listPreviewRef.current;
+      if (!preview) return;
+      listPreviewRef.current = null;
+      if (documentsEqual(preview.document, documentRef.current)) return;
+      if (commit) {
+        pushHistory(preview.document, preview.selection);
+        updateSelection({
+          anchor: { ...preview.selection.anchor },
+          focus: { ...preview.selection.focus },
+        });
+      } else {
+        applyTransaction(preview);
+      }
+    }, [applyTransaction, pushHistory, updateSelection]);
+
+    const changeListChecked = useCallback(
+      (checked: boolean) => {
+        commitTransaction(
+          setListChecked(documentRef.current, selectionRef.current, checked),
+        );
+      },
+      [commitTransaction],
+    );
+
+    const changeListInteractive = useCallback(
+      (interactive: boolean) => {
+        commitTransaction(
+          setListInteractive(
+            documentRef.current,
+            selectionRef.current,
+            interactive,
+          ),
+        );
+      },
+      [commitTransaction],
+    );
+
+    const changeListIndent = useCallback(
+      (indent: number) => {
+        focus();
+        commitTransaction(
+          setListIndent(documentRef.current, selectionRef.current, indent),
+        );
+      },
+      [commitTransaction, focus],
+    );
+
+    const shiftCurrentListIndent = useCallback(
+      (direction: -1 | 1) => {
+        focus();
+        commitTransaction(shiftListIndent(documentRef.current, selectionRef.current, direction));
+      },
+      [commitTransaction, focus],
+    );
+
+    const changeBlockIndent = useCallback(
+      (indent: number) => {
+        focus();
+        commitTransaction(
+          setBlockIndent(documentRef.current, selectionRef.current, indent),
+        );
+      },
+      [commitTransaction, focus],
+    );
+
+    const removeCurrentList = useCallback(() => {
+      focus();
+      commitTransaction(
+        removeList(documentRef.current, selectionRef.current),
+      );
+    }, [commitTransaction, focus]);
+
+    const toggleCurrentListItemChecked = useCallback(() => {
+      focus();
+      commitTransaction(
+        toggleListItemChecked(
+          documentRef.current,
+          selectionRef.current,
+        ),
+      );
+    }, [commitTransaction, focus]);
+
+    const toggleListItemAtIndex = useCallback(
+      (blockIndex: number) => {
+        if (!Number.isInteger(blockIndex)) return;
+        const currentSelection = selectionRef.current;
+        const transaction = toggleListItemChecked(
+          documentRef.current,
+          createTextSelection(blockIndex),
+        );
+        commitTransaction({
+          ...transaction,
+          selection: currentSelection,
+        }, { renderDom: false });
+        const updatedBlock = documentRef.current.content[blockIndex];
+        const root = editableRef.current;
+        const checkbox = root?.querySelector<HTMLButtonElement>(
+          `[data-puzzle-editor-control="checklist"][data-puzzle-block-index="${blockIndex}"]`,
+        );
+        if (checkbox && updatedBlock?.listType === "checklist") {
+          const checked = updatedBlock.checked === true;
+          checkbox.setAttribute("aria-checked", String(checked));
+          checkbox.setAttribute(
+            "aria-label",
+            checked
+              ? "Mark checklist item incomplete"
+              : "Mark checklist item complete",
+          );
+          checkbox.closest<HTMLElement>("[data-puzzle-editor-block]")?.setAttribute(
+            "data-puzzle-checked",
+            String(checked),
+          );
+        }
+      },
+      [commitTransaction],
+    );
+
+    const getCurrentListSelectionState =
+      useCallback((): TextListSelectionState => {
+        return getListSelectionState(
+          documentRef.current,
+          selectionRef.current,
+        );
+      }, []);
 
     const isListTypeActive = useCallback((listType: TextListType): boolean => {
       return getListType(documentRef.current, selectionRef.current, listType);
@@ -801,6 +1271,46 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       [commitTransaction, focus],
     );
 
+    const getCurrentTextStatistics = useCallback(
+      () => getTextStatistics(documentRef.current),
+      [],
+    );
+
+    const getCurrentSlashCommand = useCallback(
+      () =>
+        getSlashCommandAtSelection(
+          documentRef.current,
+          selectionRef.current,
+        ),
+      [],
+    );
+
+    const findText = useCallback(
+      (query: string, options?: TextSearchOptions) =>
+        findTextInDocument(documentRef.current, query, options),
+      [],
+    );
+
+    const replaceAll = useCallback(
+      (
+        query: string,
+        replacement: string,
+        options?: TextSearchOptions,
+      ) => {
+        focus();
+        commitTransaction(
+          replaceAllTextTransaction(
+            documentRef.current,
+            selectionRef.current,
+            query,
+            replacement,
+            options,
+          ),
+        );
+      },
+      [commitTransaction, focus],
+    );
+
     const insertText = useCallback(
       (text: string) => {
         focus();
@@ -829,14 +1339,36 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         isTextVariantActive,
         toggleMark,
         setTextVariant: changeVariant,
+        setBlockStyle: changeBlockStyle,
+        setBlockType: changeBlockType,
+        insertHorizontalRule: insertRule,
+        clearFormatting: clearAllFormatting,
+        clearInlineFormatting: clearInline,
         setTextAlign: changeAlign,
         isTextAlignActive,
         setListType: changeListType,
+        applyListType: applyCurrentListType,
         isListTypeActive,
+        getListSelectionState: getCurrentListSelectionState,
+        removeList: removeCurrentList,
+        setListAttributes: changeListAttributes,
+        beginListAttributePreview,
+        previewListAttributes,
+        finishListAttributePreview,
+        setListChecked: changeListChecked,
+        setListInteractive: changeListInteractive,
+        setListIndent: changeListIndent,
+        shiftListIndent: shiftCurrentListIndent,
+        setBlockIndent: changeBlockIndent,
+        toggleListItemChecked: toggleCurrentListItemChecked,
         getActiveLink,
         setLink: changeLink,
         insertText,
         replaceSelection,
+        getTextStatistics: getCurrentTextStatistics,
+        getSlashCommand: getCurrentSlashCommand,
+        findText,
+        replaceAllText: replaceAll,
         undo,
         redo,
         canUndo: () => historyRef.current.undo.length > 0,
@@ -845,9 +1377,28 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       [
         changeAlign,
         changeListType,
+        applyCurrentListType,
+        changeListAttributes,
+        beginListAttributePreview,
+        previewListAttributes,
+        finishListAttributePreview,
+        changeListChecked,
+        changeListIndent,
+        shiftCurrentListIndent,
+        changeBlockIndent,
+        changeListInteractive,
         changeVariant,
+        changeBlockStyle,
+        changeBlockType,
+        insertRule,
+        clearAllFormatting,
+        clearInline,
         changeLink,
         focus,
+        getCurrentListSelectionState,
+        getCurrentTextStatistics,
+        getCurrentSlashCommand,
+        findText,
         isTextAlignActive,
         getActiveMarks,
         getActiveLink,
@@ -856,21 +1407,30 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         isActive,
         isTextVariantActive,
         redo,
+        removeCurrentList,
+        replaceAll,
         replaceSelection,
         toggleMark,
+        toggleCurrentListItemChecked,
         undo,
       ],
     );
 
     useEffect(() => {
       if (!value || value === documentRef.current) return;
-      const selection = createTextSelection();
+      const preview = listPreviewRef.current;
+      const selection = preview
+        ? normalizeTextSelection(normalizeTextDocument(value), preview.selection)
+        : createTextSelection();
       const applied = applyTransaction(
         { document: value, selection },
         { emitChange: false, skipIfDocumentEqual: true },
       );
       if (!applied) return;
 
+      if (preview) {
+        listPreviewRef.current = { document: documentRef.current, selection };
+      }
       historyRef.current = {
         undo: [],
         redo: [],
@@ -884,7 +1444,13 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       if (!root) return;
 
       if (renderDomOnDocumentChangeRef.current) {
-        renderDocumentToDom(root, documentState);
+        renderDocumentToDom(root, documentState, readOnly);
+        const markers = Array.from(root.querySelectorAll<HTMLElement>(
+          '[data-puzzle-editor-control="icon"]',
+        ));
+        setIconMarkers((current) =>
+          current.length === 0 && markers.length === 0 ? current : markers,
+        );
       }
       // Each document-state commit consumes the render decision. Native input
       // skips a DOM render; commands/external value changes explicitly enable it.
@@ -893,8 +1459,10 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       const selection = restoreSelectionRef.current;
       if (!selection) return;
       restoreSelectionRef.current = null;
-      restoreSelection(selection);
-    }, [documentState, restoreSelection]);
+      if (root.contains(root.ownerDocument.activeElement)) {
+        restoreSelection(selection);
+      }
+    }, [documentState, readOnly, restoreSelection]);
 
     useEffect(() => {
       onActiveMarksChange?.(getActiveMarks());
@@ -955,18 +1523,90 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         const selection =
           selectionFromDom(root) ?? selectionRef.current;
         selectionBeforeInputRef.current = selection;
+        if (compositionRef.current || event.isComposing) return;
 
         const block = documentRef.current.content[selection.focus.block];
+        const exitBlock = inputType === "insertParagraph" && !readOnly
+          ? exitEmptyTextBlock(documentRef.current, selection)
+          : null;
         if (
+          exitBlock
+        ) {
+          event.preventDefault();
+          updateSelection(selection);
+          commitTransaction(exitBlock);
+        } else if (
           !readOnly &&
-          inputType === "insertParagraph" &&
-          block?.listType &&
-          !getBlockText(block)
+          block?.type === "codeBlock" &&
+          (inputType === "deleteContentBackward" ||
+            inputType === "deleteContentForward")
         ) {
           event.preventDefault();
           updateSelection(selection);
           commitTransaction(
-            setListType(documentRef.current, selection, null),
+            deleteTextAtSelection(
+              documentRef.current,
+              selection,
+              inputType === "deleteContentBackward"
+                ? "backward"
+                : "forward",
+            ),
+            { groupInputType: inputType },
+          );
+        } else if (
+          !readOnly &&
+          inputType === "insertText" &&
+          block?.type === "codeBlock" &&
+          typeof event.data === "string"
+        ) {
+          event.preventDefault();
+          updateSelection(selection);
+          commitTransaction(
+            insertTextAtSelection(
+              documentRef.current,
+              selection,
+              event.data,
+            ),
+            { groupInputType: inputType },
+          );
+        } else if (
+          !readOnly &&
+          inputType === "insertParagraph" &&
+          block?.type === "codeBlock"
+        ) {
+          event.preventDefault();
+          updateSelection(selection);
+          commitTransaction(
+            insertTextAtSelection(
+              documentRef.current,
+              selection,
+              "\n",
+            ),
+          );
+        } else if (
+          !readOnly &&
+          inputType === "insertParagraph" &&
+          block?.listType
+        ) {
+          const transaction = splitListItemAtSelection(
+            documentRef.current,
+            selection,
+          );
+          if (!documentsEqual(documentRef.current, transaction.document)) {
+            event.preventDefault();
+            updateSelection(selection);
+            commitTransaction(transaction);
+          }
+        } else if (
+          !readOnly &&
+          inputType === "deleteContentBackward" &&
+          isCollapsedSelection(selection) &&
+          selection.focus.offset === 0 &&
+          block?.listType
+        ) {
+          event.preventDefault();
+          commitTransaction(
+            mergeListItemBackward(documentRef.current, selection),
           );
         } else if (inputType === "historyUndo") {
           event.preventDefault();
@@ -983,11 +1623,32 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
 
     const handleInput = (event: FormEvent<HTMLDivElement>) => {
       const root = event.currentTarget;
+      const inputEvent = event.nativeEvent as InputEvent;
       const previousDocument = documentRef.current;
       const beforeSelection = selectionBeforeInputRef.current;
       const inputType = inputTypeRef.current;
       let nextDocument = parseHtmlToDocument(root.innerHTML);
-      const nextSelection = selectionFromDom(root) ?? selectionRef.current;
+      let nextSelection = selectionFromDom(root) ?? selectionRef.current;
+      const inputBlock = previousDocument.content[beforeSelection.focus.block];
+      const nextInputBlock = nextDocument.content[beforeSelection.focus.block];
+      if (
+        inputType === "insertText" &&
+        !compositionRef.current &&
+        !inputEvent.isComposing &&
+        inputBlock?.type === "codeBlock" &&
+        nextInputBlock?.type === "codeBlock" &&
+        isCollapsedSelection(beforeSelection) &&
+        typeof inputEvent.data === "string"
+      ) {
+        const point = {
+          block: beforeSelection.focus.block,
+          offset: Math.min(
+            getBlockLength(nextInputBlock),
+            beforeSelection.focus.offset + inputEvent.data.length,
+          ),
+        };
+        nextSelection = { anchor: point, focus: point };
+      }
 
       if (
         pendingMarksRef.current.length &&
@@ -1010,8 +1671,27 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         }
       }
 
+      const shortcut =
+        inputType === "insertText" &&
+        !compositionRef.current &&
+        !inputEvent.isComposing
+          ? applyMarkdownShortcut(nextDocument, nextSelection)
+          : null;
+      if (shortcut) {
+        nextDocument = shortcut.document;
+        nextSelection = shortcut.selection;
+      }
+
       if (documentsEqual(previousDocument, nextDocument)) {
         updateSelection(nextSelection);
+        return;
+      }
+
+      if (compositionRef.current || inputEvent.isComposing) {
+        applyTransaction(
+          { document: nextDocument, selection: nextSelection },
+          { renderDom: shortcut !== null },
+        );
         return;
       }
 
@@ -1046,8 +1726,36 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       }
       applyTransaction(
         { document: nextDocument, selection: nextSelection },
-        { renderDom: false },
+        { renderDom: shortcut !== null },
       );
+    };
+
+    const handleCompositionStart = () => {
+      compositionRef.current = {
+        document: documentRef.current,
+        selection: selectionRef.current,
+      };
+      clearTypingGroup();
+    };
+
+    const handleCompositionEnd = () => {
+      const composition = compositionRef.current;
+      if (!composition) return;
+
+      queueMicrotask(() => {
+        if (compositionRef.current !== composition) return;
+        compositionRef.current = null;
+        if (!documentsEqual(composition.document, documentRef.current)) {
+          pushHistory(composition.document, composition.selection);
+        } else {
+          clearTypingGroup();
+        }
+        const selection = selectionRef.current;
+        updateSelection({
+          anchor: { ...selection.anchor },
+          focus: { ...selection.focus },
+        });
+      });
     };
 
     const handlePaste = (event: ClipboardEvent<HTMLDivElement>) => {
@@ -1065,6 +1773,86 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
     };
 
     const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+      if (compositionRef.current || event.nativeEvent.isComposing) return;
+      if (readOnly) return;
+
+      for (const shortcut of shortcuts) {
+        const modifiers = new Set(shortcut.modifiers);
+        const modPressed = event.metaKey || event.ctrlKey;
+        const matches =
+          event.key.toLowerCase() === shortcut.key.toLowerCase() &&
+          (!modifiers.has("mod") || modPressed) &&
+          (!modifiers.has("ctrl") || event.ctrlKey) &&
+          (!modifiers.has("meta") || event.metaKey) &&
+          (!modifiers.has("alt") || event.altKey) &&
+          (!modifiers.has("shift") || event.shiftKey) &&
+          (modifiers.has("mod") || modifiers.has("ctrl") || !event.ctrlKey) &&
+          (modifiers.has("mod") || modifiers.has("meta") || !event.metaKey) &&
+          (modifiers.has("alt") || !event.altKey) &&
+          (modifiers.has("shift") || !event.shiftKey);
+        if (!matches) continue;
+
+        event.preventDefault();
+        if (
+          shortcut.command === "bold" ||
+          shortcut.command === "italic" ||
+          shortcut.command === "underline" ||
+          shortcut.command === "strike" ||
+          shortcut.command === "code"
+        ) {
+          toggleMark(shortcut.command);
+        } else if (shortcut.command === "undo") {
+          undo();
+        } else if (shortcut.command === "redo") {
+          redo();
+        } else if (shortcut.command === "clearFormatting") {
+          clearAllFormatting();
+        }
+        return;
+      }
+
+      if (event.key === "Enter") {
+        const root = editableRef.current;
+        const selection = root
+          ? selectionFromDom(root) ?? selectionRef.current
+          : selectionRef.current;
+        const block = documentRef.current.content[selection.focus.block];
+        const exitBlock = !readOnly && !event.shiftKey
+          ? exitEmptyTextBlock(documentRef.current, selection)
+          : null;
+        if (exitBlock) {
+          event.preventDefault();
+          updateSelection(selection);
+          commitTransaction(exitBlock);
+          return;
+        } else if (!readOnly && block?.type === "codeBlock") {
+          event.preventDefault();
+          updateSelection(selection);
+          commitTransaction(
+            insertTextAtSelection(
+              documentRef.current,
+              selection,
+              "\n",
+            ),
+          );
+          return;
+        }
+      }
+      if (event.key === "Tab") {
+        const selection = selectionRef.current;
+        const block = documentRef.current.content[selection.focus.block];
+        if (!readOnly && block && block.type !== "horizontalRule") {
+          event.preventDefault();
+          const currentIndent = block.indent ?? 0;
+          if (block.listType) {
+            shiftCurrentListIndent(event.shiftKey ? -1 : 1);
+          } else {
+            changeBlockIndent(currentIndent + (event.shiftKey ? -1 : 1));
+          }
+        }
+        return;
+      }
+
       const modifier = event.metaKey || event.ctrlKey;
       if (!modifier) return;
       const key = event.key.toLowerCase();
@@ -1085,6 +1873,9 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
       } else if (key === "u") {
         event.preventDefault();
         toggleMark("underline");
+      } else if (key === "`") {
+        event.preventDefault();
+        toggleMark("code");
       } else if (
         event.shiftKey &&
         (key === "s" || key === "x")
@@ -1107,6 +1898,7 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
     };
 
     return (
+      <>
       <div
         ref={editableRef}
         className={cn("puzzle-text-editor", className)}
@@ -1127,20 +1919,62 @@ const Editor = forwardRef<TextEditorHandle, EditorProps>(
         spellCheck
         onInput={handleInput}
         onPaste={handlePaste}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
         onKeyDown={handleKeyDown}
         onKeyUp={handleKeyUp}
         onMouseUp={handleMouseUp}
         onFocus={handleKeyUp}
+        onMouseDown={(event) => {
+          if (
+            event.target instanceof Element &&
+            event.target.closest("[data-puzzle-editor-control]")
+          ) {
+            event.preventDefault();
+          }
+        }}
         onClick={(event) => {
-          if (event.target instanceof Element && event.target.closest("a")) {
+          if (!(event.target instanceof Element)) return;
+          const checkbox = event.target.closest<HTMLButtonElement>(
+            '[data-puzzle-editor-control="checklist"]',
+          );
+          if (checkbox) {
+            event.preventDefault();
+            if (!checkbox.disabled) {
+              toggleListItemAtIndex(
+                Number(checkbox.dataset.puzzleBlockIndex),
+              );
+            }
+            return;
+          }
+          if (event.target.closest("a")) {
             event.preventDefault();
           }
         }}
       />
+      {iconMarkers.map((marker, index) =>
+        createPortal(
+          <Icon
+            name={marker.dataset.puzzleIconName ?? ""}
+            size={Number(marker.dataset.puzzleIconSize) || 18}
+            color={marker.dataset.puzzleIconColor ?? "currentColor"}
+          >
+            <circle cx="50" cy="50" r="8" fill="currentColor" />
+          </Icon>,
+          marker,
+          index,
+        ),
+      )}
+      </>
     );
   },
 );
 
 Editor.displayName = "Editor";
 
-export { Editor, type TextEditorHandle, type EditorProps };
+export {
+  Editor,
+  type TextEditorHandle,
+  type TextEditorCommands,
+  type EditorProps,
+};

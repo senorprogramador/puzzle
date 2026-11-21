@@ -1,0 +1,82 @@
+---
+title: AssetPickerDialog
+description: Select one or multiple existing media asset IDs in a responsive dialog backed by MediaLibrary.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { AssetPickerDialogExample } from "../../../../src/components/doc-examples/pieces/media-workflows";
+import { AssetPickerDialog } from "@puzzle-ui/pieces";
+
+`AssetPickerDialog` composes `MediaLibrary` with UI `Dialog` on wide viewports and UI `Drawer` on narrow viewports. It stages selection until the caller confirms; cancel and Escape do not change the supplied value.
+
+<Preview fit="device" code={`<AssetPickerDialog open={open} onOpenChange={setOpen} libraryProps={{ assets, folders }} value={assetId} onConfirm={setAssetId} />`}>
+  <AssetPickerDialogExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `open` | `boolean` | Yes | — |
+| `onOpenChange` | `(open: boolean) => void` | Yes | — |
+| `libraryProps` | `MediaLibraryPropsForPicker` | Yes | — |
+| `onConfirm` | `(assetId: string) => void` or `(assetIds: string[]) => void` | Yes | — |
+| `multiple` | `boolean` | No | `false` |
+| `value` | `string \| null` or `readonly string[]` | No | — |
+| `allowedKinds` | `readonly MediaLibraryAssetKind[]` | No | All kinds |
+| `initialFolderId` | `string \| null` | No | Root |
+| `title` / `description` | `string` | No | `"Choose media"` / — |
+| `confirmLabel` / `cancelLabel` | `string` | No | `"Choose asset"` / `"Cancel"` |
+
+Use the discriminated `multiple` API: a single picker confirms one asset ID, while `multiple` confirms a list of IDs. `libraryProps` supplies the same caller-owned `assets`, folders, query behavior, upload actions, and states as `MediaLibrary`; selection props are managed by the dialog.
+
+```tsx
+import { AssetPickerDialog } from "@puzzle-ui/pieces";
+
+<AssetPickerDialog
+  open={open}
+  onOpenChange={setOpen}
+  libraryProps={{ assets, folders }}
+  allowedKinds={["image"]}
+  value={assetId}
+  onConfirm={(nextAssetId) => setAssetId(nextAssetId)}
+/>;
+```
+
+## Responsive behavior and accessibility
+
+On desktop the component uses UI `Dialog`; on narrow screens it uses UI `Drawer`. Both reuse the UI overlay's modal focus management, close behavior, and Escape support. The drawer has a labeled heading, scrollable content, and persistent selection actions. Keep an accessible trigger in the calling application so focus can return after closing.
+
+The embedded library remains keyboard-operable and responsive. Selection is constrained to the supplied `allowedKinds`; confirmation is disabled until an eligible asset is selected. Preview URLs are caller-provided temporary authorized URLs, and selection always returns IDs rather than URLs.
+
+## Theme and customization
+
+The dialog uses UI overlay sizing and the drawer uses the public Theme tablet breakpoint. Library layout and controls inherit semantic Theme tokens. Pass the library's error, loading, permissions, and upload actions through `libraryProps` rather than adding a second picker flow.
+
+## TypeScript example
+
+Use `multiple` as a literal to select the matching callback contract:
+
+```tsx
+<AssetPickerDialog
+  open={open}
+  onOpenChange={setOpen}
+  libraryProps={{ assets, folders }}
+  multiple
+  value={assetIds}
+  onConfirm={(ids) => setAssetIds(ids)}
+/>;
+```
+
+## Related components
+
+- [MediaLibrary](/docs/pieces/components/media-library) for standalone browsing and organization.
+- [MediaField](/docs/pieces/components/media-field) for a single CMS-style form value.
+- [AssetDetailsPanel](/docs/pieces/components/asset-details-panel) for metadata editing.
+- [Media workflows overview](/docs/pieces/components/media).
+
+## API maturity
+
+API maturity: Stable.
+
+See the [framework integration guide](/docs/pieces/framework-integration) for client and SSR boundaries.

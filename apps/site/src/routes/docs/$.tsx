@@ -192,6 +192,10 @@ const serverLoader = createServerFn({
     return {
       path: page.path,
       pageTree: await source.serializePageTree(source.getPageTree()),
+      navigationPages: source.getPages().map((page) => ({
+        url: page.url,
+        title: page.data.title,
+      })),
     };
   });
 
@@ -315,13 +319,16 @@ function Page() {
   const data = useFumadocsLoader(Route.useLoaderData());
 
   return (
-    <PageLayout className="puzzle-site-docs-layout">
+    <PageLayout
+      className="puzzle-site-docs-layout"
+      sidebarPlacement={{ mobile: "below", tablet: "beside", desktop: "beside" }}
+    >
       <PageLayout.Header className="puzzle-site-header">
         <Header />
       </PageLayout.Header>
 
       <PageLayout.LeftSidebar>
-        <Sidebar />
+        <Sidebar pages={data.navigationPages} />
       </PageLayout.LeftSidebar>
 
       <PageLayout.Main>

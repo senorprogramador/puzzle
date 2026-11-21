@@ -1,0 +1,90 @@
+---
+title: React JSON Editor
+description: Edit, format, and validate serialized JSON in a labeled React textarea with controlled source text and typed parse results.
+---
+
+import { Badge, Preview, Section } from "@puzzle-ui/ui";
+import { JsonEditorExample } from "../../../../src/components/doc-examples/ui/json-editor";
+
+Use `JsonEditor` to edit serialized JSON text. It provides explicit format and
+validation actions while leaving schema rules, persistence, and submission to
+the caller. For authored rich text, use [TextEditor](/docs/ui/editors/text-editor)
+instead; JSON is not a rich-text document format.
+
+<Badge content="Beta" color="warning" /> **API maturity: Beta.** The API is
+available for evaluation and may change before it is considered stable.
+
+## Import
+
+```tsx
+import { JsonEditor } from "@puzzle-ui/ui";
+import type { JsonEditorResult, JsonValue } from "@puzzle-ui/ui";
+```
+
+## Controlled editor
+
+Pass `value` and `onChange` when the caller owns source text. `validate` receives
+parsed JSON and returns an error string or `null`. The `onValidate` callback
+receives a discriminated result: valid JSON includes a `JsonValue`; parse and
+validation errors include a typed `type` and message.
+
+<Preview
+  align="start"
+  code={`\
+<JsonEditorExample />
+`}
+>
+  <Section>
+    <JsonEditorExample />
+  </Section>
+</Preview>
+
+Use `defaultValue` for uncontrolled source text. Formatting parses the source,
+runs the optional validator, and applies the configured indentation. Validation
+errors do not prevent formatting syntactically valid JSON. The validation
+success message is shown only when parsing and the caller validator both pass.
+Numbers outside JavaScript's finite range are reported as parse errors and are
+not formatted, because serializing them would silently replace them with `null`.
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `label` | `ReactNode` | Visible label for the textarea. Required. |
+| `value` | `string` | Controlled JSON source text. |
+| `defaultValue` | `string` | Initial source for uncontrolled usage. |
+| `onChange` | `(source: string) => void` | Called when the source text changes. |
+| `description` | `ReactNode` | Supporting text associated with the textarea. |
+| `validate` | `(value: JsonValue) => string \| null` | Optional synchronous schema validation. |
+| `onValidate` | `(result: JsonEditorResult) => void` | Called after explicit validation or formatting. |
+| `formatIndent` | `number` | Indentation width used by Format; defaults to `2`. |
+| `formatLabel`, `validateLabel` | `string` | Visible and accessible action labels. |
+| `successMessage` | `string` | Status text shown after successful validation. |
+| `error` | `ReactNode \| boolean` | External validation message; `true` uses a default message. |
+| `invalid` | `boolean` | Explicit invalid state. |
+| `rows` | `number` | Initial visible textarea rows; defaults to `12`. |
+| `required`, `disabled`, `readOnly` | `boolean` | Native textarea states. |
+| `rootClassName`, `className` | `string` | Additional root and textarea classes. |
+| Native textarea attributes | - | Forwarded to the textarea, including `id`, `name`, and `aria-*`. |
+
+`JsonValue` is the recursive JSON value type. `JsonEditorResult` is a
+discriminated union of `{ valid: true; value }` and `{ valid: false; error }`;
+`JsonEditorError.type` is `"parse"` or `"validation"`.
+
+## Accessibility and compatibility
+
+The visible label is associated with a native textarea. The description and
+errors are connected with `aria-describedby`; invalid values set
+`aria-invalid`, and validation feedback is announced. Format and Validate are
+native buttons with visible focus styles. The editor uses no browser API during
+render and uses Puzzle theme tokens.
+
+UI targets React 19; verify framework-specific SSR and hydration behavior in
+your application.
+
+## Related documentation
+
+- [Text Editor](/docs/ui/editors/text-editor)
+- [FieldArray](/docs/ui/forms/field-array)
+- [Text Area Input](/docs/ui/forms/text-area-input)
+- [UI component index](/docs/ui)

@@ -1,0 +1,86 @@
+---
+title: ContentList
+description: Search, filter, paginate, and act on caller-provided CMS entries.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { ContentListExample, ContentListRemoteExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { ContentList } from "@puzzle-ui/pieces";
+
+By default, `ContentList` searches and filters the supplied entries, then uses the UI `DataTable` for local sorting and pagination. For server-driven lists, provide `remote` and one authorized page of results; the caller owns the query, fetching, sorting, and cursor history.
+
+<Preview fit="device" code={`<ContentList items={entries} locales={["en-US", "fr-FR"]} onEdit={editEntry} onArchive={archiveEntry} />`}>
+  <ContentListExample />
+</Preview>
+
+## Server-driven pages
+
+The remote controls emit the complete `ContentListQuery` without filtering or sorting the returned items. Reset the cursor history when the query changes, fetch the first matching page, and set `hasPreviousPage` and `hasNextPage` from your cursor state. Keep the query state current when an input changes; debounce the request rather than the controlled input. The optional `totalCount` must be a server-provided total, not the current page size.
+
+This preview simulates a server with in-memory data. Production code must perform filtering and pagination in the authorized server API and handle stale responses, loading, and errors in the host.
+
+<Preview fit="device" code={`<ContentList items={page.items} locales={locales} loading={loading} error={error} remote={{ query, onQueryChange, hasPreviousPage, hasNextPage, onPreviousPage, onNextPage, totalCount }} />`}>
+  <ContentListRemoteExample />
+</Preview>
+
+## Selection and bulk actions
+
+Pass `selection` to control selected IDs and configure action buttons. Selection can span pages; “Select this page” affects only the supplied remote page, while local mode selects all matching supplied entries. The caller implements and authorizes each bulk action and returns `succeededIds` and per-entry `failures`. Successful IDs are removed from selection, failures remain selected, and omitted IDs are reported as failures. Rejected actions are displayed as errors without clearing selection. Avoid supplying actions the current user is not allowed to invoke.
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `items` | `readonly CmsEntryListItem[]` | Yes | — |
+| `title` | `ReactNode` | No | `"Content"` |
+| `contentTypeName` | `string` | No | `"entry"` |
+| `locales` | `readonly string[]` | No | `[]` |
+| `loading` / `permissionDenied` | `boolean` | No | `false` |
+| `error` | `ReactNode` | No | — |
+| `onCreate` | `() => void` | No | — |
+| `onEdit` / `onDuplicate` / `onArchive` | `(entry: CmsEntryListItem) => void` | No | — |
+| `remote` | `ContentListRemote` | No | — |
+| `selection` | `ContentListSelection` | No | — |
+| `className` | `string` | No | — |
+
+`ContentListRemote` contains:
+
+| Property | Type | Purpose |
+|---|---|---|
+| `query` | `ContentListQuery` | Controlled `search`, `status`, and `locale`; use `"all"` for unfiltered status or locale. |
+| `onQueryChange` | `(query: ContentListQuery) => void` | Update the controlled input state and reset cursor history. |
+| `hasPreviousPage` / `hasNextPage` | `boolean` | Enable the corresponding page button. |
+| `onPreviousPage` / `onNextPage` | `() => void` | Navigate using the host's cursor history. |
+| `totalCount` | `number` | Optional total for the complete server query. |
+
+`ContentListSelection` contains `selectedIds`, `onSelectionChange`, optional
+`actions` (`{ id, label }[]`), and `onBulkAction(ids, actionId)`. The action
+returns or resolves to `{ succeededIds, failures }`; each failure has an
+`entryId` and optional `message`. An ID omitted from both arrays is treated as
+a failure, and a failure takes precedence if an ID appears in both.
+
+```tsx
+import { ContentList } from "@puzzle-ui/pieces";
+
+<ContentList
+  items={page.items}
+  locales={contentType.locales}
+  onEdit={(entry) => openEditor(entry.id)}
+  onArchive={(entry) => archiveOnServer(entry.id, entry.revision)}
+/>;
+```
+
+The table renders the title field when it is a string or number and falls back to the slug or entry ID. `CmsEntryListItem.updatedAt` accepts either a `Date` or the ISO string returned by `@puzzle-ui/fullstack/cms/client`. Local mode searches and paginates only `items`. Remote mode preserves server ordering and exposes no local sorting controls; sort choices and requests belong to the host application.
+
+## States and accessibility
+
+The component distinguishes loading, empty, error, and permission-denied states. Status and locale controls have visible labels, row actions include entry titles in their accessible names, and local table controls and remote previous/next buttons are keyboard operable.
+
+## Related
+
+- [ContentEditor](/docs/pieces/components/content-editor)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

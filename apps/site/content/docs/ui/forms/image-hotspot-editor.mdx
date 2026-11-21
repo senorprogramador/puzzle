@@ -1,0 +1,111 @@
+---
+title: React Image Hotspot Editor Component
+description: Place and edit normalized image focal points and labeled hotspot points or areas with keyboard and pointer controls.
+---
+
+import { Badge, ImageHotspotEditor, Preview, Section } from "@puzzle-ui/ui";
+import { ImageHotspotEditorExample } from "../../../../src/components/doc-examples/ui/image-editors";
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This component is new and may evolve as its usage is validated.
+
+`ImageHotspotEditor` is a presentation-only control for editing one focal point and multiple hotspot points or rectangular areas. It does not upload images, resolve links in hotspot metadata, or persist edits.
+
+## Import
+
+```tsx
+import {
+  ImageHotspotEditor,
+  type ImageHotspot,
+  type ImageHotspotEditorValue,
+} from "@puzzle-ui/ui";
+```
+
+## Basic usage
+
+The editor supports controlled `value`/`onChange` and uncontrolled `defaultValue`/`onChange` patterns. The preview starts with one focal point and one labeled hotspot; add, select, move, label, and remove annotations to see the JSON value update.
+
+<Preview
+  height={1100}
+  align="start"
+  hideDevices
+  code={`\
+const [value, setValue] = useState<ImageHotspotEditorValue>({
+  focalPoint: { x: 0.52, y: 0.46 },
+  hotspots: [
+    {
+      id: "reading-chair",
+      x: 0.58,
+      y: 0.54,
+      width: 0.2,
+      height: 0.24,
+      label: "Reading chair",
+      data: { href: "/furniture/chair", kind: "product" },
+    },
+  ],
+});
+
+<ImageHotspotEditor
+  src={imageUrl}
+  alt="Sunlit living room"
+  value={value}
+  onChange={setValue}
+/>
+`}
+>
+  <Section>
+    <ImageHotspotEditorExample />
+  </Section>
+</Preview>
+
+## Normalized values and coordinate space
+
+Focal-point `x` and `y`, and hotspot `x`, `y`, `width`, and `height`, are fractions of the visible `src` bounds in the inclusive `0..1` range. A hotspot with zero width and height is a point; positive dimensions describe a rectangle. Coordinates scale with the rendered image, not with fixed pixels.
+
+```ts
+const value: ImageHotspotEditorValue = {
+  focalPoint: { x: 0.52, y: 0.46 },
+  hotspots: [
+    {
+      id: "chair",
+      x: 0.58,
+      y: 0.54,
+      width: 0.2,
+      height: 0.24,
+      label: "Reading chair",
+      data: { href: "/furniture/chair", kind: "product" },
+    },
+  ],
+};
+```
+
+The exported value types are local structural types and require no media, CMS, or storage dependency. `data` accepts a JSON-safe object with scalar values (string, number, boolean, or `null`) and is passed through unchanged. When composing this control with `ImageCropper`, coordinate values remain relative to the `src` passed here: pass a cropped image to annotate that crop, or keep the original `src` to annotate the original. The editor does not map between crop and source coordinates.
+
+## Adding and editing annotations
+
+Choose **Set focal point**, **Add hotspot point**, or **Draw hotspot area**, then select or drag on the image. Select a hotspot marker or its item in the hotspot list to edit its optional label and exact `x`, `y`, `width`, and `height` values. **Delete selected hotspot** removes only that hotspot; focal-point data is independent.
+
+When a focal point exists, use **Clear focal point** in its position fieldset to remove it. Adding or removing hotspots never changes the focal point.
+
+Use stable caller-owned IDs when providing initial or controlled hotspots. IDs created by the editor are instance-scoped; replace them with application-owned IDs if they must remain stable across sessions.
+
+## Keyboard, touch, and responsive behavior
+
+- The image canvas is keyboard focusable. `Enter` or `Space` places a focal point or hotspot at the center; in area mode it adds a small centered area.
+- Tab to a focal point or hotspot marker and use arrow keys to move it by 1%; `Alt` plus an arrow moves it by 10%. The exact-position number fields provide an alternative for precise edits.
+- The toolbar, hotspot list, label field, coordinate fields, and delete button use native controls and visible focus indicators.
+- Markers and area drawing support pointer input, including touch. The editor scales with its image container and respects reduced-motion preferences.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `src` | `string` | — | Image URL to annotate. |
+| `alt` | `string` | — | Alternative text for the image. |
+| `label` | `string` | `"Image hotspot editor"` | Accessible name for the editor group. |
+| `value` | `ImageHotspotEditorValue` | — | Controlled focal point and hotspot data. |
+| `defaultValue` | `ImageHotspotEditorValue` | Empty annotations | Initial uncontrolled data. |
+| `onChange` | `(value: ImageHotspotEditorValue) => void` | — | Receives normalized edits. |
+| `disabled` | `boolean` | `false` | Disables editing controls. |
+| `className`, `style`, `id` | Standard `<div>` props | — | Outer element attributes. |
+
+Use the [Image Cropper](/docs/ui/forms/image-cropper) when the task is selecting a crop rectangle rather than describing important image content.

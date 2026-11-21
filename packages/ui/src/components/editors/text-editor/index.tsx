@@ -16,12 +16,14 @@ import type {
   TextDocument,
   TextMark,
   TextSelection,
+  TextEditorShortcut,
 } from "./text-editor.types";
 
 type TextEditorContextType = Partial<TextEditorHandle> & {
   activeMarks: TextMark[];
   activeVariant: TextBlockVariant | null;
   selection: TextSelection;
+  readOnly: boolean;
 };
 
 const TextEditorContext = createContext<TextEditorContextType | null>(null);
@@ -41,6 +43,8 @@ type TextEditorProps = {
   /** Initial document for uncontrolled use. */
   defaultValue?: TextDocument;
   onChange?: (document: TextDocument) => void;
+  readOnly?: boolean;
+  shortcuts?: readonly TextEditorShortcut[];
 };
 
 const TextEditor = ({
@@ -48,6 +52,8 @@ const TextEditor = ({
   value,
   defaultValue,
   onChange,
+  readOnly = false,
+  shortcuts,
 }: TextEditorProps) => {
   const editorHandleRef = useRef<TextEditorHandle>(null);
   const [activeMarks, setActiveMarks] = useState<TextMark[]>([]);
@@ -64,6 +70,7 @@ const TextEditor = ({
           activeMarks,
           activeVariant,
           selection,
+          readOnly,
         }}
       >
         {toolbar}
@@ -73,6 +80,8 @@ const TextEditor = ({
         value={value}
         defaultValue={defaultValue}
         onChange={onChange}
+        readOnly={readOnly}
+        shortcuts={shortcuts}
         onSelectionChange={setSelection}
         onActiveMarksChange={setActiveMarks}
         onActiveTextVariantChange={setActiveVariant}

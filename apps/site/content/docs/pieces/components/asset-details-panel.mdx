@@ -1,0 +1,66 @@
+---
+title: AssetDetailsPanel
+description: Inspect caller-provided asset metadata, variants, and usage, then edit metadata, crop, and hotspot values through callbacks.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { AssetDetailsPanelExample } from "../../../../src/components/doc-examples/pieces/media-workflows";
+import { AssetDetailsPanel } from "@puzzle-ui/pieces";
+
+`AssetDetailsPanel` is an inspector for the safe asset projection used by the Pieces media workflows. It presents file metadata, caller-provided variants and usage summaries, and editable metadata. For image assets with a supplied preview URL, it composes UI `ImageCropper` and `ImageHotspotEditor`.
+
+<Preview fit="device" code={`<AssetDetailsPanel asset={asset} folders={folders} onSave={saveMetadata} />`}>
+  <AssetDetailsPanelExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `asset` | `MediaLibraryAsset` | Yes | — |
+| `folders` | `readonly MediaLibraryFolder[]` | No | `[]` |
+| `onSave` | `(assetId: string, patch: MediaLibraryMetadataPatch) => void \| Promise<void>` | No | Read only |
+| `readOnly` | `boolean` | No | `false` |
+| `onClose` | `() => void` | No | — |
+| `className` | `string` | No | — |
+
+`onSave` receives an asset ID and a partial patch for the editable display name, folder, alt text, caption, title, description, tags, crop, focal point, and hotspots. The caller owns persistence, authorization, optimistic updates, conflict handling, and error policy; a rejected promise is shown as a save error and does not commit the local draft.
+
+## Image editing
+
+Crop coordinates, focal points, and hotspot rectangles are normalized to the source image. `ImageCropper` and `ImageHotspotEditor` load the caller-provided preview in the browser and do not upload or persist image data. If a safe preview URL is unavailable, image editing is unavailable. Variants and usage summaries are optional projection data and contain no storage object keys. The panel requests unoptimized framework-image rendering for its temporary previews; the caller must authorize and manage their lifetime.
+
+```tsx
+import { AssetDetailsPanel } from "@puzzle-ui/pieces";
+
+<AssetDetailsPanel
+  asset={asset}
+  folders={folders}
+  onSave={(assetId, patch) => saveAssetMetadata(assetId, patch)}
+/>;
+```
+
+## Responsive behavior, keyboard, and theming
+
+The panel wraps metadata fields and variant summaries on narrow screens. Tabs are native keyboard-operable controls; crop and hotspot interactions inherit their UI editors' pointer and keyboard support. Inputs, borders, typography, and focus indicators use semantic Theme tokens. Supply an informative `altText` projection for meaningful image previews.
+
+## Customization and composition
+
+Use `readOnly` or omit `onSave` to render an inspector without editing. Compose the panel beside `MediaLibrary`, or use the library's `showDetailsPanel` and `onSaveAsset` options for a selection-driven inspector. The caller controls which usage and variant data is appropriate to expose.
+
+## TypeScript example
+
+`AssetDetailsPanelExample` demonstrates a caller-owned optimistic update by merging a returned patch into its local asset state. Production applications should also handle authorization failures and concurrent revisions.
+
+## Related components
+
+- [MediaLibrary](/docs/pieces/components/media-library) for browsing and selection.
+- [AssetPickerDialog](/docs/pieces/components/asset-picker-dialog) for selecting asset IDs.
+- [MediaField](/docs/pieces/components/media-field) for form integration.
+- [Media workflows overview](/docs/pieces/components/media).
+
+## API maturity
+
+API maturity: Stable.
+
+See the [framework integration guide](/docs/pieces/framework-integration) for client and SSR boundaries.

@@ -34,6 +34,19 @@ const PopoutPositionedContext = createContext(true);
 
 const usePopoutPositioned = (): boolean => useContext(PopoutPositionedContext);
 
+type PopoutTree = {
+  parent: PopoutTree | null;
+  descendants: Set<HTMLElement>;
+};
+
+const PopoutTreeContext = createContext<PopoutTree | null>(null);
+
+const usePopoutContains = () => {
+  const tree = useContext(PopoutTreeContext);
+  return (node: Node) =>
+    tree !== null && Array.from(tree.descendants).some((element) => element.contains(node));
+};
+
 type PopoutPosition = "top" | "right" | "bottom" | "left";
 
 type PopoutAlignment = "start" | "center" | "end";
@@ -91,6 +104,11 @@ const Popout = ({
   contentClassName,
 }: PopoutProps) => {
   const themeScope = useThemeScope();
+  const parentTree = useContext(PopoutTreeContext);
+  const tree = useMemo<PopoutTree>(
+    () => ({ parent: parentTree, descendants: new Set() }),
+    [parentTree],
+  );
 
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const [mounted, setMounted] = useState(false);
@@ -108,18 +126,22 @@ const Popout = ({
   const anchorRef = useRef<HTMLElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const pointerDocumentRef = useRef<Document | null>(null);
+  const controlledRef = useRef(open !== undefined);
+  const onOpenChangeRef = useRef(onOpenChange);
+  controlledRef.current = open !== undefined;
+  onOpenChangeRef.current = onOpenChange;
 
   const isOpen = open ?? internalOpen;
 
   const changeOpenState = useCallback(
     (nextOpen: boolean) => {
-      if (open === undefined) {
+      if (!controlledRef.current) {
         setInternalOpen(nextOpen);
       }
 
-      onOpenChange?.(nextOpen);
+      onOpenChangeRef.current?.(nextOpen);
     },
-    [open, onOpenChange],
+    [],
   );
 
   const debouncedClose = useMemo(
@@ -181,13 +203,18 @@ const Popout = ({
 
       setRef(trigger.props.ref, node);
     },
-    [trigger, themeScope],
+    [trigger.props.ref, themeScope],
   );
 
   const handleContentRef = useCallback((node: HTMLDivElement | null) => {
+    const previous = contentRef.current;
+    for (let ancestor = tree.parent; ancestor; ancestor = ancestor.parent) {
+      if (previous) ancestor.descendants.delete(previous);
+      if (node) ancestor.descendants.add(node);
+    }
     contentRef.current = node;
     setContentElement(node);
-  }, []);
+  }, [tree]);
 
   const {
     style: positionStyle,
@@ -226,7 +253,8 @@ const Popout = ({
 
       if (
         anchorRef.current?.contains(target) ||
-        contentRef.current?.contains(target)
+        contentRef.current?.contains(target) ||
+        Array.from(tree.descendants).some((element) => element.contains(target))
       ) {
         return;
       }
@@ -247,6 +275,7 @@ const Popout = ({
     anchorElement,
     cancelDebouncedClose,
     changeOpenState,
+    tree,
   ]);
 
   // Escape: only the topmost registered overlay handles the key.
@@ -375,7 +404,7 @@ const Popout = ({
               onPointerLeave={action === "hover" ? scheduleClose : undefined}
             >
               <PopoutPositionedContext.Provider value={isPositioned}>
-                {children}
+                <PopoutTreeContext.Provider value={tree}>{children}</PopoutTreeContext.Provider>
               </PopoutPositionedContext.Provider>
             </div>
           </Transition>,
@@ -388,6 +417,7 @@ const Popout = ({
 export {
   Popout,
   usePopoutPositioned,
+  usePopoutContains,
   type PopoutProps,
   type PopoutPosition,
   type PopoutAlignment,

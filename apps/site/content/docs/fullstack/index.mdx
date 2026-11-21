@@ -1,14 +1,20 @@
 ---
-title: Full-Stack React Authentication
-description: Connect React authentication experiences to server handlers and Next.js or TanStack Start adapters with a browser-safe auth client.
+title: Fullstack Client and Server Integrations
+description: Connect Puzzle Auth, Media, and CMS clients to authorized server handlers and Next.js or TanStack Start adapters.
 ---
 
-`@puzzle-ui/fullstack` connects Puzzle authentication services to browser applications and server routes. It provides a browser-safe auth client and React components, server-side `Request`/`Response` handlers, and adapters for Next.js and TanStack Start. It complements the framework-independent `@puzzle-ui/auth` and `@puzzle-ui/session` packages rather than replacing them.
+`@puzzle-ui/fullstack` connects Puzzle Auth, Media, and CMS services to browser
+applications and server routes. Its explicit subpaths separate browser-safe
+clients, serializable shared contracts, server handlers, and Next.js/TanStack
+Start adapters. The package complements `@puzzle-ui/auth`, `@puzzle-ui/session`,
+`@puzzle-ui/media`, and `@puzzle-ui/cms`; it does not replace those domain
+packages.
 
-The Fullstack package APIs, including the React auth components on
+The existing Auth APIs, including the React components on
 [Client and React](/docs/fullstack/client), are Stable with within-major
-backward-compatibility intent. This describes API maturity only; it is not a
-production-readiness guarantee.
+backward-compatibility intent. The new Media and CMS subpaths are
+workspace-only until a coordinated release and are not covered by that
+maturity label.
 
 ## Install
 
@@ -68,6 +74,8 @@ Create and configure an `AuthServer` from your server-side auth and session mana
 | --- | --- | --- |
 | Client and React UI | Browser client, provider and hooks, authentication forms, MFA settings, and configurable sign-in/sign-up experience. | [Client and React](/docs/fullstack/client) |
 | Server handlers | Authentication, MFA, sessions, lifecycle, route map, readiness checks, and step-up helpers. | [Server handlers](/docs/fullstack/server) |
+| Media client and API | Browser-safe uploads, sanitized media views, server authorization, and upload lifecycle handlers. | [Media API](/docs/fullstack/media) |
+| CMS client and API | Typed content, revision, publishing, localization, and relationship APIs with separate public reads. | [CMS API](/docs/fullstack/cms) |
 | Next.js adapter | `GET` and `POST` handlers for a Next.js route handler. | [Next.js](/docs/fullstack/next) |
 | TanStack Start adapter | A Request dispatcher or explicit route map for TanStack Start. | [TanStack Start](/docs/fullstack/tanstack) |
 | Shared contracts | Serializable client snapshots, inputs, and result types shared across runtimes. | [Shared types](/docs/fullstack/shared) |
@@ -81,6 +89,16 @@ Create and configure an `AuthServer` from your server-side auth and session mana
 | `@puzzle-ui/fullstack/auth/shared` | Shared TypeScript data contracts only; no runtime values. |
 | `@puzzle-ui/fullstack/auth/next` | Next.js route-handler adapter. |
 | `@puzzle-ui/fullstack/auth/tanstack` | TanStack Start request-handler adapter. |
+| `@puzzle-ui/fullstack/media/client` | Browser media client and bounded upload queue. |
+| `@puzzle-ui/fullstack/media/shared` | Serializable media API contracts and sanitized asset/folder views. |
+| `@puzzle-ui/fullstack/media/server` | Authorized server handlers and route map. |
+| `@puzzle-ui/fullstack/media/next` | Next.js media route-handler adapter. |
+| `@puzzle-ui/fullstack/media/tanstack` | TanStack Start media dispatcher. |
+| `@puzzle-ui/fullstack/cms/client` | Browser CMS client and query invalidation hooks. |
+| `@puzzle-ui/fullstack/cms/shared` | Serializable CMS API contracts. |
+| `@puzzle-ui/fullstack/cms/server` | Authorized CMS admin and published-content handlers. |
+| `@puzzle-ui/fullstack/cms/next` | Next.js CMS route-handler adapter. |
+| `@puzzle-ui/fullstack/cms/tanstack` | TanStack Start CMS dispatcher. |
 
 There is no package-root import; use one of the exported subpaths above. Keep auth policy and storage configuration in the appropriate lower-level packages, and use Fullstack to connect them to your app. For the end-to-end app setup, continue with the [developer authentication guide](/docs/developer/authentication).
 

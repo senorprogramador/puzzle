@@ -1,0 +1,101 @@
+---
+title: Fullstack CMS API
+description: Connect tenant-authorized CMS services to admin and public HTTP routes, a typed browser client, and Next.js or TanStack Start.
+---
+
+The Fullstack CMS API adapts `@puzzle-ui/cms` to browser clients and
+`Request`/`Response` routes. It is not a database, identity provider, role
+system, or CMS admin interface.
+
+> **Workspace-only:** `@puzzle-ui/cms` and the new
+> `@puzzle-ui/fullstack/cms/*` subpaths are not available in the current npm
+> release. External applications can use them after a coordinated release.
+
+## Configure the server
+
+The host provides Storage, the deny-by-default CMS policy, a scheduler,
+trusted actor/tenant resolution, and route-level authorization:
+
+```ts
+import { createCmsServer } from "@puzzle-ui/fullstack/cms/server";
+
+const cmsServer = createCmsServer({
+  storage,
+  scheduler,
+  accessPolicy: ({ tenantId, actor, action }) =>
+    cmsPolicy.can({ tenantId, actor, action }),
+  resolveContext: (request) => resolveTrustedCmsContext(request),
+  authorize: ({ context, action }) =>
+    cmsPolicy.can({
+      tenantId: context.tenantId,
+      actor: context.actor,
+      action,
+    }),
+});
+```
+
+`storage`, `scheduler`, `cmsPolicy`, and `resolveTrustedCmsContext` are
+application-provided. Every admin request resolves actor and tenant on the
+server and passes both route authorization and the domain `accessPolicy`.
+Never accept a tenant ID, actor, or authorization decision from the browser.
+Scheduling requires an explicit scheduler; timestamps alone do not publish
+content.
+
+## Public and admin APIs
+
+Admin paths manage content types, entries, drafts, revisions, locales,
+relationships, audit events, publishing, and scheduling. Public paths expose
+only published snapshots. Private responses use `no-store`; public published
+reads are separately authorized and do not include draft fields.
+
+The browser client is imported only from `@puzzle-ui/fullstack/cms/client`:
+
+```ts
+import { createCmsClient } from "@puzzle-ui/fullstack/cms/client";
+
+const cms = createCmsClient({
+  basePath: "/api/cms",
+  onInvalidate: async (keys) => {
+    await queryCache.invalidate(keys);
+  },
+});
+
+const entries = await cms.listEntries({
+  contentType: "article",
+  locale: "en-US",
+  first: 25,
+});
+```
+
+Client mutations use revision conditions and report conflicts rather than
+overwriting newer drafts. After a successful mutation, the client explicitly
+invalidates the affected content-type, entry, revision, public-read, or
+relationship query keys. A failed invalidation is surfaced as a committed
+mutation error so the application can refresh before continuing.
+
+Media fields store asset IDs. Configure a tenant-aware media reference
+validator in `@puzzle-ui/cms`; for permanent media deletion, the host must also
+check CMS media usage records through the Media server's deletion guard.
+
+## Webhook administration
+
+The optional `webhooks` server configuration enables authorized subscription,
+delivery-history, and retry routes and turns on CMS change events. Supply a
+host transport with connection-time SSRF protections, a server-side secret
+resolver, and a side-effect-free `resolveSecretRef` that selects a
+pre-provisioned tenant secret for creation or rotation. The client cannot
+submit or read secret references. Schedule the `CmsWebhookService` outbox
+fanout and delivery workers separately; the routes do not send requests.
+See [CMS webhook delivery](/docs/cms#webhook-delivery) for retry, rotation, and
+transport requirements.
+Webhook updates invalidate all subscription queries; retries invalidate all
+delivery and attempt queries. Treat an invalidation key without an ID as a
+wildcard when adapting it to your query cache.
+
+## Framework handlers
+
+`@puzzle-ui/fullstack/cms/next` exports `createNextCmsHandler` and
+`createNextCmsRouteHandlers`. `@puzzle-ui/fullstack/cms/tanstack` exports the
+corresponding TanStack Start dispatcher and route-map helpers. Both use the
+same CMS server route map, keeping persistence, authorization, and publishing
+framework-neutral.

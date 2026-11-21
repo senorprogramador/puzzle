@@ -5,6 +5,8 @@
   "contentFile": "instructions.md",
   "instructionDependencies": [
     "@puzzle-ui/auth",
+    "@puzzle-ui/cms",
+    "@puzzle-ui/media",
     "@puzzle-ui/session",
     "@puzzle-ui/ui"
   ],

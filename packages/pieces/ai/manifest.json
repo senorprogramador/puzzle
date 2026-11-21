@@ -4,6 +4,7 @@
   "instructionVersion": 1,
   "contentFile": "instructions.md",
   "instructionDependencies": [
+    "@puzzle-ui/cms",
     "@puzzle-ui/theme",
     "@puzzle-ui/ui"
   ],

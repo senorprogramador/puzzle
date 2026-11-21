@@ -1,0 +1,59 @@
+---
+title: BlockEditor
+description: Add, duplicate, remove, and reorder schema-defined serializable content blocks.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { BlockEditorExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { BlockEditor } from "@puzzle-ui/pieces";
+
+`BlockEditor` edits arrays of serializable `{ type, fields }` values using caller-provided `CmsBlockDefinition` records. It never stores HTML as the canonical document. Use `renderBlock` to map known field definitions to specialized controls; otherwise fields remain editable as JSON.
+
+<Preview fit="device" code={`<BlockEditor label="Article blocks" definitions={blockDefinitions} value={blocks} onChange={setBlocks} />`}>
+  <BlockEditorExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `label` | `ReactNode` | Yes | — |
+| `definitions` | `readonly CmsBlockDefinition[]` | Yes | — |
+| `value` | `readonly CmsValue[]` | Yes | — |
+| `onChange` | `(value: CmsValue[]) => void` | Yes | — |
+| `onInvalidDraftChange` | `(invalid: boolean) => void` | No | — |
+| `renderBlock` | `(definition, fields, onChange) => ReactNode` | No | JSON fields editor |
+| `disabled` | `boolean` | No | `false` |
+| `error` | `ReactNode` | No | — |
+| `className` | `string` | No | — |
+
+```tsx
+import { BlockEditor } from "@puzzle-ui/pieces";
+
+<BlockEditor
+  label="Page blocks"
+  definitions={contentType.fields.find((field) => field.key === "body")?.blocks ?? []}
+  value={blocks}
+  onChange={setBlocks}
+/>;
+```
+
+Blocks can be added from available definitions, duplicated, removed, and moved with buttons. New blocks begin with field defaults from the definition. Invalid stored values remain visible and are not silently discarded; the user can remove an invalid block explicitly. Server-side schema validation remains authoritative.
+
+The built-in JSON editor requires an object and reports invalid local drafts via
+`onInvalidDraftChange`; use that state to block host save and navigation actions.
+Block actions are disabled while a draft is invalid, so the draft is not lost.
+Custom `renderBlock` controls must report and guard their own invalid state.
+
+## Accessibility and composition
+
+Actions are native keyboard-operable buttons with visible focus. Pass `renderBlock` to compose `ContentEditor`, `FieldArray`, `JsonEditor`, `MediaField`, or other controls. The component does not validate authorization or persistence.
+
+## Related
+
+- [ContentEditor](/docs/pieces/components/content-editor)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

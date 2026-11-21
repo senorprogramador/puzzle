@@ -1,0 +1,51 @@
+---
+title: AuditLogViewer
+description: Filter, inspect, and paginate through caller-authorized CMS audit events.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { AuditLogViewerExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { AuditLogViewer } from "@puzzle-ui/pieces";
+
+`AuditLogViewer` presents audit events supplied by the host. The server must authorize audit reads and scope them to the current tenant before passing data to the component.
+It also accepts sanitized Media audit projections with `upload`, `asset`, or
+`folder` resources and `failure` results. Assign each event a stable ID and use
+an empty `resourceId` when the operation has not produced one.
+
+<Preview fit="device" code={`<AuditLogViewer events={authorizedEvents} pageSize={10} />`}>
+  <AuditLogViewerExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `events` | `readonly CmsAuditLogItem[]` | Yes | — |
+| `loading` | `boolean` | No | `false` |
+| `error` | `ReactNode` | No | — |
+| `pageSize` | `number` | No | `10` |
+| `className` | `string` | No | — |
+
+```tsx
+import { AuditLogViewer } from "@puzzle-ui/pieces";
+
+<AuditLogViewer events={await cmsClient.listAuditEvents({ resourceId: entryId })} />;
+```
+
+Search, resource/result filters, and pagination apply only to the supplied events.
+The CMS API currently returns up to 500 recent events per request and supports
+filtering by resource ID, but does not provide audit-history cursor pagination.
+The component does not expose event details beyond the displayed actor, action,
+resource, result, and timestamp.
+
+## Accessibility and related components
+
+The event list uses a semantic table with column headers and labeled filters. Denied operations remain visible and are distinguishable by text, not color alone.
+
+- [CMS audit API](/docs/fullstack/cms)
+- [Media audit hook](/docs/fullstack/media#audit-and-operations)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

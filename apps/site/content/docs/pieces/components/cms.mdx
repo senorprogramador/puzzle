@@ -1,0 +1,44 @@
+---
+title: CMS Authoring
+description: Compose caller-data-driven content management interfaces without moving authorization, persistence, or scheduling into the UI.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { CmsShellExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+
+CMS authoring Pieces compose admin interfaces from data and actions supplied by the host application. They do not fetch, authorize, validate, schedule, or persist content. Use the `@puzzle-ui/cms` and `@puzzle-ui/fullstack/cms/*` APIs on the server and client for those responsibilities.
+
+<Preview fit="device" code={`<CmsShell title="Editorial workspace" navigation={navigation} activeNavigationId="articles"><ContentList items={entries} /></CmsShell>`}>
+  <CmsShellExample />
+</Preview>
+
+## Components
+
+| Component | Purpose | Reference |
+|---|---|---|
+| `CmsShell` | Responsive CMS navigation and page shell. | [CmsShell](/docs/pieces/components/cms-shell) |
+| `ContentList` | Searchable, filterable table of caller-provided entries. | [ContentList](/docs/pieces/components/content-list) |
+| `ContentEditor` | Schema-driven controlled form with draft and publish actions. | [ContentEditor](/docs/pieces/components/content-editor) |
+| `BlockEditor` | Reorderable serializable `{ type, fields }` blocks. | [BlockEditor](/docs/pieces/components/block-editor) |
+| `ContentTypeBuilder` | Edit content type fields and locale definitions. | [ContentTypeBuilder](/docs/pieces/components/content-type-builder) |
+| `LocalizationEditor` | Switch and edit explicit locale values. | [LocalizationEditor](/docs/pieces/components/localization-editor) |
+| `RelationshipField` | Select caller-provided related entries under schema constraints. | [RelationshipField](/docs/pieces/components/relationship-field) |
+| `RevisionHistory` | Inspect immutable revisions and request restore-as-new-revision. | [RevisionHistory](/docs/pieces/components/revision-history) |
+| `PublishScheduler` | Collect a date/time and IANA timezone for a server scheduler. | [PublishScheduler](/docs/pieces/components/publish-scheduler) |
+| `EditorialCalendar` | View scheduled entries in an explicit timezone. | [EditorialCalendar](/docs/pieces/components/editorial-calendar) |
+| `AuditLogViewer` | Filter and page through caller-authorized audit events. | [AuditLogViewer](/docs/pieces/components/audit-log-viewer) |
+| `WebhookManagement` | Edit webhook subscriptions and inspect or retry deliveries. | [WebhookManagement](/docs/pieces/components/webhook-management) |
+
+## Boundaries and integration
+
+Install `@puzzle-ui/cms` when using the CMS family; its public types and field-type registry are used by the Pieces API. Components accept caller-owned content projections and callbacks. The host must authorize every operation, enforce tenant and revision checks, validate on the server, and use an explicit scheduler for scheduled publication.
+
+Pass `ContentEditor.renderField` to compose specialized inputs such as `MediaField` or `RelationshipField`. Pass `BlockEditor.renderBlock` to edit the configured fields for each serializable block type. Advanced field settings belong to the CMS schema and server validation; `ContentTypeBuilder.renderFieldSettings` is the composition point for application-specific schema controls.
+
+`PublishScheduler` converts local wall time using the selected timezone, reports nonexistent daylight-saving times, and chooses the earlier instant for an ambiguous repeated time. The server scheduler remains responsible for executing the returned publication job.
+
+## References
+
+- [CMS package](/docs/cms)
+- [Fullstack CMS integration](/docs/fullstack/cms)
+- [CMS package instructions](/docs/ai)

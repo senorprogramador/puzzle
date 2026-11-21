@@ -112,6 +112,12 @@ export const components = [
       "Edit rich text with a formatting toolbar and document renderer.",
   },
   {
+    name: "JSON Editor",
+    href: "/docs/ui/editors/json-editor",
+    icon: "lucide:file-json",
+    description: "Edit, format, and validate serialized JSON.",
+  },
+  {
     name: "Autocomplete",
     href: "/docs/ui/forms/autocomplete",
     icon: "lucide:list-filter",
@@ -136,10 +142,40 @@ export const components = [
     description: "Choose a date using a calendar and input field.",
   },
   {
+    name: "FieldArray",
+    href: "/docs/ui/forms/field-array",
+    icon: "lucide:list-plus",
+    description: "Manage controlled repeated and nested form fields.",
+  },
+  {
     name: "File Upload",
     href: "/docs/ui/forms/file-upload",
     icon: "lucide:upload",
     description: "Select files and communicate upload progress and errors.",
+  },
+  {
+    name: "Image Upload",
+    href: "/docs/ui/forms/image-upload",
+    icon: "lucide:image-up",
+    description: "Resize images, prepare variants, and inject upload handling.",
+  },
+  {
+    name: "Image Cropper",
+    href: "/docs/ui/forms/image-cropper",
+    icon: "lucide:crop",
+    description: "Select, resize, and zoom a normalized image crop.",
+  },
+  {
+    name: "Image Hotspot Editor",
+    href: "/docs/ui/forms/image-hotspot-editor",
+    icon: "lucide:crosshair",
+    description: "Place normalized image focal points and hotspot areas.",
+  },
+  {
+    name: "Video Upload",
+    href: "/docs/ui/forms/video-upload",
+    icon: "lucide:video",
+    description: "Preview video metadata and compose resumable uploads.",
   },
   {
     name: "Form Field",

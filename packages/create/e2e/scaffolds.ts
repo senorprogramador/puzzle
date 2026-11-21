@@ -1,8 +1,9 @@
 import { access, readFile, rm, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
 import { Readable } from "node:stream";
 import path from "node:path";
 
-import { afterAll, describe, expect, inject, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, inject, it, vi } from "vitest";
 import { chromium } from "playwright";
 
 import { createWebAuthnCredentialFixture } from "../../auth/tests/fixtures/webauthn-cryptographic-fixture.mjs";
@@ -34,6 +35,7 @@ type PackageJson = {
   scripts?: Record<string, string>;
   dependencies?: Record<string, string>;
   devDependencies?: Record<string, string>;
+  overrides?: Record<string, string>;
 };
 
 const PORT_BASE: Record<Framework, number> = {
@@ -110,6 +112,9 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
     let packageJson: PackageJson;
     let server: Server | undefined;
     let mongoStarted = false;
+    const composeProject = `puzzle-e2e-${randomUUID()}`;
+    const previousComposeProject = process.env.COMPOSE_PROJECT_NAME;
+    const previousComposeFile = process.env.COMPOSE_FILE;
     const initialUser = {
       email: `initial-${scaffold.id}@example.com`,
       password: "Initial 'quoted' $password\\ with unicode \u00e9",
@@ -125,17 +130,29 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
       return server;
     };
 
+    beforeAll(() => {
+      if (scaffold.database === "mongodb") {
+        process.env.COMPOSE_PROJECT_NAME = composeProject;
+        process.env.COMPOSE_FILE = path.join(directory, "docker-compose.yml");
+      }
+    });
+
     afterAll(async () => {
-      await server?.stop();
-
-      if (mongoStarted) {
-        await stopMongo(directory);
+      try {
+        await server?.stop();
+        if (mongoStarted) await stopMongo(directory);
+        if (process.env.PUZZLE_E2E_KEEP !== "1") {
+          await rm(directory, { recursive: true, force: true });
+        }
+        await rm(configPath, { force: true });
+      } finally {
+        if (scaffold.database === "mongodb") {
+          if (previousComposeProject === undefined) delete process.env.COMPOSE_PROJECT_NAME;
+          else process.env.COMPOSE_PROJECT_NAME = previousComposeProject;
+          if (previousComposeFile === undefined) delete process.env.COMPOSE_FILE;
+          else process.env.COMPOSE_FILE = previousComposeFile;
+        }
       }
-
-      if (process.env.PUZZLE_E2E_KEEP !== "1") {
-        await rm(directory, { recursive: true, force: true });
-      }
-      await rm(configPath, { force: true });
     });
 
     it("creates and installs the project", async () => {
@@ -171,6 +188,12 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
       expect(packageJson).toMatchObject({ name: scaffold.id });
       expect(hasDependency(packageJson, "@puzzle-ui/ui")).toBe(true);
       expect(hasDependency(packageJson, "@puzzle-ui/theme")).toBe(true);
+      expect(packageJson.overrides?.["@puzzle-ui/media"]).toBe(
+        `file:${inject("puzzlePackages")["@puzzle-ui/media"]}`,
+      );
+      expect(packageJson.overrides?.["@puzzle-ui/cms"]).toBe(
+        `file:${inject("puzzlePackages")["@puzzle-ui/cms"]}`,
+      );
       expect(hasDependency(packageJson, "@puzzle-ui/auth")).toBe(scaffold.auth);
       expect(hasDependency(packageJson, "tailwindcss")).toBe(scaffold.tailwind);
       expect(hasDependency(packageJson, "nitro")).toBe(
@@ -179,6 +202,12 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
       expect(hasDependency(packageJson, "wrangler")).toBe(
         scaffold.database === "d1",
       );
+      if (scaffold.database === "mongodb") {
+        const compose = JSON.parse(
+          await run("docker", ["compose", "config", "--format", "json"], { cwd: directory }),
+        ) as { name?: string };
+        expect(compose.name).toBe(composeProject);
+      }
     });
 
     it("downloads the default local fonts", async () => {
@@ -282,8 +311,8 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
           );
           const requestReset = vi.fn(async (volumes: string[]) => {
             expect(volumes).toEqual([
-              `${scaffold.id}_mongodb-data`,
-              `${scaffold.id}_mongodb-config`,
+              `${composeProject}_mongodb-data`,
+              `${composeProject}_mongodb-config`,
             ]);
             return true;
           });

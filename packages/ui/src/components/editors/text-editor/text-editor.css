@@ -138,6 +138,53 @@
     text-decoration: underline;
 }
 
+.puzzle-text-editor code,
+.puzzle-text-renderer code {
+    border-radius: var(--puzzle-radius-sm, 0.25rem);
+    padding-inline: var(--puzzle-space-1, 0.25rem);
+    background: var(--puzzle-color-surface-sunken);
+    font-family: var(--puzzle-font-mono, ui-monospace, monospace);
+    font-size: 0.9em;
+}
+
+.puzzle-text-editor blockquote,
+.puzzle-text-renderer blockquote {
+    margin-inline: 0;
+    padding-inline-start: var(--puzzle-space-4, 1rem);
+    border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border, #e5e0d6);
+    color: var(--puzzle-color-text-subtle, #737373);
+}
+
+.puzzle-text-editor code,
+.puzzle-text-renderer code {
+    font-family: var(--puzzle-font-family-mono, ui-monospace, monospace);
+}
+
+.puzzle-text-editor :not(pre) > code,
+.puzzle-text-renderer :not(pre) > code {
+    padding-inline: var(--puzzle-space-1, 0.25rem);
+    border-radius: var(--puzzle-radius-sm, 0.2rem);
+    background: var(--puzzle-color-surface-subtle, #f3f4f6);
+}
+
+.puzzle-text-editor pre,
+.puzzle-text-renderer pre {
+    max-width: 100%;
+    overflow-x: auto;
+    padding: var(--puzzle-space-3, 0.75rem);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+    background: var(--puzzle-color-surface-subtle, #f3f4f6);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.puzzle-text-editor hr,
+.puzzle-text-renderer hr {
+    margin-block: var(--puzzle-space-4, 1rem);
+    border: 0;
+    border-block-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border, #e5e0d6);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .puzzle-text-editor {
         scroll-behavior: auto;
@@ -150,41 +197,136 @@
     padding-inline-start: 1.5em;
 }
 
+.puzzle-text-renderer__list--checklist,
+.puzzle-text-renderer__list--icon {
+    padding-inline-start: 0;
+    list-style: none;
+}
+
+.puzzle-text-renderer__list--checklist > li,
+.puzzle-text-renderer__list--icon > li {
+    position: relative;
+    padding-inline-start: 1.75em;
+}
+
+.puzzle-text-renderer__checkbox,
+.puzzle-text-renderer__icon {
+    position: absolute;
+    inset-block-start: 0.25em;
+    inset-inline-start: 0;
+}
+
+.puzzle-text-renderer__checkbox {
+    inline-size: 1.1em;
+    block-size: 1.1em;
+    margin: 0;
+}
+
+.puzzle-text-renderer__item-content {
+    display: block;
+}
+
+.puzzle-text-renderer__list--checklist > li > .puzzle-text-renderer__list,
+.puzzle-text-renderer__list--icon > li > .puzzle-text-renderer__list {
+    margin-block-start: 0;
+    padding-inline-start: 1.5em;
+}
+
 .puzzle-text-renderer__list + .puzzle-text-renderer__list,
 .puzzle-text-renderer__list + .puzzle-text-renderer__block,
 .puzzle-text-renderer__block + .puzzle-text-renderer__list {
     margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
 }
 
-.puzzle-text-editor__block[data-puzzle-list-type="bullet"]::before {
-    content: "•";
-    display: inline-block;
-    width: 1.5em;
-    margin-inline-start: -1.5em;
-    padding-inline-start: 0.25em;
-}
-
-.puzzle-text-editor__block[data-puzzle-list-type] {
+.puzzle-text-editor__list {
+    margin: 0;
     padding-inline-start: 1.5em;
 }
 
-.puzzle-text-editor__block[data-puzzle-list-type="ordered"] {
-    counter-increment: puzzle-editor-list;
+.puzzle-text-editor__list--bullet,
+.puzzle-text-renderer__list--bullet,
+.puzzle-text-editor__list--bullet > li,
+.puzzle-text-renderer__list--bullet > li {
+    list-style-type: disc;
 }
 
-.puzzle-text-editor__block[data-puzzle-list-type="ordered"]::before {
-    content: counter(puzzle-editor-list) ".";
-    display: inline-block;
-    width: 1.5em;
-    margin-inline-start: -1.5em;
-    padding-inline-start: 0.1em;
+.puzzle-text-editor__list--ordered,
+.puzzle-text-renderer__list--ordered,
+.puzzle-text-editor__list--ordered > li,
+.puzzle-text-renderer__list--ordered > li {
+    list-style-type: decimal;
 }
 
-.puzzle-text-editor:has(.puzzle-text-editor__block[data-puzzle-list-type]) {
-    counter-reset: puzzle-editor-list;
+.puzzle-text-editor__list--bullet > li,
+.puzzle-text-renderer__list--bullet > li,
+.puzzle-text-editor__list--ordered > li,
+.puzzle-text-renderer__list--ordered > li {
+    display: list-item;
 }
 
-.puzzle-text-editor__block:not([data-puzzle-list-type="ordered"]) +
-.puzzle-text-editor__block[data-puzzle-list-type="ordered"] {
-    counter-reset: puzzle-editor-list;
+.puzzle-text-editor__list + .puzzle-text-editor__list,
+.puzzle-text-editor__list + .puzzle-text-editor__block,
+.puzzle-text-editor__block + .puzzle-text-editor__list {
+    margin-block-start: var(--puzzle-font-gap-paragraph-gap, 1em);
+}
+
+.puzzle-text-editor__list--checklist,
+.puzzle-text-editor__list--icon {
+    padding-inline-start: 0;
+    list-style: none;
+}
+
+.puzzle-text-editor__list--checklist > li,
+.puzzle-text-editor__list--icon > li {
+    position: relative;
+    padding-inline-start: 1.75em;
+}
+
+.puzzle-text-editor__checkbox,
+.puzzle-text-editor__icon {
+    position: absolute;
+    inset-block-start: 0.2em;
+    inset-inline-start: 0;
+}
+
+.puzzle-text-editor__checkbox {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 1.15em;
+    block-size: 1.15em;
+    padding: 0;
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border, #737373);
+    border-radius: var(--puzzle-radius-sm, 0.2rem);
+    background: var(--puzzle-color-surface, #ffffff);
+    color: var(--puzzle-color-primary, #2563eb);
+    cursor: pointer;
+}
+
+.puzzle-text-editor__checkbox::after {
+    inline-size: 0.3em;
+    block-size: 0.55em;
+    border: solid currentColor;
+    border-width: 0 0.12em 0.12em 0;
+    content: "";
+    transform: rotate(45deg) scale(0);
+}
+
+.puzzle-text-editor__checkbox[aria-checked="true"]::after {
+    transform: rotate(45deg) scale(1);
+}
+
+.puzzle-text-editor__checkbox:disabled {
+    cursor: default;
+    opacity: 0.75;
+}
+
+.puzzle-text-editor__icon {
+    display: inline-flex;
+    color: var(--puzzle-color-primary, #2563eb);
+}
+
+.puzzle-text-editor__list--checklist > li > .puzzle-text-editor__list,
+.puzzle-text-editor__list--icon > li > .puzzle-text-editor__list {
+    margin-block-start: 0;
+    padding-inline-start: 1.5em;
 }

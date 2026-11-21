@@ -1,0 +1,157 @@
+---
+title: Fullstack Media API
+description: Configure authorized media routes and a browser upload queue with sanitized contracts and direct object-storage uploads.
+---
+
+The Fullstack Media API connects `@puzzle-ui/media` services to browser
+clients and `Request`/`Response` routes. It does not provide an object-storage
+vendor, image codec, transcoder, or authentication policy.
+
+> **Workspace-only:** `@puzzle-ui/media` and the new
+> `@puzzle-ui/fullstack/media/*` subpaths are not available in the current npm
+> release. They are implemented in this repository and require a coordinated
+> release before external applications can install them.
+
+## Configure the server
+
+Create the domain services with the host's Storage and object-storage
+adapters, then require trusted actor/tenant resolution and server-side
+authorization for every route:
+
+```ts
+import { createMediaServer } from "@puzzle-ui/fullstack/media/server";
+
+export const mediaServer = createMediaServer({
+  assets,
+  folders,
+  objectStorage,
+  idempotency,
+  resolveContext: (request) => resolveMediaActorAndTenant(request),
+  authorize: ({ context, action, resourceId }) =>
+    mediaPermissions.can(context, action, resourceId),
+  verifyUploadedContent: ({ object, context }) =>
+    mediaContentInspector.verify({ object, tenantId: context.tenantId }),
+  assertCanDeleteAsset: async ({ asset, context }) => {
+    await cmsMediaReferences.assertAssetUnused({
+      tenantId: context.tenantId,
+      assetId: asset.id,
+    });
+  },
+});
+```
+
+`resolveMediaActorAndTenant`, `mediaPermissions`, `mediaContentInspector`, and `cmsMediaReferences` are
+host-provided functions. The server never trusts a tenant ID, object key, or
+provider upload ID from the browser. The permanent-delete guard must include
+references tracked by CMS; Media's own usage collection cannot see those
+records.
+
+The server controls upload intents and completion. It verifies the
+object-storage adapter's actual tenant, size, MIME type, and checksum metadata
+before creating an `uploaded` asset. It never marks an asset `ready` without
+successful processing. Responses containing signed targets or private metadata
+use `Cache-Control: no-store`.
+
+Configure `verifyUploadedContent` to inspect actual bytes and return `true` only
+when the object content is acceptable for its reported MIME type. It runs
+after metadata verification and before asset creation. A `false` result rejects
+the upload; an error or non-boolean result fails closed. For compatibility the
+callback is optional: without it, Fullstack does not check file signatures.
+The host must inspect an immutable object version and reconcile completed
+objects left without assets after rejection or failure. Direct domain writes
+need separate validation.
+
+The server accepts per-action `rateLimit` and tenant-scoped
+`assertTenantQuota` callbacks. Its `readiness()` method reports configured
+storage, queue, and processor probes; missing probes are reported as
+unverified. `cleanup()` aborts expired upload sessions and can invoke
+host-provided reconciliation hooks.
+
+## Audit and operations
+
+The optional server `onAudit` callback receives sanitized tenant, actor,
+resource, action, timestamp, and success/denial/failure outcomes for mutations
+and signed-target issuance. It does not receive request bodies, signed URLs,
+headers, or object keys. The host must persist events durably, authorize
+tenant-scoped audit queries, set retention, and monitor failures. Authentication
+failures without a trusted context and operations performed directly through
+domain services or workers require separate host auditing.
+
+For metadata-adapter storage, wire `createMediaAuditService` from
+`@puzzle-ui/media` to `onAudit` using a trusted service principal. Its
+tenant-aware policy must independently authorize audit writes and reads.
+
+```ts
+import { createMediaAuditService } from "@puzzle-ui/media";
+import { createMediaServer } from "@puzzle-ui/fullstack/media/server";
+
+const audit = createMediaAuditService({
+  storage,
+  authorize: ({ tenantId, actorId, action }) =>
+    auditPolicy.can({ tenantId, actorId, action }),
+});
+const mediaServer = createMediaServer({
+  // Provide the remaining required host options shown above.
+  ...mediaOptions,
+  onAudit: async (event) => {
+    await audit.record({ event, actorId: "media-audit-worker" });
+  },
+});
+```
+
+`storage`, `auditPolicy`, and `mediaOptions` are host-provided. The host must
+reserve and authorize the service principal; it must not accept it from a
+browser request.
+
+The callback runs after the operation and is **not atomic** with its mutation.
+If it fails, the route returns 503 and the operation may already have
+committed; refresh before retrying. For stronger guarantees, coordinate audit
+and mutation in a host-owned transactional service rather than relying solely
+on this callback.
+
+## Browser client
+
+```ts
+import {
+  createMediaClient,
+  createMediaUploadQueue,
+} from "@puzzle-ui/fullstack/media/client";
+
+const client = createMediaClient({ basePath: "/api/media" });
+const uploads = createMediaUploadQueue(client, {
+  maxConcurrentUploads: 3,
+  maxRetries: 2,
+});
+
+const asset = await uploads.upload(
+  {
+    file,
+    kind: "image",
+    metadata: { altText: "A mountain landscape" },
+  },
+  {
+    signal: controller.signal,
+    onProgress: ({ percent, phase }) => updateProgress(phase, percent),
+  },
+);
+```
+
+The queue supports single PUT and server-issued multipart targets, bounded
+concurrency, transient retry, progress, abort, and pause/resume at safe
+boundaries. Call `task.getResumeData()` to obtain versioned metadata containing
+only the opaque server session ID, file identity, and completed part ETags.
+The application may persist this data, then resume only after the user
+reselects the matching file. It never contains signed URLs, headers, provider
+multipart IDs, object keys, credentials, or file bytes. Cross-origin object
+stores must expose the `ETag` response header for multipart completion.
+
+## Framework handlers
+
+`@puzzle-ui/fullstack/media/next` exports `createNextMediaHandler` and
+`createNextMediaRouteHandlers`; `@puzzle-ui/fullstack/media/tanstack` exports
+the corresponding TanStack Start dispatcher and route-map helpers. Both use
+the same server route map, so authorization and upload logic stay framework
+independent. The default route prefix is `/api/media`.
+
+See the [Media domain guide](/docs/media) for storage, processing, and cleanup
+contracts.

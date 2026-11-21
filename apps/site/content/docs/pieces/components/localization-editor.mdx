@@ -1,0 +1,55 @@
+---
+title: LocalizationEditor
+description: Switch between explicitly configured locales and edit each locale's independent field values.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { LocalizationEditorExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { LocalizationEditor } from "@puzzle-ui/pieces";
+
+`LocalizationEditor` provides locale tabs and missing/translated indicators. Values are supplied per locale; it does not invent fallback content or copy fields between translations.
+
+<Preview fit="device" code={`<LocalizationEditor contentType={contentType} values={values} onChange={updateLocale} renderLocale={renderLocale} />`}>
+  <LocalizationEditorExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `contentType` | `ContentTypeDefinition` | Yes | — |
+| `values` | `Readonly<Record<string, CmsFields \| null \| undefined>>` | Yes | — |
+| `onChange` | `(locale: string, fields: CmsFields) => void` | Yes | — |
+| `onInvalidDraftChange` | `(invalid: boolean) => void` | No | — |
+| `activeLocale` | `string` | No | Default locale or first locale |
+| `onActiveLocaleChange` | `(locale: string) => void` | No | Internal state |
+| `renderLocale` | `(locale, fields, onChange) => ReactNode` | No | JSON fields editor |
+| `disabled` | `boolean` | No | `false` |
+
+```tsx
+import { LocalizationEditor } from "@puzzle-ui/pieces";
+
+<LocalizationEditor
+  contentType={contentType}
+  values={entryFieldsByLocale}
+  onChange={(locale, fields) => updateTranslation(locale, fields)}
+/>;
+```
+
+The selected locale can be controlled or internal. Tabs expose selected state and linked tab panels. Keep locale authorization, fallback policy, translation completeness rules, and persistence in the caller and CMS service.
+
+The built-in editor requires a JSON object and reports invalid local drafts via
+`onInvalidDraftChange`. Other locale tabs are disabled until the draft is
+corrected; a host controlling `activeLocale` must also avoid changing it while
+invalid. Use the same state to guard save and navigation actions. Custom
+`renderLocale` controls must handle their own invalid state.
+
+## Related
+
+- [CMS locale and fallback behavior](/docs/cms)
+- [ContentEditor](/docs/pieces/components/content-editor)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

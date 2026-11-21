@@ -59,6 +59,7 @@ const ColorPicker = (props: ColorPickerProps) => {
     style,
     rootClassName,
     popoverClassName,
+    footer,
     id,
     ref,
     ...triggerProps
@@ -93,6 +94,12 @@ const ColorPicker = (props: ColorPickerProps) => {
   const [inputError, setInputError] = useState(false);
 
   const areaRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const setTriggerRef = useCallback((node: HTMLButtonElement | null) => {
+    triggerRef.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) ref.current = node;
+  }, [ref]);
 
   const changeOpen = useCallback(
     (nextOpen: boolean) => {
@@ -282,7 +289,7 @@ const ColorPicker = (props: ColorPickerProps) => {
         trigger={
           <button
             {...triggerProps}
-            ref={ref}
+            ref={setTriggerRef}
             id={triggerId}
             type="button"
             className={cn("puzzle-color-picker__trigger", className)}
@@ -294,6 +301,13 @@ const ColorPicker = (props: ColorPickerProps) => {
             aria-haspopup="dialog"
             aria-expanded={isOpen}
             aria-controls={isOpen ? panelId : undefined}
+            onKeyDown={(event) => {
+              triggerProps.onKeyDown?.(event);
+              if (!event.defaultPrevented && event.key === "Tab" && !event.shiftKey && isOpen && areaRef.current) {
+                event.preventDefault();
+                areaRef.current.focus();
+              }
+            }}
           >
             <span
               className="puzzle-color-picker__trigger-swatch"
@@ -319,6 +333,21 @@ const ColorPicker = (props: ColorPickerProps) => {
           className="puzzle-color-picker__panel"
           role="dialog"
           aria-label={label ? `Choose ${label}` : "Choose color"}
+          onKeyDown={(event) => {
+            if (event.defaultPrevented || event.key !== "Tab") return;
+            const focusable = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(
+              "button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex='-1'])",
+            ));
+            const active = event.currentTarget.ownerDocument.activeElement;
+            if (event.shiftKey && active === focusable[0]) {
+              event.preventDefault();
+              triggerRef.current?.focus();
+            } else if (!event.shiftKey && active === focusable[focusable.length - 1]) {
+              event.preventDefault();
+              changeOpen(false);
+              triggerRef.current?.focus();
+            }
+          }}
         >
           <div
             ref={areaRef}
@@ -494,6 +523,7 @@ const ColorPicker = (props: ColorPickerProps) => {
               </div>
             </div>
           )}
+          {footer}
         </div>
       </Popout>
 

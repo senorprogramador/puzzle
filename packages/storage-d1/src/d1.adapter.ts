@@ -107,8 +107,11 @@ const decodeCursor = (cursor: StorageCursor): CursorPayload => {
   }
 };
 
-const quoteIdentifier = (value: string): string => {
-  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)) {
+const quoteIdentifier = (value: string, allowHyphen = false): string => {
+  const valid = allowHyphen
+    ? /^[a-zA-Z_][a-zA-Z0-9_-]*$/.test(value)
+    : /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value);
+  if (!valid) {
     throw new StorageValidationError(`Invalid SQL identifier: ${value}`);
   }
 
@@ -494,6 +497,7 @@ export class D1StorageAdapter implements StorageAdapter {
       const unique = index.unique ? "UNIQUE " : "";
       const name = quoteIdentifier(
         `${this.prefix}${definition.name}_${index.name}`,
+        true,
       );
 
       await this.run(`

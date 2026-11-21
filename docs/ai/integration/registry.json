@@ -17,6 +17,20 @@
       "contentHash": "f36b226b6de463fea5e21057391323731ba03fd04330df4b87aaeb3cac3f1f23"
     },
     {
+      "name": "@puzzle-ui/cms",
+      "version": "0.14.0",
+      "instructionVersion": 1,
+      "files": [
+        "ai/manifest.json",
+        "ai/instructions.md"
+      ],
+      "instructionDependencies": [
+        "@puzzle-ui/storage"
+      ],
+      "documentationUrl": "https://puzzle-ui.com/docs/cms",
+      "contentHash": "e5cb7c26b709ae307a0d4ca1c9fc2d602e356c1ed8657a162e6d6c0edf09b578"
+    },
+    {
       "name": "@puzzle-ui/core",
       "version": "0.14.0",
       "instructionVersion": 1,
@@ -51,11 +65,13 @@
       ],
       "instructionDependencies": [
         "@puzzle-ui/auth",
+        "@puzzle-ui/cms",
+        "@puzzle-ui/media",
         "@puzzle-ui/session",
         "@puzzle-ui/ui"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/fullstack",
-      "contentHash": "b7b1142ec085e12a63e132a0421273120a6f5ed5c20acc7fb4de72e70def111f"
+      "contentHash": "21a822836044fd4eca54b1a909763fa074628aafb8c77a939f043b7c034d41f2"
     },
     {
       "name": "@puzzle-ui/hooks",
@@ -100,6 +116,20 @@
       "contentHash": "52e2b9026dabe9dd5087e317c0a4add65c320b01741e333c2311e91b2116c2e7"
     },
     {
+      "name": "@puzzle-ui/media",
+      "version": "0.14.0",
+      "instructionVersion": 1,
+      "files": [
+        "ai/manifest.json",
+        "ai/instructions.md"
+      ],
+      "instructionDependencies": [
+        "@puzzle-ui/storage"
+      ],
+      "documentationUrl": "https://puzzle-ui.com/docs/media",
+      "contentHash": "69bdf6fdb0bc2e8992f197c5cceedd1217aaee6f2934fbe232161b6ad7c6b841"
+    },
+    {
       "name": "@puzzle-ui/pieces",
       "version": "0.14.0",
       "instructionVersion": 1,
@@ -108,11 +138,12 @@
         "ai/instructions.md"
       ],
       "instructionDependencies": [
+        "@puzzle-ui/cms",
         "@puzzle-ui/theme",
         "@puzzle-ui/ui"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/pieces",
-      "contentHash": "c712eb0eb8b6c32b7a6a95b8ef539f35c0c4f0d9df2f53e857712e9754d5960b"
+      "contentHash": "bfe718d0fa0e14546734c44c931492b6a598c2f30f101c8eaabe413657379e92"
     },
     {
       "name": "@puzzle-ui/seo",
@@ -150,7 +181,7 @@
       ],
       "instructionDependencies": [],
       "documentationUrl": "https://puzzle-ui.com/docs/storage",
-      "contentHash": "4398d3acd26bedc343bef0cd17dc004ec93f8930bb188911a6410c9f2386115e"
+      "contentHash": "78660f56c93df2f3c111e51b6c723e8a717beda276feeef7451a56ea641f6046"
     },
     {
       "name": "@puzzle-ui/storage-d1",
@@ -206,7 +237,7 @@
         "@puzzle-ui/theme"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/ui",
-      "contentHash": "0aff19379bbabbecc821c99d1afd55ab86cd851865392d7b5239e7a8c8a551cc"
+      "contentHash": "e19d39104f3056740b016376d5d956c1b46376e753b7a220ef816a36beb9f0a6"
     }
   ]
 }

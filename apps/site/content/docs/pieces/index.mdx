@@ -9,9 +9,10 @@ import { PiecesComponentCatalog } from "../../../src/components/doc-examples/pie
 
 <code>@puzzle-ui/pieces</code> provides composed interface sections built on Puzzle UI. Use the existing Hero layouts for page introductions and the Marketing & Conversion collection for product features, customer proof, FAQs, comparisons, and calls to action. Pieces is not a general-purpose page builder or a library of complete website templates.
 
-The package documents **63 section families** across seven categories. Use
-the overviews below to compare their use cases, then open a component
-reference for its full API and variant previews.
+The package documents **63 section families** across seven categories. It also
+provides focused media-management and CMS-authoring workflows for caller-owned
+application data. Use the overviews below to compare their use cases, then open
+a component reference for its full API and previews.
 
 ## Browse by category
 
@@ -24,6 +25,8 @@ reference for its full API and variant previews.
 | Business & Corporate | [Explore business sections](/docs/pieces/components/business) |
 | Application & Dashboard | [Explore application sections](/docs/pieces/components/application-dashboard) |
 | Specialized & Interactive | [Explore specialized sections](/docs/pieces/components/specialized-interactive) |
+| Media & Asset Management | [Explore media workflows](/docs/pieces/components/media) |
+| CMS Authoring | [Explore CMS workflows](/docs/pieces/components/cms) |
 
 <Preview fit="device" code={`<AnnouncementSection variant="promotional" message="A calmer launch starts with a clear plan." action={<Button href="/docs/pieces/components/marketing">Explore the sections</Button>} />`}>
   <AnnouncementSection
@@ -82,9 +85,31 @@ TypeScript usage, accessibility notes, and related sections.
 
 <PiecesComponentCatalog />
 
+## Media management workflows
+
+- [MediaLibrary](/docs/pieces/components/media-library)
+- [AssetPickerDialog](/docs/pieces/components/asset-picker-dialog)
+- [AssetDetailsPanel](/docs/pieces/components/asset-details-panel)
+- [MediaField](/docs/pieces/components/media-field)
+
+## CMS authoring workflows
+
+- [CmsShell](/docs/pieces/components/cms-shell)
+- [ContentList](/docs/pieces/components/content-list)
+- [ContentEditor](/docs/pieces/components/content-editor)
+- [BlockEditor](/docs/pieces/components/block-editor)
+- [ContentTypeBuilder](/docs/pieces/components/content-type-builder)
+- [LocalizationEditor](/docs/pieces/components/localization-editor)
+- [RelationshipField](/docs/pieces/components/relationship-field)
+- [RevisionHistory](/docs/pieces/components/revision-history)
+- [PublishScheduler](/docs/pieces/components/publish-scheduler)
+- [EditorialCalendar](/docs/pieces/components/editorial-calendar)
+- [AuditLogViewer](/docs/pieces/components/audit-log-viewer)
+- [WebhookManagement](/docs/pieces/components/webhook-management)
+
 ## API maturity
 
-All 109 canonical public component APIs and their published aliases are
+All 124 canonical public component APIs and their published aliases are
 **Stable**, with backward-compatibility intent within a major version. This
 describes API maturity, not production readiness. Check each component
 reference for its supported props and variants, and review the

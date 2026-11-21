@@ -1,0 +1,48 @@
+---
+title: RevisionHistory
+description: Review immutable CMS revisions and request restoration as a new revision.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { RevisionHistoryExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { RevisionHistory } from "@puzzle-ui/pieces";
+
+`RevisionHistory` displays caller-provided revisions, offers a JSON field snapshot preview and a field-by-field comparison with the current revision, and invokes `onRestore` with the selected revision ID and revision number. The host service must perform restore-as-new-revision with optimistic concurrency and authorization.
+
+<Preview fit="device" code={`<RevisionHistory revisions={revisions} currentRevisionNumber={entry.revisionNumber} confirmRestore onRestore={restoreRevision} />`}>
+  <RevisionHistoryExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `revisions` | `readonly CmsRevisionItem[]` | Yes | — |
+| `currentRevisionNumber` | `number` | No | — |
+| `loading` | `boolean` | No | `false` |
+| `error` | `ReactNode` | No | — |
+| `confirmRestore` | `boolean` | No | `false` |
+| `onRestore` | `(revisionId, revisionNumber) => void \| Promise<void>` | No | Read only |
+| `className` | `string` | No | — |
+
+```tsx
+import { RevisionHistory } from "@puzzle-ui/pieces";
+
+<RevisionHistory
+  revisions={revisions}
+  currentRevisionNumber={entry.revisionNumber}
+  onRestore={(revisionId) => cmsClient.restoreRevision(entry.id, revisionId, entry.revision)}
+/>;
+```
+
+The comparison is shown when the revision identified by `currentRevisionNumber` is included in `revisions`; fetch it alongside any historical page you want to compare. It shows added, removed, and changed top-level fields, including nested values, but does not compare metadata such as status or slug. Set `confirmRestore` to ask before requesting a restore. The active revision cannot be restored. Callback failures are announced to the user. Restoring a historical revision must create a new immutable revision rather than overwrite history.
+
+## Related
+
+- [CMS revision and restore behavior](/docs/cms)
+- [ContentEditor](/docs/pieces/components/content-editor)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

@@ -1,0 +1,61 @@
+---
+title: React Video Upload Component
+description: Preview video metadata and posters, then connect a resumable upload client with pause, resume, cancel, retry, progress, and server-processing states.
+---
+
+import { Badge, Preview, Section, VideoUpload } from "@puzzle-ui/ui";
+import { VideoUploadExample } from "../../../../src/components/doc-examples/ui/media-uploads";
+
+<Badge content="Beta" color="info" /> **API maturity: Beta.** This component is new and may evolve as its usage is validated.
+
+`VideoUpload` composes the generic [`FileUpload`](/docs/ui/forms/file-upload) selection and validation behavior with browser metadata and poster helpers from `@puzzle-ui/media/browser`. It does not transcode in the browser or contain server, router, storage, or transport code.
+
+## Inject a resumable upload action
+
+The component reads duration, dimensions, aspect ratio, MIME type, and browser playback support, and generates a local poster preview. No upload starts unless you provide `onUpload`. The handler receives the source file plus an abort signal, metadata, poster, progress callback, and a server-status callback. Return a session with a `done` promise and any resumable controls your transport supports.
+
+<Preview
+  align="start"
+  hideDevices
+  code={`\
+<VideoUpload
+  maxFileSize={250 * 1024 * 1024}
+  maxDurationSeconds={15 * 60}
+  onUpload={(file, { signal, onProgress, onStatusChange }) =>
+    resumableClient.start(file, {
+      signal,
+      onProgress,
+      onStatusChange,
+    })
+  }
+/>\
+`}
+>
+  <Section>
+    <VideoUploadExample />
+  </Section>
+</Preview>
+
+Resolving the session's `done` promise changes the upload state to `uploaded`; it does not claim that server processing is complete. Call `onStatusChange("processing")`, then `"ready"` when the backend reports completion, or `"failed"` with a message. The component presents distinct `uploading`, `uploaded`, `processing`, `ready`, and `failed` states. Pause, resume, and cancel buttons appear when supported by the returned session. A failed or cancelled item can be retried.
+
+The example simulates a resumable client locally; it does not send files. Do not treat the browser metadata or poster as a security validation result. Enforce file policies again on your server.
+
+## Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `accept` | `readonly string[]` | `["video/*"]` | Accepted MIME types. |
+| `multiple` | `boolean` | `false` | Allow selecting multiple videos. |
+| `maxFiles` | `number` | — | Maximum selected video count in multiple mode. |
+| `maxFileSize` | `number` | — | Maximum source size in bytes per video. |
+| `maxTotalSize` | `number` | — | Maximum combined selected size in bytes. |
+| `maxDurationSeconds` | `number` | — | Reject videos longer than this duration. |
+| `posterOptions` | `VideoUploadProps["posterOptions"]` | Maximum `640 × 360`, JPEG | Configure local poster dimensions, encoding, and frame time. |
+| `onUpload` | `VideoUploadHandler` | — | Inject a resumable upload action and return `{ done, pause?, resume?, cancel? }`. |
+| `onChange` | `(files: File[]) => void` | — | Called when selection changes. |
+| `onProgress` | `(file, progress) => void` | — | Called with upload progress from `0` to `100`. |
+| `onStatusChange` | `(file, status) => void` | — | Called when upload or server-processing state changes. |
+
+The injected context contains the source `VideoMetadata`, generated `VideoPosterResult`, `AbortSignal`, progress callback, and server status callback. The `VideoUploadStatus`, `VideoUploadSession`, `VideoUploadHandler`, and related types are exported from `@puzzle-ui/ui`. Other selection and validation props follow [`FileUploadProps`](/docs/ui/forms/file-upload#props).
+
+Importing the component does not access browser globals. Metadata and poster APIs run only after a user selects a video, preserving server-rendered output without requiring client-side transcoding.

@@ -85,6 +85,35 @@ runStorageMigrationConformance({
   reset: resetMigrationDatabase,
 });
 
+describe("D1 index names", () => {
+  it("supports hyphenated index names while rejecting unsafe SQL identifiers", async () => {
+    type IndexedRecord = {
+      id: string;
+      createdAt: Date;
+      updatedAt: Date;
+      revision: number;
+      tenantId: string;
+      slug: string;
+    };
+    const adapter = new D1StorageAdapter({ database: storageDatabase });
+    const definition = {
+      name: "index_name_test",
+      indexes: [{ name: "by-tenant-slug", fields: ["tenantId", "slug"] as const, unique: true }],
+    };
+    await adapter.registerCollection<IndexedRecord>(definition);
+    await adapter.registerCollection<IndexedRecord>(definition);
+    const first = { id: "first", tenantId: "tenant-a", slug: "hello" };
+    const duplicate = { id: "second", tenantId: "tenant-a", slug: "hello" };
+    await adapter.insert<IndexedRecord>(definition.name, first);
+    await expect(adapter.insert<IndexedRecord>(definition.name, duplicate)).rejects.toThrow();
+    await expect(adapter.registerCollection<IndexedRecord>({
+      name: definition.name,
+      indexes: [{ name: 'bad"; DROP TABLE test;--', fields: ["slug"] }],
+    })).rejects.toThrow("Invalid SQL identifier");
+    expect(await adapter.findById<IndexedRecord>(definition.name, "first")).not.toBeNull();
+  });
+});
+
 describe("D1 migration-specific conformance", () => {
   it("orders migrations, honors target versions, and skips completed work", async () => {
     await resetMigrationDatabase();

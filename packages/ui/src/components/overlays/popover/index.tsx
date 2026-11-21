@@ -17,7 +17,7 @@ import {
   type RefObject,
 } from "react";
 import { cn } from "@puzzle-ui/core";
-import { Popout, type PopoutAlignment, type PopoutPosition } from "../popout";
+import { Popout, usePopoutContains, type PopoutAlignment, type PopoutPosition } from "../popout";
 import "./popover.css";
 
 type PopoverTriggerProps = HTMLAttributes<HTMLElement> &
@@ -105,6 +105,7 @@ const PopoverContent = ({
   className,
 }: PopoverContentProps) => {
   const titleId = `${id}-title`;
+  const containsNestedPopout = usePopoutContains();
 
   // Popout keeps the surface `visibility: hidden` until it is positioned, and
   // hidden elements cannot receive focus; retry once the surface is revealed.
@@ -143,6 +144,7 @@ const PopoverContent = ({
     if (
       next &&
       !event.currentTarget.contains(next) &&
+      !containsNestedPopout(next) &&
       !anchorRef.current?.contains(next)
     ) {
       onClose();
@@ -251,7 +253,7 @@ const Popover = ({
       anchorRef.current = node;
       setRef(trigger.props.ref, node);
     },
-    [trigger],
+    [trigger.props.ref],
   );
 
   // Tab from the trigger moves into the open popover instead of skipping it.

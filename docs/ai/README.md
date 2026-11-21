@@ -12,6 +12,7 @@ not replace package documentation or duplicate package instructions.
 | Trace package dependencies or change a shared contract | [Dependency map](./architecture/dependency-map.md), [cross-package workflow](./workflows/cross-package-changes.md) |
 | Choose a Piece, UI component, or custom React | [Component selection](./reference/component-selection.md) |
 | Model data or add persistence | [Data architecture](./reference/data-architecture.md), [database integration](./workflows/database-integration.md) |
+| Work on CMS content or media assets | [Package map](./architecture/package-map.md), [data architecture](./reference/data-architecture.md), [CMS package instructions](../../packages/cms/AGENTS.md), [media package instructions](../../packages/media/AGENTS.md) |
 | Choose a framework integration | [Framework overview](./frameworks/overview.md), [compatibility matrix](./frameworks/compatibility.md) |
 | Develop or validate a component/package | [Component workflow](./workflows/component-development.md), [package workflow](./workflows/package-development.md), [testing strategy](./reference/testing-strategy.md) |
 | Review component maturity or registry data | [API stability audit](../api-stability-audit.md), [component registry](./registry/README.md) |

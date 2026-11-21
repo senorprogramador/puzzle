@@ -5,6 +5,21 @@ import { userEvent } from "vitest/browser";
 import { DatePicker } from "./index";
 
 describe("DatePicker (browser)", () => {
+  it("focuses the nearest available day when initially open", async () => {
+    render(
+      <DatePicker
+        label="Appointment"
+        locale="en-GB"
+        defaultOpen
+        defaultValue={new Date(2025, 2, 14)}
+        disabledDates={[new Date(2025, 2, 14)]}
+      />,
+    );
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Saturday, 15 March 2025" })).toHaveFocus();
+    });
+  });
+
   it("opens from the keyboard, skips unavailable days, and returns focus after selection", async () => {
     const onChange = vi.fn();
 

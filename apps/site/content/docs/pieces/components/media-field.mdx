@@ -1,0 +1,78 @@
+---
+title: MediaField
+description: Use an accessible media picker as a form field whose value is a caller-owned asset ID.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { MediaFieldExample } from "../../../../src/components/doc-examples/pieces/media-workflows";
+import { MediaField } from "@puzzle-ui/pieces";
+
+`MediaField` presents a selected asset preview and a button that opens `AssetPickerDialog`. Its form value is the selected asset ID, never a storage key or preview URL.
+
+<Preview fit="device" code={`<MediaField label="Feature image" value={assetId} onChange={setAssetId} libraryProps={{ assets, folders }} />`}>
+  <MediaFieldExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `label` | `ReactNode` | Yes | — |
+| `onChange` | `(assetId: string \| null) => void` | Yes | — |
+| `libraryProps` | `MediaLibraryPropsForPicker` | Yes | — |
+| `value` | `string \| null` | No | `null` |
+| `asset` | `MediaLibraryAsset \| null` | No | Resolve from supplied assets |
+| `onSaveAsset` | `(assetId: string, patch: MediaLibraryMetadataPatch) => void \| Promise<void>` | No | — |
+| `allowedKinds` | `readonly MediaLibraryAssetKind[]` | No | All kinds |
+| `description` / `error` | `ReactNode` | No | — |
+| `required` / `requiredMessage` | `boolean` / `string` | No | `false` / `"Choose an asset."` |
+| `disabled` / `readOnly` | `boolean` | No | `false` |
+| `name` / `id` | `string` | No | Generated `id` |
+
+```tsx
+import { MediaField } from "@puzzle-ui/pieces";
+
+<MediaField
+  label="Feature image"
+  description="Choose one image for this page."
+  value={assetId}
+  onChange={setAssetId}
+  required
+  allowedKinds={["image"]}
+  libraryProps={{ assets, folders }}
+/>;
+```
+
+## Validation and accessibility
+
+The field exposes a labeled group, an associated description/error relationship, `aria-invalid`, required state, and a hidden named form input containing the asset ID. Use `error` for application validation; `requiredMessage` provides local required feedback when the value is empty. `disabled` disables the form value and picker actions. `readOnly` keeps the value but prevents changes and removal.
+
+When an image is selected and `onSaveAsset` is supplied, the field also exposes an inline details editor for metadata, crop, and hotspots. An upload action that reports a created asset ID selects that ID in the field; the caller should update its supplied asset list so the preview can resolve.
+
+The picker uses UI `Dialog` or `Drawer` according to the public Theme breakpoint. Its focus and Escape behavior comes from those UI overlays. The field itself uses native keyboard-operable controls and visible focus. The caller owns validation timing and form submission.
+
+## Preview URLs and theme
+
+Pass the current `asset` separately when the field's ID is not in the current `libraryProps.assets` list. Preview URLs remain caller-provided temporary authorized image/poster URLs. The field wraps the preview in UI `Image` and `MediaFrame` and uses semantic Theme tokens for its layout and controls.
+Previews use fill sizing, so asset dimensions are not required. They request unoptimized framework-image rendering; Next.js Image, for example, bypasses its optimizer for these temporary URLs.
+
+## Customization and composition
+
+Use `MediaField` for a single form reference; use `AssetPickerDialog` directly when a workflow needs multiple selection or custom confirmation. Supply caller-owned upload actions through `libraryProps.upload` when users may upload while selecting.
+
+## TypeScript example
+
+`MediaFieldExample` demonstrates a required single-image field with the caller-provided safe asset projection.
+
+## Related components
+
+- [AssetPickerDialog](/docs/pieces/components/asset-picker-dialog) for controlled single or multiple selection.
+- [MediaLibrary](/docs/pieces/components/media-library) for standalone media management.
+- [AssetDetailsPanel](/docs/pieces/components/asset-details-panel) for metadata and image editing.
+- [Media workflows overview](/docs/pieces/components/media).
+
+## API maturity
+
+API maturity: Stable.
+
+See the [framework integration guide](/docs/pieces/framework-integration) for client and SSR boundaries.

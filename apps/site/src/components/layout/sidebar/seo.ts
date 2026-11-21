@@ -1,4 +1,4 @@
-import type { TreeViewItem } from "@puzzle-ui/ui/components/navigation/tree-view";
+import type { TreeViewItem } from "./types";
 
 const folder = "/docs/seo" as const;
 

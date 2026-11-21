@@ -1,0 +1,62 @@
+---
+title: ContentEditor
+description: Edit CMS fields as controlled values and separate draft saves from publish actions.
+---
+
+import { Preview } from "@puzzle-ui/ui";
+import { ContentEditorExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
+import { ContentEditor } from "@puzzle-ui/pieces";
+
+`ContentEditor` renders controls from a `ContentTypeDefinition`, reports every change through `onChange`, and exposes separate draft and publish callbacks. Complex JSON-compatible fields use UI `JsonEditor`; supply `renderField` for application-specific media and relationship pickers.
+
+<Preview fit="device" code={`<ContentEditor contentType={articleType} value={fields} onChange={setFields} dirty={dirty} confirmDiscard onDiscard={discardChanges} onSaveDraft={saveDraft} onPublish={publish} />`}>
+  <ContentEditorExample />
+</Preview>
+
+## API
+
+| Prop | Type | Required | Default |
+|---|---|---:|---|
+| `contentType` | `ContentTypeDefinition` | Yes | — |
+| `value` | `CmsFields` | Yes | — |
+| `onChange` | `(value: CmsFields) => void` | Yes | — |
+| `validationErrors` | `Readonly<Record<string, string>>` | No | `{}` |
+| `onSaveDraft` | `() => void \| Promise<void>` | Yes | — |
+| `onPublish` | `() => void \| Promise<void>` | No | — |
+| `onDiscard` | `() => void` | No | — |
+| `onInvalidDraftChange` | `(invalid: boolean) => void` | No | — |
+| `renderField` | `(context: ContentEditorFieldContext) => ReactNode` | No | Built-in control |
+| `disabled` / `saving` / `dirty` | `boolean` | No | `false` |
+| `confirmDiscard` | `boolean` | No | `false` |
+| `warnOnUnload` | `boolean` | No | `false` |
+
+The built-in renderer handles text, slug, locale, textarea, number, boolean, date/datetime, select, multi-select, and JSON-compatible values. The `renderField` callback receives the field definition, current value, validation error, disabled state, and an `onChange` function; use it for `MediaField`, `RelationshipField`, or a specialized rich-text editor.
+
+```tsx
+import { ContentEditor } from "@puzzle-ui/pieces";
+
+<ContentEditor
+  contentType={contentType}
+  value={fields}
+  validationErrors={serverIssues}
+  onChange={setFields}
+  onSaveDraft={() => cmsClient.saveDraft(entryId, fields, revision)}
+  onPublish={() => cmsClient.publish(entryId, revision)}
+/>;
+```
+
+## Validation and state
+
+The component displays field-level errors and reports rejected save/publish callbacks as visible alerts. Built-in JSON-compatible fields propagate valid edits immediately; invalid JSON remains visible locally and blocks save and publish until corrected or discarded. Invalid JSON also counts as unsaved for the optional discard and unload warnings. Use `onInvalidDraftChange` to include that local state in host navigation guards. Custom field renderers must manage their own invalid state and guards.
+
+The component does not mark server validation as successful, auto-save, handle conflicts, or authorize publish. The `dirty` indicator is caller-controlled for valid values. Set `confirmDiscard` to confirm the discard action while dirty, and `warnOnUnload` to request the browser's native warning on reload or tab close. Browsers control the warning text and may suppress it without prior user interaction. Client-side router transitions do not fire `beforeunload`; the host must integrate its router's navigation blocker using both dirty and invalid-draft state. Keep expected revisions and policy checks in the server action.
+
+## Related
+
+- [BlockEditor](/docs/pieces/components/block-editor)
+- [MediaField](/docs/pieces/components/media-field)
+- [CMS authoring overview](/docs/pieces/components/cms)
+
+## API maturity
+
+API maturity: Stable.

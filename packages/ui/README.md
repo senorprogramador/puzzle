@@ -68,12 +68,17 @@ export const App = () => (
 | Actions      | Button, ButtonGroup, ToggleGroup                                                                              |
 | Data display | Alert, Avatar, Badge, Card, EmptyState, Image, Paper, Progress, Rating, Skeleton                              |
 | Editors      | TextEditor, TextEditorToolbar, TextRenderer                                                                   |
-| Forms        | Autocomplete, Checkbox, ColorPicker, DatePicker, FileUpload, FormField, inputs, Radio, Select, Slider, Switch |
+| Forms        | Autocomplete, Checkbox, ColorPicker, DatePicker, FileUpload, ImageUpload, VideoUpload, FormField, inputs, Radio, Select, Slider, Switch |
 | Layout       | AppBar, AspectRatio, Container, Grid, GridItem, PageLayout, ResizablePanels, ScrollArea, Section, SectionHeader, Separator, Sidebar, Stack |
 | Navigation   | Accordion, Breadcrumbs, Carousel, Link, Pagination, Tabs, TreeView                                            |
 | Overlays     | Command, ContextMenu, Dialog, Drawer, DropdownMenu, Notification, Popover, Tooltip                            |
 | Typography   | Heading, Text                                                                                                 |
 | Utilities    | Portal, Preview, ScrollLock, Transition                                                                       |
+
+`TextEditor` stores rich text in a serializable `TextDocument` and includes
+semantic nested lists, checklists, icon lists, block formatting, and an
+accessible command toolbar. See the [TextEditor guide](https://puzzle-ui.com/docs/ui/editors/text-editor)
+for the document schema, renderer, and transaction helpers.
 
 Browse every component with live examples, props, and accessibility guidance
 in the [component documentation](https://puzzle-ui.com/docs/ui).
@@ -93,3 +98,4 @@ prop of `Theme` to provide your framework's link and image components; see
 - [`@puzzle-ui/theme`](https://puzzle-ui.com/docs/theme) — design tokens and the `Theme` provider.
 - [`@puzzle-ui/icons`](https://puzzle-ui.com/docs/icons) — icon components.
 - [`@puzzle-ui/hooks`](https://puzzle-ui.com/docs/hooks) — reusable React hooks.
+- [`@puzzle-ui/media`](https://puzzle-ui.com/docs/media) — provider-neutral media contracts and SSR-safe browser image/video preparation helpers used by ImageUpload and VideoUpload.

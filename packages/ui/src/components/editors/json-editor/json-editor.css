@@ -1,0 +1,113 @@
+.puzzle-json-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--puzzle-space-2, 0.5rem);
+
+    min-width: 0;
+    width: 100%;
+
+    color: var(--puzzle-color-text);
+    font-family: inherit;
+}
+
+.puzzle-json-editor__label {
+    align-self: flex-start;
+
+    color: var(--puzzle-color-text);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    font-weight: var(--puzzle-font-weight-medium, 500);
+}
+
+.puzzle-json-editor__required {
+    color: var(--puzzle-color-danger);
+}
+
+.puzzle-json-editor__description,
+.puzzle-json-editor__error,
+.puzzle-json-editor__success {
+    margin: 0;
+    font-size: var(--puzzle-font-size-xs, 0.75rem);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+}
+
+.puzzle-json-editor__description {
+    color: var(--puzzle-color-text-muted);
+}
+
+.puzzle-json-editor__textarea {
+    box-sizing: border-box;
+
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 12rem;
+    padding: var(--puzzle-space-3, 0.75rem);
+
+    border: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+    border-radius: var(--puzzle-radius-md, 0.5rem);
+
+    color: var(--puzzle-color-text);
+    background: var(--puzzle-color-surface);
+
+    font-family: var(--puzzle-font-family-monospace, ui-monospace, monospace);
+    font-size: var(--puzzle-font-size-sm, 0.875rem);
+    line-height: var(--puzzle-font-line-height-normal, 1.5);
+    tab-size: 2;
+
+    resize: vertical;
+}
+
+.puzzle-json-editor__textarea:focus-visible {
+    outline: 2px solid var(--puzzle-color-ring);
+    outline-offset: 2px;
+}
+
+.puzzle-json-editor__textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.puzzle-json-editor__textarea[aria-invalid="true"] {
+    border-color: var(--puzzle-color-danger);
+}
+
+.puzzle-json-editor__error {
+    color: var(--puzzle-color-danger);
+}
+
+.puzzle-json-editor__success {
+    color: var(--puzzle-color-success);
+}
+
+.puzzle-json-editor__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-json-editor[data-disabled="true"] {
+    cursor: not-allowed;
+}
+
+.puzzle-json-editor[data-disabled="true"] .puzzle-json-editor__label,
+.puzzle-json-editor[data-disabled="true"] .puzzle-json-editor__description {
+    color: var(--puzzle-color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puzzle-json-editor__textarea {
+        scroll-behavior: auto;
+    }
+}
+
+@media (forced-colors: active) {
+    .puzzle-json-editor__error {
+        color: Mark;
+    }
+
+    .puzzle-json-editor__success {
+        color: CanvasText;
+    }
+}

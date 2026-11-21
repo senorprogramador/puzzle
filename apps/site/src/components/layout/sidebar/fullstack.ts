@@ -1,4 +1,4 @@
-import type { TreeViewItem } from "@puzzle-ui/ui/components/navigation/tree-view";
+import type { TreeViewItem } from "./types";
 
 const folder = "/docs/fullstack" as const;
 
@@ -35,6 +35,16 @@ export const fullstack: TreeViewItem = {
       id: "fullstack-shared",
       label: "Shared Types",
       href: `${folder}/shared`,
+    },
+    {
+      id: "fullstack-media",
+      label: "Media API",
+      href: `${folder}/media`,
+    },
+    {
+      id: "fullstack-cms",
+      label: "CMS API",
+      href: `${folder}/cms`,
     },
   ],
 } as const;

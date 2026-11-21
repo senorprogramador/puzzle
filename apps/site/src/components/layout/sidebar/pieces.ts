@@ -1,4 +1,4 @@
-import { TreeViewItem } from "@puzzle-ui/ui";
+import type { TreeViewItem } from "./types";
 
 const folder = "/docs/pieces" as const;
 //#region Components
@@ -168,6 +168,16 @@ const components: TreeViewItem = {
           id: "pieces-restaurant-menu",
           label: "Restaurant Menu",
           href: `${componentsFolder}/restaurant-menu`,
+        },
+        {
+          id: "pieces-dish-card",
+          label: "Dish Card",
+          href: `${componentsFolder}/dish-card`,
+        },
+        {
+          id: "pieces-dietary-information",
+          label: "Dietary Information",
+          href: `${componentsFolder}/dietary-information`,
         },
         {
           id: "pieces-table-reservation",
@@ -354,11 +364,159 @@ const components: TreeViewItem = {
       id: "pieces-application-dashboard",
       label: "Application & Dashboard",
       href: `${componentsFolder}/application-dashboard`,
+      children: [
+        {
+          id: "pieces-dashboard",
+          label: "Dashboard",
+          href: `${componentsFolder}/dashboard`,
+        },
+        {
+          id: "pieces-activity",
+          label: "Activity",
+          href: `${componentsFolder}/activity`,
+        },
+        {
+          id: "pieces-onboarding",
+          label: "Onboarding",
+          href: `${componentsFolder}/onboarding`,
+        },
+        {
+          id: "pieces-dashboard-navigation",
+          label: "Dashboard Navigation",
+          href: `${componentsFolder}/navigation`,
+        },
+        {
+          id: "pieces-project",
+          label: "Project",
+          href: `${componentsFolder}/project`,
+        },
+        {
+          id: "pieces-data-display",
+          label: "Data Display",
+          href: `${componentsFolder}/data-display`,
+        },
+        {
+          id: "pieces-empty-state",
+          label: "Empty State",
+          href: `${componentsFolder}/empty-state`,
+        },
+        {
+          id: "pieces-settings",
+          label: "Settings",
+          href: `${componentsFolder}/settings`,
+        },
+        {
+          id: "pieces-feedback",
+          label: "Feedback",
+          href: `${componentsFolder}/feedback`,
+        },
+      ],
     },
     {
       id: "pieces-specialized-interactive",
       label: "Specialized & Interactive",
       href: `${componentsFolder}/specialized-interactive`,
+      children: [
+        {
+          id: "pieces-footer-section",
+          label: "Footer Section",
+          href: `${componentsFolder}/footer-section`,
+        },
+      ],
+    },
+    {
+      id: "pieces-media",
+      label: "Media & Asset Management",
+      href: `${componentsFolder}/media`,
+      children: [
+        {
+          id: "pieces-media-library",
+          label: "MediaLibrary",
+          href: `${componentsFolder}/media-library`,
+        },
+        {
+          id: "pieces-asset-picker-dialog",
+          label: "AssetPickerDialog",
+          href: `${componentsFolder}/asset-picker-dialog`,
+        },
+        {
+          id: "pieces-asset-details-panel",
+          label: "AssetDetailsPanel",
+          href: `${componentsFolder}/asset-details-panel`,
+        },
+        {
+          id: "pieces-media-field",
+          label: "MediaField",
+          href: `${componentsFolder}/media-field`,
+        },
+      ],
+    },
+    {
+      id: "pieces-cms",
+      label: "CMS Authoring",
+      href: `${componentsFolder}/cms`,
+      children: [
+        {
+          id: "pieces-cms-shell",
+          label: "CmsShell",
+          href: `${componentsFolder}/cms-shell`,
+        },
+        {
+          id: "pieces-content-list",
+          label: "ContentList",
+          href: `${componentsFolder}/content-list`,
+        },
+        {
+          id: "pieces-content-editor",
+          label: "ContentEditor",
+          href: `${componentsFolder}/content-editor`,
+        },
+        {
+          id: "pieces-block-editor",
+          label: "BlockEditor",
+          href: `${componentsFolder}/block-editor`,
+        },
+        {
+          id: "pieces-content-type-builder",
+          label: "ContentTypeBuilder",
+          href: `${componentsFolder}/content-type-builder`,
+        },
+        {
+          id: "pieces-localization-editor",
+          label: "LocalizationEditor",
+          href: `${componentsFolder}/localization-editor`,
+        },
+        {
+          id: "pieces-relationship-field",
+          label: "RelationshipField",
+          href: `${componentsFolder}/relationship-field`,
+        },
+        {
+          id: "pieces-revision-history",
+          label: "RevisionHistory",
+          href: `${componentsFolder}/revision-history`,
+        },
+        {
+          id: "pieces-publish-scheduler",
+          label: "PublishScheduler",
+          href: `${componentsFolder}/publish-scheduler`,
+        },
+        {
+          id: "pieces-editorial-calendar",
+          label: "EditorialCalendar",
+          href: `${componentsFolder}/editorial-calendar`,
+        },
+        {
+          id: "pieces-audit-log-viewer",
+          label: "AuditLogViewer",
+          href: `${componentsFolder}/audit-log-viewer`,
+        },
+        {
+          id: "pieces-webhook-management",
+          label: "WebhookManagement",
+          href: `${componentsFolder}/webhook-management`,
+        },
+      ],
     },
     {
       id: "pieces-framework-integration",
@@ -369,56 +527,6 @@ const components: TreeViewItem = {
       id: "pieces-hero",
       label: "Hero",
       href: `${componentsFolder}/hero`,
-    },
-    {
-      id: "pieces-footer-section",
-      label: "Footer Section",
-      href: `${componentsFolder}/footer-section`,
-    },
-    {
-      id: "pieces-dashboard",
-      label: "Dashboard",
-      href: `${componentsFolder}/dashboard`,
-    },
-    {
-      id: "pieces-activity",
-      label: "Activity",
-      href: `${componentsFolder}/activity`,
-    },
-    {
-      id: "pieces-onboarding",
-      label: "Onboarding",
-      href: `${componentsFolder}/onboarding`,
-    },
-    {
-      id: "pieces-dashboard-navigation",
-      label: "Dashboard Navigation",
-      href: `${componentsFolder}/navigation`,
-    },
-    {
-      id: "pieces-project",
-      label: "Project",
-      href: `${componentsFolder}/project`,
-    },
-    {
-      id: "pieces-data-display",
-      label: "Data Display",
-      href: `${componentsFolder}/data-display`,
-    },
-    {
-      id: "pieces-empty-state",
-      label: "Empty State",
-      href: `${componentsFolder}/empty-state`,
-    },
-    {
-      id: "pieces-settings",
-      label: "Settings",
-      href: `${componentsFolder}/settings`,
-    },
-    {
-      id: "pieces-feedback",
-      label: "Feedback",
-      href: `${componentsFolder}/feedback`,
     },
   ],
 };

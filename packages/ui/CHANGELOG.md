@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## [Unreleased]
+
+- Added image and video upload/editing controls and CMS-oriented field-array and
+  JSON editors.
+- Fixed JSON formatting so non-finite parsed values are rejected instead of
+  silently converted to `null`.
+
 ## 0.14.0 - 2026-11-20
 
 - No changes; version bumped in lockstep.

@@ -10,21 +10,24 @@ This map records direct dependency relationships among workspaces. The root [`pa
 | `apps/site` (`@puzzle-ui/site`) | `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/pieces`, `@puzzle-ui/seo`, `@puzzle-ui/theme`, `@puzzle-ui/ui` |
 | `apps/workspace-next` (`workspace-next`) | `@puzzle-ui/auth`, `@puzzle-ui/fullstack`, `@puzzle-ui/pieces`, `@puzzle-ui/session`, `@puzzle-ui/storage`, `@puzzle-ui/storage-mongodb`, `@puzzle-ui/theme`, `@puzzle-ui/ui`, `@puzzle-ui/workspace`, `@puzzle-ui/workspace-ui` |
 | `apps/workspace-tanstack` (`workspace-tanstack`) | `@puzzle-ui/auth`, `@puzzle-ui/fullstack`, `@puzzle-ui/pieces`, `@puzzle-ui/session`, `@puzzle-ui/storage`, `@puzzle-ui/storage-mongodb`, `@puzzle-ui/theme`, `@puzzle-ui/ui`, `@puzzle-ui/workspace`, `@puzzle-ui/workspace-ui` |
+| `apps/workspace-react-router` (`workspace-react-router`) | `@puzzle-ui/i18n` |
 | `packages/auth` (`@puzzle-ui/auth`) | `@puzzle-ui/session`, `@puzzle-ui/storage` |
+| `packages/cms` (`@puzzle-ui/cms`) | `@puzzle-ui/storage` |
 | `packages/core` (`@puzzle-ui/core`) | None |
 | `packages/create` (`@puzzle-ui/create`) | None |
-| `packages/fullstack` (`@puzzle-ui/fullstack`) | `@puzzle-ui/auth`, `@puzzle-ui/session`, `@puzzle-ui/ui` |
+| `packages/fullstack` (`@puzzle-ui/fullstack`) | `@puzzle-ui/auth`, `@puzzle-ui/cms`, `@puzzle-ui/media`, `@puzzle-ui/session`, `@puzzle-ui/ui` |
 | `packages/hooks` (`@puzzle-ui/hooks`) | `@puzzle-ui/core` |
 | `packages/i18n` (`@puzzle-ui/i18n`) | None |
 | `packages/icons` (`@puzzle-ui/icons`) | `@puzzle-ui/core` |
-| `packages/pieces` (`@puzzle-ui/pieces`) | `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/theme`, `@puzzle-ui/ui` |
+| `packages/media` (`@puzzle-ui/media`) | `@puzzle-ui/storage` |
+| `packages/pieces` (`@puzzle-ui/pieces`) | `@puzzle-ui/cms`, `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/theme`, `@puzzle-ui/ui` |
 | `packages/seo` (`@puzzle-ui/seo`) | None |
 | `packages/session` (`@puzzle-ui/session`) | `@puzzle-ui/storage` |
 | `packages/storage` (`@puzzle-ui/storage`) | None |
 | `packages/storage-d1` (`@puzzle-ui/storage-d1`) | `@puzzle-ui/storage` |
 | `packages/storage-mongodb` (`@puzzle-ui/storage-mongodb`) | `@puzzle-ui/storage` |
 | `packages/theme` (`@puzzle-ui/theme`) | `@puzzle-ui/core` |
-| `packages/ui` (`@puzzle-ui/ui`) | `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/theme` |
+| `packages/ui` (`@puzzle-ui/ui`) | `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/media`, `@puzzle-ui/theme` |
 | `packages/workspace` (`@puzzle-ui/workspace`) | `@puzzle-ui/session`, `@puzzle-ui/storage` |
 | `packages/workspace-ui` (`@puzzle-ui/workspace-ui`) | `@puzzle-ui/fullstack`, `@puzzle-ui/pieces`, `@puzzle-ui/ui`, `@puzzle-ui/workspace` |
 

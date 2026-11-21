@@ -8,6 +8,14 @@ const resolvePath = (path: string) =>
 const resolve = {
   alias: [
     {
+      find: /^@puzzle-ui\/cms$/,
+      replacement: resolvePath("../cms/src/index.ts"),
+    },
+    {
+      find: /^@puzzle-ui\/cms\/(.+)$/,
+      replacement: resolvePath("../cms/src/$1"),
+    },
+    {
       find: /^@puzzle-ui\/core$/,
       replacement: resolvePath("../core/src/index.ts"),
     },

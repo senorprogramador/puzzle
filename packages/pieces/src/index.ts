@@ -13,3 +13,5 @@ export * from "./components/marketing";
 export * from "./components/commerce";
 export * from "./components/content";
 export * from "./components/business";
+export * from "./components/media";
+export * from "./components/cms";

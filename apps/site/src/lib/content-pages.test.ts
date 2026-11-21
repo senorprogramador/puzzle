@@ -1,7 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { getDocumentationFiles } from "./documentation-inventory";
 
 const docsDirectory = fileURLToPath(
   new URL("../../content/docs/", import.meta.url),
@@ -13,16 +14,6 @@ const landingPages = [
   "pieces/index.mdx",
   "developer/index.mdx",
 ];
-
-const getDocumentationFiles = (directory: string): string[] =>
-  readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const path = resolve(directory, entry.name);
-    return entry.isDirectory()
-      ? getDocumentationFiles(path)
-      : path.endsWith(".mdx")
-        ? [path]
-        : [];
-  });
 
 const getFrontmatter = (content: string) => {
   const frontmatter = content.match(/^---\n([\s\S]*?)\n---/);

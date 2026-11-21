@@ -32,6 +32,8 @@ await storage.registerCollection({ name: "sessions" });
 ```
 
 The default table prefix is `puzzle_`; set `tablePrefix` to change it. `D1StorageMigrationAdapter` runs explicit, versioned migrations and manages its own prefixed migration/lock tables. These are adapter-managed migrations, not Wrangler SQL migrations. Run them in deployment or startup orchestration, not on every request.
+Collection index names may contain ASCII letters, numbers, underscores, and
+hyphens; unsafe SQL identifier characters are rejected.
 
 The package exports `D1StorageAdapter`, `D1StorageMigrationAdapter`, and the D1-like binding, statement, result, and options types. See the [storage guide](https://puzzle-ui.com/docs/storage) for query and migration examples, capability details, and production guidance.
 
