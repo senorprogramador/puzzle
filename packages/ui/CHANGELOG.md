@@ -17,13 +17,6 @@ Puzzle packages are released in lockstep; versions without package changes are n
 - Fixed point-hotspot persistence and media preview sizing with framework image overrides, including Next.js.
 - Prevented retrying a single upload with an expired target.
 
-## [Unreleased]
-
-- Added image and video upload/editing controls and CMS-oriented field-array and
-  JSON editors.
-- Fixed JSON formatting so non-finite parsed values are rejected instead of
-  silently converted to `null`.
-
 ## 0.14.0 - 2026-11-20
 
 - No changes; version bumped in lockstep.

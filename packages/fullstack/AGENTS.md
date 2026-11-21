@@ -2,7 +2,7 @@
 
 ## 1. Responsibility
 
-Connects Puzzle Auth, Media, and CMS services to browser clients, server Request/Response handlers, and Next.js/TanStack Start integrations. It adapts the domain packages; it does not own authentication policy, persistence, media processing, CMS schemas, or publishing policy.
+Connects Puzzle Auth, Media, CMS, and commerce/payment services to browser clients, server Request/Response handlers, and Next.js/TanStack Start integrations. It adapts the domain packages; it does not own authentication policy, persistence, media processing, CMS schemas, publishing policy, or provider implementations.
 
 ## 2. Public API
 
@@ -23,6 +23,8 @@ There is intentionally no package-root export. Use only:
 - `@puzzle-ui/fullstack/cms/server`
 - `@puzzle-ui/fullstack/cms/next`
 - `@puzzle-ui/fullstack/cms/tanstack`
+- `@puzzle-ui/fullstack/payments/shared`
+- `@puzzle-ui/fullstack/payments/server`
 
 Verify which subpath is safe for the importing environment before adding imports.
 
@@ -43,10 +45,16 @@ with trusted actor/tenant context, explicit access policy, and a scheduler;
 public endpoints expose only published snapshots while admin endpoints remain
 authorized and uncached.
 
+`src/payments/shared/` contains serializable payment API contracts;
+`src/payments/server/` orchestrates trusted order resolution, provider
+operations, idempotency, refunds, and webhook processing. Payment APIs are
+server-only and delegate provider behavior to `@puzzle-ui/commerce` adapters.
+
 ## 4. Dependencies
 
 Runtime dependencies are `@puzzle-ui/ui`, `@puzzle-ui/auth`,
-`@puzzle-ui/media`, `@puzzle-ui/cms`, `@puzzle-ui/session`, and
+`@puzzle-ui/media`, `@puzzle-ui/cms`, `@puzzle-ui/commerce`,
+`@puzzle-ui/session`, and
 `@simplewebauthn/browser`. React
 19 and React DOM 19 are peers. Next.js 15/16 and TanStack Start 1.x are
 optional peers for their adapters; do not make them required for
@@ -81,7 +89,7 @@ dispatch in its adapter subpath.
 
 ## 6. Testing
 
-Node tests cover auth, media, and CMS client/server routes, authorization,
+Node tests cover auth, media, CMS, and payment client/server routes, authorization,
 tenant isolation, upload replay/expiry, pause/resume, quota/rate-limit,
 readiness, cleanup, deletion guards, publishing, and export boundaries.
 Browser tests use Vitest with Chromium/Playwright for the auth
@@ -118,6 +126,7 @@ and the [developer authentication guide](../../apps/site/content/docs/developer/
 
 ## 10. Context-efficient workflow
 
-Inspect the target `src/auth/<area>/index.ts` or `src/media/<area>/index.ts`,
-then its implementation and boundary tests. Read `tsdown.config.ts` before
-changing entry points; it builds each supported subpath separately.
+Inspect the target `src/auth/<area>/index.ts`, `src/media/<area>/index.ts`,
+`src/cms/<area>/index.ts`, or `src/payments/<area>/index.ts`, then its
+implementation and boundary tests. Read `tsdown.config.ts` before changing
+entry points; it builds each supported subpath separately.

@@ -11,11 +11,6 @@ Puzzle packages are released in lockstep; versions without package changes are n
 
 - Fixed registration of hyphenated index names without relaxing validation of table and other SQL identifiers.
 
-## [Unreleased]
-
-- Allow hyphens in index names without relaxing validation of table and other
-  SQL identifiers.
-
 ## 0.14.0 - 2026-11-20
 
 - No changes; version bumped in lockstep.

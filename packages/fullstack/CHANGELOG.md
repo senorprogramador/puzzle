@@ -15,16 +15,6 @@ Puzzle packages are released in lockstep; versions without package changes are n
 - Added an opt-in completed-upload content verification callback so a host content inspector can run before an asset is created.
 - Fixed guarded permanent deletion for soft-deleted media assets and prevented single-upload retries from using expired targets.
 
-## [Unreleased]
-
-- Added workspace-only CMS and Media client/server, Next.js, and TanStack
-  integrations with tenant authorization and sanitized contracts.
-- Added optional CMS webhook administration and Media audit callbacks; hosts
-  must provide policies, audit storage, and a safe webhook transport.
-- Added an opt-in completed-upload content verification callback and prevented
-  single-upload retries from using expired targets.
-- Fixed guarded permanent deletion for soft-deleted media assets.
-
 ## 0.14.0 - 2026-11-20
 
 - No changes; version bumped in lockstep.

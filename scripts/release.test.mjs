@@ -54,9 +54,9 @@ const createFixture = async (directory) => {
   });
   assert.equal(initial.status, 0, initial.stderr);
   originals["bun.lock"] = await readFile(join(directory, "bun.lock"), "utf8");
-  originals["packages/core/CHANGELOG.md"] = "# Changelog\n\nCore history.\n\n## Unreleased\n\n- Added a helper.\n\n## 0.4.0 - 2026-11-09\n\n- Previous changes.\n";
+  originals["packages/core/CHANGELOG.md"] = "# Changelog\n\nCore history.\n\n## Pending\n\n- Added a helper.\n\n## 0.4.0 - 2026-11-09\n\n- Previous changes.\n";
   await writeFile(join(directory, "packages/core/CHANGELOG.md"), originals["packages/core/CHANGELOG.md"]);
-  originals["CHANGELOG.md"] = "# Changelog\n\nRoot history.\n\n## [Unreleased]\n\n### Added\n\n- A monorepo change.\n\n## 0.4.0 - 2026-11-09\n\n- Previous root changes.\n";
+  originals["CHANGELOG.md"] = "# Changelog\n\nRoot history.\n\n## [Pending]\n\n### Added\n\n- A monorepo change.\n\n## 0.4.0 - 2026-11-09\n\n- Previous root changes.\n";
   await writeFile(join(directory, "CHANGELOG.md"), originals["CHANGELOG.md"]);
   await writeFile(join(directory, "originals.json"), JSON.stringify(originals));
 
@@ -172,7 +172,7 @@ if (command === "script") {
   }));
   if (process.env.FAIL_STEP === "missing-package") notes.pop();
   if (process.env.FAIL_STEP === "duplicate-package") notes.push(notes[0]);
-  if (process.env.FAIL_STEP === "omitted-unreleased") notes[0].changes = [];
+  if (process.env.FAIL_STEP === "omitted-pending") notes[0].changes = [];
   if (process.env.FAIL_STEP === "multiline-note") notes[0].changes = ["Added a helper.\\n## Invalid heading"];
   console.log(JSON.stringify(notes));
 } else {
@@ -479,7 +479,7 @@ for (const failure of [undefined, "--lockfile-only", "--frozen-lockfile"]) {
 for (const failure of [
   undefined, "baseline", "ai-check", "copilot", "invalid-json", "missing-package",
   "duplicate-package", "commit", "push", "publish", "tag",
-  "omitted-unreleased", "multiline-note", "duplicate-root",
+  "omitted-pending", "multiline-note", "duplicate-root",
 ]) {
   test(`release ${failure ? `stops safely after ${failure} failure` : "pushes all changelogs before publishing and tags afterwards"}`, async () => {
     const directory = await mkdtemp(join(tmpdir(), "puzzle-release-test-"));
@@ -513,12 +513,12 @@ for (const failure of [
       if (committed) {
         const core = await readFile(join(directory, "packages/core/CHANGELOG.md"), "utf8");
         assert.match(core, /## 0\.5\.0 - \d{4}-\d{2}-\d{2}\n\n- Added a helper\./);
-        assert.doesNotMatch(core, /## Unreleased/);
+        assert.doesNotMatch(core, /## Pending/);
         assert.match(core, /## 0\.4\.0 - 2026-11-09\n\n- Previous changes\./);
         assert.match(await readFile(join(directory, "packages/ui/CHANGELOG.md"), "utf8"),
           /- No changes; version bumped in lockstep\./);
         const rootChangelog = await readFile(join(directory, "CHANGELOG.md"), "utf8");
-        assert.match(rootChangelog, /## \[Unreleased\]\n\n### Added\n\n- A monorepo change\.\n\n## 0\.5\.0 - \d{4}-\d{2}-\d{2}/);
+        assert.match(rootChangelog, /## \[Pending\]\n\n### Added\n\n- A monorepo change\.\n\n## 0\.5\.0 - \d{4}-\d{2}-\d{2}/);
         assert.match(rootChangelog, /### `@puzzle-ui\/core`\n\n- Added a helper\./);
         assert.match(rootChangelog, /### `@puzzle-ui\/theme`\n\n- Updated the theme\./);
         assert.doesNotMatch(rootChangelog, /### `@puzzle-ui\/ui`/);

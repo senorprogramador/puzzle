@@ -122,7 +122,7 @@ try {
     ["react", site], ["react-dom", site], ["@types", site],
   ]);
   const nodeModules = join(work, "node_modules");
-  for (const name of ["seo", "auth", "session", "storage", "storage-d1",
+  for (const name of ["seo", "auth", "session", "storage", "storage-d1", "media",
     "storage-mongodb", "fullstack", "theme", "ui", "core", "hooks", "icons"]) {
     const directory = join(root, "packages", name);
     const manifest: {

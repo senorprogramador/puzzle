@@ -83,6 +83,8 @@ They are pre-1.0; check each package's documentation before adopting it.
 | Package                                                                                  | Availability | Purpose                                                           | Install                                            | Documentation                                                 |
 | ---------------------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------- |
 | [`@puzzle-ui/core`](https://www.npmjs.com/package/@puzzle-ui/core)                       | npm          | Framework-independent shared utilities                            | `npm install @puzzle-ui/core`                      | [Getting started](https://puzzle-ui.com/docs/getting-started) |
+| [`@puzzle-ui/commerce`](https://www.npmjs.com/package/@puzzle-ui/commerce)             | npm          | Provider-independent commerce and payment contracts              | `npm install @puzzle-ui/commerce`                  | [Commerce](https://puzzle-ui.com/docs/commerce)               |
+| [`@puzzle-ui/cms`](https://www.npmjs.com/package/@puzzle-ui/cms)                       | npm          | Framework-neutral content schemas and publishing services        | `npm install @puzzle-ui/cms`                       | [CMS](https://puzzle-ui.com/docs/cms)                         |
 | [`@puzzle-ui/hooks`](https://www.npmjs.com/package/@puzzle-ui/hooks)                     | npm          | Reusable React hooks                                              | `npm install @puzzle-ui/hooks`                     | [Hooks](https://puzzle-ui.com/docs/hooks)                     |
 | [`@puzzle-ui/icons`](https://www.npmjs.com/package/@puzzle-ui/icons)                     | npm          | Iconify-powered React SVG icons                                   | `npm install @puzzle-ui/icons`                     | [Icons](https://puzzle-ui.com/docs/icons)                     |
 | [`@puzzle-ui/theme`](https://www.npmjs.com/package/@puzzle-ui/theme)                     | npm          | Theme provider, tokens, colors, and typography                    | `npm install @puzzle-ui/theme`                     | [Theme](https://puzzle-ui.com/docs/theme)                     |
@@ -94,18 +96,16 @@ They are pre-1.0; check each package's documentation before adopting it.
 | [`@puzzle-ui/storage`](https://www.npmjs.com/package/@puzzle-ui/storage)                 | npm          | Storage contracts for authentication and sessions                 | `npm install @puzzle-ui/storage`                   | [Storage](https://puzzle-ui.com/docs/storage)                 |
 | [`@puzzle-ui/storage-d1`](https://www.npmjs.com/package/@puzzle-ui/storage-d1)           | npm          | Cloudflare D1 storage adapter                                     | `npm install @puzzle-ui/storage-d1`                | [Storage](https://puzzle-ui.com/docs/storage)                 |
 | [`@puzzle-ui/storage-mongodb`](https://www.npmjs.com/package/@puzzle-ui/storage-mongodb) | npm          | MongoDB storage adapter                                           | `npm install @puzzle-ui/storage-mongodb`           | [Storage](https://puzzle-ui.com/docs/storage)                 |
+| [`@puzzle-ui/media`](https://www.npmjs.com/package/@puzzle-ui/media)                   | npm          | Provider-neutral media and object-storage contracts              | `npm install @puzzle-ui/media`                     | [Media](https://puzzle-ui.com/docs/media)                     |
 | [`@puzzle-ui/fullstack`](https://www.npmjs.com/package/@puzzle-ui/fullstack)             | npm          | Auth, Media, and CMS clients, server handlers, and adapters      | `npm install @puzzle-ui/fullstack react react-dom` | [Fullstack](https://puzzle-ui.com/docs/fullstack)             |
 | [`@puzzle-ui/i18n`](https://www.npmjs.com/package/@puzzle-ui/i18n)                       | npm          | Multilingual runtime, tooling, React bindings, and framework adapters | `npm install @puzzle-ui/i18n`                  | [Multilingual](https://puzzle-ui.com/docs/multilingual)       |
+| [`@puzzle-ui/payment-providers`](https://www.npmjs.com/package/@puzzle-ui/payment-providers) | stage tag | Server-only payment provider adapters                         | `npm install @puzzle-ui/payment-providers`          | [Payment providers](https://puzzle-ui.com/docs/payment-providers) |
 | [`@puzzle-ui/create`](https://www.npmjs.com/package/@puzzle-ui/create)                   | npm          | Interactive React project generator                               | `npx @puzzle-ui/create`                          | [Create a project](https://puzzle-ui.com/docs/create)         |
 
-### Workspace packages in development
-
-`@puzzle-ui/media` and `@puzzle-ui/cms` are implemented as workspace packages
-but are not published to npm yet. See the [Media](https://puzzle-ui.com/docs/media)
-and [CMS](https://puzzle-ui.com/docs/cms) guides for their current repository
-APIs; external applications can install them after a release. The new
-`@puzzle-ui/fullstack/media/*` and `/cms/*` subpaths also await a Fullstack
-release.
+The repository may be ahead of the version currently tagged on npm. Check the
+package's npm page before installing a feature introduced after the published
+version. `@puzzle-ui/payment-providers` is currently published under a stage
+tag rather than as a stable release.
 
 The repository also contains the [documentation site](apps/site) and a
 [Storybook playground](apps/playground). See the

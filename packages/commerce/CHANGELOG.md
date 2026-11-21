@@ -12,9 +12,3 @@ noted as such.
 
 - Added safe minor-unit money and currency utilities.
 - Added provider-independent order, payment, refund, booking, capability, idempotency, and webhook contracts.
-
-## [Unreleased]
-
-- Added safe minor-unit money and currency utilities.
-- Added provider-independent order, payment, refund, booking, capability,
-  idempotency, and webhook contracts.

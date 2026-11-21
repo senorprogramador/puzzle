@@ -216,7 +216,7 @@ After validation, Copilot reads the files changed since the current version's
 release tag (`v<current-version>`) and returns release notes for every package.
 Fetch that tag before releasing; it must be an ancestor of HEAD.
 The script prepends a dated version entry to each package's `CHANGELOG.md`,
-incorporates any Unreleased notes, and preserves previous release history.
+incorporates any pending package notes, and preserves previous release history.
 Packages without substantive changes receive a lockstep version-bump note.
 Invalid or incomplete Copilot output stops the release before publishing.
 

@@ -56,6 +56,6 @@ The example simulates a resumable client locally; it does not send files. Do not
 | `onProgress` | `(file, progress) => void` | — | Called with upload progress from `0` to `100`. |
 | `onStatusChange` | `(file, status) => void` | — | Called when upload or server-processing state changes. |
 
-The injected context contains the source `VideoMetadata`, generated `VideoPosterResult`, `AbortSignal`, progress callback, and server status callback. The `VideoUploadStatus`, `VideoUploadSession`, `VideoUploadHandler`, and related types are exported from `@puzzle-ui/ui`. Other selection and validation props follow [`FileUploadProps`](/docs/ui/forms/file-upload#props).
+The injected context contains the source `VideoMetadata`, generated `VideoPosterResult`, `AbortSignal`, progress callback, and server status callback. The `VideoUploadStatus`, `VideoUploadSession`, `VideoUploadHandler`, and related types are exported from `@puzzle-ui/ui`. Other selection and validation props follow [`FileUploadProps`](/docs/ui/forms/file-upload#api).
 
 Importing the component does not access browser globals. Metadata and poster APIs run only after a user selects a video, preserving server-rendered output without requiring client-side transcoding.

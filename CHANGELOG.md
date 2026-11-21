@@ -4,32 +4,6 @@ All notable changes to Puzzle packages are documented in this file. Packages
 are released in lockstep; packages without changes are omitted from each release.
 Individual package changelogs contain their own history.
 
-## [Unreleased]
-
-### Added
-
-- Added the pre-release `@puzzle-ui/i18n` package with typed translations,
-  React bindings, localized routing and SEO, compiler/type generation,
-  catalog/content sources, framework adapters, and review workflows.
-- Added workspace-only Media and CMS domains, Fullstack media/CMS integrations,
-  media and authoring UI, and opt-in CMS webhook delivery and Media audit
-  storage. Hosts provide storage, policies, workers, and safe transports.
-
-### Changed
-
-- `ImageBox` can request unoptimized rendering from configured framework image
-  components. Media previews use this for caller-authorized temporary URLs.
-- Fullstack Media can invoke a host content inspector before creating an asset.
-
-### Fixed
-
-- Fixed guarded permanent deletion of soft-deleted media, non-finite JSON draft
-  handling, and D1 registration of hyphenated index names.
-- Fixed point-hotspot persistence and media preview sizing with framework image
-  overrides, including Next.js.
-- Prevented retrying a single upload with an expired target.
-- Fixed the package release order to include CMS and Media before their consumers.
-
 ### Deprecated
 
 ### Removed

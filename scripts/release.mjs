@@ -280,11 +280,11 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
     `Prepare changelog notes for Puzzle ${version}, released on ${date}.`,
     `The last release is ${baseline}; review git diff ${range} and git log ${range}.`,
     "Read every changed file that still exists, and inspect the diff for deleted files.",
-    "Read each package's existing CHANGELOG.md if present, including Unreleased notes.",
+    "Read each package's existing CHANGELOG.md if present, including Pending notes.",
     "Do not modify files or run commands other than git diff and git log.",
     "Summarize meaningful user-facing changes per package, including relevant shared changes.",
     "Exclude version/dependency bumps, lockfile churn, and changelog-only edits.",
-    "Include existing Unreleased notes in the new release without duplicating them.",
+    "Include existing Pending notes in the new release without duplicating them.",
     "Use an empty changes array if a package has no substantive changes.",
     "Return ONLY raw JSON (no Markdown code fences or prose): an array with exactly one object per package,",
     '{"package":"@puzzle-ui/core","changes":["Added ...","Fixed ..."]}.',
@@ -356,7 +356,7 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
   if (rootHeadings.some((heading) => heading[1].split(" - ")[0].replace(/^\[|\]$/g, "") === version)) {
     fail(`Root changelog already has an entry for ${version}.`);
   }
-  const firstRelease = rootHeadings.find((heading) => !/^\[?Unreleased\]?$/i.test(heading[1]));
+  const firstRelease = rootHeadings.find((heading) => !/^\[?Pending\]?$/i.test(heading[1]));
   const rootIntro = firstRelease ? rootContent.slice(0, firstRelease.index) : rootContent;
   const rootHistory = firstRelease ? rootContent.slice(firstRelease.index) : "";
   const formatChanges = (changes) => changes.length
@@ -374,16 +374,16 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
     }
     const first = headings[0];
     const intro = first ? content.slice(0, first.index) : content;
-    const unreleased = first && /^Unreleased$/i.test(first[1]);
+    const pending = first && /^Pending$/i.test(first[1]);
     const history = first
-      ? content.slice(unreleased ? (headings[1]?.index ?? content.length) : first.index)
+      ? content.slice(pending ? (headings[1]?.index ?? content.length) : first.index)
       : "";
     const changes = byPackage.get(manifest.name);
     if (
-      unreleased && changes.length === 0 &&
+      pending && changes.length === 0 &&
       content.slice(first.index + first[0].length, headings[1]?.index).trim()
     ) {
-      fail(`Copilot omitted Unreleased notes for ${manifest.name}.`);
+      fail(`Copilot omitted Pending notes for ${manifest.name}.`);
     }
     const bullets = formatChanges(changes);
     writeFileSync(path, `${intro.trimEnd()}\n\n## ${version} - ${date}\n\n${bullets}\n${history ? `\n${history}` : ""}`);

@@ -73,7 +73,7 @@ jobs:
         run: bun run --filter '@puzzle-ui/create' ai:check
 
       - name: Typecheck workspace
-        run: bun run typecheck
+        run: bun run typecheck:only
 
       - name: Install Playwright browser
         run: bunx playwright install --with-deps chromium

@@ -75,6 +75,6 @@ Each item reports `processing`, `uploading`, `ready`, `uploaded`, `failed`, or `
 | `onCropChange` | `(file, crop) => void` | — | Receives normalized crop changes. |
 | `onHotspotsChange` | `(file, value) => void` | — | Receives normalized focal point and hotspot changes. |
 
-Other selection, validation, accessibility, and presentation props follow [`FileUploadProps`](/docs/ui/forms/file-upload#props). The public types `ImageUploadProps`, `ImageUploadResult`, `ImageUploadContext`, `ImageUploadHandler`, and `ImageUploadStatus` are exported from `@puzzle-ui/ui`.
+Other selection, validation, accessibility, and presentation props follow [`FileUploadProps`](/docs/ui/forms/file-upload#api). The public types `ImageUploadProps`, `ImageUploadResult`, `ImageUploadContext`, `ImageUploadHandler`, and `ImageUploadStatus` are exported from `@puzzle-ui/ui`.
 
 The browser helpers are used only after a user selects an image. Importing the UI package remains SSR-safe; do not call browser processing helpers during server rendering.
