@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/fullstack` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.17.0 - 2026-11-22
+
+- Added `@puzzle-ui/fullstack/payments/shared` and `@puzzle-ui/fullstack/payments/server` for serializable payment contracts and server-only order resolution, provider operations, idempotency, refunds, and webhook handling built on `@puzzle-ui/commerce`.
+- Documented the Auth, Media, CMS, and Payments subpaths as published; there is still no package-root export.
+
 ## 0.16.0 - 2026-11-21
 
 - No changes; version bumped in lockstep.

@@ -10,6 +10,34 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.17.0 - 2026-11-22
+
+### `@puzzle-ui/media-cloudflare`
+
+- Added Cloudflare R2 object-storage adapters with single and multipart uploads, size/SHA-256 verification, idempotent completion, abort and delete cleanup, cursor listing, tenant-prefixed keys, and short-lived read/part targets backed by a metadata store.
+- Added Worker-compatible S3 presigning for R2 through `CloudflareR2S3UrlSigner`, per-tenant bucket and signer resolvers, an in-memory metadata store for tests and local development, and a bucket provisioner (`CloudflareR2BucketProvisioner`) built on a narrow `getBucket`/`createBucket` interface.
+- Added `CloudflareImagesProcessor`, which implements the Puzzle `MediaProcessor` contract on top of the Cloudflare Images binding.
+
+### `@puzzle-ui/ui`
+
+- Added `DateRangePicker`, an accessible popover date-range control with controlled and uncontrolled values, min/max and disabled-date rules, range validation, one or two visible months, locale and week-start options, custom day content, clearing, and form field names.
+- Added `SortableTree`, an accessible hierarchical list with drag-and-drop and keyboard reordering, depth and move constraints, single or multiple selection, expand/collapse state, custom item rendering, and screen-reader move announcements.
+
+### `@puzzle-ui/pieces`
+
+- Added `SiteHeader` with default, transparent, overlay, minimal, and centered variants, nested navigation, primary and secondary actions, sticky/scrolled states, and a mobile menu.
+- Added `LocaleSwitcher` for caller-supplied language destinations, with dropdown, inline, and compact presentations.
+- Added `ContactForm` with configurable text, email, phone, textarea, select, and checkbox fields, consent and privacy-link support, honeypot spam protection, and loading, error, and success states, leaving submission and validation to the application.
+- Added `AvailabilityCalendar` for caller-supplied day-level accommodation availability, with stay-range selection, minimum/maximum nights, one or two months, status legends, and per-day prices.
+- Added `AvailabilityManager`, a resource-by-day availability grid with single, range, and multiple selection, bulk status and minor-unit price edits, and customizable slots for application-owned editors.
+- Updated the Boutique B&B reference page and hospitality booking flow to use the new site header, availability calendar, and contact form.
+- The number of stable canonical Pieces component APIs is now 132.
+
+### `@puzzle-ui/fullstack`
+
+- Added `@puzzle-ui/fullstack/payments/shared` and `@puzzle-ui/fullstack/payments/server` for serializable payment contracts and server-only order resolution, provider operations, idempotency, refunds, and webhook handling built on `@puzzle-ui/commerce`.
+- Documented the Auth, Media, CMS, and Payments subpaths as published; there is still no package-root export.
+
 ## 0.16.0 - 2026-11-21
 
 ## 0.15.0 - 2026-11-21

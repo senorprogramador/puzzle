@@ -3,6 +3,16 @@
 All notable changes to `@puzzle-ui/pieces` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.17.0 - 2026-11-22
+
+- Added `SiteHeader` with default, transparent, overlay, minimal, and centered variants, nested navigation, primary and secondary actions, sticky/scrolled states, and a mobile menu.
+- Added `LocaleSwitcher` for caller-supplied language destinations, with dropdown, inline, and compact presentations.
+- Added `ContactForm` with configurable text, email, phone, textarea, select, and checkbox fields, consent and privacy-link support, honeypot spam protection, and loading, error, and success states, leaving submission and validation to the application.
+- Added `AvailabilityCalendar` for caller-supplied day-level accommodation availability, with stay-range selection, minimum/maximum nights, one or two months, status legends, and per-day prices.
+- Added `AvailabilityManager`, a resource-by-day availability grid with single, range, and multiple selection, bulk status and minor-unit price edits, and customizable slots for application-owned editors.
+- Updated the Boutique B&B reference page and hospitality booking flow to use the new site header, availability calendar, and contact form.
+- The number of stable canonical Pieces component APIs is now 132.
+
 ## 0.16.0 - 2026-11-21
 
 - No changes; version bumped in lockstep.

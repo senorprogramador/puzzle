@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.17.0 - 2026-11-22
+
+- Added `DateRangePicker`, an accessible popover date-range control with controlled and uncontrolled values, min/max and disabled-date rules, range validation, one or two visible months, locale and week-start options, custom day content, clearing, and form field names.
+- Added `SortableTree`, an accessible hierarchical list with drag-and-drop and keyboard reordering, depth and move constraints, single or multiple selection, expand/collapse state, custom item rendering, and screen-reader move announcements.
+
 ## 0.16.0 - 2026-11-21
 
 - No changes; version bumped in lockstep.
