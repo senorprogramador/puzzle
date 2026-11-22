@@ -9,6 +9,7 @@ export * from "./host-profile-section";
 export * from "./service-options-section";
 export * from "./case-studies-section";
 export * from "./contact-section";
+export * from "./contact-form";
 export * from "./location-section";
 export * from "./opening-hours-section";
 export * from "./careers-section";

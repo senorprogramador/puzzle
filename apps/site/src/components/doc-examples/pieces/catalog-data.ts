@@ -24,6 +24,11 @@ const nonSectionPages = new Set([
   "hospitality-overview",
   "hospitality-booking-flow",
   "navigation",
+  "navigation-site-chrome",
+  "site-header",
+  "locale-switcher",
+  "availability-calendar",
+  "contact-form",
   "project",
   "restaurant-experience",
 ]);

@@ -147,6 +147,11 @@ const forms: TreeViewItem = {
       href: `${folder}/forms/date-picker`,
     },
     {
+      id: "ui-date-range-picker",
+      label: "Date Range Picker",
+      href: `${folder}/forms/date-range-picker`,
+    },
+    {
       id: "ui-field-array",
       label: "FieldArray",
       href: `${folder}/forms/field-array`,

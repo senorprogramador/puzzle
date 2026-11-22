@@ -5,6 +5,35 @@
   ],
   "components": [
     {
+      "name": "AvailabilityCalendar",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "availability-calendar",
+      "description": "Present caller-supplied accommodation availability and select a validated check-in and check-out range without owning booking or pricing services.",
+      "documentation": "apps/site/content/docs/pieces/components/availability-calendar.mdx",
+      "source": "packages/pieces/src/components/commerce/availability-calendar/availability-calendar.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "availability-calendar"
+      },
+      "aliases": []
+    },
+    {
       "name": "AvailabilitySearchSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [

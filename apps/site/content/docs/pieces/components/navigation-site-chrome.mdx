@@ -1,0 +1,26 @@
+---
+title: Navigation & Site Chrome
+description: Compose public website headers, locale choices, and caller-owned navigation actions with accessible responsive Pieces.
+---
+
+import { Button, Preview } from "@puzzle-ui/ui";
+import {
+  LocaleSwitcherExample,
+  SiteHeaderExample,
+} from "../../../../src/components/doc-examples/pieces/hospitality-new-components";
+
+Public website chrome is distinct from authenticated dashboard navigation.
+`SiteHeader` owns the responsive public shell and `LocaleSwitcher` presents
+caller-supplied localized destinations. Both remain router-independent.
+
+<Preview fit="device" code={`<SiteHeader logo={<strong>Willow & Tide</strong>} items={items} primaryAction={<Button href="/book">Book</Button>} />`}>
+  <SiteHeaderExample />
+</Preview>
+
+<Preview fit="device" code={`<LocaleSwitcher currentLocale="en" locales={locales} presentation="inline" />`}>
+  <LocaleSwitcherExample />
+</Preview>
+
+See [SiteHeader](/docs/pieces/components/site-header) and
+[LocaleSwitcher](/docs/pieces/components/locale-switcher) for public APIs,
+accessibility behavior, and application ownership boundaries.

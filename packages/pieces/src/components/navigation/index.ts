@@ -4,6 +4,8 @@ export { DashboardTopbar } from "./dashboard-topbar";
 export { DashboardUserMenu } from "./dashboard-user-menu";
 export { DashboardMobileNavigation } from "./dashboard-mobile-navigation";
 export { DashboardBreadcrumbs } from "./dashboard-breadcrumbs";
+export * from "./site-header";
+export * from "./locale-switcher";
 
 export type {
   DashboardNavigationItem,

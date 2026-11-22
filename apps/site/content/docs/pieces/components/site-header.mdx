@@ -1,0 +1,78 @@
+---
+title: SiteHeader
+description: Build an accessible public website header with caller-owned branding, navigation, actions, locale controls, dropdowns, and a responsive mobile menu.
+---
+
+import { Badge, Button, Preview } from "@puzzle-ui/ui";
+import { SiteHeaderExample } from "../../../../src/components/doc-examples/pieces/hospitality-new-components";
+
+`SiteHeader` is the public website shell from `@puzzle-ui/pieces`. It is
+separate from `DashboardNavigation`: it presents public navigation, branding,
+and actions rather than an authenticated application workspace.
+
+<Badge content="Stable" color="primary" />
+**API maturity: Stable.**
+
+## Import and basic usage
+
+```tsx
+import { SiteHeader } from "@puzzle-ui/pieces";
+import { Button } from "@puzzle-ui/ui";
+
+<SiteHeader
+  logo={<strong>Willow & Tide</strong>}
+  items={[
+    { id: "stay", label: "Stay", href: "/stay", active: true },
+    { id: "contact", label: "Contact", href: "/contact" },
+  ]}
+  primaryAction={<Button href="/book">Book a stay</Button>}
+/>;
+```
+
+<Preview fit="device" code={`<SiteHeader logo={<strong>Willow & Tide</strong>} items={items} primaryAction={<Button href="/book">Book a stay</Button>} />`}>
+  <SiteHeaderExample />
+</Preview>
+
+## Navigation and responsive behavior
+
+Items support stable IDs, descriptions, active state, external-link indication,
+and one level of children for dropdown navigation. `active` is supplied by the
+caller; the component does not inspect a router or pathname. On smaller
+viewports the existing UI `Dialog` provides a modal mobile menu with focus
+management, Escape handling, and predictable close behavior. Links close the
+menu after activation.
+
+`sticky`, `transparent`, `overlay`, `minimal`, and `centered` are presentation
+options that share the same header layout. `scrolled` is a caller-supplied
+state so applications can decide how and when to observe scroll position.
+
+## Slots and ownership
+
+`logo`, `primaryAction`, `secondaryActions`, `localeSwitcher`, and
+`utilityNavigation` are ReactNode slots. Routing, active-route calculation,
+authentication, analytics, and destinations remain application-owned. Use
+[LocaleSwitcher](/docs/pieces/components/locale-switcher) for caller-supplied
+language destinations.
+
+## Accessibility and theme behavior
+
+The component renders a semantic `header` and labeled `nav`, native links,
+disclosure elements for desktop submenus, and a modal dialog for mobile
+navigation. Provide meaningful link labels and keep the active item accurate.
+It consumes Puzzle Theme tokens, wraps long labels, and supports keyboard focus
+and reduced-motion behavior from the shared UI overlay.
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `logo` | `ReactNode` | Required branding slot. |
+| `items` | `readonly SiteNavigationItem[]` | Public navigation items and optional children. |
+| `primaryAction`, `secondaryActions`, `localeSwitcher`, `utilityNavigation` | `ReactNode` | Caller-owned header slots. |
+| `variant` | `SiteHeaderVariant` | `default`, `transparent`, `overlay`, `minimal`, or `centered`. |
+| `sticky`, `scrolled` | `boolean` | CSS sticky and caller-supplied scrolled state. |
+| `mobileMenuTrigger` | `ReactNode` | Custom trigger content. |
+| `mobileMenuLabel`, `mobileMenuTitle`, `closeLabel`, `navigationLabel` | string | Accessible labels. |
+
+Do not use this component for dashboard sidebars; use
+[Dashboard Navigation](/docs/pieces/components/navigation) for that context.

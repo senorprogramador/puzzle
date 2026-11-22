@@ -54,10 +54,21 @@ UI.
   injected resumable client. Neither component chooses a backend or sends data
   without a supplied upload handler. Use `FileUpload` for generic files and
   documents.
-- **Simpler fit:** A form needs a start and end date without shared range
-  highlighting. Compose two controlled `DatePicker` components and pass
-  `minDate`/`maxDate` constraints between them. A separate `DateRangePicker`
-  is not needed for this composed behavior.
+- **Good fit:** A form needs a start and end date with shared range
+  highlighting, keyboard selection, localized calendar labels, or a two-month
+  view. Use `DateRangePicker` from `@puzzle-ui/ui`; use `DatePicker` for a
+  single date. Compose two controlled `DatePicker` components only when the
+  fields intentionally have independent semantics.
+- **Good fit:** A public website needs branding, navigation, a mobile menu, or
+  locale and CTA slots. Use `SiteHeader` from `@puzzle-ui/pieces`; use
+  `DashboardNavigation` for authenticated workspace navigation instead.
+- **Good fit:** A lodging page needs caller-supplied day statuses and a
+  check-in/check-out range. Use `AvailabilityCalendar`; use `DateRangePicker`
+  directly when no hospitality availability presentation is needed.
+- **Good fit:** A reusable inquiry flow needs standard fields, local validation,
+  consent, async feedback, and a typed callback. Use `ContactForm`; use
+  `ContactSection` when the page needs contact details and slots rather than
+  form behavior.
 - **Good fit:** An application needs a standalone image crop or focal
   point/hotspot editor. Use `ImageCropper` and `ImageHotspotEditor` from
   `@puzzle-ui/ui`; their normalized values are source-relative presentation

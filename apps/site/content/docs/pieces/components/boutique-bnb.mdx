@@ -6,10 +6,11 @@ description: A responsive boutique bed-and-breakfast composition using existing 
 import { Badge, Preview } from "@puzzle-ui/ui";
 import { BoutiqueBnbReferenceExample } from "../../../../src/components/doc-examples/pieces/boutique-bnb";
 
-This reference page composes the existing accommodation Hero and Gallery with
-accommodation details, amenities, host information, guest reviews, services,
-local places, vouchers, and a CTA. It presents static example content and does
-not add booking, route, price, or payment behavior.
+This reference page composes public site chrome with the existing accommodation
+Hero and Gallery, accommodation details, amenities, host information, guest
+reviews, services, local places, vouchers, a contact form, and a footer. It
+presents static example content and does not add booking, route, price, or
+payment behavior.
 
 <Badge content="Example" color="primary" /> **Reference composition:** All included component APIs are Stable; see each component page for props and variants.
 
@@ -17,7 +18,7 @@ not add booking, route, price, or payment behavior.
 
 <Preview
   fit="device"
-  code={`<main><AccommodationHero /><AccommodationDetailsSection /><GallerySection /><AmenityListSection /><HostProfileSection /><GuestReviewsSection /><ServiceOptionsSection /><LocalGuideSection /><GiftVoucherSection /><CTASection /></main>`}
+  code={`<main><SiteHeader /><AccommodationHero /><AboutSection /><AccommodationDetailsSection /><GallerySection /><AmenityListSection /><HostProfileSection /><GuestReviewsSection /><ServiceOptionsSection /><LocalGuideSection /><GiftVoucherSection /><CTASection /><ContactForm /><FooterSection /></main>`}
 >
   <BoutiqueBnbReferenceExample />
 </Preview>
@@ -27,6 +28,8 @@ not add booking, route, price, or payment behavior.
 | Page area | Component | Responsibility |
 | --- | --- | --- |
 | Introduction | Existing `AccommodationHero` | Set the property context and provide a caller-owned action. |
+| Public shell | `SiteHeader` and `LocaleSwitcher` | Present public navigation and caller-supplied language destinations. |
+| Story | `AboutSection` | Explain the property context without hardcoding a brand. |
 | Property | Existing `AccommodationDetailsSection` | Present capacity, sleeping arrangements, and highlights. |
 | Media | Existing `GallerySection` | Reuse the existing gallery and optional lightbox. |
 | Facilities | Existing `AmenityListSection` | Group property facilities. |
@@ -36,6 +39,8 @@ not add booking, route, price, or payment behavior.
 | Neighborhood | `LocalGuideSection` | Present supplied places, distance, travel time, and optional links. |
 | Gift | `GiftVoucherSection` | Display a package with a caller-provided purchase destination. |
 | Next step | Existing `CTASection` | Offer a consumer-owned contact action. |
+| Inquiry | `ContactForm` inside `ContactSection` | Collect a typed inquiry; the application owns delivery and validation. |
+| Footer | `FooterSection` | Present caller-owned links and legal content. |
 
 ## Responsive behavior
 

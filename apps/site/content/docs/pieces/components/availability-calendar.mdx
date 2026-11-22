@@ -1,0 +1,79 @@
+---
+title: AvailabilityCalendar
+description: Present caller-supplied accommodation availability and select a validated check-in and check-out range without owning booking or pricing services.
+---
+
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { AvailabilityCalendarExample } from "../../../../src/components/doc-examples/pieces/hospitality-new-components";
+
+`AvailabilityCalendar` is the hospitality composition in
+`@puzzle-ui/pieces`. It combines caller-supplied day statuses and prices with
+the generic UI `DateRangePicker`; it is not an availability API or booking
+engine.
+
+<Badge content="Stable" color="primary" />
+**API maturity: Stable.**
+
+## Import
+
+```tsx
+import {
+  AvailabilityCalendar,
+  type AvailabilityDay,
+  type AvailabilityDayStatus,
+} from "@puzzle-ui/pieces";
+```
+
+<Preview fit="device" code={`<AvailabilityCalendar availability={availability} onChange={setRange} />`}>
+  <AvailabilityCalendarExample />
+</Preview>
+
+## Availability data
+
+Each supplied day has a local `Date`, a status, and optional label, price, or
+indicator. Supported statuses are `available`, `unavailable`, `blocked`,
+`check-in-only`, `check-out-only`, and `changeover`. Missing dates are treated
+as unavailable; the component never infers availability from a gap.
+
+Prices are displayed with `Intl.NumberFormat` using the supplied currency and
+locale. The component does not calculate nightly totals, currency conversions,
+or reservation guarantees.
+
+## Rules and states
+
+Use `minNights` and `maxNights` for local range feedback. The calendar rejects
+unavailable dates, invalid ordering, and ranges that contain unavailable days.
+The application must re-check availability when a visitor proceeds with a
+booking. `loading`, `error`, empty, and `disabled` states are presentation
+props; no network call is made.
+
+`value`/`onChange` provide controlled usage and `defaultValue` provides
+uncontrolled usage. `months={2}` displays adjacent months on larger screens.
+Use `legend` and `labels` to localize status explanations.
+
+## Composition boundary
+
+Compose this component with [Availability Search](/docs/pieces/components/availability-search),
+[Rate Plans](/docs/pieces/components/rate-plans), and [Stay Summary](/docs/pieces/components/stay-summary).
+The application supplies the availability response, rates, booking action,
+server validation, and persistence. Use `DateRangePicker` directly when a
+generic form only needs dates and not hospitality status presentation.
+
+## Accessibility, responsive behavior, and theme
+
+The underlying range picker supplies semantic calendar grids, keyboard
+navigation, focus management, localized day names, and visible range states.
+Status markers and prices are passive content; the day buttons remain owned by
+the UI control. The layout collapses to one month and wraps the legend on
+narrow screens, and all colors and spacing use Puzzle Theme tokens.
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `availability` | `readonly AvailabilityDay[]` | Required caller-supplied day data. |
+| `value`, `defaultValue`, `onChange` | `DateRange` contract | Controlled or initial range selection. |
+| `minDate`, `maxDate`, `minNights`, `maxNights` | date/number constraints | Local selection constraints. |
+| `loading`, `error`, `emptyState`, `disabled` | state props | Presentation states owned by the caller. |
+| `legend`, `labels` | `ReactNode`/status labels | Customize status explanations. |
+| `locale`, `weekStartsOn`, `months` | localization/layout | Calendar formatting and visible months. |

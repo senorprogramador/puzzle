@@ -1,0 +1,79 @@
+---
+title: ContactForm
+description: Compose an accessible inquiry form from Puzzle UI controls with typed values, local validation, async feedback, consent, and honeypot support.
+---
+
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { ContactFormExample } from "../../../../src/components/doc-examples/pieces/hospitality-new-components";
+
+`ContactForm` is a reusable lead and inquiry composition from
+`@puzzle-ui/pieces`. It can stand alone or be passed to
+[ContactSection](/docs/pieces/components/contact-section) through `formSlot`.
+
+<Badge content="Stable" color="primary" />
+**API maturity: Stable.**
+
+## Import and basic usage
+
+```tsx
+import { ContactForm } from "@puzzle-ui/pieces";
+
+<ContactForm
+  onSubmit={async (values) => {
+    await submitInquiry(values);
+  }}
+/>;
+```
+
+<Preview fit="device" code={`<ContactForm onSubmit={submitInquiry} consent={{ label: "I agree to the privacy policy.", required: true }} />`}>
+  <ContactFormExample />
+</Preview>
+
+The default fields are name, email, phone, subject, and message. Pass `fields`
+to choose a subset or define select and checkbox fields for a particular
+inquiry. Custom fields use the same `ContactFormValues` record and can be
+combined with the standard fields.
+
+## Validation and submission
+
+Required values and email syntax are checked before `onSubmit` runs.
+`errors` merges caller-provided field messages, while `error`, `success`,
+`loading`, and `disabled` connect application-owned request state. The callback
+may return a promise; rejected promises are shown as a form-level error and
+repeated submissions are blocked while `loading` is true.
+
+Consent and privacy links are optional. `honeypotName` adds an off-screen field
+that the application can inspect for spam signals. The component never makes an
+HTTP request and does not provide captcha, rate limiting, email delivery,
+authorization, or server validation.
+
+## Controlled values and composition
+
+Use `value` and `onChange` when the surrounding form owns state; omit `value`
+and use `defaultValue` for uncontrolled initialization. The form composes
+inside a dialog, drawer, standalone page, or `ContactSection` without depending
+on any route or backend.
+
+## Accessibility, responsive behavior, and theme
+
+The form uses `FormField`, `TextInput`, `TextAreaInput`, `Select`, `Checkbox`,
+and `Button` from `@puzzle-ui/ui`, preserving labels, descriptions, errors,
+keyboard behavior, native required semantics, and loading announcements.
+Fields use a fluid grid that collapses to one column on narrow screens. Theme
+tokens control colors, spacing, focus states, and typography.
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `fields` | `readonly ContactFormField[]` | Standard and custom fields; defaults to common inquiry fields. |
+| `value`, `defaultValue`, `onChange` | `ContactFormValues` contract | Controlled or initial values. |
+| `onSubmit` | `(values) => void \| Promise<void>` | Required caller-owned submission callback. |
+| `errors`, `error`, `success` | error/status content | External validation and request feedback. |
+| `consent` | `ContactFormConsent` | Optional consent and privacy policy field. |
+| `honeypotName` | `string` | Optional hidden anti-spam field name. |
+| `loading`, `disabled`, `submitLabel`, `loadingLabel` | state/content | Submission state and labels. |
+
+Use a normal semantic form when the page has one bespoke field and no shared
+validation or feedback contract. Use `ContactSection` for contact details and
+layout; it does not replace this form.

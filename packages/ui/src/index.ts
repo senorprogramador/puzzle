@@ -284,6 +284,14 @@ export {
 } from "./components/forms/date-picker";
 
 export {
+  DateRangePicker,
+  type DateRange,
+  type DateRangeDayState,
+  type DateRangePickerProps,
+  type DateRangePickerSize,
+} from "./components/forms/date-range-picker";
+
+export {
   FieldArray,
   RepeaterField,
   type FieldArrayItemContext,

@@ -1,0 +1,112 @@
+---
+title: React Date Range Picker
+description: Select a local calendar date range with accessible keyboard interaction, validation, localized labels, and optional multi-month display.
+---
+
+import { Badge, Preview, Section } from "@puzzle-ui/ui";
+import { DateRangePickerExamples } from "../../../../src/components/doc-examples/ui/date-range-picker";
+
+<Badge content="Stable" color="primary" /> **API maturity: Stable.** The range picker is a UI control; it does not calculate rates, query availability, or submit reservations.
+
+`DateRangePicker` is the generic `@puzzle-ui/ui` control for selecting a start
+and end calendar date. Use it when the two dates should share range highlighting
+and keyboard behavior. For a single date, use [DatePicker](/docs/ui/forms/date-picker).
+For accommodation availability and stay rules, use
+[AvailabilityCalendar](/docs/pieces/components/availability-calendar).
+
+## Import
+
+```tsx
+import {
+  DateRangePicker,
+  type DateRange,
+  type DateRangePickerProps,
+} from "@puzzle-ui/ui";
+```
+
+## Basic and uncontrolled usage
+
+Dates are local calendar values. Construct them with `new Date(year,
+monthIndex, day)` and avoid serializing a calendar day with `toISOString()`.
+
+```tsx
+<DateRangePicker
+  label="Stay dates"
+  locale="en-GB"
+  defaultValue={{ start: new Date(2025, 2, 15), end: null }}
+  placeholder="Choose a stay"
+/>
+```
+
+<Preview fit="device" code={`<DateRangePicker label="Stay dates" defaultValue={{ start: new Date(2025, 2, 15), end: null }} />`}>
+  <Section>
+    <DateRangePickerExamples />
+  </Section>
+</Preview>
+
+## Controlled ranges
+
+Use `value` and `onChange` when the application owns the selection. The callback
+reports a new `DateRange` after the start date is chosen and again when a
+complete range is selected.
+
+```tsx
+const [range, setRange] = useState<DateRange>({
+  start: null,
+  end: null,
+});
+
+<DateRangePicker
+  label="Dates"
+  value={range}
+  onChange={setRange}
+  clearable
+  months={2}
+/>;
+```
+
+## Constraints and extensions
+
+`minDate`, `maxDate`, `disabledDates`, and `shouldDisableDate` prevent dates
+from being selected. Use `validateRange` for application-local rules such as a
+minimum stay. The callback should return an error message for invalid complete
+ranges; the final availability check remains the application's responsibility.
+
+`dayContent` adds small, non-interactive content such as a price or availability
+marker. The picker owns the actual day button and its accessible semantics.
+
+## Locale and responsive behavior
+
+Pass a BCP 47 `locale` to format dates, month names, weekdays, and numbers.
+`weekStartsOn` overrides the locale's first day when the application needs a
+specific calendar convention. `months={2}` shows two months on wider screens
+and collapses to one month on narrow screens. `size` and `fullWidth` accept
+Puzzle responsive values.
+
+## Accessibility and SSR
+
+The control uses a labeled button, a semantic calendar grid, accessible day
+names, visible focus, keyboard navigation, disabled states, and Escape/outside
+close behavior from the existing UI popout. Arrow keys move by day or week,
+Home/End move within a week, Page Up/Page Down change months, and Enter or
+Space selects a date. Dates are normalized from local calendar fields, so
+daylight-saving and timezone offsets do not shift the selected day. Browser
+globals are used only by interactive event handling; the initial markup is
+SSR-safe.
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `value`, `defaultValue` | `DateRange \| null` | Controlled or initial range. |
+| `onChange` | `(value: DateRange) => void` | Receives partial and complete selections. |
+| `label`, `placeholder`, `startPlaceholder`, `endPlaceholder` | `ReactNode` | Field and selection text. |
+| `minDate`, `maxDate`, `disabledDates`, `shouldDisableDate` | Date constraints | Prevent invalid day choices. |
+| `validateRange` | `(range: DateRange) => ReactNode \| undefined` | Validates a complete local range. |
+| `months` | `1 \| 2` | Number of visible months. |
+| `dayContent` | `(date, state) => ReactNode` | Adds passive day information. |
+| `locale`, `weekStartsOn`, `dateFormat` | Localization options | Control calendar and date formatting. |
+| `clearable`, `required`, `disabled` | boolean | Field state and clearing behavior. |
+
+Use [FormField](/docs/ui/forms/form-field) for additional form composition.
+Use [Select](/docs/ui/forms/select) for bounded non-date choices.

@@ -281,6 +281,47 @@
       "aliases": []
     },
     {
+      "name": "ContactForm",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "contact-form",
+      "description": "Compose an accessible inquiry form from Puzzle UI controls with typed values, local validation, async feedback, consent, and honeypot support.",
+      "documentation": "apps/site/content/docs/pieces/components/contact-form.mdx",
+      "source": "packages/pieces/src/components/business/contact-form/contact-form.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "contact-form"
+      },
+      "requiredProps": [
+        "onSubmit"
+      ],
+      "contentRequirements": [
+        "title (optional)",
+        "description (optional)",
+        "submitLabel (optional)",
+        "loadingLabel (optional)",
+        "honeypotLabel (optional)"
+      ],
+      "dataRequirements": [
+        "fields (optional)"
+      ],
+      "interactiveBehavior": [
+        "onChange",
+        "onSubmit"
+      ],
+      "aliases": []
+    },
+    {
       "name": "ContactSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [
@@ -1050,6 +1091,35 @@
         "onRetry",
         "onSelectSubscription"
       ],
+      "aliases": []
+    },
+    {
+      "name": "AvailabilityCalendar",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "availability-calendar",
+      "description": "Present caller-supplied accommodation availability and select a validated check-in and check-out range without owning booking or pricing services.",
+      "documentation": "apps/site/content/docs/pieces/components/availability-calendar.mdx",
+      "source": "packages/pieces/src/components/commerce/availability-calendar/availability-calendar.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "availability-calendar"
+      },
       "aliases": []
     },
     {
@@ -4580,6 +4650,48 @@
       "aliases": []
     },
     {
+      "name": "LocaleSwitcher",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "locale-switcher",
+      "description": "Let visitors choose among caller-supplied localized destinations with accessible dropdown and inline presentations.",
+      "documentation": "apps/site/content/docs/pieces/components/locale-switcher.mdx",
+      "source": "packages/pieces/src/components/navigation/locale-switcher/locale-switcher.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "locale-switcher"
+      },
+      "requiredProps": [
+        "currentLocale",
+        "locales"
+      ],
+      "contentRequirements": [
+        "label (optional)",
+        "ariaLabel (optional)"
+      ],
+      "dataRequirements": [
+        "locales (required)"
+      ],
+      "interactiveBehavior": [
+        "onLocaleChange"
+      ],
+      "aliases": []
+    },
+    {
       "name": "DashboardBreadcrumbs",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [
@@ -4803,6 +4915,86 @@
       "contentRequirements": [
         "children (required)",
         "label (optional)"
+      ],
+      "aliases": []
+    },
+    {
+      "name": "SiteHeader",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "site-header",
+      "description": "Build an accessible public website header with caller-owned branding, navigation, actions, locale controls, dropdowns, and a responsive mobile menu.",
+      "documentation": "apps/site/content/docs/pieces/components/site-header.mdx",
+      "source": "packages/pieces/src/components/navigation/site-header/site-header.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "dashboard",
+        "workspace"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "site-header"
+      },
+      "requiredProps": [
+        "logo"
+      ],
+      "contentRequirements": [
+        "mobileMenuLabel (optional)",
+        "mobileMenuTitle (optional)",
+        "closeLabel (optional)",
+        "navigationLabel (optional)"
+      ],
+      "dataRequirements": [
+        "items (optional)"
+      ],
+      "mediaRequirements": [
+        "logo (required)"
+      ],
+      "variants": [
+        {
+          "name": "default",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/navigation/site-header/site-header.types.ts",
+          "prop": "variant",
+          "typeName": "SiteHeaderVariant"
+        },
+        {
+          "name": "transparent",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/navigation/site-header/site-header.types.ts",
+          "prop": "variant",
+          "typeName": "SiteHeaderVariant"
+        },
+        {
+          "name": "overlay",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/navigation/site-header/site-header.types.ts",
+          "prop": "variant",
+          "typeName": "SiteHeaderVariant"
+        },
+        {
+          "name": "minimal",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/navigation/site-header/site-header.types.ts",
+          "prop": "variant",
+          "typeName": "SiteHeaderVariant"
+        },
+        {
+          "name": "centered",
+          "kind": "prop",
+          "source": "packages/pieces/src/components/navigation/site-header/site-header.types.ts",
+          "prop": "variant",
+          "typeName": "SiteHeaderVariant"
+        }
       ],
       "aliases": []
     },

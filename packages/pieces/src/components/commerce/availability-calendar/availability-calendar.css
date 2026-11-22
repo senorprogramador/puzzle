@@ -1,0 +1,70 @@
+.puzzle-availability-calendar {
+  min-width: 0;
+}
+
+.puzzle-availability-calendar__content {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-availability-calendar__status {
+  padding: var(--puzzle-space-3, 0.75rem);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  color: var(--puzzle-color-text-muted);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-availability-calendar__error {
+  color: var(--puzzle-color-danger);
+}
+
+.puzzle-availability-calendar__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--puzzle-space-3, 0.75rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--puzzle-color-text-muted);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+}
+
+.puzzle-availability-calendar__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-availability-calendar__status-marker {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--puzzle-color-text-muted);
+}
+
+.puzzle-availability-calendar__status-marker[data-status="available"] {
+  background: var(--puzzle-color-success);
+}
+
+.puzzle-availability-calendar__status-marker[data-status="unavailable"],
+.puzzle-availability-calendar__status-marker[data-status="blocked"] {
+  background: var(--puzzle-color-danger);
+}
+
+.puzzle-availability-calendar__status-marker[data-status="check-in-only"],
+.puzzle-availability-calendar__status-marker[data-status="check-out-only"],
+.puzzle-availability-calendar__status-marker[data-status="changeover"] {
+  background: var(--puzzle-color-warning);
+}
+
+.puzzle-availability-calendar__day-detail {
+  display: block;
+  color: var(--puzzle-color-text-muted);
+  font-size: 0.65rem;
+  line-height: 1;
+}
+
+.puzzle-availability-calendar__day-detail[data-status="unavailable"],
+.puzzle-availability-calendar__day-detail[data-status="blocked"] {
+  text-decoration: line-through;
+}

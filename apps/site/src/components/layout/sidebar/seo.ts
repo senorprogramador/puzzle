@@ -51,5 +51,10 @@ export const seo: TreeViewItem = {
       label: "Testing",
       href: `${folder}/testing`,
     },
+    {
+      id: "seo-hospitality",
+      label: "Hospitality",
+      href: `${folder}/hospitality`,
+    },
   ],
 } as const;

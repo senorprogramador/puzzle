@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  AvailabilityCalendar,
   AvailabilitySearchSection,
   HouseRulesSection,
   RatePlansSection,
@@ -42,6 +43,12 @@ const initialSearch: AvailabilitySearchValues = {
   accommodationId: "willow-house",
   flexibleDates: false,
 };
+
+const calendarAvailability = Array.from({ length: 16 }, (_, index) => ({
+  date: new Date(2026, 8, 10 + index),
+  status: index === 4 ? ("blocked" as const) : ("available" as const),
+  price: { amount: 220 + index * 5, currency: "EUR" },
+}));
 
 const ratePlans: RatePlan[] = [
   {
@@ -458,13 +465,32 @@ export const BookingFlowExample = () => {
         }}
       />
       {status ? <p role="status">{status}</p> : null}
+      <AvailabilityCalendar
+        title="2. Confirm available dates"
+        description="Example availability supplied by the application before rates are shown."
+        availability={calendarAvailability}
+        value={{
+          start: searchValue.checkIn,
+          end: searchValue.checkOut,
+        }}
+        onChange={(range) =>
+          setSearchValue((current) => ({
+            ...current,
+            checkIn: range.start,
+            checkOut: range.end,
+          }))
+        }
+        locale="en-GB"
+        minNights={2}
+        months={2}
+      />
       <RatePlansSection
-        title="2. Compare supplied rates"
+        title="3. Compare supplied rates"
         plans={ratePlans}
         locale="en-GB"
       />
       <StaySummarySection
-        title="3. Review the supplied summary"
+        title="4. Review the supplied summary"
         {...staySummaryProps}
         checkIn={searchValue.checkIn}
         checkOut={searchValue.checkOut}
@@ -475,7 +501,7 @@ export const BookingFlowExample = () => {
         }
       />
       <HouseRulesSection
-        title="4. Review the house rules"
+        title="5. Review the house rules"
         categories={houseRuleCategories}
         variant="compact"
         collapsible

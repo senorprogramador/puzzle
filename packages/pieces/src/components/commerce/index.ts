@@ -15,6 +15,7 @@ export * from "./table-reservation-section";
 export * from "./commerce-benefits";
 export * from "./checkout-section";
 export * from "./payment-method-selector";
+export * from "./availability-calendar";
 export type {
   CommerceImage,
   CommerceMoney,

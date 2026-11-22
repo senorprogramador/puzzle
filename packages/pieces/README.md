@@ -119,7 +119,7 @@ to compare use cases:
 
 ## API maturity
 
-All 127 canonical component APIs and their published aliases are **Stable**.
+All 131 canonical component APIs and their published aliases are **Stable**.
 Their documented contracts are intended to remain backward-compatible within
 a major version; breaking changes require a major release. Stable describes API
 compatibility, not production readiness or suitability for a particular

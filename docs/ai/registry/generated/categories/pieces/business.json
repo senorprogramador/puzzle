@@ -173,6 +173,47 @@
       "aliases": []
     },
     {
+      "name": "ContactForm",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "business",
+      "subcategory": "contact-form",
+      "description": "Compose an accessible inquiry form from Puzzle UI controls with typed values, local validation, async feedback, consent, and honeypot support.",
+      "documentation": "apps/site/content/docs/pieces/components/contact-form.mdx",
+      "source": "packages/pieces/src/components/business/contact-form/contact-form.tsx",
+      "useCases": [
+        "business"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "contact-form"
+      },
+      "requiredProps": [
+        "onSubmit"
+      ],
+      "contentRequirements": [
+        "title (optional)",
+        "description (optional)",
+        "submitLabel (optional)",
+        "loadingLabel (optional)",
+        "honeypotLabel (optional)"
+      ],
+      "dataRequirements": [
+        "fields (optional)"
+      ],
+      "interactiveBehavior": [
+        "onChange",
+        "onSubmit"
+      ],
+      "aliases": []
+    },
+    {
       "name": "ContactSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [

@@ -2,7 +2,7 @@
 
 ## Scope and method
 
-Audited all 71 individually documented components in `@puzzle-ui/ui`, all 127
+Audited all 72 individually documented components in `@puzzle-ui/ui`, all 131
 canonical components documented by `@puzzle-ui/pieces` (including 14 canonical
 Hero components; the package also exposes 11 aliases that are not double-counted), and 46 other React components documented by the Theme (2), Icons
 (1), Fullstack (7), and SEO (36) package guides. Aliases are recorded with
@@ -13,7 +13,7 @@ The public API below is taken from the package entry points and component
 exports, not inferred from examples. Validation evidence is based on
 component-local test files and the public package peer dependencies. The site
 package declares React and React DOM 19 as peers. The component inventory
-contains 244 APIs: 243 Stable and `SectionHeader` Beta. Stable classifications
+contains 249 APIs: 248 Stable and `SectionHeader` Beta. Stable classifications
 include documented backward-compatibility intent within a major version.
 Package-level utility and adapter APIs retain their separate maturity
 classifications below.
@@ -60,6 +60,7 @@ The test count is the number of test files in the component source directory
 | Checkbox | `Checkbox`, `CheckboxProps`, `CheckboxSize` | Stable | 2 local test files. React 19 peer; within-major backward-compatibility intent documented. |
 | Color Picker | `ColorPicker`, `ColorPickerProps`, `ColorPickerFormat`, `ColorPickerSwatch` | Stable | 3 local test files. Several input modes are exposed; within-major backward-compatibility intent documented. |
 | Date Picker | `DatePicker`, `DatePickerProps`, `DatePickerSize` | Stable | 2 local test files. Calendar interaction is framework/browser-sensitive; test the target environment. |
+| Date Range Picker | `DateRangePicker`, `DateRange`, `DateRangeDayState`, `DateRangePickerProps`, `DateRangePickerSize` | Stable | 3 local test files covering local-date range selection, validation, disabled dates, keyboard navigation, and browser focus restoration. |
 | File Upload | `FileUpload` and item, status, rejection, upload-context, and handler types | Stable | 3 local test files. Upload transport is supplied by the consumer; within-major backward-compatibility intent documented. |
 | Form Field | `FormField`, `FormFieldProps` | Stable | 4 local test files. Composition is defined by child control relationships; within-major backward-compatibility intent documented. |
 | Input Group | `InputGroup`, `InputGroupAddonProps`, `InputGroupAddonAlign`, `InputGroupProps` | Stable | 3 local test files. Compound parts; within-major backward-compatibility intent documented. |
@@ -151,6 +152,7 @@ specialized required-media prop types.
 | AssetDetailsPanel | `AssetDetailsPanel`, `AssetDetailsPanelProps`, and safe metadata patch types | Stable | Source: `src/components/media/asset-details-panel.tsx`; reference: `pieces/components/asset-details-panel.mdx`. Focused component tests cover metadata editing and crop/hotspot composition; callers own persistence and conflict handling. |
 | AssetPickerDialog | `AssetPickerDialog`, discriminated single/multiple props, and picker types | Stable | Source: `src/components/media/asset-picker-dialog.tsx`; reference: `pieces/components/asset-picker-dialog.mdx`. Component/browser tests cover ID selection, kind filtering, narrow Drawer presentation, and Escape; UI overlays own focus management. |
 | AvailabilitySearchSection | `AvailabilitySearchSection` and its exported props/types | Stable | Source: `src/components/commerce/availability-search-section/availability-search-section.tsx`; reference: `pieces/components/availability-search.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
+| AvailabilityCalendar | `AvailabilityCalendar`, `AvailabilityCalendarProps`, `AvailabilityDay`, and `AvailabilityDayStatus` | Stable | Source: `src/components/commerce/availability-calendar/availability-calendar.tsx`; reference: `pieces/components/availability-calendar.mdx`. Component tests cover supplied statuses, empty state, local stay constraints, and composition with DateRangePicker. |
 | AwardsSection | `AwardsSection` and its exported props/types | Stable | Source: `src/components/business/awards-section/awards-section.tsx`; reference: `pieces/components/awards-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | BenefitsSection | `BenefitsSection` and its exported props/types | Stable | Source: `src/components/marketing/benefits/benefits.tsx`; reference: `pieces/components/benefits.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | BlogSection | `BlogSection` and its exported props/types | Stable | Source: `src/components/content/blog-section/blog-section.tsx`; reference: `pieces/components/blog-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
@@ -167,6 +169,7 @@ specialized required-media prop types.
 | ComparisonSection | `ComparisonSection` and its exported props/types | Stable | Source: `src/components/marketing/comparison/comparison.tsx`; reference: `pieces/components/comparison.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | ConfirmAction | `ConfirmAction` and its exported props/types | Stable | Source: `src/components/feedback/confirm-action.tsx`; reference: `pieces/components/feedback.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | ContactSection | `ContactSection` and its exported props/types | Stable | Source: `src/components/business/contact-section/contact-section.tsx`; reference: `pieces/components/contact-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
+| ContactForm | `ContactForm`, `ContactFormProps`, `ContactFormField`, `ContactFormConsent`, and typed value/error contracts | Stable | Source: `src/components/business/contact-form/contact-form.tsx`; reference: `pieces/components/contact-form.mdx`. Component tests cover required fields, consent, typed submission, and caller-owned async feedback. |
 | ContentSection | `ContentSection` and its exported props/types | Stable | Source: `src/components/content/content-section/content-section.tsx`; reference: `pieces/components/content-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | DashboardActivityFeed | `DashboardActivityFeed` and its exported props/types | Stable | Source: `src/components/dashboard/dashboard-activity-feed.tsx`; reference: `pieces/components/dashboard.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | DashboardBreadcrumbs | `DashboardBreadcrumbs` and its exported props/types | Stable | Source: `src/components/navigation/dashboard-breadcrumbs.tsx`; reference: `pieces/components/navigation.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
@@ -200,6 +203,8 @@ specialized required-media prop types.
 | IntegrationsSection | `IntegrationsSection` and its exported props/types | Stable | Source: `src/components/marketing/integrations/integrations.tsx`; reference: `pieces/components/integrations.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | LocalGuideSection | `LocalGuideSection` and its exported props/types | Stable | Source: `src/components/content/local-guide-section/local-guide-section.tsx`; reference: `pieces/components/local-guide.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | LocationSection | `LocationSection` and its exported props/types | Stable | Source: `src/components/business/location-section/location-section.tsx`; reference: `pieces/components/location-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
+| LocaleSwitcher | `LocaleSwitcher`, `LocaleSwitcherProps`, `LocaleOption`, and `LocaleSwitcherPresentation` | Stable | Source: `src/components/navigation/locale-switcher/locale-switcher.tsx`; reference: `pieces/components/locale-switcher.mdx`. Component tests cover dropdown and inline presentations; destinations remain caller-supplied. |
+| SiteHeader | `SiteHeader`, `SiteHeaderProps`, `SiteHeaderVariant`, and `SiteNavigationItem` | Stable | Source: `src/components/navigation/site-header/site-header.tsx`; reference: `pieces/components/site-header.mdx`. Component and browser tests cover semantic navigation, active links, mobile dialog behavior, and focus-safe close handling. |
 | LogoCloudSection | `LogoCloudSection` and its exported props/types | Stable | Source: `src/components/marketing/logo-cloud/logo-cloud.tsx`; reference: `pieces/components/logo-cloud.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | MediaField | `MediaField`, `MediaFieldProps`, and asset-ID value contract | Stable | Source: `src/components/media/media-field.tsx`; reference: `pieces/components/media-field.mdx`. Component tests cover required/error relationships, selection IDs, and read-only state; validation policy remains caller-owned. |
 | MediaLibrary | `MediaLibrary`, safe `MediaLibraryAsset` projection, query, folder, and action types | Stable | Source: `src/components/media/media-library.tsx`; reference: `pieces/components/media-library.mdx`. Unit, component, and browser tests cover filters, folders, ID selection, partial bulk failures, upload composition, responsive layout, and keyboard use. |

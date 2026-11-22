@@ -1,0 +1,63 @@
+---
+title: LocaleSwitcher
+description: Let visitors choose among caller-supplied localized destinations with accessible dropdown and inline presentations.
+---
+
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { LocaleSwitcherExample } from "../../../../src/components/doc-examples/pieces/hospitality-new-components";
+
+`LocaleSwitcher` is a small presentation component for public-site language
+choices. It is not a translation provider and does not replace
+`@puzzle-ui/i18n`.
+
+<Badge content="Stable" color="primary" />
+**API maturity: Stable.**
+
+## Import and usage
+
+```tsx
+import { LocaleSwitcher } from "@puzzle-ui/pieces";
+
+<LocaleSwitcher
+  currentLocale="en"
+  locales={[
+    { id: "en", locale: "en", label: "English", href: "/en/stay" },
+    { id: "es", locale: "es", label: "Español", href: "/es/estancia" },
+  ]}
+/>;
+```
+
+<Preview fit="device" code={`<LocaleSwitcher currentLocale="en" locales={locales} presentation="inline" />`}>
+  <LocaleSwitcherExample />
+</Preview>
+
+Every locale includes its destination URL. The component never derives a
+localized path from the current URL. Without `onLocaleChange`, the dropdown
+uses the supplied URL for browser navigation; provide the callback when a
+framework-specific navigation action is required. Inline links preserve normal
+modified-click behavior.
+
+## Presentations, responsive behavior, and accessibility
+
+`dropdown` uses a native select and is the most compact keyboard-friendly
+choice. `inline` renders links with `aria-current` on the active locale.
+`compact` keeps the select label visually hidden while retaining its accessible
+name. Labels are human-readable and optional icons or flags are decoration;
+never use a flag as the only language identifier.
+
+The component uses Theme tokens, supports `lang` attributes for each option,
+wraps inline choices, and is SSR-safe because navigation occurs only in an
+event handler.
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `currentLocale` | `string` | Active BCP 47 locale tag. |
+| `locales` | `readonly LocaleOption[]` | Locale IDs, labels, tags, destinations, and optional decoration. |
+| `presentation` | `"dropdown" \| "inline" \| "compact"` | Visual and interaction presentation. |
+| `onLocaleChange` | `(locale: LocaleOption) => void` | Optional application-owned navigation callback. |
+| `label`, `ariaLabel`, `className` | `ReactNode \| string` | Labels and styling. |
+
+Use `@puzzle-ui/i18n` for catalogs, translation lookup, formatting, and locale
+state. Use ordinary links when a page needs only two or three language choices.

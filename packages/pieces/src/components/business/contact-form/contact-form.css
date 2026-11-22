@@ -1,0 +1,49 @@
+.puzzle-contact-form {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+  min-width: 0;
+}
+
+.puzzle-contact-form__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-contact-form__field--full {
+  grid-column: 1 / -1;
+}
+
+.puzzle-contact-form__status {
+  padding: var(--puzzle-space-3, 0.75rem);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface-sunken);
+}
+
+.puzzle-contact-form__status[role="alert"] {
+  color: var(--puzzle-color-danger);
+}
+
+.puzzle-contact-form__consent {
+  display: grid;
+  gap: var(--puzzle-space-1, 0.25rem);
+}
+
+.puzzle-contact-form__submit {
+  justify-self: start;
+}
+
+.puzzle-contact-form__honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 36rem) {
+  .puzzle-contact-form__submit {
+    width: 100%;
+  }
+}

@@ -1,14 +1,20 @@
 import {
+  AboutSection,
   AccommodationDetailsSection,
   AccommodationHero,
   AmenityListSection,
+  ContactForm,
+  ContactSection,
   CTASection,
+  FooterSection,
   GallerySection,
   GiftVoucherSection,
   GuestReviewsSection,
   HostProfileSection,
+  LocaleSwitcher,
   LocalGuideSection,
   ServiceOptionsSection,
+  SiteHeader,
 } from "@puzzle-ui/pieces";
 import { Button, Text } from "@puzzle-ui/ui";
 import { Icon } from "@puzzle-ui/icons";
@@ -71,6 +77,26 @@ const amenities = [
 
 export const BoutiqueBnbReferenceExample = () => (
   <main>
+    <SiteHeader
+      logo={<strong>Willow & Tide</strong>}
+      items={[
+        { id: "stay", label: "Stay", href: "#rooms", active: true },
+        { id: "guide", label: "Guide", href: "#guide" },
+        { id: "contact", label: "Contact", href: "#contact" },
+      ]}
+      localeSwitcher={
+        <LocaleSwitcher
+          currentLocale="en"
+          locales={[
+            { id: "en", locale: "en", label: "English", href: "/en" },
+            { id: "nl", locale: "nl", label: "Nederlands", href: "/nl" },
+          ]}
+          presentation="compact"
+        />
+      }
+      primaryAction={<Button href="#contact">Ask the host</Button>}
+      sticky
+    />
     <AccommodationHero
       eyebrow="The Willow & Tide"
       title="A small B&B with room to slow down."
@@ -129,6 +155,13 @@ export const BoutiqueBnbReferenceExample = () => (
         />
       }
       actions={<Button href="mailto:hello@willowtide.example">Ask the host</Button>}
+    />
+    <AboutSection
+      title="A small place with a big welcome"
+      description="Willow & Tide is a quiet guest house for travelers who want local mornings and an easy walk to the coast."
+      variant="mission"
+      mission="Make room for slower weekends."
+      vision="Share the best of the coast with care."
     />
     <HostProfileSection
       title="Meet Mara"
@@ -206,6 +239,7 @@ export const BoutiqueBnbReferenceExample = () => (
       variant="categorized"
     />
     <LocalGuideSection
+      id="guide"
       title="A little further afield"
       places={[
         {
@@ -255,6 +289,36 @@ export const BoutiqueBnbReferenceExample = () => (
       primaryAction={
         <Button href="mailto:mara@willowtide.example">Contact the host</Button>
       }
+    />
+    <ContactSection
+      id="contact"
+      title="Ask about your stay"
+      email="hello@willowtide.example"
+      formSlot={
+        <ContactForm
+          fields={[
+            { id: "name", name: "name", type: "text", label: "Name", required: true },
+            { id: "email", name: "email", type: "email", label: "Email", required: true },
+            { id: "message", name: "message", type: "textarea", label: "Message", required: true },
+          ]}
+          onSubmit={() => undefined}
+        />
+      }
+    />
+    <FooterSection
+      logo={<strong>Willow & Tide</strong>}
+      description="A fictional reference composition for Puzzle."
+      navigationGroups={[
+        {
+          id: "explore",
+          label: "Explore",
+          links: [
+            { id: "rooms", label: "Rooms", href: "#rooms" },
+            { id: "guide-link", label: "Local guide", href: "#guide" },
+          ],
+        },
+      ]}
+      copyright="© Willow & Tide"
     />
   </main>
 );

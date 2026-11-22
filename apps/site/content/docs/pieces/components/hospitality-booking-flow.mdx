@@ -7,7 +7,7 @@ import { Preview } from "@puzzle-ui/ui";
 import { BookingFlowExample } from "../../../../src/components/doc-examples/pieces/hospitality-booking";
 
 This example composes existing and new Pieces for an accommodation booking
-journey. The search form, rates, summary, and house rules all use supplied
+journey. The search form, availability calendar, rates, summary, and house rules all use supplied
 props. The demo has no booking backend, availability calculation, price
 calculation, database, or payment flow.
 
@@ -22,11 +22,13 @@ calculation, database, or payment flow.
 
 1. `AvailabilitySearchSection` presents dates, guest counts, and an optional
    accommodation choice. Its callback hands the values to application code.
-2. `RatePlansSection` displays the rate data returned by the application's
+2. `AvailabilityCalendar` presents day-level availability supplied by the
+   application and shares the selected range with the search step.
+3. `RatePlansSection` displays the rate data returned by the application's
    external source. It does not derive weekly prices from nightly prices.
-3. `StaySummarySection` displays the supplied guest/date details, price lines,
+4. `StaySummarySection` displays the supplied guest/date details, price lines,
    and total. It does not calculate nights or sum the breakdown.
-4. `HouseRulesSection` presents property terms provided by the owner or app.
+5. `HouseRulesSection` presents property terms provided by the owner or app.
 5. Existing [Accommodation Details](/docs/pieces/components/accommodation-details),
    [Gallery](/docs/pieces/components/gallery-section), and
    [Testimonials](/docs/pieces/components/testimonials) can be composed around

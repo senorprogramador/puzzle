@@ -1,0 +1,120 @@
+---
+title: Hospitality SEO with Puzzle
+description: Apply Puzzle metadata, canonical URLs, Schema.org graphs, localized routes, and truthful content practices to hospitality websites.
+---
+
+import {
+  LDBreadcrumbList,
+  LDLocalBusiness,
+  LDWebPage,
+  LDWebSite,
+  Schema,
+} from "@puzzle-ui/seo";
+
+This guide applies the existing `@puzzle-ui/seo` metadata and graph
+infrastructure to boutique hotels, B&Bs, apartments, villas, retreats, and
+other accommodation websites. It does not create a hospitality-specific SEO
+engine.
+
+## Page metadata
+
+Give every indexable page a unique title and useful description. Resolve a
+canonical URL from the application's configured site origin, add Open Graph
+metadata and an appropriate social preview image, and keep image `alt` text
+descriptive rather than promotional. Set the page locale and add `hreflang`
+alternates only when translated versions actually exist. Use `noindex` for
+private, duplicate, or incomplete pages.
+
+In the documentation site, route metadata already flows through the shared SEO
+helpers. A hospitality application should use the same pattern:
+
+```tsx
+const metadata = {
+  title: "Willow & Tide — coastal guest house",
+  description: "A small guest house with a garden near the coast.",
+  canonical: "/stay",
+  openGraph: { type: "website", url: "https://example.test/stay" },
+};
+```
+
+Keep the canonical origin, route, locale, and sitemap configuration consistent.
+Do not add duplicate head tags from individual content sections.
+
+## Truthful structured data
+
+The generated Schema.org registry is the source of truth. Use the existing
+React components for the business, website, page, and breadcrumbs:
+
+```tsx
+<LDLocalBusiness
+  id="https://example.test/#business"
+  name="Willow & Tide"
+  url="https://example.test/"
+  telephone="+31 20 000 0000"
+/>
+<LDWebSite id="https://example.test/#website" name="Willow & Tide" url="https://example.test/" />
+<LDWebPage
+  id="https://example.test/stay#page"
+  name="Stay at Willow & Tide"
+  url="https://example.test/stay"
+  isPartOf={{ "@id": "https://example.test/#website" }}
+/>
+<LDBreadcrumbList
+  itemListElement={[
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://example.test/" },
+    { "@type": "ListItem", position: 2, name: "Stay", item: "https://example.test/stay" },
+  ]}
+/>
+```
+
+Use the generic `Schema` escape hatch only for a generated type whose
+properties you have verified:
+
+```tsx
+<Schema
+  type="VacationRental"
+  id="https://example.test/stay/garden-room#property"
+  properties={{
+    name: "Garden Room",
+    url: "https://example.test/stay/garden-room",
+    description: "A room opening onto the garden.",
+  }}
+/>
+```
+
+Choose `LodgingBusiness` for the real lodging business and `VacationRental`
+when the page describes a vacation rental property and the facts are
+available. Use `Hotel` or `HotelRoom` only for an actual hotel and hotel-room
+offer. An apartment is not a hotel merely because the type is convenient.
+Expose only names, addresses, contact details, amenities, prices, ratings,
+reviews, coordinates, and availability that are real and visible on the page.
+
+## Local SEO and page structure
+
+Keep the business name, address, phone, contact details, map/directions links,
+and local content consistent across the site and external profiles. A
+property overview can describe the business and collection of stays;
+individual apartment pages should identify the specific property; gallery
+pages need meaningful alternatives; booking pages should expose only truthful
+offers and availability; contact pages should make a real contact method
+clear. Host stories and reviews must be supplied facts, not generated claims.
+
+## Multilingual pages
+
+Use `@puzzle-ui/i18n` for locale state, catalogs, ICU formatting, and safe
+locale-prefixed paths. `LocaleSwitcher` only presents caller-supplied
+destinations. Create an alternate link for each translated page, ensure each
+locale has a self-consistent canonical URL, and do not infer translations from
+the active path.
+
+## Sitemaps, robots, and validation
+
+Include only canonical, public accommodation URLs in the existing SEO sitemap.
+Keep booking steps, account routes, and incomplete content out of the index.
+Use the existing robots helpers and validation reports rather than writing
+another robots or JSON-LD generator. Validate graph nodes against the
+generated registry and inspect warnings before publishing.
+
+See [Metadata & URLs](/docs/seo/metadata), [Structured Data](/docs/seo/structured-data),
+[React Integration](/docs/seo/react), [Sitemaps](/docs/seo/sitemaps), and
+[Validation](/docs/seo/validation) for the public APIs and framework adapters.

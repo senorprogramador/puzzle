@@ -142,6 +142,12 @@ export const components = [
     description: "Choose a date using a calendar and input field.",
   },
   {
+    name: "Date Range Picker",
+    href: "/docs/ui/forms/date-range-picker",
+    icon: "lucide:calendar-range",
+    description: "Choose a start and end date with shared range behavior.",
+  },
+  {
     name: "FieldArray",
     href: "/docs/ui/forms/field-array",
     icon: "lucide:list-plus",

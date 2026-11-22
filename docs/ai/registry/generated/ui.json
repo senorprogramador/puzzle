@@ -1440,6 +1440,33 @@
       "aliases": []
     },
     {
+      "name": "DateRangePicker",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "forms",
+      "subcategory": "date-range-picker",
+      "description": "Choose a start and end date with shared range behavior.",
+      "documentation": "apps/site/content/docs/ui/forms/date-range-picker.mdx",
+      "source": "packages/ui/src/components/forms/date-range-picker/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Date Range Picker"
+      },
+      "aliases": []
+    },
+    {
       "name": "FieldArray",
       "package": "@puzzle-ui/ui",
       "entryPoints": [

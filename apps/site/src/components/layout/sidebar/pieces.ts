@@ -8,6 +8,23 @@ const components: TreeViewItem = {
   label: "Components",
   children: [
     {
+      id: "pieces-site-chrome",
+      label: "Navigation & Site Chrome",
+      href: `${componentsFolder}/navigation-site-chrome`,
+      children: [
+        {
+          id: "pieces-site-header",
+          label: "Site Header",
+          href: `${componentsFolder}/site-header`,
+        },
+        {
+          id: "pieces-locale-switcher",
+          label: "Locale Switcher",
+          href: `${componentsFolder}/locale-switcher`,
+        },
+      ],
+    },
+    {
       id: "pieces-marketing",
       label: "Marketing & Conversion",
       href: `${componentsFolder}/marketing`,
@@ -165,6 +182,11 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/availability-search`,
         },
         {
+          id: "pieces-availability-calendar",
+          label: "Availability Calendar",
+          href: `${componentsFolder}/availability-calendar`,
+        },
+        {
           id: "pieces-rate-plans",
           label: "Rate Plans",
           href: `${componentsFolder}/rate-plans`,
@@ -312,6 +334,11 @@ const components: TreeViewItem = {
           id: "pieces-contact-section",
           label: "Contact Section",
           href: `${componentsFolder}/contact-section`,
+        },
+        {
+          id: "pieces-contact-form",
+          label: "Contact Form",
+          href: `${componentsFolder}/contact-form`,
         },
         {
           id: "pieces-location-section",
