@@ -7,9 +7,8 @@ storage, media processing, CMS schemas/publishing, or payment-provider
 credentials.
 
 Install with `npm install @puzzle-ui/fullstack`. There is intentionally no
-package-root import. Use only declared subpaths. The current npm release
-contains the Auth subpaths; Media and CMS subpaths in this repository await a
-coordinated release with their domain packages.
+package-root import. Use only the declared Auth, Media, CMS, and Payments
+subpaths.
 
 - `@puzzle-ui/fullstack/auth/client` for browser-facing APIs.
 - `@puzzle-ui/fullstack/auth/shared` for serializable shared contracts.

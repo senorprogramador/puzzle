@@ -187,6 +187,11 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/availability-calendar`,
         },
         {
+          id: "pieces-availability-manager",
+          label: "Availability Manager",
+          href: `${componentsFolder}/availability-manager`,
+        },
+        {
           id: "pieces-rate-plans",
           label: "Rate Plans",
           href: `${componentsFolder}/rate-plans`,

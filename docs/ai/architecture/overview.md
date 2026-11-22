@@ -4,7 +4,7 @@ Puzzle is a TypeScript and React ecosystem designed for both human developers an
 
 ## Monorepo organization
 
-The root [`package.json`](../../../package.json) defines the Bun workspaces. Expanding those patterns discovers 26 workspaces: 5 applications and 21 packages. The root manifest and each matched package manifest are authoritative; package names come from each manifest's `name`, not its directory.
+The root [`package.json`](../../../package.json) defines the Bun workspaces. Expanding those patterns discovers 27 workspaces: 5 applications and 22 packages. The root manifest and each matched package manifest are authoritative; package names come from each manifest's `name`, not its directory.
 
 - [`apps/`](../../../apps/) contains the documentation site, component playground, two Workspace examples, and a React Router SSR/i18n example.
 - [`packages/`](../../../packages/) contains public library workspaces (including packages awaiting release) and private packages shared by the sample apps.
@@ -44,6 +44,7 @@ flowchart LR
     ui["@puzzle-ui/ui"]
     pieces["@puzzle-ui/pieces"]
     media["@puzzle-ui/media"]
+    mediacf["@puzzle-ui/media-cloudflare"]
     cms["@puzzle-ui/cms"]
     storage["@puzzle-ui/storage"]
     d1["@puzzle-ui/storage-d1"]
@@ -60,6 +61,7 @@ flowchart LR
   end
 
   playground --> core
+  mediacf --> media
   playground --> hooks
   playground --> icons
   playground --> pieces

@@ -78,12 +78,13 @@
       "instructionDependencies": [
         "@puzzle-ui/auth",
         "@puzzle-ui/cms",
+        "@puzzle-ui/commerce",
         "@puzzle-ui/media",
         "@puzzle-ui/session",
         "@puzzle-ui/ui"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/fullstack",
-      "contentHash": "db1fd7a58ab25368fb84b86217aaf801c0499237e7dde55579e0aa2d0358772a"
+      "contentHash": "e97931ff4c64124ed1dac5f5d73bb9504a0530fec8c1da82a72dfdd8b2337df2"
     },
     {
       "name": "@puzzle-ui/hooks",
@@ -142,6 +143,20 @@
       "contentHash": "69bdf6fdb0bc2e8992f197c5cceedd1217aaee6f2934fbe232161b6ad7c6b841"
     },
     {
+      "name": "@puzzle-ui/media-cloudflare",
+      "version": "0.16.0",
+      "instructionVersion": 1,
+      "files": [
+        "ai/manifest.json",
+        "ai/instructions.md"
+      ],
+      "instructionDependencies": [
+        "@puzzle-ui/media"
+      ],
+      "documentationUrl": "https://puzzle-ui.com/docs/media-cloudflare",
+      "contentHash": "7b9dcb86d33cea61eb740c3d582ead8f2d1b9d14fd7de906fe0f6cd756610aa4"
+    },
+    {
       "name": "@puzzle-ui/payment-providers",
       "version": "0.16.0",
       "instructionVersion": 1,
@@ -167,7 +182,7 @@
         "@puzzle-ui/ui"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/pieces",
-      "contentHash": "bfe718d0fa0e14546734c44c931492b6a598c2f30f101c8eaabe413657379e92"
+      "contentHash": "3fbc055b1f63379f75ac99379692deda8c219e19aa413b647b3a8f4316307271"
     },
     {
       "name": "@puzzle-ui/seo",
@@ -261,7 +276,7 @@
         "@puzzle-ui/theme"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/ui",
-      "contentHash": "e19d39104f3056740b016376d5d956c1b46376e753b7a220ef816a36beb9f0a6"
+      "contentHash": "6293d2b08fb2dd869e2bd91b7d2678a33acb3b6d6f1ebb124ea92f2b88481e2a"
     }
   ]
 }

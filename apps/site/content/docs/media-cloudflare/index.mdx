@@ -1,0 +1,80 @@
+---
+title: Cloudflare Media
+description: Use Cloudflare R2 and Images with Puzzle's provider-neutral media contracts.
+---
+
+`@puzzle-ui/media-cloudflare` provides server- and Worker-compatible Cloudflare
+implementations for [`@puzzle-ui/media`](/docs/media). It keeps Cloudflare
+bindings, signing credentials, bucket provisioning, and image processing behind
+injected adapters so the host application retains tenant authorization and
+durable metadata ownership.
+
+## Install
+
+```sh
+npm install @puzzle-ui/media @puzzle-ui/media-cloudflare
+```
+
+The package is currently workspace-available. Do not expose R2 credentials,
+object keys, multipart IDs, signed headers, or signed URLs to browser-facing
+application state.
+
+## R2 object storage
+
+`CloudflareR2MediaObjectStorageAdapter` supports single and multipart upload
+lifecycles, expiry checks, SHA-256 and size validation, idempotent completion,
+abort and deletion cleanup, metadata, cursor listing, and tenant-prefixed
+object references. Static R2 bindings can be used for shared buckets. Dynamic
+tenant bucket resolution is represented by injected resolver and signer
+interfaces for applications using the R2 S3-compatible API. For direct
+presigned targets, `CloudflareR2S3UrlSigner` provides Worker-compatible AWS
+Signature Version 4 signing without an AWS SDK runtime dependency.
+
+```ts
+import {
+  CloudflareR2MediaObjectStorageAdapter,
+  InMemoryCloudflareMediaMetadataStore,
+} from "@puzzle-ui/media-cloudflare";
+
+const objectStorage = new CloudflareR2MediaObjectStorageAdapter({
+  tenantId: "tenant-a",
+  bucket: {
+    bucket: env.MEDIA_BUCKET,
+    signer: env.MEDIA_SIGNER,
+  },
+  metadataStore: new InMemoryCloudflareMediaMetadataStore(),
+});
+```
+
+Use a durable, tenant-scoped metadata store in production. The in-memory store
+is for tests and local development. The host must authorize the trusted tenant
+context before constructing or invoking the adapter; an asset or object ID is
+not an authorization mechanism.
+
+## Bucket provisioning
+
+`CloudflareR2BucketProvisioner` consumes a narrow Cloudflare account API
+interface. It validates names, supports idempotent creation and lookup,
+exposes provisioning status, and requires explicit safeguards before deletion.
+Supply host-owned checks for active references, retention, and incomplete
+operations before allowing a bucket to be removed.
+
+## Cloudflare Images
+
+`CloudflareImagesProcessor` accepts an injectable Images binding, source
+resolver, and variant writer. Named profiles are normalized before processing,
+and deterministic profile/checksum identities allow callers to reuse generated
+variants rather than transforming on every request. Missing source objects,
+unsupported data, transformation failures, aborts, and failed writes are
+reported as errors; the processor never reports an unchanged original as a
+successful transformation.
+
+## Ownership and deployment
+
+This package does not provide a database, queue, HTTP API, tenant registry, or
+browser upload UI. Applications remain responsible for durable upload metadata,
+tenant-to-bucket mapping, authorization, content inspection, quotas, lifecycle
+workers, and controlled asset URL resolution. See the
+[provider-neutral Media guide](/docs/media) for the upload and processing
+contracts and [Fullstack Media integration](/docs/fullstack/media) for
+server-handler composition.

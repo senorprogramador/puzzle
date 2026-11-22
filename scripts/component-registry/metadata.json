@@ -25,6 +25,7 @@
         "AccommodationOverviewSection": "apps/site/content/docs/pieces/components/accommodation-overview.mdx",
         "AvailabilitySearchSection": "apps/site/content/docs/pieces/components/availability-search.mdx",
         "AvailabilityCalendar": "apps/site/content/docs/pieces/components/availability-calendar.mdx",
+        "AvailabilityManager": "apps/site/content/docs/pieces/components/availability-manager.mdx",
         "AmenityListSection": "apps/site/content/docs/pieces/components/amenity-list.mdx",
         "ContactForm": "apps/site/content/docs/pieces/components/contact-form.mdx",
         "CheckoutSection": "apps/site/content/docs/pieces/components/checkout.mdx",

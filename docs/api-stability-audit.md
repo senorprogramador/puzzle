@@ -2,7 +2,7 @@
 
 ## Scope and method
 
-Audited all 72 individually documented components in `@puzzle-ui/ui`, all 131
+Audited all 72 individually documented components in `@puzzle-ui/ui`, all 132
 canonical components documented by `@puzzle-ui/pieces` (including 14 canonical
 Hero components; the package also exposes 11 aliases that are not double-counted), and 46 other React components documented by the Theme (2), Icons
 (1), Fullstack (7), and SEO (36) package guides. Aliases are recorded with
@@ -13,7 +13,7 @@ The public API below is taken from the package entry points and component
 exports, not inferred from examples. Validation evidence is based on
 component-local test files and the public package peer dependencies. The site
 package declares React and React DOM 19 as peers. The component inventory
-contains 249 APIs: 248 Stable and `SectionHeader` Beta. Stable classifications
+contains 250 APIs: 249 Stable and `SectionHeader` Beta. Stable classifications
 include documented backward-compatibility intent within a major version.
 Package-level utility and adapter APIs retain their separate maturity
 classifications below.
@@ -153,6 +153,7 @@ specialized required-media prop types.
 | AssetPickerDialog | `AssetPickerDialog`, discriminated single/multiple props, and picker types | Stable | Source: `src/components/media/asset-picker-dialog.tsx`; reference: `pieces/components/asset-picker-dialog.mdx`. Component/browser tests cover ID selection, kind filtering, narrow Drawer presentation, and Escape; UI overlays own focus management. |
 | AvailabilitySearchSection | `AvailabilitySearchSection` and its exported props/types | Stable | Source: `src/components/commerce/availability-search-section/availability-search-section.tsx`; reference: `pieces/components/availability-search.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | AvailabilityCalendar | `AvailabilityCalendar`, `AvailabilityCalendarProps`, `AvailabilityDay`, and `AvailabilityDayStatus` | Stable | Source: `src/components/commerce/availability-calendar/availability-calendar.tsx`; reference: `pieces/components/availability-calendar.mdx`. Component tests cover supplied statuses, empty state, local stay constraints, and composition with DateRangePicker. |
+| AvailabilityManager | `AvailabilityManager` and its exported props/types | Stable | Source: `src/components/commerce/availability-manager/availability-manager.tsx`; reference: `pieces/components/availability-manager.mdx`. Component and browser tests cover controlled resource/day data, date and range selection, bulk-edit presentation, accessibility, and responsive layouts; callers own persistence and availability rules. |
 | AwardsSection | `AwardsSection` and its exported props/types | Stable | Source: `src/components/business/awards-section/awards-section.tsx`; reference: `pieces/components/awards-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | BenefitsSection | `BenefitsSection` and its exported props/types | Stable | Source: `src/components/marketing/benefits/benefits.tsx`; reference: `pieces/components/benefits.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
 | BlogSection | `BlogSection` and its exported props/types | Stable | Source: `src/components/content/blog-section/blog-section.tsx`; reference: `pieces/components/blog-section.mdx`. The complete Pieces suite passed 874 tests; within-major compatibility is committed. |
@@ -322,8 +323,8 @@ their component names and usage.
 
 ## Findings and follow-up
 
-- **Stable: 241; Beta: 1; Experimental: 0 (242 components total).** The sole
-  Beta component is UI `SectionHeader`; all 125 canonical Pieces components
+- **Stable: 249; Beta: 1; Experimental: 0 (250 components total).** The sole
+  Beta component is UI `SectionHeader`; all 132 canonical Pieces components
   have a within-major backward-compatibility commitment. Component-specific
   limitations and framework boundaries remain documented; Stable does not
   mean production readiness.

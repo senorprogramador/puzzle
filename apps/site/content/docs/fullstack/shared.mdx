@@ -1,9 +1,20 @@
 ---
-title: Shared types
-description: Serializable authentication snapshots, inputs, user data, and results exposed by the shared entry point.
+title: Auth shared types
+description: Serializable authentication snapshots, inputs, user data, and results exposed by the Auth shared entry point.
 ---
 
-The `@puzzle-ui/fullstack/auth/shared` subpath contains data-only TypeScript contracts used across browser and server code. It has no runtime exports, so import these types when defining app boundaries or passing auth state between runtimes. The client entry point re-exports most client-facing contracts; `AuthClientLifecycleResult` is available from this shared subpath.
+The `@puzzle-ui/fullstack/auth/shared` subpath contains data-only TypeScript
+contracts used across browser and server code. It has no runtime exports, so
+import these types when defining app boundaries or passing auth state between
+runtimes. The client entry point re-exports most client-facing contracts;
+`AuthClientLifecycleResult` is available from this shared subpath.
+
+Fullstack also exposes area-specific shared contracts from
+`@puzzle-ui/fullstack/media/shared`, `@puzzle-ui/fullstack/cms/shared`, and
+`@puzzle-ui/fullstack/payments/shared`. Those contracts are documented with
+their corresponding [Media API](/docs/fullstack/media),
+[CMS API](/docs/fullstack/cms), and [commerce/payment](/docs/commerce)
+guides; do not import them from `auth/shared`.
 
 ## Install
 

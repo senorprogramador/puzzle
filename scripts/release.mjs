@@ -17,6 +17,7 @@ const releaseOrder = [
   "icons",
   "storage",
   "media",
+  "media-cloudflare",
   "cms",
   "ui",
   "pieces",

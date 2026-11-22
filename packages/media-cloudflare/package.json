@@ -1,0 +1,61 @@
+{
+  "name": "@puzzle-ui/media-cloudflare",
+  "version": "0.16.0",
+  "description": "Cloudflare R2 and Images adapters for Puzzle media contracts.",
+  "homepage": "https://puzzle-ui.com/docs/media-cloudflare",
+  "keywords": [
+    "puzzle-ui",
+    "cloudflare",
+    "r2",
+    "images",
+    "media",
+    "object-storage"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/senorprogramador/puzzle.git"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "ai"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "bun test tests --timeout 30000",
+    "vitest": "bun test tests --timeout 30000",
+    "clean": "rm -rf dist",
+    "prepack": "tsdown"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "bun": "^1.4.4",
+    "tsdown": "^0.23.1",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@puzzle-ui/media": "^0.16.0"
+  }
+}

@@ -6,6 +6,7 @@
   "instructionDependencies": [
     "@puzzle-ui/auth",
     "@puzzle-ui/cms",
+    "@puzzle-ui/commerce",
     "@puzzle-ui/media",
     "@puzzle-ui/session",
     "@puzzle-ui/ui"

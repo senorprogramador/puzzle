@@ -195,20 +195,20 @@ Pass <code>env.DB</code> to <code>D1StorageAdapter</code> from your Worker. The 
 import { D1StorageAdapter, D1StorageMigrationAdapter } from "@puzzle-ui/storage-d1";
 import type { D1DatabaseLike } from "@puzzle-ui/storage-d1";
 
-export default {
-  async fetch(_request: Request, env: { DB: D1DatabaseLike }) {
-    const storage = new D1StorageAdapter({ database: env.DB });
-    const migrations = new D1StorageMigrationAdapter({ database: env.DB });
-
-    await migrations.runMigrations([initialSchema]);
-    await storage.registerCollection({ name: "sessions" });
-
-    return new Response("Storage is ready");
-  },
-};
+export const createStorage = (env: { DB: D1DatabaseLike }) => ({
+  storage: new D1StorageAdapter({ database: env.DB }),
+  migrations: new D1StorageMigrationAdapter({ database: env.DB }),
+});
 ```
 
-Use one-time deployment or startup orchestration for <code>runMigrations</code>; avoid running the migration list on every request. D1's migration adapter maintains its own prefixed migration and lock tables. These are adapter-managed migrations—not Wrangler's SQL migration directory or <code>wrangler d1 migrations</code> commands. Wrangler still manages the database binding and local/remote database lifecycle. <code>registerCollection</code> creates the prefixed table and any declared indexes if they do not exist.
+Call <code>runMigrations</code> from one-time deployment or startup
+orchestration before serving requests; do not run the migration list inside a
+request handler or a recurring cleanup job. D1's migration adapter maintains
+its own prefixed migration and lock tables. These are adapter-managed
+migrations—not Wrangler's SQL migration directory or <code>wrangler d1
+migrations</code> commands. Wrangler still manages the database binding and
+local/remote database lifecycle. <code>registerCollection</code> creates the
+prefixed table and any declared indexes if they do not exist.
 
 The default table prefix is <code>puzzle_</code>; set <code>tablePrefix</code> to change it. D1 stores record-specific fields as JSON and keeps IDs, timestamps, and revisions in columns. It supports the shared query operators, conditional writes, cursor pagination, unique indexes, migrations, and atomic batches. D1 reports transactions and atomic batches as supported through its batch API; it does not provide TTL indexes, so schedule expiration cleanup in your application or a Worker cron job. Configure a distinct prefix if multiple adapters share a database and need separate table namespaces.
 

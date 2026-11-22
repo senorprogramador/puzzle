@@ -17,10 +17,9 @@ npm install @puzzle-ui/fullstack react react-dom
 
 React and React DOM 19 are required peer dependencies. `next` (15 or 16) and `@tanstack/react-start` are optional peers for their respective adapters. On the server, configure the managers from `@puzzle-ui/auth` and `@puzzle-ui/session` with your storage backend. See the [Auth docs](https://puzzle-ui.com/docs/auth), [Storage docs](https://puzzle-ui.com/docs/storage), and [developer authentication guide](https://puzzle-ui.com/docs/developer/authentication).
 
-The existing npm release contains the Auth subpaths. The new `/media/*` and
-`/cms/*` subpaths are available in this repository as workspace source and
-require a coordinated release with `@puzzle-ui/media` and `@puzzle-ui/cms`
-before they can be installed from npm.
+The published package includes the Auth, Media, CMS, and Payments subpaths
+listed below. Keep framework imports on the matching `/next` or `/tanstack`
+subpath; there is no package-root export.
 
 ## Payments
 

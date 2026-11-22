@@ -1,0 +1,130 @@
+---
+title: React Sortable Tree Component
+description: Reorder nested React tree data with accessible keyboard, pointer, and touch interactions.
+---
+
+import { Badge, Preview, Section, SortableTree } from "@puzzle-ui/ui";
+
+Use `SortableTree` for editors, file managers, and navigation structures where
+people need to change the order or nesting of nodes. It is controlled: persist
+the `SortableTreeMove` from `onMove`, or use `onItemsChange` when the component
+should provide the next immutable tree value. For read-only browsing, use
+[TreeView](/docs/ui/navigation/tree-view) instead.
+
+<Badge content="Stable" color="primary" /> **API maturity: Stable.**
+
+## Import
+
+```tsx
+import {
+  SortableTree,
+  type SortableTreeItem,
+  type SortableTreeMove,
+} from "@puzzle-ui/ui";
+```
+
+## Nested editing
+
+The drag handle is a native button, so it remains keyboard reachable and does
+not make the entire row draggable. Use Space to lift the focused item, Arrow Up
+or Arrow Down to choose a sibling destination, Space to drop, and Escape to
+cancel. Pointer and long-press touch dragging use the same handle.
+
+<Preview
+  hideDevices={true}
+  code={`\
+const [items, setItems] = useState<SortableTreeItem[]>([
+  { id: "content", label: "Content", children: [
+    { id: "home", label: "Home" },
+    { id: "about", label: "About" },
+  ] },
+  { id: "settings", label: "Settings" },
+]);
+
+<SortableTree
+  aria-label="Site structure"
+  items={items}
+  defaultExpandedIds={["content"]}
+  maxDepth={3}
+  onItemsChange={setItems}
+/>
+`}
+>
+  <Section>
+    <SortableTree
+      aria-label="Site structure"
+      defaultExpandedIds={["content"]}
+      items={[
+        {
+          id: "content",
+          label: "Content",
+          children: [
+            { id: "home", label: "Home" },
+            { id: "about", label: "About" },
+          ],
+        },
+        { id: "settings", label: "Settings" },
+      ]}
+      maxDepth={3}
+    />
+  </Section>
+</Preview>
+
+## Selection, expansion, and custom content
+
+Expansion and selection follow the same controlled conventions as `TreeView`.
+Use `renderItem`, `renderIcon`, `renderLabel`, or `renderActions` for
+application-specific content. Action content should be independently
+interactive; the tree ignores its clicks so an action does not select or move
+the row.
+
+```tsx
+<SortableTree
+  aria-label="Project files"
+  items={items}
+  selectionMode="multiple"
+  selectedIds={selectedIds}
+  onSelectionChange={setSelectedIds}
+  expandedIds={expandedIds}
+  onExpandedChange={setExpandedIds}
+  renderActions={(item) => (
+    <button type="button" onClick={() => rename(item.id)}>Rename</button>
+  )}
+/>
+```
+
+## Safe moves
+
+`SortableTree` rejects drops onto a node's own descendant, disabled nodes, and
+destinations deeper than `maxDepth`. Use `canMove` for domain-specific rules.
+`onMove` receives the source ID, destination parent, child index, target ID, and
+relative position (`"before"`, `"inside"`, or `"after"`). The move callback is
+also where an application can update a server or history stack.
+
+The tree announces lift, movement, invalid destinations, cancellation, and
+drop through a polite live region. Keep the accessible tree name and the drag
+handle labels meaningful when labels are rendered as rich content.
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `items` | `SortableTreeItem<TData>[]` | Controlled nested nodes. |
+| `onMove` | `(move: SortableTreeMove) => void` | Receives a valid keyboard or pointer move. |
+| `onItemsChange` | `(items: SortableTreeItem<TData>[]) => void` | Receives the immutable result of a valid move. |
+| `maxDepth` | `number` | Maximum resulting depth, including descendants. |
+| `canMove` | `(move: SortableTreeMove) => boolean` | Optional domain-specific move guard. |
+| `expandedIds`, `defaultExpandedIds` | `string[]` | Controlled or initial expanded nodes. |
+| `selectedIds`, `defaultSelectedIds` | `string[]` | Controlled or initial selection. |
+| `selectionMode` | `"none" \| "single" \| "multiple"` | Selection behavior. |
+| `renderItem`, `renderIcon`, `renderLabel`, `renderActions` | render callbacks | Customize node content and actions. |
+| `size`, `indentation` | `"sm" \| "md"`, `string \| number` | Density and hierarchy spacing. |
+
+`SortableTreeItem` requires a stable `id` and `label`; `children`, `icon`,
+`actions`, `disabled`, `selectable`, `textValue`, and `data` are optional.
+
+## Related documentation
+
+- [Tree View](/docs/ui/navigation/tree-view) for read-only hierarchies.
+- [Navigation components](/docs/ui/navigation)
+- [Theme design tokens](/docs/theme/tokens)

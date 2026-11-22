@@ -65,6 +65,10 @@ UI.
 - **Good fit:** A lodging page needs caller-supplied day statuses and a
   check-in/check-out range. Use `AvailabilityCalendar`; use `DateRangePicker`
   directly when no hospitality availability presentation is needed.
+- **Good fit:** An authorized application needs a responsive resource/day
+  availability matrix with monthly navigation, selection, and a hand-off to
+  its own bulk editor. Use `AvailabilityManager`; keep availability rules,
+  price arithmetic, authorization, and persistence in the application.
 - **Good fit:** A reusable inquiry flow needs standard fields, local validation,
   consent, async feedback, and a typed callback. Use `ContactForm`; use
   `ContactSection` when the page needs contact details and slots rather than

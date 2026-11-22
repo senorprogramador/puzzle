@@ -405,6 +405,13 @@ export const components = [
     description: "Browse and select items in a hierarchical tree.",
   },
   {
+    name: "Sortable Tree",
+    href: "/docs/ui/navigation/sortable-tree",
+    icon: "lucide:waypoints",
+    description:
+      "Reorder nested nodes with accessible keyboard, pointer, and touch interactions.",
+  },
+  {
     name: "Backdrop",
     href: "/docs/ui/overlays/backdrop",
     icon: "lucide:blend",

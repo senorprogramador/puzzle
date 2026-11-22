@@ -37,6 +37,7 @@ const packagePages = [
   ["storage-mongodb", "/docs/storage#mongodb-adapter"],
   ["cms", "/docs/cms"],
   ["media", "/docs/media"],
+  ["media-cloudflare", "/docs/media-cloudflare"],
   ["fullstack", "/docs/fullstack"],
   ["payment-providers", "/docs/payment-providers"],
   ["seo", "/docs/seo"],

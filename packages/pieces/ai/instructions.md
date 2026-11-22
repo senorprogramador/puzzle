@@ -41,6 +41,11 @@ validation only: the application owns availability, confirmation, and
 reservation persistence. The `Restaurant Experience` docs show the complete
 composition.
 
+For resource-level availability editing, use `AvailabilityManager` with
+caller-owned resource/day data and minor-unit prices. Keep selection handling,
+availability and pricing rules, authorization, and persistence in the
+application; use its typed slots to compose the application's bulk editor.
+
 For shared hospitality content, prefer `GuestReviewsSection` over
 `TestimonialsSection` only when review dates, sources, or a supplied rating
 distribution are needed. Use `LocalGuideSection` for nearby recommendations

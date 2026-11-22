@@ -381,6 +381,11 @@ const navigation: TreeViewItem = {
       label: "Tree View",
       href: `${folder}/navigation/tree-view`,
     },
+    {
+      id: "ui-sortable-tree",
+      label: "Sortable Tree",
+      href: `${folder}/navigation/sortable-tree`,
+    },
   ],
 } as const;
 //#endregion Navigation

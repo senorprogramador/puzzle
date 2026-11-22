@@ -70,7 +70,7 @@ export const App = () => (
 | Editors      | TextEditor, TextEditorToolbar, TextRenderer                                                                   |
 | Forms        | Autocomplete, Checkbox, ColorPicker, DatePicker, FileUpload, ImageUpload, VideoUpload, FormField, inputs, Radio, Select, Slider, Switch |
 | Layout       | AppBar, AspectRatio, Container, Grid, GridItem, PageLayout, ResizablePanels, ScrollArea, Section, SectionHeader, Separator, Sidebar, Stack |
-| Navigation   | Accordion, Breadcrumbs, Carousel, Link, Pagination, Tabs, TreeView                                            |
+| Navigation   | Accordion, Breadcrumbs, Carousel, Link, Pagination, SortableTree, Tabs, TreeView                              |
 | Overlays     | Command, ContextMenu, Dialog, Drawer, DropdownMenu, Notification, Popover, Tooltip                            |
 | Typography   | Heading, Text                                                                                                 |
 | Utilities    | Portal, Preview, ScrollLock, Transition                                                                       |

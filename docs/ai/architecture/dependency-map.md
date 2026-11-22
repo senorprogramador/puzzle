@@ -21,6 +21,7 @@ This map records direct dependency relationships among workspaces. The root [`pa
 | `packages/i18n` (`@puzzle-ui/i18n`) | None |
 | `packages/icons` (`@puzzle-ui/icons`) | `@puzzle-ui/core` |
 | `packages/media` (`@puzzle-ui/media`) | `@puzzle-ui/storage` |
+| `packages/media-cloudflare` (`@puzzle-ui/media-cloudflare`) | `@puzzle-ui/media` |
 | `packages/payment-providers` (`@puzzle-ui/payment-providers`) | `@puzzle-ui/commerce` |
 | `packages/pieces` (`@puzzle-ui/pieces`) | `@puzzle-ui/cms`, `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/theme`, `@puzzle-ui/ui` |
 | `packages/seo` (`@puzzle-ui/seo`) | None |

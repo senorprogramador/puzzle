@@ -1124,6 +1124,35 @@
       "aliases": []
     },
     {
+      "name": "AvailabilityManager",
+      "package": "@puzzle-ui/pieces",
+      "entryPoints": [
+        "."
+      ],
+      "category": "commerce",
+      "subcategory": "availability-manager",
+      "description": "Present caller-owned resource availability and minor-unit prices in a responsive monthly editor surface.",
+      "documentation": "apps/site/content/docs/pieces/components/availability-manager.mdx",
+      "source": "packages/pieces/src/components/commerce/availability-manager/availability-manager.tsx",
+      "useCases": [
+        "commerce"
+      ],
+      "pageTypes": [
+        "catalog",
+        "product",
+        "booking"
+      ],
+      "capabilities": [
+        "responsive",
+        "composable"
+      ],
+      "composition": {
+        "kind": "section",
+        "family": "availability-manager"
+      },
+      "aliases": []
+    },
+    {
       "name": "AvailabilitySearchSection",
       "package": "@puzzle-ui/pieces",
       "entryPoints": [
@@ -8460,6 +8489,33 @@
       "composition": {
         "kind": "primitive",
         "family": "Pagination"
+      },
+      "aliases": []
+    },
+    {
+      "name": "SortableTree",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "sortable-tree",
+      "description": "Reorder nested nodes with accessible keyboard, pointer, and touch interactions.",
+      "documentation": "apps/site/content/docs/ui/navigation/sortable-tree.mdx",
+      "source": "packages/ui/src/components/navigation/sortable-tree/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Sortable Tree"
       },
       "aliases": []
     },

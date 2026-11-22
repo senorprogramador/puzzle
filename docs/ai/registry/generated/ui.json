@@ -2777,6 +2777,33 @@
       "aliases": []
     },
     {
+      "name": "SortableTree",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "."
+      ],
+      "category": "navigation",
+      "subcategory": "sortable-tree",
+      "description": "Reorder nested nodes with accessible keyboard, pointer, and touch interactions.",
+      "documentation": "apps/site/content/docs/ui/navigation/sortable-tree.mdx",
+      "source": "packages/ui/src/components/navigation/sortable-tree/index.tsx",
+      "useCases": [
+        "navigation"
+      ],
+      "pageTypes": [
+        "generic"
+      ],
+      "capabilities": [
+        "navigation",
+        "interactive"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Sortable Tree"
+      },
+      "aliases": []
+    },
+    {
       "name": "Tabs",
       "package": "@puzzle-ui/ui",
       "entryPoints": [

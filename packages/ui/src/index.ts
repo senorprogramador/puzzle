@@ -599,6 +599,17 @@ export {
   type TreeViewSize,
 } from "./components/navigation/tree-view";
 
+export {
+  SortableTree,
+  type SortableTreeProps,
+  type SortableTreeItem,
+  type SortableTreeItemState,
+  type SortableTreeMove,
+  type SortableTreeDropPosition,
+  type SortableTreeSelectionMode,
+  type SortableTreeSize,
+} from "./components/navigation/sortable-tree";
+
 // #endregion Navigation
 
 // #region Overlays

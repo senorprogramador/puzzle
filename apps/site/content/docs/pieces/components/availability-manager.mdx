@@ -1,0 +1,76 @@
+---
+title: AvailabilityManager
+description: Present caller-owned resource availability and minor-unit prices in a responsive monthly editor surface.
+---
+
+import { Badge, Preview } from "@puzzle-ui/ui";
+import { AvailabilityManagerExample } from "../../../../src/components/doc-examples/pieces/hospitality-new-components";
+
+`AvailabilityManager` is a presentation-only resource/day matrix for
+accommodation and other inventory calendars. It renders one or more months,
+supports single, range, and multi-cell selection, and exposes typed slots for
+the editor controls owned by the application.
+
+<Badge content="Stable" color="primary" />
+**API maturity: Stable.**
+
+## Import
+
+```tsx
+import {
+  AvailabilityManager,
+  type AvailabilityManagerDay,
+  type AvailabilityManagerResource,
+  type AvailabilityManagerSelection,
+} from "@puzzle-ui/pieces";
+```
+
+<Preview fit="device" code={`<AvailabilityManager resources={resources} onSelectionChange={setSelection} />`}>
+  <AvailabilityManagerExample />
+</Preview>
+
+## Data and currency
+
+Each resource has an `id`, label, and caller-supplied `days`. Day dates are
+date-only local `Date` values; time and timezone are ignored when the manager
+builds keys and ranges. Missing day data is shown as unavailable. A day price
+uses the `AvailabilityManagerPrice` shape (`{ amount, currency }`) where
+`amount` is in minor currency units: `1250` USD displays as `$12.50`. The
+manager does not calculate prices, totals, availability, or persistence.
+
+## Selection and editing
+
+Use `value` with `onChange` or `onSelectionChange` for controlled selection;
+`defaultValue` is available for an initial local selection. Set
+`selectionMode` to `single`, `range`, or `multiple`. The `range` mode selects
+an inclusive date range for one resource. `onCellClick` is a notification
+callback, while `onBulkEdit` is a typed hand-off for an application-owned
+editor. Use `slots.bulkActions` to render those controls; the slot receives
+selected cells, `clearSelection`, and `applyBulkEdit` callbacks and does not
+persist anything.
+
+## Months, accessibility, and responsive behavior
+
+`months={1}`, `2`, or `3` renders adjacent month matrices with previous/next
+month controls. Dates are real buttons inside semantic grid tables with
+accessible resource/date labels, pressed selection state, keyboard focus, and
+live month headings. Month tables remain usable on narrow screens through
+horizontal scrolling, while multiple months collapse into a single column.
+`slots.toolbar`, `slots.resourceLabel`, and `slots.day` allow caller-owned
+controls and content without replacing the calendar's semantics.
+
+## API
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `resources` | `readonly AvailabilityManagerResource[]` | Resource rows and caller-supplied day data. |
+| `value`, `defaultValue`, `onSelectionChange` | selection contract | Controlled or initial selected cells. |
+| `selectionMode` | `"single" \| "range" \| "multiple"` | Selection presentation behavior. |
+| `months`, `month`, `initialMonth`, `onMonthChange` | month controls | One to three visible months and caller-owned navigation state. |
+| `slots` | `AvailabilityManagerSlots` | Typed toolbar, resource, day, bulk-action, and empty-state slots. |
+| `loading`, `error`, `emptyState`, `disabled` | state props | Presentation states supplied by the caller. |
+
+Use [AvailabilityCalendar](/docs/pieces/components/availability-calendar) for
+guest-facing check-in/check-out selection. Use this manager when an authorized
+application needs to present inventory rows and hand selections to its own
+availability and pricing workflow.

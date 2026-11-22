@@ -7,6 +7,7 @@ import hooks from "../../../../packages/hooks/package.json";
 import i18n from "../../../../packages/i18n/package.json";
 import icons from "../../../../packages/icons/package.json";
 import media from "../../../../packages/media/package.json";
+import mediaCloudflare from "../../../../packages/media-cloudflare/package.json";
 import pieces from "../../../../packages/pieces/package.json";
 import seo from "../../../../packages/seo/package.json";
 import session from "../../../../packages/session/package.json";
@@ -30,13 +31,18 @@ type PublicManifest = {
 
 // Explicitly select public fields rather than serializing package manifests.
 const manifests: PublicManifest[] = [
-  auth, cms, core, create, fullstack, hooks, i18n, icons, media, pieces, seo, session, storage,
+  auth, cms, core, create, fullstack, hooks, i18n, icons, media, mediaCloudflare, pieces, seo, session, storage,
   storageD1, storageMongodb, theme, ui,
 ];
 
 const repository = root.repository.url.replace(/^git\+/, "").replace(/\.git$/, "");
 // Do not advertise npm URLs until these new workspace packages are released.
-const unpublishedPackages = new Set([cms.name, i18n.name, media.name]);
+const unpublishedPackages = new Set([
+  cms.name,
+  i18n.name,
+  media.name,
+  mediaCloudflare.name,
+]);
 
 const publicPeers = (manifest: PublicManifest): Record<string, string> =>
   Object.fromEntries(

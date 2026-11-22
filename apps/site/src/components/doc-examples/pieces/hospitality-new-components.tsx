@@ -1,6 +1,8 @@
 import { useState } from "react";
 import {
   AvailabilityCalendar,
+  AvailabilityManager,
+  type AvailabilityManagerSelection,
   ContactForm,
   LocaleSwitcher,
   SiteHeader,
@@ -68,6 +70,40 @@ const AvailabilityCalendarExample = () => {
   );
 };
 
+const AvailabilityManagerExample = () => {
+  const [selection, setSelection] = useState<AvailabilityManagerSelection>({
+    cells: [],
+  });
+  const days = Array.from({ length: 30 }, (_, index) => ({
+    date: new Date(2026, 8, index + 1),
+    status: index === 8 ? ("blocked" as const) : ("available" as const),
+    price: { amount: 12500 + index * 500, currency: "EUR" },
+  }));
+
+  return (
+    <AvailabilityManager
+      title="Manage room availability"
+      description="Select days to hand to your own bulk editor."
+      resources={[
+        { id: "garden", label: "Garden room", description: "Sleeps two", days },
+        { id: "studio", label: "Sea studio", description: "Sleeps four", days },
+      ]}
+      initialMonth={new Date(2026, 8, 1)}
+      months={2}
+      locale="en-GB"
+      value={selection}
+      onSelectionChange={setSelection}
+      slots={{
+        bulkActions: ({ cells, clearSelection }) => (
+          <Button type="button" onClick={clearSelection}>
+            Prepare edit for {cells.length} days
+          </Button>
+        ),
+      }}
+    />
+  );
+};
+
 const ContactFormExample = () => {
   const [sent, setSent] = useState(false);
 
@@ -91,6 +127,7 @@ const ContactFormExample = () => {
 
 export {
   AvailabilityCalendarExample,
+  AvailabilityManagerExample,
   ContactFormExample,
   LocaleSwitcherExample,
   SiteHeaderExample,

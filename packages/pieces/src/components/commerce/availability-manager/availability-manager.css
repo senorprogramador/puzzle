@@ -1,0 +1,231 @@
+.puzzle-availability-manager {
+  min-width: 0;
+}
+
+.puzzle-availability-manager__content {
+  display: grid;
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-availability-manager__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--puzzle-space-3, 0.75rem);
+  flex-wrap: wrap;
+}
+
+.puzzle-availability-manager__toolbar-main,
+.puzzle-availability-manager__toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--puzzle-space-2, 0.5rem);
+}
+
+.puzzle-availability-manager__toolbar h2 {
+  margin: 0;
+  min-width: 12rem;
+  text-align: center;
+  font-size: var(--puzzle-font-size-lg, 1.125rem);
+}
+
+.puzzle-availability-manager__navigation,
+.puzzle-availability-manager__cell {
+  border: 1px solid var(--puzzle-color-border, #d6d9df);
+  color: var(--puzzle-color-text, #1d2733);
+  background: var(--puzzle-color-surface, #fff);
+}
+
+.puzzle-availability-manager__navigation {
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  border-radius: var(--puzzle-radius-sm, 0.375rem);
+  cursor: pointer;
+}
+
+.puzzle-availability-manager__navigation:hover:not(:disabled) {
+  background: var(--puzzle-color-surface-sunken, #f3f5f7);
+}
+
+.puzzle-availability-manager__navigation:focus-visible,
+.puzzle-availability-manager__cell:focus-visible {
+  outline: 2px solid var(--puzzle-color-focus, #2563eb);
+  outline-offset: 2px;
+}
+
+.puzzle-availability-manager__months {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr));
+  gap: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-availability-manager__month {
+  min-width: 0;
+}
+
+.puzzle-availability-manager__table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--puzzle-color-border, #d6d9df);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface, #fff);
+}
+
+.puzzle-availability-manager__table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.puzzle-availability-manager__table th,
+.puzzle-availability-manager__table td {
+  border-right: 1px solid var(--puzzle-color-border, #d6d9df);
+  border-bottom: 1px solid var(--puzzle-color-border, #d6d9df);
+  padding: var(--puzzle-space-1, 0.25rem);
+  text-align: center;
+  vertical-align: middle;
+}
+
+.puzzle-availability-manager__table tr:last-child > * {
+  border-bottom: 0;
+}
+
+.puzzle-availability-manager__table tr > *:last-child {
+  border-right: 0;
+}
+
+.puzzle-availability-manager__table thead th {
+  padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-1, 0.25rem);
+  color: var(--puzzle-color-text-muted, #5b6573);
+  background: var(--puzzle-color-surface-sunken, #f3f5f7);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+  font-weight: 600;
+}
+
+.puzzle-availability-manager__resource-heading {
+  width: 10rem;
+  text-align: start !important;
+}
+
+.puzzle-availability-manager__resource {
+  width: 10rem;
+  text-align: start !important;
+  background: var(--puzzle-color-surface-sunken, #f3f5f7);
+}
+
+.puzzle-availability-manager__resource-label {
+  display: block;
+  font-weight: 600;
+}
+
+.puzzle-availability-manager__resource-description {
+  display: block;
+  margin-top: var(--puzzle-space-1, 0.25rem);
+  color: var(--puzzle-color-text-muted, #5b6573);
+  font-size: var(--puzzle-font-size-sm, 0.875rem);
+  font-weight: 400;
+}
+
+.puzzle-availability-manager__weekday,
+.puzzle-availability-manager__date {
+  display: block;
+}
+
+.puzzle-availability-manager__date {
+  margin-top: var(--puzzle-space-1, 0.25rem);
+  color: var(--puzzle-color-text, #1d2733);
+  font-size: var(--puzzle-font-size-md, 1rem);
+}
+
+.puzzle-availability-manager__cell {
+  display: grid;
+  width: 100%;
+  min-height: 4.25rem;
+  align-content: center;
+  gap: var(--puzzle-space-1, 0.25rem);
+  border: 0;
+  border-radius: var(--puzzle-radius-sm, 0.375rem);
+  cursor: pointer;
+  font: inherit;
+}
+
+.puzzle-availability-manager__cell:hover:not(:disabled) {
+  background: var(--puzzle-color-surface-sunken, #f3f5f7);
+}
+
+.puzzle-availability-manager__cell[data-selected="true"] {
+  color: var(--puzzle-color-on-primary, #fff);
+  background: var(--puzzle-color-primary, #2563eb);
+}
+
+.puzzle-availability-manager__cell[data-status="unavailable"],
+.puzzle-availability-manager__cell[data-status="blocked"] {
+  color: var(--puzzle-color-text-muted, #5b6573);
+  background: var(--puzzle-color-surface-sunken, #f3f5f7);
+}
+
+.puzzle-availability-manager__cell:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.puzzle-availability-manager__status,
+.puzzle-availability-manager__error {
+  padding: var(--puzzle-space-3, 0.75rem);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+}
+
+.puzzle-availability-manager__status {
+  color: var(--puzzle-color-text-muted, #5b6573);
+  background: var(--puzzle-color-surface-sunken, #f3f5f7);
+}
+
+.puzzle-availability-manager__error {
+  color: var(--puzzle-color-danger, #b42318);
+}
+
+.puzzle-availability-manager__bulk-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--puzzle-space-3, 0.75rem);
+  flex-wrap: wrap;
+  padding: var(--puzzle-space-3, 0.75rem);
+  border: 1px solid var(--puzzle-color-border, #d6d9df);
+  border-radius: var(--puzzle-radius-md, 0.5rem);
+  background: var(--puzzle-color-surface-sunken, #f3f5f7);
+}
+
+.puzzle-availability-manager__selection-count {
+  color: var(--puzzle-color-text-muted, #5b6573);
+}
+
+@media (max-width: 40rem) {
+  .puzzle-availability-manager__toolbar {
+    align-items: stretch;
+  }
+
+  .puzzle-availability-manager__toolbar-main {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .puzzle-availability-manager__toolbar h2 {
+    min-width: 0;
+    flex: 1;
+    font-size: var(--puzzle-font-size-md, 1rem);
+  }
+
+  .puzzle-availability-manager__toolbar-actions {
+    width: 100%;
+  }
+
+  .puzzle-availability-manager__table {
+    min-width: 36rem;
+  }
+
+  .puzzle-availability-manager__resource,
+  .puzzle-availability-manager__resource-heading {
+    width: 8rem;
+  }
+}

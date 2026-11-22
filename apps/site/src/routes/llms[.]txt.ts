@@ -67,6 +67,7 @@ const buildLlmsTxt = (): string => {
     "/docs/storage",
     "/docs/cms",
     "/docs/media",
+    "/docs/media-cloudflare",
     "/docs/fullstack",
     "/docs/payment-providers",
     "/docs/seo",

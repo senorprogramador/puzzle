@@ -28,6 +28,7 @@ const nonSectionPages = new Set([
   "site-header",
   "locale-switcher",
   "availability-calendar",
+  "availability-manager",
   "contact-form",
   "project",
   "restaurant-experience",

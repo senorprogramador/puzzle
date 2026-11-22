@@ -79,5 +79,10 @@ export const applicationDevelopment: TreeViewItem = {
     { id: "storage", label: "Storage", href: "/docs/storage" },
     { id: "cms", label: "CMS", href: "/docs/cms" },
     { id: "media", label: "Media", href: "/docs/media" },
+    {
+      id: "media-cloudflare",
+      label: "Cloudflare Media",
+      href: "/docs/media-cloudflare",
+    },
   ],
 };

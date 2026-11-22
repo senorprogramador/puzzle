@@ -346,6 +346,19 @@
         "typescript": "^7.0.2",
       },
     },
+    "packages/media-cloudflare": {
+      "name": "@puzzle-ui/media-cloudflare",
+      "version": "0.16.0",
+      "dependencies": {
+        "@puzzle-ui/media": "^0.16.0",
+      },
+      "devDependencies": {
+        "@types/bun": "^1.4.4",
+        "bun": "^1.4.4",
+        "tsdown": "^0.23.1",
+        "typescript": "^7.0.2",
+      },
+    },
     "packages/payment-providers": {
       "name": "@puzzle-ui/payment-providers",
       "version": "0.16.0",
@@ -1054,6 +1067,8 @@
     "@puzzle-ui/icons": ["@puzzle-ui/icons@workspace:packages/icons"],
 
     "@puzzle-ui/media": ["@puzzle-ui/media@workspace:packages/media"],
+
+    "@puzzle-ui/media-cloudflare": ["@puzzle-ui/media-cloudflare@workspace:packages/media-cloudflare"],
 
     "@puzzle-ui/payment-providers": ["@puzzle-ui/payment-providers@workspace:packages/payment-providers"],
 

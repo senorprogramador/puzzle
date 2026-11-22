@@ -71,5 +71,13 @@ For a simple date range, compose two controlled `DatePicker`s and constrain
 their `minDate`/`maxDate`; do not add a separate range component unless the
 interaction needs shared range selection or highlighting.
 
+Use `SortableTree` for controlled nested editors or file/navigation structures
+whose nodes can be reordered. Provide `onMove` or `onItemsChange` to persist a
+drop; the component does not mutate `items`. The drag handle supports native
+pointer dragging, long-press touch dragging, and Space/arrow-key lift and drop.
+Keep `maxDepth` and the component's invalid-move protection enabled when a
+hierarchy has structural constraints. Use `TreeView` instead when nodes should
+only be browsed and never reordered.
+
 Do not deep-import source, add routing or business logic, or treat Beta and
 Experimental APIs as Stable. See the [UI documentation](https://puzzle-ui.com/docs/ui).
