@@ -26,6 +26,7 @@ const PACKED_PACKAGES = [
   "ui",
   "media",
   "cms",
+  "commerce",
   "storage",
   "session",
   "auth",

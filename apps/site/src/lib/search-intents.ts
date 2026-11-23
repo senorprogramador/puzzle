@@ -434,17 +434,18 @@ export const searchIntentMap = {
     ],
   },
   "/docs/fullstack": {
-    intent: "Connect browser authentication UI with React server handlers.",
-    primaryKeyword: "full-stack React authentication",
+    intent:
+      "Connect Puzzle Auth, Media, CMS, and commerce services across browser clients and server integrations.",
+    primaryKeyword: "React full-stack integrations",
     secondaryKeywords: [
-      "Next.js authentication",
-      "TanStack Start authentication",
-      "TypeScript authentication",
-      "React authentication UI",
+      "React server integrations",
+      "Next.js full-stack adapters",
+      "TanStack Start integrations",
+      "browser-safe React clients",
     ],
-    title: "Full-Stack React Authentication",
+    title: "Fullstack integrations",
     description:
-      "Connect React authentication experiences to server handlers and Next.js or TanStack Start adapters with a browser-safe auth client.",
+      "Connect Puzzle Auth, Media, CMS, and payment services to browser clients, server handlers, and Next.js or TanStack Start adapters.",
     canonical: getCanonicalUrl("/docs/fullstack"),
     structuredData: ["WebPage", "TechArticle", "BreadcrumbList"],
     internalLinks: [
