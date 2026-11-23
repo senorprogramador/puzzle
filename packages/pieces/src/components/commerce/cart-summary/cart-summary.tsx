@@ -46,7 +46,7 @@ const CartItemRow = ({
 }) => (
   <li>
     <article className="puzzle-cart-summary__item">
-      {variant !== "compact" && variant !== "mobile" ? (
+      {variant !== "compact" ? (
         <CommerceImageView image={item.image} label={item.name} />
       ) : null}
       <div className="puzzle-cart-summary__item-copy">

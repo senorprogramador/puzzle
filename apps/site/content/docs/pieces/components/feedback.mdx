@@ -91,7 +91,7 @@ Use `NotificationList` for an empty state and a collection of items. `Notificati
 
 ## Confirming an action
 
-`ConfirmAction` uses Puzzle's `Dialog` and `Button` components. The callback runs only after explicit confirmation; application code owns errors and persistence.
+`ConfirmAction` uses Puzzle's alert dialog and buttons. The callback runs only after explicit confirmation; while an asynchronous callback is pending, the dialog cannot be dismissed. If the callback fails, the dialog remains open and displays an error message.
 
 ```tsx
 <ConfirmAction
@@ -157,5 +157,5 @@ Use `NotificationList` for an empty state and a collection of items. `Notificati
 | --- | --- |
 | `NotificationItem` | `title` (required), `description`, `timestamp`, `dateTime`, `href`, `unread`, `onDismiss`, `dismissLabel`, `className` |
 | `NotificationList` | `items` (required; each has `id` and `NotificationItem` props), `label`, `emptyState`, `className` |
-| `ConfirmAction` | `triggerLabel`, `title`, `confirmLabel`, `onConfirm` (required), `description`, `cancelLabel`, `confirmVariant`, `className` |
+| `ConfirmAction` | `triggerLabel`, `title`, `confirmLabel`, `onConfirm` (required; may return a promise), `description`, `cancelLabel`, `confirmVariant`, `className` |
 | `ErrorStatePanel` | `title` (required), `description`, `action`, `className` |

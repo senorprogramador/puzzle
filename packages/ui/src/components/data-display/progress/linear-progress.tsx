@@ -46,7 +46,6 @@ const LinearProgress = ({
           transform:
             value !== undefined ? `scaleX(${value / 100})` : "scaleX(1)",
           height: "100%",
-          transition: "transform 0.3s",
         }}
       />
     </div>

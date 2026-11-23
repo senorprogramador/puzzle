@@ -4,12 +4,12 @@ import { cn } from "@puzzle-ui/core";
 import {
   Children,
   cloneElement,
+  type CSSProperties,
   type AnimationEventHandler,
   type ComponentPropsWithoutRef,
   createElement,
   type ElementType,
   isValidElement,
-  type PropsWithoutRef,
   type ReactNode,
   type TransitionEventHandler,
   useEffect,
@@ -105,7 +105,7 @@ const resolveTemplate = (
   }
 };
 
-type ChildProps = PropsWithoutRef<HTMLElement> & {
+type ChildProps = ComponentPropsWithoutRef<"div"> & {
   onAnimationEnd?: AnimationEventHandler<HTMLElement>;
   onTransitionEnd?: TransitionEventHandler<HTMLElement>;
 };
@@ -119,6 +119,7 @@ const Transition = <T extends ElementType = "div">({
   enterTo: enterToProp,
   exitTo: exitToProp,
   className = "",
+  style: userStyle,
   duration = 300,
   unmountOnExit = true,
   forceMount = false,
@@ -136,6 +137,10 @@ const Transition = <T extends ElementType = "div">({
     onAnimationEnd?: AnimationEventHandler<HTMLElement>;
     onTransitionEnd?: TransitionEventHandler<HTMLElement>;
   } & Record<string, unknown>;
+  const transitionStyle = {
+    ...((userStyle ?? {}) as CSSProperties),
+    "--puzzle-transition-duration": `${duration}ms`,
+  } as CSSProperties;
 
   const [mounted, setMounted] = useState(
     () => visible || forceMount || !unmountOnExit,
@@ -291,6 +296,7 @@ const Transition = <T extends ElementType = "div">({
       as,
       {
         ...props,
+        style: transitionStyle,
         className: cn(className, phaseClass),
         onAnimationEnd: (event: React.AnimationEvent<HTMLElement>) => {
           propsOnAnimationEnd?.(event);
@@ -314,6 +320,7 @@ const Transition = <T extends ElementType = "div">({
     return cloneElement(child, {
       ...child.props,
       ...props,
+      style: { ...(child.props.style ?? {}), ...transitionStyle },
       className: cn(child.props?.className, className, phaseClass),
       onAnimationEnd: (event: React.AnimationEvent<HTMLElement>) => {
         child.props.onAnimationEnd?.(event);

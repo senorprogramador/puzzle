@@ -1,7 +1,14 @@
 "use client";
 
 import { Button } from "@puzzle-ui/ui";
-import { useEffect, useState, type ElementType, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ElementType,
+  type ReactNode,
+} from "react";
 import { MarketingSection, type MarketingSectionBaseProps } from "../shared";
 import type { AnnouncementItem, AnnouncementSectionProps } from "./announcement.types";
 import "./announcement.css";
@@ -85,6 +92,8 @@ const AnnouncementSection = <C extends ElementType = "section">(
   const [dismissedIds, setDismissedIds] = useState<ReadonlySet<string>>(
     () => new Set(),
   );
+  const listRef = useRef<HTMLDivElement>(null);
+  const nextDismissIndex = useRef<number | null>(null);
   const announcements =
     "announcements" in props && props.announcements
       ? props.announcements
@@ -122,6 +131,24 @@ const AnnouncementSection = <C extends ElementType = "section">(
       announcement.message !== false &&
       !(variant === "multi-message" && dismissedIds.has(announcement.id)),
   );
+  useLayoutEffect(() => {
+    if (nextDismissIndex.current === null) {
+      return;
+    }
+
+    const buttons =
+      listRef.current?.querySelectorAll<HTMLButtonElement>(
+        ".puzzle-announcement__dismiss",
+      );
+    const index = Math.min(nextDismissIndex.current, (buttons?.length ?? 0) - 1);
+    nextDismissIndex.current = null;
+    buttons?.[index]?.focus();
+  }, [visibleMessages.length]);
+
+  const tickerLabel =
+    typeof props["aria-label"] === "string"
+      ? props["aria-label"]
+      : "Announcements";
   const sectionProps = { ...props };
   delete (sectionProps as Partial<AnnouncementSectionProps<C>>).variant;
   delete (sectionProps as Partial<AnnouncementSectionProps<C>>).message;
@@ -144,8 +171,14 @@ const AnnouncementSection = <C extends ElementType = "section">(
       variant={variant}
     >
       {visibleMessages.length ? (
-        <div className="puzzle-announcement__list">
-          {visibleMessages.map((announcement) => (
+        <div
+          ref={listRef}
+          className="puzzle-announcement__list"
+          role={variant === "ticker" ? "group" : undefined}
+          aria-label={variant === "ticker" ? tickerLabel : undefined}
+          tabIndex={variant === "ticker" ? 0 : undefined}
+        >
+          {visibleMessages.map((announcement, index) => (
             <AnnouncementContent
               key={announcement.id}
               announcement={announcement}
@@ -157,6 +190,7 @@ const AnnouncementSection = <C extends ElementType = "section">(
               dismissible={canDismiss}
               onDismiss={() => {
                 if (variant === "multi-message") {
+                  nextDismissIndex.current = index;
                   setDismissedIds((current) => {
                     const next = new Set(current);
                     next.add(announcement.id);

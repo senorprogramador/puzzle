@@ -165,6 +165,11 @@
   scroll-snap-type: inline mandatory;
 }
 
+.puzzle-activity-section[data-variant="horizontal"] .puzzle-activity-section__list:focus-visible {
+  outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
+  outline-offset: var(--puzzle-space-1, 0.25rem);
+}
+
 .puzzle-activity-section[data-variant="horizontal"] .puzzle-activity-section__item {
   scroll-snap-align: start;
 }

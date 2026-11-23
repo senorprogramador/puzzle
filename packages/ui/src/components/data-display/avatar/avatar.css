@@ -3,6 +3,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    object-fit: cover;
 
     background-color: var(--puzzle-color-secondary);
     border: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-border);

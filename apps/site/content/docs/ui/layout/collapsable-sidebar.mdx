@@ -73,7 +73,7 @@ Use `expand="inline"` to reserve the expanded width in the layout, or `expand="o
 | `ariaLabel`          | `string`                       | `"Main navigation"` | Navigation name.                        |
 | `className`, `style` | `string`, `CSSProperties`      | -                   | Root styling.                           |
 
-Items require `id`, `icon`, `label`, and either `href` or `onClick`; `active` marks the current item. Groups require `id` and `items`, with an optional `label`. Use stable IDs. Current links receive `aria-current`; icons are decorative.
+Items require `id`, `icon`, a non-empty `label`, and either `href` or `onClick`; `active` marks the current item. Groups require a unique `id` without whitespace and `items`, with an optional non-empty `label`. Item IDs must be unique among siblings, and the navigation `ariaLabel` must not be empty. Invalid labels or IDs throw an error. Current links receive `aria-current`; icons are decorative.
 
 ## Accessibility and keyboard behavior
 

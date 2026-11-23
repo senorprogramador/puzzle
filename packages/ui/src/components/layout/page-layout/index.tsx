@@ -1,5 +1,6 @@
 import {
   Children,
+  Fragment,
   isValidElement,
   type CSSProperties,
   type HTMLAttributes,
@@ -89,17 +90,36 @@ const PageLayoutBase = ({
 
   const regions: Partial<Record<RegionType, ReactElement<RegionProps>>> = {};
 
-  Children.forEach(children, (child) => {
-    if (!isValidElement(child)) {
-      return;
-    }
+  const collectRegions = (content: ReactNode) => {
+    Children.forEach(content, (child) => {
+      if (child == null || typeof child === "boolean") {
+        return;
+      }
 
-    const type = child.type as typeof Header;
+      if (!isValidElement<{ children?: ReactNode }>(child)) {
+        throw new Error(
+          "PageLayout only accepts Header, Main, LeftSidebar, RightSidebar, and Footer regions.",
+        );
+      }
 
-    if (type.regionType) {
+      if (child.type === Fragment) {
+        collectRegions(child.props.children);
+        return;
+      }
+
+      const type = child.type as typeof Header;
+
+      if (!type.regionType) {
+        throw new Error(
+          "PageLayout only accepts Header, Main, LeftSidebar, RightSidebar, and Footer regions.",
+        );
+      }
+
       regions[type.regionType] = child as ReactElement<RegionProps>;
-    }
-  });
+    });
+  };
+
+  collectRegions(children);
 
   const renderRegion = (
     region: ReactElement<RegionProps> | undefined,

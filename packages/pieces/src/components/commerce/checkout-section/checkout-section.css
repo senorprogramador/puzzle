@@ -1,5 +1,6 @@
 .puzzle-checkout-section {
   min-width: 0;
+  container-type: inline-size;
 }
 
 .puzzle-checkout-section__form,
@@ -102,7 +103,7 @@
   gap: var(--puzzle-space-3, 0.75rem);
 }
 
-@media (max-width: 48rem) {
+@container (max-width: 48rem) {
   .puzzle-checkout-section[data-variant="split"] .puzzle-checkout-section__layout,
   .puzzle-checkout-section[data-variant="sidebar"] .puzzle-checkout-section__layout {
     grid-template-columns: minmax(0, 1fr);

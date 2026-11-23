@@ -55,6 +55,14 @@ describe("Dialog", () => {
     ).toBeInTheDocument();
   });
 
+  it("supports alert dialog semantics", async () => {
+    renderDialog({ role: "alertdialog" });
+
+    expect(
+      await screen.findByRole("alertdialog", { name: "Test dialog" }),
+    ).toBeInTheDocument();
+  });
+
   it("does not render its content when closed", () => {
     renderDialog({ open: false });
 

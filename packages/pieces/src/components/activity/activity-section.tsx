@@ -63,7 +63,25 @@ const ActivityList = ({
   variant: ActivitySectionVariant;
   renderItem?: (item: ActivityItem) => React.ReactNode;
 }) => (
-  <ol className="puzzle-activity-section__list">
+  <ol
+    className="puzzle-activity-section__list"
+    aria-label={variant === "horizontal" ? "Activity items" : undefined}
+    tabIndex={variant === "horizontal" ? 0 : undefined}
+    onKeyDown={
+      variant === "horizontal"
+        ? (event) => {
+            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+              return;
+            }
+
+            event.preventDefault();
+            event.currentTarget.scrollBy({
+              left: event.key === "ArrowRight" ? 80 : -80,
+            });
+          }
+        : undefined
+    }
+  >
     {items.map((item) => {
       const content = renderItem ? renderItem(item) : <ActivityItemContent item={item} />;
       const contentClassName = [

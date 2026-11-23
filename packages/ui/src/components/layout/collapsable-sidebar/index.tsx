@@ -9,6 +9,7 @@ import {
   type MouseEventHandler,
   type ReactNode,
 } from "react";
+import { hasRenderableContent } from "../../../utils/has-renderable-content";
 import "./collapsable-sidebar.css";
 import { Text } from "../../typography/text";
 
@@ -56,6 +57,58 @@ const isSidebarGroup = (
   entry: CollapsableSidebarEntry,
 ): entry is CollapsableSidebarGroup => "items" in entry;
 
+const validateUniqueIds = (ids: string[], message: string) => {
+  const seen = new Set<string>();
+
+  for (const id of ids) {
+    if (!id.trim() || seen.has(id)) {
+      throw new Error(message);
+    }
+
+    seen.add(id);
+  }
+};
+
+const validateSidebar = (
+  items: CollapsableSidebarEntry[],
+  ariaLabel: string,
+) => {
+  if (!ariaLabel.trim()) {
+    throw new Error("CollapsableSidebar: ariaLabel must not be empty.");
+  }
+
+  const topLevelIds = items.map((item) => item.id);
+  validateUniqueIds(
+    topLevelIds,
+    "CollapsableSidebar: top-level IDs must be unique and non-empty.",
+  );
+
+  for (const entry of items) {
+    if (isSidebarGroup(entry)) {
+      if (/\s/.test(entry.id)) {
+        throw new Error(
+          "CollapsableSidebar: group IDs must not contain whitespace.",
+        );
+      }
+
+      if (entry.label !== undefined && !entry.label.trim()) {
+        throw new Error("CollapsableSidebar: group labels must not be empty.");
+      }
+
+      validateUniqueIds(
+        entry.items.map((item) => item.id),
+        "CollapsableSidebar: group item IDs must be unique and non-empty.",
+      );
+
+      if (entry.items.some((item) => !item.label.trim())) {
+        throw new Error("CollapsableSidebar: item labels must not be empty.");
+      }
+    } else if (!entry.label.trim()) {
+      throw new Error("CollapsableSidebar: item labels must not be empty.");
+    }
+  }
+};
+
 type SidebarItemRendererProps = {
   item: CollapsableSidebarItem;
   collapsed: boolean;
@@ -69,9 +122,11 @@ const SidebarItemRenderer = ({ item, collapsed }: SidebarItemRendererProps) => {
 
   const content = (
     <>
-      <span className="puzzle-collapsable-sidebar__icon" aria-hidden="true">
-        {item.icon}
-      </span>
+      {hasRenderableContent(item.icon) && (
+        <span className="puzzle-collapsable-sidebar__icon" aria-hidden="true">
+          {item.icon}
+        </span>
+      )}
 
       <span className="puzzle-collapsable-sidebar__label">{item.label}</span>
     </>
@@ -156,6 +211,8 @@ const CollapsableSidebar = ({
   className,
   style,
 }: CollapsableSidebarProps) => {
+  validateSidebar(items, ariaLabel);
+
   const [internalCollapsed, setInternalCollapsed] = useState(defaultCollapsed);
 
   const idPrefix = `puzzle-sidebar-${useId()}`;

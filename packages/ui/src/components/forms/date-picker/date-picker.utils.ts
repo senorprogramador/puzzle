@@ -9,26 +9,33 @@ type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 const isValidDate = (date: Date): boolean =>
   date instanceof Date && Number.isFinite(date.getTime());
 
+const createLocalDate = (year: number, month: number, day: number): Date => {
+  const date = new Date(0);
+  date.setFullYear(year, month, day);
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+
 const startOfDay = (date: Date): Date =>
-  new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  createLocalDate(date.getFullYear(), date.getMonth(), date.getDate());
 
 const startOfMonth = (date: Date): Date =>
-  new Date(date.getFullYear(), date.getMonth(), 1);
+  createLocalDate(date.getFullYear(), date.getMonth(), 1);
 
 const addDays = (date: Date, amount: number): Date =>
-  new Date(date.getFullYear(), date.getMonth(), date.getDate() + amount);
+  createLocalDate(date.getFullYear(), date.getMonth(), date.getDate() + amount);
 
 const addMonths = (date: Date, amount: number): Date => {
   const day = date.getDate();
-  const target = new Date(date.getFullYear(), date.getMonth() + amount, 1);
+  const target = createLocalDate(date.getFullYear(), date.getMonth() + amount, 1);
 
-  const lastDay = new Date(
+  const lastDay = createLocalDate(
     target.getFullYear(),
     target.getMonth() + 1,
     0,
   ).getDate();
 
-  return new Date(
+  return createLocalDate(
     target.getFullYear(),
     target.getMonth(),
     Math.min(day, lastDay),
@@ -73,7 +80,7 @@ const getCalendarDays = (month: Date, weekStartsOn: Weekday): CalendarDay[] => {
 };
 
 const getLastDayOfMonth = (date: Date): Date =>
-  new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  createLocalDate(date.getFullYear(), date.getMonth() + 1, 0);
 
 const sundayRegions = [
   "US",
@@ -127,7 +134,7 @@ const getLocaleWeekStartsOn = (locale: string): Weekday => {
 
 const getWeekdayDates = (weekStartsOn: Weekday): Date[] => {
   // January 7, 2024 was a Sunday.
-  const sunday = new Date(2024, 0, 7);
+  const sunday = createLocalDate(2024, 0, 7);
 
   return Array.from({ length: 7 }, (_, index) =>
     addDays(sunday, weekStartsOn + index),

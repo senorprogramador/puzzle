@@ -9,9 +9,9 @@ afterEach(() => {
 });
 
 describe("Tabs (browser)", () => {
-  it("supports manual keyboard activation without changing selection on focus", async () => {
+  it("automatically activates tabs during keyboard navigation", async () => {
     render(
-      <Tabs activationMode="manual" aria-label="Workspace sections">
+      <Tabs aria-label="Workspace sections">
         <Tabs.Tab id="overview" tab="Overview">
           Overview content
         </Tabs.Tab>
@@ -36,10 +36,6 @@ describe("Tabs (browser)", () => {
     await userEvent.keyboard("{ArrowRight}");
 
     expect(settings).toHaveFocus();
-    expect(settings).toHaveAttribute("aria-selected", "false");
-
-    await userEvent.keyboard("{Enter}");
-
     expect(settings).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("tabpanel")).toHaveTextContent("Settings content");
   });

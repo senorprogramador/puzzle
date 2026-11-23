@@ -2,7 +2,7 @@
 
 import { Dialog } from "@puzzle-ui/ui";
 import type { ElementType, KeyboardEvent } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   EditorialImageView,
   validateContentIds,
@@ -31,9 +31,18 @@ const GallerySection = <C extends ElementType = "section">({
   validateContentIds(items, "Gallery item");
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const activeTrigger = useRef<HTMLButtonElement | null>(null);
+  const restoreTriggerFocus = useRef(false);
   const lightboxEnabled = lightbox ?? variant === "fullscreen";
   const selectedIndex = items.findIndex((item) => item.id === selectedId);
   const selectedItem = items[selectedIndex];
+
+  useEffect(() => {
+    if (selectedId === null && restoreTriggerFocus.current) {
+      restoreTriggerFocus.current = false;
+      activeTrigger.current?.focus();
+    }
+  }, [selectedId]);
 
   const selectImage = (index: number) => {
     if (index >= 0 && index < items.length) {
@@ -75,7 +84,11 @@ const GallerySection = <C extends ElementType = "section">({
             type="button"
             className="puzzle-gallery-section__open"
             aria-label={`Open ${label} in lightbox`}
-            onClick={() => setSelectedId(item.id)}
+            onClick={(event) => {
+              activeTrigger.current = event.currentTarget;
+              restoreTriggerFocus.current = true;
+              setSelectedId(item.id);
+            }}
           >
             {image}
           </button>
@@ -141,6 +154,7 @@ const GallerySection = <C extends ElementType = "section">({
           open
           onOpenChange={(open) => {
             if (!open) {
+              restoreTriggerFocus.current = true;
               setSelectedId(null);
             }
           }}

@@ -1,5 +1,6 @@
 .puzzle-booking-section {
   min-width: 0;
+  container-type: inline-size;
 }
 
 .puzzle-booking-section__form,
@@ -111,7 +112,7 @@
   align-items: start;
 }
 
-@media (max-width: 48rem) {
+@container (max-width: 48rem) {
   .puzzle-booking-section[data-variant="sidebar"] .puzzle-booking-section__layout,
   .puzzle-booking-section[data-variant="split"] .puzzle-booking-section__layout {
     grid-template-columns: minmax(0, 1fr);

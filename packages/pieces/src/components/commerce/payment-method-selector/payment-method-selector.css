@@ -11,6 +11,8 @@
 }
 
 .puzzle-payment-method-selector__provider {
+  min-width: 0;
   color: var(--puzzle-color-text-muted);
   font-size: var(--puzzle-font-size-sm, 0.875rem);
+  overflow-wrap: anywhere;
 }

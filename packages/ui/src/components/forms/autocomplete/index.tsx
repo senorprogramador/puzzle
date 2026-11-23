@@ -362,6 +362,7 @@ const Autocomplete = <T, FreeSolo extends boolean = false>(
       filteredOptions.map((option) => ({
         ...option,
         disabled:
+          readOnly ||
           option.disabled === true ||
           (multiple &&
             maxSelected !== undefined &&
@@ -485,7 +486,7 @@ const Autocomplete = <T, FreeSolo extends boolean = false>(
     !isOptionSelected(option);
 
   const handleOptionSelect = (option: AutocompleteOption<T>) => {
-    if (disabled || option.disabled || isAtSelectionLimit(option)) {
+    if (disabled || readOnly || option.disabled || isAtSelectionLimit(option)) {
       return;
     }
 

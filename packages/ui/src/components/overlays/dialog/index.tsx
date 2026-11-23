@@ -59,6 +59,9 @@ type DialogProps = NativeDialogProps & {
   /** Whether to render a close button. */
   closeButton?: boolean;
 
+  /** Accessible dialog role. */
+  role?: "dialog" | "alertdialog";
+
   /** Accessible label for the close button. */
   closeLabel?: string;
 
@@ -86,6 +89,7 @@ const Dialog = ({
   children,
   footer,
   size = "md",
+  role = "dialog",
   closeButton = true,
   closeLabel = "Close dialog",
   closeOnBackdrop = true,
@@ -128,7 +132,7 @@ const Dialog = ({
             data-overlay-content=""
             tabIndex={-1}
             className={cn("puzzle-dialog", `puzzle-dialog--${size}`, className)}
-            role="dialog"
+            role={role}
             aria-modal="true"
             aria-labelledby={titleId}
             aria-describedby={describedBy}

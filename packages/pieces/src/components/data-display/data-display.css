@@ -45,6 +45,7 @@
     font-family: var(--puzzle-font-heading);
     font-size: var(--puzzle-font-size-2xl, 1.5rem);
     font-weight: var(--puzzle-font-weight-semibold, 600);
+    overflow-wrap: anywhere;
 }
 
 .puzzle-empty-state-panel__action {

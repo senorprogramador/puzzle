@@ -143,6 +143,7 @@
 :root .puzzle-typography-caption,
 :root .puzzle-typography-overline {
     font-family: var(--puzzle-font-family-body, inherit);
+    overflow-wrap: anywhere;
 }
 
 :root .puzzle-typography-display1 {

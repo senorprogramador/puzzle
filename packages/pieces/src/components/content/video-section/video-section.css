@@ -124,6 +124,8 @@
 }
 
 .puzzle-video-section[data-variant="phone"] .puzzle-video-section__player {
+  aspect-ratio: 9 / 16;
+  height: min(40rem, 160vw);
   width: min(100%, 22rem);
   margin-inline: auto;
   border: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-border-strong);
@@ -131,6 +133,8 @@
 }
 
 .puzzle-video-section[data-variant="phone"] .puzzle-video-section__player video {
+  position: absolute;
+  inset: 0;
   object-fit: cover;
 }
 

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 import { Alert, Text } from "@puzzle-ui/ui";
 
@@ -41,41 +41,64 @@ export const NotificationItem = ({
   onDismiss,
   dismissLabel = "Dismiss notification",
   className,
-}: NotificationItemProps) => (
-  <li
-    className={["puzzle-notification-item", className]
-      .filter(Boolean)
-      .join(" ")}
-    data-unread={unread || undefined}
-  >
-    <div className="puzzle-notification-item__content">
-      <div className="puzzle-notification-item__title">
-        {href ? <a href={href}>{title}</a> : title}
+}: NotificationItemProps) => {
+  const titleId = useId();
+  const unreadId = useId();
+  const dismissId = useId();
+
+  return (
+    <li
+      className={["puzzle-notification-item", className]
+        .filter(Boolean)
+        .join(" ")}
+      data-unread={unread || undefined}
+    >
+      <div className="puzzle-notification-item__content">
+        <div className="puzzle-notification-item__title" id={titleId}>
+          {href ? <a href={href}>{title}</a> : title}
+        </div>
+        {description && (
+          <Text as="p" className="puzzle-notification-item__description">
+            {description}
+          </Text>
+        )}
+        {timestamp && (
+          <time className="puzzle-notification-item__time" dateTime={dateTime}>
+            {timestamp}
+          </time>
+        )}
       </div>
-      {description && (
-        <Text as="p" className="puzzle-notification-item__description">{description}</Text>
-      )}
-      {timestamp && (
-        <time
-          className="puzzle-notification-item__time"
-          dateTime={dateTime}
+      {unread ? (
+        <span
+          id={unreadId}
+          className="puzzle-notification-item__visually-hidden"
         >
-          {timestamp}
-        </time>
+          Unread
+        </span>
+      ) : null}
+      {onDismiss && (
+        <button
+          className="puzzle-notification-item__dismiss"
+          type="button"
+          aria-labelledby={
+            unread
+              ? `${titleId} ${unreadId} ${dismissId}`
+              : `${titleId} ${dismissId}`
+          }
+          onClick={onDismiss}
+        >
+          <span
+            id={dismissId}
+            className="puzzle-notification-item__visually-hidden"
+          >
+            {dismissLabel}
+          </span>
+          <span aria-hidden="true">&times;</span>
+        </button>
       )}
-    </div>
-    {onDismiss && (
-      <button
-        className="puzzle-notification-item__dismiss"
-        type="button"
-        aria-label={dismissLabel}
-        onClick={onDismiss}
-      >
-        <span aria-hidden="true">&times;</span>
-      </button>
-    )}
-  </li>
-);
+    </li>
+  );
+};
 
 export const NotificationList = ({
   items,

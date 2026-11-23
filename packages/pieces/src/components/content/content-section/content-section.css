@@ -83,13 +83,26 @@
     order: 1;
   }
 
+  .puzzle-content-section[data-variant="image-right"] .puzzle-content-section__body > :first-child {
+    order: 1;
+  }
+
   .puzzle-content-section[data-variant="split"] .puzzle-content-section__layout {
     grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr);
+  }
+
+  .puzzle-content-section[data-variant="split"] .puzzle-content-section__layout[data-has-sidebar="false"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .puzzle-content-section[data-variant="media"] .puzzle-content-section__body[data-has-media="false"],
+  .puzzle-content-section[data-variant="editorial"] .puzzle-content-section__body[data-has-media="false"] {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 39.99rem) {
   .puzzle-content-section[data-variant="three-column"] .puzzle-content-section__columns {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
 }

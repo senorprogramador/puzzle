@@ -60,6 +60,11 @@
     gap: var(--puzzle-space-3, 0.75rem);
 }
 
+.puzzle-dashboard-stat-card__header > :first-child,
+.puzzle-dashboard-progress-card__header > :first-child {
+    min-width: 0;
+}
+
 .puzzle-dashboard-stat-card__label,
 .puzzle-dashboard-progress-card__title {
     margin: 0;

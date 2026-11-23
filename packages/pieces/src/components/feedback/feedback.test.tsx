@@ -34,7 +34,11 @@ describe("NotificationItem", () => {
       "dateTime",
       "2026-11-16",
     );
-    fireEvent.click(screen.getByRole("button", { name: "Dismiss notification" }));
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: "Task assigned Unread Dismiss notification",
+      }),
+    );
     expect(onDismiss).toHaveBeenCalledOnce();
   });
 });
@@ -75,7 +79,9 @@ describe("ConfirmAction", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Delete project" }));
-    expect(screen.getByRole("dialog", { name: "Delete this project?" })).toBeVisible();
+    expect(
+      screen.getByRole("alertdialog", { name: "Delete this project?" }),
+    ).toBeVisible();
     expect(onConfirm).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Delete", hidden: true }));

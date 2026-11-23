@@ -83,7 +83,10 @@ const FeaturesSection = <C extends ElementType = "section">({
           }))}
         />
       ) : items.length && variant === "sticky" ? (
-        <div className="puzzle-features__sticky-layout">
+        <div
+          className="puzzle-features__sticky-layout"
+          data-has-media={stickyMedia?.media != null}
+        >
           {stickyMedia?.media ? (
             <div className="puzzle-features__sticky-media">
               {stickyMedia.media}

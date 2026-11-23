@@ -152,11 +152,16 @@
 }
 
 .puzzle-cart-summary[data-variant="detailed"] .puzzle-cart-summary__item {
-  grid-template-columns: minmax(5rem, 0.3fr) minmax(0, 1.7fr);
+  grid-template-columns: minmax(5rem, 0.3fr) minmax(0, 1.7fr) auto;
+  align-items: start;
 }
 
 .puzzle-cart-summary[data-variant="mobile"] .puzzle-cart-summary__item {
   grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.puzzle-cart-summary[data-variant="mobile"] .puzzle-commerce__image {
+  display: none;
 }
 
 @media (min-width: 48rem) {
@@ -168,5 +173,9 @@
 
   .puzzle-cart-summary[data-variant="mobile"] .puzzle-cart-summary__item {
     grid-template-columns: minmax(5rem, 0.25fr) minmax(0, 1.5fr) auto;
+  }
+
+  .puzzle-cart-summary[data-variant="mobile"] .puzzle-commerce__image {
+    display: block;
   }
 }

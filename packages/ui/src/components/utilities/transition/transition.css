@@ -4,7 +4,8 @@
 
 .puzzle-transition-fade-active,
 .puzzle-transition-fade-exit {
-  transition: opacity var(--puzzle-duration-normal, 300ms)
+  transition: opacity
+    var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
     var(--puzzle-easing-out, ease-out);
 }
 
@@ -24,9 +25,11 @@
 .puzzle-transition-slide-in-up-active,
 .puzzle-transition-slide-in-up-exit {
   transition:
-    transform var(--puzzle-duration-normal, 300ms)
+    transform
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out),
-    opacity var(--puzzle-duration-normal, 300ms)
+    opacity
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out);
 }
 
@@ -48,9 +51,11 @@
 .puzzle-transition-slide-in-down-active,
 .puzzle-transition-slide-in-down-exit {
   transition:
-    transform var(--puzzle-duration-normal, 300ms)
+    transform
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out),
-    opacity var(--puzzle-duration-normal, 300ms)
+    opacity
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out);
 }
 
@@ -72,9 +77,11 @@
 .puzzle-transition-slide-in-left-active,
 .puzzle-transition-slide-in-left-exit {
   transition:
-    transform var(--puzzle-duration-normal, 300ms)
+    transform
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out),
-    opacity var(--puzzle-duration-normal, 300ms)
+    opacity
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out);
 }
 
@@ -96,9 +103,11 @@
 .puzzle-transition-slide-in-right-active,
 .puzzle-transition-slide-in-right-exit {
   transition:
-    transform var(--puzzle-duration-normal, 300ms)
+    transform
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out),
-    opacity var(--puzzle-duration-normal, 300ms)
+    opacity
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out);
 }
 
@@ -132,9 +141,11 @@
   overflow: hidden;
 
   transition:
-    grid-template-rows var(--puzzle-duration-normal, 300ms)
+    grid-template-rows
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out),
-    opacity var(--puzzle-duration-normal, 300ms)
+    opacity
+      var(--puzzle-transition-duration, var(--puzzle-duration-normal, 300ms))
       var(--puzzle-easing-out, ease-out);
 }
 

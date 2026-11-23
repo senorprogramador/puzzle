@@ -54,6 +54,8 @@ const ContentSection = <C extends ElementType = "section">({
   ) : (
     children
   );
+  const hasMedia = media != null || image !== undefined;
+  const hasSidebar = sidebar != null;
 
   return (
     <MarketingSection<C>
@@ -68,8 +70,14 @@ const ContentSection = <C extends ElementType = "section">({
           {attribution ? <cite>{attribution}</cite> : null}
         </blockquote>
       ) : (
-        <div className="puzzle-content-section__layout">
-          <div className="puzzle-content-section__body">
+        <div
+          className="puzzle-content-section__layout"
+          data-has-sidebar={hasSidebar}
+        >
+          <div
+            className="puzzle-content-section__body"
+            data-has-media={hasMedia}
+          >
             <ContentMedia media={media} image={image} />
             {content}
           </div>

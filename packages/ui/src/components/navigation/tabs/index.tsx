@@ -68,6 +68,8 @@ const TabsRoot = ({
   forceMountContent = false,
   children,
   className,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
   ...rootProps
 }: TabsProps) => {
   const generatedId = useId();
@@ -186,6 +188,8 @@ const TabsRoot = ({
         className="puzzle-tabs__list"
         role="tablist"
         aria-orientation={isVertical ? "vertical" : "horizontal"}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
       >
         {tabs.map((tab) => {
           const { id, tab: tabContent, disabled = false } = tab.props;
