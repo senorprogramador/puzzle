@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:13.000
+A consistent Puzzle UI setup starts with one Theme provider around your application. It resolves the package tokens into CSS variables, applies Puzzle's global styles at the root by default, and lets UI components share the same palette. We'll install the package, customize a few values, and serve fonts locally.
+
+2
+00:00:13.000 --> 00:00:26.000
+Run the install command from the application workspace, not necessarily the monorepo root. The theme package includes the React provider and the puzzle-theme executable. Keep the React and React DOM 19 dependencies already used by your application; no separate font package or global CLI installation is required.
+
+3
+00:00:26.000 --> 00:00:42.000
+Import Theme from the public @puzzle-ui/theme entry point and wrap the application content at its existing root. With no props, Theme uses the default tokens, follows the user's system color scheme, and injects Puzzle's global styles. Keep one React root; do not create a second root just for theming.
+
+4
+00:00:42.000 --> 00:00:55.000
+Set theme to system, light, or dark to choose the active color scheme. Use colorTheme for a built-in palette such as cobalt-sky. These are separate choices: system mode follows prefers-color-scheme, while the named color theme supplies the palette values.
+
+5
+00:00:55.000 --> 00:01:11.000
+Use the tokens prop for focused design adjustments instead of copying the entire default token object. This example changes the medium radius and keeps the selected color theme. Token values are validated before they are written as CSS, so fix invalid names or values rather than expecting them to be ignored.
+
+6
+00:01:11.000 --> 00:01:26.000
+For reproducible typography, create a JSON configuration with the font roles you use. This example sets a variable weight range for Sora headings and discrete weights for Inter body text. The same JSON can be imported by your app, so the downloader and Theme use consistent family names and weights.
+
+7
+00:01:26.000 --> 00:01:40.000
+Run puzzle-theme fonts download from your app workspace, passing the configuration path. The CLI writes a stylesheet and WOFF2 files under public/fonts. This step contacts Google Fonts during setup or build; it does not make the browser request those fonts at runtime. The package's CLI requires Node.js 20.19 or newer.
+
+8
+00:01:40.000 --> 00:01:57.000
+Import the same JSON into your app theme, set fontSource to local, and keep fontBasePath aligned with the public URL directory. Theme then links the generated stylesheet instead of Google Fonts. The body role is preloaded by default; disable preloading or choose another role if the generated files do not contain the expected Latin face.
+
+9
+00:01:57.000 --> 00:02:10.000
+Add the font download command before your framework's build script and make sure public/fonts is included in deployment. Verify that puzzle-fonts.css and each referenced WOFF2 file resolve from the site root. The initial download requires network access; an offline deployment must receive the generated assets in advance.
+
+10
+00:02:10.000 --> 00:02:24.000
+The setup is a single Theme provider at your existing app root, with the mode and palette chosen explicitly when needed. Use token overrides for small changes, and keep font configuration, downloaded assets, and the local font URL in sync. Continue with the Theme Provider and CLI references for scoped themes and advanced font options.

@@ -1,0 +1,33 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:11.000
+Puzzle DataTable is designed for structured data that may arrive in ranges. You provide the total count, column headers, a range loader, and a cell renderer. We'll add pagination, local sorting, and search while keeping the data boundary clear.
+
+2
+00:00:11.000 --> 00:00:23.000
+Start with the required props. requestItems receives start and end indexes, and renderCell maps one typed row into cell values. This example slices a local array, but the same contract can call an application-owned service.
+
+3
+00:00:23.000 --> 00:00:34.000
+The requested end index is exclusive. That makes Array.slice a direct local example and gives a server adapter a precise range to translate into its own pagination convention. Keep the total item count consistent with the dataset.
+
+4
+00:00:34.000 --> 00:00:46.000
+Set itemsPerPage to show pagination. DataTable calculates the range for each page and invokes requestItems with that range. Keep loading and persistence behavior in the function you provide rather than adding data fetching to cell rendering.
+
+5
+00:00:46.000 --> 00:00:59.000
+Sorting needs a value accessor and an initial or controlled sort state. Return a sortable value for the requested column. The preview uses the actual DataTable component, and the documentation covers controlled sorting when a parent owns that state.
+
+6
+00:00:59.000 --> 00:01:12.000
+Search is also local to the currently loaded items. DataTable does not send its search or sort state through requestItems, so server-paginated data is not globally filtered or sorted. Use your own server query controls when the full dataset must be searched.
+
+7
+00:01:12.000 --> 00:01:24.000
+When the first page is already in memory, initialItems lets the table render it immediately. For remote data, let requestItems resolve the requested range and handle failures through the documented error callback and retry behavior.
+
+8
+00:01:24.000 --> 00:01:36.000
+The essential pattern is a stable total count, a range loader, and a typed row renderer. Add sorting and search only with the right value accessors, and remember that those operations are local to loaded rows. The DataTable docs include the complete prop reference.

@@ -1,0 +1,375 @@
+import type { TutorialDefinition } from "../types";
+
+export const tutorials: readonly TutorialDefinition[] = [
+  {
+    id: "file-upload",
+    title: "Build a reliable file upload flow",
+    description:
+      "Use Puzzle FileUpload for accessible selection, validation, progress, retry, and cancellation without coupling the component to a storage provider.",
+    category: "components",
+    componentName: "FileUpload",
+    packageName: "@puzzle-ui/ui",
+    audience: "React developers integrating file selection and uploads",
+    objectives: [
+      "Render an accessible file selection dropzone.",
+      "Connect onUpload to an application-owned upload service.",
+      "Report progress and handle retry and cancellation.",
+    ],
+    language: "en",
+    documentationUrl: "/docs/ui/forms/file-upload",
+    version: "1",
+    sourceFiles: [
+      "packages/ui/src/components/forms/file-upload/index.tsx",
+      "packages/ui/src/components/forms/file-upload/file-upload.types.ts",
+      "packages/ui/src/components/forms/file-upload/file-upload.utils.ts",
+      "packages/ui/src/components/forms/file-upload/file-upload.css",
+      "packages/ui/src/index.ts",
+      "apps/site/content/docs/ui/forms/file-upload.mdx",
+    ],
+    scenes: [
+      {
+        id: "intro",
+        title: "Make upload states understandable",
+        body: "A dropzone is the start of an upload workflow, not the upload service itself.",
+        narration:
+          "FileUpload brings file selection and upload feedback together. This tutorial follows the public API from accessible selection to progress, errors, retry, and cancellation, using a local example that sends no files.",
+        durationSeconds: 10,
+        steps: ["Select", "Validate", "Upload", "Recover"],
+      },
+      {
+        id: "selection",
+        title: "Start with the accessible dropzone",
+        body: "Choose a file by pointer, keyboard, or drag and drop. Single-file selection is the default.",
+        narration:
+          "Import FileUpload from the public UI package. The dropzone uses the browser's file picker and also accepts drag and drop. Users can focus it and press Enter or Space, so a mouse is not required.",
+        durationSeconds: 12,
+        code: `import { FileUpload } from "@puzzle-ui/ui";\n\n<FileUpload\n  title="Upload a document"\n  description="Choose a document or drop it here."\n  browseLabel="Choose file"\n/>`,
+        highlightedLines: [1, 3, 4, 5],
+        preview: "file-upload",
+      },
+      {
+        id: "validation",
+        title: "Set clear file validation limits",
+        body: "Type is matched by MIME value, sizes are bytes, and maxFiles applies in multiple mode.",
+        narration:
+          "Use accept for MIME types, maxFileSize for each file in bytes, maxTotalSize for the combined selection, and maxFiles when multiple is enabled. Rejected files are reported separately and do not replace the current selection.",
+        durationSeconds: 12,
+        code: `import { FileUpload } from "@puzzle-ui/ui";\n\n<FileUpload\n  multiple\n  accept={["application/pdf", "image/*"]}\n  maxFileSize={5_000_000}\n  maxTotalSize={10_000_000}\n  maxFiles={3}\n/>`,
+        highlightedLines: [4, 5, 6, 7],
+        preview: "file-upload",
+      },
+      {
+        id: "handler",
+        title: "Connect an application-owned upload handler",
+        body: "onUpload receives the File and an object with an AbortSignal and progress callback.",
+        narration:
+          "Without onUpload, accepted files stay in a ready state and Puzzle sends nothing. Add onUpload when your application has a destination. The component remains provider-neutral; your handler decides where and how the bytes are stored.",
+        durationSeconds: 12,
+        code: `import { FileUpload } from "@puzzle-ui/ui";\n\n<FileUpload\n  onUpload={async (file, { signal, onProgress }) => {\n    await saveFile(file, { signal, onProgress });\n  }}\n/>`,
+        highlightedLines: [4, 5],
+        preview: "file-upload",
+      },
+      {
+        id: "progress",
+        title: "Report progress from the actual transfer",
+        body: "Call onProgress with the transfer percentage; do not infer completion from a timer.",
+        narration:
+          "Report progress from the upload operation itself, from zero through one hundred. The callback updates the component's visible status. In a real app, connect it to the progress events provided by your storage or API client.",
+        durationSeconds: 12,
+        code: `onUpload={async (file, { signal, onProgress }) => {\n  await upload(file, {\n    signal,\n    onProgress: (percent) => onProgress(percent),\n  });\n}}`,
+        highlightedLines: [1, 3, 4],
+        steps: ["Transfer starts", "Progress updates", "Upload resolves"],
+      },
+      {
+        id: "retry",
+        title: "Make errors recoverable",
+        body: "A rejected upload reports an error and exposes Retry. This code excerpt runs inside the documented onUpload handler.",
+        narration:
+          "If an upload rejects, FileUpload shows its error state and a retry action. The documented local simulation fails the first attempt for each File and completes on retry. It exists to test the UI; it does not transmit file data.",
+        durationSeconds: 15,
+        code: `import { useRef } from "react";\nimport { FileUpload } from "@puzzle-ui/ui";\n\nfunction LocalUploadDemo() {\n  const attemptedFiles = useRef(new WeakSet<File>());\n  return (\n    <FileUpload multiple onUpload={async (file, { signal, onProgress }) => {\n      const firstAttempt = !attemptedFiles.current.has(file);\n      attemptedFiles.current.add(file);\n      for (const progress of [25, 50, 75, 100]) {\n        await new Promise<void>((resolve) => setTimeout(resolve, 250));\n        signal.throwIfAborted();\n        onProgress(progress);\n        if (firstAttempt && progress === 50) throw new Error("Retry this upload.");\n      }\n    }} />\n  );\n}`,
+        highlightedLines: [5, 7, 9, 12, 14],
+        steps: ["First attempt fails", "Error is announced", "Retry can complete"],
+      },
+      {
+        id: "cancellation",
+        title: "Respect cancellation",
+        body: "Removing or replacing a file, or unmounting the component, aborts its signal.",
+        narration:
+          "The handler receives an AbortSignal. Pass it through to your transfer client and stop work when it is aborted. Removing a file, replacing it, or unmounting the component cancels the associated operation.",
+        durationSeconds: 11,
+        code: `onUpload={async (file, { signal, onProgress }) => {\n  for (const percent of [25, 50, 75, 100]) {\n    signal.throwIfAborted();\n    onProgress(percent);\n  }\n}}`,
+        highlightedLines: [1, 3, 4],
+        steps: ["Pass the signal onward", "Stop on abort", "Keep UI and transfer aligned"],
+      },
+      {
+        id: "recap",
+        title: "Keep storage and UI responsibilities separate",
+        body: "FileUpload owns selection and status; your application owns authorization, transport, and persistence.",
+        narration:
+          "Use FileUpload for the accessible selection and feedback experience. Keep permissions, upload endpoints, storage providers, and permanent asset records in your application. Continue with the API reference for validation options and lifecycle details.",
+        durationSeconds: 10,
+        steps: ["Public UI component", "Application upload handler", "Your storage boundary"],
+      },
+    ],
+  },
+  {
+    id: "data-table",
+    title: "Build a data table with range loading",
+    description:
+      "Connect Puzzle DataTable to an in-memory or server-backed range loader, then add pagination, sorting, and local search.",
+    category: "components",
+    componentName: "DataTable",
+    packageName: "@puzzle-ui/ui",
+    audience: "React developers presenting paginated data",
+    objectives: [
+      "Implement the required range-loading contract.",
+      "Add pagination and typed cell rendering.",
+      "Understand the limits of client-side sorting and search.",
+    ],
+    language: "en",
+    documentationUrl: "/docs/ui/data-display/data-table",
+    version: "1",
+    sourceFiles: [
+      "packages/ui/src/components/data-display/data-table/data-table.tsx",
+      "packages/ui/src/components/data-display/data-table/data-table.types.ts",
+      "packages/ui/src/components/data-display/data-table/data-table.utils.ts",
+      "packages/ui/src/components/data-display/data-table/data-table.css",
+      "packages/ui/src/components/data-display/data-table/index.ts",
+      "packages/ui/src/index.ts",
+      "apps/site/content/docs/ui/data-display/data-table.mdx",
+    ],
+    scenes: [
+      {
+        id: "intro",
+        title: "Separate the table from data ownership",
+        body: "DataTable renders rows; the application supplies the total and the requested ranges.",
+        narration:
+          "Puzzle DataTable is designed for structured data that may arrive in ranges. You provide the total count, column headers, a range loader, and a cell renderer. We'll add pagination, local sorting, and search while keeping the data boundary clear.",
+        durationSeconds: 11,
+        steps: ["Your data source", "Requested range", "Accessible table"],
+      },
+      {
+        id: "contract",
+        title: "Implement the required contract",
+        body: "The range callback receives a start index and an exclusive end index.",
+        narration:
+          "Start with the required props. requestItems receives start and end indexes, and renderCell maps one typed row into cell values. This example slices a local array, but the same contract can call an application-owned service.",
+        durationSeconds: 12,
+        code: `import { DataTable } from "@puzzle-ui/ui";\n\n<DataTable\n  numberOfItems={rows.length}\n  header={["Name", "Role"]}\n  requestItems={async (start, end) => rows.slice(start, end)}\n  renderCell={(row) => [row.name, row.role]}\n/>`,
+        highlightedLines: [1, 3, 4, 5, 6],
+        preview: "data-table",
+      },
+      {
+        id: "range",
+        title: "Treat range boundaries consistently",
+        body: "The end index is exclusive, matching Array.prototype.slice(start, end).",
+        narration:
+          "The requested end index is exclusive. That makes Array.slice a direct local example and gives a server adapter a precise range to translate into its own pagination convention. Keep the total item count consistent with the dataset.",
+        durationSeconds: 11,
+        code: `requestItems={async (start, end) => {\n  return rows.slice(start, end);\n}}`,
+        highlightedLines: [1, 2],
+        preview: "data-table",
+      },
+      {
+        id: "pagination",
+        title: "Add page size without changing the loader",
+        body: "itemsPerPage controls pagination; the component requests the range for the current page.",
+        narration:
+          "Set itemsPerPage to show pagination. DataTable calculates the range for each page and invokes requestItems with that range. Keep loading and persistence behavior in the function you provide rather than adding data fetching to cell rendering.",
+        durationSeconds: 12,
+        code: `<DataTable\n  numberOfItems={rows.length}\n  header={["Name", "Role", "Team"]}\n  itemsPerPage={3}\n  requestItems={async (start, end) => rows.slice(start, end)}\n  renderCell={(row) => [row.name, row.role, row.team]}\n/>`,
+        highlightedLines: [4, 5],
+        preview: "data-table",
+      },
+      {
+        id: "sorting",
+        title: "Add sorting with a value accessor",
+        body: "getSortValue supplies comparable values; defaultSort sets the initial order.",
+        narration:
+          "Sorting needs a value accessor and an initial or controlled sort state. Return a sortable value for the requested column. The preview uses the actual DataTable component, and the documentation covers controlled sorting when a parent owns that state.",
+        durationSeconds: 13,
+        code: `<DataTable\n  defaultSort={{ columnIndex: 0, direction: "asc" }}\n  getSortValue={(row, columnIndex) =>\n    [row.name, row.role, row.team][columnIndex] ?? null\n  }\n  /* keep the required range and cell props */\n/>`,
+        highlightedLines: [2, 3, 4],
+        preview: "data-table",
+      },
+      {
+        id: "search",
+        title: "Know what local search can see",
+        body: "Search and sorting apply only to currently loaded items, not unseen server pages.",
+        narration:
+          "Search is also local to the currently loaded items. DataTable does not send its search or sort state through requestItems, so server-paginated data is not globally filtered or sorted. Use your own server query controls when the full dataset must be searched.",
+        durationSeconds: 13,
+        code: `<DataTable\n  searchable\n  searchPlaceholder="Search members"\n  getSearchValue={(row) => row.name + " " + row.role}\n/>`,
+        highlightedLines: [2, 3, 4],
+        preview: "data-table",
+      },
+      {
+        id: "initial-data",
+        title: "Render available data immediately",
+        body: "Use initialItems when the first range is already available to avoid an initial loading state.",
+        narration:
+          "When the first page is already in memory, initialItems lets the table render it immediately. For remote data, let requestItems resolve the requested range and handle failures through the documented error callback and retry behavior.",
+        durationSeconds: 12,
+        code: `<DataTable\n  numberOfItems={rows.length}\n  initialItems={rows.slice(0, 3)}\n  itemsPerPage={3}\n  requestItems={loadRows}\n  renderCell={(row) => [row.name, row.role, row.team]}\n/>`,
+        highlightedLines: [3, 4],
+        preview: "data-table",
+      },
+      {
+        id: "recap",
+        title: "Make the data boundary explicit",
+        body: "Use the table for presentation and page interaction; keep querying, authorization, and persistence in your app.",
+        narration:
+          "The essential pattern is a stable total count, a range loader, and a typed row renderer. Add sorting and search only with the right value accessors, and remember that those operations are local to loaded rows. The DataTable docs include the complete prop reference.",
+        durationSeconds: 12,
+        steps: ["Define the dataset", "Load requested ranges", "Choose local or server filtering"],
+      },
+    ],
+  },
+  {
+    id: "theme-setup",
+    title: "Set Up a Puzzle UI Theme for React",
+    description:
+      "Install the Puzzle theme package, wrap your application, customize its palette and tokens, and self-host configured fonts.",
+    category: "components",
+    componentName: "Theme",
+    packageName: "@puzzle-ui/theme",
+    audience: "React developers setting up shared application styling",
+    objectives: [
+      "Install @puzzle-ui/theme and use its public Theme provider.",
+      "Apply the system color scheme and a built-in color theme at the app root.",
+      "Override a token without replacing the package defaults.",
+      "Download and serve fonts locally without browser-time Google Fonts requests.",
+    ],
+    language: "en",
+    documentationUrl: "/docs/tutorials/theme",
+    version: "1",
+    sourceFiles: [
+      "packages/theme/package.json",
+      "packages/theme/src/theme.tsx",
+      "packages/theme/src/types.ts",
+      "packages/theme/src/cli.ts",
+      "apps/site/content/docs/theme/theme-provider.mdx",
+      "apps/site/content/docs/theme/cli.mdx",
+      "apps/site/content/docs/tutorials/theme/index.mdx",
+    ],
+    scenes: [
+      {
+        id: "intro",
+        title: "Give every component one theme source",
+        body: "Puzzle Theme resolves tokens once and exposes them to the application.",
+        narration:
+          "A consistent Puzzle UI setup starts with one Theme provider around your application. It resolves the package tokens into CSS variables, applies Puzzle's global styles at the root by default, and lets UI components share the same palette. We'll install the package, customize a few values, and serve fonts locally.",
+        durationSeconds: 13,
+        steps: ["Install the theme package", "Wrap the app once", "Configure palette, tokens, and fonts"],
+      },
+      {
+        id: "install",
+        title: "Install the package in your app workspace",
+        body: "The provider and puzzle-theme font CLI ship together; React 19 is a peer dependency.",
+        narration:
+          "Run the install command from the application workspace, not necessarily the monorepo root. The theme package includes the React provider and the puzzle-theme executable. Keep the React and React DOM 19 dependencies already used by your application; no separate font package or global CLI installation is required.",
+        durationSeconds: 13,
+        code: "bun add @puzzle-ui/theme",
+        codeFilename: "terminal",
+        codeLanguage: "Shell",
+        highlightedLines: [1],
+        steps: ["Use your existing package manager", "Install in the consuming app", "Keep React 19 in place"],
+      },
+      {
+        id: "root-provider",
+        title: "Wrap the existing application root",
+        body: "The default provider follows the system scheme and applies root tokens and global styles.",
+        narration:
+          "Import Theme from the public @puzzle-ui/theme entry point and wrap the application content at its existing root. With no props, Theme uses the default tokens, follows the user's system color scheme, and injects Puzzle's global styles. Keep one React root; do not create a second root just for theming.",
+        durationSeconds: 16,
+        code: `import { Theme } from "@puzzle-ui/theme";\n\nexport const App = () => (\n  <Theme>\n    <YourApp />\n  </Theme>\n);`,
+        highlightedLines: [1, 3, 4, 5],
+        preview: "theme-setup",
+        steps: ["Import the public provider", "Wrap your existing app", "Keep the default system mode"],
+      },
+      {
+        id: "color-mode",
+        title: "Choose a mode and built-in color theme",
+        body: "The mode controls light, dark, or system behavior; colorTheme selects a registered palette.",
+        narration:
+          "Set theme to system, light, or dark to choose the active color scheme. Use colorTheme for a built-in palette such as cobalt-sky. These are separate choices: system mode follows prefers-color-scheme, while the named color theme supplies the palette values.",
+        durationSeconds: 13,
+        code: `<Theme theme="system" colorTheme="cobalt-sky">\n  <YourApp />\n</Theme>`,
+        highlightedLines: [1],
+        preview: "theme-setup",
+        steps: ["Choose the color mode", "Select a built-in palette", "Let components consume the same variables"],
+      },
+      {
+        id: "token-override",
+        title: "Override only the token you need",
+        body: "Deep-partial token overrides keep the rest of the package defaults intact.",
+        narration:
+          "Use the tokens prop for focused design adjustments instead of copying the entire default token object. This example changes the medium radius and keeps the selected color theme. Token values are validated before they are written as CSS, so fix invalid names or values rather than expecting them to be ignored.",
+        durationSeconds: 16,
+        code: `<Theme\n  colorTheme="cobalt-sky"\n  tokens={{ radius: { md: "0.5rem" } }}\n>\n  <YourApp />\n</Theme>`,
+        highlightedLines: [3],
+        preview: "theme-setup",
+        steps: ["Keep the package defaults", "Override a specific token", "Verify the result in your UI"],
+      },
+      {
+        id: "font-config",
+        title: "Define font roles once",
+        body: "Use heading, body, and accent roles to keep download and runtime configuration aligned.",
+        narration:
+          "For reproducible typography, create a JSON configuration with the font roles you use. This example sets a variable weight range for Sora headings and discrete weights for Inter body text. The same JSON can be imported by your app, so the downloader and Theme use consistent family names and weights.",
+        durationSeconds: 15,
+        codeFilename: "theme/puzzle-fonts.json",
+        codeLanguage: "JSON",
+        code: `{\n  "heading": {\n    "family": "Sora",\n    "weightRange": [300, 700]\n  },\n  "body": {\n    "family": "Inter",\n    "weights": [400, 500, 700]\n  }\n}`,
+        highlightedLines: [2, 3, 4, 6, 7, 8],
+        steps: ["Create puzzle-fonts.json", "Choose supported family weights", "Reuse the config in Theme"],
+      },
+      {
+        id: "download-fonts",
+        title: "Download fonts into your public directory",
+        body: "The one-time CLI download needs network access; the browser can then use local assets.",
+        narration:
+          "Run puzzle-theme fonts download from your app workspace, passing the configuration path. The CLI writes a stylesheet and WOFF2 files under public/fonts. This step contacts Google Fonts during setup or build; it does not make the browser request those fonts at runtime. The package's CLI requires Node.js 20.19 or newer.",
+        durationSeconds: 14,
+        code: "bunx puzzle-theme fonts download --config theme/puzzle-fonts.json --subsets latin,latin-ext",
+        codeFilename: "terminal",
+        codeLanguage: "Shell",
+        highlightedLines: [1],
+        steps: ["Download during setup or build", "Serve public/fonts at /fonts", "Re-run after font config changes"],
+      },
+      {
+        id: "local-fonts",
+        title: "Load the generated stylesheet locally",
+        body: "Match fontSource, fontBasePath, and the public asset location.",
+        narration:
+          "Import the same JSON into your app theme, set fontSource to local, and keep fontBasePath aligned with the public URL directory. Theme then links the generated stylesheet instead of Google Fonts. The body role is preloaded by default; disable preloading or choose another role if the generated files do not contain the expected Latin face.",
+        durationSeconds: 17,
+        code: `import { Theme } from "@puzzle-ui/theme";\nimport fonts from "./theme/puzzle-fonts.json";\n\n<Theme\n  theme="system"\n  colorTheme="cobalt-sky"\n  fonts={fonts}\n  fontSource="local"\n  fontBasePath="/fonts"\n>\n  <YourApp />\n</Theme>`,
+        highlightedLines: [2, 7, 8],
+        steps: ["Import the shared font config", "Select local font loading", "Match the public URL path"],
+      },
+      {
+        id: "deployment",
+        title: "Verify assets before deploying",
+        body: "Generate fonts before the build and check both the stylesheet and referenced files.",
+        narration:
+          "Add the font download command before your framework's build script and make sure public/fonts is included in deployment. Verify that puzzle-fonts.css and each referenced WOFF2 file resolve from the site root. The initial download requires network access; an offline deployment must receive the generated assets in advance.",
+        durationSeconds: 13,
+        steps: ["Download fonts before build", "Check stylesheet and WOFF2 URLs", "Verify system mode and local requests"],
+      },
+      {
+        id: "recap",
+        title: "Keep theme ownership at the application boundary",
+        body: "One root provider, explicit palette choices, focused overrides, and verified font assets.",
+        narration:
+          "The setup is a single Theme provider at your existing app root, with the mode and palette chosen explicitly when needed. Use token overrides for small changes, and keep font configuration, downloaded assets, and the local font URL in sync. Continue with the Theme Provider and CLI references for scoped themes and advanced font options.",
+        durationSeconds: 14,
+        steps: ["One provider at the root", "Use documented public props", "Check local assets in production"],
+      },
+    ],
+  },
+];
+
+export const getTutorial = (id: string) =>
+  tutorials.find((tutorial) => tutorial.id === id);

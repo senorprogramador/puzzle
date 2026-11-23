@@ -1,0 +1,13 @@
+{
+  "ollamaUrl": "http://127.0.0.1:11434",
+  "defaultModel": "qwen3:14b",
+  "scriptModel": "qwen3:8b",
+  "lightweightModel": "qwen3:4b",
+  "temperature": 0.2,
+  "contextSize": 16384,
+  "maxOutputTokens": 4096,
+  "requestTimeoutMs": 120000,
+  "modelKeepAlive": "0",
+  "maxModelMemoryGb": 18,
+  "renderWaitTimeoutMs": 1800000
+}

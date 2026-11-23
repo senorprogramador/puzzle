@@ -1,0 +1,45 @@
+.puzzle-tutorial-video {
+  margin: 2rem 0;
+  padding: 1.25rem;
+  border: 1px solid var(--puzzle-color-border, #e2e8f0);
+  border-radius: 1rem;
+  background: var(--puzzle-color-surface, #fff);
+}
+
+.puzzle-tutorial-video h2 {
+  margin: 0;
+}
+
+.puzzle-tutorial-video__description {
+  margin: 0.5rem 0 0;
+  color: var(--puzzle-color-text-muted, #475569);
+}
+
+.puzzle-tutorial-video__meta {
+  margin: 0.5rem 0 0.75rem;
+  color: var(--puzzle-color-text-subtle, #64748b);
+  font-size: 0.875rem;
+}
+
+.puzzle-tutorial-video video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.75rem;
+  background: #0b1220;
+}
+
+.puzzle-tutorial-video__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 40rem) {
+  .puzzle-tutorial-video {
+    margin: 1.5rem 0;
+    padding: 0.75rem;
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@puzzle-ui/tutorials",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "studio:cli": "bun scripts/tutorial-studio.ts",
+    "validate": "bun scripts/validate-tutorials.ts",
+    "render": "bun scripts/render-tutorials.ts",
+    "render:all": "bun scripts/render-tutorials.ts --all",
+    "render:component": "bun scripts/render-tutorials.ts",
+    "render:vertical": "bun scripts/render-vertical.ts",
+    "thumbnails": "bun scripts/render-tutorials.ts --thumbnails-only",
+    "manifest": "bun scripts/render-tutorials.ts --manifest-only",
+    "test": "bun test src && bun scripts/validate-tutorials.ts",
+    "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "@puzzle-ui/theme": "workspace:*",
+    "@puzzle-ui/ui": "workspace:*",
+    "@remotion/cli": "4.0.545",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "4.0.545"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^7.0.2"
+  }
+}

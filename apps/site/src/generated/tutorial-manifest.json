@@ -1,0 +1,47 @@
+[
+  {
+    "id": "file-upload",
+    "title": "Build a reliable file upload flow",
+    "description": "Use Puzzle FileUpload for accessible selection, validation, progress, retry, and cancellation without coupling the component to a storage provider.",
+    "category": "components",
+    "durationSeconds": 94,
+    "language": "en",
+    "videoUrl": "/videos/components/file-upload/tutorial.mp4",
+    "thumbnailUrl": "/videos/components/file-upload/thumbnail.jpg",
+    "captionsUrl": "/videos/components/file-upload/captions.vtt",
+    "documentationUrl": "/docs/ui/forms/file-upload",
+    "lastGeneratedAt": "2026-11-23T10:26:24.961Z",
+    "version": "1",
+    "sourceHash": "0ab9f2fc1f9609981ddfe33d08f8f95f9eadbcc8595b13b09b1f95d4d8ed47ad"
+  },
+  {
+    "id": "data-table",
+    "title": "Build a data table with range loading",
+    "description": "Connect Puzzle DataTable to an in-memory or server-backed range loader, then add pagination, sorting, and local search.",
+    "category": "components",
+    "durationSeconds": 96,
+    "language": "en",
+    "videoUrl": "/videos/components/data-table/tutorial.mp4",
+    "thumbnailUrl": "/videos/components/data-table/thumbnail.jpg",
+    "captionsUrl": "/videos/components/data-table/captions.vtt",
+    "documentationUrl": "/docs/ui/data-display/data-table",
+    "lastGeneratedAt": "2026-11-23T10:27:34.293Z",
+    "version": "1",
+    "sourceHash": "909ae313650d27af6b5a798af3e2085e660ac2d0174568d4f09244b081b38fec"
+  },
+  {
+    "id": "theme-setup",
+    "title": "Set Up a Puzzle UI Theme for React",
+    "description": "Install the Puzzle theme package, wrap your application, customize its palette and tokens, and self-host configured fonts.",
+    "category": "components",
+    "durationSeconds": 144,
+    "language": "en",
+    "videoUrl": "/videos/components/theme-setup/tutorial.mp4",
+    "thumbnailUrl": "/videos/components/theme-setup/thumbnail.jpg",
+    "captionsUrl": "/videos/components/theme-setup/captions.vtt",
+    "documentationUrl": "/docs/tutorials/theme",
+    "lastGeneratedAt": "2026-11-23T10:29:15.799Z",
+    "version": "1",
+    "sourceHash": "1ca371c7961ced7a9a60d58a86e5bb5d3d6ed1dc5cacfbf82d66d08b4893d07e"
+  }
+]

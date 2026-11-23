@@ -1,0 +1,23 @@
+name: Validate rendered tutorial videos
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Test tutorial metadata and definitions
+        run: bun run --filter '@puzzle-ui/tutorials' test
+      - name: Validate committed player assets
+        run: bun run --filter '@puzzle-ui/site' test:video-tutorials

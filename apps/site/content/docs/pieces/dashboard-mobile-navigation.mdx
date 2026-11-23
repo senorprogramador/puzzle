@@ -1,0 +1,84 @@
+---
+title: Dashboard Mobile Navigation
+description: Use an accessible, responsive disclosure for compact dashboard navigation with Puzzle Pieces.
+---
+
+import { DashboardMobileNavigation } from "@puzzle-ui/pieces";
+import { Preview } from "@puzzle-ui/ui";
+
+`DashboardMobileNavigation` presents dashboard links in a native disclosure. It
+is a compact alternative to an overlay drawer when navigation can expand
+inline. It does not own application routing, authorization, or route visibility.
+
+## Import
+
+```tsx
+import { DashboardMobileNavigation } from "@puzzle-ui/pieces";
+```
+
+## Example
+
+Pass the same navigation items and current path used by the desktop dashboard
+navigation. The built-in styles display this component up to `48rem`; it is
+hidden at wider viewports.
+
+<Preview
+  defaultDevice="mobile"
+  height={300}
+  code={`\
+<DashboardMobileNavigation
+  items={[
+    { id: "overview", label: "Overview", href: "/workspace" },
+    { id: "projects", label: "Projects", href: "/workspace/projects" },
+    { id: "settings", label: "Settings", href: "/workspace/settings" },
+  ]}
+  pathname="/workspace/projects"
+  onNavigate={(href) => navigate({ to: href })}
+  label="Workspace navigation"
+/>
+`}
+>
+  <DashboardMobileNavigation
+    items={[
+      { id: "overview", label: "Overview", href: "/workspace" },
+      { id: "projects", label: "Projects", href: "/workspace/projects" },
+      { id: "settings", label: "Settings", href: "/workspace/settings" },
+    ]}
+    pathname="/workspace/projects"
+    label="Workspace navigation"
+  />
+</Preview>
+
+The trigger's `label` text is its accessible name; it defaults to
+`"Open navigation"`. A blank or whitespace-only label also falls back to this
+visible default. The contained navigation landmark is named `"Mobile
+navigation"`. Use a clear trigger label and choose another component if the
+landmark name must be customized.
+
+The native disclosure supports keyboard toggling. Selecting a link with an
+unmodified primary click closes it, whether navigation is handled by the
+browser or by `onNavigate`. Modified clicks retain the browser's normal link
+behavior. When `onNavigate` is supplied, the callback handles only unmodified
+primary activation; otherwise native anchor navigation is preserved.
+
+## API
+
+| Prop | Required | Default | Description |
+| --- | --- | --- | --- |
+| `items` | Yes | — | Navigation items with `id`, string `label`, `href`, and optional `icon` or nested `children`. |
+| `pathname` | No | — | Current path used to mark active and current-page links. |
+| `onNavigate` | No | — | Callback for unmodified primary link activation. |
+| `label` | No | `"Open navigation"` | Visible text and accessible name of the disclosure trigger. |
+| `className` | No | — | Additional class on the disclosure element. |
+
+## Choosing a pattern
+
+| Option | Documented fit |
+| --- | --- |
+| `DashboardMobileNavigation` | Inline native disclosure and labeled navigation links, with mobile-only visibility and router-independent callback support. |
+| [React Aria Disclosure](https://react-aria.adobe.com/Disclosure) | A disclosure built from a heading, trigger button, and panel; use it when the application wants the React Aria disclosure API and composes its own links and navigation landmark. |
+| [MUI temporary Drawer](https://mui.com/material-ui/react-drawer/) | An overlay navigation drawer with Escape/overlay dismissal and selection-driven closing through controlled state; use it when a modal or temporary side surface is needed. |
+
+These are different composition patterns, not an overall quality ranking.
+`DashboardMobileNavigation` does not provide an overlay, focus trap, backdrop,
+or controlled open-state prop.

@@ -1,0 +1,33 @@
+WEBVTT
+
+1
+00:00:00.000 --> 00:00:10.000
+FileUpload brings file selection and upload feedback together. This tutorial follows the public API from accessible selection to progress, errors, retry, and cancellation, using a local example that sends no files.
+
+2
+00:00:10.000 --> 00:00:22.000
+Import FileUpload from the public UI package. The dropzone uses the browser's file picker and also accepts drag and drop. Users can focus it and press Enter or Space, so a mouse is not required.
+
+3
+00:00:22.000 --> 00:00:34.000
+Use accept for MIME types, maxFileSize for each file in bytes, maxTotalSize for the combined selection, and maxFiles when multiple is enabled. Rejected files are reported separately and do not replace the current selection.
+
+4
+00:00:34.000 --> 00:00:46.000
+Without onUpload, accepted files stay in a ready state and Puzzle sends nothing. Add onUpload when your application has a destination. The component remains provider-neutral; your handler decides where and how the bytes are stored.
+
+5
+00:00:46.000 --> 00:00:58.000
+Report progress from the upload operation itself, from zero through one hundred. The callback updates the component's visible status. In a real app, connect it to the progress events provided by your storage or API client.
+
+6
+00:00:58.000 --> 00:01:13.000
+If an upload rejects, FileUpload shows its error state and a retry action. The documented local simulation fails the first attempt for each File and completes on retry. It exists to test the UI; it does not transmit file data.
+
+7
+00:01:13.000 --> 00:01:24.000
+The handler receives an AbortSignal. Pass it through to your transfer client and stop work when it is aborted. Removing a file, replacing it, or unmounting the component cancels the associated operation.
+
+8
+00:01:24.000 --> 00:01:34.000
+Use FileUpload for the accessible selection and feedback experience. Keep permissions, upload endpoints, storage providers, and permanent asset records in your application. Continue with the API reference for validation options and lifecycle details.
