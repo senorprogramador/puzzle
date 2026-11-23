@@ -10,6 +10,39 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.18.0 - 2026-11-23
+
+### `@puzzle-ui/theme`
+
+- Adjusted shared theme CSS for the updated component styling.
+
+### `@puzzle-ui/ui`
+
+- Added `role="alertdialog"` support to `Dialog` through a new `role` prop (defaults to `dialog`).
+- Added `aria-label` and `aria-labelledby` support to `Tabs`, applied to the tablist.
+- Fixed `Autocomplete` so `readOnly` prevents option selection and renders options as disabled.
+- Fixed `DatePicker` date calculations to construct local dates reliably for years 0–99 and across month and day boundaries.
+- Fixed `CollapsableSidebar` so empty or fragment-only icons no longer render an empty icon slot.
+- Changed `CollapsableSidebar` to throw clear errors for an empty `ariaLabel`, empty or duplicate item IDs, whitespace in group IDs, and empty labels.
+- Changed `PageLayout` to accept regions wrapped in fragments and throw a clear error for unsupported children.
+- Fixed `Transition` so a user `style` is preserved and the duration is exposed through the `--puzzle-transition-duration` CSS variable.
+- Fixed `LinearProgress` and `CircularProgress` to respect `prefers-reduced-motion`, and moved the linear progress transition into CSS.
+- Improved `Avatar` image rendering with `object-fit: cover`.
+- Added resource descriptor validation for rendering utilities, plus new unit and browser test coverage across forms, layout, navigation, and overlays.
+
+### `@puzzle-ui/pieces`
+
+- Changed `ConfirmAction` to use an `alertdialog`, support async `onConfirm` with a pending state and retry error message, and restore focus to the trigger on close.
+- Added keyboard and focus support to horizontal `ActivitySection` lists, ticker `Announcement` lists, and horizontal `GallerySection` lists.
+- Fixed `Announcement` to move focus to the next dismiss button after dismissing a message.
+- Fixed `GallerySection` to return focus to the triggering item when its lightbox closes.
+- Fixed `NotificationItem` accessibility with unread status text and a dismiss button labelled by the notification title.
+- Fixed `DashboardMobileNavigation` to close after an item is navigated.
+- Fixed `CartSummary` mobile layout, showing product images and aligning item columns.
+- Fixed `ContentSection`, `Features`, and `GallerySection` layouts when media or a sidebar is absent, and improved responsive stacking, container-based breakpoints, and long-text wrapping.
+- Fixed `VideoSection` vertical video aspect ratio and sizing.
+- Improved responsive styling of booking, checkout, payment method, dashboard, and data-display pieces, and added extensive browser test coverage.
+
 ## 0.17.0 - 2026-11-22
 
 ### `@puzzle-ui/media-cloudflare`

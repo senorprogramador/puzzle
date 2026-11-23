@@ -3,6 +3,19 @@
 All notable changes to `@puzzle-ui/pieces` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.18.0 - 2026-11-23
+
+- Changed `ConfirmAction` to use an `alertdialog`, support async `onConfirm` with a pending state and retry error message, and restore focus to the trigger on close.
+- Added keyboard and focus support to horizontal `ActivitySection` lists, ticker `Announcement` lists, and horizontal `GallerySection` lists.
+- Fixed `Announcement` to move focus to the next dismiss button after dismissing a message.
+- Fixed `GallerySection` to return focus to the triggering item when its lightbox closes.
+- Fixed `NotificationItem` accessibility with unread status text and a dismiss button labelled by the notification title.
+- Fixed `DashboardMobileNavigation` to close after an item is navigated.
+- Fixed `CartSummary` mobile layout, showing product images and aligning item columns.
+- Fixed `ContentSection`, `Features`, and `GallerySection` layouts when media or a sidebar is absent, and improved responsive stacking, container-based breakpoints, and long-text wrapping.
+- Fixed `VideoSection` vertical video aspect ratio and sizing.
+- Improved responsive styling of booking, checkout, payment method, dashboard, and data-display pieces, and added extensive browser test coverage.
+
 ## 0.17.0 - 2026-11-22
 
 - Added `SiteHeader` with default, transparent, overlay, minimal, and centered variants, nested navigation, primary and secondary actions, sticky/scrolled states, and a mobile menu.

@@ -3,6 +3,20 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.18.0 - 2026-11-23
+
+- Added `role="alertdialog"` support to `Dialog` through a new `role` prop (defaults to `dialog`).
+- Added `aria-label` and `aria-labelledby` support to `Tabs`, applied to the tablist.
+- Fixed `Autocomplete` so `readOnly` prevents option selection and renders options as disabled.
+- Fixed `DatePicker` date calculations to construct local dates reliably for years 0–99 and across month and day boundaries.
+- Fixed `CollapsableSidebar` so empty or fragment-only icons no longer render an empty icon slot.
+- Changed `CollapsableSidebar` to throw clear errors for an empty `ariaLabel`, empty or duplicate item IDs, whitespace in group IDs, and empty labels.
+- Changed `PageLayout` to accept regions wrapped in fragments and throw a clear error for unsupported children.
+- Fixed `Transition` so a user `style` is preserved and the duration is exposed through the `--puzzle-transition-duration` CSS variable.
+- Fixed `LinearProgress` and `CircularProgress` to respect `prefers-reduced-motion`, and moved the linear progress transition into CSS.
+- Improved `Avatar` image rendering with `object-fit: cover`.
+- Added resource descriptor validation for rendering utilities, plus new unit and browser test coverage across forms, layout, navigation, and overlays.
+
 ## 0.17.0 - 2026-11-22
 
 - Added `DateRangePicker`, an accessible popover date-range control with controlled and uncontrolled values, min/max and disabled-date rules, range validation, one or two visible months, locale and week-start options, custom day content, clearing, and form field names.

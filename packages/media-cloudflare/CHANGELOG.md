@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.18.0 - 2026-11-23
+
+- No changes; version bumped in lockstep.
+
 ## 0.17.0 - 2026-11-22
 
 - Added Cloudflare R2 object-storage adapters with single and multipart uploads, size/SHA-256 verification, idempotent completion, abort and delete cleanup, cursor listing, tenant-prefixed keys, and short-lived read/part targets backed by a metadata store.
