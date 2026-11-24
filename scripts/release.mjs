@@ -364,17 +364,50 @@ const restoreReleaseFiles = (files) => {
 };
 
 // Copilot may wrap the JSON in a Markdown fence or surround it with prose.
-const parseChangelogJson = (output) => {
+const parseCopilotJson = (output) => {
   const text = output.trim();
   const fenced = text.match(/```(?:json)?\s*\n([\s\S]*?)\n?```/i);
   const body = fenced ? fenced[1].trim() : text;
   try {
     return JSON.parse(body);
   } catch (error) {
-    const start = body.indexOf("[");
-    const end = body.lastIndexOf("]");
-    if (start === -1 || end <= start) throw error;
-    return JSON.parse(body.slice(start, end + 1));
+    for (let start = 0; start < body.length; start += 1) {
+      if (body[start] !== "[" && body[start] !== "{") continue;
+
+      const expectedClosers = [];
+      let inString = false;
+      let escaped = false;
+      for (let end = start; end < body.length; end += 1) {
+        const character = body[end];
+        if (inString) {
+          if (escaped) {
+            escaped = false;
+          } else if (character === "\\") {
+            escaped = true;
+          } else if (character === "\"") {
+            inString = false;
+          }
+          continue;
+        }
+        if (character === "\"") {
+          inString = true;
+        } else if (character === "{") {
+          expectedClosers.push("}");
+        } else if (character === "[") {
+          expectedClosers.push("]");
+        } else if (character === "}" || character === "]") {
+          if (expectedClosers.pop() !== character) break;
+          if (expectedClosers.length === 0) {
+            try {
+              return JSON.parse(body.slice(start, end + 1));
+            } catch {
+              break;
+            }
+          }
+        }
+      }
+    }
+    throw error;
   }
 };
 
@@ -436,7 +469,7 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
 
   let notes;
   try {
-    notes = parseChangelogJson(result.stdout);
+    notes = parseCopilotJson(result.stdout);
   } catch (error) {
     fail(`Copilot did not return valid changelog JSON: ${error.message}`);
   }
@@ -562,7 +595,7 @@ const auditPublicDocumentation = (manifests, version, baseline, originals) => {
 
   let response;
   try {
-    response = parseChangelogJson(result.stdout);
+    response = parseCopilotJson(result.stdout);
   } catch (error) {
     fail(`Copilot did not return valid documentation audit JSON: ${error.message}`);
   }

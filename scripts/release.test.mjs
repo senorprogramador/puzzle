@@ -216,9 +216,12 @@ if (command === "script") {
     if (process.env.FAIL_STEP === "docs-out-of-scope") {
       edits[0].path = "packages/core/package.json";
     }
-    console.log(JSON.stringify({
+    const response = {
       edits: process.env.ALL_DOCS_VALID === "true" ? [] : edits,
-    }));
+    };
+    console.log(process.env.COPILOT_DOCS_PROSE === "true"
+      ? "Audit complete:\\n" + JSON.stringify(response)
+      : JSON.stringify(response));
   } else {
     assert.match(prompt, /v0\\.4\\.0\\.\\.HEAD/);
     assert.match(prompt, /Read every changed file/);
@@ -423,6 +426,32 @@ for (const dryRun of [false, true]) {
     }
   });
 }
+
+test("release parses Copilot audit JSON surrounded by prose", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "puzzle-release-docs-prose-test-"));
+  try {
+    const originals = await createFixture(directory);
+    const result = run(process.execPath, ["scripts/release.mjs", "--dry-run"], {
+      cwd: directory,
+      input: "minor\n",
+      env: {
+        ...process.env,
+        PATH: `${join(directory, "bin")}:${process.env.PATH}`,
+        REAL_BUN: bun,
+        FIXTURE_ROOT: directory,
+        FAIL_INSTALL: "",
+        DRY_RUN: "true",
+        COPILOT_DOCS_PROSE: "true",
+      },
+    });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    for (const [path, content] of Object.entries(originals)) {
+      assert.equal(await readFile(join(directory, path), "utf8"), content, path);
+    }
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
 
 for (const missing of [false, true]) {
   for (const failure of [undefined, "copilot-login", "copilot-auth-retry"]) {
