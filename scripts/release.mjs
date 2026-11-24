@@ -53,6 +53,7 @@ const releaseTypes = ["major", "minor", "patch"];
 const lockfile = join(root, "bun.lock");
 const npmPollIntervalMs = 10_000;
 const npmPollTimeoutMs = 15 * 60 * 1000;
+const maxCopilotOutputBytes = 64 * 1024 * 1024;
 
 class ReleaseError extends Error {}
 
@@ -70,12 +71,14 @@ const run = (command, args, {
   allowMissing = false,
   allowTimeout = false,
   timeout,
+  maxBuffer,
 } = {}) => {
   const result = spawnSync(command, args, {
     cwd,
     encoding: "utf8",
     stdio: capture ? ["inherit", "pipe", "pipe"] : "inherit",
     ...(timeout === undefined ? {} : { timeout }),
+    ...(maxBuffer === undefined ? {} : { maxBuffer }),
   });
 
   if (result.error) {
@@ -102,14 +105,15 @@ const runOrFail = (description, command, args, options) => {
 };
 
 const runCopilot = (args, { capture = false } = {}) => {
-  const result = run("copilot", args, { capture, allowMissing: true });
+  const options = { capture, allowMissing: true, maxBuffer: maxCopilotOutputBytes };
+  const result = run("copilot", args, options);
   if (!result.missing) {
     return result;
   }
   log("Copilot CLI is not on PATH; running @github/copilot through Bun's package cache");
   return run("bun", [
     "x", "--silent", "--package", "@github/copilot", "copilot", ...args,
-  ], { capture });
+  ], options);
 };
 
 const collectMarkdownFiles = (directory) => {

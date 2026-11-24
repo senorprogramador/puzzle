@@ -219,9 +219,12 @@ if (command === "script") {
     const response = {
       edits: process.env.ALL_DOCS_VALID === "true" ? [] : edits,
     };
-    console.log(process.env.COPILOT_DOCS_PROSE === "true"
+    const prefix = process.env.COPILOT_DOCS_LARGE === "true"
+      ? "x".repeat(1024 * 1024 + 1)
+      : "";
+    console.log(prefix + (process.env.COPILOT_DOCS_PROSE === "true"
       ? "Audit complete:\\n" + JSON.stringify(response)
-      : JSON.stringify(response));
+      : JSON.stringify(response)));
   } else {
     assert.match(prompt, /v0\\.4\\.0\\.\\.HEAD/);
     assert.match(prompt, /Read every changed file/);
@@ -427,7 +430,7 @@ for (const dryRun of [false, true]) {
   });
 }
 
-test("release parses Copilot audit JSON surrounded by prose", async () => {
+test("release captures large prose-wrapped Copilot audit responses", async () => {
   const directory = await mkdtemp(join(tmpdir(), "puzzle-release-docs-prose-test-"));
   try {
     const originals = await createFixture(directory);
@@ -442,6 +445,7 @@ test("release parses Copilot audit JSON surrounded by prose", async () => {
         FAIL_INSTALL: "",
         DRY_RUN: "true",
         COPILOT_DOCS_PROSE: "true",
+        COPILOT_DOCS_LARGE: "true",
       },
     });
     assert.equal(result.status, 0, result.stdout + result.stderr);
