@@ -140,4 +140,37 @@ describe("Backdrop", () => {
     await user.keyboard("{Escape}");
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  it("uses the latest close handler without resetting modal focus", async () => {
+    const user = userEvent.setup();
+    const previousOnClose = vi.fn();
+    const onClose = vi.fn();
+    const content = (
+      <div data-overlay-content="">
+        <button type="button">First action</button>
+        <input aria-label="Name" />
+      </div>
+    );
+    const { rerender } = render(
+      <Backdrop modal onClose={previousOnClose} data-testid="backdrop">
+        {content}
+      </Backdrop>,
+    );
+
+    await user.click(screen.getByRole("textbox", { name: "Name" }));
+    rerender(
+      <Backdrop modal onClose={onClose} data-testid="backdrop">
+        {content}
+      </Backdrop>,
+    );
+
+    expect(screen.getByRole("textbox", { name: "Name" })).toHaveFocus();
+    await user.keyboard("{Escape}");
+    expect(onClose).toHaveBeenCalledOnce();
+    expect(previousOnClose).not.toHaveBeenCalled();
+
+    await user.click(screen.getByTestId("backdrop"));
+    expect(onClose).toHaveBeenCalledTimes(2);
+    expect(previousOnClose).not.toHaveBeenCalled();
+  });
 });

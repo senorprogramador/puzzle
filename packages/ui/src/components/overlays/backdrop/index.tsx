@@ -52,6 +52,11 @@ const Backdrop = <C extends ElementType = "div">({
 
   const rootRef = useRef<HTMLElement | null>(null);
   const registrationRef = useRef<OverlayRegistration | null>(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   // Track the actual mounted element. Transition may mount it
   // after the initial render when open changes from false to true.
@@ -88,7 +93,7 @@ const Backdrop = <C extends ElementType = "div">({
       rootElement.ownerDocument,
       () => {
         if (closeOnEscape) {
-          onClose?.();
+          onCloseRef.current?.();
         }
       },
       parentPriority,
@@ -111,7 +116,7 @@ const Backdrop = <C extends ElementType = "div">({
         registrationRef.current = null;
       }
     };
-  }, [open, rootElement, modal, closeOnEscape, onClose, parentPriority]);
+  }, [open, rootElement, modal, closeOnEscape, parentPriority]);
 
   return (
     <OverlayStackProvider priority={parentPriority + 1}>
