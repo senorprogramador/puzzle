@@ -84,7 +84,7 @@ describe.each(["Dialog", "Drawer"] as const)("%s inputs (browser)", (container) 
       expect(input).toHaveFocus();
       expect(input).toHaveValue("a");
 
-      await userEvent.keyboard("{Home}Z{End}!");
+      await userEvent.keyboard("{ArrowLeft}Z{ArrowRight}!");
       expect(input).toHaveFocus();
       expect(input).toHaveValue("Za!");
     }
