@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/storage-d1` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.19.1 - 2026-11-24
+
+- No changes; version bumped in lockstep.
+
 ## 0.19.0 - 2026-11-24
 
 - Added support for nested dotted-path filters and sorts, case-insensitive `contains` matching for strings and arrays, and query validation.

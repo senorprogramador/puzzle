@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/fullstack` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.19.1 - 2026-11-24
+
+- No changes; version bumped in lockstep.
+
 ## 0.19.0 - 2026-11-24
 
 - Breaking: rewrote the CMS client, shared contracts and server handlers around code-first collections and singletons, with flat JSON-safe `CmsApiDocument` records and `where`/`sort`/`limit`/`page`/`locale` queries.

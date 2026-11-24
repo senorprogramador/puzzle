@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/payment-providers",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "Server-only payment provider adapters for Puzzle Commerce.",
   "homepage": "https://puzzle-ui.com/docs/payments",
   "keywords": [
@@ -88,7 +88,7 @@
     "vitest": "bunx vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@puzzle-ui/commerce": "^0.19.0"
+    "@puzzle-ui/commerce": "^0.19.1"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

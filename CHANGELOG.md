@@ -10,6 +10,12 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.19.1 - 2026-11-24
+
+### `@puzzle-ui/ui`
+
+- Fixed modal `Dialog` and `Drawer` losing input focus while typing in controlled inputs. `Backdrop` now calls the latest `onClose` handler without re-registering its overlay, so focus is no longer reset on each re-render.
+
 ## 0.19.0 - 2026-11-24
 
 ### `@puzzle-ui/storage`

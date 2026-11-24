@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.19.1 - 2026-11-24
+
+- No changes; version bumped in lockstep.
+
 ## 0.19.0 - 2026-11-24
 
 - Breaking: rewrote the package as a code-first CMS. Define schemas statically with `defineCMS`, `collection`, `collection.singleton` and the `fields` factories, replacing runtime content-type registration.

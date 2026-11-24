@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.19.1 - 2026-11-24
+
+- No changes; version bumped in lockstep.
+
 ## 0.19.0 - 2026-11-24
 
 - No changes; version bumped in lockstep.

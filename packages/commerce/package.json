@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/commerce",
-  "version": "0.19.0",
+  "version": "0.19.1",
   "description": "Provider-independent commerce contracts and safe monetary utilities for Puzzle.",
   "homepage": "https://puzzle-ui.com/docs/commerce",
   "keywords": [
