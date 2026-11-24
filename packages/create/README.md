@@ -41,6 +41,10 @@ MongoDB and D1 Auth configurations require initial-user credentials on stdin wit
 
 The generator installs `@puzzle-ui/ui` and `@puzzle-ui/theme`, maps Puzzle `Link` (and `Image` on Next.js) to the framework's components in the theme, adds a starter page that links to the package docs, and uses the detected package manager for framework generation and dependency installation. Tailwind is enabled by default; Puzzle Auth is optional and disabled by default.
 
+With Tailwind enabled, the generated stylesheet registers `compact:`, `tablet:`, `desktop:`, and `hd:` responsive variants at 480px, 768px, 1024px, and 1440px respectively. Tailwind's default variants remain available. Edit the generated `@theme` block to customize these build-time breakpoints; runtime Theme token overrides do not change them.
+
+Puzzle's semantic color roles are also available as Tailwind colors with a `puzzle-` prefix, such as `bg-puzzle-primary`, `text-puzzle-primary-foreground`, and `border-puzzle-border`. These colors follow the active Theme, including local scopes and token overrides; Tailwind's default colors remain available. See the [color roles](https://puzzle-ui.com/docs/theme/colors#color-roles) for the full list.
+
 ## AI instructions
 
 The CLI can generate package-aware consumer instructions from locally installed Puzzle packages:

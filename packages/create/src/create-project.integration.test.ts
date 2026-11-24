@@ -134,6 +134,11 @@ describe("createProject", () => {
       "utf8",
     );
 
+    const css = await readFile(
+      path.join(projectDirectory, "src/index.css"),
+      "utf8",
+    );
+
     const signIn = await readFile(
       path.join(projectDirectory, "src/auth/sign-in.tsx"),
       "utf8",
@@ -146,6 +151,8 @@ describe("createProject", () => {
 
     expect(main).toContain("@puzzle-ui/fullstack/auth/client");
     expect(main).toContain("<AuthProvider");
+    expect(css).not.toContain("--breakpoint-tablet");
+    expect(css).not.toContain("--color-puzzle-primary");
 
     expect(signIn).toContain('mode="sign-in"');
     expect(signUp).toContain('mode="sign-up"');

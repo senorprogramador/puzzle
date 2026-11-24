@@ -108,6 +108,10 @@ Tailwind is enabled by default, but you can opt out. When enabled, the generator
 
 The CLI installs `tailwindcss`, `@tailwindcss/postcss`, and `postcss` for Next.js; for the Vite-based frameworks it installs `tailwindcss` and `@tailwindcss/vite`. React Router's template ships with Tailwind, so the CLI removes it when you opt out.
 
+The generated stylesheet also registers Puzzle's `compact:`, `tablet:`, `desktop:`, and `hd:` responsive variants at 480px, 768px, 1024px, and 1440px respectively, alongside Tailwind's default variants. For example, `tablet:flex` applies at the tablet breakpoint. Edit the generated `@theme` block to customize these build-time breakpoints; runtime Theme token overrides do not change them. See [Breakpoints](/docs/theme/breakpoints) for Puzzle's JavaScript and CSS values.
+
+Puzzle's [semantic color roles](/docs/theme/colors#color-roles) are available as Tailwind colors with a `puzzle-` prefix. For example, use `bg-puzzle-primary text-puzzle-primary-foreground` or `border-puzzle-border`. They follow the active Theme, including local scopes and token overrides, and do not replace Tailwind's default colors.
+
 ## Puzzle Auth
 
 Puzzle Auth is off by default. When enabled, the CLI installs `@puzzle-ui/auth`, `@puzzle-ui/fullstack`, and `@puzzle-ui/session`, adds an `AuthProvider` with the `/api/auth` base path, and creates sign-in and sign-up views using `AuthExperience`.

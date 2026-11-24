@@ -4,6 +4,7 @@ import path from "node:path";
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
+import type { Framework } from "../types";
 import { configureTailwind } from "./configure-tailwind";
 
 const cwd = path.resolve(process.cwd(), ".test-work/configure-tailwind");
@@ -54,9 +55,10 @@ describe("configureTailwind", () => {
     const configuredVite = await read("vite.config.ts");
     await configureTailwind(cwd, "react-router");
 
-    expect(configuredCss).toBe('@import "tailwindcss";\n\n' + css);
+    expect(configuredCss).toContain('@import "tailwindcss";\n\n' + css);
     expect(configuredVite).toContain("react()");
     expect(configuredVite.match(/tailwindcss\(\)/g)).toHaveLength(1);
+    expect(await read("app/app.css")).toBe(configuredCss);
     expect(await read("vite.config.ts")).toBe(configuredVite);
   });
 
@@ -80,7 +82,9 @@ describe("configureTailwind", () => {
     const rootRoute = await read("src/routes/__root.tsx");
     const viteConfig = await read("vite.config.ts");
 
-    expect(css).toBe('@import "tailwindcss";\n\n/* keep this stylesheet */\n');
+    expect(css).toContain(
+      '@import "tailwindcss";\n\n/* keep this stylesheet */\n',
+    );
     expect(rootRoute).toContain('import stylesheet from "../styles/app.css?url"');
     expect(rootRoute).not.toContain('import "../styles.css"');
     expect(viteConfig).toContain("start()");
@@ -89,4 +93,71 @@ describe("configureTailwind", () => {
     expect(await read("src/styles/app.css")).toBe(css);
     expect(await read("vite.config.ts")).toBe(viteConfig);
   });
+
+  it("adds colors when breakpoints were already configured", async () => {
+    const existing = `@import "tailwindcss";
+
+/* Puzzle responsive breakpoints */
+@theme {
+  --breakpoint-hd: 100rem;
+}
+`;
+    await write("src/app/globals.css", existing);
+
+    await configureTailwind(cwd, "next");
+
+    const css = await read("src/app/globals.css");
+    expect(css.startsWith(existing)).toBe(true);
+    expect(css).toContain(
+      "--color-puzzle-primary: var(--puzzle-color-primary);",
+    );
+    await configureTailwind(cwd, "next");
+    expect(await read("src/app/globals.css")).toBe(css);
+  });
+
+  it.each([
+    ["next", "src/app/globals.css"],
+    ["tanstack", "src/styles.css"],
+    ["react-router", "app/app.css"],
+    ["react", "src/index.css"],
+  ] as [Framework, string][])(
+    "registers Puzzle tokens in the %s stylesheet without duplicating them",
+    async (framework, cssPath) => {
+      await write(cssPath, '@import "tailwindcss";\n@import "./base.css";\n');
+      if (framework === "tanstack") {
+        await write("src/routes/__root.tsx", 'import "../styles.css";\n');
+      }
+      if (framework !== "next") {
+        await write(
+          "vite.config.ts",
+          "export default defineConfig({ plugins: [] });\n",
+        );
+      }
+
+      await configureTailwind(cwd, framework);
+      const css = await read(cssPath);
+      expect(css).toContain('@import "tailwindcss";\n@import "./base.css";');
+      expect(css).toContain("--breakpoint-compact: 30rem;");
+      expect(css).toContain("--breakpoint-tablet: 48rem;");
+      expect(css).toContain("--breakpoint-desktop: 64rem;");
+      expect(css).toContain("--breakpoint-hd: 90rem;");
+      expect(css).toContain("@theme inline {");
+      expect(css).toContain(
+        "--color-puzzle-primary: var(--puzzle-color-primary);",
+      );
+      expect(css).toContain(
+        "--color-puzzle-primary-foreground: var(--puzzle-color-primary-foreground);",
+      );
+
+      const customized = css
+        .replace("--breakpoint-hd: 90rem;", "--breakpoint-hd: 100rem;")
+        .replace(
+          "var(--puzzle-color-primary);",
+          "var(--my-primary);",
+        );
+      await write(cssPath, customized);
+      await configureTailwind(cwd, framework);
+      expect(await read(cssPath)).toBe(customized);
+    },
+  );
 });

@@ -239,6 +239,116 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
       }
     });
 
+    if (scaffold.tailwind) {
+      it("compiles Puzzle and default Tailwind responsive and color utilities", async () => {
+        let cssPath: string;
+        switch (scaffold.framework) {
+          case "next":
+            cssPath = "src/app/globals.css";
+            break;
+          case "react-router":
+            cssPath = "app/app.css";
+            break;
+          case "react":
+            cssPath = "src/index.css";
+            break;
+          case "tanstack": {
+            const root = await readFile(
+              path.join(directory, "src/routes/__root.tsx"),
+              "utf8",
+            );
+            const importedCss = root.match(
+              /import\s+(?:[\w{}\s,*]+\s+from\s+)?["'](\.[^"']+\.css)(?:\?url)?["']/,
+            )?.[1];
+            if (!importedCss) {
+              throw new Error("TanStack root stylesheet import not found");
+            }
+            cssPath = path.resolve(directory, "src/routes", importedCss);
+            break;
+          }
+        }
+
+        const css = await readFile(path.resolve(directory, cssPath), "utf8");
+        const theme = css.match(
+          /\/\* Puzzle responsive breakpoints \*\/\s*@theme\s*\{[^}]*\}/,
+        )?.[0];
+        const colors = css.match(
+          /\/\* Puzzle semantic colors \*\/\s*@theme inline\s*\{[^}]*\}/,
+        )?.[0];
+        expect(theme).toBeDefined();
+        expect(colors).toBeDefined();
+        const output = await run(
+          "bun",
+          ["-e", `
+          import { readFile } from "node:fs/promises";
+          import { compile } from "tailwindcss";
+          import { BREAKPOINTS, DEFAULT_COLOR_SCHEME } from "@puzzle-ui/theme";
+          const defaults = await readFile(new URL(import.meta.resolve("tailwindcss/theme.css")), "utf8");
+          const compiler = await compile(defaults + ${JSON.stringify(theme)} + ${JSON.stringify(colors)} + "\\n@tailwind utilities;");
+          const roles = Object.keys(DEFAULT_COLOR_SCHEME.light).map((name) => name.replace(/[A-Z]/g, (letter) => "-" + letter.toLowerCase()));
+          const classes = [
+            ...[...Object.keys(BREAKPOINTS), "md", "lg"].map((name) => name + ":flex"),
+            ...roles.map((name) => "bg-puzzle-" + name),
+            "text-puzzle-primary-foreground", "border-puzzle-border", "bg-puzzle-primary/50", "bg-red-500",
+          ];
+          console.log(JSON.stringify({ css: compiler.build(classes), breakpoints: BREAKPOINTS, roles }));
+        `],
+          { cwd: directory },
+        );
+        const result = JSON.parse(output) as {
+          css: string;
+          breakpoints: Record<string, number>;
+          roles: string[];
+        };
+        for (const [name, pixels] of Object.entries(result.breakpoints)) {
+          expect(result.css).toMatch(
+            new RegExp(`@media \\(width >= ${pixels / 16}rem\\) \\{(?:(?!@media)[\\s\\S])*?\\.${name}\\\\:flex`),
+          );
+        }
+        expect(result.css).toContain(".md\\:flex");
+        expect(result.css).toContain(".lg\\:flex");
+        for (const role of result.roles) {
+          expect(result.css).toContain(
+            `.bg-puzzle-${role} {\n  background-color: var(--puzzle-color-${role});`,
+          );
+        }
+        expect(result.css).toContain(".bg-red-500");
+        expect(result.css).toContain(".bg-puzzle-primary\\/50");
+        expect(result.css).toContain(
+          "color: var(--puzzle-color-primary-foreground);",
+        );
+        expect(result.css).toContain("border-color: var(--puzzle-color-border);");
+
+        if (scaffold.framework === "react" && !scaffold.auth) {
+          const browser = await chromium.launch();
+          try {
+            const page = await browser.newPage();
+            await page.setContent(`
+              <style>
+                ${result.css}
+                :root { --puzzle-color-primary: rgb(1, 2, 3); }
+                .local { --puzzle-color-primary: rgb(4, 5, 6); }
+              </style>
+              <div id="root-color" class="bg-puzzle-primary"></div>
+              <div class="local"><div id="local-color" class="bg-puzzle-primary"></div></div>
+            `);
+            const background = (selector: string) =>
+              page.locator(selector).evaluate((element) =>
+                getComputedStyle(element).backgroundColor,
+              );
+            expect(await background("#root-color")).toBe("rgb(1, 2, 3)");
+            expect(await background("#local-color")).toBe("rgb(4, 5, 6)");
+            await page.locator(".local").evaluate((element) =>
+              element.style.setProperty("--puzzle-color-primary", "rgb(7, 8, 9)"),
+            );
+            expect(await background("#local-color")).toBe("rgb(7, 8, 9)");
+          } finally {
+            await browser.close();
+          }
+        }
+      });
+    }
+
     it("writes the infrastructure for the selected options", async () => {
       expect(await exists(path.join(directory, ".env"))).toBe(fullStackAuth);
       expect(await exists(path.join(directory, "docker-compose.yml"))).toBe(

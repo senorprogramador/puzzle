@@ -8,8 +8,12 @@ import { prependVitePlugin } from "../utils/vite-config";
 const readIfExists = async (filePath: string) => {
   try {
     return await readFile(filePath, "utf8");
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+      return null;
+    }
+
+    throw error;
   }
 };
 
@@ -36,31 +40,79 @@ const writeIfMissingImport = async (
   await writeFile(filePath, `${importStatement}\n\n${current}`, "utf8");
 };
 
-const prependCssImport = async (filePath: string) => {
+const configureCss = async (filePath: string) => {
   const importStatement = '@import "tailwindcss";';
-  const current = await readIfExists(filePath);
+  const breakpointMarker = "/* Puzzle responsive breakpoints */";
+  const breakpointTheme = `${breakpointMarker}
+@theme {
+  --breakpoint-compact: 30rem;
+  --breakpoint-tablet: 48rem;
+  --breakpoint-desktop: 64rem;
+  --breakpoint-hd: 90rem;
+}`;
+  const colorMarker = "/* Puzzle semantic colors */";
+  const colorRoles = [
+    "background",
+    "surface",
+    "surface-elevated",
+    "surface-sunken",
+    "text",
+    "text-muted",
+    "text-subtle",
+    "border",
+    "border-strong",
+    "primary",
+    "primary-foreground",
+    "secondary",
+    "secondary-foreground",
+    "accent",
+    "accent-foreground",
+    "ring",
+    "success",
+    "success-foreground",
+    "warning",
+    "warning-foreground",
+    "danger",
+    "danger-foreground",
+    "info",
+    "info-foreground",
+  ];
+  const colorTheme = `${colorMarker}
+@theme inline {
+${colorRoles.map((role) => `  --color-puzzle-${role}: var(--puzzle-color-${role});`).join("\n")}
+}`;
+  const existing = await readIfExists(filePath);
+  let current = existing;
 
   if (current === null) {
     await mkdir(path.dirname(filePath), {
       recursive: true,
     });
 
-    await writeFile(filePath, `${importStatement}\n`, "utf8");
-
-    return;
+    current = "";
   }
 
-  if (current.includes(importStatement)) {
-    return;
+  if (!current.includes(importStatement)) {
+    current = `${importStatement}\n\n${current}`;
   }
 
-  await writeFile(filePath, `${importStatement}\n\n${current}`, "utf8");
+  if (!current.includes(breakpointMarker)) {
+    current += `${current.endsWith("\n") ? "\n" : "\n\n"}${breakpointTheme}\n`;
+  }
+
+  if (!current.includes(colorMarker)) {
+    current += `${current.endsWith("\n") ? "\n" : "\n\n"}${colorTheme}\n`;
+  }
+
+  if (current !== existing) {
+    await writeFile(filePath, current, "utf8");
+  }
 };
 
 const configureNextTailwind = async (directory: string) => {
   const cssPath = path.join(directory, "src", "app", "globals.css");
 
-  await prependCssImport(cssPath);
+  await configureCss(cssPath);
 
   const postcssConfigPath = path.join(directory, "postcss.config.mjs");
 
@@ -107,7 +159,7 @@ const findTanStackCssPath = async (directory: string) => {
 const configureTanStackTailwind = async (directory: string) => {
   const cssPath = await findTanStackCssPath(directory);
 
-  await prependCssImport(cssPath);
+  await configureCss(cssPath);
 
   const rootRoutePath = path.join(directory, "src", "routes", "__root.tsx");
 
@@ -147,7 +199,7 @@ const configureTanStackTailwind = async (directory: string) => {
 };
 
 const configureViteTailwind = async (directory: string, cssPath: string) => {
-  await prependCssImport(cssPath);
+  await configureCss(cssPath);
 
   const viteConfigPath = path.join(directory, "vite.config.ts");
 
