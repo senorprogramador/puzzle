@@ -16,7 +16,7 @@ Compose several families where the page needs them, with visual and layout varie
 
 ## 4. Dependencies
 
-Runtime Puzzle dependencies are Core, Hooks, Icons, Theme, and UI; React and React DOM 19 are peers. Pieces must remain router- and backend-independent. Do not add database, authentication, payment, booking, or third-party map-service dependencies. The optional CMS authoring family uses framework-neutral `@puzzle-ui/cms` types only; data access, authorization, and persistence remain caller-owned.
+Runtime Puzzle dependencies are Core, Hooks, Icons, Theme, and UI; React and React DOM 19 are peers. Pieces must remain router- and backend-independent. Do not add database, authentication, payment, booking, or third-party map-service dependencies. The optional CMS authoring family uses framework-neutral `@puzzle-ui/cms` types only; data access, authorization, and persistence remain caller-owned. Consume only the public `CmsCollectionPresentation` safe projection in browser Pieces—never pass raw collection access policies, lifecycle hooks, field callbacks, or secrets to client components.
 
 ## 5. Implementation conventions
 

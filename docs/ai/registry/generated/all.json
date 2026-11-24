@@ -682,7 +682,7 @@
       ],
       "category": "cms",
       "subcategory": "cms",
-      "description": "Edit CMS fields as controlled values and separate draft saves from publish actions.",
+      "description": "Edit caller-provided CMS fields with controlled save and publish callbacks.",
       "documentation": "apps/site/content/docs/pieces/components/content-editor.mdx",
       "source": "packages/pieces/src/components/cms/cms-components.tsx",
       "useCases": [
@@ -705,22 +705,6 @@
         "kind": "primitive",
         "family": "cms"
       },
-      "requiredProps": [
-        "contentType",
-        "value",
-        "onChange",
-        "onSaveDraft"
-      ],
-      "dataRequirements": [
-        "validationErrors (optional)"
-      ],
-      "interactiveBehavior": [
-        "onChange",
-        "onDiscard",
-        "onInvalidDraftChange",
-        "onPublish",
-        "onSaveDraft"
-      ],
       "aliases": []
     },
     {
@@ -770,47 +754,6 @@
         "onCreate",
         "onDuplicate",
         "onEdit"
-      ],
-      "aliases": []
-    },
-    {
-      "name": "ContentTypeBuilder",
-      "package": "@puzzle-ui/pieces",
-      "entryPoints": [
-        "."
-      ],
-      "category": "cms",
-      "subcategory": "cms",
-      "description": "Edit content type identity, locales, and ordered field definitions.",
-      "documentation": "apps/site/content/docs/pieces/components/content-type-builder.mdx",
-      "source": "packages/pieces/src/components/cms/cms-components.tsx",
-      "useCases": [
-        "content",
-        "dashboard"
-      ],
-      "pageTypes": [
-        "dashboard",
-        "workspace",
-        "form"
-      ],
-      "capabilities": [
-        "responsive",
-        "interactive",
-        "keyboard-navigation",
-        "data-entry",
-        "composable"
-      ],
-      "composition": {
-        "kind": "primitive",
-        "family": "cms"
-      },
-      "requiredProps": [
-        "value",
-        "onChange"
-      ],
-      "interactiveBehavior": [
-        "onChange",
-        "onSave"
       ],
       "aliases": []
     },
@@ -1004,7 +947,7 @@
       ],
       "category": "cms",
       "subcategory": "cms",
-      "description": "Review immutable CMS revisions and request restoration as a new revision.",
+      "description": "Display caller-provided CMS revision snapshots and forward host-owned actions.",
       "documentation": "apps/site/content/docs/pieces/components/revision-history.mdx",
       "source": "packages/pieces/src/components/cms/cms-components.tsx",
       "useCases": [
@@ -7747,7 +7690,7 @@
       ],
       "category": "layout",
       "subcategory": "app-bar",
-      "description": "Compose an application header with branding and navigation.",
+      "description": "Compose a responsive application header with branding, navigation, and optional per-link icons.",
       "documentation": "apps/site/content/docs/ui/layout/app-bar.mdx",
       "source": "packages/ui/src/components/layout/app-bar/index.tsx",
       "useCases": [

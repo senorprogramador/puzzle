@@ -40,10 +40,15 @@ authorization, quota/rate-limit, readiness, idempotency, cleanup, and
 deletion-guard callbacks. The media framework subpaths dispatch that route map
 without browser dependencies.
 
-`src/cms/` follows the same split. Its server handlers compose `CmsService`
-with trusted actor/tenant context, explicit access policy, and a scheduler;
-public endpoints expose only published snapshots while admin endpoints remain
-authorized and uncached.
+`src/cms/` follows the same split. The server accepts a static `defineCMS`
+configuration and Storage adapter, resolves trusted context per request,
+authorizes the route, then creates a request-scoped `createCms` instance with
+the explicit domain access policy. Collection and singleton routes derive
+from the static schema; there are no runtime content-type registration
+endpoints. Keep public reads limited to published snapshots and admin routes
+authorized and uncached. The configured CMS lifecycle includes opt-in drafts,
+timestamps, nested localization, access policies, and hooks; expose those
+operations only through verified shared/client/server contracts.
 
 `src/payments/shared/` contains serializable payment API contracts;
 `src/payments/server/` orchestrates trusted order resolution, provider
@@ -77,21 +82,42 @@ permanent deletion because CMS usages live outside Media's usage collection.
 Media `onAudit` events are sanitized HTTP-operation outcomes; the host owns
 durable storage and direct domain/worker auditing. Never imply atomicity with
 the media mutation.
-For CMS, keep admin and public reads separate, send only published snapshots
-from public routes, preserve revision checks, and require the host scheduler
-for scheduled publication.
+For CMS, resolve tenant/actor from trusted server context for each request and
+authorize every route independently from the CMS access policy. Keep admin and
+public reads separate, send only published snapshots from public routes, and
+preserve revision checks. `delete` is soft; permanent `purge` must require an
+expected revision and retain CMS relationship/media-usage protections.
+Relationship additions and purge use an atomic target guard, so only existing
+or historical incoming references block deletion; capability or bounded-scan
+failures remain fail-closed. Do not
+accept client-supplied tenant/actor IDs or
+runtime content-type registration. Collection and singleton routes derive
+from static keys; framework adapters dispatch the same server route map.
+Drafts, publication, revisions, scheduling, localization, access, and hooks
+belong to the configured lifecycle API; use exact verified contracts and do
+not infer method names from Pieces callbacks. Collection access denies omitted
+actions; global and collection policies must both allow. `beforeChange` runs
+after authorization and may veto before persistence; `afterChange` runs after
+commit, so its errors do not roll back a mutation.
 Optional webhook routes must not accept or return secret references. The host
 selects pre-provisioned references, supplies an SSRF-safe transport, and runs
-outbox and delivery workers separately.
+outbox and delivery workers separately. With `emitChangeEvents: true`, the
+server writes metadata-only events, but Fullstack does not expose its
+request-scoped CMS instance. It exposes authorized, sanitized change-event
+routes when event emission is enabled; the host still runs fanout and delivery
+workers separately. Feed event IDs and revisions to webhook fanout. Fanout
+records deliveries and removes the consumed event; do not separately
+acknowledge it.
 Keep no-store responses, typed serializable results, secure auth cookies and
 CSRF/origin protections, and explicit error behavior. Keep framework-specific
 dispatch in its adapter subpath.
 
 ## 6. Testing
 
-Node tests cover auth, media, CMS, and payment client/server routes, authorization,
-tenant isolation, upload replay/expiry, pause/resume, quota/rate-limit,
-readiness, cleanup, deletion guards, publishing, and export boundaries.
+Node tests cover auth, media, CMS, and payment client/server routes,
+authorization, tenant isolation, upload replay/expiry, pause/resume,
+quota/rate-limit, readiness, cleanup, deletion guards, configured CMS
+collection/singleton lifecycle routes, and export boundaries.
 Browser tests use Vitest with Chromium/Playwright for the auth
 experience and real interactions. Keep client/server export-boundary tests
 when adding modules.

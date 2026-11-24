@@ -8,6 +8,7 @@ import type {
   CmsValue,
   ContentTypeDefinition,
 } from "./types";
+import type { RuntimeCmsFieldDefinition } from "./fields/types";
 
 export type CmsSchemaRegistryOptions = {
   readonly customValidators?: Readonly<Record<string, CmsCustomFieldValidator>>;
@@ -17,6 +18,10 @@ export type CmsFieldValidationResult = {
   readonly fields: CmsFields;
   readonly issues: readonly import("./errors").CmsValidationIssue[];
 };
+
+const asRuntimeField = (
+  field: CmsFieldDefinition,
+): RuntimeCmsFieldDefinition => field as unknown as RuntimeCmsFieldDefinition;
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" &&
@@ -62,15 +67,21 @@ const fieldTypeSet = new Set<string>([
   "boolean",
   "date",
   "datetime",
+  "email",
+  "url",
   "slug",
   "select",
   "multiSelect",
   "media",
   "relationship",
   "repeater",
+  "array",
+  "object",
   "blocks",
   "json",
   "locale",
+  "computed",
+  "custom",
 ]);
 
 const uniqueStrings = (values: readonly string[]): boolean =>
@@ -115,6 +126,7 @@ const collectDefinitionIssues = (
         issues.push(issue(path, "type", "A field definition must be an object."));
         return;
       }
+      const runtime = asRuntimeField(field);
 
       if (typeof field.key !== "string" || !/^[A-Za-z][A-Za-z0-9_]*$/.test(field.key)) {
         issues.push(issue(`${path}.key`, "format", "Field keys must be identifier-like."));
@@ -123,8 +135,8 @@ const collectDefinitionIssues = (
         issues.push(issue(`${path}.key`, "duplicate", `Field "${field.key}" is duplicated.`));
       }
       if (typeof field.key === "string") keys.add(field.key);
-      if (!fieldTypeSet.has(field.type)) {
-        issues.push(issue(`${path}.type`, "unknown", `Unknown field type "${field.type}".`));
+      if (!fieldTypeSet.has(runtime.type)) {
+        issues.push(issue(`${path}.type`, "unknown", `Unknown field type "${runtime.type}".`));
       }
       if (typeof field.label !== "string" || !field.label.trim()) {
         issues.push(issue(`${path}.label`, "required", "A field label is required."));
@@ -166,8 +178,23 @@ const collectDefinitionIssues = (
           issues.push(issue(`${path}.validation.pattern`, "pattern", "The validation pattern is invalid."));
         }
       }
+      for (const [key, value] of Object.entries({
+        minLength: runtime.validation?.minLength,
+        maxLength: runtime.validation?.maxLength,
+      })) {
+        if (value !== undefined && (!Number.isInteger(value) || value < 0)) {
+          issues.push(issue(`${path}.validation.${key}`, "range", "String length constraints must be non-negative integers."));
+        }
+      }
+      if (
+        runtime.validation?.minLength !== undefined &&
+        runtime.validation.maxLength !== undefined &&
+        runtime.validation.minLength > runtime.validation.maxLength
+      ) {
+        issues.push(issue(`${path}.validation`, "range", "Minimum string length cannot exceed maximum string length."));
+      }
       if (field.options) {
-        if (field.type !== "select" && field.type !== "multiSelect") {
+        if (runtime.type !== "select" && runtime.type !== "multiSelect") {
           issues.push(issue(`${path}.options`, "type", "Options are only valid for select fields."));
         }
         const values = field.options.map((option) => JSON.stringify(option.value));
@@ -175,24 +202,37 @@ const collectDefinitionIssues = (
           issues.push(issue(`${path}.options`, "duplicate", "Select option values must be unique."));
         }
       }
-      if ((field.type === "select" || field.type === "multiSelect") && !field.options?.length) {
+      if ((runtime.type === "select" || runtime.type === "multiSelect") && !field.options?.length) {
         issues.push(issue(`${path}.options`, "required", "Select fields require at least one option."));
       }
-      if (field.type === "relationship") {
+      if (runtime.type === "relationship") {
         if (!field.relation?.targetTypes.length) {
           issues.push(issue(`${path}.relation`, "required", "Relationship fields require target types."));
         }
       } else if (field.relation) {
         issues.push(issue(`${path}.relation`, "type", "Relation configuration is only valid for relationship fields."));
       }
-      if (field.type === "repeater") {
+      if (runtime.type === "repeater") {
         if (!field.fields?.length) {
           issues.push(issue(`${path}.fields`, "required", "Repeater fields require nested fields."));
         }
-      } else if (field.fields && field.type !== "blocks") {
-        issues.push(issue(`${path}.fields`, "type", "Nested fields are only valid for repeaters and blocks."));
+      } else if (runtime.type === "object") {
+        if (!Array.isArray(runtime.fields)) {
+          issues.push(issue(`${path}.fields`, "required", "Object fields require a nested field map."));
+        }
+      } else if (field.fields && runtime.type !== "blocks") {
+        issues.push(issue(`${path}.fields`, "type", "Nested fields are only valid for repeaters, objects, and blocks."));
       }
-      if (field.type === "blocks") {
+      if (runtime.type === "array") {
+        if (!runtime.of || typeof runtime.of !== "object") {
+          issues.push(issue(`${path}.of`, "required", "Array fields require an item field definition."));
+        } else {
+          validateFields([runtime.of as CmsFieldDefinition], `${path}.of`);
+        }
+      } else if (runtime.of) {
+        issues.push(issue(`${path}.of`, "type", "Item definitions are only valid for array fields."));
+      }
+      if (runtime.type === "blocks") {
         if (!field.blocks?.length) {
           issues.push(issue(`${path}.blocks`, "required", "Block fields require at least one block definition."));
         }
@@ -206,8 +246,39 @@ const collectDefinitionIssues = (
       } else if (field.blocks) {
         issues.push(issue(`${path}.blocks`, "type", "Block definitions are only valid for blocks fields."));
       }
-      if (field.fields && field.type === "repeater") {
+      if (field.fields && (runtime.type === "repeater" || runtime.type === "object")) {
         validateFields(field.fields, `${path}.fields`);
+      }
+      if (
+        runtime.type === "computed" &&
+        typeof runtime.compute !== "function"
+      ) {
+        issues.push(issue(`${path}.compute`, "required", "Computed fields require a compute callback."));
+      }
+      if (
+        runtime.type === "computed" &&
+        field.defaultValue !== undefined
+      ) {
+        issues.push(issue(`${path}.defaultValue`, "type", "Computed fields cannot have a default value."));
+      }
+      if (
+        runtime.type === "custom" &&
+        (typeof runtime.name !== "string" ||
+          !runtime.name.trim() ||
+          typeof runtime.is !== "function")
+      ) {
+        issues.push(issue(`${path}.custom`, "required", "Custom fields require a name and a type guard."));
+      }
+      if (
+        runtime.type === "url" &&
+        runtime.protocols !== undefined &&
+        (!runtime.protocols.length ||
+          runtime.protocols.some((protocol) =>
+            typeof protocol !== "string" ||
+            !/^[a-z][a-z\d+.-]*:$/i.test(protocol),
+          ))
+      ) {
+        issues.push(issue(`${path}.protocols`, "invalid", "URL protocols must be a non-empty list of protocol names ending in a colon."));
       }
       if (
         field.defaultValue !== undefined &&
@@ -260,9 +331,18 @@ const validateValue = (
   required: boolean,
 ): import("./errors").CmsValidationIssue[] => {
   const issues: import("./errors").CmsValidationIssue[] = [];
+  const runtime = asRuntimeField(field);
+  const fieldType = runtime.type;
   const badType = (expected: string): void => {
     issues.push(issue(path, "type", `Expected ${expected}.`));
   };
+
+  if (fieldType === "computed") {
+    if (value !== undefined) {
+      issues.push(issue(path, "read-only", "Computed fields cannot be written."));
+    }
+    return issues;
+  }
 
   if (
     value === undefined ||
@@ -274,7 +354,7 @@ const validateValue = (
     return issues;
   }
 
-  switch (field.type) {
+  switch (fieldType) {
     case "text":
     case "textarea":
     case "slug":
@@ -285,18 +365,45 @@ const validateValue = (
         badType("a string");
         break;
       }
-      if (field.type === "date" && !isDateOnly(value)) {
+      if (fieldType === "date" && !isDateOnly(value)) {
         issues.push(issue(path, "date", "Expected a valid YYYY-MM-DD date."));
       }
-      if (field.type === "datetime" && !Number.isFinite(Date.parse(value))) {
+      if (fieldType === "datetime" && !Number.isFinite(Date.parse(value))) {
         issues.push(issue(path, "datetime", "Expected a valid datetime string."));
       }
-      if (field.type === "locale" && !normalizeLocale(value)) {
+      if (fieldType === "locale" && !normalizeLocale(value)) {
         issues.push(issue(path, "locale", "Expected a valid BCP 47 locale."));
       }
       checkStringValidation(field, value, path, issues);
       break;
     }
+    case "email":
+      if (typeof value !== "string") {
+        badType("an email address");
+      } else {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          issues.push(issue(path, "email", "Expected a valid email address."));
+        }
+        checkStringValidation(field, value, path, issues);
+      }
+      break;
+    case "url":
+      if (typeof value !== "string") {
+        badType("a URL");
+      } else {
+        let valid = false;
+        try {
+          const parsed = new URL(value);
+          valid = (runtime.protocols ?? ["http:", "https:"]).includes(parsed.protocol);
+        } catch {
+          valid = false;
+        }
+        if (!valid) {
+          issues.push(issue(path, "url", "Expected a valid URL with an allowed protocol."));
+        }
+        checkStringValidation(field, value, path, issues);
+      }
+      break;
     case "number":
       if (typeof value !== "number" || !Number.isFinite(value)) {
         badType("a finite number");
@@ -362,6 +469,40 @@ const validateValue = (
         issues.push(...nestedIssues);
       });
       break;
+    case "array":
+      if (!Array.isArray(value)) {
+        badType("an array");
+        break;
+      }
+      checkRange(field, value.length, path, issues);
+      if (!runtime.of) {
+        issues.push(issue(`${path}.of`, "required", "Array fields require an item field definition."));
+        break;
+      }
+      value.forEach((item, index) => {
+        issues.push(
+          ...validateValue(
+            runtime.of as CmsFieldDefinition,
+            item,
+            `${path}[${index}]`,
+            Boolean(runtime.of?.required),
+          ),
+        );
+      });
+      break;
+    case "object":
+      if (!isPlainObject(value)) {
+        badType("an object");
+      } else {
+        issues.push(
+          ...validateObjectFields(
+            (runtime.fields ?? []) as readonly CmsFieldDefinition[],
+            value,
+            path,
+          ),
+        );
+      }
+      break;
     case "blocks":
       if (!Array.isArray(value)) {
         badType("an array of content blocks");
@@ -372,21 +513,45 @@ const validateValue = (
           issues.push(issue(`${path}[${index}]`, "type", "Blocks require a type and fields object."));
           return;
         }
-        const block = field.blocks?.find((candidate) => candidate.type === item.type);
+        const block = runtime.blocks?.find((candidate) => candidate.type === item.type);
         if (!block) {
           issues.push(issue(`${path}[${index}].type`, "unknown-block", `Unknown block type "${item.type}".`));
           return;
         }
-        issues.push(...validateObjectFields(block.fields, item.fields, `${path}[${index}].fields`));
+        issues.push(
+          ...validateObjectFields(
+            block.fields as readonly CmsFieldDefinition[],
+            item.fields,
+            `${path}[${index}].fields`,
+          ),
+        );
       });
       break;
     case "richText":
     case "json":
       if (!isCmsValue(value)) {
         badType("a JSON-compatible value");
-      } else if (field.type === "richText" && !isPlainObject(value) && !Array.isArray(value)) {
+      } else if (fieldType === "richText" && !isPlainObject(value) && !Array.isArray(value)) {
         badType("a rich-text document object or array");
       }
+      break;
+    case "custom":
+      if (!isCmsValue(value)) {
+        issues.push(issue(path, "serialization", "Expected a JSON-compatible value."));
+      } else {
+        let matches = false;
+        try {
+          matches = typeof runtime.is === "function" && runtime.is(value);
+        } catch {
+          matches = false;
+        }
+        if (!matches) {
+          issues.push(issue(path, "type", "Value does not match the custom field type."));
+        }
+      }
+      break;
+    default:
+      badType("a supported field value");
       break;
   }
 
@@ -413,8 +578,15 @@ const checkStringValidation = (
   path: string,
   issues: import("./errors").CmsValidationIssue[],
 ): void => {
+  const validation = asRuntimeField(field).validation;
   checkRange(field, value.length, path, issues);
-  if (field.validation?.pattern && !new RegExp(field.validation.pattern).test(value)) {
+  if (validation?.minLength !== undefined && value.length < validation.minLength) {
+    issues.push(issue(path, "min-length", `Value must contain at least ${validation.minLength} characters.`));
+  }
+  if (validation?.maxLength !== undefined && value.length > validation.maxLength) {
+    issues.push(issue(path, "max-length", `Value must contain at most ${validation.maxLength} characters.`));
+  }
+  if (validation?.pattern && !new RegExp(validation.pattern).test(value)) {
     issues.push(issue(path, "pattern", "Value does not match the required pattern."));
   }
   checkAllowedValues(field, value, path, issues);
@@ -475,22 +647,41 @@ const normalizeFieldValue = (
   value: unknown,
 ): CmsValue | undefined => {
   if (value === undefined) return undefined;
-  if (field.type === "slug" && typeof value === "string") return normalizeCmsSlug(value);
-  if (field.type === "locale" && typeof value === "string") return normalizeLocale(value) ?? value;
-  if (field.type === "repeater" && Array.isArray(value)) {
+  const runtime = asRuntimeField(field);
+  if (runtime.type === "computed") return undefined;
+  if (runtime.type === "slug" && typeof value === "string") return normalizeCmsSlug(value);
+  if (runtime.type === "locale" && typeof value === "string") return normalizeLocale(value) ?? value;
+  if (runtime.type === "array" && Array.isArray(value) && runtime.of) {
+    return value.map((item) =>
+      normalizeFieldValue(
+        runtime.of as CmsFieldDefinition,
+        item,
+      ) as CmsValue,
+    );
+  }
+  if (runtime.type === "object" && isPlainObject(value)) {
+    return normalizeObjectFields(
+      (runtime.fields ?? []) as readonly CmsFieldDefinition[],
+      value,
+    );
+  }
+  if (runtime.type === "repeater" && Array.isArray(value)) {
     return value.map((item) => {
       if (!isPlainObject(item)) return item as CmsValue;
       return normalizeObjectFields(field.fields ?? [], item);
     });
   }
-  if (field.type === "blocks" && Array.isArray(value)) {
+  if (runtime.type === "blocks" && Array.isArray(value)) {
     return value.map((item) => {
       if (!isPlainObject(item)) return item as CmsValue;
-      const block = field.blocks?.find((candidate) => candidate.type === item.type);
+      const block = runtime.blocks?.find((candidate) => candidate.type === item.type);
       if (!block || !isPlainObject(item.fields)) return item as CmsValue;
       return {
         type: block.type,
-        fields: normalizeObjectFields(block.fields, item.fields),
+        fields: normalizeObjectFields(
+          block.fields as readonly CmsFieldDefinition[],
+          item.fields,
+        ),
       };
     });
   }
@@ -558,6 +749,8 @@ export const getBreakingSchemaChanges = (
         changes.push(`${path}: removed`);
         continue;
       }
+      const oldRuntime = asRuntimeField(oldField);
+      const newRuntime = asRuntimeField(newField);
       if (oldField.type !== newField.type) changes.push(`${path}: type changed`);
       if (Boolean(oldField.localized) !== Boolean(newField.localized)) {
         changes.push(`${path}: localization changed`);
@@ -570,24 +763,49 @@ export const getBreakingSchemaChanges = (
           JSON.stringify(newField.validation ?? null) ||
         JSON.stringify(oldField.options ?? null) !== JSON.stringify(newField.options ?? null) ||
         JSON.stringify(oldField.relation ?? null) !== JSON.stringify(newField.relation ?? null) ||
+        JSON.stringify(oldRuntime.protocols ?? null) !== JSON.stringify(newRuntime.protocols ?? null) ||
+        JSON.stringify(oldRuntime.name ?? null) !== JSON.stringify(newRuntime.name ?? null) ||
         JSON.stringify(oldField.customValidators ?? []) !==
           JSON.stringify(newField.customValidators ?? [])
       ) {
         changes.push(`${path}: constraints changed`);
       }
-      if (oldField.type === "repeater" && newField.type === "repeater") {
-        checkChildren(oldField.fields ?? [], newField.fields ?? [], `${path}.`);
+      if (
+      (oldRuntime.type === "repeater" || oldRuntime.type === "object") &&
+      oldRuntime.type === newRuntime.type
+      ) {
+      checkChildren(
+        (oldRuntime.fields ?? []) as readonly CmsFieldDefinition[],
+        (newRuntime.fields ?? []) as readonly CmsFieldDefinition[],
+        `${path}.`,
+      );
       }
-      if (oldField.type === "blocks" && newField.type === "blocks") {
-        const newBlocks = new Map((newField.blocks ?? []).map((block) => [block.type, block]));
-        for (const oldBlock of oldField.blocks ?? []) {
+      if (oldRuntime.type === "array" && newRuntime.type === "array") {
+      const oldItem = oldRuntime.of;
+      const newItem = newRuntime.of;
+      if (!oldItem || !newItem) {
+        if (oldItem !== newItem) changes.push(`${path}: array item definition changed`);
+      } else {
+        if (oldItem.type !== newItem.type) changes.push(`${path}[]: item type changed`);
+        if (oldItem.type === "object" && newItem.type === "object") {
+          checkChildren(
+            (oldItem.fields ?? []) as readonly CmsFieldDefinition[],
+            (newItem.fields ?? []) as readonly CmsFieldDefinition[],
+            `${path}[].`,
+          );
+        }
+      }
+      }
+      if (oldRuntime.type === "blocks" && newRuntime.type === "blocks") {
+      const newBlocks = new Map((newRuntime.blocks ?? []).map((block) => [block.type, block]));
+      for (const oldBlock of oldRuntime.blocks ?? []) {
           const newBlock = newBlocks.get(oldBlock.type);
           if (!newBlock) {
             changes.push(`${path}.${oldBlock.type}: block removed`);
           } else {
             checkChildren(
-              oldBlock.fields,
-              newBlock.fields,
+              oldBlock.fields as readonly CmsFieldDefinition[],
+              newBlock.fields as readonly CmsFieldDefinition[],
               `${path}.${oldBlock.type}.`,
             );
           }
@@ -638,6 +856,20 @@ export const validateContentFields = async (
     fieldPath: string,
   ): Promise<void> => {
     if (value === undefined) return;
+    const runtime = asRuntimeField(field);
+    if (runtime.validate) {
+      try {
+        const message = await runtime.validate(value, {
+          ...context,
+          path: fieldPath,
+        });
+        if (typeof message === "string" && message) {
+          issues.push(issue(fieldPath, "custom-validation", message));
+        }
+      } catch {
+        issues.push(issue(fieldPath, "custom-validation", "Custom validation failed."));
+      }
+    }
     for (const name of field.customValidators ?? []) {
       const validator = options.customValidators?.[name];
       if (!validator) {
@@ -661,7 +893,23 @@ export const validateContentFields = async (
       }
     }
 
-    if (field.type === "repeater" && Array.isArray(value)) {
+    if (runtime.type === "object" && isPlainObject(value)) {
+      for (const nested of runtime.fields ?? []) {
+        await runCustomValidators(
+          nested as CmsFieldDefinition,
+          value[nested.key] as CmsValue | undefined,
+          `${fieldPath}.${nested.key}`,
+        );
+      }
+    } else if (runtime.type === "array" && Array.isArray(value) && runtime.of) {
+      for (const [index, item] of value.entries()) {
+        await runCustomValidators(
+          runtime.of as CmsFieldDefinition,
+          item as CmsValue,
+          `${fieldPath}[${index}]`,
+        );
+      }
+    } else if (runtime.type === "repeater" && Array.isArray(value)) {
       for (const [index, item] of value.entries()) {
         if (!isPlainObject(item)) continue;
         for (const nested of field.fields ?? []) {
@@ -672,13 +920,13 @@ export const validateContentFields = async (
           );
         }
       }
-    } else if (field.type === "blocks" && Array.isArray(value)) {
+    } else if (runtime.type === "blocks" && Array.isArray(value)) {
       for (const [index, item] of value.entries()) {
         if (!isPlainObject(item) || !isPlainObject(item.fields)) continue;
-        const block = field.blocks?.find((candidate) => candidate.type === item.type);
+        const block = runtime.blocks?.find((candidate) => candidate.type === item.type);
         for (const nested of block?.fields ?? []) {
           await runCustomValidators(
-            nested,
+            nested as CmsFieldDefinition,
             item.fields[nested.key] as CmsValue | undefined,
             `${fieldPath}[${index}].${nested.key}`,
           );

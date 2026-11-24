@@ -5,7 +5,7 @@ description: Build a responsive React app bar with branding, desktop navigation,
 
 import { AppBar, Badge, Button, Preview } from "@puzzle-ui/ui";
 
-Use the React AppBar component for an application header that combines branding and navigation. Its desktop navigation adapts to a mobile drawer when space is limited.
+Use the React AppBar component for an application header that combines branding and navigation. Its desktop navigation adapts to a mobile drawer when space is limited. Navigation items can include prefix and suffix icons around their labels.
 
 <Badge content="Stable" color="primary" /> **API maturity: Stable.** The documented public API is covered by tests and is intended to remain backward-compatible within a major version. This is an API commitment, not a guarantee of production readiness in every application.
 
@@ -26,8 +26,8 @@ The app bar adapts its navigation to a mobile drawer. Resize the preview to see 
   code={`\
 <AppBar title="Workspace" logoHref="#home"
   navigationItems={[
-    { label: "Overview", href: "#overview", current: true },
-    { label: "Projects", href: "#projects" },
+    { label: "Overview", href: "#overview", current: true, prefixIcon: "lucide:house" },
+    { label: "Projects", href: "#projects", suffixIcon: "lucide:chevron-down" },
   ]}
   trailingComponents={<Button size="sm">Sign in</Button>}
 />
@@ -37,8 +37,8 @@ The app bar adapts its navigation to a mobile drawer. Resize the preview to see 
     title="Workspace"
     logoHref="#home"
     navigationItems={[
-      { label: "Overview", href: "#overview", current: true },
-      { label: "Projects", href: "#projects" },
+      { label: "Overview", href: "#overview", current: true, prefixIcon: "lucide:house" },
+      { label: "Projects", href: "#projects", suffixIcon: "lucide:chevron-down" },
     ]}
     trailingComponents={<Button size="sm">Sign in</Button>}
   />
@@ -51,7 +51,7 @@ The app bar adapts its navigation to a mobile drawer. Resize the preview to see 
 | `logo`                        | `ReactNode`                                                                | -                   | Brand content.                                        |
 | `title`                       | `string`                                                                   | -                   | Application title.                                    |
 | `logoHref`                    | `string`                                                                   | `"/"`               | Brand destination.                                    |
-| `navigationItems`             | `{ label: string; href: string; current?: boolean; external?: boolean }[]` | `[]`                | Navigation links.                                     |
+| `navigationItems`             | `{ label: string; href: string; prefixIcon?: ReactNode; suffixIcon?: ReactNode; current?: boolean; external?: boolean }[]` | `[]`                | Navigation links with optional icons before and after each label. |
 | `customNavigationItems`       | `T[]`                                                                      | -                   | Custom navigation data.                               |
 | `renderCustomNavigationItems` | `(item: T, index: number) => ReactNode`                                    | -                   | Renderer for custom items.                            |
 | `trailingComponents`          | `ReactNode`                                                                | -                   | Actions after navigation.                             |
@@ -59,6 +59,8 @@ The app bar adapts its navigation to a mobile drawer. Resize the preview to see 
 | `ariaLabel`                   | `string`                                                                   | `"Main navigation"` | Accessible navigation name.                           |
 | `className`                   | `string`                                                                   | -                   | Root styling hook.                                    |
 | `nonce`                       | `string`                                                                   | -                   | CSP nonce for the initial sticky-offset script and stylesheet. |
+
+`prefixIcon` and `suffixIcon` accept any `ReactNode`. A string is treated as an icon name and rendered with `Icon` from `@puzzle-ui/icons` at 16px; custom nodes are rendered as supplied. Icons are decorative, follow the link label's color, and stay horizontally aligned with it.
 
 Use descriptive destinations and label icon-only actions. Place sticky bars in `PageLayout.Header` to scope their measured layout offset to that page. Make the header region itself sticky (`position: sticky; top: 0`) when it wraps the bar, so the wrapper does not limit its sticky travel.
 

@@ -11,13 +11,12 @@ import {
   type ReactNode,
 } from "react";
 import type {
-  CmsBlockDefinition,
   CmsEntryStatus,
-  CmsFieldType,
-  CmsFieldDefinition,
   CmsFields,
   CmsValue,
-  ContentTypeDefinition,
+  FieldDescriptor,
+  FieldValue,
+  FieldsValue,
 } from "@puzzle-ui/cms";
 import { Breadcrumbs, DataTable, Dialog, JsonEditor } from "@puzzle-ui/ui";
 import { DashboardShell } from "../dashboard";
@@ -26,13 +25,18 @@ import type {
   AuditLogViewerProps,
   BlockEditorProps,
   CmsEntryListItem,
+  CmsBlockDefinition,
+  CmsBlockValue,
+  CmsCollectionPresentation,
+  CmsFieldRow,
+  CmsFieldMap,
+  CmsFieldRows,
   CmsNavigationItem,
   CmsRevisionItem,
   CmsShellProps,
   ContentEditorFieldContext,
   ContentEditorProps,
   ContentListProps,
-  ContentTypeBuilderProps,
   EditorialCalendarItem,
   EditorialCalendarProps,
   LocalizationEditorProps,
@@ -42,25 +46,6 @@ import type {
 } from "./cms.types";
 
 import "./cms.css";
-
-const cmsFieldTypes = [
-  "text",
-  "textarea",
-  "richText",
-  "number",
-  "boolean",
-  "date",
-  "datetime",
-  "slug",
-  "select",
-  "multiSelect",
-  "media",
-  "relationship",
-  "repeater",
-  "blocks",
-  "json",
-  "locale",
-] satisfies readonly CmsFieldType[];
 
 const errorMessage = (error: unknown) =>
   error instanceof Error && error.message
@@ -484,7 +469,7 @@ const useInvalidJsonDrafts = (onInvalidDraftChange?: (invalid: boolean) => void)
   return { hasInvalidDraft, setValidity };
 };
 
-const CmsJsonField = ({
+const CmsJsonField = <TField extends CmsFieldRow,>({
   field,
   value,
   error,
@@ -492,7 +477,7 @@ const CmsJsonField = ({
   onChange,
   onValidityChange,
   validateValue,
-}: ContentEditorFieldContext & {
+}: ContentEditorFieldContext<TField> & {
   onValidityChange: (fieldKey: string, valid: boolean) => void;
   validateValue?: (value: CmsValue) => string | null;
 }) => {
@@ -542,10 +527,10 @@ const CmsJsonField = ({
         setDraftError(null);
         onValidityChange(field.key, true);
         lastEmitted.current = JSON.stringify(parsed, null, 2);
-        onChange(parsed);
+        onChange(parsed as FieldValue<TField>);
       }}
       disabled={disabled}
-      required={field.required}
+      required={field.required === true && field.defaultValue === undefined}
       error={draftError ?? error}
       validate={(parsed) => isJsonValue(parsed)
         ? validateValue?.(parsed) ?? null
@@ -556,18 +541,18 @@ const CmsJsonField = ({
 
 const renderContentField = (
   context: ContentEditorFieldContext,
-  contentType: ContentTypeDefinition,
   idPrefix: string,
   onJsonValidityChange: (fieldKey: string, valid: boolean) => void,
   jsonReset: number,
 ) => {
   const { field, value, error, disabled, onChange } = context;
-  const id = `${idPrefix}-${contentType.slug}-${field.key}`;
+  const id = `${idPrefix}-${field.key}`;
   const errorId = `${id}-error`;
+  const isRequired = field.required === true && field.defaultValue === undefined;
   const common = {
     id,
     disabled,
-    required: field.required,
+    required: isRequired,
     "aria-invalid": error ? true : undefined,
     "aria-describedby": error ? errorId : undefined,
   } as const;
@@ -581,7 +566,7 @@ const renderContentField = (
           checked={value === true}
           onChange={(event) => onChange(event.currentTarget.checked)}
         />
-        <label htmlFor={id}>{field.label}{field.required ? " *" : ""}</label>
+        <label htmlFor={id}>{field.label}{isRequired ? " *" : ""}</label>
       </div>
     );
   }
@@ -592,7 +577,7 @@ const renderContentField = (
       const selected = Array.isArray(value) ? value : [];
       return (
         <label className="puzzle-cms-field" htmlFor={id}>
-          <span>{field.label}{field.required ? " *" : ""}</span>
+          <span>{field.label}{isRequired ? " *" : ""}</span>
           <select
             {...common}
             multiple
@@ -619,7 +604,7 @@ const renderContentField = (
     }
     return (
       <label className="puzzle-cms-field" htmlFor={id}>
-        <span>{field.label}{field.required ? " *" : ""}</span>
+        <span>{field.label}{isRequired ? " *" : ""}</span>
         <select
           {...common}
           value={options.findIndex((option) => Object.is(option.value, value)).toString()}
@@ -638,11 +623,15 @@ const renderContentField = (
     );
   }
 
-  if (["json", "richText", "repeater", "blocks"].includes(field.type)) {
+  if (
+    ["array", "blocks", "computed", "custom", "json", "media", "object", "relationship", "richText"]
+      .includes(field.type)
+  ) {
     return (
       <CmsJsonField
         key={jsonReset}
         {...context}
+        disabled={disabled || field.type === "computed"}
         onValidityChange={onJsonValidityChange}
       />
     );
@@ -670,13 +659,19 @@ const renderContentField = (
         ? "date"
         : field.type === "datetime"
           ? "datetime-local"
-          : "text";
+          : field.type === "email"
+            ? "email"
+            : field.type === "url"
+              ? "url"
+              : "text";
   const inputProps = {
     ...common,
     type: inputType,
     value: displayValue,
     min: field.validation?.min,
     max: field.validation?.max,
+    minLength: field.validation?.minLength,
+    maxLength: field.validation?.maxLength,
     pattern: field.validation?.pattern,
     onChange: (event: FormEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const raw = event.currentTarget.value;
@@ -698,7 +693,7 @@ const renderContentField = (
 
   return (
     <label className="puzzle-cms-field" htmlFor={id}>
-      <span>{field.label}{field.required ? " *" : ""}</span>
+      <span>{field.label}{isRequired ? " *" : ""}</span>
       {field.type === "textarea" ? (
         <textarea {...inputProps} rows={4} />
       ) : (
@@ -714,7 +709,7 @@ const renderContentField = (
   );
 };
 
-export const ContentEditor = ({
+export const ContentEditor = <TFields extends CmsFieldMap = CmsFieldMap>({
   contentType,
   value,
   validationErrors = {},
@@ -730,7 +725,7 @@ export const ContentEditor = ({
   onInvalidDraftChange,
   renderField,
   className,
-}: ContentEditorProps) => {
+}: ContentEditorProps<TFields>) => {
   const id = useId();
   const [actionError, setActionError] = useState<string | null>(null);
   const [discardOpen, setDiscardOpen] = useState(false);
@@ -749,11 +744,11 @@ export const ContentEditor = ({
   useEffect(() => {
     if (!effectiveDirty) setDiscardOpen(false);
   }, [effectiveDirty]);
-  const updateField = (key: string, nextValue: CmsValue | undefined) => {
-    const next = { ...value };
+  const updateField = (key: string, nextValue: unknown) => {
+    const next = { ...value } as Record<string, unknown>;
     if (nextValue === undefined) delete next[key];
     else next[key] = nextValue;
-    onChange(next);
+    onChange(next as Partial<FieldsValue<NoInfer<TFields>>>);
   };
   const runAction = async (action: () => void | Promise<void>) => {
     setActionError(null);
@@ -771,6 +766,12 @@ export const ContentEditor = ({
     onDiscard?.();
     setJsonReset((current) => current + 1);
   };
+  const contentTypeName = contentType.name ?? "Content";
+  const fieldRows = Object.entries(contentType.fields).map(([key, descriptor]) => ({
+    ...descriptor,
+    key,
+    label: descriptor.label ?? key,
+  })) as unknown as CmsFieldRows<TFields>[];
 
   return (
     <form
@@ -780,16 +781,19 @@ export const ContentEditor = ({
     >
       <header className="puzzle-cms-editor__header">
         <div>
-          <h2>{contentType.name}</h2>
-          <p>{contentType.description ?? `Edit ${contentType.name.toLowerCase()} content.`}</p>
+          <h2>{contentTypeName}</h2>
+          <p>{contentType.description ?? `Edit ${contentTypeName.toLowerCase()} content.`}</p>
         </div>
         {effectiveDirty ? <span className="puzzle-cms-editor__dirty">Unsaved changes</span> : null}
       </header>
       <div className="puzzle-cms-editor__fields">
-        {contentType.fields.map((field) => {
-          const context: ContentEditorFieldContext = {
+        {fieldRows.map((field) => {
+          const fieldValue = Object.prototype.hasOwnProperty.call(value, field.key)
+            ? (value as Readonly<Record<string, unknown>>)[field.key]
+            : field.defaultValue;
+          const context: ContentEditorFieldContext<CmsFieldRows<TFields>> = {
             field,
-            value: value[field.key],
+            value: fieldValue as FieldValue<CmsFieldRows<TFields>> | undefined,
             error: validationErrors[field.key],
             disabled: disabled || saving,
             onChange: (nextValue) => updateField(field.key, nextValue),
@@ -798,10 +802,15 @@ export const ContentEditor = ({
             <div
               className="puzzle-cms-editor__field"
               key={field.key}
-              id={`${id}-${field.key}`}
+              id={`${id}-field-${field.key}`}
             >
               {renderField?.(context) ??
-                renderContentField(context, contentType, id, onJsonValidityChange, jsonReset)}
+                renderContentField(
+                  context as unknown as ContentEditorFieldContext,
+                  id,
+                  onJsonValidityChange,
+                  jsonReset,
+                )}
             </div>
           );
         })}
@@ -862,10 +871,7 @@ export const ContentEditor = ({
   );
 };
 
-const isCmsBlock = (value: CmsValue): value is CmsValue & {
-  readonly type: string;
-  readonly fields: CmsFields;
-} =>
+const isCmsBlock = (value: unknown): value is CmsBlockValue =>
   typeof value === "object" &&
   value !== null &&
   !Array.isArray(value) &&
@@ -880,12 +886,12 @@ const isCmsFields = (value: unknown): value is CmsFields =>
   value !== null &&
   !Array.isArray(value);
 
-const defaultCmsFields = (definitions: readonly CmsFieldDefinition[]) =>
+const defaultCmsFields = (definitions: Readonly<Record<string, FieldDescriptor>>) =>
   Object.fromEntries(
-    definitions.flatMap((field) =>
+    Object.entries(definitions).flatMap(([key, field]) =>
       field.defaultValue === undefined
         ? []
-        : [[field.key, field.defaultValue] as const],
+        : [[key, field.defaultValue] as const],
     ),
   ) as CmsFields;
 
@@ -902,7 +908,7 @@ export const BlockEditor = ({
 }: BlockEditorProps) => {
   const { hasInvalidDraft, setValidity } = useInvalidJsonDrafts(onInvalidDraftChange);
   const blocks = [...value];
-  const updateBlock = (index: number, next: CmsValue) => {
+  const updateBlock = (index: number, next: CmsBlockValue) => {
     const nextValue = [...blocks];
     nextValue[index] = next;
     onChange(nextValue);
@@ -1039,304 +1045,6 @@ export const BlockEditor = ({
   );
 };
 
-const reservedFieldKeys = new Set([
-  "id",
-  "tenantId",
-  "contentTypeId",
-  "revisionNumber",
-  "status",
-  "createdAt",
-  "updatedAt",
-]);
-
-const contentTypeIssues = (definition: ContentTypeDefinition) => {
-  const issues: string[] = [];
-  const seen = new Set<string>();
-  for (const field of definition.fields) {
-    if (!/^[a-z][a-zA-Z0-9_]*$/.test(field.key)) {
-      issues.push(`"${field.key}" must start with a lowercase letter and contain only letters, numbers, or underscores.`);
-    }
-    if (reservedFieldKeys.has(field.key)) issues.push(`"${field.key}" is reserved.`);
-    if (seen.has(field.key)) issues.push(`"${field.key}" is duplicated.`);
-    seen.add(field.key);
-  }
-  return issues;
-};
-
-const newField = (fields: readonly CmsFieldDefinition[]): CmsFieldDefinition => {
-  const keys = new Set(fields.map((field) => field.key));
-  let number = fields.length + 1;
-  while (keys.has(`field_${number}`)) number += 1;
-  return { key: `field_${number}`, type: "text", label: `Field ${number}` };
-};
-
-export const ContentTypeBuilder = ({
-  value,
-  onChange,
-  onSave,
-  saving = false,
-  disabled = false,
-  renderFieldSettings,
-  className,
-}: ContentTypeBuilderProps) => {
-  const id = useId();
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const localesText = (value.locales ?? []).join(", ");
-  const [localeDraft, setLocaleDraft] = useState(localesText);
-  const [editingLocales, setEditingLocales] = useState(false);
-  useEffect(() => {
-    const parsedDraft = localeDraft.split(",").map((locale) => locale.trim()).filter(Boolean).join(", ");
-    if (!editingLocales || parsedDraft !== localesText) setLocaleDraft(localesText);
-  }, [editingLocales, localeDraft, localesText]);
-  const issues = contentTypeIssues(value);
-  const updateField = (index: number, nextField: CmsFieldDefinition) =>
-    onChange({
-      ...value,
-      fields: value.fields.map((field, fieldIndex) =>
-        fieldIndex === index ? nextField : field,
-      ),
-    });
-  const changeFieldType = (
-    field: CmsFieldDefinition,
-    type: CmsFieldDefinition["type"],
-  ) => {
-    const {
-      options: _options,
-      relation: _relation,
-      fields: _fields,
-      blocks: _blocks,
-      ...shared
-    } = field;
-    return {
-      ...shared,
-      type,
-      ...(type === "select" || type === "multiSelect" ? { options: field.options } : {}),
-      ...(type === "relationship" ? { relation: field.relation } : {}),
-      ...(type === "repeater" ? { fields: field.fields } : {}),
-      ...(type === "blocks" ? { blocks: field.blocks } : {}),
-    } satisfies CmsFieldDefinition;
-  };
-  const runSave = async () => {
-    setSaveError(null);
-    try {
-      await onSave?.();
-    } catch (error) {
-      setSaveError(errorMessage(error));
-    }
-  };
-
-  return (
-    <section
-      className={["puzzle-cms-type-builder", className].filter(Boolean).join(" ")}
-      aria-labelledby={`${id}-title`}
-    >
-      <header>
-        <h2 id={`${id}-title`}>Content type</h2>
-        <p>Define the fields and locales available to this content type.</p>
-      </header>
-      <div className="puzzle-cms-type-builder__meta">
-        <label className="puzzle-cms-field">
-          <span>Name</span>
-          <input
-            disabled={disabled}
-            value={value.name}
-            onChange={(event) => onChange({ ...value, name: event.currentTarget.value })}
-          />
-        </label>
-        <label className="puzzle-cms-field">
-          <span>Slug</span>
-          <input
-            disabled={disabled}
-            value={value.slug}
-            onChange={(event) => onChange({ ...value, slug: event.currentTarget.value })}
-          />
-        </label>
-        <label className="puzzle-cms-field">
-          <span>Description</span>
-          <input
-            disabled={disabled}
-            value={value.description ?? ""}
-            onChange={(event) =>
-              onChange({ ...value, description: event.currentTarget.value || undefined })
-            }
-          />
-        </label>
-        <label className="puzzle-cms-field">
-          <span>Schema version</span>
-          <input
-            disabled={disabled}
-            type="number"
-            min={1}
-            value={value.version}
-            onChange={(event) =>
-              onChange({ ...value, version: Math.max(1, Number(event.currentTarget.value) || 1) })
-            }
-          />
-        </label>
-        <label className="puzzle-cms-field">
-          <span>Locales (comma separated)</span>
-          <input
-            disabled={disabled}
-            value={localeDraft}
-            onFocus={() => setEditingLocales(true)}
-            onBlur={() => setEditingLocales(false)}
-            onChange={(event) => {
-              const nextDraft = event.currentTarget.value;
-              setLocaleDraft(nextDraft);
-              onChange({
-                ...value,
-                locales: nextDraft
-                  .split(",")
-                  .map((locale) => locale.trim())
-                  .filter(Boolean),
-              });
-            }}
-          />
-        </label>
-        <label className="puzzle-cms-field">
-          <span>Default locale</span>
-          <select
-            disabled={disabled}
-            value={value.defaultLocale ?? ""}
-            onChange={(event) =>
-              onChange({
-                ...value,
-                defaultLocale: event.currentTarget.value || undefined,
-              })
-            }
-          >
-            <option value="">No default</option>
-            {(value.locales ?? []).map((locale) => (
-              <option value={locale} key={locale}>{locale}</option>
-            ))}
-          </select>
-        </label>
-      </div>
-      <div className="puzzle-cms-type-builder__fields">
-        <div className="puzzle-cms-type-builder__fields-heading">
-          <h3>Fields</h3>
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => onChange({ ...value, fields: [...value.fields, newField(value.fields)] })}
-          >
-            Add field
-          </button>
-        </div>
-        {value.fields.map((field, index) => (
-          <fieldset className="puzzle-cms-type-builder__field" key={index}>
-            <legend>{field.label || `Field ${index + 1}`}</legend>
-            <label className="puzzle-cms-field">
-              <span>Key</span>
-              <input
-                disabled={disabled}
-                value={field.key}
-                onChange={(event) =>
-                  updateField(index, { ...field, key: event.currentTarget.value })
-                }
-              />
-            </label>
-            <label className="puzzle-cms-field">
-              <span>Label</span>
-              <input
-                disabled={disabled}
-                value={field.label}
-                onChange={(event) =>
-                  updateField(index, { ...field, label: event.currentTarget.value })
-                }
-              />
-            </label>
-            <label className="puzzle-cms-field">
-              <span>Field type</span>
-              <select
-                disabled={disabled}
-                value={field.type}
-                onChange={(event) =>
-                  updateField(index, {
-                    ...changeFieldType(
-                      field,
-                      event.currentTarget.value as CmsFieldDefinition["type"],
-                    ),
-                  })
-                }
-              >
-                {cmsFieldTypes.map((type) => (
-                  <option value={type} key={type}>{type}</option>
-                ))}
-              </select>
-            </label>
-            <label className="puzzle-cms-type-builder__check">
-              <input
-                disabled={disabled}
-                type="checkbox"
-                checked={field.required ?? false}
-                onChange={(event) => updateField(index, { ...field, required: event.currentTarget.checked })}
-              />
-              Required
-            </label>
-            <label className="puzzle-cms-type-builder__check">
-              <input
-                disabled={disabled}
-                type="checkbox"
-                checked={field.localized ?? false}
-                onChange={(event) => updateField(index, { ...field, localized: event.currentTarget.checked })}
-              />
-              Localized
-            </label>
-            {renderFieldSettings?.(field, index, (next) => updateField(index, next))}
-            <div className="puzzle-cms-type-builder__field-actions">
-              <button
-                type="button"
-                disabled={disabled || index === 0}
-                aria-label={`Move ${field.label} field up`}
-                onClick={() => {
-                  const fields = [...value.fields];
-                  [fields[index - 1], fields[index]] = [fields[index]!, fields[index - 1]!];
-                  onChange({ ...value, fields });
-                }}
-              >
-                Move up
-              </button>
-              <button
-                type="button"
-                disabled={disabled || index === value.fields.length - 1}
-                aria-label={`Move ${field.label} field down`}
-                onClick={() => {
-                  const fields = [...value.fields];
-                  [fields[index], fields[index + 1]] = [fields[index + 1]!, fields[index]!];
-                  onChange({ ...value, fields });
-                }}
-              >
-                Move down
-              </button>
-              <button
-                type="button"
-                disabled={disabled}
-                onClick={() =>
-                  onChange({ ...value, fields: value.fields.filter((_, fieldIndex) => fieldIndex !== index) })
-                }
-              >
-                Remove field
-              </button>
-            </div>
-          </fieldset>
-        ))}
-      </div>
-      {issues.length > 0 ? (
-        <ul className="puzzle-cms-type-builder__issues" role="alert">
-          {issues.map((issue) => <li key={issue}>{issue}</li>)}
-        </ul>
-      ) : null}
-      {saveError ? <p role="alert">{saveError}</p> : null}
-      {onSave ? (
-        <button type="button" disabled={disabled || saving || issues.length > 0} onClick={() => void runSave()}>
-          {saving ? "Saving…" : "Save content type"}
-        </button>
-      ) : null}
-    </section>
-  );
-};
-
 export const LocalizationEditor = ({
   contentType,
   values,
@@ -1349,9 +1057,9 @@ export const LocalizationEditor = ({
   className,
 }: LocalizationEditorProps) => {
   const { hasInvalidDraft, setValidity } = useInvalidJsonDrafts(onInvalidDraftChange);
-  const locales = contentType.locales ?? [];
+  const locales = contentType.localization?.locales ?? [];
   const [internalLocale, setInternalLocale] = useState(
-    activeLocale ?? contentType.defaultLocale ?? locales[0] ?? "",
+    activeLocale ?? contentType.localization?.defaultLocale ?? locales[0] ?? "",
   );
   const selectedLocale = activeLocale ?? internalLocale;
   const activeFields = values[selectedLocale] ?? {};
@@ -1411,7 +1119,7 @@ export const LocalizationEditor = ({
           )}
         </div>
       ) : (
-        <p role="status">No locales are configured for {contentType.name}.</p>
+        <p role="status">No locales are configured for {contentType.name ?? "this collection"}.</p>
       )}
     </section>
   );
@@ -1438,9 +1146,12 @@ export const RelationshipField = ({
   }
   const allowedStatuses = relation.allowedStatuses;
   const missingLocale = Boolean(relation.sameLocale && !locale);
+  const targets = typeof relation.target === "string"
+    ? [relation.target]
+    : relation.target;
   const allowedOptions = options.filter(
     (option) =>
-      relation.targetTypes.includes(option.contentType) &&
+      targets.includes(option.contentType) &&
       (!relation.sameLocale || (Boolean(locale) && option.locale === locale)) &&
       (!allowedStatuses || allowedStatuses.includes(option.status)),
   );
@@ -2110,7 +1821,6 @@ export type {
   CmsShellProps,
   ContentEditorProps,
   ContentListProps,
-  ContentTypeBuilderProps,
   EditorialCalendarProps,
   LocalizationEditorProps,
   PublishSchedulerProps,

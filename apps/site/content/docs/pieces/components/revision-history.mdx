@@ -1,13 +1,13 @@
 ---
 title: RevisionHistory
-description: Review immutable CMS revisions and request restoration as a new revision.
+description: Display caller-provided CMS revision snapshots and forward host-owned actions.
 ---
 
 import { Preview } from "@puzzle-ui/ui";
 import { RevisionHistoryExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
 import { RevisionHistory } from "@puzzle-ui/pieces";
 
-`RevisionHistory` displays caller-provided revisions, offers a JSON field snapshot preview and a field-by-field comparison with the current revision, and invokes `onRestore` with the selected revision ID and revision number. The host service must perform restore-as-new-revision with optimistic concurrency and authorization.
+`RevisionHistory` displays caller-provided revisions, offers a JSON field snapshot preview and a field-by-field comparison with the current revision, and invokes `onRestore` with the selected revision ID and revision number. The component does not restore history; use the verified CMS/Fullstack lifecycle contract for any restore action.
 
 <Preview fit="device" code={`<RevisionHistory revisions={revisions} currentRevisionNumber={entry.revisionNumber} confirmRestore onRestore={restoreRevision} />`}>
   <RevisionHistoryExample />
@@ -26,16 +26,38 @@ import { RevisionHistory } from "@puzzle-ui/pieces";
 | `className` | `string` | No | — |
 
 ```tsx
+import { createCmsClient } from "@puzzle-ui/fullstack/cms/client";
 import { RevisionHistory } from "@puzzle-ui/pieces";
+
+const cms = createCmsClient({ basePath: "/api/cms" });
+const articles = cms.collection("articles");
+const revisions = await articles.listRevisions(entry.id, 20);
+
+const restoreRevision = async (revisionId: string) => {
+  await articles.restoreRevision(entry.id, {
+    expectedRevision: entry.revision,
+    revisionId,
+  });
+};
 
 <RevisionHistory
   revisions={revisions}
   currentRevisionNumber={entry.revisionNumber}
-  onRestore={(revisionId) => cmsClient.restoreRevision(entry.id, revisionId, entry.revision)}
+  onRestore={(revisionId) => restoreRevision(revisionId)}
 />;
 ```
 
-The comparison is shown when the revision identified by `currentRevisionNumber` is included in `revisions`; fetch it alongside any historical page you want to compare. It shows added, removed, and changed top-level fields, including nested values, but does not compare metadata such as status or slug. Set `confirmRestore` to ask before requesting a restore. The active revision cannot be restored. Callback failures are announced to the user. Restoring a historical revision must create a new immutable revision rather than overwrite history.
+The Fullstack collection client exposes `listRevisions` and `restoreRevision`
+when the collection enables drafts. `listRevisions` returns an array of flat
+`CmsApiRevision` records whose public fields map to `CmsRevisionItem`; no
+tenant ID is sent to the browser.
+The comparison is shown when the revision identified by
+`currentRevisionNumber` is included in `revisions`; provide it alongside any
+historical page you want to compare. It shows added, removed, and changed
+top-level fields, including nested values, but does not compare metadata such
+as status or slug. Set `confirmRestore` to ask before invoking the callback.
+The active revision cannot be restored. Callback failures are announced to
+the user.
 
 ## Related
 

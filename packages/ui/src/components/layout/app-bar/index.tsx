@@ -4,6 +4,7 @@ import { cn } from "@puzzle-ui/core";
 import { classifyComponent } from "@puzzle-ui/core/rendering";
 import type { IdentifiedResourceDescriptor } from "@puzzle-ui/core/resources";
 import { useResourcePrefetch } from "@puzzle-ui/hooks";
+import { Icon } from "@puzzle-ui/icons";
 import { Link } from "../../navigation/link";
 import type { DrawerProps } from "../../overlays/drawer";
 import {
@@ -93,9 +94,30 @@ const initializeStickyOffset = (
 
 const stickyOffsetScript = `(${initializeStickyOffset.toString()})(document.currentScript,${getStickyOffsetScope.toString()})`;
 
+const renderNavigationIcon = (icon: ReactNode) => {
+  if (icon == null || typeof icon === "boolean" || icon === "") return null;
+
+  return (
+    <span className="puzzle-app-bar__link-icon" aria-hidden="true">
+      {typeof icon === "string" ? (
+        <Icon
+          name={icon}
+          size={16}
+          color="currentColor"
+          aria-hidden="true"
+        />
+      ) : (
+        icon
+      )}
+    </span>
+  );
+};
+
 type AppBarNavigationItem = {
   label: string;
   href: string;
+  prefixIcon?: ReactNode;
+  suffixIcon?: ReactNode;
   current?: boolean;
   external?: boolean;
 };
@@ -194,24 +216,28 @@ const AppBar = <T,>({
 
   const renderNavigationItems = () => (
     <ul className="puzzle-app-bar__list">
-      {navigationItems.map(({ label, href, current, external }) => (
-        <li key={href}>
-          <Link
-            className="puzzle-app-bar__link"
-            href={href}
-            aria-current={current ? "page" : undefined}
-            {...(external
-              ? {
-                  target: "_blank",
-                  rel: "noopener noreferrer",
-                }
-              : {})}
-            onClick={() => setOpen(false)}
-          >
-            {label}
-          </Link>
-        </li>
-      ))}
+      {navigationItems.map(
+        ({ label, href, prefixIcon, suffixIcon, current, external }) => (
+          <li key={href}>
+            <Link
+              className="puzzle-app-bar__link"
+              href={href}
+              aria-current={current ? "page" : undefined}
+              {...(external
+                ? {
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                  }
+                : {})}
+              onClick={() => setOpen(false)}
+            >
+              {renderNavigationIcon(prefixIcon)}
+              <span className="puzzle-app-bar__link-label">{label}</span>
+              {renderNavigationIcon(suffixIcon)}
+            </Link>
+          </li>
+        ),
+      )}
 
       {hasCustomNavigation &&
         customNavigationItems.map((item, index) => (

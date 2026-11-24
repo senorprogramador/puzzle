@@ -1,0 +1,77 @@
+---
+title: Schema migrations
+description: Version code-first collections and transform existing entry fields when a breaking schema change is introduced.
+---
+
+The collection `version` is the content schema version; an entry's `revision`
+is its optimistic-concurrency version. Keep them separate. Compatible
+optional/defaulted additions can be introduced without a version bump.
+Removing a field, changing its type or constraints, or making it newly
+required is a breaking change and requires a consecutive schema version and a
+migration callback.
+
+## Define a migration
+
+This example renames the `title` field to `headline`, moving collection schema
+version 1 to version 2:
+
+```ts
+import type { CmsSchemaMigration } from "@puzzle-ui/cms";
+
+const migration: CmsSchemaMigration = {
+  contentTypeSlug: "posts",
+  fromVersion: 1,
+  toVersion: 2,
+  migrate: (fields) => {
+    const { title, ...rest } = fields;
+    return {
+      ...rest,
+      headline: typeof title === "string" ? title : "",
+    };
+  },
+};
+```
+
+Update the static schema and pass the migration to each configured CMS
+instance:
+
+```ts
+import { collection, createCms, defineCMS, fields } from "@puzzle-ui/cms";
+
+const cmsConfig = defineCMS({
+  collections: {
+    posts: collection({
+      name: "Post",
+      version: 2,
+      fields: {
+        headline: fields.text({ label: "Headline", required: true }),
+        slug: fields.slug({ label: "Slug", required: true }),
+      },
+    }),
+  },
+});
+
+const cms = createCms({
+  config: cmsConfig,
+  storage,
+  context: { tenantId: "publisher-1", actor: { id: "editor-7" } },
+  accessPolicy: ({ actor }) => actor !== null,
+  migrations: [migration],
+});
+```
+
+`contentTypeSlug` is the normalized collection key. `toVersion` must equal
+`fromVersion + 1`; `tenantId` is optional when a migration is tenant-specific.
+The callback receives a serializable `CmsFields` value and returns its
+transformed value synchronously or asynchronously. Make transformations
+deterministic and safe to retry; do not perform unrelated external side
+effects in a migration.
+
+Migrations are runtime callbacks, so every application process that can
+initialize the schema must be configured with the required migration. CMS
+schema migrations transform content fields; database table/index migrations
+belong to the selected storage adapter and are a separate contract.
+
+See [Custom Storage adapters](/docs/cms/custom-storage) for adapter
+capabilities and the [Storage migration guide](/docs/storage) for database
+schema changes.

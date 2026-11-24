@@ -1,0 +1,62 @@
+---
+title: Lifecycle hooks
+description: Validate and observe collection mutations with server-only beforeChange and afterChange callbacks.
+---
+
+Configure collection callbacks in the static schema under `hooks`. Hooks run
+only on the server and are not serialized into the collection presentation.
+
+```ts
+import { collection, defineCMS, fields } from "@puzzle-ui/cms";
+
+const cmsConfig = defineCMS({
+  collections: {
+    posts: collection({
+      name: "Post",
+      fields: {
+        title: fields.text({ label: "Title", required: true }),
+        slug: fields.slug({ label: "Slug", required: true }),
+      },
+      hooks: {
+        beforeChange: ({ operation, fields: submitted }) => {
+          if (operation === "create" && submitted?.title === "Blocked title") {
+            throw new Error("This title is not allowed.");
+          }
+        },
+        afterChange: ({ operation, entry }) => {
+          console.info("CMS entry committed", { operation, id: entry.id });
+        },
+      },
+    }),
+  },
+});
+```
+
+`beforeChange` runs after access authorization and before validation and
+persistence. Throwing vetoes the mutation. Do not rely on it as the only
+validation boundary; schema field validation still runs after the hook.
+
+`afterChange` runs after the write commits and receives the committed `entry`.
+If it throws, the error is surfaced to the caller but the committed mutation
+is not rolled back. Keep external work idempotent and use a durable outbox
+when a side effect must be retried independently.
+
+## Event shape
+
+`CmsCollectionHookEvent` contains:
+
+- `operation`: create, update, publish, unpublish, schedule, unschedule,
+  archive, delete, restore, or scheduled-publish.
+- `context`: the bound tenant and actor.
+- `contentType`: the configured collection key/normalized content type.
+- `entryId`: present when the operation already has an entry.
+- `fields`: submitted field values when relevant.
+- `current`: the current entry view when one exists.
+
+`afterChange` adds the committed `entry`. The fields are typed from the
+collection schema. Hooks receive trusted server context; never forward their
+configuration to browser code.
+
+For authorization callbacks, use [Access policies](/docs/cms/access). For
+transactional change events and worker-owned webhooks, see
+[Media, change events, and webhooks](/docs/cms/media-webhooks).

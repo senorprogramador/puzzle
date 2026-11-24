@@ -5,10 +5,13 @@ import type {
   CmsEntryView,
   CmsFields,
   CmsValue,
-  CmsBlockDefinition,
-  CmsFieldDefinition,
-  ContentTypeDefinition,
   CmsWebhookEventType,
+  CmsCollectionPresentation as PublicCmsCollectionPresentation,
+  CollectionKind,
+  FieldDescriptor,
+  FieldMap,
+  FieldValue,
+  FieldsValue,
 } from "@puzzle-ui/cms";
 import type { ReactNode } from "react";
 import type { BreadcrumbsProps } from "@puzzle-ui/ui";
@@ -175,33 +178,53 @@ export type ContentListProps = {
   readonly className?: string;
 };
 
-export type ContentEditorFieldContext = {
-  readonly field: CmsFieldDefinition;
-  readonly value: CmsValue | undefined;
+export type CmsFieldMap = FieldMap;
+export type CmsFieldRow<TField extends FieldDescriptor = FieldDescriptor> = TField & {
+  readonly key: string;
+  readonly label: string;
+};
+export type CmsFieldRows<TFields extends FieldMap> = {
+  [TKey in keyof TFields]: CmsFieldRow<TFields[TKey]> & {
+    readonly key: TKey & string;
+  };
+}[keyof TFields];
+export type CmsCollectionPresentation<
+  TFields extends FieldMap = FieldMap,
+  TKind extends CollectionKind = CollectionKind,
+> = PublicCmsCollectionPresentation<TFields, TKind>;
+
+export type ContentEditorFieldContext<TField = CmsFieldRow> = {
+  readonly field: TField;
+  readonly value: FieldValue<TField> | undefined;
   readonly error?: string;
   readonly disabled: boolean;
-  readonly onChange: (value: CmsValue | undefined) => void;
+  readonly onChange: (value: FieldValue<TField> | undefined) => void;
 };
 
-export type ContentEditorProps = {
-  readonly contentType: ContentTypeDefinition;
-  readonly value: CmsFields;
+export type ContentEditorProps<TFields extends FieldMap = FieldMap> = {
+  readonly contentType: CmsCollectionPresentation<TFields>;
+  readonly value: Partial<FieldsValue<NoInfer<TFields>>>;
   readonly validationErrors?: Readonly<Record<string, string>>;
   readonly disabled?: boolean;
   readonly saving?: boolean;
   readonly dirty?: boolean;
   readonly confirmDiscard?: boolean;
   readonly warnOnUnload?: boolean;
-  readonly onChange: (value: CmsFields) => void;
+  readonly onChange: (value: Partial<FieldsValue<NoInfer<TFields>>>) => void;
   readonly onSaveDraft: () => void | Promise<void>;
   readonly onPublish?: () => void | Promise<void>;
   readonly onDiscard?: () => void;
   /** Reports invalid text in built-in JSON fields so hosts can guard navigation. */
   readonly onInvalidDraftChange?: (invalid: boolean) => void;
-  readonly renderField?: (context: ContentEditorFieldContext) => ReactNode;
+  readonly renderField?: (
+    context: ContentEditorFieldContext<CmsFieldRows<NoInfer<TFields>>>,
+  ) => ReactNode;
   readonly className?: string;
 };
 
+export type CmsBlockDefinition = NonNullable<
+  Extract<FieldDescriptor, { readonly type: "blocks" }>["blocks"]
+>[number];
 export type CmsBlockValue = {
   readonly type: string;
   readonly fields: CmsFields;
@@ -216,29 +239,13 @@ type CmsBlockRenderer = (
 export type BlockEditorProps = {
   readonly label: ReactNode;
   readonly definitions: readonly CmsBlockDefinition[];
-  readonly value: readonly CmsValue[];
-  readonly onChange: (value: CmsValue[]) => void;
+  readonly value: readonly CmsBlockValue[];
+  readonly onChange: (value: CmsBlockValue[]) => void;
   /** Reports invalid text in built-in JSON field editors. */
   readonly onInvalidDraftChange?: (invalid: boolean) => void;
   readonly renderBlock?: CmsBlockRenderer;
   readonly disabled?: boolean;
   readonly error?: ReactNode;
-  readonly className?: string;
-};
-
-type CmsFieldSettingsRenderer = (
-  field: CmsFieldDefinition,
-  index: number,
-  onChange: (field: CmsFieldDefinition) => void,
-) => ReactNode;
-
-export type ContentTypeBuilderProps = {
-  readonly value: ContentTypeDefinition;
-  readonly onChange: (value: ContentTypeDefinition) => void;
-  readonly onSave?: () => void | Promise<void>;
-  readonly saving?: boolean;
-  readonly disabled?: boolean;
-  readonly renderFieldSettings?: CmsFieldSettingsRenderer;
   readonly className?: string;
 };
 
@@ -249,7 +256,7 @@ type CmsLocaleRenderer = (
 ) => ReactNode;
 
 export type LocalizationEditorProps = {
-  readonly contentType: ContentTypeDefinition;
+  readonly contentType: CmsCollectionPresentation;
   readonly values: Readonly<Record<string, CmsFields | null | undefined>>;
   readonly activeLocale?: string;
   readonly onActiveLocaleChange?: (locale: string) => void;
@@ -271,7 +278,10 @@ export type RelationshipOption = {
 
 export type RelationshipFieldProps = {
   readonly label: ReactNode;
-  readonly relation: NonNullable<CmsFieldDefinition["relation"]>;
+  readonly relation: Extract<
+    FieldDescriptor,
+    { readonly type: "relationship" }
+  >;
   readonly options: readonly RelationshipOption[];
   readonly value: string | readonly string[] | null;
   readonly locale?: string;
@@ -339,7 +349,7 @@ export type {
   CmsEntryView,
   CmsFields,
   CmsValue,
-  CmsBlockDefinition,
-  CmsFieldDefinition,
-  ContentTypeDefinition,
+  FieldDescriptor,
+  FieldValue,
+  FieldsValue,
 };

@@ -264,6 +264,7 @@ export const runCrudConformance = (
       await insertUser("user-1", { age: 18 });
       await insertUser("user-2", { age: 25 });
       await insertUser("user-3", { age: 40 });
+      await insertUser("user-4", { age: 50, nullableValue: "other" });
 
       const included = await adapter.findMany<ConformanceUser>(
         USERS_COLLECTION,
@@ -284,7 +285,44 @@ export const runCrudConformance = (
       );
 
       expect(included.map(({ age }) => age).sort()).toEqual([18, 40]);
-      expect(excluded.map(({ age }) => age)).toEqual([25]);
+      expect(excluded.map(({ age }) => age).sort()).toEqual([25, 50]);
+
+      const nullValues = await adapter.findMany<ConformanceUser>(
+        USERS_COLLECTION,
+        {
+          where: {
+            nullableValue: { operator: "in", value: [null] },
+          },
+        },
+      );
+      const nonNullValues = await adapter.findMany<ConformanceUser>(
+        USERS_COLLECTION,
+        {
+          where: {
+            nullableValue: { operator: "notIn", value: [null] },
+          },
+        },
+      );
+      const notOther = await adapter.findMany<ConformanceUser>(
+        USERS_COLLECTION,
+        {
+          where: {
+            nullableValue: { operator: "ne", value: "other" },
+          },
+        },
+      );
+
+      expect(nullValues.map(({ id }) => id).sort()).toEqual([
+        "user-1",
+        "user-2",
+        "user-3",
+      ]);
+      expect(nonNullValues.map(({ id }) => id)).toEqual(["user-4"]);
+      expect(notOther.map(({ id }) => id).sort()).toEqual([
+        "user-1",
+        "user-2",
+        "user-3",
+      ]);
     });
 
     it("supports exists", async () => {
@@ -303,6 +341,85 @@ export const runCrudConformance = (
       );
 
       expect(records).toHaveLength(1);
+      expect(
+        await adapter.findMany<ConformanceUser>(USERS_COLLECTION, {
+          where: {
+            nullableValue: { operator: "exists", value: true },
+          },
+        }),
+      ).toHaveLength(1);
+      expect(
+        await adapter.findMany<ConformanceUser>(USERS_COLLECTION, {
+          where: {
+            "profile.nickname": { operator: "exists", value: false },
+          },
+        }),
+      ).toHaveLength(1);
+    });
+
+    it("filters nested fields and supports string and array contains", async () => {
+      await reset();
+      adapter = await createAdapter();
+
+      await insertUser("user-1", {
+        profile: {
+          displayName: "Ada Lovelace",
+          score: 12,
+          roles: ["author", "reviewer"],
+        },
+      });
+      await insertUser("user-2", {
+        profile: {
+          displayName: "Grace Hopper",
+          score: 20,
+          roles: ["admin"],
+        },
+      });
+      await insertUser("user-3", {
+        profile: {
+          displayName: "Katherine Johnson",
+          score: 25,
+          roles: ["reviewer"],
+        },
+      });
+      await insertUser("user-4", { scores: [42], flags: [false] });
+
+      const byName = await adapter.findMany<ConformanceUser>(
+        USERS_COLLECTION,
+        {
+          where: {
+            "profile.displayName": {
+              operator: "contains",
+              value: "ADA",
+            },
+          },
+        },
+      );
+      const byRole = await adapter.findMany<ConformanceUser>(
+        USERS_COLLECTION,
+        {
+          where: {
+            "profile.roles": { operator: "contains", value: "reviewer" },
+          },
+        },
+      );
+      const byScalarArrayValues = await adapter.findMany<ConformanceUser>(
+        USERS_COLLECTION,
+        {
+          where: {
+            scores: { operator: "contains", value: 42 },
+            flags: { operator: "contains", value: false },
+          },
+        },
+      );
+
+      expect(byName.map(({ id }) => id)).toEqual(["user-1"]);
+      expect(byRole.map(({ id }) => id).sort()).toEqual([
+        "user-1",
+        "user-3",
+        "user-4",
+      ]);
+      expect(byScalarArrayValues.map(({ id }) => id)).toEqual(["user-4"]);
     });
 
     it("supports sorting, limit and offset", async () => {

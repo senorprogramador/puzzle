@@ -1,2 +1,0 @@
-{"version":10,"type":"context-options","origin":"library","browserName":"chromium","playwrightVersion":"1.65.1","options":{"baseURL":"http://127.0.0.1:4173","viewport":{"width":1920,"height":1080},"deviceScaleFactor":1,"isMobile":false},"platform":"linux","wallTime":1795307185053,"monotonicTime":46739.352,"sdkLanguage":"javascript","testIdAttributeName":"data-testid","title":"reference-site.visual.spec.mjs:15 › @a11y /journal/choosing-the-right-layer"}
-{"type":"before","callId":"sqsg@1201","startTime":46740.343,"class":"BrowserContext","method":"newPage","params":{}}

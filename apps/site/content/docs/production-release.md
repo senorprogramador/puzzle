@@ -185,22 +185,32 @@ The release script publishes all packages in dependency order.
 The release order is:
 
 1. core
-2. theme
-3. hooks
-4. icons
-5. ui
-6. pieces
-7. create
-8. storage
-9. session
-10. storage-d1
-11. storage-mongodb
-12. auth
-13. fullstack
-14. seo
+2. commerce
+3. theme
+4. hooks
+5. icons
+6. storage
+7. media
+8. media-cloudflare
+9. cms
+10. ui
+11. pieces
+12. create
+13. session
+14. storage-d1
+15. storage-mongodb
+16. auth
+17. fullstack
+18. payment-providers
+19. seo
+20. i18n
 
 The script checks package coverage, version consistency, typechecks, tests,
-builds and npm package contents.
+builds, AI instructions, documentation, and npm package contents. It generates
+changelogs, then audits public site documentation and consumer AI instructions
+against the implementation and package contents for the release. Copilot
+automatically applies only the validated documentation edits returned by that
+audit.
 
 Perform a dry run first:
 
@@ -209,8 +219,10 @@ Perform a dry run first:
 Inspect the output and confirm that every package is included.
 
 A dry run must not publish packages, create commits or create Git tags.
-It does run Copilot changelog generation and restores all version, lockfile and
-changelog changes afterwards. Copilot usage may consume premium requests.
+It runs Copilot changelog generation and the documentation audit, then performs
+`npm publish --dry-run` for each package. It restores version, lockfile,
+generated registry, changelog, documentation, and consumer AI-instruction
+changes afterwards. Copilot usage may consume premium requests.
 
 After validation, Copilot reads the files changed since the current version's
 release tag (`v<current-version>`) and returns release notes for every package.
@@ -240,47 +252,51 @@ Select one of:
 - minor
 - major
 
-After building, testing and validating package contents, the release procedure
-generates changelogs, stages all changes, commits the release and pushes the
-commit. Only then does it publish packages in dependency order.
-After every package is published, it creates and pushes the release tag.
+After building and testing, the release procedure generates changelogs and
+audits public documentation and consumer AI instructions. It then validates
+the updated instructions and site, and runs npm package preflights. Packages
+are published in dependency order. The script polls npm for each exact package
+version every 10 seconds, for up to 15 minutes, before committing and pushing
+the release changes. Once that commit is pushed, it creates and pushes the
+annotated release tag.
 
 On macOS and Linux, npm login and publishing use Bash and the system `script`
 utility so the release automatically answers "Press ENTER to open in the browser".
 Complete authentication in the browser yourself; OTP and other prompts remain
 manual. npm login uses web authentication.
 
-Failures before the commit restore version, lockfile and changelog changes.
-If the commit has already been created, it is preserved on failure.
-A failed push prevents npm publishing; resolve it before publishing manually.
-A failed npm publish leaves the pushed release commit intact. Inspect the
-registry, publish only missing packages at that version, then create and push
-the release tag after all packages are published. Do not rerun the version-bump
-script to recover an incomplete release.
-
-Do not interrupt a release after one or more packages have been published.
-
-If publishing fails partway through, inspect the npm registry before retrying.
-Already published versions cannot be overwritten.
+Failures before any package is successfully published restore release versions,
+lockfile, generated registry, changelogs, and documentation/AI-instruction
+edits. Once any package has been published, the script preserves all release
+files and reports the packages it knows were published. This also applies if
+npm propagation times out or a later Git commit, push, or tag operation fails.
+Inspect npm and Git state, then complete only the missing steps; do not blindly
+rerun the release or republish versions that are already available.
 
 ## 8. Post-release verification
 
 Verify each package on npm:
 
 - @puzzle-ui/core
+- @puzzle-ui/commerce
 - @puzzle-ui/theme
 - @puzzle-ui/hooks
 - @puzzle-ui/icons
+- @puzzle-ui/storage
+- @puzzle-ui/media
+- @puzzle-ui/media-cloudflare
+- @puzzle-ui/cms
 - @puzzle-ui/ui
 - @puzzle-ui/pieces
 - @puzzle-ui/create
-- @puzzle-ui/storage
 - @puzzle-ui/session
 - @puzzle-ui/storage-d1
 - @puzzle-ui/storage-mongodb
 - @puzzle-ui/auth
 - @puzzle-ui/fullstack
+- @puzzle-ui/payment-providers
 - @puzzle-ui/seo
+- @puzzle-ui/i18n
 
 Verify:
 

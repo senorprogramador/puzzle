@@ -33,7 +33,7 @@ test("CMS public subpaths are declared and build to import and require targets",
   }
 });
 
-test("shared and client CMS exports do not contain runtime server, storage, or secret dependencies", async () => {
+test("shared and client CMS exports contain only serializable DTOs", async () => {
   const [sharedJs, clientJs, sharedDts, clientDts] = await Promise.all([
     readDist("cms/shared/index.js"),
     readDist("cms/client/index.js"),
@@ -46,17 +46,14 @@ test("shared and client CMS exports do not contain runtime server, storage, or s
   assert.doesNotMatch(clientJs, /@puzzle-ui\/cms|cms\/server|@puzzle-ui\/storage|node:/);
   assert.doesNotMatch(
     publicDeclarations,
-    /CmsServiceOptions|CmsService\b|StorageAdapter|MediaObjectReference|objectKey|secretKey|providerUploadId/i,
-  );
-  assert.match(clientDts, /getPublishedEntry\([^)]*\): Promise<CmsPublishedEntry>/);
-
-  const publicEntryDeclaration = sharedDts.slice(
-    sharedDts.indexOf("CmsPublishedEntry"),
+    /CmsServiceOptions|CmsService\b|StorageAdapter|CmsContext|CmsAccessPolicy|MediaObjectReference|objectKey|secretKey|providerUploadId/i,
   );
   assert.doesNotMatch(
-    publicEntryDeclaration.split("export type CmsPublishedEntryPage")[0] ?? "",
-    /tenantId|publishedSnapshot|scheduledAt|secretDraft/i,
+    `${sharedDts}\n${clientDts}`,
+    /tenantId|actor:|userId|secretRef|leaseToken/i,
   );
+  assert.match(clientDts, /collection\(name: string\): CmsCollectionClient/);
+  assert.match(clientDts, /public: \{/);
 });
 
 test("framework CMS adapters import only the server dispatcher", async () => {

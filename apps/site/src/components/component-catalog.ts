@@ -266,7 +266,8 @@ export const components = [
     name: "App Bar",
     href: "/docs/ui/layout/app-bar",
     icon: "lucide:panel-top-dashed",
-    description: "Compose an application header with branding and navigation.",
+    description:
+      "Compose a responsive application header with branding, navigation, and optional per-link icons.",
   },
   {
     name: "Aspect Ratio",

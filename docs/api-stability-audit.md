@@ -2,7 +2,7 @@
 
 ## Scope and method
 
-Audited all 72 individually documented components in `@puzzle-ui/ui`, all 132
+Audited all 72 individually documented components in `@puzzle-ui/ui`, all 131
 canonical components documented by `@puzzle-ui/pieces` (including 14 canonical
 Hero components; the package also exposes 11 aliases that are not double-counted), and 46 other React components documented by the Theme (2), Icons
 (1), Fullstack (7), and SEO (36) package guides. Aliases are recorded with
@@ -13,7 +13,7 @@ The public API below is taken from the package entry points and component
 exports, not inferred from examples. Validation evidence is based on
 component-local test files and the public package peer dependencies. The site
 package declares React and React DOM 19 as peers. The component inventory
-contains 250 APIs: 249 Stable and `SectionHeader` Beta. Stable classifications
+contains 249 APIs: 248 Stable and `SectionHeader` Beta. Stable classifications
 include documented backward-compatibility intent within a major version.
 Package-level utility and adapter APIs retain their separate maturity
 classifications below.
@@ -260,7 +260,6 @@ specialized required-media prop types.
 | CmsShell | `CmsShell`, `CmsShellProps`, `CmsNavigationItem` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/cms-shell.mdx`. Component tests cover active navigation and composition; routes remain caller-owned. |
 | ContentEditor | `ContentEditor`, `ContentEditorProps`, `ContentEditorFieldContext` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/content-editor.mdx`. Component tests cover controlled fields, action separation, and visible failures; server validation and revision checks remain required. |
 | ContentList | `ContentList`, `ContentListProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/content-list.mdx`. Component tests cover filters, row actions, loading, error, empty, and permission-denied states. |
-| ContentTypeBuilder | `ContentTypeBuilder`, `ContentTypeBuilderProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/content-type-builder.mdx`. Component tests cover field addition; server schema validation and migrations remain authoritative. |
 | EditorialCalendar | `EditorialCalendar`, `EditorialCalendarProps`, `EditorialCalendarItem` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/editorial-calendar.mdx`. Component tests cover timezone grouping and selection; schedule data is caller-owned. |
 | LocalizationEditor | `LocalizationEditor`, `LocalizationEditorProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/localization-editor.mdx`. Component tests cover missing translation state and locale selection; fallback behavior remains explicit. |
 | PublishScheduler | `PublishScheduler`, `PublishSchedulerProps` | Stable | Source: `src/components/cms/cms-components.tsx`; reference: `pieces/components/publish-scheduler.mdx`. Component and unit tests cover explicit timezones and daylight-saving transitions; a host scheduler must execute revision-bound jobs. |
@@ -323,8 +322,8 @@ their component names and usage.
 
 ## Findings and follow-up
 
-- **Stable: 249; Beta: 1; Experimental: 0 (250 components total).** The sole
-  Beta component is UI `SectionHeader`; all 132 canonical Pieces components
+- **Stable: 248; Beta: 1; Experimental: 0 (249 components total).** The sole
+  Beta component is UI `SectionHeader`; all 131 canonical Pieces components
   have a within-major backward-compatibility commitment. Component-specific
   limitations and framework boundaries remain documented; Stable does not
   mean production readiness.

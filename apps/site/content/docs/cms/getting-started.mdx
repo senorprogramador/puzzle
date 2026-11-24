@@ -1,0 +1,106 @@
+---
+title: Getting started
+description: Define a code-first CMS schema, bind a request-scoped instance to trusted context, and publish a first entry.
+---
+
+## Availability and setup
+
+`@puzzle-ui/cms@0.18.0` is published to npm, but this guide describes a newer
+code-first rewrite that is not yet released. Do not assume the published
+tarball contains the APIs below. In this repository, use the workspace
+dependency `"@puzzle-ui/cms": "workspace:*"` to run these examples.
+
+CMS is database-neutral. Choose a supported `@puzzle-ui/storage` adapter or
+implement the public `StorageAdapter` contract; the CMS package does not create
+a database connection for you. See [Custom Storage adapters](/docs/cms/custom-storage)
+before selecting adapter capabilities.
+
+## Define a schema
+
+Collection keys are stable API keys. The `posts` key below becomes
+`cms.posts`; it is not an entry type created through a runtime registration
+route.
+
+```ts
+import { collection, defineCMS, fields } from "@puzzle-ui/cms";
+
+export const cmsConfig = defineCMS({
+  collections: {
+    posts: collection({
+      name: "Post",
+      description: "Published blog posts.",
+      version: 1,
+      drafts: true,
+      timestamps: true,
+      fields: {
+        title: fields.text({ label: "Title", required: true }),
+        slug: fields.slug({ label: "Slug", required: true }),
+        body: fields.textarea({ label: "Body", required: true }),
+      },
+    }),
+  },
+});
+```
+
+See [Collections and fields](/docs/cms/schema) for the full field catalog,
+collection options, relationships, and schema evolution.
+
+## Bind trusted request context
+
+Create a CMS instance on the server after resolving the tenant and actor from
+your authentication/session layer. `storage` below is the application's
+configured `StorageAdapter`; CMS methods bind to the context and do not accept
+tenant or actor IDs from callers.
+
+```ts
+import { createCms } from "@puzzle-ui/cms";
+import type { CmsAccessPolicy, CmsRequestContext } from "@puzzle-ui/cms";
+
+const requestContext: CmsRequestContext = {
+  tenantId: "publisher-1",
+  actor: { id: "editor-7" },
+};
+
+const accessPolicy: CmsAccessPolicy = ({ actor }) => actor !== null;
+
+const cms = createCms({
+  config: cmsConfig,
+  storage,
+  context: requestContext,
+  accessPolicy,
+});
+```
+
+The policy above is intentionally minimal. Production code must check tenant
+membership and grant the requested action; see [Access policies](/docs/cms/access)
+and [Multi-tenant setup](/docs/cms/multi-tenancy).
+
+## Create and publish
+
+The slug field in this example is required and has no generator, so provide it
+when creating an entry. Because drafts are enabled, the entry is not public
+until published.
+
+```ts
+const post = await cms.posts.create({
+  title: "A first post",
+  slug: "first-post",
+  body: "A short introduction.",
+});
+
+const published = await cms.posts.publish(post.id, {
+  expectedRevision: post.revision,
+});
+
+const publicPost = await cms.posts.findBySlug("first-post", {
+  visibility: "public",
+});
+```
+
+Use the returned revision for subsequent conditional writes. Public reads
+return only the published snapshot. Continue with [Entries and queries](/docs/cms/entries),
+[Drafts and revisions](/docs/cms/lifecycle), and the [API reference](/docs/cms/reference).
+
+For browser clients, HTTP handlers, and Next.js/TanStack Start adapters, use
+[`@puzzle-ui/fullstack`](https://puzzle-ui.com/docs/fullstack/cms). Keep CMS
+services, storage adapters, access callbacks, and secrets on the server.

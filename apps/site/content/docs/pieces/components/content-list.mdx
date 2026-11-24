@@ -19,7 +19,13 @@ The remote controls emit the complete `ContentListQuery` without filtering or so
 
 This preview simulates a server with in-memory data. Production code must perform filtering and pagination in the authorized server API and handle stale responses, loading, and errors in the host.
 
-<Preview fit="device" code={`<ContentList items={page.items} locales={locales} loading={loading} error={error} remote={{ query, onQueryChange, hasPreviousPage, hasNextPage, onPreviousPage, onNextPage, totalCount }} />`}>
+The Fullstack CMS client returns flat `CmsApiDocument` records. Project each
+record's schema fields and admin metadata into the `CmsEntryListItem`
+presentation shape before passing the page to this component; do not pass
+`page.items` directly. Revision/status metadata is present when drafts are
+enabled, and `createdAt`/`updatedAt` are present when timestamps are enabled.
+
+<Preview fit="device" code={`<ContentList items={contentListItems} locales={locales} loading={loading} error={error} remote={{ query, onQueryChange, hasPreviousPage, hasNextPage, onPreviousPage, onNextPage, totalCount }} />`}>
   <ContentListRemoteExample />
 </Preview>
 
@@ -60,13 +66,18 @@ returns or resolves to `{ succeededIds, failures }`; each failure has an
 a failure, and a failure takes precedence if an ID appears in both.
 
 ```tsx
+import { createCmsClient } from "@puzzle-ui/fullstack/cms/client";
 import { ContentList } from "@puzzle-ui/pieces";
 
+const cms = createCmsClient({ basePath: "/api/cms" });
+const articles = cms.collection("articles");
+
 <ContentList
-  items={page.items}
-  locales={contentType.locales}
-  onEdit={(entry) => openEditor(entry.id)}
-  onArchive={(entry) => archiveOnServer(entry.id, entry.revision)}
+  items={contentListItems}
+  locales={contentType.localization.locales}
+  onArchive={(entry) => {
+    void articles.archive(entry.id, { expectedRevision: entry.revision });
+  }}
 />;
 ```
 

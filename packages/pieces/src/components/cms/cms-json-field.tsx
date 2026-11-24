@@ -85,7 +85,7 @@ const CmsJsonField = ({
         onChange(parsed);
       }}
       disabled={disabled}
-      required={field.required}
+      required={field.required === true && field.defaultValue === undefined}
       error={draftError ?? error}
       validate={(parsed) => isJsonValue(parsed)
         ? validateValue?.(parsed) ?? null

@@ -28,7 +28,7 @@
         "@puzzle-ui/storage"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/cms",
-      "contentHash": "e5cb7c26b709ae307a0d4ca1c9fc2d602e356c1ed8657a162e6d6c0edf09b578"
+      "contentHash": "3f78a6fa632529a7bfb07ab8dba8ac0ff49a521ea94648f37dee381b1c9560d1"
     },
     {
       "name": "@puzzle-ui/commerce",
@@ -84,7 +84,7 @@
         "@puzzle-ui/ui"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/fullstack",
-      "contentHash": "e97931ff4c64124ed1dac5f5d73bb9504a0530fec8c1da82a72dfdd8b2337df2"
+      "contentHash": "d82f3247a5694081a8064a0e5a563c0bf753d50957cf8b31a4e996e60f8dfc00"
     },
     {
       "name": "@puzzle-ui/hooks",
@@ -182,7 +182,7 @@
         "@puzzle-ui/ui"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/pieces",
-      "contentHash": "3fbc055b1f63379f75ac99379692deda8c219e19aa413b647b3a8f4316307271"
+      "contentHash": "97a902c18672b7d571c98e1cfe9e4297d23c2982163b871229731e3ee10ee8f8"
     },
     {
       "name": "@puzzle-ui/seo",
@@ -220,7 +220,7 @@
       ],
       "instructionDependencies": [],
       "documentationUrl": "https://puzzle-ui.com/docs/storage",
-      "contentHash": "78660f56c93df2f3c111e51b6c723e8a717beda276feeef7451a56ea641f6046"
+      "contentHash": "fc3cfba6657c60056437390e757dbbdc39d58910f7226eddfc0f7a3d35939704"
     },
     {
       "name": "@puzzle-ui/storage-d1",
@@ -276,7 +276,7 @@
         "@puzzle-ui/theme"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/ui",
-      "contentHash": "6293d2b08fb2dd869e2bd91b7d2678a33acb3b6d6f1ebb124ea92f2b88481e2a"
+      "contentHash": "fa86ddb4b01e873f18b8871b39b7a621b58e19778da9a0ed1e875946d00c1404"
     }
   ]
 }

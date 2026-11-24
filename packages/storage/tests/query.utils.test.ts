@@ -12,6 +12,11 @@ type TestRecord = {
   name: string;
   active: boolean;
   createdAt: Date;
+  profile: {
+    displayName: string;
+    score: number;
+  };
+  tags: readonly string[];
 };
 
 const invalid = (run: () => void, message: string) => {
@@ -61,6 +66,15 @@ describe("validateWhere", () => {
     );
   });
 
+  it("accepts validated dotted paths and contains comparisons", () => {
+    assert.doesNotThrow(() =>
+      validateWhere<TestRecord>({
+        "profile.displayName": { operator: "contains", value: "Ada" },
+        tags: { operator: "contains", value: "admin" },
+      }),
+    );
+  });
+
   it("rejects non-array boolean clauses", () => {
     invalid(
       () => validateWhere<TestRecord>({ and: {} } as never),
@@ -76,7 +90,7 @@ describe("validateWhere", () => {
     invalid(
       () =>
         validateWhere<TestRecord>({
-          name: { operator: "contains", value: "Ada" },
+          name: { operator: "matches", value: "Ada" },
         } as never),
       'Invalid comparison for field "name".',
     );
@@ -101,6 +115,25 @@ describe("validateWhere", () => {
         } as never),
       'Invalid comparison for field "active".',
     );
+  });
+
+  it("rejects malformed or unsupported field paths", () => {
+    for (const field of [
+      "profile..displayName",
+      ".name",
+      "name.",
+      "profile.$where",
+      "__proto__.name",
+      "id.name",
+    ]) {
+      assert.throws(
+        () =>
+          validateWhere<TestRecord>({
+            [field]: { operator: "eq", value: "Ada" },
+          } as never),
+        StorageValidationError,
+      );
+    }
   });
 });
 
@@ -134,6 +167,28 @@ describe("validateQuery", () => {
       invalid(
         () => validateQuery<TestRecord>({ offset }),
         "Query offset must be a non-negative integer.",
+      );
+    }
+  });
+
+  it("validates dotted sort fields and sort directions", () => {
+    assert.doesNotThrow(() =>
+      validateQuery<TestRecord>({
+        orderBy: [{ field: "profile.score", direction: "desc" }],
+      }),
+    );
+
+    for (const orderBy of [
+      [{ field: "profile..score", direction: "asc" }],
+      [{ field: "profile.score", direction: "sideways" }],
+      [
+        { field: "profile.score", direction: "asc" },
+        { field: "profile.score", direction: "desc" },
+      ],
+    ]) {
+      assert.throws(
+        () => validateQuery<TestRecord>({ orderBy } as never),
+        StorageValidationError,
       );
     }
   });

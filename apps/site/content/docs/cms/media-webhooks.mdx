@@ -1,0 +1,105 @@
+---
+title: Media and webhooks
+description: Validate CMS asset references and run host-managed webhook delivery without exposing secrets or object-storage details.
+---
+
+## Media references
+
+CMS media fields contain asset IDs as strings. They never store binary bytes,
+object keys, or signed URLs. Supply a tenant-aware
+`CmsMediaReferenceValidator` to `createCms`; media values are rejected if the
+host cannot authorize the reference. The CMS records draft and published media
+usage so the host can protect assets from permanent deletion.
+
+Store bytes through the object-storage APIs in `@puzzle-ui/media`. A
+Fullstack Media deletion guard must consult CMS usage before permanently
+deleting an asset; Media's own usage collection cannot see CMS references.
+Browser Pieces receive only authorized media projections and temporary
+preview URLs, not storage keys or server metadata.
+
+## Webhook service
+
+The public `CmsWebhookService` is a server-side sidecar, separate from the
+request-scoped `createCms` collection instance. It requires the same Storage
+adapter, an explicit access policy, a host-provided transport, and a
+server-side secret resolver. There is deliberately no default network
+transport.
+
+```ts
+import { CmsWebhookService } from "@puzzle-ui/cms";
+
+const webhooks = new CmsWebhookService({
+  storage,
+  accessPolicy,
+  transport: hostWebhookTransport,
+  resolveSecret: hostSecretResolver,
+});
+```
+
+`storage`, `accessPolicy`, `hostWebhookTransport`, and `hostSecretResolver`
+are host-owned server dependencies. Subscription operations include
+`createSubscription`, `updateSubscription`, `listSubscriptions`,
+`getSubscription`, and `assertCanManage`. Delivery workers use `fanout`,
+`listDeliveries`, `listAttempts`, `retryDelivery`, and `runNext`; every
+operation is tenant/actor scoped and authorized.
+
+The exported `CMS_WEBHOOK_EVENTS` list contains `content-type:create`,
+`content-type:update`, `entry:create`, `entry:save-draft`, `entry:publish`,
+`entry:unpublish`, `entry:schedule`, `entry:unschedule`, `entry:archive`,
+`entry:delete`, `entry:restore`, and `entry:scheduled-publish`. A subscription
+selects one or more of these event names.
+
+The webhook service requires atomic batches, conditional writes, and unique
+constraints. Subscription records store secret-manager references, never
+secret values.
+
+`createCms({ emitChangeEvents: true })` writes metadata-only outbox records
+atomically with successful content mutations and exposes
+`cms.events.list({ first?, after? })` plus
+`cms.events.acknowledge(eventId, { expectedRevision })`. These methods use the
+instance's bound tenant/actor and service access policy. For a custom consumer,
+acknowledge an event only after durable processing. For webhooks, drive
+`fanout` with the listed event ID and revision; fanout records matching
+deliveries and removes the outbox event itself, so do not acknowledge it
+separately. `fanout` receives a trusted
+`{ tenantId, actor, eventId, expectedRevision }`. Workers must make processing
+idempotent and run delivery separately from HTTP handlers. Keep the event API
+and raw event records on the server. Fullstack can expose sanitized change-event
+DTOs to authorized clients; never send raw CMS event records to the browser.
+
+## Transport and secret security
+
+The transport and secret resolver are mandatory. The host must enforce
+connection-time DNS/IP validation, reject unsafe redirects, use timeouts and
+response-size limits, and return a sanitized transport result. Subscription
+records store secret-manager references only; never send references or secret
+values to the browser. The host selects references for creation/rotation and
+manages retention and receiver-secret rotation.
+
+Delivery is at least once. Workers use optimistic leases; expired attempts may
+be sent again. Connection/secret-resolution errors, timeouts, invalid transport
+responses, 408, 429, and 5xx are retried with bounded exponential delay; other
+non-2xx responses fail. Disabled subscriptions cancel queued jobs when workers
+observe the change, but a job already claimed may still be sent. Secret
+rotation uses an expected revision; pending jobs use the current subscription
+endpoint and secret at send time. Keep the prior receiver secret through the
+retry horizon.
+
+`signCmsWebhook` and `verifyCmsWebhook` sign the exact raw body with
+HMAC-SHA256. The header is
+`t=<Unix milliseconds>,v1=<lowercase HMAC-SHA256 hex>`; signed bytes are UTF-8
+`v1.<timestamp>.<deliveryId>.` followed by the raw body. Use a cryptographically
+random secret of at least 32 bytes and a stable ASCII delivery ID. Verification
+accepts one to three active secrets and requires a durable atomic replay store
+scoped by endpoint and delivery ID. The default timestamp window is five
+minutes (maximum 24 hours), and bodies are limited to 1 MiB. Couple replay
+reservation to a durable processing handoff so retries remain safe after worker
+crashes. These signature helpers do not send requests or protect outbound
+connections from SSRF; the host transport must validate DNS/IPs at connection
+time, reject unsafe redirects, and enforce timeouts and response-size limits.
+
+For browser subscription administration, see the
+[Fullstack CMS API](/docs/fullstack/cms). Optional webhook routes expose
+sanitized subscription/delivery DTOs, and event routes are available when
+change-event emission is enabled. Fullstack does not execute fanout or delivery
+workers.

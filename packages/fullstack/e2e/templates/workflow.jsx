@@ -7,13 +7,12 @@ import { createMediaClient, createMediaUploadQueue } from "@puzzle-ui/fullstack/
 import { createCmsClient } from "@puzzle-ui/fullstack/cms/client";
 
 const contentType = {
-  slug: "story",
+  kind: "collection",
   name: "Story",
-  version: 1,
-  fields: [
-    { key: "title", type: "text", label: "Title", required: true },
-    { key: "media", type: "media", label: "Media" },
-  ],
+  fields: {
+    title: { type: "text", label: "Title", required: true },
+    media: { type: "media", label: "Media" },
+  },
 };
 
 const responseOrThrow = async (response) => {
@@ -50,6 +49,7 @@ export function Workflow() {
   }), []);
   const queue = useMemo(() => createMediaUploadQueue(media, { maxRetries: 0 }), [media]);
   const cms = useMemo(() => createCmsClient(), []);
+  const story = useMemo(() => cms.collection("story"), [cms]);
   useEffect(() => setHydrated(true), []);
   const project = (asset) => ({
     ...asset,
@@ -134,17 +134,23 @@ export function Workflow() {
   };
   const saveDraft = async () => {
     const saved = entry
-      ? await cms.saveDraft(entry.id, { expectedRevision: entry.revision, slug: entry.slug, fields })
-      : await cms.createEntry({
-        contentType: "story", locale: "en-US", slug: `story-${fields.media}`, fields,
+      ? await story.update(entry.id, fields, {
+        expectedRevision: entry.revision,
+      })
+      : await story.create(fields, {
+        locale: "en-US",
+        slug: `story-${fields.media}`,
       });
     setEntry(saved);
+    setPublished(null);
   };
   const publish = async () => {
     if (!entry) throw new Error("Save a draft first.");
-    const saved = await cms.publish(entry.id, { expectedRevision: entry.revision });
+    const saved = await story.publish(entry.id, {
+      expectedRevision: entry.revision,
+    });
     setEntry(saved);
-    setPublished(await cms.getPublishedEntry(entry.id));
+    setPublished(await story.public.findById(entry.id));
   };
   const previewDraft = async () => {
     if (!entry) {
@@ -152,8 +158,23 @@ export function Workflow() {
       return;
     }
     try {
-      setDraftPreview(await cms.getEntry(entry.id));
+      setDraftPreview(await story.findById(entry.id));
     } catch (caught) {
+      setError(caught.message);
+    }
+  };
+  const checkPublicEntry = async () => {
+    if (!entry) {
+      setError("Save a draft first.");
+      return;
+    }
+    try {
+      setPublished(await story.public.findById(entry.id));
+    } catch (caught) {
+      if (caught.status === 404) {
+        setPublished(null);
+        return;
+      }
       setError(caught.message);
     }
   };
@@ -189,6 +210,7 @@ export function Workflow() {
         ) : null}
       />
       <button type="button" onClick={previewDraft}>Preview draft</button>
+      <button type="button" onClick={checkPublicEntry}>Check public visibility</button>
       <output data-testid="entry">{JSON.stringify(entry)}</output>
       <output data-testid="draft-preview">{JSON.stringify(draftPreview)}</output>
       <output data-testid="public-entry">{JSON.stringify(published)}</output>

@@ -1,0 +1,62 @@
+---
+title: Custom Storage adapters
+description: Integrate a custom database through the StorageAdapter contract and report only guarantees CMS can rely on.
+---
+
+CMS persists metadata through the database-neutral `StorageAdapter` from
+`@puzzle-ui/storage`. It does not import a database driver or require a
+specific adapter. Choose an existing adapter such as
+[`@puzzle-ui/storage-d1`](/docs/storage#cloudflare-d1-adapter) or
+[`@puzzle-ui/storage-mongodb`](/docs/storage#mongodb-adapter), or implement the
+public adapter contract.
+
+## Required guarantees
+
+The Storage adapter reports capabilities through `getCapabilities()` and the
+`capabilities` property. CMS checks for the guarantees needed by each
+operation and fails with `CmsCapabilityError` when one is unavailable.
+
+| Capability | CMS use |
+|---|---|
+| `atomicBatch` | Keep related content, revision, audit, outbox, and media-usage writes all-or-nothing. |
+| `conditionalWrites` | Enforce expected revisions for updates, lifecycle transitions, and acknowledgements. |
+| `uniqueConstraints` | Preserve schema, slug, and other declared uniqueness invariants. |
+| `cursorPagination` | Page collection and change-event reads with stable cursors. |
+| `transactions` | Adapter-specific transaction support; CMS relies on the advertised `atomicBatch` guarantee. |
+
+These are not interchangeable. An adapter must report `atomicBatch` only when
+every operation in a batch commits or none do. A transaction flag alone does
+not establish that contract.
+
+## Implement the public interface
+
+`StorageAdapter` includes collection registration; `findById`, `findOne`,
+`findMany`, and `findPage`; insert/upsert/update/delete operations; counts and
+existence checks; capability reporting; and `atomicBatch`. Use the declarations
+in the public `@puzzle-ui/storage` entry point rather than copying the
+interface from CMS internals.
+
+Your application's database adapter must implement the `StorageAdapter`
+interface; CMS does not export a database-adapter factory. The Storage package
+documents the exact adapter methods, query AST, conditional-write semantics,
+and conformance fixture in its
+[adapter guide](/docs/storage#writing-a-custom-adapter).
+
+Run the public conformance suite from `@puzzle-ui/storage/testing` against an
+isolated test database before using a custom adapter in production. It checks
+CRUD/query behavior, revisions, uniqueness, cursor pagination, atomic-batch
+rollback, capability reporting, and storage migrations. CMS schema migrations
+are separate: those transform CMS field data and are configured with
+`createCms({ migrations })`; see [Schema migrations](/docs/cms/migrations).
+
+## Select adapter features deliberately
+
+The D1 and MongoDB adapters expose different deployment requirements. For
+example, MongoDB transactions and atomic batches require explicit adapter
+configuration and a deployment that supports transactions. Do not silently
+degrade conditional updates or CMS mutations when a database cannot meet the
+required capabilities. See the [Storage guide](/docs/storage) for adapter
+options, migrations, and deployment-specific limitations.
+
+CMS stores media asset references and usage records, not binary bytes. Use
+`@puzzle-ui/media` object storage for files.

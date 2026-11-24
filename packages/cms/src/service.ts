@@ -7,8 +7,10 @@ import {
   type StorageComparison,
   type StorageIndex,
   type StorageInsert,
+  type StorageOrder,
   type StorageRecord,
   type StorageUpdate,
+  type StorageWhere,
 } from "@puzzle-ui/storage";
 import {
   CmsAuditError,
@@ -71,6 +73,16 @@ import type {
   CmsVisibility,
   ContentTypeDefinition,
 } from "./types";
+import type { CmsEntryWhereNode } from "./collections/query";
+import type { RuntimeCmsFieldDefinition } from "./fields/types";
+import type { FieldMap } from "./fields/types";
+import type {
+  CollectionAccessAction,
+  CmsCollectionAccessPolicy,
+  CmsCollectionHookEvent,
+  CmsCollectionHookOperation,
+  CmsCollectionRuntimeOptions,
+} from "./collections/collection";
 
 const COLLECTIONS = {
   contentTypes: "cms_content_types",
@@ -79,6 +91,7 @@ const COLLECTIONS = {
   audit: "cms_audit_events",
   changeEvents: "cms_change_events",
   mediaUsages: "cms_media_usages",
+  relationshipLocks: "cms_relationship_locks",
 } as const;
 
 const unpublishedSlugKey = (entryId: string): string =>
@@ -90,11 +103,24 @@ type CmsStoredRecord =
   | CmsContentRevision
   | CmsAuditEvent
   | CmsChangeEvent
-  | CmsMediaUsage;
+  | CmsMediaUsage
+  | CmsRelationshipLock;
+
+type CmsRelationshipLock = StorageRecord & {
+  readonly tenantId: string;
+  readonly targetEntryId: string;
+  readonly generation: number;
+};
+
+type ResolvedCmsCollectionRuntimeOptions = CmsCollectionRuntimeOptions & {
+  readonly drafts: boolean;
+  readonly timestamps: boolean;
+};
 
 export type CmsServiceOptions = {
   readonly storage: StorageAdapter;
   readonly accessPolicy: CmsAccessPolicy;
+  readonly collectionOptions?: Readonly<Record<string, CmsCollectionRuntimeOptions>>;
   readonly scheduler?: CmsScheduler;
   readonly mediaReferenceValidator?: CmsMediaReferenceValidator;
   readonly customValidators?: Readonly<Record<string, CmsCustomFieldValidator>>;
@@ -128,6 +154,12 @@ export type CmsListMediaUsagesInput = CmsContext & {
   readonly first?: number;
 };
 
+export type CmsPurgeEntryInput = CmsContext & {
+  readonly entryId: string;
+  readonly expectedRevision: number;
+  readonly changeSummary?: string;
+};
+
 export type CmsScheduledPublicationResult =
   | { readonly published: true; readonly entry: CmsEntryView }
   | { readonly published: false; readonly reason: "stale" | "not-due" };
@@ -145,13 +177,984 @@ const equality = <T>(value: T): StorageComparison<T> => ({
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+const isCmsValue = (value: unknown, seen = new Set<object>()): value is CmsValue => {
+  if (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "boolean"
+  ) {
+    return true;
+  }
+  if (typeof value === "number") return Number.isFinite(value);
+  if (typeof value !== "object" || seen.has(value)) return false;
+  seen.add(value);
+  const valid = Array.isArray(value)
+    ? value.every((item) => isCmsValue(item, seen))
+    : isRecord(value) &&
+      (Object.getPrototypeOf(value) === Object.prototype ||
+        Object.getPrototypeOf(value) === null) &&
+      Object.values(value).every((item) => isCmsValue(item, seen));
+  seen.delete(value);
+  return valid;
+};
+
+const fieldAccessPathsAt = (
+  definitions: readonly QueryFieldDefinition[],
+  fieldPath: string,
+): readonly { readonly definition: QueryFieldDefinition; readonly path: string }[] => {
+  const segments = fieldPath.replace(/\[\d+\]/g, "").split(".");
+  let candidates = definitions;
+  let current: QueryFieldDefinition | undefined;
+  let currentPath = "";
+  const found: Array<{
+    readonly definition: QueryFieldDefinition;
+    readonly path: string;
+  }> = [];
+  for (const segment of segments) {
+    if (segment === "fields" && current?.type === "blocks") {
+      candidates = current.blocks?.flatMap((block) => block.fields) ?? [];
+      currentPath = `${currentPath}.fields`;
+      current = undefined;
+      continue;
+    }
+    current = candidates.find((candidate) => candidate.key === segment);
+    if (!current) return [];
+    currentPath = currentPath ? `${currentPath}.${segment}` : segment;
+    found.push({ definition: current, path: currentPath });
+    const runtime = current;
+    if (runtime.type === "array" && runtime.of?.type === "object") {
+      candidates = runtime.of.fields ?? [];
+    } else {
+      candidates = runtime.fields ?? [];
+    }
+  }
+  return found;
+};
+
+const MAX_PURGE_CONTENT_TYPES = 500;
+const MAX_PURGE_RELATED_RECORDS = 500;
+const MAX_PURGE_REFERENCE_SCAN = 10_000;
+const PURGE_SCAN_PAGE_SIZE = 200;
+const MAX_RELATIONSHIP_GUARDS = 500;
+
+const hasRelationshipTarget = (
+  definitions: readonly QueryFieldDefinition[],
+  targetType: string,
+): boolean =>
+  definitions.some((field) => {
+    if (
+      field.type === "relationship" &&
+      field.relation?.targetTypes.includes(targetType)
+    ) {
+      return true;
+    }
+    if (hasRelationshipTarget(field.fields ?? [], targetType)) return true;
+    if (field.of && hasRelationshipTarget([field.of], targetType)) return true;
+    return (field.blocks ?? []).some((block) =>
+      hasRelationshipTarget(block.fields, targetType),
+    );
+  });
+
 const sameValue = (left: unknown, right: unknown): boolean =>
   JSON.stringify(left) === JSON.stringify(right);
+
+const immutableClone = <T>(value: T): T => {
+  const clone = structuredClone(value);
+  const seen = new Set<object>();
+  const freeze = (current: unknown): void => {
+    if (typeof current !== "object" || current === null || seen.has(current)) return;
+    seen.add(current);
+    Object.values(current).forEach(freeze);
+    Object.freeze(current);
+  };
+  freeze(clone);
+  return clone;
+};
 
 const addIndexes = <T extends StorageRecord>(
   name: string,
   indexes: readonly StorageIndex<T>[],
 ) => ({ name, indexes });
+
+type QueryFieldDefinition = RuntimeCmsFieldDefinition;
+
+const collectRelationshipIds = (
+  definitions: readonly QueryFieldDefinition[],
+  values: CmsFields,
+): ReadonlySet<string> => {
+  const ids = new Set<string>();
+  const visitField = (field: QueryFieldDefinition, value: CmsValue): void => {
+    if (field.type === "relationship") {
+      for (const id of Array.isArray(value) ? value : [value]) {
+        if (typeof id === "string") ids.add(id);
+      }
+      return;
+    }
+    if (field.type === "object" && isRecord(value)) {
+      visit(field.fields ?? [], value as CmsFields);
+      return;
+    }
+    if (field.type === "array" && Array.isArray(value) && field.of) {
+      for (const item of value) visitField(field.of, item);
+      return;
+    }
+    if (field.type === "repeater" && Array.isArray(value)) {
+      for (const item of value) {
+        if (isRecord(item)) visit(field.fields ?? [], item as CmsFields);
+      }
+      return;
+    }
+    if (field.type === "blocks" && Array.isArray(value)) {
+      for (const item of value) {
+        if (!isRecord(item) || !isRecord(item.fields)) continue;
+        const block = field.blocks?.find((candidate) => candidate.type === item.type);
+        if (block) visit(block.fields, item.fields as CmsFields);
+      }
+    }
+  };
+  const visit = (
+    fields: readonly QueryFieldDefinition[],
+    record: CmsFields,
+  ): void => {
+    for (const field of fields) {
+      if (Object.prototype.hasOwnProperty.call(record, field.key)) {
+        visitField(field, record[field.key]!);
+      }
+    }
+  };
+  visit(definitions, values);
+  return ids;
+};
+
+type CmsEntryQueryWithWhere = CmsEntryQuery & {
+  readonly where?: CmsEntryWhereNode | readonly CmsEntryWhereNode[];
+  readonly translationGroupId?: string;
+};
+
+export type CmsEntryTranslationsQuery = CmsEntryQuery & {
+  readonly translationGroupId: string;
+  readonly where?: CmsEntryWhereNode | readonly CmsEntryWhereNode[];
+};
+
+type QueryPath = {
+  readonly fieldType?: string;
+  readonly arrayItemType?: string;
+  readonly metadata?: string;
+  readonly publicStatus?: boolean;
+};
+
+type NormalizedQuerySort = {
+  readonly field: string;
+  readonly sourceField: string;
+  readonly direction: "asc" | "desc";
+};
+
+type StorageCondition = StorageWhere<CmsContentEntry>;
+
+const queryableMetadata = new Set([
+  "id",
+  "slug",
+  "locale",
+  "status",
+  "createdAt",
+  "updatedAt",
+  "publishedAt",
+]);
+
+const assertStoragePathDepth = (storagePath: string, path: string): string => {
+  if (storagePath.split(".").length > 6) {
+    throw new CmsValidationError([
+      { path, code: "range", message: "Storage query paths cannot exceed six segments." },
+    ]);
+  }
+  return storagePath;
+};
+
+const searchableFieldTypes = new Set([
+  "text",
+  "textarea",
+  "email",
+  "url",
+  "slug",
+  "select",
+  "multiSelect",
+  "array",
+  "media",
+  "relationship",
+  "date",
+  "datetime",
+  "locale",
+]);
+
+const sortableFieldTypes = new Set([
+  "text",
+  "textarea",
+  "email",
+  "url",
+  "slug",
+  "select",
+  "media",
+  "relationship",
+  "number",
+  "boolean",
+  "date",
+  "datetime",
+  "locale",
+]);
+
+const scalarArrayItemTypes = new Set([
+  "text",
+  "textarea",
+  "number",
+  "boolean",
+  "date",
+  "datetime",
+  "email",
+  "url",
+  "slug",
+  "select",
+  "media",
+  "relationship",
+  "locale",
+]);
+
+const createQueryPathMap = (
+  fields: readonly QueryFieldDefinition[],
+): ReadonlyMap<string, QueryPath> => {
+  const paths = new Map<string, QueryPath>();
+  const visit = (
+    definitions: readonly QueryFieldDefinition[],
+    prefix = "",
+  ): void => {
+    for (const field of definitions) {
+      const path = prefix ? `${prefix}.${field.key}` : field.key;
+      paths.set(path, {
+        fieldType: field.type,
+        ...(field.type === "array" && field.of
+          ? { arrayItemType: field.of.type }
+          : field.type === "multiSelect"
+            ? { arrayItemType: "select" }
+            : {}),
+      });
+      if (field.type === "object" && field.fields) {
+        visit(field.fields, path);
+      }
+    }
+  };
+  visit(fields);
+  for (const name of queryableMetadata) paths.set(name, { metadata: name });
+  return paths;
+};
+
+const serializeRuntimeField = (
+  definition: QueryFieldDefinition,
+): CmsFieldDefinition => {
+  const record = { ...definition } as Record<string, unknown>;
+  const runtimeAccess = definition.access;
+  const runtimeCallbacks = [
+    ...(typeof definition.validate === "function" ? ["validate"] : []),
+    ...(typeof definition.compute === "function" ? ["compute"] : []),
+    ...(typeof definition.is === "function" ? ["is"] : []),
+    ...(typeof runtimeAccess?.read === "function" ? ["access.read"] : []),
+    ...(typeof runtimeAccess?.write === "function" ? ["access.write"] : []),
+  ];
+  delete record.access;
+  delete record.validate;
+  delete record.compute;
+  delete record.is;
+  if (runtimeCallbacks.length) {
+    record.__cmsRuntimeCallbacks = runtimeCallbacks;
+  } else {
+    delete record.__cmsRuntimeCallbacks;
+  }
+  if (definition.fields) {
+    record.fields = definition.fields.map(serializeRuntimeField);
+  }
+  if (definition.of) {
+    record.of = serializeRuntimeField(definition.of);
+  }
+  if (definition.blocks) {
+    record.blocks = definition.blocks.map((block) => ({
+      ...block,
+      fields: block.fields.map(serializeRuntimeField),
+    }));
+  }
+  if (runtimeAccess) {
+    const serializableAccess: { read?: boolean; write?: boolean } = {};
+    if (typeof runtimeAccess.read === "boolean") {
+      serializableAccess.read = runtimeAccess.read;
+    }
+    if (typeof runtimeAccess.write === "boolean") {
+      serializableAccess.write = runtimeAccess.write;
+    }
+    if (Object.keys(serializableAccess).length) record.access = serializableAccess;
+  }
+  return record as unknown as CmsFieldDefinition;
+};
+
+const serializeRuntimeFields = (
+  definitions: readonly CmsFieldDefinition[],
+): readonly CmsFieldDefinition[] =>
+  definitions.map((definition) =>
+    serializeRuntimeField(definition as QueryFieldDefinition),
+  );
+
+const missingRuntimeCallbacks = (
+  definitions: readonly QueryFieldDefinition[],
+  prefix = "",
+): readonly string[] => {
+  const missing: string[] = [];
+  for (const field of definitions) {
+    const path = prefix ? `${prefix}.${field.key}` : field.key;
+    const markers = (field as QueryFieldDefinition & {
+      readonly __cmsRuntimeCallbacks?: readonly string[];
+    }).__cmsRuntimeCallbacks ?? [];
+    for (const callback of markers) {
+      if (
+        (callback === "validate" && typeof field.validate !== "function") ||
+        (callback === "compute" && typeof field.compute !== "function") ||
+        (callback === "is" && typeof field.is !== "function") ||
+        (callback === "access.read" && typeof field.access?.read !== "function") ||
+        (callback === "access.write" && typeof field.access?.write !== "function")
+      ) {
+        missing.push(`${path}:${callback}`);
+      }
+    }
+    missing.push(...missingRuntimeCallbacks(field.fields ?? [], path));
+    if (field.of) {
+      missing.push(...missingRuntimeCallbacks([field.of], `${path}[]`));
+    }
+    for (const block of field.blocks ?? []) {
+      missing.push(...missingRuntimeCallbacks(block.fields, `${path}.${block.type}`));
+    }
+  }
+  return missing;
+};
+
+const resolveQueryPath = (
+  field: string,
+  paths: ReadonlyMap<string, QueryPath>,
+  visibility: CmsVisibility,
+  path: string,
+): {
+  readonly storagePath: string;
+  readonly schemaPath?: string;
+  readonly fieldType?: string;
+  readonly arrayItemType?: string;
+  readonly publicStatus?: boolean;
+} => {
+  const normalized = field.startsWith("fields.")
+    ? field.slice("fields.".length)
+    : field;
+  const definition = paths.get(normalized);
+  if (!definition) {
+    throw new CmsValidationError([
+      {
+        path,
+        code: "unknown-field",
+        message: `Query field "${field}" is not present in the content type schema.`,
+      },
+    ]);
+  }
+
+  if (definition.fieldType) {
+    if (definition.fieldType === "computed") {
+      throw new CmsValidationError([
+        {
+          path,
+          code: "unsupported-field",
+          message: "Computed fields cannot be filtered, searched, or sorted in Storage.",
+        },
+      ]);
+    }
+    return {
+      storagePath: assertStoragePathDepth(
+        `${visibility === "public" ? "publishedSnapshot.fields" : "fields"}.${normalized}`,
+        path,
+      ),
+      schemaPath: normalized,
+      fieldType: definition.fieldType,
+      arrayItemType: definition.arrayItemType,
+    };
+  }
+
+  const metadata = definition.metadata!;
+  if (metadata === "slug") {
+    return {
+      storagePath: assertStoragePathDepth(
+        visibility === "public" ? "publishedSnapshot.slug" : "slug",
+        path,
+      ),
+      schemaPath: metadata,
+    };
+  }
+  if (metadata === "locale") {
+    return {
+      storagePath: assertStoragePathDepth(
+        visibility === "public" ? "publishedSnapshot.locale" : "locale",
+        path,
+      ),
+      schemaPath: metadata,
+    };
+  }
+  if (metadata === "updatedAt") {
+    return {
+      storagePath: assertStoragePathDepth(
+        visibility === "public" ? "publishedSnapshot.publishedAt" : "updatedAt",
+        path,
+      ),
+      schemaPath: metadata,
+    };
+  }
+  if (metadata === "publishedAt") {
+    return {
+      storagePath: assertStoragePathDepth("publishedSnapshot.publishedAt", path),
+      schemaPath: metadata,
+    };
+  }
+  if (metadata === "status" && visibility === "public") {
+    return {
+      storagePath: assertStoragePathDepth("status", path),
+      schemaPath: metadata,
+      publicStatus: true,
+    };
+  }
+  return {
+    storagePath: assertStoragePathDepth(metadata, path),
+    schemaPath: metadata,
+  };
+};
+
+const mergeConditions = (
+  conditions: readonly StorageCondition[],
+): StorageCondition => {
+  if (conditions.length === 0) return {};
+  if (conditions.length === 1) return conditions[0]!;
+  return { and: conditions };
+};
+
+const conditionAt = (
+  field: string,
+  comparison: StorageComparison,
+): StorageCondition =>
+  ({ [field]: comparison }) as unknown as StorageCondition;
+
+const isStorageScalar = (
+  value: unknown,
+): value is string | number | boolean | null | Date =>
+  value === null ||
+  typeof value === "string" ||
+  (typeof value === "number" && Number.isFinite(value)) ||
+  typeof value === "boolean" ||
+  value instanceof Date;
+
+const collectionAccessAlias = (request: CmsAccessRequest): string | undefined => {
+  const isTranslation =
+    isRecord(request.record) &&
+    typeof request.record.translationGroupId === "string";
+  switch (request.action) {
+    case "entry:create":
+      return isTranslation ? "translations" : "create";
+    case "entry:read":
+      return isTranslation ? "translations" : "read";
+    case "entry:update":
+      return "update";
+    case "entry:delete":
+      return "delete";
+    case "entry:publish":
+      return "publish";
+    case "entry:unpublish":
+      return "unpublish";
+    case "entry:schedule":
+      return "schedule";
+    case "entry:unschedule":
+      return "unschedule";
+    case "entry:archive":
+      return "archive";
+    case "entry:restore":
+      return "restore";
+    case "revision:read":
+      return "revisions";
+    case "field:read":
+      return "read";
+    case "field:write":
+      if (
+        isRecord(request.record) &&
+        (
+          request.record.collectionOperation === "create" ||
+          request.record.collectionOperation === "update" ||
+          request.record.collectionOperation === "restore"
+        )
+      ) {
+        return request.record.collectionOperation;
+      }
+      return "update";
+    default:
+      return undefined;
+  }
+};
+
+const toStorageFilterCondition = (
+  field: string,
+  operator: string,
+  value: unknown,
+  path: string,
+): StorageCondition => {
+  if (operator === "exists") {
+    if (typeof value !== "boolean") {
+      throw new CmsValidationError([
+        { path, code: "type", message: "The exists filter requires a boolean value." },
+      ]);
+    }
+    return value
+      ? mergeConditions([
+          conditionAt(field, { operator: "exists", value: true }),
+          conditionAt(field, { operator: "ne", value: null }),
+        ])
+      : {
+          or: [
+            conditionAt(field, { operator: "exists", value: false }),
+            conditionAt(field, { operator: "eq", value: null }),
+          ],
+        };
+  }
+
+  if (operator === "in" || operator === "notIn") {
+    if (
+      !Array.isArray(value) ||
+      !value.every(isStorageScalar)
+    ) {
+      throw new CmsValidationError([
+        { path, code: "type", message: "This filter requires an array of scalar values." },
+      ]);
+    }
+    const comparison = {
+      operator,
+      value,
+    } as StorageComparison;
+    const condition = conditionAt(field, comparison);
+    if (operator === "notIn") {
+      return {
+        or: [condition, conditionAt(field, { operator: "exists", value: false })],
+      };
+    }
+    return mergeConditions([
+      conditionAt(field, { operator: "exists", value: true }),
+      condition,
+    ]);
+  }
+
+  if (!isStorageScalar(value)) {
+    throw new CmsValidationError([
+      { path, code: "type", message: "Query filters require scalar values." },
+    ]);
+  }
+
+  if (operator === "equals") operator = "eq";
+  if (operator === "notEquals") operator = "ne";
+  if (operator === "greaterThan") operator = "gt";
+  if (operator === "greaterThanOrEqual") operator = "gte";
+  if (operator === "lessThan") operator = "lt";
+  if (operator === "lessThanOrEqual") operator = "lte";
+  if (![
+    "eq",
+    "ne",
+    "contains",
+    "gt",
+    "gte",
+    "lt",
+    "lte",
+  ].includes(operator)) {
+    throw new CmsValidationError([
+      { path, code: "operator", message: `Unsupported filter operator "${operator}".` },
+    ]);
+  }
+  const condition = conditionAt(field, { operator, value } as StorageComparison);
+  if (operator === "eq" && value === null) {
+    return mergeConditions([
+      conditionAt(field, { operator: "exists", value: true }),
+      condition,
+    ]);
+  }
+  return operator === "ne"
+    ? { or: [condition, conditionAt(field, { operator: "exists", value: false })] }
+    : condition;
+};
+
+const validateContainsField = (
+  resolved: ReturnType<typeof resolveQueryPath>,
+  operator: string,
+  value: unknown,
+  path: string,
+): void => {
+  const isArrayField =
+    resolved.fieldType === "array" ||
+    resolved.fieldType === "multiSelect";
+  if (
+    isArrayField &&
+    operator !== "contains" &&
+    operator !== "exists"
+  ) {
+    throw new CmsValidationError([
+      { path, code: "operator", message: "Array fields support only contains and exists filters." },
+    ]);
+  }
+  const containsAllowed =
+    (resolved.fieldType !== undefined &&
+      searchableFieldTypes.has(resolved.fieldType) &&
+      (!isArrayField ||
+        (resolved.arrayItemType !== undefined &&
+          scalarArrayItemTypes.has(resolved.arrayItemType)))) ||
+    (resolved.fieldType === undefined &&
+      ["id", "slug", "locale", "status"].includes(resolved.schemaPath ?? ""));
+  if (operator === "contains" && !containsAllowed) {
+    throw new CmsValidationError([
+      { path, code: "operator", message: "The contains operator is not supported for this field." },
+    ]);
+  }
+  if (
+    operator === "contains" &&
+    !isArrayField &&
+    typeof value !== "string"
+  ) {
+    throw new CmsValidationError([
+      { path, code: "type", message: "Contains on scalar fields requires a string value." },
+    ]);
+  }
+};
+
+const publicStatusCondition = (
+  operator: string,
+  value: unknown,
+  path: string,
+): StorageCondition => {
+  const actual = "published";
+  if (
+    (operator === "exists" && typeof value !== "boolean") ||
+    ((operator === "in" || operator === "notIn") &&
+      (!Array.isArray(value) || !value.every(isStorageScalar))) ||
+    (operator === "contains" && typeof value !== "string") ||
+    ([
+      "gt",
+      "gte",
+      "lt",
+      "lte",
+      "greaterThan",
+      "greaterThanOrEqual",
+      "lessThan",
+      "lessThanOrEqual",
+    ].includes(operator) && typeof value !== "string") ||
+    (!["exists", "in", "notIn"].includes(operator) &&
+      !isStorageScalar(value))
+  ) {
+    throw new CmsValidationError([
+      { path, code: "type", message: "The status filter value has an invalid type." },
+    ]);
+  }
+  let matches: boolean;
+  if (operator === "exists") {
+    matches = value === true;
+  } else if (operator === "equals" || operator === "eq") {
+    matches = actual === value;
+  } else if (operator === "notEquals" || operator === "ne") {
+    matches = actual !== value;
+  } else if (operator === "contains") {
+    matches = typeof value === "string" &&
+      actual.toLocaleLowerCase().includes(value.toLocaleLowerCase());
+  } else if (operator === "in") {
+    matches = Array.isArray(value) && value.includes(actual);
+  } else if (operator === "notIn") {
+    matches = Array.isArray(value) && !value.includes(actual);
+  } else if (
+    operator === "gt" ||
+    operator === "greaterThan"
+  ) {
+    matches = typeof value === "string" && actual > value;
+  } else if (
+    operator === "gte" ||
+    operator === "greaterThanOrEqual"
+  ) {
+    matches = typeof value === "string" && actual >= value;
+  } else if (
+    operator === "lt" ||
+    operator === "lessThan"
+  ) {
+    matches = typeof value === "string" && actual < value;
+  } else if (
+    operator === "lte" ||
+    operator === "lessThanOrEqual"
+  ) {
+    matches = typeof value === "string" && actual <= value;
+  } else {
+    throw new CmsValidationError([
+      { path, code: "operator", message: `Unsupported filter operator "${operator}".` },
+    ]);
+  }
+  return matches
+    ? {}
+    : {
+        and: [
+          conditionAt("id", { operator: "exists", value: true }),
+          conditionAt("id", { operator: "exists", value: false }),
+        ],
+      };
+};
+
+const normalizeWhereNode = (
+  node: CmsEntryWhereNode,
+  paths: ReadonlyMap<string, QueryPath>,
+  visibility: CmsVisibility,
+  path: string,
+): StorageCondition => {
+  if (typeof node !== "object" || node === null || Array.isArray(node)) {
+    throw new CmsValidationError([
+      { path, code: "type", message: "A where clause must be an object." },
+    ]);
+  }
+  if ("field" in node) {
+    if (
+      typeof node.field !== "string" ||
+      !node.field.trim() ||
+      typeof node.operator !== "string"
+    ) {
+      throw new CmsValidationError([
+        { path, code: "type", message: "A where condition requires a field and operator." },
+      ]);
+    }
+    const resolved = resolveQueryPath(node.field, paths, visibility, `${path}.field`);
+    if (resolved.publicStatus) {
+      return publicStatusCondition(node.operator, node.value, `${path}.value`);
+    }
+    validateContainsField(resolved, node.operator, node.value, `${path}.field`);
+    return toStorageFilterCondition(
+      resolved.storagePath,
+      node.operator,
+      node.value,
+      `${path}.value`,
+    );
+  }
+
+  if ("and" in node) {
+    const children = node.and;
+    if (!Array.isArray(children) || children.length === 0) {
+      throw new CmsValidationError([
+        { path: `${path}.and`, code: "required", message: "The and clause requires at least one condition." },
+      ]);
+    }
+    const conditions = children.map((child, index) =>
+      normalizeWhereNode(child, paths, visibility, `${path}.and[${index}]`),
+    );
+    return mergeConditions(conditions);
+  }
+  if ("or" in node) {
+    const children = node.or;
+    if (!Array.isArray(children) || children.length === 0) {
+      throw new CmsValidationError([
+        { path: `${path}.or`, code: "required", message: "The or clause requires at least one condition." },
+      ]);
+    }
+    return {
+      or: children.map((child, index) =>
+        normalizeWhereNode(child, paths, visibility, `${path}.or[${index}]`),
+      ),
+    };
+  }
+
+  throw new CmsValidationError([
+    { path, code: "type", message: "A where clause must contain a field, and, or or condition." },
+  ]);
+};
+
+const normalizeFlatFilter = (
+  filter: CmsEntryFilter,
+  index: number,
+  paths: ReadonlyMap<string, QueryPath>,
+  visibility: CmsVisibility,
+): StorageCondition => {
+  if (!filter.field.trim()) {
+    throw new CmsValidationError([
+      { path: `filters[${index}].field`, code: "required", message: "Filter field is required." },
+    ]);
+  }
+  const resolved = resolveQueryPath(
+    filter.field,
+    paths,
+    visibility,
+    `filters[${index}].field`,
+  );
+  if (resolved.publicStatus) {
+    return publicStatusCondition(filter.operator, filter.value, `filters[${index}].value`);
+  }
+  validateContainsField(
+    resolved,
+    filter.operator as string,
+    filter.value,
+    `filters[${index}].field`,
+  );
+  return toStorageFilterCondition(
+    resolved.storagePath,
+    filter.operator,
+    filter.value,
+    `filters[${index}].value`,
+  );
+};
+
+const getSearchPaths = (
+  paths: ReadonlyMap<string, QueryPath>,
+  visibility: CmsVisibility,
+): readonly string[] =>
+  [...paths.entries()]
+    .filter(([, definition]) =>
+      definition.metadata === "slug" ||
+      definition.metadata === "locale" ||
+      (definition.fieldType !== undefined &&
+        searchableFieldTypes.has(definition.fieldType) &&
+        (definition.fieldType !== "array" ||
+          (definition.arrayItemType !== undefined &&
+            scalarArrayItemTypes.has(definition.arrayItemType)))),
+    )
+    .map(([field, definition]) => {
+      if (definition.metadata === "slug") {
+        return visibility === "public" ? "publishedSnapshot.slug" : "slug";
+      }
+      if (definition.metadata === "locale") {
+        return visibility === "public" ? "publishedSnapshot.locale" : "locale";
+      }
+      return `${visibility === "public" ? "publishedSnapshot.fields" : "fields"}.${field}`;
+    })
+    .filter((field) => field.split(".").length <= 6);
+
+const collectWhereFields = (
+  node: CmsEntryWhereNode | readonly CmsEntryWhereNode[] | undefined,
+): readonly string[] => {
+  if (!node) return [];
+  if (Array.isArray(node)) {
+    return (node as readonly CmsEntryWhereNode[])
+      .flatMap((child) => collectWhereFields(child));
+  }
+  const whereNode = node as CmsEntryWhereNode;
+  if ("field" in whereNode) return [whereNode.field];
+  if ("and" in whereNode) {
+    return whereNode.and.flatMap((child) => collectWhereFields(child));
+  }
+  if ("or" in whereNode) {
+    return whereNode.or.flatMap((child) => collectWhereFields(child));
+  }
+  return [];
+};
+
+const normalizeSorts = (
+  input: readonly CmsEntrySort[] | undefined,
+  paths: ReadonlyMap<string, QueryPath>,
+  visibility: CmsVisibility,
+): readonly NormalizedQuerySort[] => {
+  if (input !== undefined && !Array.isArray(input)) {
+    throw new CmsValidationError([
+      { path: "orderBy", code: "type", message: "Sort fields must be an array." },
+    ]);
+  }
+  if (!input?.length) {
+    return [{
+      field: visibility === "public" ? "publishedSnapshot.publishedAt" : "updatedAt",
+      sourceField: "",
+      direction: "desc",
+    }];
+  }
+  const orderBy = input;
+  const seen = new Set<string>();
+  return orderBy.flatMap((sort, index) => {
+    if (
+      !sort ||
+      typeof sort.field !== "string" ||
+      (sort.direction !== "asc" && sort.direction !== "desc")
+    ) {
+      throw new CmsValidationError([
+        { path: `orderBy[${index}]`, code: "type", message: "Each sort needs a valid field and direction." },
+      ]);
+    }
+    const resolved = resolveQueryPath(
+      sort.field,
+      paths,
+      visibility,
+      `orderBy[${index}].field`,
+    );
+    if (resolved.publicStatus) return [];
+    if (
+      resolved.fieldType !== undefined &&
+      !sortableFieldTypes.has(resolved.fieldType)
+    ) {
+      throw new CmsValidationError([
+        { path: `orderBy[${index}].field`, code: "type", message: "This field cannot be sorted." },
+      ]);
+    }
+    if (seen.has(resolved.storagePath)) {
+      throw new CmsValidationError([
+        { path: `orderBy[${index}].field`, code: "duplicate", message: "Sort fields must be unique." },
+      ]);
+    }
+    seen.add(resolved.storagePath);
+    return [{
+      field: resolved.storagePath,
+      sourceField: sort.field,
+      direction: sort.direction,
+    }];
+  });
+};
+
+const toStorageOrder = (
+  sorts: readonly NormalizedQuerySort[],
+): readonly StorageOrder<CmsContentEntry>[] =>
+  (sorts.length
+    ? sorts
+    : [{ field: "id", direction: "asc" as const, sourceField: "" }]
+  ).map(({ field, direction }) => ({
+    field: field as StorageOrder<CmsContentEntry>["field"],
+    direction,
+  }));
+
+const createCursor = (
+  storageAfter: string,
+  scope: string,
+): string =>
+  encodeURIComponent(JSON.stringify({ scope, storageAfter }));
+
+const decodeCursor = (
+  value: string,
+  scope: string,
+): string => {
+  try {
+    const cursor: unknown = JSON.parse(decodeURIComponent(value));
+    if (
+      !isRecord(cursor) ||
+      cursor.scope !== scope ||
+      typeof cursor.storageAfter !== "string"
+    ) {
+      throw new Error("Invalid cursor");
+    }
+    return cursor.storageAfter;
+  } catch {
+    throw new CmsValidationError([
+      { path: "after", code: "cursor", message: "Cursor is invalid or belongs to a different query." },
+    ]);
+  }
+};
+
+const getCursorScope = (
+  query: CmsEntryQueryWithWhere,
+  typeId: string,
+  orderBy: readonly { readonly field: string; readonly direction: "asc" | "desc" }[],
+): string =>
+  JSON.stringify({
+    tenantId: query.tenantId,
+    typeId,
+    locale: query.locale ? serializeLocale(query.locale) : null,
+    visibility: query.visibility,
+    search: query.search?.trim().toLocaleLowerCase() ?? "",
+    filters: query.filters ?? [],
+    where: query.where ?? null,
+    translationGroupId: query.translationGroupId ?? null,
+    orderBy,
+  });
 
 const serializeLocale = (locale: string): string => {
   const normalized = normalizeLocale(locale);
@@ -176,193 +1179,52 @@ const isPublicEntry = (entry: CmsContentEntry): boolean =>
   entry.publishedSnapshot !== null &&
   entry.publicSlug !== null;
 
-const valueAtPath = (entry: CmsContentEntry | CmsEntryView, path: string): unknown => {
-  const normalizedPath = path.startsWith("fields.")
-    ? path.slice("fields.".length)
-    : path;
-  const firstSeparator = normalizedPath.indexOf(".");
-  const root = firstSeparator < 0
-    ? normalizedPath
-    : normalizedPath.slice(0, firstSeparator);
-  let value: unknown = Object.prototype.hasOwnProperty.call(entry.fields, root)
-    ? entry.fields[root]
-    : (entry as unknown as Record<string, unknown>)[root];
-  const remaining = firstSeparator < 0 ? [] : normalizedPath.slice(firstSeparator + 1).split(".");
-  for (const part of remaining) {
-    if (!isRecord(value)) return undefined;
-    value = value[part];
-  }
-  return value;
-};
-
-const compareValues = (left: unknown, right: unknown): number => {
-  if (left instanceof Date) left = left.getTime();
-  else if (
-    typeof left === "string" &&
-    /^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(left) &&
-    Number.isFinite(Date.parse(left))
-  ) {
-    left = Date.parse(left);
-  }
-  if (right instanceof Date) right = right.getTime();
-  else if (
-    typeof right === "string" &&
-    /^\d{4}-\d{2}-\d{2}(?:T.*)?$/.test(right) &&
-    Number.isFinite(Date.parse(right))
-  ) {
-    right = Date.parse(right);
-  }
-  if (left === right) return 0;
-  if (left === undefined || left === null) return -1;
-  if (right === undefined || right === null) return 1;
-  if (typeof left === "number" && typeof right === "number") {
-    return left < right ? -1 : 1;
-  }
-  const leftString = typeof left === "string" ? left : JSON.stringify(left);
-  const rightString = typeof right === "string" ? right : JSON.stringify(right);
-  return leftString < rightString ? -1 : leftString > rightString ? 1 : 0;
-};
-
-const matchesFilter = (entry: CmsEntryView, filter: CmsEntryFilter): boolean => {
-  const value = valueAtPath(entry, filter.field);
-  const values = Array.isArray(filter.value) ? filter.value : [filter.value];
-  switch (filter.operator) {
-    case "exists":
-      return (value !== undefined && value !== null) === Boolean(filter.value);
-    case "eq":
-      return sameValue(value, filter.value);
-    case "ne":
-      return !sameValue(value, filter.value);
-    case "in":
-      return values.some((candidate) => sameValue(value, candidate));
-    case "notIn":
-      return values.every((candidate) => !sameValue(value, candidate));
-    case "gt":
-      return compareValues(value, filter.value) > 0;
-    case "gte":
-      return compareValues(value, filter.value) >= 0;
-    case "lt":
-      return compareValues(value, filter.value) < 0;
-    case "lte":
-      return compareValues(value, filter.value) <= 0;
-  }
-};
-
-const validateFilters = (filters: readonly CmsEntryFilter[] | undefined): void => {
-  const issues: CmsValidationIssue[] = [];
-  filters?.forEach((filter, index) => {
-    if (!filter.field.trim()) {
-      issues.push({ path: `filters[${index}].field`, code: "required", message: "Filter field is required." });
-    }
-    if (![
-      "eq", "ne", "in", "notIn", "gt", "gte", "lt", "lte", "exists",
-    ].includes(filter.operator)) {
-      issues.push({ path: `filters[${index}].operator`, code: "operator", message: "Unsupported filter operator." });
-    }
-    if (
-      (filter.operator === "in" || filter.operator === "notIn") &&
-      !Array.isArray(filter.value)
-    ) {
-      issues.push({ path: `filters[${index}].value`, code: "type", message: "This filter requires an array." });
-    }
-  });
-  if (issues.length) throw new CmsValidationError(issues);
-};
-
-const collectStrings = (value: unknown, output: string[]): void => {
-  if (typeof value === "string") {
-    output.push(value);
-  } else if (Array.isArray(value)) {
-    value.forEach((item) => collectStrings(item, output));
-  } else if (isRecord(value)) {
-    Object.values(value).forEach((item) => collectStrings(item, output));
-  }
-};
-
-const compareEntries = (
-  left: CmsEntryView,
-  right: CmsEntryView,
-  orderBy: readonly CmsEntrySort[],
-): number => {
-  for (const order of orderBy) {
-    const compared = compareValues(
-      valueAtPath(left, order.field),
-      valueAtPath(right, order.field),
-    );
-    if (compared) return order.direction === "asc" ? compared : -compared;
-  }
-  return left.id.localeCompare(right.id);
-};
-
-const getCursorScope = (query: CmsEntryQuery, typeId: string): string =>
-  JSON.stringify({
-    tenantId: query.tenantId,
-    typeId,
-    locale: query.locale ? serializeLocale(query.locale) : null,
-    visibility: query.visibility,
-    search: query.search?.trim().toLocaleLowerCase() ?? "",
-    filters: query.filters ?? [],
-    orderBy: query.orderBy ?? [{ field: "updatedAt", direction: "desc" }],
-  });
-
-const createCursor = (
-  entry: CmsEntryView,
-  orderBy: readonly CmsEntrySort[],
-  scope: string,
-): string =>
-  encodeURIComponent(JSON.stringify({
-    scope,
-    values: orderBy.map((sort) => valueAtPath(entry, sort.field)),
-    id: entry.id,
-  }));
-
-const decodeCursor = (
-  value: string,
-  scope: string,
-): { readonly values: readonly unknown[]; readonly id: string } => {
-  try {
-    const cursor: unknown = JSON.parse(decodeURIComponent(value));
-    if (
-      !isRecord(cursor) ||
-      cursor.scope !== scope ||
-      !Array.isArray(cursor.values) ||
-      typeof cursor.id !== "string"
-    ) {
-      throw new Error("Invalid cursor");
-    }
-    return { values: cursor.values, id: cursor.id };
-  } catch {
-    throw new CmsValidationError([
-      { path: "after", code: "cursor", message: "Cursor is invalid or belongs to a different query." },
-    ]);
-  }
-};
-
 const fieldPaths = (
-  definitions: readonly CmsFieldDefinition[],
+  definitions: readonly QueryFieldDefinition[],
   fields: CmsFields,
   prefix = "",
 ): readonly string[] => {
   const paths: string[] = [];
   for (const definition of definitions) {
     if (!Object.prototype.hasOwnProperty.call(fields, definition.key)) continue;
+    const runtime = definition as QueryFieldDefinition;
     const path = prefix ? `${prefix}.${definition.key}` : definition.key;
     paths.push(path);
     const value = fields[definition.key];
-    if (definition.type === "repeater" && Array.isArray(value)) {
+    if (runtime.type === "object" && isRecord(value)) {
+      paths.push(...fieldPaths(
+        runtime.fields ?? [],
+        value as CmsFields,
+        path,
+      ));
+    } else if (
+      runtime.type === "array" &&
+      runtime.of?.type === "object" &&
+      Array.isArray(value)
+    ) {
       value.forEach((item, index) => {
         if (isRecord(item)) {
           paths.push(...fieldPaths(
-            definition.fields ?? [],
+            runtime.of!.fields ?? [],
             item as CmsFields,
             `${path}[${index}]`,
           ));
         }
       });
-    } else if (definition.type === "blocks" && Array.isArray(value)) {
+    } else if (runtime.type === "repeater" && Array.isArray(value)) {
+      value.forEach((item, index) => {
+        if (isRecord(item)) {
+          paths.push(...fieldPaths(
+            runtime.fields ?? [],
+            item as CmsFields,
+            `${path}[${index}]`,
+          ));
+        }
+      });
+    } else if (runtime.type === "blocks" && Array.isArray(value)) {
       value.forEach((item, index) => {
         if (!isRecord(item) || !isRecord(item.fields)) return;
-        const block = definition.blocks?.find((candidate) => candidate.type === item.type);
+        const block = runtime.blocks?.find((candidate) => candidate.type === item.type);
         if (block) {
           paths.push(...fieldPaths(
             block.fields,
@@ -386,6 +1248,7 @@ export class CmsService {
   readonly #idGenerator: () => string;
   readonly #registry: ContentTypeRegistry;
   readonly #emitChangeEvents: boolean;
+  readonly #collectionOptions: ReadonlyMap<string, ResolvedCmsCollectionRuntimeOptions>;
   readonly #migrations = new Map<string, CmsSchemaMigration>();
   #collectionsReady?: Promise<void>;
   #changeEventsReady?: Promise<void>;
@@ -398,6 +1261,36 @@ export class CmsService {
     this.#accessPolicy = options.accessPolicy;
     this.#scheduler = options.scheduler;
     this.#emitChangeEvents = options.emitChangeEvents === true;
+    const collectionOptions = new Map<string, ResolvedCmsCollectionRuntimeOptions>();
+    for (const [slug, runtimeOptions] of Object.entries(options.collectionOptions ?? {})) {
+      const normalizedSlug = normalizeCmsSlug(slug);
+      if (!normalizedSlug || collectionOptions.has(normalizedSlug)) {
+        throw new TypeError("Collection runtime options require unique normalized collection slugs.");
+      }
+      if (
+        !runtimeOptions ||
+        typeof runtimeOptions !== "object" ||
+        (runtimeOptions.drafts !== undefined && typeof runtimeOptions.drafts !== "boolean") ||
+        (runtimeOptions.timestamps !== undefined && typeof runtimeOptions.timestamps !== "boolean") ||
+        (runtimeOptions.access !== undefined &&
+          (!isRecord(runtimeOptions.access) ||
+            Object.values(runtimeOptions.access).some(
+              (policy) => typeof policy !== "function",
+            ))) ||
+        (runtimeOptions.hooks?.beforeChange !== undefined &&
+          typeof runtimeOptions.hooks.beforeChange !== "function") ||
+        (runtimeOptions.hooks?.afterChange !== undefined &&
+          typeof runtimeOptions.hooks.afterChange !== "function")
+      ) {
+        throw new TypeError(`Invalid runtime options for collection "${slug}".`);
+      }
+      collectionOptions.set(normalizedSlug, {
+        ...runtimeOptions,
+        drafts: runtimeOptions.drafts ?? false,
+        timestamps: runtimeOptions.timestamps ?? false,
+      });
+    }
+    this.#collectionOptions = collectionOptions;
     this.#mediaValidator = options.mediaReferenceValidator;
     this.#customValidators = options.customValidators ?? {};
     this.#clock = options.clock ?? (() => new Date());
@@ -440,7 +1333,10 @@ export class CmsService {
       this.#requireCapabilities("conditionalWrites");
       const previousDefinition = this.#definition(existing);
       if (definition.version === existing.version) {
-        if (sameValue(previousDefinition, definition)) return existing;
+        if (this.#matchesDefinition(existing, definition)) {
+          this.#registry.register(input.tenantId, definition);
+          return existing;
+        }
         throw new CmsSchemaError("A content type cannot change without increasing its schema version.");
       }
       if (definition.version !== existing.version + 1) {
@@ -488,7 +1384,7 @@ export class CmsService {
         name: definition.name,
         description: definition.description,
         version: definition.version,
-        fields: definition.fields,
+        fields: serializeRuntimeFields(definition.fields),
         locales: definition.locales ?? [],
         defaultLocale: definition.defaultLocale,
         requiresMigrationFromVersions: requiredVersions,
@@ -504,17 +1400,34 @@ export class CmsService {
       });
       this.#requireChangeEventCapabilities();
       if (this.#emitChangeEvents) await this.#ensureChangeEvents();
-      await this.#runBatch([
-        {
-          type: "update",
-          collection: COLLECTIONS.contentTypes,
-          id: existing.id,
-          condition: { expectedRevision: existing.revision },
-          changes: this.#updateChanges(updated),
-        },
-        { type: "insert", collection: COLLECTIONS.audit, record: audit },
-        ...this.#changeEventOperations(audit),
-      ]);
+      try {
+        await this.#runBatch([
+          {
+            type: "update",
+            collection: COLLECTIONS.contentTypes,
+            id: existing.id,
+            condition: { expectedRevision: existing.revision },
+            changes: this.#updateChanges(updated),
+          },
+          { type: "insert", collection: COLLECTIONS.audit, record: audit },
+          ...this.#changeEventOperations(audit),
+        ]);
+      } catch (error) {
+        if (!(error instanceof CmsConflictError || error instanceof CmsDuplicateError)) {
+          throw error;
+        }
+        const raced = await this.#findContentType(input.tenantId, definition.slug);
+        if (
+          raced &&
+          raced.version === definition.version &&
+          this.#matchesDefinition(raced, definition)
+        ) {
+          if (input.migration && !configuredMigration) this.#addMigration(input.migration);
+          this.#registry.register(input.tenantId, definition);
+          return raced;
+        }
+        throw error;
+      }
       if (input.migration && !configuredMigration) this.#addMigration(input.migration);
       this.#registry.register(input.tenantId, definition);
       const saved = await this.#findContentType(input.tenantId, definition.slug);
@@ -536,7 +1449,7 @@ export class CmsService {
       name: definition.name,
       description: definition.description,
       version: definition.version,
-      fields: definition.fields,
+      fields: serializeRuntimeFields(definition.fields),
       locales: definition.locales ?? [],
       defaultLocale: definition.defaultLocale,
       requiresMigrationFromVersions: [],
@@ -554,15 +1467,29 @@ export class CmsService {
     });
     this.#requireChangeEventCapabilities();
     if (this.#emitChangeEvents) await this.#ensureChangeEvents();
-    await this.#runBatch([
-      {
-        type: "insert",
-        collection: COLLECTIONS.contentTypes,
-        record: record as StorageInsert<CmsContentTypeRecord>,
-      },
-      { type: "insert", collection: COLLECTIONS.audit, record: audit },
-      ...this.#changeEventOperations(audit),
-    ]);
+    try {
+      await this.#runBatch([
+        {
+          type: "insert",
+          collection: COLLECTIONS.contentTypes,
+          record: record as StorageInsert<CmsContentTypeRecord>,
+        },
+        { type: "insert", collection: COLLECTIONS.audit, record: audit },
+        ...this.#changeEventOperations(audit),
+      ]);
+    } catch (error) {
+      if (!(error instanceof CmsDuplicateError)) throw error;
+      const raced = await this.#findContentType(input.tenantId, definition.slug);
+      if (
+        !raced ||
+        raced.version !== definition.version ||
+        !this.#matchesDefinition(raced, definition)
+      ) {
+        throw error;
+      }
+      this.#registry.register(input.tenantId, definition);
+      return raced;
+    }
     this.#registry.register(input.tenantId, definition);
     return record;
   }
@@ -640,16 +1567,28 @@ export class CmsService {
       actor: input.actor,
       resource: "entry",
       action: "entry:create",
-      record: { contentType: type.slug, locale },
+      record: {
+        contentType: type.slug,
+        locale,
+        ...(input.translationGroupId
+          ? { translationGroupId: input.translationGroupId }
+          : {}),
+      },
     });
 
+    const fieldsInput = this.#withSlugField(type, input.fields, input.slug);
     await this.#assertWritableFields(
       input.tenantId,
       input.actor,
       type,
-      isRecord(input.fields) ? input.fields as CmsFields : {},
+      isRecord(fieldsInput) ? fieldsInput as CmsFields : {},
     );
-    const fieldsInput = this.#withSlugField(type, input.fields, input.slug);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "create",
+      { fields: fieldsInput as CmsFields },
+    );
     const fields = await this.#validateFields(
       type,
       fieldsInput,
@@ -682,6 +1621,19 @@ export class CmsService {
     await this.#assertUniqueSlug(input.tenantId, type, locale, slug);
 
     const entryId = this.#idGenerator();
+    const draftsEnabled = this.#draftsEnabled(type);
+    const publishedSnapshot = draftsEnabled
+      ? null
+      : {
+          revisionNumber: 1,
+          entryRevision: 1,
+          schemaVersion: type.version,
+          slug,
+          locale,
+          fields,
+          publishedAt: this.#now(),
+          publishedBy: input.actor?.id ?? null,
+        };
     const entry = await this.#persistEntry(
       null,
       {
@@ -692,13 +1644,13 @@ export class CmsService {
         translationGroupId,
         locale,
         slug,
-        publicSlug: null,
-        publicSlugKey: unpublishedSlugKey(entryId),
+        publicSlug: publishedSnapshot ? slug : null,
+        publicSlugKey: publishedSnapshot ? slug : unpublishedSlugKey(entryId),
         fields,
         schemaVersion: type.version,
         revisionNumber: 1,
-        status: "draft",
-        publishedSnapshot: null,
+        status: draftsEnabled ? "draft" : "published",
+        publishedSnapshot,
         scheduledAt: null,
         scheduledTimeZone: null,
         scheduledRevisionNumber: null,
@@ -711,7 +1663,15 @@ export class CmsService {
       "create",
       input.changeSummary,
     );
-    return this.#makeView(entry, type, "admin", input.actor);
+    const view = await this.#makeView(entry, type, "admin", input.actor);
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "create",
+      view,
+      { fields },
+    );
+    return view;
   }
 
   async saveDraft(input: CmsUpdateEntryInput): Promise<CmsEntryView> {
@@ -723,24 +1683,40 @@ export class CmsService {
     }
     await this.#authorizeEntry(input, current, "entry:update");
     const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
+    if (!isRecord(input.fields)) {
+      throw new CmsValidationError([
+        { path: "fields", code: "type", message: "Fields must be an object." },
+      ]);
+    }
+    const submittedFields = input.fields as CmsFields;
+    const fieldsInput = this.#withSlugField(type, submittedFields, input.slug);
     await this.#assertWritableFields(
       input.tenantId,
       input.actor,
       type,
-      isRecord(input.fields) ? input.fields as CmsFields : {},
+      fieldsInput,
       current,
     );
-    const fieldsInput = this.#withSlugField(type, input.fields, input.slug);
+    const currentView = await this.#makeView(current, type, "admin", input.actor);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "update",
+      {
+        entryId: current.id,
+        fields: fieldsInput,
+        current: currentView,
+      },
+    );
     const fields = await this.#validateFields(
       type,
-      fieldsInput,
+      { ...current.fields, ...fieldsInput },
       input.tenantId,
       current.locale,
       input.actor,
       current.id,
     );
-    const slug = this.#resolveSlug(input.slug, type, fields);
-    await this.#assertWritableFields(input.tenantId, input.actor, type, fields, current);
+    const slug = this.#resolveSlug(input.slug ?? current.slug, type, fields);
     await this.#assertSharedFieldUpdate(type, fields, current);
     await this.#validateReferences(
       input.tenantId,
@@ -758,12 +1734,28 @@ export class CmsService {
       current.id,
     );
     const scheduled = this.#scheduledTask(current);
+    const draftsEnabled = this.#draftsEnabled(type);
+    const publishedSnapshot = draftsEnabled
+      ? current.publishedSnapshot
+      : {
+          revisionNumber: current.revisionNumber + 1,
+          entryRevision: current.revision + 1,
+          schemaVersion: type.version,
+          slug,
+          locale: current.locale,
+          fields,
+          publishedAt: this.#now(),
+          publishedBy: input.actor?.id ?? null,
+        };
     const updated = await this.#persistEntry(
       current,
       {
         ...current,
         ...this.#revisionFields(current, type, fields, slug),
-        status: "draft",
+        status: draftsEnabled ? "draft" : "published",
+        publicSlug: draftsEnabled ? current.publicSlug : slug,
+        publicSlugKey: draftsEnabled ? current.publicSlugKey : slug,
+        publishedSnapshot,
         scheduledAt: null,
         scheduledTimeZone: null,
         scheduledRevisionNumber: null,
@@ -772,11 +1764,19 @@ export class CmsService {
         updatedBy: input.actor?.id ?? null,
       },
       input.actor,
-      "save-draft",
+      draftsEnabled ? "save-draft" : "publish",
       input.changeSummary,
     );
     if (scheduled) await this.#cancelScheduled(scheduled);
-    return this.#makeView(updated, type, "admin", input.actor);
+    const view = await this.#makeView(updated, type, "admin", input.actor);
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "update",
+      view,
+      { fields, current: currentView },
+    );
+    return view;
   }
 
   async publish(input: CmsContext & CmsEntryMutationInput): Promise<CmsEntryView> {
@@ -788,6 +1788,13 @@ export class CmsService {
     }
     await this.#authorizeEntry(input, current, "entry:publish");
     const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
+    const currentView = await this.#makeView(current, type, "admin", input.actor);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "publish",
+      { entryId: current.id, current: currentView },
+    );
     const fields = await this.#currentFields(current, type, input);
     await this.#validateReferences(input.tenantId, input.actor, type, current.locale, fields, current.id);
     await this.#assertUniqueSlug(input.tenantId, type, current.locale, current.slug, current.id);
@@ -824,7 +1831,15 @@ export class CmsService {
       input.changeSummary,
     );
     if (scheduled) await this.#cancelScheduled(scheduled);
-    return this.#makeView(updated, type, "admin", input.actor);
+    const view = await this.#makeView(updated, type, "admin", input.actor);
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "publish",
+      view,
+      { fields, current: currentView },
+    );
+    return view;
   }
 
   async unpublish(input: CmsContext & CmsEntryMutationInput): Promise<CmsEntryView> {
@@ -832,10 +1847,20 @@ export class CmsService {
     const current = await this.#getEntryRecord(input);
     this.#assertExpectedRevision(current, input.expectedRevision);
     await this.#authorizeEntry(input, current, "entry:unpublish");
+    const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
+    if (!this.#draftsEnabled(type)) {
+      throw new CmsCapabilityError("drafts");
+    }
     if (!current.publishedSnapshot && current.status !== "scheduled") {
       throw new CmsConflictError("The entry has no published version to unpublish.");
     }
-    const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
+    const currentView = await this.#makeView(current, type, "admin", input.actor);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "unpublish",
+      { entryId: current.id, current: currentView },
+    );
     const fields = await this.#currentFields(current, type, input);
     const scheduled = this.#scheduledTask(current);
     const updated = await this.#persistEntry(
@@ -857,7 +1882,15 @@ export class CmsService {
       input.changeSummary,
     );
     if (scheduled) await this.#cancelScheduled(scheduled);
-    return this.#makeView(updated, type, "admin", input.actor);
+    const view = await this.#makeView(updated, type, "admin", input.actor);
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "unpublish",
+      view,
+      { fields, current: currentView },
+    );
+    return view;
   }
 
   async schedulePublish(input: CmsScheduleEntryInput): Promise<CmsEntryView> {
@@ -874,6 +1907,14 @@ export class CmsService {
       throw new CmsConflictError("Archived or deleted entries cannot be scheduled.");
     }
     await this.#authorizeEntry(input, current, "entry:schedule");
+    const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
+    const currentView = await this.#makeView(current, type, "admin", input.actor);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "schedule",
+      { entryId: current.id, fields: currentView.fields, current: currentView },
+    );
     const publishAt = new Date(input.publishAt);
     if (!Number.isFinite(publishAt.getTime()) || publishAt <= this.#now()) {
       throw new CmsValidationError([
@@ -895,7 +1936,6 @@ export class CmsService {
         { path: "timeZone", code: "invalid-time-zone", message: "The time zone must be a supported IANA identifier." },
       ]);
     }
-    const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
     const fields = await this.#currentFields(current, type, input);
     await this.#validateReferences(input.tenantId, input.actor, type, current.locale, fields, current.id);
     await this.#assertUniqueSlug(input.tenantId, type, current.locale, current.slug, current.id);
@@ -950,7 +1990,15 @@ export class CmsService {
     }
     const previousTask = this.#scheduledTask(current);
     if (previousTask) await this.#cancelScheduled(previousTask);
-    return this.#makeView(updated, type, "admin", input.actor);
+    const view = await this.#makeView(updated, type, "admin", input.actor);
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "schedule",
+      view,
+      { fields, current: currentView },
+    );
+    return view;
   }
 
   async unschedule(input: CmsContext & CmsEntryMutationInput): Promise<CmsEntryView> {
@@ -963,6 +2011,19 @@ export class CmsService {
     }
     await this.#authorizeEntry(input, current, "entry:unschedule");
     const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
+    const draftsEnabled = this.#draftsEnabled(type);
+    if (!draftsEnabled && !current.publishedSnapshot) {
+      throw new CmsConflictError(
+        "A non-draft collection cannot unschedule an entry without a published snapshot.",
+      );
+    }
+    const currentView = await this.#makeView(current, type, "admin", input.actor);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "unschedule",
+      { entryId: current.id, current: currentView },
+    );
     const fields = await this.#currentFields(current, type, input);
     const scheduled = this.#scheduledTask(current);
     const updated = await this.#persistEntry(
@@ -970,7 +2031,7 @@ export class CmsService {
       {
         ...current,
         ...this.#revisionFields(current, type, fields, current.slug),
-        status: "draft",
+        status: draftsEnabled ? "draft" : "published",
         scheduledAt: null,
         scheduledTimeZone: null,
         scheduledRevisionNumber: null,
@@ -981,7 +2042,15 @@ export class CmsService {
       input.changeSummary,
     );
     if (scheduled) await this.#cancelScheduled(scheduled);
-    return this.#makeView(updated, type, "admin", input.actor);
+    const view = await this.#makeView(updated, type, "admin", input.actor);
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "unschedule",
+      view,
+      { fields, current: currentView },
+    );
+    return view;
   }
 
   async publishScheduled(
@@ -993,9 +2062,14 @@ export class CmsService {
     if (input.tenantId !== input.publication.tenantId) {
       throw new CmsNotFoundError("Scheduled publication");
     }
-    const current = await this.#storage.findById<CmsContentEntry>(
+    const current = await this.#storage.findOne<CmsContentEntry>(
       COLLECTIONS.entries,
-      input.publication.entryId,
+      {
+        where: {
+          id: equality(input.publication.entryId),
+          tenantId: equality(input.tenantId),
+        },
+      },
     );
     if (
       !current ||
@@ -1013,6 +2087,13 @@ export class CmsService {
     this.#assertExpectedRevision(current, current.revision);
     await this.#authorizeEntry(input, current, "entry:publish");
     const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
+    const currentView = await this.#makeView(current, type, "admin", input.actor);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "scheduled-publish",
+      { entryId: current.id, fields: currentView.fields, current: currentView },
+    );
     const fields = await this.#currentFields(current, type, input);
     await this.#validateReferences(input.tenantId, input.actor, type, current.locale, fields, current.id);
     const now = this.#now();
@@ -1044,9 +2125,17 @@ export class CmsService {
       "scheduled-publish",
       "Scheduled publication",
     );
+    const view = await this.#makeView(updated, type, "admin", input.actor);
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "scheduled-publish",
+      view,
+      { fields, current: currentView },
+    );
     return {
       published: true,
-      entry: await this.#makeView(updated, type, "admin", input.actor),
+      entry: view,
     };
   }
 
@@ -1058,15 +2147,183 @@ export class CmsService {
     return this.#archiveEntry(input, true);
   }
 
+  async purgeEntry(input: CmsPurgeEntryInput): Promise<void> {
+    await this.#ensureCollections();
+    const current = await this.#getEntryRecord(input);
+    this.#assertExpectedRevision(current, input.expectedRevision);
+    await this.#authorizeEntry(input, current, "entry:delete");
+    const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
+    const currentView = await this.#makeView(current, type, "admin", input.actor);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "delete",
+      { entryId: current.id, current: currentView },
+    );
+    this.#requireCapabilities(
+      "atomicBatch",
+      "conditionalWrites",
+      "uniqueConstraints",
+      "cursorPagination",
+    );
+    const relationshipLock = await this.#ensureRelationshipLock(
+      input.tenantId,
+      current.id,
+    );
+    await this.#assertNoIncomingRelationshipReferences(input.tenantId, current);
+    const [revisions, mediaUsages] = await Promise.all([
+      this.#storage.findMany<CmsContentRevision>(COLLECTIONS.revisions, {
+        where: {
+          tenantId: equality(input.tenantId),
+          entryId: equality(current.id),
+        },
+        orderBy: [{ field: "revisionNumber", direction: "desc" }],
+        limit: MAX_PURGE_RELATED_RECORDS + 1,
+      }),
+      this.#storage.findMany<CmsMediaUsage>(COLLECTIONS.mediaUsages, {
+        where: {
+          tenantId: equality(input.tenantId),
+          entryId: equality(current.id),
+        },
+        orderBy: [{ field: "id", direction: "asc" }],
+        limit: MAX_PURGE_RELATED_RECORDS + 1,
+      }),
+    ]);
+    if (
+      revisions.length > MAX_PURGE_RELATED_RECORDS ||
+      mediaUsages.length > MAX_PURGE_RELATED_RECORDS ||
+      revisions.length + mediaUsages.length > MAX_PURGE_RELATED_RECORDS
+    ) {
+      throw new CmsCapabilityError("bounded atomic permanent-delete batch");
+    }
+
+    this.#requireChangeEventCapabilities();
+    if (this.#emitChangeEvents) await this.#ensureChangeEvents();
+    const now = this.#now();
+    const tombstone: StorageInsert<CmsContentRevision> = {
+      id: this.#idGenerator(),
+      tenantId: current.tenantId,
+      contentTypeId: current.contentTypeId,
+      entryId: current.id,
+      locale: current.locale,
+      revisionNumber: current.revisionNumber + 1,
+      schemaVersion: type.version,
+      slug: current.slug,
+      fields: {},
+      status: "archived",
+      publishedSnapshot: null,
+      scheduledAt: null,
+      scheduledTimeZone: null,
+      action: "delete",
+      actorId: input.actor?.id ?? null,
+      changeSummary: input.changeSummary ?? "Permanently deleted",
+      createdAt: now,
+      updatedAt: now,
+      revision: 1,
+    };
+    const audit = this.#auditInsert({
+      tenantId: input.tenantId,
+      actor: input.actor,
+      resource: "entry",
+      resourceId: current.id,
+      action: "entry:delete",
+      result: "success",
+      revisionNumber: tombstone.revisionNumber,
+      details: { permanent: true },
+    });
+    const scheduled = this.#scheduledTask(current);
+    const scheduler = scheduled ? this.#requireScheduler() : undefined;
+    if (scheduled) {
+      try {
+        await scheduler!.cancel(scheduled);
+      } catch (error) {
+        throw new CmsSchedulerError(
+          "The scheduled publication could not be cancelled; the entry was not purged.",
+          {
+            entryId: current.id,
+            scheduledRevisionNumber: scheduled.scheduledRevisionNumber,
+          },
+          { cause: error },
+        );
+      }
+    }
+
+    const operations: StorageBatchOperation<CmsStoredRecord>[] = [
+      {
+        type: "delete",
+        collection: COLLECTIONS.entries,
+        id: current.id,
+        condition: { expectedRevision: current.revision },
+      },
+      {
+        type: "delete",
+        collection: COLLECTIONS.relationshipLocks,
+        id: relationshipLock.id,
+        condition: { expectedRevision: relationshipLock.revision },
+      },
+      ...revisions.map((revision) => ({
+        type: "delete" as const,
+        collection: COLLECTIONS.revisions,
+        id: revision.id,
+        condition: { expectedRevision: revision.revision },
+      })),
+      ...mediaUsages.map((usage) => ({
+        type: "delete" as const,
+        collection: COLLECTIONS.mediaUsages,
+        id: usage.id,
+        condition: { expectedRevision: usage.revision },
+      })),
+      {
+        type: "insert",
+        collection: COLLECTIONS.revisions,
+        record: tombstone,
+      },
+      { type: "insert", collection: COLLECTIONS.audit, record: audit },
+      ...this.#changeEventOperations(audit),
+    ];
+    try {
+      await this.#runBatch(operations);
+    } catch (error) {
+      if (scheduled && scheduler) {
+        try {
+          await scheduler.schedule(scheduled);
+        } catch (scheduleError) {
+          throw new CmsSchedulerError(
+            "The entry could not be purged and its scheduled publication could not be restored.",
+            {
+              entryId: current.id,
+              scheduledRevisionNumber: scheduled.scheduledRevisionNumber,
+            },
+            { cause: scheduleError },
+          );
+        }
+      }
+      throw error;
+    }
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "delete",
+      currentView,
+      { fields: currentView.fields, current: currentView },
+    );
+  }
+
   async restoreRevision(input: CmsRestoreRevisionInput): Promise<CmsEntryView> {
     await this.#ensureCollections();
     const current = await this.#getEntryRecord(input);
     this.#assertExpectedRevision(current, input.expectedRevision);
-    const revision = await this.#storage.findById<CmsContentRevision>(
+    const revision = await this.#storage.findOne<CmsContentRevision>(
       COLLECTIONS.revisions,
-      input.revisionId,
+      {
+        where: {
+          id: equality(input.revisionId),
+          tenantId: equality(input.tenantId),
+          entryId: equality(current.id),
+        },
+      },
     );
-    if (!revision || revision.tenantId !== input.tenantId || revision.entryId !== current.id) {
+    if (!revision) {
       throw new CmsNotFoundError("Content revision");
     }
     await this.#authorize({
@@ -1075,7 +2332,7 @@ export class CmsService {
       resource: "revision",
       action: "revision:read",
       resourceId: revision.id,
-      record: revision,
+      record: { ...revision, contentTypeSlug: current.contentTypeSlug },
     });
     await this.#authorizeEntry(input, current, "entry:restore");
     const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
@@ -1084,6 +2341,17 @@ export class CmsService {
       revision.fields,
       revision.schemaVersion,
       input.tenantId,
+    );
+    const currentView = await this.#makeView(current, type, "admin", input.actor);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "restore",
+      {
+        entryId: current.id,
+        fields: migratedFields,
+        current: currentView,
+      },
     );
     const fields = await this.#validateFields(
       type,
@@ -1094,16 +2362,39 @@ export class CmsService {
       current.id,
     );
     const slug = this.#resolveSlug(revision.slug, type, fields);
-    await this.#assertWritableFields(input.tenantId, input.actor, type, fields, current);
+    await this.#assertWritableFields(
+      input.tenantId,
+      input.actor,
+      type,
+      fields,
+      current,
+      "restore",
+    );
     await this.#validateReferences(input.tenantId, input.actor, type, current.locale, fields, current.id);
     await this.#assertUniqueSlug(input.tenantId, type, current.locale, slug, current.id);
     const scheduled = this.#scheduledTask(current);
+    const draftsEnabled = this.#draftsEnabled(type);
+    const publishedSnapshot = draftsEnabled
+      ? current.publishedSnapshot
+      : {
+          revisionNumber: current.revisionNumber + 1,
+          entryRevision: current.revision + 1,
+          schemaVersion: type.version,
+          slug,
+          locale: current.locale,
+          fields,
+          publishedAt: this.#now(),
+          publishedBy: input.actor?.id ?? null,
+        };
     const updated = await this.#persistEntry(
       current,
       {
         ...current,
         ...this.#revisionFields(current, type, fields, slug),
-        status: "draft",
+        status: draftsEnabled ? "draft" : "published",
+        publicSlug: draftsEnabled ? current.publicSlug : slug,
+        publicSlugKey: draftsEnabled ? current.publicSlugKey : slug,
+        publishedSnapshot,
         scheduledAt: null,
         scheduledTimeZone: null,
         scheduledRevisionNumber: null,
@@ -1116,7 +2407,15 @@ export class CmsService {
       input.changeSummary ?? `Restored from revision ${revision.revisionNumber}`,
     );
     if (scheduled) await this.#cancelScheduled(scheduled);
-    return this.#makeView(updated, type, "admin", input.actor);
+    const view = await this.#makeView(updated, type, "admin", input.actor);
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      "restore",
+      view,
+      { fields, current: currentView },
+    );
+    return view;
   }
 
   async getEntry(input: CmsGetEntryInput): Promise<CmsEntryView> {
@@ -1150,22 +2449,30 @@ export class CmsService {
     });
 
     for (const locale of locales) {
-      const entries = await this.#storage.findMany<CmsContentEntry>(
+      const where: Record<string, StorageComparison> = {
+        tenantId: equality(input.tenantId),
+        contentTypeId: equality(type.id),
+        deletedAt: equality(null),
+      };
+      if (visibility === "public") {
+        Object.assign(where, {
+          status: { operator: "ne", value: "archived" },
+          publicSlug: equality(slug),
+          "publishedSnapshot.slug": equality(slug),
+          "publishedSnapshot.locale": equality(locale),
+        });
+      } else {
+        Object.assign(where, {
+          locale: equality(locale),
+          slug: equality(slug),
+        });
+      }
+      const match = await this.#storage.findOne<CmsContentEntry>(
         COLLECTIONS.entries,
-        {
-          where: {
-            tenantId: equality(input.tenantId),
-            contentTypeId: equality(type.id),
-            locale: equality(locale),
-          },
-        },
-      );
-      const match = entries.find((entry) =>
-        visibility === "public"
-          ? isPublicEntry(entry) && entry.publicSlug === slug
-          : !entry.deletedAt && entry.slug === slug,
+        { where: where as StorageWhere<CmsContentEntry> },
       );
       if (!match) continue;
+      if (visibility === "public" && !isPublicEntry(match)) continue;
       if (!(await this.#isAllowed({
         tenantId: input.tenantId,
         actor: input.actor,
@@ -1190,87 +2497,241 @@ export class CmsService {
         { path: "first", code: "range", message: "Page size must be an integer from 1 to 100." },
       ]);
     }
-    validateFilters(input.filters);
     const type = await this.#getType(input.tenantId, input.contentType);
     const locale = input.locale ? this.#validateLocale(type, input.locale) : undefined;
     const visibility = validateVisibility(input.visibility);
+    const queryInput = input as CmsEntryQueryWithWhere;
     await this.#authorize({
       tenantId: input.tenantId,
       actor: input.actor,
       resource: "entry",
       action: "entry:read",
       visibility,
-      record: { contentType: type.slug, locale },
+      record: {
+        contentType: type.slug,
+        locale,
+        ...(queryInput.translationGroupId
+          ? { translationGroupId: queryInput.translationGroupId }
+          : {}),
+      },
     });
-
-    const where: Record<string, StorageComparison> = {
-      tenantId: equality(input.tenantId),
-      contentTypeId: equality(type.id),
-    };
-    if (locale) where.locale = equality(locale);
-    const entries = await this.#storage.findMany<CmsContentEntry>(
-      COLLECTIONS.entries,
-      { where },
-    );
-    const views: CmsEntryView[] = [];
-    for (const entry of entries) {
-      if (visibility === "public" && !isPublicEntry(entry)) continue;
-      if (visibility === "admin" && entry.deletedAt) continue;
+    const paths = createQueryPathMap(type.fields);
+    const sorts = normalizeSorts(input.orderBy, paths, visibility);
+    const storageOrder = toStorageOrder(sorts);
+    const scope = getCursorScope(queryInput, type.id, storageOrder);
+    const initialStorageAfter = input.after
+      ? decodeCursor(input.after, scope)
+      : undefined;
+    const conditions: StorageCondition[] = [
+      conditionAt("tenantId", equality(input.tenantId)),
+      conditionAt("contentTypeId", equality(type.id)),
+      conditionAt("deletedAt", equality(null)),
+    ];
+    if (queryInput.translationGroupId !== undefined) {
       if (
-        !(await this.#isAllowed({
-          tenantId: input.tenantId,
-          actor: input.actor,
-          resource: "entry",
-          action: "entry:read",
-          visibility,
-          resourceId: entry.id,
-          record: entry,
-        }))
+        typeof queryInput.translationGroupId !== "string" ||
+        !queryInput.translationGroupId.trim()
       ) {
-        continue;
+        throw new CmsValidationError([
+          { path: "translationGroupId", code: "required", message: "A translation group ID is required." },
+        ]);
       }
-      views.push(await this.#makeView(entry, type, visibility, input.actor));
+      conditions.push(
+        conditionAt("translationGroupId", equality(queryInput.translationGroupId)),
+      );
     }
-
-    const search = input.search?.trim().toLocaleLowerCase();
-    let filtered = views.filter((entry) => {
-      if (input.filters?.some((filter) => !matchesFilter(entry, filter))) return false;
-      if (!search) return true;
-      const strings: string[] = [];
-      collectStrings(entry.fields, strings);
-      strings.push(entry.slug, entry.locale);
-      return strings.some((value) => value.toLocaleLowerCase().includes(search));
-    });
-
-    const orderBy = input.orderBy?.length
-      ? input.orderBy
-      : [{ field: "updatedAt", direction: "desc" as const }];
-    filtered.sort((left, right) => compareEntries(left, right, orderBy));
-    const scope = getCursorScope(input, type.id);
-    if (input.after) {
-      const cursor = decodeCursor(input.after, scope);
-      filtered = filtered.filter((entry) => {
-        for (const [index, order] of orderBy.entries()) {
-          const compared = compareValues(
-            valueAtPath(entry, order.field),
-            cursor.values[index],
-          );
-          if (compared) return order.direction === "asc" ? compared > 0 : compared < 0;
+    if (locale) {
+      conditions.push(conditionAt(
+        visibility === "public" ? "publishedSnapshot.locale" : "locale",
+        equality(locale),
+      ));
+    }
+    if (visibility === "public") {
+      conditions.push(
+        conditionAt("status", { operator: "ne", value: "archived" }),
+        conditionAt("publicSlug", { operator: "ne", value: null }),
+        conditionAt("publishedSnapshot.slug", { operator: "ne", value: null }),
+      );
+    }
+    if (input.filters !== undefined && !Array.isArray(input.filters)) {
+      throw new CmsValidationError([
+        { path: "filters", code: "type", message: "Filters must be an array." },
+      ]);
+    }
+    const filterFields: string[] = [];
+    for (const [index, filter] of (input.filters ?? []).entries()) {
+      if (!filter || typeof filter.field !== "string") {
+        throw new CmsValidationError([
+          { path: `filters[${index}].field`, code: "type", message: "Filter field is required." },
+        ]);
+      }
+      conditions.push(normalizeFlatFilter(filter, index, paths, visibility));
+      filterFields.push(filter.field);
+    }
+    if (queryInput.where) {
+      for (const [index, node] of (
+        Array.isArray(queryInput.where) ? queryInput.where : [queryInput.where]
+      ).entries()) {
+        conditions.push(
+          normalizeWhereNode(node, paths, visibility, `where[${index}]`),
+        );
+      }
+    }
+    const queryFields = new Set([
+      ...filterFields,
+      ...collectWhereFields(queryInput.where),
+      ...sorts
+        .map((sort) => sort.sourceField)
+        .filter((field) => field.length > 0),
+    ]);
+    for (const field of queryFields) {
+      const resolved = resolveQueryPath(field, paths, visibility, "where.field");
+      if (!resolved.schemaPath || queryableMetadata.has(resolved.schemaPath)) continue;
+      const request: CmsAccessRequest = {
+        tenantId: input.tenantId,
+        actor: input.actor,
+        resource: "entry",
+        action: "field:read",
+        visibility,
+        fieldPath: resolved.schemaPath,
+        record: { contentType: type.slug },
+      };
+      await this.#authorize(request);
+      if (!(await this.#fieldAccessAllowed(
+        input.tenantId,
+        input.actor,
+        type,
+        resolved.schemaPath,
+        "read",
+        locale,
+      ))) {
+        await this.#recordDenied(request);
+        throw new CmsPermissionDeniedError();
+      }
+    }
+    const search = input.search?.trim();
+    if (search) {
+      const searchPaths = getSearchPaths(paths, visibility);
+      const readableSearchPaths: string[] = [];
+      for (const storagePath of searchPaths) {
+        const schemaPath = storagePath
+          .replace(/^publishedSnapshot\.fields\./, "")
+          .replace(/^fields\./, "");
+        if (
+          (!storagePath.startsWith("fields.") &&
+            !storagePath.startsWith("publishedSnapshot.fields.")) ||
+          (await this.#isAllowed({
+            tenantId: input.tenantId,
+            actor: input.actor,
+            resource: "entry",
+            action: "field:read",
+            visibility,
+            fieldPath: schemaPath,
+            record: { contentType: type.slug },
+          })) &&
+          (await this.#fieldAccessAllowed(
+            input.tenantId,
+            input.actor,
+            type,
+            schemaPath,
+            "read",
+            locale,
+          ))
+        ) {
+          readableSearchPaths.push(storagePath);
         }
-        return entry.id.localeCompare(cursor.id) > 0;
-      });
+      }
+      const searchConditions = readableSearchPaths.map((field) =>
+        conditionAt(field, { operator: "contains", value: search }),
+      );
+      conditions.push(searchConditions.length
+        ? { or: searchConditions }
+        : conditionAt("id", equality("")));
     }
 
-    const pageRows = filtered.slice(0, input.first + 1);
-    const hasNextPage = pageRows.length > input.first;
-    const pageItems = pageRows.slice(0, input.first);
+    const where = mergeConditions(conditions);
+    const selected: Array<{
+      readonly record: CmsContentEntry;
+      readonly view: CmsEntryView;
+      readonly pageStartAfter?: string;
+      readonly pageIndex: number;
+    }> = [];
+    let scanAfter = initialStorageAfter;
+    while (selected.length <= input.first) {
+      const pageStartAfter = scanAfter;
+      const page = await this.#storage.findPage<CmsContentEntry>(
+        COLLECTIONS.entries,
+        {
+          where,
+          orderBy: storageOrder,
+          first: input.first + 1,
+          ...(scanAfter ? { after: { value: scanAfter } } : {}),
+        },
+      );
+      if (!page.items.length) break;
+      for (const [index, entry] of page.items.entries()) {
+        if (visibility === "public" && !isPublicEntry(entry)) continue;
+        if (entry.deletedAt) continue;
+        if (
+          !(await this.#isAllowed({
+            tenantId: input.tenantId,
+            actor: input.actor,
+            resource: "entry",
+            action: "entry:read",
+            visibility,
+            resourceId: entry.id,
+            record: entry,
+          }))
+        ) {
+          continue;
+        }
+        selected.push({
+          record: entry,
+          view: await this.#makeView(entry, type, visibility, input.actor),
+          pageStartAfter,
+          pageIndex: index + 1,
+        });
+        if (selected.length > input.first) break;
+      }
+      if (selected.length > input.first || !page.hasNextPage) break;
+      if (!page.nextCursor) {
+        throw new CmsCapabilityError("storage cursor pagination");
+      }
+      scanAfter = page.nextCursor.value;
+    }
+
+    const pageItems = selected.slice(0, input.first).map(({ view }) => view);
+    const hasNextPage = selected.length > input.first;
+    let nextCursor: string | null = null;
+    if (hasNextPage) {
+      const boundary = selected[input.first - 1]!;
+      const boundaryPage = await this.#storage.findPage<CmsContentEntry>(
+        COLLECTIONS.entries,
+        {
+          where,
+          orderBy: storageOrder,
+          first: boundary.pageIndex,
+          ...(boundary.pageStartAfter
+            ? { after: { value: boundary.pageStartAfter } }
+            : {}),
+        },
+      );
+      if (!boundaryPage.hasNextPage || !boundaryPage.nextCursor) {
+        throw new CmsCapabilityError("storage cursor pagination");
+      }
+      nextCursor = createCursor(boundaryPage.nextCursor.value, scope);
+    }
     return {
       items: pageItems,
-      nextCursor: hasNextPage
-        ? createCursor(pageItems[pageItems.length - 1]!, orderBy, scope)
-        : null,
+      nextCursor,
       hasNextPage,
     };
+  }
+
+  async listEntryTranslations(
+    input: CmsEntryTranslationsQuery,
+  ): Promise<CmsEntryPage> {
+    return this.listEntries(input);
   }
 
   async listRevisions(
@@ -1313,7 +2774,7 @@ export class CmsService {
           resource: "revision",
           action: "revision:read",
           resourceId: revision.id,
-          record: revision,
+          record: { ...revision, contentTypeSlug: type.slug },
         }))
       ) {
         continue;
@@ -1460,9 +2921,14 @@ export class CmsService {
         { path: "expectedRevision", code: "required", message: "A positive expected revision is required." },
       ]);
     }
-    const event = await this.#storage.findById<CmsChangeEvent>(
+    const event = await this.#storage.findOne<CmsChangeEvent>(
       COLLECTIONS.changeEvents,
-      input.eventId,
+      {
+        where: {
+          id: equality(input.eventId),
+          tenantId: equality(input.tenantId),
+        },
+      },
     );
     if (!event || event.tenantId !== input.tenantId) {
       throw new CmsNotFoundError("Change event");
@@ -1553,6 +3019,14 @@ export class CmsService {
     this.#assertExpectedRevision(current, input.expectedRevision);
     await this.#authorizeEntry(input, current, deleted ? "entry:delete" : "entry:archive");
     const type = await this.#getTypeById(input.tenantId, current.contentTypeId);
+    const operation = deleted ? "delete" : "archive";
+    const currentView = await this.#makeView(current, type, "admin", input.actor);
+    await this.#runBeforeChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      operation,
+      { entryId: current.id, current: currentView },
+    );
     const fields = await this.#currentFields(current, type, input);
     const scheduled = this.#scheduledTask(current);
     const now = this.#now();
@@ -1577,7 +3051,15 @@ export class CmsService {
       input.changeSummary,
     );
     if (scheduled) await this.#cancelScheduled(scheduled);
-    return this.#makeView(updated, type, "admin", input.actor);
+    const view = await this.#makeView(updated, type, "admin", input.actor);
+    await this.#runAfterChange(
+      type,
+      { tenantId: input.tenantId, actor: input.actor },
+      operation,
+      view,
+      { fields, current: currentView },
+    );
+    return view;
   }
 
   async #persistEntry(
@@ -1636,6 +3118,35 @@ export class CmsService {
         "The content type schema changed during this operation; reload and retry.",
       );
     }
+    const typeFields = type.fields as readonly QueryFieldDefinition[];
+    const desiredRelationshipIds = new Set([
+      ...collectRelationshipIds(typeFields, entry.fields),
+      ...(entry.publishedSnapshot
+        ? collectRelationshipIds(typeFields, entry.publishedSnapshot.fields)
+        : []),
+    ]);
+    const currentRelationshipIds = current
+      ? new Set([
+          ...collectRelationshipIds(typeFields, current.fields),
+          ...(current.publishedSnapshot
+            ? collectRelationshipIds(typeFields, current.publishedSnapshot.fields)
+            : []),
+        ])
+      : new Set<string>();
+    const newRelationshipIds = [...desiredRelationshipIds].filter(
+      (id) => !currentRelationshipIds.has(id),
+    );
+    if (newRelationshipIds.length > MAX_RELATIONSHIP_GUARDS) {
+      throw new CmsCapabilityError("bounded atomic relationship guard batch");
+    }
+    if (newRelationshipIds.length) {
+      this.#requireCapabilities("conditionalWrites");
+    }
+    const relationshipLocks = await Promise.all(
+      newRelationshipIds.map((id) =>
+        this.#ensureRelationshipLock(entry.tenantId, id),
+      ),
+    );
     const desiredMediaUsages = this.#collectMediaUsages(type, entry, actor);
     const currentMediaUsages = current
       ? await this.#storage.findMany<CmsMediaUsage>(COLLECTIONS.mediaUsages, {
@@ -1666,7 +3177,31 @@ export class CmsService {
         collection: COLLECTIONS.entries,
         record: entry as StorageInsert<CmsContentEntry>,
       } as StorageBatchOperation<CmsStoredRecord>);
+      operations.push({
+        type: "insert",
+        collection: COLLECTIONS.relationshipLocks,
+        record: {
+          id: entry.id,
+          tenantId: entry.tenantId,
+          targetEntryId: entry.id,
+          generation: 0,
+          createdAt: entry.createdAt,
+          updatedAt: entry.updatedAt,
+          revision: 1,
+        } as StorageInsert<CmsRelationshipLock>,
+      } as StorageBatchOperation<CmsStoredRecord>);
     }
+    operations.push(
+      ...relationshipLocks.map((lock) => ({
+        type: "update" as const,
+        collection: COLLECTIONS.relationshipLocks,
+        id: lock.id,
+        condition: { expectedRevision: lock.revision },
+        changes: {
+          generation: lock.generation + 1,
+        } as StorageUpdate<CmsRelationshipLock>,
+      } as StorageBatchOperation<CmsStoredRecord>)),
+    );
     for (const usage of currentMediaUsages) {
       if (!desiredUsageKeys.has(this.#mediaUsageKey(usage))) {
         operations.push({
@@ -1727,11 +3262,16 @@ export class CmsService {
 
   async #getEntryRecord(input: CmsContext & { readonly entryId: string }): Promise<CmsContentEntry> {
     this.#assertTenant(input.tenantId);
-    const entry = await this.#storage.findById<CmsContentEntry>(
+    const entry = await this.#storage.findOne<CmsContentEntry>(
       COLLECTIONS.entries,
-      input.entryId,
+      {
+        where: {
+          id: equality(input.entryId),
+          tenantId: equality(input.tenantId),
+        },
+      },
     );
-    if (!entry || entry.tenantId !== input.tenantId) {
+    if (!entry) {
       throw new CmsNotFoundError("Content entry");
     }
     return entry;
@@ -1756,22 +3296,37 @@ export class CmsService {
     const record = await this.#findContentType(tenantId, normalizeCmsSlug(slug));
     if (!record) throw new CmsNotFoundError("Content type");
     this.#cacheDefinition(tenantId, record);
-    return record;
+    return this.#runtimeType(tenantId, record);
   }
 
   async #getTypeById(
     tenantId: string,
     id: string,
   ): Promise<CmsContentTypeRecord> {
-    const type = await this.#storage.findById<CmsContentTypeRecord>(
+    const type = await this.#storage.findOne<CmsContentTypeRecord>(
       COLLECTIONS.contentTypes,
-      id,
+      {
+        where: {
+          id: equality(id),
+          tenantId: equality(tenantId),
+        },
+      },
     );
-    if (!type || type.tenantId !== tenantId) {
+    if (!type) {
       throw new CmsNotFoundError("Content type");
     }
     this.#cacheDefinition(tenantId, type);
-    return type;
+    return this.#runtimeType(tenantId, type);
+  }
+
+  #runtimeType(
+    tenantId: string,
+    record: CmsContentTypeRecord,
+  ): CmsContentTypeRecord {
+    const definition = this.#registry.get(tenantId, record.slug);
+    return definition
+      ? { ...record, fields: definition.fields }
+      : record;
   }
 
   #collectMediaUsages(
@@ -1780,8 +3335,57 @@ export class CmsService {
     actor: CmsActor | null,
   ): readonly StorageInsert<CmsMediaUsage>[] {
     const found: StorageInsert<CmsMediaUsage>[] = [];
+    const visitField = (
+      field: QueryFieldDefinition,
+      value: CmsValue,
+      path: string,
+      usageType: CmsMediaUsage["usageType"],
+    ): void => {
+      if (field.type === "media" && typeof value === "string") {
+        const now = this.#now();
+        found.push({
+          id: this.#idGenerator(),
+          tenantId: entry.tenantId,
+          assetId: value,
+          contentTypeId: entry.contentTypeId,
+          entryId: entry.id,
+          locale: entry.locale,
+          fieldPath: path,
+          usageType,
+          createdBy: actor?.id ?? null,
+          createdAt: now,
+          updatedAt: now,
+          revision: 1,
+        });
+      } else if (field.type === "object" && isRecord(value)) {
+        visit(field.fields ?? [], value as CmsFields, usageType, path);
+      } else if (field.type === "array" && Array.isArray(value) && field.of) {
+        value.forEach((item, index) =>
+          visitField(field.of!, item, `${path}[${index}]`, usageType),
+        );
+      } else if (field.type === "repeater" && Array.isArray(value)) {
+        value.forEach((item, index) => {
+          if (isRecord(item)) {
+            visit(field.fields ?? [], item as CmsFields, usageType, `${path}[${index}]`);
+          }
+        });
+      } else if (field.type === "blocks" && Array.isArray(value)) {
+        value.forEach((item, index) => {
+          if (!isRecord(item) || !isRecord(item.fields)) return;
+          const block = field.blocks?.find((candidate) => candidate.type === item.type);
+          if (block) {
+            visit(
+              block.fields,
+              item.fields as CmsFields,
+              usageType,
+              `${path}[${index}].fields`,
+            );
+          }
+        });
+      }
+    };
     const visit = (
-      definitions: readonly CmsFieldDefinition[],
+      definitions: readonly QueryFieldDefinition[],
       fields: CmsFields,
       usageType: CmsMediaUsage["usageType"],
       prefix = "",
@@ -1789,48 +3393,7 @@ export class CmsService {
       for (const field of definitions) {
         if (!Object.prototype.hasOwnProperty.call(fields, field.key)) continue;
         const path = prefix ? `${prefix}.${field.key}` : field.key;
-        const value = fields[field.key];
-        if (field.type === "media" && typeof value === "string") {
-          const now = this.#now();
-          found.push({
-            id: this.#idGenerator(),
-            tenantId: entry.tenantId,
-            assetId: value,
-            contentTypeId: entry.contentTypeId,
-            entryId: entry.id,
-            locale: entry.locale,
-            fieldPath: path,
-            usageType,
-            createdBy: actor?.id ?? null,
-            createdAt: now,
-            updatedAt: now,
-            revision: 1,
-          });
-        } else if (field.type === "repeater" && Array.isArray(value)) {
-          value.forEach((item, index) => {
-            if (isRecord(item)) {
-              visit(
-                field.fields ?? [],
-                item as CmsFields,
-                usageType,
-                `${path}[${index}]`,
-              );
-            }
-          });
-        } else if (field.type === "blocks" && Array.isArray(value)) {
-          value.forEach((item, index) => {
-            if (!isRecord(item) || !isRecord(item.fields)) return;
-            const block = field.blocks?.find((candidate) => candidate.type === item.type);
-            if (block) {
-              visit(
-                block.fields,
-                item.fields as CmsFields,
-                usageType,
-                `${path}[${index}].fields`,
-              );
-            }
-          });
-        }
+        visitField(field, fields[field.key]!, path, usageType);
       }
     };
 
@@ -1859,11 +3422,36 @@ export class CmsService {
     };
   }
 
+  #matchesDefinition(
+    record: CmsContentTypeRecord,
+    definition: ContentTypeDefinition,
+  ): boolean {
+    const serializableDefinition = {
+      slug: definition.slug,
+      name: definition.name,
+      description: definition.description,
+      version: definition.version,
+      fields: serializeRuntimeFields(definition.fields),
+      locales: definition.locales?.length ? definition.locales : undefined,
+      defaultLocale: definition.defaultLocale,
+    };
+    return sameValue(this.#definition(record), serializableDefinition);
+  }
+
   #cacheDefinition(tenantId: string, record: CmsContentTypeRecord): void {
     const current = this.#registry.get(tenantId, record.slug);
     if (current && current.version > record.version) {
       throw new CmsConflictError(
         "A newer content type schema is already cached; reload the content type.",
+      );
+    }
+    if (current?.version === record.version) return;
+    const missingCallbacks = missingRuntimeCallbacks(
+      record.fields as readonly QueryFieldDefinition[],
+    );
+    if (missingCallbacks.length) {
+      throw new CmsSchemaError(
+        `Runtime field callbacks must be re-registered from code: ${missingCallbacks.join(", ")}.`,
       );
     }
     if (!current || current.version < record.version) {
@@ -2113,18 +3701,110 @@ export class CmsService {
     type: CmsContentTypeRecord,
     fields: CmsFields,
     record?: CmsContentEntry,
+    collectionOperation?: "create" | "update" | "restore",
   ): Promise<void> {
+    const operation = collectionOperation ?? (record ? "update" : "create");
     for (const fieldPath of fieldPaths(type.fields, fields)) {
-      await this.#authorize({
+      const request: CmsAccessRequest = {
         tenantId,
         actor,
         resource: "entry",
         action: "field:write",
         resourceId: record?.id,
         fieldPath,
-        record,
-      });
+        record: record
+          ? { ...record, collectionOperation: operation }
+          : { contentType: type.slug, collectionOperation: operation },
+      };
+      await this.#authorize(request);
+      if (!(await this.#fieldAccessAllowed(
+        tenantId,
+        actor,
+        type,
+        fieldPath,
+        "write",
+        record?.locale,
+      ))) {
+        await this.#recordDenied(request);
+        throw new CmsPermissionDeniedError();
+      }
     }
+  }
+
+  async #fieldAccessAllowed(
+    tenantId: string,
+    actor: CmsActor | null,
+    type: CmsContentTypeRecord,
+    fieldPath: string,
+    operation: "read" | "write",
+    locale?: string,
+  ): Promise<boolean> {
+    const definitions = fieldAccessPathsAt(type.fields, fieldPath);
+    for (const [index, item] of definitions.entries()) {
+      const access = item.definition.access?.[operation];
+      if (access === false) return false;
+      if (typeof access === "function") {
+        try {
+          if (!(await access({
+            operation,
+            path: index === definitions.length - 1 ? fieldPath : item.path,
+            tenantId,
+            contentTypeSlug: type.slug,
+            locale,
+            actor,
+          }))) {
+            return false;
+          }
+        } catch {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  async #runBeforeChange(
+    type: CmsContentTypeRecord,
+    context: CmsContext,
+    operation: CmsCollectionHookOperation,
+    input: {
+      readonly entryId?: string;
+      readonly fields?: CmsFields;
+      readonly current?: CmsEntryView;
+    } = {},
+  ): Promise<void> {
+    const hook = this.#collectionOptions.get(normalizeCmsSlug(type.slug))
+      ?.hooks?.beforeChange;
+    if (!hook) return;
+    await hook(immutableClone({
+      operation,
+      context,
+      contentType: type.slug,
+      ...input,
+    }));
+  }
+
+  async #runAfterChange(
+    type: CmsContentTypeRecord,
+    context: CmsContext,
+    operation: CmsCollectionHookOperation,
+    entry: CmsEntryView,
+    input: {
+      readonly fields?: CmsFields;
+      readonly current?: CmsEntryView;
+    } = {},
+  ): Promise<void> {
+    const hook = this.#collectionOptions.get(normalizeCmsSlug(type.slug))
+      ?.hooks?.afterChange;
+    if (!hook) return;
+    await hook(immutableClone({
+      operation,
+      context,
+      contentType: type.slug,
+      entryId: entry.id,
+      ...input,
+      entry,
+    }));
   }
 
   async #validateReferences(
@@ -2136,85 +3816,253 @@ export class CmsService {
     entryId?: string,
   ): Promise<void> {
     const issues: CmsValidationIssue[] = [];
+    const visitField = async (
+      field: QueryFieldDefinition,
+      value: CmsValue,
+      path: string,
+    ): Promise<void> => {
+      if (field.type === "media" && typeof value === "string") {
+        if (!this.#mediaValidator) {
+          issues.push({
+            path,
+            code: "media-validator-required",
+            message: "A media reference validator is required to accept asset IDs.",
+          });
+        } else {
+          try {
+            await this.#mediaValidator.assertCanReference({
+              tenantId,
+              assetId: value,
+              actor,
+              contentTypeSlug: type.slug,
+              entryId,
+              fieldPath: path,
+            });
+          } catch {
+            issues.push({
+              path,
+              code: "media-reference",
+              message: "The asset is missing or cannot be referenced in this tenant.",
+            });
+          }
+        }
+      } else if (field.type === "relationship") {
+        const ids = Array.isArray(value) ? value : [value];
+        for (const id of ids) {
+          if (typeof id !== "string") continue;
+          const target = await this.#storage.findOne<CmsContentEntry>(
+            COLLECTIONS.entries,
+            {
+              where: {
+                id: equality(id),
+                tenantId: equality(tenantId),
+              },
+            },
+          );
+          const relation = (field as CmsFieldDefinition).relation;
+          const valid =
+            target !== null &&
+            relation?.targetTypes.includes(target.contentTypeSlug) === true &&
+            (!relation.sameLocale || target.locale === locale) &&
+            !target.deletedAt &&
+            (relation.allowedStatuses
+              ? relation.allowedStatuses.includes(target.status)
+              : target.status !== "archived");
+          if (!valid) {
+            issues.push({
+              path,
+              code: "invalid-relation",
+              message: "A related entry is missing, outside this tenant, or disallowed by the relation.",
+            });
+          }
+        }
+      } else if (field.type === "object" && isRecord(value)) {
+        await visit(field.fields ?? [], value as CmsFields, path);
+      } else if (field.type === "array" && Array.isArray(value) && field.of) {
+        for (const [index, item] of value.entries()) {
+          await visitField(field.of, item, `${path}[${index}]`);
+        }
+      } else if (field.type === "repeater" && Array.isArray(value)) {
+        for (const [index, item] of value.entries()) {
+          if (isRecord(item)) {
+            await visit(field.fields ?? [], item as CmsFields, `${path}[${index}]`);
+          }
+        }
+      } else if (field.type === "blocks" && Array.isArray(value)) {
+        for (const [index, item] of value.entries()) {
+          if (!isRecord(item) || !isRecord(item.fields)) continue;
+          const block = field.blocks?.find((candidate) => candidate.type === item.type);
+          if (block) {
+            await visit(
+              block.fields,
+              item.fields as CmsFields,
+              `${path}[${index}].fields`,
+            );
+          }
+        }
+      }
+    };
     const visit = async (
-      definitions: readonly CmsFieldDefinition[],
+      definitions: readonly QueryFieldDefinition[],
       values: CmsFields,
       prefix = "",
     ): Promise<void> => {
       for (const field of definitions) {
         if (!Object.prototype.hasOwnProperty.call(values, field.key)) continue;
         const path = prefix ? `${prefix}.${field.key}` : field.key;
-        const value = values[field.key];
-        if (field.type === "media" && typeof value === "string") {
-          if (!this.#mediaValidator) {
-            issues.push({
-              path,
-              code: "media-validator-required",
-              message: "A media reference validator is required to accept asset IDs.",
-            });
-          } else {
-            try {
-              await this.#mediaValidator.assertCanReference({
-                tenantId,
-                assetId: value,
-                actor,
-                contentTypeSlug: type.slug,
-                entryId,
-                fieldPath: path,
-              });
-            } catch {
-              issues.push({
-                path,
-                code: "media-reference",
-                message: "The asset is missing or cannot be referenced in this tenant.",
-              });
-            }
-          }
-        } else if (field.type === "relationship") {
-          const ids = Array.isArray(value) ? value : [value];
-          for (const id of ids) {
-            if (typeof id !== "string") continue;
-            const target = await this.#storage.findById<CmsContentEntry>(
-              COLLECTIONS.entries,
-              id,
-            );
-            const relation = field.relation;
-            const valid =
-              target !== null &&
-              target.tenantId === tenantId &&
-              relation?.targetTypes.includes(target.contentTypeSlug) === true &&
-              (!relation.sameLocale || target.locale === locale) &&
-              !target.deletedAt &&
-              (relation.allowedStatuses
-                ? relation.allowedStatuses.includes(target.status)
-                : target.status !== "archived");
-            if (!valid) {
-              issues.push({
-                path,
-                code: "invalid-relation",
-                message: "A related entry is missing, outside this tenant, or disallowed by the relation.",
-              });
-            }
-          }
-        } else if (field.type === "repeater" && Array.isArray(value)) {
-          for (const [index, item] of value.entries()) {
-            if (isRecord(item)) {
-              await visit(field.fields ?? [], item as CmsFields, `${path}[${index}]`);
-            }
-          }
-        } else if (field.type === "blocks" && Array.isArray(value)) {
-          for (const [index, item] of value.entries()) {
-            if (!isRecord(item) || !isRecord(item.fields)) continue;
-            const block = field.blocks?.find((candidate) => candidate.type === item.type);
-            if (block) {
-              await visit(block.fields, item.fields as CmsFields, `${path}[${index}].fields`);
-            }
-          }
-        }
+        await visitField(
+          field as QueryFieldDefinition,
+          values[field.key]!,
+          path,
+        );
       }
     };
     await visit(type.fields, fields);
     if (issues.length) throw new CmsValidationError(issues);
+  }
+
+  async #assertNoIncomingRelationshipReferences(
+    tenantId: string,
+    target: CmsContentEntry,
+  ): Promise<void> {
+    const typeRecords = await this.#storage.findMany<CmsContentTypeRecord>(
+      COLLECTIONS.contentTypes,
+      {
+        where: { tenantId: equality(tenantId) },
+        orderBy: [{ field: "slug", direction: "asc" }],
+        limit: MAX_PURGE_CONTENT_TYPES + 1,
+      },
+    );
+    if (typeRecords.length > MAX_PURGE_CONTENT_TYPES) {
+      throw new CmsCapabilityError("bounded schema scan for permanent deletion");
+    }
+    let scanned = 0;
+    for (const type of typeRecords) {
+      const definitions = type.fields as readonly QueryFieldDefinition[];
+      if (!hasRelationshipTarget(definitions, target.contentTypeSlug)) continue;
+      const inspect = async <T extends CmsContentEntry | CmsContentRevision>(
+        collection: string,
+        isTargetRecord: (record: T) => boolean,
+      ): Promise<void> => {
+        let after: string | undefined;
+        while (true) {
+          const page = await this.#storage.findPage<T>(collection, {
+            where: {
+              tenantId: equality(tenantId),
+              contentTypeId: equality(type.id),
+            } as unknown as StorageWhere<T>,
+            orderBy: [{ field: "id", direction: "asc" } as StorageOrder<T>],
+            first: PURGE_SCAN_PAGE_SIZE,
+            ...(after ? { after: { value: after } } : {}),
+          });
+          scanned += page.items.length;
+          if (scanned > MAX_PURGE_REFERENCE_SCAN) {
+            throw new CmsCapabilityError("bounded relationship scan for permanent deletion");
+          }
+          for (const record of page.items) {
+            if (isTargetRecord(record)) continue;
+            const fields = await this.#migrateFields(
+              type,
+              record.fields,
+              record.schemaVersion,
+              tenantId,
+            );
+            if (collectRelationshipIds(definitions, fields).has(target.id)) {
+              throw new CmsConflictError(
+                "The entry is still referenced by other CMS content and cannot be permanently deleted.",
+              );
+            }
+            if (record.publishedSnapshot) {
+              const publishedFields = await this.#migrateFields(
+                type,
+                record.publishedSnapshot.fields,
+                record.publishedSnapshot.schemaVersion,
+                tenantId,
+              );
+              if (collectRelationshipIds(definitions, publishedFields).has(target.id)) {
+                throw new CmsConflictError(
+                  "The entry is still referenced by a published CMS snapshot and cannot be permanently deleted.",
+                );
+              }
+            }
+          }
+          if (!page.hasNextPage) break;
+          if (!page.nextCursor) {
+            throw new CmsCapabilityError("storage cursor pagination");
+          }
+          after = page.nextCursor.value;
+        }
+      };
+      await inspect<CmsContentEntry>(
+        COLLECTIONS.entries,
+        (entry) => entry.id === target.id,
+      );
+      await inspect<CmsContentRevision>(
+        COLLECTIONS.revisions,
+        (revision) => revision.entryId === target.id,
+      );
+    }
+  }
+
+  async #ensureRelationshipLock(
+    tenantId: string,
+    targetEntryId: string,
+  ): Promise<CmsRelationshipLock> {
+    const where = {
+      id: equality(targetEntryId),
+      tenantId: equality(tenantId),
+    };
+    const findLock = () =>
+      this.#storage.findOne<CmsRelationshipLock>(
+        COLLECTIONS.relationshipLocks,
+        { where },
+      );
+    let lock = await findLock();
+    if (!lock) {
+      const target = await this.#storage.findOne<CmsContentEntry>(
+        COLLECTIONS.entries,
+        { where },
+      );
+      if (!target) throw new CmsNotFoundError("Relationship target");
+      const now = this.#now();
+      const candidate: StorageInsert<CmsRelationshipLock> = {
+        id: targetEntryId,
+        tenantId,
+        targetEntryId,
+        generation: 0,
+        createdAt: now,
+        updatedAt: now,
+        revision: 1,
+      };
+      try {
+        await this.#storage.insert(
+          COLLECTIONS.relationshipLocks,
+          candidate,
+        );
+      } catch (error) {
+        if (!(error instanceof StorageDuplicateError)) throw error;
+      }
+      lock = await findLock();
+    }
+
+    const target = await this.#storage.findOne<CmsContentEntry>(
+      COLLECTIONS.entries,
+      { where },
+    );
+    if (!target) {
+      if (lock) {
+        await this.#storage.delete<CmsRelationshipLock>(
+          COLLECTIONS.relationshipLocks,
+          lock.id,
+          { expectedRevision: lock.revision },
+        );
+      }
+      throw new CmsNotFoundError("Relationship target");
+    }
+    if (!lock || lock.targetEntryId !== targetEntryId) {
+      throw new CmsConflictError("The relationship integrity guard is unavailable.");
+    }
+    return lock;
   }
 
   async #makeView(
@@ -2261,11 +4109,19 @@ export class CmsService {
       entry.schemaVersion,
       entry.tenantId,
     );
+    const projectedFields = await this.#projectFieldMap(
+      type,
+      type.fields,
+      fields,
+      entry.tenantId,
+      actor,
+      entry.locale,
+    );
     const redacted = await this.#redactFields(
       entry.tenantId,
       actor,
       type,
-      fields,
+      projectedFields,
       entry,
       "admin",
     );
@@ -2302,18 +4158,233 @@ export class CmsService {
       snapshot.schemaVersion,
       tenantId,
     );
+    const projectedFields = await this.#projectFieldMap(
+      type,
+      type.fields,
+      fields,
+      tenantId,
+      actor,
+      snapshot.locale,
+    );
     return {
       ...snapshot,
       fields: await this.#redactFields(
         tenantId,
         actor,
         type,
-        fields,
+        projectedFields,
         record,
         visibility,
       ),
       schemaVersion: type.version,
     };
+  }
+
+  async #projectFieldMap(
+    type: CmsContentTypeRecord,
+    definitions: readonly QueryFieldDefinition[],
+    source: CmsFields,
+    tenantId: string,
+    actor: CmsActor | null,
+    locale: string,
+    prefix = "",
+  ): Promise<CmsFields> {
+    const result: Record<string, CmsValue> = { ...source };
+    for (const definition of definitions) {
+      const field = definition as QueryFieldDefinition;
+      const path = prefix ? `${prefix}.${field.key}` : field.key;
+      if (field.type === "computed") {
+        if (typeof field.compute !== "function") {
+          throw new CmsSchemaError(
+            `Computed field "${path}" requires its runtime callback after restart.`,
+          );
+        }
+        let value: CmsValue;
+        try {
+          value = await field.compute({
+            path,
+            tenantId,
+            contentTypeSlug: type.slug,
+            locale,
+            actor,
+            fields: result,
+          });
+        } catch {
+          throw new CmsValidationError([
+            { path, code: "computed", message: "The computed field could not be evaluated." },
+          ]);
+        }
+        if (!isCmsValue(value)) {
+          throw new CmsValidationError([
+            { path, code: "serialization", message: "Computed values must be finite JSON-compatible values." },
+          ]);
+        }
+        await this.#validateProjectedValue(
+          field,
+          value,
+          path,
+          tenantId,
+          actor,
+          locale,
+          type.slug,
+        );
+        result[field.key] = value;
+        continue;
+      }
+      if (!Object.prototype.hasOwnProperty.call(source, field.key)) continue;
+      result[field.key] = await this.#projectFieldValue(
+        type,
+        field,
+        source[field.key]!,
+        path,
+        tenantId,
+        actor,
+        locale,
+        source,
+      );
+    }
+    return result;
+  }
+
+  async #validateProjectedValue(
+    field: QueryFieldDefinition,
+    value: CmsValue,
+    path: string,
+    tenantId: string,
+    actor: CmsActor | null,
+    locale: string,
+    contentTypeSlug: string,
+  ): Promise<void> {
+    if (typeof field.validate !== "function") return;
+    try {
+      const message = await field.validate(value, {
+        path,
+        fieldPath: path,
+        tenantId,
+        actor,
+        locale,
+        contentTypeSlug,
+      });
+      if (typeof message === "string" && message) {
+        throw new CmsValidationError([
+          { path, code: "custom-validation", message },
+        ]);
+      }
+    } catch (error) {
+      if (error instanceof CmsValidationError) throw error;
+      throw new CmsValidationError([
+        { path, code: "custom-validation", message: "Computed field validation failed." },
+      ]);
+    }
+  }
+
+  async #projectFieldValue(
+    type: CmsContentTypeRecord,
+    field: QueryFieldDefinition,
+    value: CmsValue,
+    path: string,
+    tenantId: string,
+    actor: CmsActor | null,
+    locale: string,
+    parentFields: CmsFields,
+  ): Promise<CmsValue> {
+    if (field.type === "computed") {
+      if (typeof field.compute !== "function") {
+        throw new CmsSchemaError(
+          `Computed field "${path}" requires its runtime callback after restart.`,
+        );
+      }
+      let computed: CmsValue;
+      try {
+        computed = await field.compute({
+          path,
+          tenantId,
+          contentTypeSlug: type.slug,
+          locale,
+          actor,
+          fields: parentFields,
+        });
+      } catch {
+        throw new CmsValidationError([
+          { path, code: "computed", message: "The computed field could not be evaluated." },
+        ]);
+      }
+      if (!isCmsValue(computed)) {
+        throw new CmsValidationError([
+          { path, code: "serialization", message: "Computed values must be finite JSON-compatible values." },
+        ]);
+      }
+      await this.#validateProjectedValue(
+        field,
+        computed,
+        path,
+        tenantId,
+        actor,
+        locale,
+        type.slug,
+      );
+      return computed;
+    }
+    if (field.type === "object" && isRecord(value)) {
+      return this.#projectFieldMap(
+        type,
+        field.fields ?? [],
+        value as CmsFields,
+        tenantId,
+        actor,
+        locale,
+        path,
+      );
+    }
+    if (field.type === "array" && Array.isArray(value) && field.of) {
+      return Promise.all(value.map((item, index) =>
+        this.#projectFieldValue(
+          type,
+          field.of!,
+          item,
+          `${path}[${index}]`,
+          tenantId,
+          actor,
+          locale,
+          parentFields,
+        ),
+      ));
+    }
+    if (field.type === "repeater" && Array.isArray(value)) {
+      return Promise.all(value.map((item, index) =>
+        isRecord(item)
+          ? this.#projectFieldMap(
+              type,
+              field.fields ?? [],
+              item as CmsFields,
+              tenantId,
+              actor,
+              locale,
+              `${path}[${index}]`,
+            )
+          : item,
+      ));
+    }
+    if (field.type === "blocks" && Array.isArray(value)) {
+      return Promise.all(value.map(async (item, index) => {
+        if (!isRecord(item) || !isRecord(item.fields)) return item;
+        const block = field.blocks?.find((candidate) => candidate.type === item.type);
+        if (!block) return item;
+        return {
+          type: block.type,
+          fields: await this.#projectFieldMap(
+            type,
+            block.fields,
+            item.fields as CmsFields,
+            tenantId,
+            actor,
+            locale,
+            `${path}[${index}].fields`,
+          ),
+        };
+      }));
+    }
+    return value;
   }
 
   async #redactFields(
@@ -2325,14 +4396,18 @@ export class CmsService {
     visibility: CmsVisibility,
   ): Promise<CmsFields> {
     const redact = async (
-      definitions: readonly CmsFieldDefinition[],
+      definitions: readonly QueryFieldDefinition[],
       source: CmsFields,
       prefix = "",
     ): Promise<Record<string, CmsValue>> => {
       const result: Record<string, CmsValue> = {};
       for (const field of definitions) {
         if (!Object.prototype.hasOwnProperty.call(source, field.key)) continue;
+        const runtime = field as QueryFieldDefinition;
         const path = prefix ? `${prefix}.${field.key}` : field.key;
+        const recordLocale = isRecord(record) && typeof record.locale === "string"
+          ? record.locale
+          : undefined;
         const allowed = await this.#isAllowed({
           tenantId,
           actor,
@@ -2342,27 +4417,61 @@ export class CmsService {
           fieldPath: path,
           record,
         });
-        if (!allowed) continue;
+        if (
+          !allowed ||
+          !(await this.#fieldAccessAllowed(
+            tenantId,
+            actor,
+            type,
+            path,
+            "read",
+            recordLocale,
+          ))
+        ) continue;
         const value = source[field.key];
         if (value === undefined) continue;
-        if (field.type === "repeater" && Array.isArray(value)) {
+        if (runtime.type === "object" && isRecord(value)) {
+          result[field.key] = await redact(
+            runtime.fields ?? [],
+            value as CmsFields,
+            path,
+          );
+        } else if (
+          runtime.type === "array" &&
+          runtime.of?.type === "object" &&
+          Array.isArray(value)
+        ) {
           const rows: CmsValue[] = [];
           for (const [index, item] of value.entries()) {
             rows.push(
               isRecord(item)
-                ? await redact(field.fields ?? [], item as CmsFields, `${path}[${index}]`)
+                ? await redact(
+                    runtime.of.fields ?? [],
+                    item as CmsFields,
+                    `${path}[${index}]`,
+                  )
                 : item,
             );
           }
           result[field.key] = rows;
-        } else if (field.type === "blocks" && Array.isArray(value)) {
+        } else if (runtime.type === "repeater" && Array.isArray(value)) {
+          const rows: CmsValue[] = [];
+          for (const [index, item] of value.entries()) {
+            rows.push(
+              isRecord(item)
+                ? await redact(runtime.fields ?? [], item as CmsFields, `${path}[${index}]`)
+                : item,
+            );
+          }
+          result[field.key] = rows;
+        } else if (runtime.type === "blocks" && Array.isArray(value)) {
           const blocks: CmsValue[] = [];
           for (const [index, item] of value.entries()) {
             if (!isRecord(item) || !isRecord(item.fields)) {
               blocks.push(item);
               continue;
             }
-            const block = field.blocks?.find((candidate) => candidate.type === item.type);
+            const block = runtime.blocks?.find((candidate) => candidate.type === item.type);
             blocks.push(block
               ? {
                   type: block.type,
@@ -2428,6 +4537,10 @@ export class CmsService {
     return this.#scheduler;
   }
 
+  #draftsEnabled(type: CmsContentTypeRecord): boolean {
+    return this.#collectionOptions.get(normalizeCmsSlug(type.slug))?.drafts ?? true;
+  }
+
   async #authorizeEntry(
     input: CmsContext & { readonly entryId?: string },
     entry: CmsContentEntry,
@@ -2456,7 +4569,48 @@ export class CmsService {
 
   async #isAllowed(request: CmsAccessRequest): Promise<boolean> {
     try {
-      return (await this.#accessPolicy(request)) === true;
+      if ((await this.#accessPolicy(request)) !== true) return false;
+      if (request.resource === "contentType" || !isRecord(request.record)) {
+        return true;
+      }
+      const contentTypeSlug =
+        typeof request.record.contentTypeSlug === "string"
+          ? request.record.contentTypeSlug
+          : typeof request.record.contentType === "string"
+            ? request.record.contentType
+            : undefined;
+      let resolvedContentTypeSlug = contentTypeSlug;
+      if (!resolvedContentTypeSlug && request.resource === "mediaUsage") {
+        if (typeof request.record.contentTypeId !== "string") return false;
+        const type = await this.#storage.findOne<CmsContentTypeRecord>(
+          COLLECTIONS.contentTypes,
+          {
+            where: {
+              id: equality(request.record.contentTypeId),
+              tenantId: equality(request.tenantId),
+            },
+          },
+        );
+        if (!type) return false;
+        resolvedContentTypeSlug = type.slug;
+      }
+      if (!resolvedContentTypeSlug) return true;
+      const collectionAccess = this.#collectionOptions.get(
+        normalizeCmsSlug(resolvedContentTypeSlug),
+      )?.access;
+      if (collectionAccess === undefined) return true;
+      const accessMap = collectionAccess as Readonly<Record<string, unknown>>;
+      const friendlyAction = collectionAccessAlias(request);
+      const action = friendlyAction && Object.hasOwn(accessMap, friendlyAction)
+        ? friendlyAction
+        : request.action;
+      const policy = accessMap[action] as CmsCollectionAccessPolicy | undefined;
+      return typeof policy === "function" &&
+        (await policy({
+          ...request,
+          action: action as CmsAccessAction | CollectionAccessAction,
+          user: request.actor,
+        })) === true;
     } catch {
       return false;
     }
@@ -2624,6 +4778,9 @@ export class CmsService {
           { name: "by-tenant-entry-field-asset", fields: ["tenantId", "entryId", "usageType", "fieldPath", "assetId"], unique: true },
           { name: "by-tenant-asset", fields: ["tenantId", "assetId"] },
         ]),
+      ),
+      this.#storage.registerCollection<CmsRelationshipLock>(
+        addIndexes<CmsRelationshipLock>(COLLECTIONS.relationshipLocks, []),
       ),
     ]).then(() => undefined);
     await this.#collectionsReady;

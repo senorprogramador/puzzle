@@ -1,0 +1,94 @@
+---
+title: Build a blog
+description: Model posts and topics with code-first collections, publish drafts, and query public content.
+---
+
+This example uses a `topics` collection and a `posts` collection. The
+relationship target is checked against the static registry at compile time and
+validated for tenant and status when content is written.
+
+```ts
+import { collection, defineCMS, fields } from "@puzzle-ui/cms";
+
+export const blogConfig = defineCMS({
+  collections: {
+    topics: collection({
+      name: "Topic",
+      version: 1,
+      fields: {
+        name: fields.text({ label: "Name", required: true }),
+        slug: fields.slug({ label: "Slug", from: "name", required: true }),
+      },
+    }),
+    posts: collection({
+      name: "Post",
+      version: 1,
+      drafts: true,
+      timestamps: true,
+      fields: {
+        title: fields.text({ label: "Title", required: true }),
+        slug: fields.slug({ label: "Slug", required: true }),
+        excerpt: fields.textarea({ label: "Excerpt" }),
+        body: fields.textarea({ label: "Body", required: true }),
+        topic: fields.relationship({
+          label: "Topic",
+          target: "topics",
+          multiple: false,
+          allowedStatuses: ["published"],
+        }),
+      },
+    }),
+  },
+});
+```
+
+`createCms` needs a configured `StorageAdapter`, trusted request context, and
+access policy. These values are host dependencies; see [Getting
+started](/docs/cms/getting-started) and [Multi-tenant
+setup](/docs/cms/multi-tenancy).
+
+## Write and publish content
+
+```ts
+const topic = await cms.topics.create({ name: "Engineering" });
+const post = await cms.posts.create({
+  title: "Building a reliable publishing workflow",
+  slug: "reliable-publishing-workflow",
+  excerpt: "A practical guide to drafts and revisions.",
+  body: "Write and review content before it goes live.",
+  topic: topic.id,
+});
+
+const published = await cms.posts.publish(post.id, {
+  expectedRevision: post.revision,
+  changeSummary: "Approved for publication.",
+});
+```
+
+With `drafts: true`, creating a post creates a draft. Publishing is an explicit
+revision-checked transition. Without drafts enabled, creates and updates are
+published immediately.
+
+## Query the public feed
+
+```ts
+const latest = await cms.posts.find({
+  visibility: "public",
+  sort: "-publishedAt",
+  limit: 20,
+  page: 1,
+});
+
+const article = await cms.posts.findBySlug("reliable-publishing-workflow", {
+  visibility: "public",
+});
+```
+
+Public visibility returns only published snapshots. The collection page is
+bounded and includes `nextCursor` and `hasNextPage`; filters and sorting are
+validated against the declared fields. See [Entries, queries, and
+relationships](/docs/cms/entries) for filter operators and cursor pagination.
+
+For routes and browser clients, follow the
+[Fullstack CMS guide](/docs/fullstack/cms). CMS does not provide blog routes,
+templates, or rendering components; your application owns those concerns.

@@ -2,7 +2,7 @@
 
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync, readdirSync, unlinkSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { createInterface } from "node:readline/promises";
 import { fileURLToPath } from "node:url";
 
@@ -51,6 +51,8 @@ const dependencyFields = [
 
 const releaseTypes = ["major", "minor", "patch"];
 const lockfile = join(root, "bun.lock");
+const npmPollIntervalMs = 10_000;
+const npmPollTimeoutMs = 15 * 60 * 1000;
 
 class ReleaseError extends Error {}
 
@@ -62,16 +64,26 @@ const fail = (message) => {
   throw new ReleaseError(message);
 };
 
-const run = (command, args, { cwd = root, capture = false, allowMissing = false } = {}) => {
+const run = (command, args, {
+  cwd = root,
+  capture = false,
+  allowMissing = false,
+  allowTimeout = false,
+  timeout,
+} = {}) => {
   const result = spawnSync(command, args, {
     cwd,
     encoding: "utf8",
     stdio: capture ? ["inherit", "pipe", "pipe"] : "inherit",
+    ...(timeout === undefined ? {} : { timeout }),
   });
 
   if (result.error) {
     if (allowMissing && result.error.code === "ENOENT") {
       return { ok: false, missing: true, stdout: "", stderr: result.error.message };
+    }
+    if (allowTimeout && result.error.code === "ETIMEDOUT") {
+      return { ok: false, timedOut: true, stdout: "", stderr: result.error.message };
     }
     fail(`Could not run "${command}": ${result.error.message}`);
   }
@@ -98,6 +110,36 @@ const runCopilot = (args, { capture = false } = {}) => {
   return run("bun", [
     "x", "--silent", "--package", "@github/copilot", "copilot", ...args,
   ], { capture });
+};
+
+const collectMarkdownFiles = (directory) => {
+  if (!existsSync(directory)) {
+    return [];
+  }
+
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      return collectMarkdownFiles(path);
+    }
+    return entry.isFile() && /\.mdx?$/.test(entry.name) ? [path] : [];
+  });
+};
+
+const getPublicDocumentationPaths = (manifests) => {
+  const paths = [
+    join(root, "README.md"),
+    ...manifests.flatMap(({ dir }) => [
+      join(dir, "README.md"),
+      ...collectMarkdownFiles(join(dir, "ai")),
+    ]),
+    ...collectMarkdownFiles(join(root, "apps/site/content/docs")),
+  ];
+
+  return [...new Set(paths)]
+    .filter(existsSync)
+    .map((path) => relative(root, path))
+    .sort();
 };
 
 const readManifest = (path) => JSON.parse(readFileSync(path, "utf8"));
@@ -244,8 +286,77 @@ const ensureNpmAuthentication = async () => {
   }
 };
 
+export const waitForNpmAvailability = async (
+  manifests,
+  version,
+  {
+    query = (name, expectedVersion, remainingMs) =>
+      run("npm", [
+        "view",
+        `${name}@${expectedVersion}`,
+        "version",
+        "--json",
+        "--fetch-retries=0",
+        `--fetch-timeout=${Math.max(1, remainingMs)}`,
+      ], {
+        capture: true,
+        allowTimeout: true,
+        timeout: remainingMs,
+      }),
+    sleep = (milliseconds) => new Promise((resolveSleep) => setTimeout(resolveSleep, milliseconds)),
+    now = () => Date.now(),
+    intervalMs = npmPollIntervalMs,
+    timeoutMs = npmPollTimeoutMs,
+  } = {},
+) => {
+  const pending = new Set(manifests.map(({ name }) => name));
+  const deadline = now() + timeoutMs;
+  const failTimeout = () => fail(
+    `Timed out waiting for npm to expose ${version} for: ${[...pending].join(", ")}.`,
+  );
+
+  while (pending.size > 0) {
+    for (const name of pending) {
+      const remaining = deadline - now();
+      if (remaining <= 0) {
+        failTimeout();
+      }
+      const result = await query(name, version, remaining);
+      if (result.timedOut) {
+        failTimeout();
+      }
+      if (result.ok) {
+        let availableVersion;
+        try {
+          availableVersion = JSON.parse(result.stdout);
+        } catch (error) {
+          fail(`npm returned invalid version data for ${name}@${version}: ${error.message}`);
+        }
+        if (availableVersion !== version) {
+          fail(`npm reports ${name}@${version} as ${availableVersion ?? "unavailable"}.`);
+        }
+        pending.delete(name);
+      } else if (!/\bE404\b|\b404 Not Found\b|No match found for version/i.test(
+        `${result.stdout}\n${result.stderr}`,
+      )) {
+        fail(`Could not check npm availability for ${name}@${version}.${result.stderr ? `\n${result.stderr}` : ""}`);
+      }
+    }
+
+    if (pending.size === 0) {
+      return;
+    }
+
+    const remaining = deadline - now();
+    if (remaining <= 0) {
+      failTimeout();
+    }
+    await sleep(Math.min(intervalMs, remaining));
+  }
+};
+
 const restoreReleaseFiles = (files) => {
-  log("Restoring version changes");
+  log("Restoring release changes");
 
   runOrFail("Restoring release files", "git", [
     "restore", "--staged", "--worktree", "--", ...files,
@@ -398,6 +509,93 @@ const updateChangelogs = (manifests, version, baseline, originals) => {
   writeFileSync(rootPath, `${rootIntro.trimEnd()}\n\n## ${version} - ${date}\n${packageNotes ? `\n${packageNotes}\n` : ""}${rootHistory ? `\n${rootHistory}` : ""}`);
 };
 
+const auditPublicDocumentation = (manifests, version, baseline, originals) => {
+  const paths = getPublicDocumentationPaths(manifests);
+  if (paths.length === 0) {
+    log("No public documentation or consumer AI instructions were found to audit");
+    return;
+  }
+
+  const range = `${baseline}..HEAD`;
+  const changed = run("git", ["diff", "--name-status", range], { capture: true });
+  const commits = run("git", ["log", "--format=%h %s", range], { capture: true });
+  if (!changed.ok || !commits.ok) {
+    fail(`Could not inspect changes since ${baseline} for the documentation audit.`);
+  }
+
+  const prompt = [
+    `Audit public documentation and consumer AI instructions for the Puzzle ${version} release.`,
+    `The previous release is ${baseline}; inspect git diff ${range} and git log ${range}.`,
+    "Read every candidate document and compare feature claims with the current package source, public exports, package manifests, and included package files.",
+    "Make only minimal edits needed to remove or accurately qualify feature claims that are not implemented and included in this release.",
+    "Do not remove accurate claims merely because they are new; do not invent or promise functionality.",
+    "Do not edit source code, package manifests, changelogs, maintainer instructions, generated registries, roadmaps, or planning documents.",
+    "Do not modify files directly. Return ONLY raw JSON with this shape:",
+    '{"edits":[{"path":"apps/site/content/docs/example.mdx","content":"complete updated file contents\\n","reason":"Why the claim is not releasable","evidence":["path/to/source.ts: export ..."]}]}.',
+    "Use paths relative to the repository root. Include only changed files; use an empty edits array if no changes are needed.",
+    "Each edit must include the complete updated document, a nonempty single-line reason, and at least one concrete source/export evidence string.",
+    `Candidate documents:\n${paths.map((path) => `- ${path}`).join("\n")}`,
+    `Changed files:\n${changed.stdout || "(none)"}`,
+    `Commits:\n${commits.stdout || "(none)"}`,
+  ].join("\n");
+  const args = [
+    "--prompt", prompt,
+    "--silent",
+    "--no-ask-user",
+    "--available-tools", "bash,view,grep,glob",
+    "--allow-tool", "read",
+    "--allow-tool", "shell(git diff)",
+    "--allow-tool", "shell(git log)",
+    "--deny-tool", "write",
+  ];
+  let result = runCopilot(args, { capture: true });
+  if (!result.ok && /No authentication information found/i.test(result.stderr)) {
+    log("Copilot requires GitHub authentication. Complete the login in your browser...");
+    if (!runCopilot(["login"]).ok) {
+      fail("Copilot login failed. Run \"bun x --package @github/copilot copilot login\" before retrying the release.");
+    }
+    result = runCopilot(args, { capture: true });
+  }
+  if (!result.ok) {
+    fail(`Copilot documentation audit failed.${result.stderr ? `\n${result.stderr}` : ""}\nAuthenticate first with "bun x --package @github/copilot copilot login".`);
+  }
+
+  let response;
+  try {
+    response = parseChangelogJson(result.stdout);
+  } catch (error) {
+    fail(`Copilot did not return valid documentation audit JSON: ${error.message}`);
+  }
+  if (!response || !Array.isArray(response.edits)) {
+    fail("Copilot documentation audit output must contain an edits array.");
+  }
+
+  const allowed = new Set(paths);
+  const edited = new Set();
+  for (const edit of response.edits) {
+    if (
+      !edit || !allowed.has(edit.path) || edited.has(edit.path) ||
+      typeof edit.content !== "string" || !edit.content.trim() ||
+      !edit.content.endsWith("\n") ||
+      typeof edit.reason !== "string" || !edit.reason.trim() || /[\r\n]/.test(edit.reason) ||
+      !Array.isArray(edit.evidence) || edit.evidence.length === 0 ||
+      edit.evidence.some((item) => typeof item !== "string" || !item.trim())
+    ) {
+      fail("Copilot returned an invalid, duplicate, or out-of-scope documentation edit.");
+    }
+    edited.add(edit.path);
+
+    const path = join(root, edit.path);
+    const original = readFileSync(path, "utf8");
+    if (edit.content === original) {
+      continue;
+    }
+    originals.set(path, original);
+    writeFileSync(path, edit.content);
+    log(`Updated ${edit.path}: ${edit.reason}`);
+  }
+};
+
 const restoreChangelogs = (originals) => {
   for (const [path, content] of originals) {
     if (content === null && existsSync(path)) {
@@ -405,6 +603,12 @@ const restoreChangelogs = (originals) => {
     } else if (content !== null) {
       writeFileSync(path, content);
     }
+  }
+};
+
+const restoreDocumentation = (originals) => {
+  for (const [path, content] of originals) {
+    writeFileSync(path, content);
   }
 };
 
@@ -481,7 +685,9 @@ const main = async () => {
 
   const published = [];
   const changelogOriginals = new Map();
+  const documentationOriginals = new Map();
   let releaseCommitted = false;
+  let releaseTagCreated = false;
 
   try {
     log(`Updating packages from ${currentVersion} to ${version}`);
@@ -534,6 +740,9 @@ const main = async () => {
       });
     }
 
+    updateChangelogs(manifests, version, baseline, changelogOriginals);
+    auditPublicDocumentation(manifests, version, baseline, documentationOriginals);
+
     runOrFail(
       "AI instruction tarball and consumer CLI validation",
       "bun",
@@ -558,103 +767,87 @@ const main = async () => {
       );
     }
 
-    updateChangelogs(manifests, version, baseline, changelogOriginals);
+    log("Publishing packages");
 
-    if (!dryRun) {
-      log(`Committing and pushing ${tag} before publishing`);
-      runOrFail("Staging release changes", "git", ["add", "--all"]);
-      runOrFail("Committing release", "git", [
-        "commit", "-m", `Release ${tag}`,
-        "-m", "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
-      ]);
-      releaseCommitted = true;
-      runOrFail("Pushing release commit", "git", ["push"]);
+    if (dryRun) {
+      for (const { dir, manifest } of manifests) {
+        log(`Publishing ${manifest.name}@${version} (dry run)`);
+        const args = ["publish", "--ignore-scripts", "--dry-run"];
+        runOrFail(`Publishing ${manifest.name}`, "npm", args, { cwd: dir });
+      }
+
+      restoreReleaseFiles(releaseFiles);
+      restoreChangelogs(changelogOriginals);
+      restoreDocumentation(documentationOriginals);
+      log(`Dry run for ${tag} succeeded. No packages were published and no commit or tag was created.`);
+      return;
     }
+
+    await ensureNpmAuthentication();
+
+    for (const { dir, manifest } of manifests) {
+      log(`Publishing ${manifest.name}@${version}`);
+
+      if (!(await runNpmWithBrowserPrompt([
+        "publish",
+        "--ignore-scripts",
+      ], dir)).ok) {
+        fail(`Publishing ${manifest.name}@${version} failed.`);
+      }
+
+      published.push(manifest.name);
+    }
+
+    log(`Waiting for ${version} to become available on npm`);
+    await waitForNpmAvailability(
+      manifests.map(({ manifest }) => manifest),
+      version,
+    );
+
+    log(`Committing and pushing ${tag}`);
+    runOrFail("Staging release changes", "git", ["add", "--all"]);
+    runOrFail("Committing release", "git", [
+      "commit", "-m", `Release ${tag}`,
+      "-m", "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>",
+    ]);
+    releaseCommitted = true;
+    runOrFail("Pushing release commit", "git", ["push"]);
+
+    log(`Tagging ${tag}`);
+    runOrFail("Creating tag", "git", ["tag", "-a", tag, "-m", `Release ${tag}`]);
+    releaseTagCreated = true;
+    runOrFail("Pushing release tag", "git", ["push", "--follow-tags"]);
+
+    console.log(
+      `\n\x1b[32mSuccessfully released ${tag}: ${[...names].join(", ")}.\x1b[0m`,
+    );
   } catch (error) {
-    if (releaseCommitted) {
-      console.error(`\nRelease ${tag} was committed. Files were left in place; resolve the push failure before publishing.`);
+    if (!dryRun && published.length > 0) {
+      const gitStatus = releaseCommitted
+        ? `Release commit ${tag} exists${releaseTagCreated ? " and the local tag was created" : ""}; inspect which Git pushes completed.`
+        : "The release commit and tag have not been completed.";
+      console.error(
+        `\nRelease ${tag} stopped after publishing. Published: ${published.join(", ")}. Files were left in place. ${gitStatus} Inspect npm and Git state, then complete only the missing steps; do not blindly republish.`,
+      );
     } else {
       const trackedChangelogs = [...changelogOriginals]
         .filter(([, content]) => content !== null)
         .map(([path]) => relative(root, path));
       restoreReleaseFiles([...releaseFiles, ...trackedChangelogs]);
-      const newChangelogs = [...changelogOriginals]
-        .filter(([, content]) => content === null)
-        .map(([path]) => relative(root, path));
-      // Newly created changelogs may have been staged before a failed commit.
-      if (!dryRun && newChangelogs.length > 0) {
-        runOrFail("Unstaging changelogs", "git", [
-          "reset", "HEAD", "--", ...newChangelogs,
-        ]);
-      }
       restoreChangelogs(changelogOriginals);
-    }
-    throw error;
-  }
-
-  try {
-    if (!dryRun) {
-      await ensureNpmAuthentication();
-    }
-
-    log("Publishing packages");
-
-    for (const { dir, manifest } of manifests) {
-      log(`Publishing ${manifest.name}@${version}`);
-
-      const args = [
-        "publish",
-        "--ignore-scripts",
-        ...(dryRun ? ["--dry-run"] : []),
-      ];
-
-      if (dryRun) {
-        runOrFail(`Publishing ${manifest.name}`, "npm", args, { cwd: dir });
-      } else if (!(await runNpmWithBrowserPrompt(args, dir)).ok) {
-        fail(`Publishing ${manifest.name} failed.`);
-      }
-
-      published.push(manifest.name);
-    }
-  } catch (error) {
-    if (!dryRun) {
-      console.error(
-        `\nRelease ${tag} was committed and pushed. Already published: ${published.join(", ") || "(none)"}. Files were left in place; inspect npm before recovering the release.`,
-      );
-    } else {
-      restoreReleaseFiles(releaseFiles);
-      restoreChangelogs(changelogOriginals);
+      restoreDocumentation(documentationOriginals);
     }
 
     throw error;
   }
-
-  if (dryRun) {
-    restoreReleaseFiles(releaseFiles);
-    restoreChangelogs(changelogOriginals);
-
-    log(
-      `Dry run for ${tag} succeeded. No packages were published and no commit or tag was created.`,
-    );
-
-    return;
-  }
-
-  log(`Tagging ${tag}`);
-
-  runOrFail("Creating tag", "git", ["tag", "-a", tag, "-m", `Release ${tag}`]);
-
-  runOrFail("Pushing tags and commits", "git", ["push", "--follow-tags"]);
-
-  console.log(
-    `\n\x1b[32mSuccessfully released ${tag}: ${[...names].join(", ")}.\x1b[0m`,
-  );
 };
 
-main().catch((error) => {
-  console.error(
-    `\n\x1b[31mRelease stopped: ${error instanceof ReleaseError ? error.message : error}\x1b[0m`,
-  );
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  main().catch((error) => {
+    console.error(
+      `\n\x1b[31mRelease stopped: ${error instanceof ReleaseError ? error.message : error}\x1b[0m`,
+    );
 
-  process.exit(1);
-});
+    process.exit(1);
+  });
+}

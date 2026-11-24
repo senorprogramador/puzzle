@@ -15,6 +15,7 @@ import {
   type StorageQuery,
   type StorageRecord,
   type StorageUpdate,
+  type StorageComparison,
   type StorageWhere,
 } from "@puzzle-ui/storage";
 
@@ -28,6 +29,13 @@ const equal = (left: unknown, right: unknown): boolean =>
   left instanceof Date && right instanceof Date
     ? left.getTime() === right.getTime()
     : JSON.stringify(left) === JSON.stringify(right);
+
+const isStorageComparison = (value: unknown): value is StorageComparison =>
+  typeof value === "object" &&
+  value !== null &&
+  !Array.isArray(value) &&
+  "operator" in value &&
+  "value" in value;
 
 const matchesWhere = <T extends StorageRecord>(
   record: T,
@@ -48,9 +56,11 @@ const matchesWhere = <T extends StorageRecord>(
       }
       continue;
     }
-    if (!condition || typeof condition !== "object") continue;
+    if (!isStorageComparison(condition)) {
+      throw new TypeError("Storage field comparisons must be objects.");
+    }
     const actual = value[field];
-    const comparison = condition as { readonly operator: string; readonly value: unknown };
+    const comparison = condition;
     switch (comparison.operator) {
       case "eq":
         if (!equal(actual, comparison.value)) return false;

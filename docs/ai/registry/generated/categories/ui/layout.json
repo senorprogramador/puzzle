@@ -12,7 +12,7 @@
       ],
       "category": "layout",
       "subcategory": "app-bar",
-      "description": "Compose an application header with branding and navigation.",
+      "description": "Compose a responsive application header with branding, navigation, and optional per-link icons.",
       "documentation": "apps/site/content/docs/ui/layout/app-bar.mdx",
       "source": "packages/ui/src/components/layout/app-bar/index.tsx",
       "useCases": [

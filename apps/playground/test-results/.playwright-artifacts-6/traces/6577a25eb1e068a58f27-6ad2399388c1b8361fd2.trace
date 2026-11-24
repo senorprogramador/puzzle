@@ -1,4 +1,0 @@
-{"version":10,"type":"context-options","origin":"library","browserName":"chromium","playwrightVersion":"1.65.1","options":{"baseURL":"http://127.0.0.1:4173","viewport":{"width":1920,"height":1080},"deviceScaleFactor":1,"isMobile":false},"platform":"linux","wallTime":1795307181497,"monotonicTime":43183.522,"sdkLanguage":"javascript","testIdAttributeName":"data-testid","title":"reference-site.environment.visual.spec.mjs:15 › @environment reports actual browser and font rendering"}
-{"type":"before","callId":"sqsg@42","startTime":43186.142,"class":"BrowserContext","method":"newPage","params":{}}
-{"type":"event","time":43197.299,"class":"BrowserContext","method":"page","params":{"pageId":"page@7c68c77cdbe67c2da04827e6ef10fd43"}}
-{"type":"after","callId":"sqsg@42","endTime":43197.357,"result":{"page":"<Page>"}}

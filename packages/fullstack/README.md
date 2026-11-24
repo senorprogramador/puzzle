@@ -212,48 +212,144 @@ stores must expose the `ETag` response header.
 
 ## CMS client and server
 
-The CMS client exposes content type, entry, revision, relationship, audit,
-publishing, and published-read methods. Mutations use revision conditions and
-explicit query invalidation:
+The CMS client, shared contracts, server handlers, and framework adapters use
+separate `@puzzle-ui/fullstack/cms/*` entry points. Keep browser clients and
+serializable DTOs separate from the server-only CMS service and Storage
+adapter. Resolve trusted tenant/actor context for every request before
+constructing its CMS instance, and authorize each route separately. Never
+accept tenant, actor, or authorization decisions from browser input. Admin
+reads and mutations remain separate from public published reads. Server setup
+requires the static CMS `config`, Storage adapter, explicit `accessPolicy`,
+`scheduler`, `resolveContext(request)`, and route-level `authorize(access)`.
+The code-defined collection configuration can opt into drafts and timestamps,
+set `localization: { locales, defaultLocale }`, and provide access policies and
+hooks.
+Collection access is deny-by-default for omitted actions; both the global
+`accessPolicy` and any collection action policy must allow a request. Hooks run
+server-side: `beforeChange` can veto before persistence, while `afterChange`
+runs after commit and cannot roll back a successful write.
 
 ```ts
 import { createCmsClient } from "@puzzle-ui/fullstack/cms/client";
 
-const cmsClient = createCmsClient({
-  basePath: "/api/cms",
-  onInvalidate: (keys) => queryCache.invalidate(keys),
-});
-
-const page = await cmsClient.listEntries({
-  contentType: "article",
+const cms = createCmsClient({ basePath: "/api/cms" });
+const articles = await cms.collection("articles").find({
+  where: { title: { contains: "launch" } },
+  limit: 25,
+  page: 1,
   locale: "en-US",
-  first: 25,
 });
+const siteSettings = await cms.singleton("settings").find();
 ```
 
-Configure the server with a Storage adapter, explicit scheduler, tenant/actor
-resolver, CMS access policy, and route authorization. Admin mutations and
-private reads are separate from public published-entry routes; public
-responses project only the published snapshot. CMS API responses use
-`no-store`. Scheduled jobs require the host scheduler to call
-`publishScheduled` with the revision-bound job; a timestamp alone never
-publishes content.
+Content types are code-defined and are not registered at runtime. Collection
+keys and singleton keys come from the server's static CMS configuration.
+Regular collections expose `find`, `findById`, `findBySlug`
+when a slug field exists, `create`, `update`, `delete`, and `purge`; `.public`
+exposes published reads. `delete` is a soft delete; purge permanently removes
+after schedule checks and scans current entries, published snapshots, and
+immutable revisions for incoming relationships. Relationship additions
+conditionally advance a per-target guard in the same batch as their content
+write; purge conditionally removes that guard with the target. Thus a
+concurrent relationship write either commits first and makes purge conflict
+or fails without leaving a dangling reference. A relationship-capable schema
+alone does not block purge if there are no current or historical references.
+Singleton clients expose `find`, `create`, `update`, `delete`, and `purge`,
+with `.public.find` for public reads.
 
-Webhook administration is opt-in through the CMS server's `webhooks` option.
-Provide a transport that enforces connection-time SSRF protections, a
-server-side secret resolver, and a side-effect-free `resolveSecretRef` that
-selects a pre-provisioned tenant secret reference for creation or rotation.
-Clients cannot provide or read secret references. Configure policies for
-`webhook:read`, `webhook:manage`, `webhook:dispatch`, `change-event:read`, and
-`change-event:ack`; schedule outbox fanout and delivery workers separately
-using `CmsWebhookService` with the same storage. A failed or stale update may
-occur after reference selection, so provisioning and cleanup remain host
-responsibilities. See the CMS package documentation for delivery and transport
-requirements.
+Queries accept `where`, `sort`, `limit`, `page`, `after`, and `locale`.
+`create` accepts optional `slug`, `locale`, `translationGroupId`, and
+`changeSummary`; `update(id, data, { expectedRevision, changeSummary?, slug? })`
+and `delete(id, { expectedRevision, changeSummary? })` use optimistic
+concurrency. Public reads use the separate `.public` client; callers do not
+set a visibility flag.
+Regular purge is `purge(id, { expectedRevision, changeSummary? })`; singleton
+purge is `purge({ expectedRevision, locale?, changeSummary? })`. It removes
+the entry, revisions, and its own media-usage records, preserving other
+entries' shared media usages.
 
-Use `@puzzle-ui/fullstack/cms/next` for Next.js route handlers or
-`@puzzle-ui/fullstack/cms/tanstack` for a TanStack Start dispatcher. The
-framework adapters reuse the same CMS route map.
+Collection clients expose `publish`/`unpublish`/`archive` with an
+`expectedRevision`, `schedulePublish(id, { expectedRevision, publishAt,
+timeZone, changeSummary? })`, `unschedule` with an `expectedRevision`,
+`listRevisions(id, first?)`, and
+`restoreRevision(id, { expectedRevision, revisionId, changeSummary? })`.
+`drafts: true` enables publishing and revision/restore operations; a configured
+scheduler enables scheduling and the `POST /scheduler/publications` worker
+route. Its `publication` payload contains `entryId`, `scheduledRevisionNumber`,
+`publishAt`, and `timeZone`; the server derives tenant context from the trusted
+host resolver, not from the payload. The response distinguishes published
+entries from stale or not-due jobs. A
+`localization: { locales, defaultLocale }` option enables locale-aware reads,
+`listLocaleVariants(id, queryWithoutLocale?)`, and
+`createTranslation(id, data, { locale, slug?, changeSummary? })`.
+Singleton clients expose `publish`, `unpublish`, `archive`, `schedulePublish`,
+`unschedule`, `listRevisions`, `restoreRevision`, `listLocaleVariants`, and
+`createTranslation` at the collection root, without a document ID. Singleton
+translation creation takes `data` and `{ locale, changeSummary? }`.
+
+`CmsApiDocument` is a flat JSON-safe record with a required `id`; collection
+pages contain these documents, not nested `{ fields }` objects. Map the schema's
+field keys into a `CmsEntryListItem.fields` projection before passing a page to
+Pieces. Admin documents include status/revision metadata; timestamp fields are
+present only when timestamps are enabled. Public documents contain published
+fields but omit status, revision, timestamp, scheduling, archive, and delete
+metadata. The client does not expose audit-query methods.
+
+The Next.js and TanStack Start adapters dispatch the same `CmsServer` route
+map. `createNextCmsHandler({ cms })` returns `GET`, `POST`, `PATCH`, and
+`DELETE` handlers; `createTanStackCmsHandler({ cms })` returns a
+`Request => Promise<Response>` dispatcher. Their `create*CmsRouteHandlers`
+helpers expose the route map for explicit framework route registration.
+Routes are derived from the static config: collection admin/public paths are
+`/admin/collections/:key` and `/public/collections/:key`. Regular collections
+add a `/:documentId` route; `/by-slug/:slug` routes exist only when the schema
+defines a slug field. Draft-enabled collections add `publish`, `unpublish`,
+`archive`, `restore`, and `revisions` routes under the document path; a
+configured scheduler adds `schedule`/`unschedule`, while localization adds
+`translations`. Singleton lifecycle routes use the collection root. The
+scheduler worker resolves tenant context from the host, never from the request
+body.
+
+Webhook management routes are opt-in through `createCmsServer({ webhooks })`.
+When enabled, provide a host transport, `resolveSecret`, and
+`resolveSecretRef({ context, request, purpose, subscriptionId? })`; Fullstack
+binds its Storage, access policy, clock, and ID generator to the webhook
+service. Without `webhooks`, these routes are not mounted.
+
+Routes are `GET/POST /admin/webhooks`,
+`GET/PATCH /admin/webhooks/:subscriptionId`,
+`GET /admin/webhooks/:subscriptionId/deliveries?first`,
+`GET /admin/webhook-deliveries/:deliveryId/attempts?first`, and
+`POST /admin/webhook-deliveries/:deliveryId/retry` with an
+`expectedRevision`. The client exposes `listWebhookSubscriptions`,
+`getWebhookSubscription`, `createWebhookSubscription`,
+`updateWebhookSubscription`, `listWebhookDeliveries`,
+`listWebhookAttempts`, and `retryWebhookDelivery`.
+
+When `emitChangeEvents: true` or `webhooks` is configured, Fullstack also
+mounts `GET /admin/change-events?first&after` and
+`POST /admin/change-events/:eventId/ack` with `{ expectedRevision }`.
+`listChangeEvents({ first?, after? })` returns a page of sanitized change-event
+DTOs containing `id`, `resource`, `resourceId`, `action`, `occurredAt`,
+`createdAt`, `updatedAt`, `revision`, and optional `revisionNumber`; tenant IDs
+and fanout leases are omitted. The page has
+`{ items, nextCursor, hasNextPage }`.
+`acknowledgeChangeEvent(eventId, expectedRevision)` returns void and invalidates
+change-event queries. Event routes can be enabled without webhook
+administration by setting
+`emitChangeEvents: true`.
+
+Secret values, secret-manager references, and delivery lease tokens never
+enter browser DTOs. The routes do not execute deliveries: the host schedules
+the standalone `CmsWebhookService` fanout and delivery workers separately.
+When `emitChangeEvents: true` is enabled on `createCmsServer` (or `webhooks`
+is configured, which enables emission), CMS writes metadata-only events.
+Fullstack does not expose its request-scoped CMS instance, but authorized
+change-event routes and client methods are available as described above.
+Supply listed event IDs and revisions to `fanout`; fanout records deliveries
+and removes the event. Run `runNext` separately to deliver jobs. See the
+[CMS package documentation](https://puzzle-ui.com/docs/cms) for worker,
+signature, and transport security details.
 
 ## Entry points
 

@@ -1,0 +1,105 @@
+---
+title: Access policies
+description: Bind CMS authorization to trusted context and combine global, collection, and field-level policies.
+---
+
+CMS authorization is server-side. Resolve tenant and actor from a trusted
+session, bind them through `createCms({ context, accessPolicy })`, and never
+accept those identities from content fields or browser input.
+
+## Global policy
+
+The global `CmsAccessPolicy` receives `tenantId`, `actor`, `resource`, and
+`action`; visibility, resource ID, field path, and the affected record may
+also be present. It can return a boolean or a promise.
+
+```ts
+import { createCms } from "@puzzle-ui/cms";
+import type { CmsAccessPolicy } from "@puzzle-ui/cms";
+
+const accessPolicy: CmsAccessPolicy = ({ actor }) =>
+  actor?.id === "editor-7";
+
+const cms = createCms({
+  config: cmsConfig,
+  storage,
+  context: { tenantId: "publisher-1", actor: { id: "editor-7" } },
+  accessPolicy,
+});
+```
+
+This is a minimal identity check, not a production membership policy. A
+production callback should verify that the actor belongs to the bound tenant
+and may perform the requested action.
+
+When `context` is supplied, `accessPolicy` is required. With no context and no
+policy, `cmsLocalAccessPolicy` allows only tenant `"default"` with actor `null`;
+it is intended for local single-tenant use, not as a multi-tenant default.
+
+## Collection policies
+
+Collections may further restrict actions with a partial `access` map. The
+global policy and matching collection policy are both evaluated. An omitted
+collection action denies access rather than inheriting an allow.
+
+```ts
+import { collection, defineCMS, fields } from "@puzzle-ui/cms";
+
+const cmsConfig = defineCMS({
+  collections: {
+    posts: collection({
+      name: "Post",
+      fields: {
+        title: fields.text({ label: "Title", required: true }),
+      },
+      access: {
+        read: ({ user }) => user !== null,
+        create: ({ user }) => user?.id === "editor-7",
+        update: ({ user }) => user?.id === "editor-7",
+        publish: ({ user }) => user?.id === "editor-7",
+      },
+    }),
+  },
+});
+```
+
+Collection aliases include `read`, `create`, `update`, `delete`, `publish`,
+`unpublish`, `schedule`, `unschedule`, `archive`, `restore`, `revisions`, and
+`translations`. Access callbacks receive trusted `user` as a compatibility
+alias for `actor`. The underlying global action is a `CmsAccessAction`, such as
+`entry:update` or `revision:read`.
+
+## Field access
+
+Fields can independently restrict reads and writes with booleans or callbacks.
+Callbacks receive tenant, actor, locale, field path, and `operation` (`read` or
+`write`). A field restriction is not a replacement for the global and
+collection policies.
+
+```ts
+import { collection, defineCMS, fields } from "@puzzle-ui/cms";
+
+const fieldAccessConfig = defineCMS({
+  collections: {
+    posts: collection({
+      name: "Post",
+      fields: {
+        title: fields.text({ label: "Title", required: true }),
+        internalNote: fields.text({
+          label: "Internal note",
+          access: {
+            read: ({ actor }) => actor?.attributes?.role === "editor",
+            write: ({ actor }) => actor?.attributes?.role === "editor",
+          },
+        }),
+      },
+    }),
+  },
+});
+```
+
+Do not treat knowing an entry ID as permission. Public reads return only the
+published snapshot; admin reads remain authorized. Fullstack additionally
+resolves context and authorizes each HTTP route before invoking CMS. See
+[Multi-tenant setup](/docs/cms/multi-tenancy) and the
+[Fullstack CMS guide](/docs/fullstack/cms).

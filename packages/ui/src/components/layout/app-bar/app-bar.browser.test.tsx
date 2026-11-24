@@ -209,3 +209,25 @@ describe("AppBar client-rendered sticky offset", () => {
     expect(consoleError).not.toHaveBeenCalled();
   });
 });
+
+describe("AppBar navigation icons", () => {
+  it("keeps icons and labels horizontal with tokenized spacing", async () => {
+    const doc = await renderServerFrame(
+      <AppBar
+        navigationItems={[
+          {
+            label: "Overview",
+            href: "/",
+            prefixIcon: "lucide:house",
+            suffixIcon: "lucide:chevron-down",
+          },
+        ]}
+      />,
+    );
+    const link = doc.querySelector(".puzzle-app-bar__link")!;
+    const styles = doc.defaultView!.getComputedStyle(link);
+
+    expect(styles.flexDirection).toBe("row");
+    expect(styles.gap).toBe("8px");
+  });
+});

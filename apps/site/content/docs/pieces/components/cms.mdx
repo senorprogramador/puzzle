@@ -18,22 +18,25 @@ CMS authoring Pieces compose admin interfaces from data and actions supplied by 
 |---|---|---|
 | `CmsShell` | Responsive CMS navigation and page shell. | [CmsShell](/docs/pieces/components/cms-shell) |
 | `ContentList` | Searchable, filterable table of caller-provided entries. | [ContentList](/docs/pieces/components/content-list) |
-| `ContentEditor` | Schema-driven controlled form with draft and publish actions. | [ContentEditor](/docs/pieces/components/content-editor) |
+| `ContentEditor` | Schema-driven controlled form with caller-owned save and publish callbacks. | [ContentEditor](/docs/pieces/components/content-editor) |
 | `BlockEditor` | Reorderable serializable `{ type, fields }` blocks. | [BlockEditor](/docs/pieces/components/block-editor) |
-| `ContentTypeBuilder` | Edit content type fields and locale definitions. | [ContentTypeBuilder](/docs/pieces/components/content-type-builder) |
 | `LocalizationEditor` | Switch and edit explicit locale values. | [LocalizationEditor](/docs/pieces/components/localization-editor) |
 | `RelationshipField` | Select caller-provided related entries under schema constraints. | [RelationshipField](/docs/pieces/components/relationship-field) |
-| `RevisionHistory` | Inspect immutable revisions and request restore-as-new-revision. | [RevisionHistory](/docs/pieces/components/revision-history) |
-| `PublishScheduler` | Collect a date/time and IANA timezone for a server scheduler. | [PublishScheduler](/docs/pieces/components/publish-scheduler) |
-| `EditorialCalendar` | View scheduled entries in an explicit timezone. | [EditorialCalendar](/docs/pieces/components/editorial-calendar) |
+| `RevisionHistory` | Display caller-provided revisions and forward a restore request to the host. | [RevisionHistory](/docs/pieces/components/revision-history) |
+| `PublishScheduler` | Collect a date/time and IANA timezone for a host-owned scheduling workflow. | [PublishScheduler](/docs/pieces/components/publish-scheduler) |
+| `EditorialCalendar` | Display caller-provided schedule items in an explicit timezone. | [EditorialCalendar](/docs/pieces/components/editorial-calendar) |
 | `AuditLogViewer` | Filter and page through caller-authorized audit events. | [AuditLogViewer](/docs/pieces/components/audit-log-viewer) |
 | `WebhookManagement` | Edit webhook subscriptions and inspect or retry deliveries. | [WebhookManagement](/docs/pieces/components/webhook-management) |
 
 ## Boundaries and integration
 
-Install `@puzzle-ui/cms` when using the CMS family; its public types and field-type registry are used by the Pieces API. Components accept caller-owned content projections and callbacks. The host must authorize every operation, enforce tenant and revision checks, validate on the server, and use an explicit scheduler for scheduled publication.
+Define the CMS schema and operations in the application/server layer; these Pieces accept caller-owned content projections and callbacks and do not call the CMS service. The host must authorize every operation, enforce tenant and revision checks, validate on the server, and use an explicit scheduler for scheduled publication.
 
-Pass `ContentEditor.renderField` to compose specialized inputs such as `MediaField` or `RelationshipField`. Pass `BlockEditor.renderBlock` to edit the configured fields for each serializable block type. Advanced field settings belong to the CMS schema and server validation; `ContentTypeBuilder.renderFieldSettings` is the composition point for application-specific schema controls.
+CMS schemas are defined in application code; these Pieces do not register or persist runtime schemas. Pass only the presentation-safe collection data needed by the UI; keep access policies, lifecycle hooks, validators, secrets, and authorization decisions on the server. Pass `ContentEditor.renderField` to compose specialized inputs such as `MediaField` or `RelationshipField`. Pass `BlockEditor.renderBlock` to edit the configured fields for each serializable block type.
+
+Use the CMS and Fullstack guides for verified persistence and lifecycle
+operations. These Pieces remain presentation components; their callbacks do
+not define server routes or client methods.
 
 `PublishScheduler` converts local wall time using the selected timezone, reports nonexistent daylight-saving times, and chooses the earlier instant for an ambiguous repeated time. The server scheduler remains responsible for executing the returned publication job.
 

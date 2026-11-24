@@ -19,6 +19,11 @@ Prefer semantic HTML, keyboard-accessible native behavior, visible focus,
 existing Theme tokens, and the documented controlled/uncontrolled API. Keep
 server/client imports separate and do not access browser APIs at module load.
 
+Use `AppBar` for a responsive application header with branding and navigation.
+Its `navigationItems` support `prefixIcon` and `suffixIcon` React nodes; a
+string value is interpreted as an icon name from `@puzzle-ui/icons`. These
+decorative icons render beside the label and inherit its color.
+
 For image editing controls, choose `ImageCropper` for normalized crop rectangles
 and `ImageHotspotEditor` for focal points or normalized hotspot points/areas.
 Their value types are serializable, source-relative UI contracts; they do not

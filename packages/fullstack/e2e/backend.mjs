@@ -8,7 +8,7 @@ import {
   InMemoryMediaProcessingQueueAdapter,
 } from "@puzzle-ui/media/testing/adapters";
 import { MemoryStorageAdapter } from "../../media/tests/helpers/memory-storage-adapter.ts";
-import { cmsRequest, createCmsFixture } from "../tests/cms-fixtures.mjs";
+import { createCmsFixture, storyConfig } from "../tests/cms-fixtures.mjs";
 import { createMediaFixture } from "../tests/media-fixtures.mjs";
 import { createNextMediaHandler } from "../dist/media/next/index.js";
 import { createTanStackMediaHandler } from "../dist/media/tanstack/index.js";
@@ -70,6 +70,8 @@ export const createCmsMediaBrowserFixture = async (framework) => {
     resolveProcessingProfiles: async () => [{ name: "preview", maxWidth: 64 }],
   });
   const cms = await createCmsFixture({
+    config: storyConfig(),
+    emitChangeEvents: true,
     mediaReferenceValidator: {
       async assertCanReference({ tenantId, assetId }) {
         const asset = await assets.get(tenantId, assetId);
@@ -77,21 +79,6 @@ export const createCmsMediaBrowserFixture = async (framework) => {
       },
     },
   });
-  const definition = {
-    slug: "story",
-    name: "Story",
-    version: 1,
-    fields: [
-      { key: "title", type: "text", label: "Title", required: true },
-      { key: "media", type: "media", label: "Media" },
-    ],
-  };
-  const registered = await cms.server.dispatch(cmsRequest("POST", "/admin/content-types", {
-    definition,
-  }));
-  if (registered.status !== 201) {
-    throw new Error(`Could not register the test content type: ${await registered.text()}`);
-  }
   const mediaHandler = framework === "next"
     ? createNextMediaHandler({ media: media.server })
     : createTanStackMediaHandler({ media: media.server });

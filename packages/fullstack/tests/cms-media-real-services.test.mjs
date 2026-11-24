@@ -12,7 +12,7 @@ import {
   InMemoryMediaProcessingQueueAdapter,
 } from "@puzzle-ui/media/testing/adapters";
 import { MemoryStorageAdapter } from "../../media/tests/helpers/memory-storage-adapter.ts";
-import { cmsRequest, createCmsFixture } from "./cms-fixtures.mjs";
+import { cmsRequest, createCmsFixture, storyConfig } from "./cms-fixtures.mjs";
 import { createMediaFixture, mediaRequest } from "./media-fixtures.mjs";
 import { createNextMediaHandler } from "../dist/media/next/index.js";
 import { createTanStackMediaHandler } from "../dist/media/tanstack/index.js";
@@ -60,7 +60,7 @@ test("host inspection reads real stored bytes before publishing an uploaded asse
 for (const [framework, kind] of [
   ["next", "image"], ["next", "video"], ["tanstack", "image"], ["tanstack", "video"],
 ]) {
-  test(`${framework} adapters connect real ${kind} services to CMS publication`, async () => {
+  test(`${framework} adapters connect real ${kind} services to code-first CMS drafts`, async () => {
     const storage = new MemoryStorageAdapter();
     let objectNow = Date.now();
     const objectStorage = new InMemoryMediaObjectStorageAdapter({
@@ -134,6 +134,7 @@ for (const [framework, kind] of [
       ...(kind === "video" ? { multipart: { thresholdBytes: 4, partSizeBytes: 2 } } : {}),
     });
     const cms = await createCmsFixture({
+      config: storyConfig(),
       mediaReferenceValidator: {
         async assertCanReference({ tenantId, assetId }) {
           const asset = await assets.get(tenantId, assetId);
@@ -151,15 +152,22 @@ for (const [framework, kind] of [
     const dispatchCms = (request) => framework === "next"
       ? nextCms[request.method](request)
       : tanstackCms(request);
-    const { CmsService } = await import("@puzzle-ui/cms");
-    const cmsUsages = new CmsService({ storage: cms.storage, accessPolicy: async () => true });
+    let storyAssetId;
+    let storyDocumentId;
+    let storyDocumentRevision;
     media.setDeletionGuard(async ({ asset: candidate, context }) => (
-      await cmsUsages.listMediaUsages({
-        tenantId: context.tenantId,
-        actor: { id: context.actorId },
-        assetId: candidate.id,
-      })
-    ).length === 0);
+      context.tenantId !== "tenant-a" || candidate.id !== storyAssetId
+    ));
+
+    const createStory = (mediaId) => dispatchCms(cmsRequest(
+      "POST",
+      "/admin/collections/story",
+      {
+        data: { title: "Story", media: mediaId },
+        slug: "story",
+        locale: "en-US",
+      },
+    ));
 
     const intentResponse = await dispatchMedia(mediaRequest("POST", "/uploads/intent", {
       fileName, kind, mimeType, size: bytes.length,
@@ -220,17 +228,7 @@ for (const [framework, kind] of [
     const source = await assets.get("tenant-a", asset.id);
     assert.deepEqual(objectStorage.getBytesForTesting(source.object), bytes);
 
-    const typeResponse = await dispatchCms(cmsRequest("POST", "/admin/content-types", {
-      definition: {
-        slug: "story", name: "Story", version: 1,
-        fields: [{ key: "media", type: "media", label: "Media" }],
-      },
-    }));
-    assert.equal(typeResponse.status, 201);
-    const createStory = () => dispatchCms(cmsRequest("POST", "/admin/entries", {
-      contentType: "story", locale: "en-US", slug: "story", fields: { media: asset.id },
-    }));
-    assert.equal((await createStory()).status, 400);
+    assert.equal((await createStory(asset.id)).status, 400);
 
     const queued = await dispatchMedia(
       mediaRequest("POST", `/assets/${asset.id}/processing`),
@@ -239,7 +237,7 @@ for (const [framework, kind] of [
     assert.equal((await queued.json()).processing.status, "queued");
     assert.equal((await processing.runNext("worker-1"))?.status, "retrying");
     assert.equal((await assets.get("tenant-a", asset.id)).status, "processing");
-    assert.equal((await createStory()).status, 400);
+    assert.equal((await createStory(asset.id)).status, 400);
     assert.equal(await processing.runNext("worker-1"), null);
     now += 1_000;
     assert.equal((await processing.runNext("worker-1"))?.status, "succeeded");
@@ -274,43 +272,34 @@ for (const [framework, kind] of [
       assert.equal(stale.status, 409);
     }
 
-    const draftResponse = await createStory();
+    const draftResponse = await createStory(asset.id);
     assert.equal(draftResponse.status, 201, await draftResponse.clone().text());
-    const { entry } = await draftResponse.json();
-    cms.scheduler.schedule = async () => { throw new Error("Scheduler unavailable"); };
-    const failedSchedule = await dispatchCms(cmsRequest("POST", `/admin/entries/${entry.id}/schedule`, {
-      expectedRevision: entry.revision,
-      publishAt: "2026-01-02T00:00:00.000Z",
-      timeZone: "UTC",
-    }));
-    assert.equal(failedSchedule.status, 503);
-    const revisionsResponse = await dispatchCms(cmsRequest("GET", `/admin/entries/${entry.id}/revisions`));
-    const { revisions } = await revisionsResponse.json();
-    assert.equal(revisions.length, 1);
+    const { document } = await draftResponse.json();
+    storyDocumentId = document.id;
+    storyDocumentRevision = document.revision;
+    storyAssetId = asset.id;
+    const publishStory = await dispatchCms(
+      cmsRequest("POST", `/admin/collections/story/${document.id}/publish`, {
+        expectedRevision: document.revision,
+      }),
+    );
+    assert.equal(publishStory.status, 200, await publishStory.clone().text());
+    const publishedDocument = (await publishStory.json()).document;
+    storyDocumentRevision = publishedDocument.revision;
+    const publicStory = await dispatchCms(
+      cmsRequest("GET", `/public/collections/story/${document.id}`),
+    );
+    assert.equal(publicStory.status, 200);
+    assert.equal((await publicStory.json()).document.media, asset.id);
+
     cms.setAuthorization(false);
-    const deniedRestore = await dispatchCms(cmsRequest("POST", `/admin/entries/${entry.id}/restore`, {
-      expectedRevision: entry.revision,
-      revisionId: revisions[0].id,
-    }));
-    assert.equal(deniedRestore.status, 403);
+    const deniedDelete = await dispatchCms(
+      cmsRequest("DELETE", `/admin/collections/story/${storyDocumentId}`, {
+        expectedRevision: storyDocumentRevision,
+      }),
+    );
+    assert.equal(deniedDelete.status, 403);
     cms.setAuthorization(true);
-    const edits = await Promise.all(["story-one", "story-two"].map((slug) =>
-      dispatchCms(cmsRequest("PATCH", `/admin/entries/${entry.id}`, {
-        expectedRevision: entry.revision,
-        slug,
-        fields: { media: asset.id },
-      })),
-    ));
-    assert.deepEqual(edits.map((response) => response.status).sort(), [200, 409]);
-    const savedEntry = (await edits.find((response) => response.status === 200).json()).entry;
-    const published = await dispatchCms(cmsRequest("POST", `/admin/entries/${entry.id}/publish`, {
-      expectedRevision: savedEntry.revision,
-    }));
-    assert.equal(published.status, 200, await published.clone().text());
-    const { entry: publishedEntry } = await published.json();
-    const publicResponse = await dispatchCms(cmsRequest("GET", `/public/entries/${entry.id}`));
-    assert.equal(publicResponse.status, 200);
-    assert.equal((await publicResponse.json()).entry.fields.media, asset.id);
 
     const currentAsset = await assets.get("tenant-a", asset.id);
     const softDelete = await dispatchMedia(mediaRequest("DELETE", `/assets/${asset.id}`, {
@@ -327,16 +316,13 @@ for (const [framework, kind] of [
     media.setContext({ actorId: "actor-a", tenantId: "tenant-a" });
     assert.equal((await permanentlyDelete()).status, 403);
     assert.deepEqual(objectStorage.getBytesForTesting(source.object), bytes);
-    const unpublish = await dispatchCms(cmsRequest("POST", `/admin/entries/${entry.id}/unpublish`, {
-      expectedRevision: publishedEntry.revision,
-    }));
-    assert.equal(unpublish.status, 200, await unpublish.clone().text());
-    const removeReference = await dispatchCms(cmsRequest("PATCH", `/admin/entries/${entry.id}`, {
-      expectedRevision: (await unpublish.json()).entry.revision,
-      slug: "story",
-      fields: {},
-    }));
+    const removeReference = await dispatchCms(
+      cmsRequest("DELETE", `/admin/collections/story/${storyDocumentId}`, {
+        expectedRevision: storyDocumentRevision,
+      }),
+    );
     assert.equal(removeReference.status, 200, await removeReference.clone().text());
+    storyAssetId = undefined;
     assert.equal((await permanentlyDelete()).status, 200);
     assert.equal(objectStorage.getBytesForTesting(source.object), null);
     assert.equal(objectStorage.getBytesForTesting(ready.variants[0].object), null);

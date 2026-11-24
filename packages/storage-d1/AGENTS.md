@@ -20,6 +20,8 @@ The adapter and migration engine are separate (`d1.adapter.ts`, `d1.migrations.t
 
 Preserve the shared query AST, serialization, cursor, capability, and migration semantics. D1 has no native TTL indexes; do not claim TTL support or substitute adapter cleanup for application expiry checks. Migrations are explicit adapter-managed versioned migrations, not Wrangler SQL migrations; run them in startup/deployment orchestration, not per request.
 
+Keep dotted JSON paths validated by the shared Storage query validator, generate SQL paths only from validated segments, and bind filter values as parameters. Preserve shared `contains` behavior: case-insensitive substring matching for strings and exact scalar membership for arrays. SQLite's built-in `lower()` is ASCII-only.
+
 ## 6. Testing
 
 Tests under `tests/` use Bun and run contract/conformance behavior against the D1 test environment. Keep adapter and migration tests isolated and cover the capabilities D1 actually advertises.

@@ -112,6 +112,8 @@ The generated stylesheet also registers Puzzle's `compact:`, `tablet:`, `desktop
 
 Puzzle's [semantic color roles](/docs/theme/colors#color-roles) are available as Tailwind colors with a `puzzle-` prefix. For example, use `bg-puzzle-primary text-puzzle-primary-foreground` or `border-puzzle-border`. They follow the active Theme, including local scopes and token overrides, and do not replace Tailwind's default colors.
 
+Puzzle's other theme tokens are also available through `puzzle-`-prefixed utilities: for example, `p-puzzle-4`, `rounded-puzzle-md`, `shadow-puzzle-elevation-2`, `text-puzzle-body1`, `font-puzzle-heading`, `max-w-puzzle-container`, and `duration-puzzle-fast`. Border widths and z-index tokens are available as `border-width-puzzle-strong` and `z-puzzle-modal`. These utilities reference the runtime theme variables, so token overrides are reflected automatically. See [Design Tokens](/docs/theme/tokens) for the available token groups.
+
 ## Puzzle Auth
 
 Puzzle Auth is off by default. When enabled, the CLI installs `@puzzle-ui/auth`, `@puzzle-ui/fullstack`, and `@puzzle-ui/session`, adds an `AuthProvider` with the `/api/auth` base path, and creates sign-in and sign-up views using `AuthExperience`.

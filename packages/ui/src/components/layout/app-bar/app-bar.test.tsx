@@ -9,6 +9,25 @@ import { createResourceScheduler } from "@puzzle-ui/core/resources";
 import { AppBar } from "./index";
 import { PageLayout } from "../page-layout";
 
+vi.mock("@puzzle-ui/icons", () => ({
+  Icon: ({
+    name,
+    size,
+    color,
+  }: {
+    name: string;
+    size?: number;
+    color?: string;
+  }) => (
+    <svg
+      data-testid="app-bar-icon"
+      data-icon-name={name}
+      data-icon-size={size}
+      color={color}
+    />
+  ),
+}));
+
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
@@ -147,6 +166,57 @@ describe("AppBar", () => {
     expect(link).toHaveAttribute("target", "_blank");
     expect(link.getAttribute("rel")).toContain("noopener");
     expect(link.getAttribute("rel")).toContain("noreferrer");
+  });
+
+  it("renders navigation icons around the label without changing its accessible name", () => {
+    const customIcon = <span data-testid="custom-app-bar-icon">Custom</span>;
+    render(
+      <AppBar
+        navigationItems={[
+          {
+            label: "Projects",
+            href: "/projects",
+            prefixIcon: "lucide:folder",
+            suffixIcon: "lucide:chevron-right",
+          },
+          {
+            label: "Custom",
+            href: "/custom",
+            prefixIcon: customIcon,
+          },
+        ]}
+      />,
+    );
+
+    const navigation = screen.getAllByRole("navigation")[0]!;
+    const projectsLink = within(navigation).getByRole("link", {
+      name: "Projects",
+    });
+    const projectsChildren = Array.from(projectsLink.children);
+
+    expect(projectsChildren.map((child) => child.className)).toEqual([
+      "puzzle-app-bar__link-icon",
+      "puzzle-app-bar__link-label",
+      "puzzle-app-bar__link-icon",
+    ]);
+    expect(
+      within(projectsLink).getAllByTestId("app-bar-icon").map((icon) => ({
+        name: icon.getAttribute("data-icon-name"),
+        size: icon.getAttribute("data-icon-size"),
+        color: icon.getAttribute("color"),
+      })),
+    ).toEqual([
+      { name: "lucide:folder", size: "16", color: "currentColor" },
+      { name: "lucide:chevron-right", size: "16", color: "currentColor" },
+    ]);
+    expect(
+      within(projectsLink).getAllByText(/Projects/).length,
+    ).toBeGreaterThan(0);
+    expect(
+      within(navigation).getByRole("link", { name: "Custom" }).querySelector(
+        '[data-testid="custom-app-bar-icon"]',
+      ),
+    ).toBeTruthy();
   });
 
   it("renders navigation links through the configured theme Link", () => {

@@ -23,10 +23,12 @@ import {
   type StoragePage,
   type StorageQuery,
   type StorageRecord,
+  type StorageScalarFieldPath,
   type StorageUpdate,
   type StorageWhere,
   type StorageCapabilities,
   type StorageCapabilityReport,
+  validateFieldPath,
   validateQuery,
   type StorageInsert,
 } from "@puzzle-ui/storage";
@@ -44,6 +46,15 @@ type CursorPayload = {
   readonly values: readonly unknown[];
 };
 
+const CURSOR_DATE_MARKER = "__puzzle_storage_cursor_date__";
+
+const isCursorScalar = (value: unknown): boolean =>
+  value === null ||
+  typeof value === "string" ||
+  typeof value === "boolean" ||
+  (typeof value === "number" && Number.isFinite(value)) ||
+  (value instanceof Date && !Number.isNaN(value.getTime()));
+
 const isDuplicateError = (error: unknown): error is MongoServerError =>
   typeof error === "object" &&
   error !== null &&
@@ -60,18 +71,94 @@ const mapMongoError = (error: unknown): never => {
 
 const toMongoField = (field: string) => (field === "id" ? "_id" : field);
 
+const getDocumentField = (document: Document, field: string): unknown => {
+  const [first, ...rest] = validateFieldPath(field);
+  let value: unknown = document;
+
+  for (const segment of [first, ...rest]) {
+    if (typeof value !== "object" || value === null) return undefined;
+    const key = segment === "id" && value === document ? "_id" : segment;
+    value = (value as Record<string, unknown>)[key!];
+  }
+
+  return value;
+};
+
+const escapeRegex = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const toMongoValue = (value: unknown) =>
   value instanceof Date ? value : value;
 
-const encodeCursor = (payload: CursorPayload): StorageCursor => ({
-  value: Buffer.from(JSON.stringify(payload)).toString("base64url"),
-});
+const encodeCursor = (payload: CursorPayload): StorageCursor => {
+  const values = payload.values.map((value) => value ?? null);
+
+  if (!values.every(isCursorScalar)) {
+    throw new StorageValidationError(
+      "MongoDB cursor sort values must be scalar values.",
+    );
+  }
+
+  return {
+    value: Buffer.from(
+      JSON.stringify({
+        values: values.map((value) =>
+          value instanceof Date
+            ? { [CURSOR_DATE_MARKER]: value.toISOString() }
+            : value,
+        ),
+      }),
+    ).toString("base64url"),
+  };
+};
 
 const decodeCursor = (cursor: StorageCursor): CursorPayload => {
   try {
-    return JSON.parse(
+    const payload = JSON.parse(
       Buffer.from(cursor.value, "base64url").toString("utf8"),
-    ) as CursorPayload;
+    ) as unknown;
+
+    if (
+      typeof payload !== "object" ||
+      payload === null ||
+      Array.isArray(payload) ||
+      !("values" in payload) ||
+      !Array.isArray(payload.values)
+    ) {
+      throw new Error("Missing cursor values.");
+    }
+
+    const values = payload.values.map((value: unknown) => {
+      if (
+        typeof value === "object" &&
+        value !== null &&
+        CURSOR_DATE_MARKER in value
+      ) {
+        const encoded = value as Record<string, unknown>;
+        const dateValue = encoded[CURSOR_DATE_MARKER];
+        if (
+          Object.keys(encoded).length !== 1 ||
+          typeof dateValue !== "string"
+        ) {
+          throw new Error("Invalid cursor date.");
+        }
+        const date = new Date(dateValue);
+        if (
+          Number.isNaN(date.getTime()) ||
+          date.toISOString() !== dateValue
+        ) {
+          throw new Error("Invalid cursor date.");
+        }
+        return date;
+      }
+      return value;
+    });
+
+    if (!values.every(isCursorScalar)) {
+      throw new Error("Cursor values must be scalar.");
+    }
+
+    return { values };
   } catch {
     throw new StorageValidationError("Invalid MongoDB cursor.");
   }
@@ -146,6 +233,7 @@ const toMongoWhere = <T extends object>(
     const operators: Record<string, string> = {
       eq: "$eq",
       ne: "$ne",
+      contains: "$contains",
       in: "$in",
       notIn: "$nin",
       gt: "$gt",
@@ -161,6 +249,42 @@ const toMongoWhere = <T extends object>(
       throw new StorageValidationError(
         `Unsupported query operator: ${value.operator}`,
       );
+    }
+
+    if (value.operator === "contains") {
+      const branches: Filter<MongoRecord>[] = [];
+
+      if (typeof value.value === "string") {
+        branches.push({
+          $expr: {
+            $cond: [
+              { $eq: [{ $type: `$${mongoField}` }, "string"] },
+              {
+                $regexMatch: {
+                  input: `$${mongoField}`,
+                  regex: escapeRegex(value.value),
+                  options: "i",
+                },
+              },
+              false,
+            ],
+          },
+        });
+      }
+
+      branches.push({
+        $and: [
+          { [mongoField]: { $type: "array" } },
+          {
+            [mongoField]: {
+              $elemMatch: { $eq: toMongoValue(value.value) },
+            },
+          },
+        ],
+      });
+
+      result.push({ $or: branches });
+      continue;
     }
 
     result.push({
@@ -220,13 +344,32 @@ const toCursorFilter = <T extends StorageRecord>(
 
     const field = fields[index]!;
     const operator = field.direction === "asc" ? "$gt" : "$lt";
+    const value = values[index] ?? null;
+
+    if (value === null) {
+      if (field.direction === "asc") {
+        branches.push({
+          $and: [
+            ...prefix,
+            {
+              [field.field]: {
+                $exists: true,
+                $ne: null,
+              },
+            },
+          ],
+        });
+      }
+
+      continue;
+    }
 
     branches.push({
       $and: [
         ...prefix,
         {
           [field.field]: {
-            [operator]: values[index],
+            [operator]: value,
           },
         },
       ],
@@ -401,14 +544,21 @@ export class MongoStorageAdapter implements StorageAdapter {
       );
     }
 
+    validateQuery(query);
+
     const orderBy = query.orderBy ?? [
-      { field: "id" as keyof T & string, direction: "asc" as const },
+      { field: "id" as StorageScalarFieldPath<T>, direction: "asc" as const },
     ];
 
     let filter = toMongoWhere(query.where);
 
     if (query.after) {
       const payload = decodeCursor(query.after);
+      const cursorFieldCount =
+        orderBy.length + (orderBy.some((item) => item.field === "id") ? 0 : 1);
+      if (payload.values.length !== cursorFieldCount) {
+        throw new StorageValidationError("Invalid MongoDB cursor.");
+      }
 
       const cursorFilter = toCursorFilter(orderBy, payload.values);
 
@@ -429,18 +579,16 @@ export class MongoStorageAdapter implements StorageAdapter {
     const items = documents.slice(0, query.first);
     const last = items.at(-1);
 
-    const cursorFields = [
-      ...orderBy.map((item) => toMongoField(String(item.field))),
-    ];
-
-    if (!cursorFields.includes("_id")) cursorFields.push("_id");
-
     const nextCursor =
       hasNextPage && last
         ? encodeCursor({
-            values: cursorFields.map((field) =>
-              field === "_id" ? last._id : last[field],
-            ),
+            values: orderBy
+              .map((item) => getDocumentField(last, String(item.field)))
+              .concat(
+                orderBy.some((item) => item.field === "id")
+                  ? []
+                  : [last._id],
+              ),
           })
         : null;
 

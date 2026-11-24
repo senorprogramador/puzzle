@@ -9,6 +9,12 @@ import { LocalizationEditor } from "@puzzle-ui/pieces";
 
 `LocalizationEditor` provides locale tabs and missing/translated indicators. Values are supplied per locale; it does not invent fallback content or copy fields between translations.
 
+On localization-enabled collections, the Fullstack CMS client exposes
+`listLocaleVariants(entryId, queryWithoutLocale?)` and
+`createTranslation(entryId, data, { locale, slug?, changeSummary? })`. Project
+returned documents into the component's per-locale `values` map; the component
+does not fetch or persist translations.
+
 <Preview fit="device" code={`<LocalizationEditor contentType={contentType} values={values} onChange={updateLocale} renderLocale={renderLocale} />`}>
   <LocalizationEditorExample />
 </Preview>
@@ -17,7 +23,7 @@ import { LocalizationEditor } from "@puzzle-ui/pieces";
 
 | Prop | Type | Required | Default |
 |---|---|---:|---|
-| `contentType` | `ContentTypeDefinition` | Yes | — |
+| `contentType` | `CmsCollectionPresentation` | Yes | — |
 | `values` | `Readonly<Record<string, CmsFields \| null \| undefined>>` | Yes | — |
 | `onChange` | `(locale: string, fields: CmsFields) => void` | Yes | — |
 | `onInvalidDraftChange` | `(invalid: boolean) => void` | No | — |

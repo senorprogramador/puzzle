@@ -2,21 +2,21 @@ import { useState } from "react";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { CMS_FIELD_TYPES } from "@puzzle-ui/cms";
+import { fields } from "@puzzle-ui/cms";
 import type {
   CmsAuditEvent,
   CmsContentRevision,
   CmsEntryView,
   CmsFields,
-  ContentTypeDefinition,
+  FieldsValue,
 } from "@puzzle-ui/cms";
+import type { CmsBlockValue, CmsCollectionPresentation } from "./cms.types";
 import {
   AuditLogViewer,
   BlockEditor,
   CmsShell,
   ContentEditor,
   ContentList,
-  ContentTypeBuilder,
   EditorialCalendar,
   LocalizationEditor,
   PublishScheduler,
@@ -24,18 +24,20 @@ import {
   RevisionHistory,
 } from "./cms-components";
 
-const typeDefinition: ContentTypeDefinition = {
-  slug: "article",
+const typeDefinition = {
+  kind: "collection",
   name: "Article",
-  version: 1,
-  locales: ["en-US", "fr-FR"],
-  defaultLocale: "en-US",
-  fields: [
-    { key: "title", type: "text", label: "Title", required: true },
-    { key: "published", type: "boolean", label: "Published" },
-    { key: "related", type: "relationship", label: "Related", relation: { targetTypes: ["article"] } },
-  ],
-};
+  description: "Edit article content.",
+  localization: {
+    locales: ["en-US", "fr-FR"],
+    defaultLocale: "en-US",
+  },
+  fields: {
+    title: fields.text({ label: "Title", required: true }),
+    published: fields.boolean({ label: "Published" }),
+    related: fields.relationship({ label: "Related", target: "article" }),
+  },
+} satisfies CmsCollectionPresentation;
 
 const makeEntry = (
   id: string,
@@ -302,11 +304,14 @@ describe("ContentEditor", () => {
     const onSave = vi.fn();
     const onPublish = vi.fn();
     const onInvalidDraftChange = vi.fn();
+    const editorFields = { data: fields.json({ label: "Data" }) };
     const ControlledEditor = () => {
-      const [value, setValue] = useState<CmsFields>({ data: { count: 1 } });
+      const [value, setValue] = useState<Partial<FieldsValue<typeof editorFields>>>({
+        data: { count: 1 },
+      });
       return (
         <ContentEditor
-          contentType={{ ...typeDefinition, fields: [{ key: "data", type: "json", label: "Data" }] }}
+          contentType={{ ...typeDefinition, fields: editorFields }}
           value={value}
           validationErrors={{ data: "Server validation failed." }}
           onChange={setValue}
@@ -346,7 +351,7 @@ describe("ContentEditor", () => {
   it("confirms and clears invalid JSON on discard, and releases removed fields", async () => {
     const user = userEvent.setup();
     const onDiscard = vi.fn();
-    const type = { ...typeDefinition, fields: [{ key: "data", type: "json" as const, label: "Data" }] };
+    const type = { ...typeDefinition, fields: { data: fields.json({ label: "Data" }) } };
     const props = {
       contentType: type,
       value: { data: { count: 1 } },
@@ -365,7 +370,7 @@ describe("ContentEditor", () => {
     expect(screen.getByRole("button", { name: "Save draft" })).toBeEnabled();
 
     fireEvent.change(screen.getByRole("textbox", { name: "Data" }), { target: { value: "{" } });
-    rerender(<ContentEditor {...props} contentType={{ ...type, fields: [] }} />);
+    rerender(<ContentEditor {...props} contentType={{ ...type, fields: {} }} />);
     await waitFor(() => expect(screen.getByRole("button", { name: "Save draft" })).toBeEnabled());
   });
 
@@ -374,10 +379,10 @@ describe("ContentEditor", () => {
       <ContentEditor
         contentType={{
           ...typeDefinition,
-          fields: [
-            { key: "first", type: "json", label: "First JSON" },
-            { key: "second", type: "json", label: "Second JSON" },
-          ],
+          fields: {
+            first: fields.json({ label: "First JSON" }),
+            second: fields.json({ label: "Second JSON" }),
+          },
         }}
         value={{ first: 1, second: 2 }}
         onChange={vi.fn()}
@@ -400,7 +405,7 @@ describe("ContentEditor", () => {
     const onSaveDraft = vi.fn();
     const onPublish = vi.fn();
     const ControlledEditor = () => {
-      const [value, setValue] = useState<CmsFields>({
+      const [value, setValue] = useState<Partial<FieldsValue<typeof typeDefinition.fields>>>({
         title: "First draft",
         published: false,
       });
@@ -419,8 +424,8 @@ describe("ContentEditor", () => {
     };
     render(<ControlledEditor />);
 
-    await user.clear(screen.getByRole("textbox", { name: "Title *" }));
-    await user.type(screen.getByRole("textbox", { name: "Title *" }), "Updated draft");
+    await user.clear(screen.getByRole("textbox", { name: /^Title\s*\*$/ }));
+    await user.type(screen.getByRole("textbox", { name: /^Title\s*\*$/ }), "Updated draft");
     expect(onChange).toHaveBeenLastCalledWith({
       title: "Updated draft",
       published: false,
@@ -430,6 +435,97 @@ describe("ContentEditor", () => {
     expect(onSaveDraft).toHaveBeenCalledOnce();
     await user.click(screen.getByRole("button", { name: "Publish" }));
     expect(onPublish).toHaveBeenCalledOnce();
+  });
+
+  it("maps nested field descriptors into render rows without losing schema metadata", () => {
+    const schemaFields = {
+      profile: fields.object({
+        label: "Profile",
+        fields: {
+          displayName: fields.text({ required: true }),
+          preferences: fields.object({
+            fields: {
+              color: fields.select({
+                options: [
+                  { label: "Blue", value: "blue" },
+                  { label: "Green", value: "green" },
+                ],
+              }),
+            },
+          }),
+        },
+      }),
+      gallery: fields.array({
+        label: "Gallery",
+        of: fields.media({ accept: ["image/*"] }),
+      }),
+      sections: fields.blocks({
+        blocks: [{
+          type: "hero",
+          label: "Hero",
+          fields: { heading: fields.text({ required: true }) },
+        }],
+      }),
+    };
+    const renderField = vi.fn(({ field }) => (
+      <div data-testid={`custom-${field.key}`}>{field.type}</div>
+    ));
+
+    render(
+      <ContentEditor
+        contentType={{ kind: "collection", name: "Article", fields: schemaFields }}
+        value={{}}
+        onChange={vi.fn()}
+        onSaveDraft={vi.fn()}
+        renderField={renderField}
+      />,
+    );
+
+    expect(screen.getByTestId("custom-profile")).toHaveTextContent("object");
+    expect(screen.getByTestId("custom-gallery")).toHaveTextContent("array");
+    expect(screen.getByTestId("custom-sections")).toHaveTextContent("blocks");
+    const contexts = renderField.mock.calls.map(([context]) => context);
+    expect(contexts.map(({ field }) => field.key)).toEqual([
+      "profile",
+      "gallery",
+      "sections",
+    ]);
+    expect(contexts[0]?.field.fields.preferences.fields.color.options).toEqual([
+      { label: "Blue", value: "blue" },
+      { label: "Green", value: "green" },
+    ]);
+    expect(contexts[1]?.field.of.accept).toEqual(["image/*"]);
+    expect(contexts[2]?.field.blocks[0]?.fields.heading.required).toBe(true);
+  });
+
+  it("shows schema defaults and required/server validation state", () => {
+    const schemaFields = {
+      title: fields.text({ label: "Title", required: true }),
+      summary: fields.text({
+        label: "Summary",
+        required: true,
+        defaultValue: "A starting summary",
+      }),
+    };
+    render(
+      <ContentEditor
+        contentType={{ kind: "collection", name: "Article", fields: schemaFields }}
+        value={{}}
+        validationErrors={{ title: "Title is required." }}
+        onChange={vi.fn()}
+        onSaveDraft={vi.fn()}
+      />,
+    );
+
+    const title = screen.getByRole("textbox", {
+      name: /Title\s*\* Title is required\./,
+    });
+    expect(title).toBeRequired();
+    expect(title).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByRole("alert")).toHaveTextContent("Title is required.");
+    const summary = screen.getByRole("textbox", { name: "Summary" });
+    expect(summary).toHaveValue("A starting summary");
+    expect(summary).not.toBeRequired();
   });
 
   it("uses a caller field renderer and announces validation failures", async () => {
@@ -507,7 +603,7 @@ describe("BlockEditor", () => {
   const definitions = [
     {
       type: "hero",
-      fields: [{ key: "heading", type: "text" as const, label: "Heading", defaultValue: "Welcome" }],
+      fields: { heading: fields.text({ label: "Heading", defaultValue: "Welcome" }) },
     },
   ];
 
@@ -558,93 +654,12 @@ describe("BlockEditor", () => {
       <BlockEditor
         label="Page blocks"
         definitions={definitions}
-        value={["invalid block"]}
+        value={["invalid block"] as unknown as CmsBlockValue[]}
         onChange={onChange}
       />,
     );
     expect(screen.getByRole("alert")).toHaveTextContent("invalid");
     expect(screen.getByRole("button", { name: "Remove invalid block" })).toBeVisible();
-  });
-});
-
-describe("ContentTypeBuilder", () => {
-  it("adds fields and prevents saving invalid or duplicate keys", async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    const onSave = vi.fn();
-    render(
-      <ContentTypeBuilder
-        value={typeDefinition}
-        onChange={onChange}
-        onSave={onSave}
-      />,
-    );
-
-    await user.click(screen.getByRole("button", { name: "Add field" }));
-    expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({
-        fields: expect.arrayContaining([
-          expect.objectContaining({ key: "field_4", type: "text" }),
-        ]),
-      }),
-    );
-    const typeSelect = screen.getAllByLabelText("Field type")[0]!;
-    expect(
-      Array.from(typeSelect.querySelectorAll("option"), (option) => option.value),
-    ).toEqual(CMS_FIELD_TYPES);
-    expect(screen.getByRole("button", { name: "Save content type" })).toBeEnabled();
-  });
-
-  it("keeps key input focus while editing and generates unused field keys after deletion", async () => {
-    const user = userEvent.setup();
-    const ControlledBuilder = () => {
-      const [definition, setDefinition] = useState<ContentTypeDefinition>({
-        ...typeDefinition,
-        fields: [
-          { key: "field_1", type: "text", label: "First" },
-          { key: "field_3", type: "text", label: "Third" },
-        ],
-      });
-      return <ContentTypeBuilder value={definition} onChange={setDefinition} />;
-    };
-    render(<ControlledBuilder />);
-    await user.click(screen.getByRole("button", { name: "Add field" }));
-    const keys = screen.getAllByLabelText("Key");
-    expect(keys[2]).toHaveValue("field_4");
-    await user.clear(keys[0]!);
-    await user.type(keys[0]!, "new_name");
-    expect(keys[0]).toHaveValue("new_name");
-    expect(keys[0]).toHaveFocus();
-  });
-
-  it("allows comma-separated locales to be typed and normalizes them on blur", async () => {
-    const user = userEvent.setup();
-    const ControlledBuilder = () => {
-      const [definition, setDefinition] = useState(typeDefinition);
-      return <ContentTypeBuilder value={definition} onChange={setDefinition} />;
-    };
-    render(<ControlledBuilder />);
-    const input = screen.getByLabelText("Locales (comma separated)");
-    await user.click(input);
-    await user.type(input, ", nl-NL");
-    expect(input).toHaveValue("en-US, fr-FR, nl-NL");
-    expect(screen.getByRole("option", { name: "nl-NL" })).toBeInTheDocument();
-    await user.tab();
-    expect(input).toHaveValue("en-US, fr-FR, nl-NL");
-  });
-
-  it("reflects external locale changes even while the input is focused", async () => {
-    const user = userEvent.setup();
-    const { rerender } = render(<ContentTypeBuilder value={typeDefinition} onChange={() => {}} />);
-    const input = screen.getByLabelText("Locales (comma separated)");
-    await user.click(input);
-    rerender(
-      <ContentTypeBuilder
-        value={{ ...typeDefinition, locales: ["de-DE"], defaultLocale: "de-DE" }}
-        onChange={() => {}}
-      />,
-    );
-    expect(input).toHaveValue("de-DE");
   });
 });
 
@@ -707,12 +722,12 @@ describe("RelationshipField", () => {
     render(
       <RelationshipField
         label="Related articles"
-        relation={{
-          targetTypes: ["article"],
+        relation={fields.relationship({
+          target: "article",
           multiple: true,
           sameLocale: true,
           allowedStatuses: ["published"],
-        }}
+        })}
         options={options}
         value={[]}
         locale="en-US"
@@ -735,7 +750,7 @@ describe("RelationshipField", () => {
     render(
       <RelationshipField
         label="Related"
-        relation={{ targetTypes: ["article"], multiple: true }}
+        relation={fields.relationship({ target: "article", multiple: true })}
         options={[
           { id: "allowed", label: "Visible result", contentType: "article", locale: "en-US", status: "draft" },
           { id: "wrong", label: "Wrong type", contentType: "page", locale: "en-US", status: "draft" },
@@ -758,7 +773,7 @@ describe("RelationshipField", () => {
     expect(() => render(
       <RelationshipField
         label="Related"
-        relation={{ targetTypes: ["article"] }}
+        relation={fields.relationship({ target: "article" })}
         options={[]}
         value={null}
         searchMode="remote"
@@ -771,7 +786,7 @@ describe("RelationshipField", () => {
     render(
       <RelationshipField
         label="Related"
-        relation={{ targetTypes: ["article"], sameLocale: true }}
+        relation={fields.relationship({ target: "article", sameLocale: true })}
         options={[{ id: "entry", label: "Entry", contentType: "article", locale: "en-US", status: "draft" }]}
         value={null}
         onChange={vi.fn()}

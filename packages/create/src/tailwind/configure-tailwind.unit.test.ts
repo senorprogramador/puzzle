@@ -111,6 +111,9 @@ describe("configureTailwind", () => {
     expect(css).toContain(
       "--color-puzzle-primary: var(--puzzle-color-primary);",
     );
+    expect(css).toContain(
+      "--spacing-puzzle-4: var(--puzzle-space-4);",
+    );
     await configureTailwind(cwd, "next");
     expect(await read("src/app/globals.css")).toBe(css);
   });
@@ -148,12 +151,37 @@ describe("configureTailwind", () => {
       expect(css).toContain(
         "--color-puzzle-primary-foreground: var(--puzzle-color-primary-foreground);",
       );
+      expect(css).toContain(
+        "--spacing-puzzle-4: var(--puzzle-space-4);",
+      );
+      expect(css).toContain(
+        "--radius-puzzle-md: var(--puzzle-radius-md);",
+      );
+      expect(css).toContain(
+        "--shadow-puzzle-elevation-2: var(--puzzle-elevation-2);",
+      );
+      expect(css).toContain(
+        "--text-puzzle-body1: var(--puzzle-font-size-body1);",
+      );
+      expect(css).toContain(
+        "--container-puzzle-container: var(--puzzle-container-width);",
+      );
+      expect(css).toContain(
+        "transition-duration: var(--puzzle-duration-fast);",
+      );
+      expect(css).toContain(
+        "z-index: var(--puzzle-z-index-modal);",
+      );
 
       const customized = css
         .replace("--breakpoint-hd: 90rem;", "--breakpoint-hd: 100rem;")
         .replace(
           "var(--puzzle-color-primary);",
           "var(--my-primary);",
+        )
+        .replace(
+          "var(--puzzle-space-4);",
+          "var(--my-spacing);",
         );
       await write(cssPath, customized);
       await configureTailwind(cwd, framework);

@@ -1,0 +1,150 @@
+---
+title: API reference
+description: Reference the public CMS exports, configuration options, collection methods, and feature gates.
+---
+
+Use the package root, `@puzzle-ui/cms`. The code-first rewrite described by
+this guide is not yet released; the published `0.18.0` npm tarball is not
+asserted to contain these APIs.
+
+## Runtime exports
+
+| Export | Purpose |
+|---|---|
+| `defineCMS` | Build and validate a static collection registry. |
+| `collection`, `collection.singleton` | Define list collections and stable singleton records. |
+| `fields` | Create typed field descriptors. |
+| `createCms` | Bind schema, Storage, optional services, trusted context, and access policy. |
+| `cmsLocalAccessPolicy` | Restrict context-free local use to tenant `default` and actor `null`. |
+| `toCmsPresentation` | Project a whole CMS config to callback-free presentation metadata. |
+| `toCmsFieldDefinition` | Convert a field descriptor to its serializable schema definition. |
+| `validateFieldMap`, `validateFieldValue` | Validate field maps and values. |
+| `CmsWebhookService` | Host-side subscription, fanout, and delivery service. |
+| `signCmsWebhook`, `verifyCmsWebhook` | Sign and verify webhook payloads with replay protection. |
+| `CMS_WEBHOOK_EVENTS` | Supported change-event names for webhook subscriptions. |
+
+The root also exports schema, document, query, access, lifecycle, webhook, and
+error types. Common contracts include `CmsConfig`, `CmsCollectionRegistry`,
+`CreateCmsOptions`, `CmsInstance`, `CmsRequestContext`, `CmsAccessPolicy`,
+`CmsScheduler`, `CmsMediaReferenceValidator`, `CmsSchemaMigration`,
+`CmsDocument`, `CmsPurgeOptions`, `CmsWhere`, `CmsSort`,
+`CmsChangeEventPage`, `CmsCustomFieldValidator`, and
+`CmsWebhookServiceOptions`. Error exports include
+`CmsError`, `CmsValidationError`, `CmsPermissionDeniedError`,
+`CmsConflictError`, `CmsNotFoundError`, `CmsDuplicateError`,
+`CmsCapabilityError`, `CmsSchemaError`, `CmsAuditError`, and
+`CmsSchedulerError`. Framework routes and browser clients are in
+`@puzzle-ui/fullstack/cms/*`, not in the CMS package.
+
+## Configuration and instance options
+
+`defineCMS({ collections })` takes keyed `collection(...)` and
+`collection.singleton(...)` definitions. Collection options include `name`,
+`description`, `version`, `drafts`, `timestamps`, `localization`, `access`,
+`hooks`, and `fields`.
+
+`createCms` accepts:
+
+| Option | Role |
+|---|---|
+| `config`, `storage` | Required static schema and `StorageAdapter`. |
+| `context` | Optional bound tenant and actor/user; never caller-controlled. |
+| `accessPolicy` | Global access callback; required when context is supplied. |
+| `scheduler` | Adds `schedulePublish`, `unschedule`, and `$scheduler`. |
+| `mediaReferenceValidator` | Validates asset references before CMS accepts media values. |
+| `customValidators` | Named validator registry for runtime schema validation; the typed code-first field factories do not expose a way to attach these names. |
+| `migrations` | Runtime callbacks for breaking schema changes. |
+| `clock`, `idGenerator` | Optional deterministic host functions. |
+| `emitChangeEvents` | Atomically writes metadata-only events and adds `cms.events`. |
+
+## Field factories
+
+The `fields` object contains:
+
+`text`, `textarea`, `number`, `boolean`, `date`, `datetime`, `email`, `url`,
+`slug`, `select`, `multiSelect`, `media`, `relationship`, `richText`, `json`,
+`array`, `object`, `blocks`, `computed`, and `custom`.
+
+Field-level common options include `label`, `required`, `defaultValue`,
+`localized`, `access`, `validation`, and `validate`, with factory-specific
+options for choices, nested fields, relationship targets, slug sources,
+computed functions, and custom type guards. `computed` fields derive a value
+from current fields and validation context. `custom` fields require a `name`
+and an `is` type guard; field factories can also receive a `validate` callback.
+These are server-side callbacks and must not be sent to a browser. See
+[Collections and fields](/docs/cms/schema) for typed examples.
+
+Although `CreateCmsOptions` also accepts `customValidators`, the static
+`fields.*` descriptors currently expose per-field `validate` callbacks rather
+than named validator references. Use `validate` for code-first schemas; do not
+assume a validator registered only by name will run for a typed field.
+
+```ts
+import { fields } from "@puzzle-ui/cms";
+
+const productFields = {
+  sku: fields.custom<string>({
+    name: "stock-code",
+    label: "Stock code",
+    is: (value): value is string =>
+      typeof value === "string" && value.startsWith("SKU-"),
+    validate: (value) =>
+      value.startsWith("SKU-") ? undefined : "Use the SKU- prefix.",
+  }),
+  wordCount: fields.computed({
+    label: "Word count",
+    compute: ({ fields: currentFields }) => {
+      const body = currentFields.body;
+      return typeof body === "string"
+        ? body.trim().split(/\s+/).filter(Boolean).length
+        : 0;
+    },
+  }),
+};
+```
+
+`CmsMediaReferenceValidator` implements `assertCanReference(request)`. The
+request includes `tenantId`, `assetId`, `actor`, `contentTypeSlug`, and
+`fieldPath`, with `entryId` when applicable. The host must confirm asset
+ownership/readiness; see [Media, change events, and
+webhooks](/docs/cms/media-webhooks).
+
+## Collection methods
+
+Regular collections expose `find`, `findById`, `create`, `update`, `delete`,
+`purge`, and `archive`. `findBySlug` is available only when the collection has
+a slug field. Query methods accept schema-typed `where`, `sort`, `limit`,
+`page`, `after`, `visibility`, and localized `locale`.
+
+When enabled:
+
+| Schema or instance option | Additional methods |
+|---|---|
+| `drafts: true` | `publish`, `unpublish`, `listRevisions`, `restoreRevision` |
+| `localization` | `createTranslation`, `listLocaleVariants`; locale-aware reads |
+| `drafts: true` plus `scheduler` | `schedulePublish`, `unschedule` |
+| `emitChangeEvents: true` | `events.list`, `events.acknowledge` |
+
+Singletons use the same concepts at the collection root without an entry ID.
+Singleton `purge` requires `expectedRevision` and accepts `locale` when
+localized. `delete` is soft deletion; `purge` is explicit permanent removal.
+Purge scans current entries, published snapshots, and immutable revisions for
+incoming relationships. Relationship additions conditionally advance a
+per-target guard in the same batch as the source write, and purge conditionally
+deletes that guard with the target; concurrent writes cannot create dangling
+references. A relationship-capable schema alone does not prevent purging an
+unreferenced entry. See [Entries and queries](/docs/cms/entries) for scan and
+capability limits.
+
+## Query operators
+
+Field operators include `equals`, `notEquals`, `contains`, `in`, `notIn`,
+`gt`, `gte`, `lt`, `lte`, `greaterThan`, `greaterThanOrEqual`,
+`lessThan`, `lessThanOrEqual`, and `exists`. Compose conditions with nested
+`and` and `or`. Field paths are checked against the declared schema.
+
+See the focused guides for [Entries and queries](/docs/cms/entries),
+[Access policies](/docs/cms/access), [Lifecycle hooks](/docs/cms/hooks),
+[Schema migrations](/docs/cms/migrations), [Scheduled
+publishing](/docs/cms/scheduling), and [Media and
+webhooks](/docs/cms/media-webhooks).

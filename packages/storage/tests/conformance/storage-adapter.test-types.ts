@@ -1,4 +1,9 @@
-import type { StorageRecord } from "../../src";
+import type {
+  StorageOrder,
+  StorageQuery,
+  StorageRecord,
+  StorageWhere,
+} from "../../src";
 
 export type ConformanceUser = StorageRecord & {
   readonly email: string;
@@ -7,8 +12,50 @@ export type ConformanceUser = StorageRecord & {
   readonly age: number;
   readonly active: boolean;
   readonly tags: readonly string[];
+  readonly scores: readonly number[];
+  readonly flags: readonly boolean[];
   readonly nullableValue: string | null;
+  readonly profile: {
+    readonly displayName: string;
+    readonly score: number;
+    readonly roles: readonly string[];
+    readonly nickname?: string;
+  };
 };
+
+const queryTypeContract = () => {
+  const validQuery: StorageQuery<ConformanceUser> = {
+    where: {
+      "profile.displayName": { operator: "contains", value: "Ada" },
+      tags: { operator: "contains", value: "editor" },
+      nullableValue: { operator: "eq", value: null },
+    },
+    orderBy: [{ field: "profile.score", direction: "asc" }],
+  };
+
+  const objectFilter: StorageWhere<ConformanceUser> = {
+    // @ts-expect-error Container objects are not queryable leaves.
+    profile: { operator: "eq", value: "profile" },
+  };
+  const arrayFilter: StorageWhere<ConformanceUser> = {
+    // @ts-expect-error Arrays support contains only.
+    tags: { operator: "eq", value: "editor" },
+  };
+  const objectOrder: StorageOrder<ConformanceUser> = {
+    // @ts-expect-error Container objects cannot be sorted.
+    field: "profile",
+    direction: "asc",
+  };
+  const arrayOrder: StorageOrder<ConformanceUser> = {
+    // @ts-expect-error Arrays cannot be sorted.
+    field: "tags",
+    direction: "asc",
+  };
+
+  return [validQuery, objectFilter, arrayFilter, objectOrder, arrayOrder];
+};
+
+void queryTypeContract;
 
 export const USERS_COLLECTION = "conformance_users";
 
@@ -23,7 +70,14 @@ export const createUser = (
   age: 30,
   active: true,
   tags: ["admin", "test"],
+  scores: [1, 2],
+  flags: [true],
   nullableValue: null,
+  profile: {
+    displayName: "Alice Example",
+    score: 10,
+    roles: ["editor", "reviewer"],
+  },
   ...overrides,
 });
 

@@ -110,4 +110,22 @@ describe("CMS webhook signatures", () => {
     await expect(signCmsWebhook({ secret, deliveryId, timestamp, body: new Uint8Array(1_048_577) }))
       .rejects.toThrow("at most");
   });
+
+  it("rejects malformed raw-body and timestamp inputs before replay-store access", async () => {
+    const signature = await signCmsWebhook({ secret, deliveryId, timestamp, body });
+    const { store, calls } = replayStore();
+    const base = { secrets: [secret], deliveryId, signature, body, scope, replayStore: store, now: timestamp };
+
+    await expect(verifyCmsWebhook({ ...base, body: "not raw bytes" as never }))
+      .rejects.toThrow("raw webhook body");
+    await expect(verifyCmsWebhook({ ...base, now: Number.MAX_SAFE_INTEGER }))
+      .rejects.toThrow("Unix timestamp");
+    await expect(verifyCmsWebhook({ ...base, toleranceMs: Number.POSITIVE_INFINITY }))
+      .rejects.toThrow("tolerance");
+    await expect(verifyCmsWebhook({ ...base, secrets: [new Uint8Array(31)] }))
+      .rejects.toThrow("32 and 1024");
+    expect(await verifyCmsWebhook({ ...base, signature: "t=1800000000000,v2=00" }))
+      .toEqual({ valid: false, reason: "invalid" });
+    expect(calls).toHaveLength(0);
+  });
 });

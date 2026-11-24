@@ -50,7 +50,6 @@
         "CmsShell": "apps/site/content/docs/pieces/components/cms-shell.mdx",
         "ContentEditor": "apps/site/content/docs/pieces/components/content-editor.mdx",
         "ContentList": "apps/site/content/docs/pieces/components/content-list.mdx",
-        "ContentTypeBuilder": "apps/site/content/docs/pieces/components/content-type-builder.mdx",
         "EditorialCalendar": "apps/site/content/docs/pieces/components/editorial-calendar.mdx",
         "LocalizationEditor": "apps/site/content/docs/pieces/components/localization-editor.mdx",
         "MediaField": "apps/site/content/docs/pieces/components/media-field.mdx",

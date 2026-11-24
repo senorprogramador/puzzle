@@ -163,9 +163,11 @@ documented review-time guarantee.
 
 The repository does not use a Changesets workflow. Packages are versioned in
 lockstep by the maintainer's `scripts/release.mjs` helper, which updates the
-package changelogs and publishes the packages. The helper provides
-`bun run release:dry-run` for a dry run; `bun run release` performs release
-operations and is intended for maintainers.
+package changelogs, audits public documentation and consumer AI instructions,
+publishes each package, waits for its version to become available on npm, then
+commits and tags the release. The helper provides `bun run release:dry-run` for
+a dry run; `bun run release` performs release operations and is intended for
+maintainers.
 
 Package-level release history is kept in each package's `CHANGELOG.md`. Do not
 manually change package versions or publish packages as part of an ordinary

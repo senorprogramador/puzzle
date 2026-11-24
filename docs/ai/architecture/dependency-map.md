@@ -7,7 +7,7 @@ This map records direct dependency relationships among workspaces. The root [`pa
 | Consumer directory (`package.json` name) | Direct runtime workspace dependencies |
 | --- | --- |
 | `apps/playground` (`@puzzle-ui/playground`) | `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/pieces`, `@puzzle-ui/theme`, `@puzzle-ui/ui` |
-| `apps/site` (`@puzzle-ui/site`) | `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/pieces`, `@puzzle-ui/seo`, `@puzzle-ui/theme`, `@puzzle-ui/ui` |
+| `apps/site` (`@puzzle-ui/site`) | `@puzzle-ui/cms`, `@puzzle-ui/core`, `@puzzle-ui/hooks`, `@puzzle-ui/icons`, `@puzzle-ui/pieces`, `@puzzle-ui/seo`, `@puzzle-ui/theme`, `@puzzle-ui/ui` |
 | `apps/workspace-next` (`workspace-next`) | `@puzzle-ui/auth`, `@puzzle-ui/fullstack`, `@puzzle-ui/pieces`, `@puzzle-ui/session`, `@puzzle-ui/storage`, `@puzzle-ui/storage-mongodb`, `@puzzle-ui/theme`, `@puzzle-ui/ui`, `@puzzle-ui/workspace`, `@puzzle-ui/workspace-ui` |
 | `apps/workspace-tanstack` (`workspace-tanstack`) | `@puzzle-ui/auth`, `@puzzle-ui/fullstack`, `@puzzle-ui/pieces`, `@puzzle-ui/session`, `@puzzle-ui/storage`, `@puzzle-ui/storage-mongodb`, `@puzzle-ui/theme`, `@puzzle-ui/ui`, `@puzzle-ui/workspace`, `@puzzle-ui/workspace-ui` |
 | `apps/workspace-react-router` (`workspace-react-router`) | `@puzzle-ui/i18n` |

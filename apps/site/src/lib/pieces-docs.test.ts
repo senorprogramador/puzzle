@@ -187,7 +187,6 @@ const cmsWorkflowDocs = [
   ["content-list", "ContentList"],
   ["content-editor", "ContentEditor"],
   ["block-editor", "BlockEditor"],
-  ["content-type-builder", "ContentTypeBuilder"],
   ["localization-editor", "LocalizationEditor"],
   ["relationship-field", "RelationshipField"],
   ["revision-history", "RevisionHistory"],

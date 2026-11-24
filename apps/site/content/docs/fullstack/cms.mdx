@@ -1,97 +1,201 @@
 ---
 title: Fullstack CMS API
-description: Connect tenant-authorized CMS services to admin and public HTTP routes, a typed browser client, and Next.js or TanStack Start.
+description: Bind a code-defined CMS schema to trusted requests, typed collection and singleton clients, lifecycle routes, and framework adapters.
 ---
 
-The Fullstack CMS API adapts `@puzzle-ui/cms` to browser clients and
-`Request`/`Response` routes. It is not a database, identity provider, role
-system, or CMS admin interface.
+`@puzzle-ui/fullstack` exposes separate browser, shared, server, Next.js, and
+TanStack Start CMS entry points. The schema remains code-first in
+`@puzzle-ui/cms`; Fullstack does not register content types at runtime.
 
 ## Configure the server
 
-The host provides Storage, the deny-by-default CMS policy, a scheduler,
-trusted actor/tenant resolution, and route-level authorization:
+Construct a `CmsServer` from the static config and a Storage adapter.
+`resolveContext` resolves tenant and actor from the trusted request/session;
+`authorize` independently authorizes each HTTP route, while `accessPolicy`
+enforces the domain policy inside CMS.
 
 ```ts
 import { createCmsServer } from "@puzzle-ui/fullstack/cms/server";
 
-const cmsServer = createCmsServer({
+export const cmsServer = createCmsServer({
+  config: cmsConfig,
   storage,
+  accessPolicy,
   scheduler,
-  accessPolicy: ({ tenantId, actor, action }) =>
-    cmsPolicy.can({ tenantId, actor, action }),
   resolveContext: (request) => resolveTrustedCmsContext(request),
   authorize: ({ context, action }) =>
-    cmsPolicy.can({
-      tenantId: context.tenantId,
-      actor: context.actor,
-      action,
-    }),
+    authorizeCmsRoute({ context, action }),
 });
 ```
 
-`storage`, `scheduler`, `cmsPolicy`, and `resolveTrustedCmsContext` are
-application-provided. Every admin request resolves actor and tenant on the
-server and passes both route authorization and the domain `accessPolicy`.
-Never accept a tenant ID, actor, or authorization decision from the browser.
-Scheduling requires an explicit scheduler; timestamps alone do not publish
-content.
+`cmsConfig`, `storage`, `accessPolicy`, `scheduler`,
+`resolveTrustedCmsContext`, and `authorizeCmsRoute` are host-owned. Each request
+resolves trusted context and route authorization before creating its
+request-scoped `createCms` instance. Never accept tenant IDs, actor IDs, or
+permission decisions from browser input.
 
-## Public and admin APIs
+Collection access is deny-by-default for omitted actions. Both the global
+`accessPolicy` and any collection-local policy must allow a request. Drafts,
+timestamps, nested localization, access maps, and hooks are configured in the
+code-defined schema; access and hook callbacks remain server-only.
 
-Admin paths manage content types, entries, drafts, revisions, locales,
-relationships, audit events, publishing, and scheduling. Public paths expose
-only published snapshots. Private responses use `no-store`; public published
-reads are separately authorized and do not include draft fields.
+## Static routes and visibility
 
-The browser client is imported only from `@puzzle-ui/fullstack/cms/client`:
+Routes derive from the static config keys:
+
+- `/admin/collections/:key` and `/public/collections/:key` for regular
+  collection queries.
+- `/:documentId` routes for regular collection records.
+- `DELETE /admin/collections/:key/:documentId/permanent` and
+  `DELETE /admin/collections/:key/permanent` for permanent collection and
+  singleton purge.
+- `/by-slug/:slug` routes only when the collection defines a slug field.
+- Collection-root routes for singletons.
+
+Draft-enabled collections add admin `publish`, `unpublish`, `archive`,
+`restore`, and `revisions` routes. A configured scheduler adds `schedule` and
+`unschedule`; localized collections add `translations`. Public reads use a
+separate route family and return only the published snapshot. Private responses
+are `no-store`; public responses omit draft/status/revision and
+schedule/archive/delete metadata.
+
+## Browser client
+
+Import the client only from `@puzzle-ui/fullstack/cms/client`. Collection
+methods infer their schema key from the configured API. Public reads use a
+separate `.public` client; callers do not set a visibility flag.
+The following example assumes the collection enables drafts and localization,
+as in the [CMS schema example](/docs/cms).
 
 ```ts
 import { createCmsClient } from "@puzzle-ui/fullstack/cms/client";
 
-const cms = createCmsClient({
-  basePath: "/api/cms",
-  onInvalidate: async (keys) => {
-    await queryCache.invalidate(keys);
-  },
-});
+const cms = createCmsClient({ basePath: "/api/cms" });
+const articles = cms.collection("articles");
 
-const entries = await cms.listEntries({
-  contentType: "article",
+const page = await articles.find({
+  where: { featured: { equals: true } },
+  limit: 20,
+  page: 1,
   locale: "en-US",
-  first: 25,
+});
+const article = await articles.findBySlug("first-article", {
+  locale: "en-US",
+  fallbackLocales: ["fr-FR"],
+});
+const updated = await articles.update(article.id, { title: "Revised" }, {
+  expectedRevision: article.revision,
+  changeSummary: "Updated the headline.",
 });
 ```
 
-Client mutations use revision conditions and report conflicts rather than
-overwriting newer drafts. After a successful mutation, the client explicitly
-invalidates the affected content-type, entry, revision, public-read, or
-relationship query keys. A failed invalidation is surfaced as a committed
-mutation error so the application can refresh before continuing.
+`find` accepts `where`, `sort`, `limit`, `page`, `after`, and `locale`.
+Conditions include equality, inequality, containment, membership, ordered
+comparisons, and existence checks; nested `and`/`or` groups are supported.
+`CmsApiDocument` is a flat JSON-safe record with a required `id`, not a nested
+`{ fields }` object. Admin records include revision/status metadata and
+timestamps when configured; public records contain published schema fields and
+omit private lifecycle metadata. To feed a Piece such as `ContentList`, project
+each schema field into the component's `CmsEntryListItem.fields` view.
 
-Media fields store asset IDs. Configure a tenant-aware media reference
-validator in `@puzzle-ui/cms`; for permanent media deletion, the host must also
-check CMS media usage records through the Media server's deletion guard.
+Regular collection clients expose `find`, `findById`, `findBySlug`,
+`create`, `update`, `delete`, `purge`, `archive`, `publish`, `unpublish`,
+`schedulePublish`, `unschedule`, `listRevisions`, `restoreRevision`,
+`listLocaleVariants`, and `createTranslation`. `create` accepts a JSON-safe
+record and optional `{ slug, locale, translationGroupId, changeSummary }`;
+`update` and `delete` require an `expectedRevision`. Publishing, archive,
+restore, and scheduling operations also require revision conditions.
+`delete` is a soft delete. `purge(id, { expectedRevision, changeSummary? })`
+permanently removes an entry and cancels any scheduled publication; it
+scans current entries, published snapshots, and immutable revisions for
+incoming relationships, then atomically removes the entry, its revisions, and
+its own media-usage records. Relationship additions conditionally advance a
+per-target guard in the same batch as their content write; purge conditionally
+removes that guard with the target. A concurrent write either commits first
+and makes purge conflict or fails without leaving a dangling reference. A
+relationship-capable schema alone does not block purge if no current or
+historical references exist. Other entries' shared media usages remain.
 
-## Webhook administration
+With `drafts: true`, collections support draft saves, publish/unpublish,
+revision listing, and restore. `schedulePublish` accepts an ISO `publishAt`
+string, IANA `timeZone`, and `expectedRevision`; a configured scheduler enables
+schedule/unschedule and the `POST /scheduler/publications` worker route.
+`localization: { locales, defaultLocale? }` enables locale-aware reads,
+`listLocaleVariants(id, queryWithoutLocale?)`, and
+`createTranslation(id, data, { locale, slug?, changeSummary? })`. Fallback
+locales are explicit and tried in caller-provided order.
 
-The optional `webhooks` server configuration enables authorized subscription,
-delivery-history, and retry routes and turns on CMS change events. Supply a
-host transport with connection-time SSRF protections, a server-side secret
-resolver, and a side-effect-free `resolveSecretRef` that selects a
-pre-provisioned tenant secret for creation or rotation. The client cannot
-submit or read secret references. Schedule the `CmsWebhookService` outbox
-fanout and delivery workers separately; the routes do not send requests.
-See [CMS webhook delivery](/docs/cms#webhook-delivery) for retry, rotation, and
-transport requirements.
-Webhook updates invalidate all subscription queries; retries invalidate all
-delivery and attempt queries. Treat an invalidation key without an ID as a
-wildcard when adapting it to your query cache.
+Singleton clients use `cms.singleton(name)` with root-level `find`, `create`,
+`update`, `delete`, `purge`, and lifecycle methods; singleton routes do not
+accept an arbitrary document ID. `purge({ expectedRevision, locale?,
+changeSummary? })` permanently removes the selected singleton locale variant.
+Singleton translation creation takes `data` and `{ locale, changeSummary? }`.
 
-## Framework handlers
+### Mapping flat CMS documents to Pieces
 
-`@puzzle-ui/fullstack/cms/next` exports `createNextCmsHandler` and
-`createNextCmsRouteHandlers`. `@puzzle-ui/fullstack/cms/tanstack` exports the
-corresponding TanStack Start dispatcher and route-map helpers. Both use the
-same CMS server route map, keeping persistence, authorization, and publishing
-framework-neutral.
+Admin `CmsApiDocument` records include flat schema properties and CMS metadata.
+When using a Piece that expects a `CmsEntryListItem`, map the schema fields into
+its nested `fields` projection; include `revision`, `revisionNumber`, `status`,
+`slug`, `locale`, and timestamps when enabled. Public DTOs intentionally omit
+private status, revision, schedule, archive, and delete metadata.
+
+## Optional webhook administration
+
+Webhook HTTP routes are mounted only when `createCmsServer` receives the
+optional `webhooks` configuration. When enabled, provide a host transport,
+`resolveSecret`, and
+`resolveSecretRef({ context, request, purpose, subscriptionId? })`; Fullstack
+binds its Storage, access policy, clock, and ID generator to the standalone
+webhook service. Without `webhooks`, these routes are absent.
+
+- `GET`/`POST /admin/webhooks`
+- `GET`/`PATCH /admin/webhooks/:subscriptionId`
+- `GET /admin/webhooks/:subscriptionId/deliveries?first`
+- `GET /admin/webhook-deliveries/:deliveryId/attempts?first`
+- `POST /admin/webhook-deliveries/:deliveryId/retry` with `expectedRevision`
+
+Client methods include `listWebhookSubscriptions`,
+`getWebhookSubscription`, `createWebhookSubscription`,
+`updateWebhookSubscription`, `listWebhookDeliveries`, `listWebhookAttempts`,
+and `retryWebhookDelivery`. DTOs omit tenant IDs, secret references, and
+delivery lease tokens. Routes never send deliveries; the host runs the
+standalone `CmsWebhookService` fanout and delivery workers separately. When
+`emitChangeEvents: true` is enabled on `createCmsServer` (or `webhooks` is
+configured, which enables it), CMS writes metadata-only events. Fullstack does
+not expose the request-scoped CMS instance. It does expose authorized event
+routes:
+
+- `GET /admin/change-events?first&after`
+- `POST /admin/change-events/:eventId/ack` with `{ expectedRevision }`
+
+The client methods `listChangeEvents({ first?, after? })` and
+`acknowledgeChangeEvent(eventId, expectedRevision)` use these routes. The list
+returns `{ items, nextCursor, hasNextPage }` with sanitized DTOs containing
+`id`, `resource`, `resourceId`, `action`, `occurredAt`, `createdAt`,
+`updatedAt`, `revision`, and optional `revisionNumber` (timestamps are ISO
+strings); tenant IDs and fanout leases are omitted. The host can feed these IDs and revisions to
+`CmsWebhookService.fanout`, which records deliveries and removes the consumed
+event, so do not acknowledge it separately. For other consumers, acknowledge
+only after durable processing. Routes do not execute fanout or delivery
+workers.
+
+## Next.js and TanStack Start
+
+The adapters dispatch the same `CmsServer` route map.
+
+```ts
+import { createNextCmsHandler } from "@puzzle-ui/fullstack/cms/next";
+
+export const { GET, POST, PATCH, DELETE } =
+  createNextCmsHandler({ cms: cmsServer });
+```
+
+For explicit Next route registration, use
+`createNextCmsRouteHandlers({ cms: cmsServer })`. TanStack Start provides
+`createTanStackCmsHandler({ cms: cmsServer })`, a
+`(request: Request) => Promise<Response>` dispatcher, and
+`createTanStackCmsRouteHandlers({ cms: cmsServer })` for the shared route map.
+Keep framework imports in their matching `/next` or `/tanstack` subpath.
+
+See the [CMS package guide](/docs/cms) for schema, access, hooks, media, and
+webhook worker details.

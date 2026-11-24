@@ -1,0 +1,116 @@
+---
+title: Drafts, revisions, and localization
+description: Configure and use draft publication, immutable revisions, scheduled jobs, localization, and lifecycle hooks.
+---
+
+Drafts, timestamps, localization, and scheduling are opt-in collection
+features. Their configuration belongs in the code-defined schema; request
+identity, access decisions, and scheduler execution remain server-owned.
+The examples below use the request-scoped `cms` instance from
+[the overview](/docs/cms).
+
+## Drafts, publish, and revisions
+
+Set `drafts: true` on a collection to keep working changes separate from the
+published snapshot. With drafts disabled, successful creates and updates are
+published immediately. Public reads return only the immutable published
+snapshot; admin visibility is separately authorized.
+
+```ts
+const updated = await cms.articles.update(
+  article.id,
+  { title: "Revised headline" },
+  { expectedRevision: article.revision, changeSummary: "Updated the headline." },
+);
+
+await cms.articles.publish(updated.id, {
+  expectedRevision: updated.revision,
+  changeSummary: "Approved for publication.",
+});
+
+const revisions = await cms.articles.listRevisions(updated.id, { first: 20 });
+await cms.articles.restoreRevision(updated.id, revisions[0]!.id, {
+  expectedRevision: updated.revision,
+  changeSummary: "Restored a previous version.",
+});
+```
+
+Revisions are immutable. Update, publish, unpublish, archive, and restore use
+optimistic revision conditions; after a conflict, read the current document
+and make an explicit merge/retry decision. Restoring history creates a new
+revision rather than mutating an old snapshot. Public reads never return draft
+fields.
+
+## Scheduling
+
+A collection needs drafts enabled and the `createCms` instance needs an
+explicit `CmsScheduler` before schedule methods are available. Pass an absolute
+instant and an IANA timezone; do not infer a timezone from a browser-local
+clock.
+
+```ts
+const article = await cms.articles.create({ title: "First article" });
+
+const scheduled = await cms.articles.schedulePublish(article.id, {
+  expectedRevision: article.revision,
+  publishAt: new Date("2035-02-01T10:00:00.000Z"),
+  timeZone: "Europe/Amsterdam",
+  changeSummary: "Schedule the launch.",
+});
+
+await cms.articles.unschedule(article.id, {
+  expectedRevision: scheduled.revision,
+});
+```
+
+The host retains scheduler jobs and calls `$scheduler.publishScheduled` with
+the expected entry ID, scheduled revision number, due instant, and timezone.
+Stale or not-yet-due jobs are no-ops; an old job cannot publish a later draft.
+See the [Fullstack CMS guide](/docs/fullstack/cms) for the HTTP scheduler
+worker route and its trusted tenant binding.
+
+## Localization
+
+Configure `localization: { locales, defaultLocale? }` on a collection. Each
+locale variant has its own fields, slug, revision history, and published
+snapshot, while translations share a group. Locale fallbacks are always
+explicit; the CMS never guesses a default locale for a public request.
+
+```ts
+const french = await cms.articles.createTranslation(
+  article.id,
+  { title: "Un lancement plus serein", summary: "Une courte introduction." },
+  { locale: "fr-FR", slug: "lancement-serein" },
+);
+
+const variants = await cms.articles.listLocaleVariants(article.id, {
+  limit: 20,
+  page: 1,
+});
+```
+
+`findBySlug` accepts `locale` and ordered `fallbackLocales`; it tries the same
+normalized slug in each listed locale. `listLocaleVariants` accepts query
+options without a locale so it can return the translation group. Localized
+singleton methods use the locale option instead of an entry ID.
+
+## Hooks and access
+
+Use the collection `access` map to refine the required global `accessPolicy`.
+Supported action aliases include `read`, `create`, `update`, `delete`,
+`publish`, `unpublish`, `schedule`, `unschedule`, `archive`, `restore`,
+`revisions`, and `translations`. An omitted local action denies access; global
+and local policies are ANDed. The request contains trusted `tenantId` and
+`actor` (`user` is its compatibility alias), plus resource/action and optional
+visibility, resource ID, field path, and record details.
+
+`beforeChange` runs after access authorization and before validation and
+persistence; it can veto by throwing. `afterChange` runs after commit and
+receives the committed `entry`; its errors are surfaced but do not roll back
+the mutation. Keep both hooks and access functions server-side.
+
+For the complete collection configuration, see
+[Collections and fields](/docs/cms/schema). Use the corresponding
+[Fullstack CMS client methods](/docs/fullstack/cms) for browser operations; the
+client binds trusted context on the server and never accepts tenant or actor
+IDs from browser payloads.

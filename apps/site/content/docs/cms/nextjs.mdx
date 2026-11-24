@@ -1,0 +1,59 @@
+---
+title: Next.js integration
+description: Mount the authorized Fullstack CMS route map in Next.js and use the browser-safe CMS client.
+---
+
+The CMS domain stays in `@puzzle-ui/cms`; Next.js HTTP routing is provided by
+`@puzzle-ui/fullstack`. Configure one `CmsServer` with your static schema,
+Storage adapter, scheduler, access policy, trusted context resolver, and
+route-level authorization. Keep that server module out of Client Components.
+See the [Fullstack CMS guide](/docs/fullstack/cms) for the complete server
+configuration contract.
+
+## Mount the route handler
+
+In a Next.js App Router route module, adapt the configured `cmsServer` to
+standard request handlers:
+
+```ts
+import { createNextCmsHandler } from "@puzzle-ui/fullstack/cms/next";
+import { cmsServer } from "../cms-server";
+
+export const { GET, POST, PATCH, DELETE } =
+  createNextCmsHandler({ cms: cmsServer });
+```
+
+`cmsServer` is the app-owned instance returned by
+`createCmsServer`. `createNextCmsHandler` returns `GET`, `POST`, `PATCH`, and
+`DELETE` handlers that dispatch against the same route map. For explicit
+registration, `createNextCmsRouteHandlers({ cms: cmsServer })` returns that
+route map instead.
+
+The adapter does not provide authentication or storage. The server's
+`resolveContext(request)` must derive tenant and actor from trusted request
+state, and `authorize` must authorize each route. CMS then applies its own
+global and collection access policies.
+
+## Use the browser client
+
+Import browser operations only from the client subpath:
+
+```ts
+import { createCmsClient } from "@puzzle-ui/fullstack/cms/client";
+
+const cms = createCmsClient({ basePath: "/api/cms" });
+const posts = await cms.collection("posts").find({
+  limit: 20,
+  page: 1,
+});
+```
+
+Collection keys are derived from static server configuration. Public reads use
+the separate `.public` client; do not send tenant IDs, actor IDs, or visibility
+decisions from the browser. The client returns flat, serializable
+`CmsApiDocument` records. For previewing drafts, use an authenticated admin
+route rather than a public query; see [Previewing drafts](/docs/cms/preview).
+
+Next route adapters are optional peers and are isolated to
+`@puzzle-ui/fullstack/cms/next`. Do not import them from browser code or
+deep-import Fullstack source.

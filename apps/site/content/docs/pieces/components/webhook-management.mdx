@@ -31,6 +31,13 @@ service or authorization boundary.
 Existing subscribed events remain available in the editor even if omitted from
 `eventTypes`, so they can be removed or reselected before saving.
 
+The browser CMS client provides `listWebhookSubscriptions`,
+`getWebhookSubscription`, `createWebhookSubscription`,
+`updateWebhookSubscription`, `listWebhookDeliveries`, `listWebhookAttempts`,
+and `retryWebhookDelivery`. Map the component callbacks to these methods using
+their documented revision inputs; the client contracts contain only sanitized
+projections, never secret references.
+
 ```tsx
 import { WebhookManagement } from "@puzzle-ui/pieces";
 ```

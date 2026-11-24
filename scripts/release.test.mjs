@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { waitForNpmAvailability } from "./release.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const bun = join(root, "node_modules/.bin/bun");
@@ -19,6 +20,7 @@ const createFixture = async (directory) => {
   await mkdir(join(directory, "scripts"));
   await mkdir(join(directory, "bin"));
   await mkdir(join(directory, "docs/ai/integration"), { recursive: true });
+  await mkdir(join(directory, "apps/site/content/docs"), { recursive: true });
   await copyFile(join(root, "scripts/release.mjs"), join(directory, "scripts/release.mjs"));
   await writeFile(join(directory, "package.json"), JSON.stringify({
     name: "release-test",
@@ -26,6 +28,13 @@ const createFixture = async (directory) => {
     workspaces: ["packages/*"],
   }));
   const originals = {};
+  originals["README.md"] = "# Release test\n";
+  await writeFile(join(directory, "README.md"), originals["README.md"]);
+  originals["apps/site/content/docs/getting-started.mdx"] = "# Getting started\n\nUse the released helper.\n";
+  await writeFile(
+    join(directory, "apps/site/content/docs/getting-started.mdx"),
+    originals["apps/site/content/docs/getting-started.mdx"],
+  );
   originals["docs/ai/integration/registry.json"] = JSON.stringify({
     schemaVersion: 1,
     packages: [],
@@ -48,6 +57,14 @@ const createFixture = async (directory) => {
       scripts: { build: "unused", ...(entry.name === "core" ? { test: "unused" } : {}) },
     });
     await writeFile(join(directory, path), originals[path]);
+    if (entry.name === "core") {
+      await mkdir(join(directory, "packages/core/ai"));
+      originals["packages/core/ai/instructions.md"] = "# Core consumer guidance\n";
+      await writeFile(
+        join(directory, "packages/core/ai/instructions.md"),
+        originals["packages/core/ai/instructions.md"],
+      );
+    }
   }
   const initial = run(bun, ["install", "--lockfile-only", "--ignore-scripts"], {
     cwd: directory,
@@ -115,7 +132,25 @@ if (command === "script") {
 } else if (command === "npm") {
   if (process.env.DRY_RUN === "true") assert.ok(args.includes("--dry-run"), "Never publish during a dry run");
   const authenticated = join(process.env.FIXTURE_ROOT, "npm-authenticated");
+  if (args[0] === "view") {
+    if (process.env.FAIL_STEP === "poll-timeout") {
+      console.error("npm error code E404");
+      process.exit(1);
+    }
+    if (process.env.FAIL_STEP === "poll-error") {
+      console.error("npm error ECONNRESET");
+      process.exit(1);
+    }
+    const version = args[1].slice(args[1].lastIndexOf("@") + 1);
+    console.log(JSON.stringify(version));
+    process.exit(0);
+  }
   if (args[0] === "whoami" && process.env.NPM_LOGIN === "true" && !existsSync(authenticated)) process.exit(1);
+  if (args[0] === "publish" && process.env.FAIL_STEP === "partial-publish") {
+    const publishedMarker = join(process.env.FIXTURE_ROOT, "one-package-published");
+    if (existsSync(publishedMarker)) process.exit(1);
+    writeFileSync(publishedMarker, "published");
+  }
   if (args[0] === process.env.FAIL_STEP) process.exit(1);
   if (args[0] === "login" || (args[0] === "publish" && process.env.NPM_LOGIN === "true")) {
     if (args[0] === "login") assert.ok(args.includes("--auth-type=web"));
@@ -154,27 +189,58 @@ if (command === "script") {
   assert.ok(args.includes("bash,view,grep,glob"));
   assert.ok(args.includes("--deny-tool"));
   const prompt = args[args.indexOf("--prompt") + 1];
-  assert.match(prompt, /v0\\.4\\.0\\.\\.HEAD/);
-  assert.match(prompt, /Read every changed file/);
-  assert.match(prompt, /packages\\/core\\/src\\/index\\.ts/);
   if (process.env.FAIL_STEP === "copilot") process.exit(1);
-  if (process.env.FAIL_STEP === "invalid-json") {
-    console.log("not JSON");
-    process.exit(0);
+  if (prompt.includes("Audit public documentation")) {
+    assert.match(prompt, /v0\\.4\\.0\\.\\.HEAD/);
+    assert.match(prompt, /apps\\/site\\/content\\/docs\\/getting-started\\.mdx/);
+    assert.match(prompt, /packages\\/core\\/ai\\/instructions\\.md/);
+    if (process.env.FAIL_STEP === "docs-audit") process.exit(1);
+    if (process.env.FAIL_STEP === "docs-invalid-json") {
+      console.log("not JSON");
+      process.exit(0);
+    }
+    const edits = [
+      {
+        path: "apps/site/content/docs/getting-started.mdx",
+        content: "# Getting started\\n\\nUse the released helper safely.\\n",
+        reason: "The updated wording matches the release implementation.",
+        evidence: ["packages/core/src/index.ts: exports helper"],
+      },
+      {
+        path: "packages/core/ai/instructions.md",
+        content: "# Core consumer guidance\\n\\nUse the released helper safely.\\n",
+        reason: "The updated instructions match the release implementation.",
+        evidence: ["packages/core/src/index.ts: exports helper"],
+      },
+    ];
+    if (process.env.FAIL_STEP === "docs-out-of-scope") {
+      edits[0].path = "packages/core/package.json";
+    }
+    console.log(JSON.stringify({
+      edits: process.env.ALL_DOCS_VALID === "true" ? [] : edits,
+    }));
+  } else {
+    assert.match(prompt, /v0\\.4\\.0\\.\\.HEAD/);
+    assert.match(prompt, /Read every changed file/);
+    assert.match(prompt, /packages\\/core\\/src\\/index\\.ts/);
+    if (process.env.FAIL_STEP === "invalid-json") {
+      console.log("not JSON");
+      process.exit(0);
+    }
+    const packageLine = prompt.split("\\n").find((line) => line.startsWith("Packages: "));
+    const packages = JSON.parse(packageLine.slice("Packages: ".length));
+    const notes = packages.map(({ package: name }) => ({
+      package: name,
+      changes: process.env.ALL_EMPTY === "true" ? [] :
+        name === "@puzzle-ui/core" ? ["Added a helper."] :
+        name === "@puzzle-ui/theme" ? ["Updated the theme."] : [],
+    }));
+    if (process.env.FAIL_STEP === "missing-package") notes.pop();
+    if (process.env.FAIL_STEP === "duplicate-package") notes.push(notes[0]);
+    if (process.env.FAIL_STEP === "omitted-pending") notes[0].changes = [];
+    if (process.env.FAIL_STEP === "multiline-note") notes[0].changes = ["Added a helper.\\n## Invalid heading"];
+    console.log(JSON.stringify(notes));
   }
-  const packageLine = prompt.split("\\n").find((line) => line.startsWith("Packages: "));
-  const packages = JSON.parse(packageLine.slice("Packages: ".length));
-  const notes = packages.map(({ package: name }) => ({
-    package: name,
-    changes: process.env.ALL_EMPTY === "true" ? [] :
-      name === "@puzzle-ui/core" ? ["Added a helper."] :
-      name === "@puzzle-ui/theme" ? ["Updated the theme."] : [],
-  }));
-  if (process.env.FAIL_STEP === "missing-package") notes.pop();
-  if (process.env.FAIL_STEP === "duplicate-package") notes.push(notes[0]);
-  if (process.env.FAIL_STEP === "omitted-pending") notes[0].changes = [];
-  if (process.env.FAIL_STEP === "multiline-note") notes[0].changes = ["Added a helper.\\n## Invalid heading"];
-  console.log(JSON.stringify(notes));
 } else {
   assert.equal(command, "bun");
   assert.equal(args[0], "run");
@@ -188,6 +254,56 @@ if (command === "script") {
   await writeFile(join(directory, "bin/package.json"), '{"type":"module"}');
   return originals;
 };
+
+test("npm availability polling retries 404s until every package reports the release version", async () => {
+  let time = 0;
+  const attempts = new Map();
+  const sleeps = [];
+
+  await waitForNpmAvailability([
+    { name: "@puzzle-ui/core" },
+    { name: "@puzzle-ui/theme" },
+  ], "0.5.0", {
+    query: (name, version) => {
+      const count = (attempts.get(name) ?? 0) + 1;
+      attempts.set(name, count);
+      if (name === "@puzzle-ui/core" && count === 1) {
+        return { ok: false, stderr: "npm error code E404" };
+      }
+      return { ok: true, stdout: JSON.stringify(version) };
+    },
+    sleep: async (milliseconds) => {
+      sleeps.push(milliseconds);
+      time += milliseconds;
+    },
+    now: () => time,
+    intervalMs: 10,
+    timeoutMs: 100,
+  });
+
+  assert.equal(attempts.get("@puzzle-ui/core"), 2);
+  assert.equal(attempts.get("@puzzle-ui/theme"), 1);
+  assert.deepEqual(sleeps, [10]);
+});
+
+test("npm availability polling stops at its deadline and surfaces non-404 errors", async () => {
+  let time = 0;
+  await assert.rejects(waitForNpmAvailability([{ name: "@puzzle-ui/core" }], "0.5.0", {
+    query: () => ({ ok: false, stderr: "npm error code E404" }),
+    sleep: async (milliseconds) => { time += milliseconds; },
+    now: () => time,
+    intervalMs: 10,
+    timeoutMs: 15,
+  }), /Timed out waiting for npm to expose 0\.5\.0/);
+
+  await assert.rejects(waitForNpmAvailability([{ name: "@puzzle-ui/core" }], "0.5.0", {
+    query: () => ({ ok: false, stderr: "npm error ECONNRESET" }),
+    sleep: async () => assert.fail("Network errors must not be retried as propagation delays"),
+    now: () => 0,
+    intervalMs: 10,
+    timeoutMs: 100,
+  }), /Could not check npm availability/);
+});
 
 test("root changelog includes changed package release entries only", async () => {
   const rootChangelog = await readFile(join(root, "CHANGELOG.md"), "utf8");
@@ -336,7 +452,7 @@ for (const missing of [false, true]) {
           command === "copilot" || (command === "bun" && args[0] === "x"));
         assert.equal(copilotCommands.filter(({ args }) => args.includes("login")).length, 1);
         assert.equal(copilotCommands.filter(({ args }) => args.includes("--prompt")).length,
-          failure === "copilot-login" ? 1 : 2);
+          failure === "copilot-login" ? 1 : failure === "copilot-auth-retry" ? 2 : 3);
         assert.equal(commands.some(({ command, args }) => command === "npm" && args[0] === "publish"), !failure);
         for (const [path, content] of Object.entries(originals)) {
           assert.equal(await readFile(join(directory, path), "utf8"), content, path);
@@ -373,7 +489,8 @@ for (const failure of [undefined, "copilot-runner"]) {
       assert.equal(result.status, failure ? 1 : 0, result.stdout + result.stderr);
       const commands = (await readFile(join(directory, "commands.jsonl"), "utf8"))
         .trim().split("\n").map((line) => JSON.parse(line));
-      assert.equal(commands.filter(({ command, args }) => command === "bun" && args[0] === "x").length, 1);
+      assert.equal(commands.filter(({ command, args }) => command === "bun" && args[0] === "x").length,
+        failure ? 1 : 2);
       assert.equal(commands.some(({ command }) => command === "copilot"), false);
       if (failure) {
         assert.match(result.stderr, /Copilot authentication required/);
@@ -478,10 +595,11 @@ for (const failure of [undefined, "--lockfile-only", "--frozen-lockfile"]) {
 
 for (const failure of [
   undefined, "baseline", "ai-check", "copilot", "invalid-json", "missing-package",
-  "duplicate-package", "commit", "push", "publish", "tag",
+  "duplicate-package", "docs-audit", "docs-invalid-json", "docs-out-of-scope",
+  "commit", "push", "publish", "partial-publish", "tag",
   "omitted-pending", "multiline-note", "duplicate-root",
 ]) {
-  test(`release ${failure ? `stops safely after ${failure} failure` : "pushes all changelogs before publishing and tags afterwards"}`, async () => {
+  test(`release ${failure ? `stops safely after ${failure} failure` : "publishes and polls before committing and tagging"}`, async () => {
     const directory = await mkdtemp(join(tmpdir(), "puzzle-release-test-"));
     try {
       const originals = await createFixture(directory);
@@ -508,9 +626,10 @@ for (const failure of [
         .trim().split("\n").map((line) => JSON.parse(line));
       const index = (command, action) => commands.findIndex((entry) =>
         entry.command === command && (!action || entry.args[0] === action));
-      const committed = [undefined, "push", "publish", "tag"].includes(failure);
+      const preserved = [undefined, "commit", "push", "partial-publish", "tag"].includes(failure);
+      const committed = [undefined, "push", "tag"].includes(failure);
       assert.equal(commands.some(({ command, args }) => command === "bun" && args[0] === "x"), false);
-      if (committed) {
+      if (preserved) {
         const core = await readFile(join(directory, "packages/core/CHANGELOG.md"), "utf8");
         assert.match(core, /## 0\.5\.0 - \d{4}-\d{2}-\d{2}\n\n- Added a helper\./);
         assert.doesNotMatch(core, /## Pending/);
@@ -524,13 +643,34 @@ for (const failure of [
         assert.doesNotMatch(rootChangelog, /### `@puzzle-ui\/ui`/);
         assert.doesNotMatch(rootChangelog, /No changes; version bumped in lockstep\./);
         assert.match(rootChangelog, /## 0\.4\.0 - 2026-11-09\n\n- Previous root changes\./);
-        assert.equal(index("git", "restore"), -1);
-        assert.ok(index("copilot") > commands.findLastIndex(({ command }) => command === "bun"));
+        assert.equal(await readFile(join(directory, "apps/site/content/docs/getting-started.mdx"), "utf8"),
+          "# Getting started\n\nUse the released helper safely.\n");
+        assert.equal(await readFile(join(directory, "packages/core/ai/instructions.md"), "utf8"),
+          "# Core consumer guidance\n\nUse the released helper safely.\n");
         assert.ok(commands.some(({ command, args }) => command === "bun" && args[1] === "test"));
-        assert.ok(index("copilot") < index("git", "commit"));
-        assert.ok(index("git", "commit") < index("git", "push"));
-        assert.deepEqual(commands[index("git", "add")].args, ["add", "--all"]);
-        assert.ok(commands[index("git", "commit")].args.some((arg) => arg.includes("Co-authored-by: Copilot")));
+        if (failure === "partial-publish") {
+          const publishes = commands.filter(({ command, args }) => command === "npm" && args[0] === "publish");
+          assert.equal(publishes.length, 2);
+          assert.equal(basename(publishes[0].cwd), "core");
+          assert.equal(commands.some(({ command, args }) => command === "npm" && args[0] === "view"), false);
+          assert.equal(index("git", "add"), -1);
+          assert.match(result.stderr, /Published: @puzzle-ui\/core/);
+        } else {
+          const publishIndexes = commands.flatMap((entry, commandIndex) =>
+            entry.command === "npm" && entry.args[0] === "publish" ? [commandIndex] : []);
+          const lastPublishIndex = Math.max(...publishIndexes);
+          const lastViewIndex = commands.findLastIndex(({ command, args }) =>
+            command === "npm" && args[0] === "view");
+          assert.ok(index("copilot") < index("npm", "publish"));
+          assert.ok(lastPublishIndex < lastViewIndex);
+          assert.ok(lastViewIndex < index("git", "add"));
+          assert.ok(index("git", "add") < index("git", "commit"));
+        }
+        if (committed) {
+          assert.ok(index("git", "commit") < index("git", "push"));
+          assert.deepEqual(commands[index("git", "add")].args, ["add", "--all"]);
+          assert.ok(commands[index("git", "commit")].args.some((arg) => arg.includes("Co-authored-by: Copilot")));
+        }
       } else {
         for (const [path, content] of Object.entries(originals)) {
           assert.equal(await readFile(join(directory, path), "utf8"), content, path);
@@ -538,13 +678,16 @@ for (const failure of [
         assert.equal((await readdir(join(directory, "packages/ui"))).includes("CHANGELOG.md"), false);
         if (failure === "duplicate-root") assert.match(result.stderr, /Root changelog already has an entry/);
       }
-      if (!failure || ["publish", "tag"].includes(failure)) {
-        assert.ok(index("git", "push") < index("npm", "publish"));
+      if (committed) {
+        assert.ok(index("npm", "publish") < index("git", "push"));
+      } else if (preserved) {
+        assert.equal(index("git", "push"), -1);
       } else {
-        assert.equal(index("npm", "publish"), -1);
+        assert.equal(index("git", "commit"), -1);
       }
       if (!failure || failure === "tag") {
-        assert.ok(index("git", "tag") > commands.findLastIndex(({ command }) => command === "npm"));
+        assert.ok(index("git", "tag") > commands.findLastIndex(({ command, args }) =>
+          command === "npm" && args[0] === "view"));
       } else {
         assert.equal(index("git", "tag"), -1);
       }
@@ -599,18 +742,26 @@ for (const failure of [undefined, "commit", "push"]) {
         },
       });
       assert.equal(result.status, failure ? 1 : 0, result.stdout + result.stderr);
-      assert.equal(gitRun("status", "--porcelain"), "");
       if (failure === "commit") {
         assert.equal(gitRun("rev-parse", "HEAD"), initialHead);
-        for (const [path, content] of Object.entries(originals)) {
-          assert.equal(await readFile(join(directory, path), "utf8"), content, path);
-        }
+        assert.notEqual(gitRun("status", "--porcelain"), "");
+        assert.equal(JSON.parse(await readFile(join(directory, "packages/core/package.json"), "utf8")).version, "0.5.0");
+        assert.match(await readFile(join(directory, "apps/site/content/docs/getting-started.mdx"), "utf8"),
+          /released helper safely/);
+        assert.match(result.stderr, /Published:/);
       } else {
+        assert.equal(gitRun("status", "--porcelain"), "");
         assert.notEqual(gitRun("rev-parse", "HEAD"), initialHead);
         assert.match(gitRun("show", "HEAD:packages/ui/CHANGELOG.md"), /No changes; version bumped in lockstep/);
         assert.match(gitRun("show", "HEAD:CHANGELOG.md"), /### `@puzzle-ui\/core`\n\n- Added a helper\./);
+        assert.match(gitRun("show", "HEAD:apps/site/content/docs/getting-started.mdx"),
+          /released helper safely/);
+        assert.match(gitRun("show", "HEAD:packages/core/ai/instructions.md"),
+          /released helper safely/);
         if (!failure) {
           assert.equal(gitRun("rev-parse", "HEAD"), gitRun("--git-dir=remote.git", "rev-parse", "v0.5.0^{}"));
+        } else {
+          assert.notEqual(run(git, ["show-ref", "--verify", "--quiet", "refs/tags/v0.5.0"], { cwd: directory }).status, 0);
         }
       }
     } finally {

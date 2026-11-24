@@ -66,6 +66,105 @@ const auth: TreeViewItem = {
   ],
 };
 
+const cmsFolder = "/docs/cms" as const;
+const cms: TreeViewItem = {
+  id: "cms",
+  label: "CMS",
+  children: [
+    { id: "cms-overview", label: "Overview", href: cmsFolder },
+    {
+      id: "cms-getting-started",
+      label: "Getting Started",
+      href: `${cmsFolder}/getting-started`,
+    },
+    {
+      id: "cms-concepts",
+      label: "Concepts",
+      href: `${cmsFolder}/concepts`,
+    },
+    {
+      id: "cms-blog",
+      label: "Build a Blog",
+      href: `${cmsFolder}/blog`,
+    },
+    {
+      id: "cms-schema",
+      label: "Collections & Fields",
+      href: `${cmsFolder}/schema`,
+    },
+    {
+      id: "cms-entries",
+      label: "Entries & Queries",
+      href: `${cmsFolder}/entries`,
+    },
+    {
+      id: "cms-access",
+      label: "Access Policies",
+      href: `${cmsFolder}/access`,
+    },
+    {
+      id: "cms-hooks",
+      label: "Lifecycle Hooks",
+      href: `${cmsFolder}/hooks`,
+    },
+    {
+      id: "cms-lifecycle",
+      label: "Drafts & Revisions",
+      href: `${cmsFolder}/lifecycle`,
+    },
+    {
+      id: "cms-multilingual",
+      label: "Multilingual Content",
+      href: `${cmsFolder}/multilingual`,
+    },
+    {
+      id: "cms-scheduling",
+      label: "Scheduled Publishing",
+      href: `${cmsFolder}/scheduling`,
+    },
+    {
+      id: "cms-preview",
+      label: "Previewing Drafts",
+      href: `${cmsFolder}/preview`,
+    },
+    {
+      id: "cms-migrations",
+      label: "Schema Migrations",
+      href: `${cmsFolder}/migrations`,
+    },
+    {
+      id: "cms-multi-tenancy",
+      label: "Multi-tenant Setup",
+      href: `${cmsFolder}/multi-tenancy`,
+    },
+    {
+      id: "cms-custom-storage",
+      label: "Custom Storage",
+      href: `${cmsFolder}/custom-storage`,
+    },
+    {
+      id: "cms-media-webhooks",
+      label: "Media & Webhooks",
+      href: `${cmsFolder}/media-webhooks`,
+    },
+    {
+      id: "cms-nextjs",
+      label: "Next.js Integration",
+      href: `${cmsFolder}/nextjs`,
+    },
+    {
+      id: "cms-tanstack-start",
+      label: "TanStack Start Integration",
+      href: `${cmsFolder}/tanstack-start`,
+    },
+    {
+      id: "cms-reference",
+      label: "API Reference",
+      href: `${cmsFolder}/reference`,
+    },
+  ],
+} as const;
+
 export const applicationDevelopment: TreeViewItem = {
   id: "application-development",
   label: "Application Development",
@@ -77,7 +176,7 @@ export const applicationDevelopment: TreeViewItem = {
     { id: "session", label: "Session Management", href: "/docs/session" },
     fullstack,
     { id: "storage", label: "Storage", href: "/docs/storage" },
-    { id: "cms", label: "CMS", href: "/docs/cms" },
+    cms,
     { id: "media", label: "Media", href: "/docs/media" },
     {
       id: "media-cloudflare",

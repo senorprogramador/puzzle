@@ -85,5 +85,43 @@ export const runPaginationConformance = (
       expect(page.hasNextPage).toBe(false);
       expect(page.nextCursor).toBeNull();
     });
+
+    it("paginates on dotted sort fields with a stable id tie-breaker", async () => {
+      await reset();
+
+      const adapter = await createAdapter();
+      const profiles = [
+        { id: "user-1", score: 10 },
+        { id: "user-2", score: 10 },
+        { id: "user-3", score: 20 },
+      ] as const;
+
+      for (const profile of profiles) {
+        await adapter.insert<ConformanceUser>(USERS_COLLECTION, {
+          id: profile.id,
+          ...createUser({
+            profile: {
+              displayName: `User ${profile.id}`,
+              score: profile.score,
+              roles: [],
+            },
+          }),
+        } as StorageInsert<ConformanceUser>);
+      }
+
+      const first = await adapter.findPage<ConformanceUser>(USERS_COLLECTION, {
+        first: 1,
+        orderBy: [{ field: "profile.score", direction: "asc" }],
+      });
+      const second = await adapter.findPage<ConformanceUser>(USERS_COLLECTION, {
+        first: 1,
+        after: first.nextCursor!,
+        orderBy: [{ field: "profile.score", direction: "asc" }],
+      });
+
+      expect(first.items.map(({ id }) => id)).toEqual(["user-1"]);
+      expect(second.items.map(({ id }) => id)).toEqual(["user-2"]);
+      expect(second.hasNextPage).toBe(true);
+    });
   });
 };

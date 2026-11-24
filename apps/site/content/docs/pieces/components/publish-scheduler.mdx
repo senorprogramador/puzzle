@@ -25,19 +25,31 @@ import { PublishScheduler } from "@puzzle-ui/pieces";
 | `className` | `string` | No | — |
 
 ```tsx
+import { createCmsClient } from "@puzzle-ui/fullstack/cms/client";
 import { PublishScheduler } from "@puzzle-ui/pieces";
+
+const cms = createCmsClient({ basePath: "/api/cms" });
+const articles = cms.collection("articles");
 
 <PublishScheduler
   scheduledAt={entry.scheduledAt}
   timeZone={entry.scheduledTimeZone ?? "UTC"}
-  onSchedule={(publishAt, timeZone) =>
-    cmsClient.schedule(entry.id, publishAt, timeZone, entry.revision)
-  }
-  onCancelSchedule={() => cmsClient.unschedule(entry.id, entry.revision)}
+  onSchedule={async (publishAt, timeZone) => {
+    await articles.schedulePublish(entry.id, {
+      expectedRevision: entry.revision,
+      publishAt: publishAt.toISOString(),
+      timeZone,
+    });
+  }}
+  onCancelSchedule={async () => {
+    await articles.unschedule(entry.id, {
+      expectedRevision: entry.revision,
+    });
+  }}
 />;
 ```
 
-Nonexistent daylight-saving local times are rejected visibly. If a local time occurs twice during a clock rollback, the earlier instant is selected. The CMS service still requires an explicit scheduler and revision-bound job; server authorization and execution remain mandatory.
+Nonexistent daylight-saving local times are rejected visibly. If a local time occurs twice during a clock rollback, the earlier instant is selected. This component only collects a date/time; schedule operations are available when the server configures a CMS scheduler.
 
 ## Related
 

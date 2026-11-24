@@ -53,6 +53,8 @@
 .puzzle-app-bar__link {
     display: inline-flex;
     align-items: center;
+    flex-direction: row;
+    gap: var(--puzzle-space-2, 0.5rem);
     min-height: 2.5rem;
     padding: 0.5rem 0.75rem;
     border-radius: var(--puzzle-radius-md, 0.5rem);
@@ -62,6 +64,14 @@
     transition:
         color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease),
         background-color var(--puzzle-duration-fast, 150ms) var(--puzzle-easing-standard, ease);
+}
+
+.puzzle-app-bar__link-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
 }
 
 .puzzle-app-bar__link:hover,

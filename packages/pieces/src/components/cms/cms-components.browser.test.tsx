@@ -3,8 +3,9 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { page, userEvent as browserUserEvent } from "vitest/browser";
 import { expect, it, vi } from "vitest";
-import { CmsShell, ContentEditor, ContentList, ContentTypeBuilder, EditorialCalendar, RelationshipField, RevisionHistory } from "./cms-components";
-import type { CmsEntryListItem, CmsRevisionItem, ContentTypeDefinition, EditorialCalendarItem } from "./cms.types";
+import { fields } from "@puzzle-ui/cms";
+import { CmsShell, ContentEditor, ContentList, EditorialCalendar, RelationshipField, RevisionHistory } from "./cms-components";
+import type { CmsEntryListItem, CmsRevisionItem, EditorialCalendarItem } from "./cms.types";
 
 const items: EditorialCalendarItem[] = [
   {
@@ -103,7 +104,7 @@ it("confirms dirty discards with keyboard access at mobile width", async () => {
   await page.viewport(375, 800);
   render(
     <ContentEditor
-      contentType={{ slug: "article", name: "Article", version: 1, fields: [] }}
+      contentType={{ kind: "collection", name: "Article", fields: {} }}
       value={{}}
       onChange={() => undefined}
       onSaveDraft={() => undefined}
@@ -145,8 +146,8 @@ it("blocks save and publish while a JSON draft is invalid", async () => {
     return (
       <ContentEditor
         contentType={{
-          slug: "article", name: "Article", version: 1,
-          fields: [{ key: "data", type: "json", label: "Data" }],
+          kind: "collection", name: "Article",
+          fields: { data: fields.json({ label: "Data" }) },
         }}
         value={value}
         onChange={(next) => {
@@ -199,42 +200,13 @@ it("opens revision comparisons with the keyboard without mobile overflow", async
   );
 });
 
-it("keeps a content type field key editable across controlled updates", async () => {
-  const user = userEvent.setup();
-  await page.viewport(375, 800);
-  const Builder = () => {
-    const [value, setValue] = useState<ContentTypeDefinition>({
-      slug: "article",
-      name: "Article",
-      version: 1,
-      locales: ["en-US"],
-      fields: [{ key: "title", label: "Title", type: "text" }],
-    });
-    return <ContentTypeBuilder value={value} onChange={setValue} />;
-  };
-  render(<Builder />);
-  const key = screen.getByLabelText("Key");
-  await user.clear(key);
-  await user.type(key, "headline");
-  expect(key).toHaveValue("headline");
-  expect(key).toHaveFocus();
-  const locales = screen.getByLabelText("Locales (comma separated)");
-  await user.click(locales);
-  await user.type(locales, ", fr-FR");
-  expect(locales).toHaveValue("en-US, fr-FR");
-  expect(screen.getByRole("option", { name: "fr-FR" })).toBeVisible();
-  expect(document.documentElement.scrollWidth).toBeLessThanOrEqual(
-    document.documentElement.clientWidth,
-  );
-});
-
 it("supports keyboard removal of an off-page relationship on mobile", async () => {
   const onChange = vi.fn();
   await page.viewport(320, 800);
   render(
     <RelationshipField
       label="Related"
-      relation={{ targetTypes: ["article"], multiple: true }}
+      relation={fields.relationship({ target: "article", multiple: true })}
       options={[]}
       value={["off-page"]}
       onChange={onChange}

@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { collection, defineCMS, fields, toCmsPresentation } from "@puzzle-ui/cms";
+import type { FieldsValue } from "@puzzle-ui/cms";
 import {
   AuditLogViewer,
   BlockEditor,
   CmsShell,
   ContentEditor,
   ContentList,
-  ContentTypeBuilder,
   EditorialCalendar,
   LocalizationEditor,
   PublishScheduler,
@@ -14,65 +15,68 @@ import {
   WebhookManagement,
 } from "@puzzle-ui/pieces";
 import type {
-  CmsAuditEvent,
-  CmsContentRevision,
-  CmsEntryView,
+  CmsAuditLogItem,
+  CmsBlockDefinition,
+  CmsBlockValue,
+  CmsEntryListItem,
   CmsFields,
+  CmsRevisionItem,
   ContentListQuery,
-  ContentTypeDefinition,
   EditorialCalendarItem,
   RelationshipOption,
   WebhookDeliveryItem,
   WebhookSubscriptionItem,
 } from "@puzzle-ui/pieces";
 
-const articleType: ContentTypeDefinition = {
-  slug: "article",
-  name: "Article",
-  description: "Editorial articles.",
-  version: 1,
-  locales: ["en-US", "fr-FR"],
-  defaultLocale: "en-US",
-  fields: [
-    { key: "title", type: "text", label: "Title", required: true, localized: true },
-    { key: "summary", type: "textarea", label: "Summary", localized: true },
-    { key: "featured", type: "boolean", label: "Featured" },
-  ],
-};
+const cmsConfig = defineCMS({
+  collections: {
+    articles: collection({
+      name: "Article",
+      description: "Editorial articles.",
+      version: 1,
+      fields: {
+        title: fields.text({ label: "Title", required: true, localized: true }),
+        slug: fields.slug({ label: "Slug", from: "title", required: true, localized: true }),
+        summary: fields.textarea({ label: "Summary", localized: true }),
+        featured: fields.boolean({ label: "Featured", defaultValue: false }),
+        displaySettings: fields.json({ label: "Display settings" }),
+        related: fields.relationship({
+          label: "Related articles",
+          target: "articles",
+          multiple: true,
+          sameLocale: true,
+          allowedStatuses: ["published"],
+        }),
+      },
+      drafts: true,
+      timestamps: true,
+      localization: {
+        locales: ["en-US", "fr-FR"],
+        defaultLocale: "en-US",
+      },
+    }),
+  },
+});
+
+const articleFields = cmsConfig.collections.articles.fields;
+const articlePresentation = toCmsPresentation(cmsConfig).collections.articles;
 
 const makeEntry = (
   id: string,
   title: string,
-  status: CmsEntryView["status"],
+  status: CmsEntryListItem["status"],
   locale: string,
-): CmsEntryView => {
+): CmsEntryListItem => {
   const timestamp = new Date("2026-10-28T12:00:00.000Z");
   return {
     id,
-    createdAt: timestamp,
     updatedAt: timestamp,
     revision: 1,
-    tenantId: "tenant-demo",
-    contentTypeId: "article-type",
-    contentTypeSlug: "article",
-    translationGroupId: `translation-${id}`,
-    locale,
     slug: id,
-    publicSlug: null,
-    publicSlugKey: id,
-    fields: { title },
-    schemaVersion: 1,
-    revisionNumber: 2,
+    locale,
     status,
-    publishedSnapshot: null,
-    scheduledAt: null,
-    scheduledTimeZone: null,
-    scheduledRevisionNumber: null,
-    archivedAt: null,
-    deletedAt: null,
-    createdBy: "editor-demo",
-    updatedBy: "editor-demo",
-    resolvedLocale: locale,
+    fields: { title },
+    revisionNumber: 1,
   };
 };
 
@@ -103,7 +107,7 @@ export const ContentListExample = () => (
     title="Articles"
     contentTypeName="article"
     items={entries}
-    locales={articleType.locales}
+    locales={articlePresentation.localization.locales}
     onCreate={() => undefined}
     onEdit={() => undefined}
     onDuplicate={() => undefined}
@@ -130,7 +134,7 @@ export const ContentListRemoteExample = () => {
       title="Articles"
       contentTypeName="article"
       items={matching.slice(page, page + 1)}
-      locales={articleType.locales}
+      locales={articlePresentation.localization.locales}
       remote={{
         query,
         onQueryChange: (next) => {
@@ -154,7 +158,7 @@ export const ContentListRemoteExample = () => {
 };
 
 export const ContentEditorExample = () => {
-  const initialFields: CmsFields = {
+  const initialFields: Partial<FieldsValue<typeof articleFields>> = {
     title: "Field notes for a calmer launch",
     summary: "A practical guide to preparing a focused release.",
     featured: true,
@@ -162,14 +166,11 @@ export const ContentEditorExample = () => {
   };
   const [dirty, setDirty] = useState(true);
   const [invalidDraft, setInvalidDraft] = useState(false);
-  const [value, setValue] = useState<CmsFields>(initialFields);
+  const [value, setValue] = useState<Partial<FieldsValue<typeof articleFields>>>(initialFields);
   return (
     <>
       <ContentEditor
-        contentType={{
-          ...articleType,
-          fields: [...articleType.fields, { key: "displaySettings", type: "json", label: "Display settings" }],
-        }}
+        contentType={articlePresentation}
         value={value}
         onChange={(next) => {
           setValue(next);
@@ -190,25 +191,25 @@ export const ContentEditorExample = () => {
   );
 };
 
-const blockDefinitions = [
+const blockDefinitions: CmsBlockDefinition[] = [
   {
     type: "callout",
-    fields: [
-      { key: "heading", type: "text" as const, label: "Heading" },
-      { key: "body", type: "textarea" as const, label: "Body" },
-    ],
+    fields: {
+      heading: { type: "text", label: "Heading" },
+      body: { type: "textarea", label: "Body" },
+    },
   },
   {
     type: "quote",
-    fields: [
-      { key: "quote", type: "textarea" as const, label: "Quote" },
-      { key: "attribution", type: "text" as const, label: "Attribution" },
-    ],
+    fields: {
+      quote: { type: "textarea", label: "Quote" },
+      attribution: { type: "text", label: "Attribution" },
+    },
   },
 ];
 
 export const BlockEditorExample = () => {
-  const [blocks, setBlocks] = useState<CmsFields[keyof CmsFields][]>([
+  const [blocks, setBlocks] = useState<CmsBlockValue[]>([
     { type: "callout", fields: { heading: "Start with one clear goal" } },
   ]);
   return (
@@ -216,14 +217,9 @@ export const BlockEditorExample = () => {
       label="Article blocks"
       definitions={blockDefinitions}
       value={blocks}
-      onChange={setBlocks}
+      onChange={(next) => setBlocks([...next])}
     />
   );
-};
-
-export const ContentTypeBuilderExample = () => {
-  const [definition, setDefinition] = useState(articleType);
-  return <ContentTypeBuilder value={definition} onChange={setDefinition} />;
 };
 
 export const LocalizationEditorExample = () => {
@@ -233,7 +229,7 @@ export const LocalizationEditorExample = () => {
   });
   return (
     <LocalizationEditor
-      contentType={articleType}
+      contentType={articlePresentation}
       values={values}
       onChange={(locale, fields) =>
         setValues((current) => ({ ...current, [locale]: fields }))
@@ -278,7 +274,7 @@ export const RelationshipFieldExample = () => {
   return (
     <RelationshipField
       label="Related articles"
-      relation={{ targetTypes: ["article"], multiple: true, sameLocale: true }}
+      relation={articlePresentation.fields.related}
       options={relatedOptions.filter((option) =>
         option.label.toLowerCase().includes(query.toLowerCase()),
       )}
@@ -291,23 +287,14 @@ export const RelationshipFieldExample = () => {
   );
 };
 
-const revisions: CmsContentRevision[] = [1, 2].map((revisionNumber) => ({
+const revisions: CmsRevisionItem[] = [1, 2].map((revisionNumber) => ({
   id: `revision-${revisionNumber}`,
   createdAt: new Date(`2026-10-${revisionNumber + 26}T12:00:00.000Z`),
-  updatedAt: new Date(`2026-10-${revisionNumber + 26}T12:00:00.000Z`),
-  revision: revisionNumber,
-  tenantId: "tenant-demo",
-  contentTypeId: "article-type",
-  entryId: "field-notes",
-  locale: "en-US",
   revisionNumber,
   schemaVersion: 1,
   slug: "field-notes",
   fields: { title: revisionNumber === 1 ? "First draft" : "Field notes" },
   status: "draft",
-  publishedSnapshot: null,
-  scheduledAt: null,
-  scheduledTimeZone: null,
   action: revisionNumber === 1 ? "create" : "save-draft",
   actorId: "editor-demo",
   changeSummary: revisionNumber === 2 ? "Refined the introduction." : undefined,
@@ -359,27 +346,18 @@ export const EditorialCalendarExample = () => (
   />
 );
 
-const auditEvents: CmsAuditEvent[] = [
+const auditEvents: CmsAuditLogItem[] = [
   {
     id: "audit-1",
-    createdAt: new Date("2026-10-28T12:00:00.000Z"),
-    updatedAt: new Date("2026-10-28T12:00:00.000Z"),
-    revision: 1,
-    tenantId: "tenant-demo",
     actorId: "editor-demo",
     resource: "entry",
     resourceId: "field-notes",
     action: "entry:update",
     result: "success",
     timestamp: new Date("2026-10-28T12:00:00.000Z"),
-    revisionNumber: 2,
   },
   {
     id: "audit-2",
-    createdAt: new Date("2026-10-28T12:30:00.000Z"),
-    updatedAt: new Date("2026-10-28T12:30:00.000Z"),
-    revision: 1,
-    tenantId: "tenant-demo",
     actorId: null,
     resource: "entry",
     resourceId: "seasonal-guide",

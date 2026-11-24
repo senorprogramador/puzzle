@@ -14,6 +14,12 @@ type TestRecord = StorageRecord & {
   name: string;
   active: boolean;
   lastSeen: Date;
+  profile: {
+    displayName: string;
+    score: number;
+    publishedAt: Date;
+  };
+  tags: readonly string[];
 };
 
 type Row = Record<string, unknown> & { _id?: string };
@@ -239,16 +245,88 @@ describe("MongoStorageAdapter query and document gaps", () => {
     });
   });
 
-  it("rejects unsupported operators before issuing a Mongo query", async () => {
+  it("translates dotted paths and contains semantics to Mongo filters", async () => {
     const { database, calls } = createMockDatabase();
     const adapter = new MongoStorageAdapter({ database });
 
+    await adapter.findMany<TestRecord>("users", {
+      where: {
+        "profile.displayName": { operator: "contains", value: "ad.a" },
+        tags: { operator: "contains", value: "reviewer" },
+      },
+    });
+
+    expect(calls.findFilter).toEqual({
+      $and: [
+        {
+          $or: [
+            {
+              $expr: {
+                $cond: [
+                  {
+                    $eq: [
+                      { $type: "$profile.displayName" },
+                      "string",
+                    ],
+                  },
+                  {
+                    $regexMatch: {
+                      input: "$profile.displayName",
+                      regex: "ad\\.a",
+                      options: "i",
+                    },
+                  },
+                  false,
+                ],
+              },
+            },
+            {
+              $and: [
+                { "profile.displayName": { $type: "array" } },
+                {
+                  "profile.displayName": {
+                    $elemMatch: { $eq: "ad.a" },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        {
+          $or: [
+            {
+              $expr: {
+                $cond: [
+                  { $eq: [{ $type: "$tags" }, "string"] },
+                  {
+                    $regexMatch: {
+                      input: "$tags",
+                      regex: "reviewer",
+                      options: "i",
+                    },
+                  },
+                  false,
+                ],
+              },
+            },
+            {
+              $and: [
+                { tags: { $type: "array" } },
+                { tags: { $elemMatch: { $eq: "reviewer" } } },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
     await expect(
       adapter.findMany<TestRecord>("users", {
-        where: { name: { operator: "contains", value: "Ada" } } as never,
+        where: {
+          "profile..displayName": { operator: "eq", value: "Ada" },
+        } as never,
       }),
     ).rejects.toBeInstanceOf(StorageValidationError);
-    expect(calls.findFilter).toBeUndefined();
   });
 
   it("maps duplicate-key writes to a storage duplicate error", async () => {
@@ -351,6 +429,117 @@ describe("MongoStorageAdapter query and document gaps", () => {
     expect(calls.findSkip).toBe(2);
     expect(calls.findLimit).toBe(5);
     expect(calls.findSort).toEqual({ name: -1, _id: 1 });
+  });
+
+  it("uses nested sort values and id tie-breaking in cursor pagination", async () => {
+    const documents: Row[] = [
+      { _id: "a", profile: { score: 10 } },
+      { _id: "b", profile: { score: 10 } },
+      { _id: "c", profile: { score: 20 } },
+    ];
+    const { database, calls } = createMockDatabase(documents);
+    const adapter = new MongoStorageAdapter({ database });
+
+    const page = await adapter.findPage<TestRecord>("users", {
+      first: 2,
+      orderBy: [{ field: "profile.score", direction: "asc" }],
+    });
+
+    expect(calls.findSort).toEqual({ "profile.score": 1, _id: 1 });
+    expect(
+      JSON.parse(
+        Buffer.from(page.nextCursor!.value, "base64url").toString("utf8"),
+      ),
+    ).toEqual({ values: [10, "b"] });
+
+    await adapter.findPage<TestRecord>("users", {
+      first: 2,
+      orderBy: [{ field: "profile.score", direction: "asc" }],
+      after: page.nextCursor!,
+    });
+
+    expect(calls.findFilter).toEqual({
+      $or: [
+        { $and: [{ "profile.score": { $gt: 10 } }] },
+        {
+          $and: [
+            { "profile.score": 10 },
+            { _id: { $gt: "b" } },
+          ],
+        },
+      ],
+    });
+  });
+
+  it("preserves date values in dotted cursor fields", async () => {
+    const firstDate = new Date("2026-01-01T00:00:00.000Z");
+    const secondDate = new Date("2026-02-01T00:00:00.000Z");
+    const documents: Row[] = [
+      { _id: "a", profile: { publishedAt: firstDate } },
+      { _id: "b", profile: { publishedAt: secondDate } },
+    ];
+    const { database, calls } = createMockDatabase(documents);
+    const adapter = new MongoStorageAdapter({ database });
+
+    const page = await adapter.findPage<TestRecord>("users", {
+      first: 1,
+      orderBy: [{ field: "profile.publishedAt", direction: "asc" }],
+    });
+
+    await adapter.findPage<TestRecord>("users", {
+      first: 1,
+      orderBy: [{ field: "profile.publishedAt", direction: "asc" }],
+      after: page.nextCursor!,
+    });
+
+    expect(calls.findFilter).toEqual({
+      $or: [
+        {
+          $and: [
+            { "profile.publishedAt": { $gt: firstDate } },
+          ],
+        },
+        {
+          $and: [
+            { "profile.publishedAt": firstDate },
+            { _id: { $gt: "a" } },
+          ],
+        },
+      ],
+    });
+  });
+
+  it("rejects forged cursor dates and non-scalar sort values", async () => {
+    const { database, calls } = createMockDatabase();
+    const adapter = new MongoStorageAdapter({ database });
+    const forgedCursor = (values: readonly unknown[]) => ({
+      value: Buffer.from(JSON.stringify({ values })).toString("base64url"),
+    });
+    const query = {
+      first: 1,
+      orderBy: [
+        { field: "profile.publishedAt" as const, direction: "asc" as const },
+      ],
+    };
+
+    for (const cursor of [
+      forgedCursor([
+        { __puzzle_storage_cursor_date__: "not-a-date" },
+        "user-1",
+      ]),
+      forgedCursor([{ nested: true }, "user-1"]),
+      forgedCursor([[1, 2], "user-1"]),
+      forgedCursor([new Date("2026-01-01T00:00:00.000Z")]),
+    ]) {
+      await expect(
+        adapter.findPage<TestRecord>("users", {
+          ...query,
+          after: cursor,
+        }),
+      ).rejects.toBeInstanceOf(StorageValidationError);
+    }
+
+    expect(calls.findFilter).toBeUndefined();
   });
 });
 

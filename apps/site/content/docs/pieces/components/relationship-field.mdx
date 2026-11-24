@@ -7,11 +7,11 @@ import { Preview } from "@puzzle-ui/ui";
 import { RelationshipFieldExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
 import { RelationshipField } from "@puzzle-ui/pieces";
 
-`RelationshipField` filters supplied options by allowed target types, locale, and statuses from the relation configuration. Search filters option labels locally by default. Set `searchMode="remote"` and provide `onSearch` to use caller-fetched search results without filtering them again by label; the component itself does not fetch.
+`RelationshipField` filters supplied options by the target collection(s), locale, and allowed statuses in the relationship field descriptor. Search filters option labels locally by default. Set `searchMode="remote"` and provide `onSearch` to use caller-fetched search results without filtering them again by label; the component itself does not fetch.
 
 The preview simulates a remote search using in-memory options.
 
-<Preview fit="device" code={`<RelationshipField label="Related articles" relation={field.relation} options={options} value={value} searchMode="remote" onSearch={searchEntries} onChange={setValue} />`}>
+<Preview fit="device" code={`<RelationshipField label="Related articles" relation={relatedArticles} options={options} value={value} searchMode="remote" onSearch={searchEntries} onChange={setValue} />`}>
   <RelationshipFieldExample />
 </Preview>
 
@@ -20,7 +20,7 @@ The preview simulates a remote search using in-memory options.
 | Prop | Type | Required | Default |
 |---|---|---:|---|
 | `label` | `ReactNode` | Yes | — |
-| `relation` | `CmsRelationshipConfig` | Yes | — |
+| `relation` | `Extract<FieldDescriptor, { type: "relationship" }>` | Yes | — |
 | `options` | `readonly RelationshipOption[]` | Yes | — |
 | `value` | `string \| readonly string[] \| null` | Yes | — |
 | `onChange` | `(value: string \| string[] \| null) => void` | Yes | — |
@@ -33,18 +33,39 @@ The preview simulates a remote search using in-memory options.
 `RelationshipOption` contains an entry ID, display label, content type, locale, and status. Values returned to the caller are IDs, not copied entry data.
 
 ```tsx
+import { useState } from "react";
+import { fields } from "@puzzle-ui/cms";
 import { RelationshipField } from "@puzzle-ui/pieces";
 
-<RelationshipField
-  label="Related articles"
-  relation={field.relation!}
-  options={authorizedOptions}
-  value={relatedEntryIds}
-  locale={entry.locale}
-  searchMode="remote"
-  onSearch={searchAuthorizedEntries}
-  onChange={setRelatedEntryIds}
-/>;
+const relatedArticles = fields.relationship({
+  target: "article",
+  multiple: true,
+  sameLocale: true,
+  allowedStatuses: ["published"],
+});
+const authorizedOptions = [{
+  id: "field-notes",
+  label: "Field notes for a calmer launch",
+  contentType: "article",
+  locale: "en-US",
+  status: "published" as const,
+}];
+
+const RelatedArticlesField = () => {
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  return (
+    <RelationshipField
+      label="Related articles"
+      relation={relatedArticles}
+      options={authorizedOptions}
+      value={selectedIds}
+      locale="en-US"
+      onChange={(next) =>
+        setSelectedIds(Array.isArray(next) ? [...next] : next ? [next] : [])
+      }
+    />
+  );
+};
 ```
 
 Selected IDs are listed separately so they can be removed even when they are not in the current options. An unavailable label can mean a deleted, inaccessible, or simply off-page entry; the host decides how to resolve it. When `relation.sameLocale` is enabled, supply the source `locale`; no options are offered without it. The host must revalidate target type, status, locale, tenant, and permission on every server mutation. A displayed or selected ID is not authorization.

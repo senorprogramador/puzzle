@@ -1,0 +1,94 @@
+---
+title: Multilingual content
+description: Configure locales, create translated entries, and use explicit locale fallback for CMS queries.
+---
+
+Localization is an opt-in collection feature. Define allowed locales and mark
+only the fields that vary by locale with `localized: true`.
+
+```ts
+import { collection, defineCMS, fields } from "@puzzle-ui/cms";
+
+const multilingualConfig = defineCMS({
+  collections: {
+    pages: collection({
+      name: "Page",
+      version: 1,
+      drafts: true,
+      localization: {
+        locales: ["en-US", "fr-FR", "ja-JP"],
+        defaultLocale: "en-US",
+      },
+      fields: {
+        title: fields.text({ required: true, localized: true }),
+        slug: fields.slug({ required: true, localized: true }),
+        body: fields.textarea({ required: true, localized: true }),
+        internalCode: fields.text({ required: true }),
+      },
+    }),
+  },
+});
+```
+
+`defaultLocale` is configuration metadata; it is not an implicit fallback for
+reads. Fallback locales must be explicitly requested and are tried in the
+provided order. Slugs are unique by tenant, collection, and locale.
+
+## Create translation variants
+
+Create the initial locale through the regular collection API. Create another
+locale variant from its existing entry with `createTranslation`:
+
+```ts
+const english = await cms.pages.create(
+  {
+    title: "About our team",
+    slug: "about-our-team",
+    body: "The people behind the product.",
+    internalCode: "about",
+  },
+  { locale: "en-US" },
+);
+
+const french = await cms.pages.createTranslation(
+  english.id,
+  {
+    title: "À propos de notre équipe",
+    slug: "a-propos-de-notre-equipe",
+    body: "Les personnes derrière le produit.",
+    internalCode: "about",
+  },
+  { locale: "fr-FR" },
+);
+```
+
+The locale option is optional on regular `create` when the collection has a
+configured default; use it explicitly when the application must control the
+initial locale. `createTranslation` requires a locale. Translations share a
+group, while each locale has its own fields, slug, revision history, and
+published snapshot. `listLocaleVariants(id, query?)` reads the group.
+
+## Locale-aware reads
+
+```ts
+const frenchPage = await cms.pages.findBySlug("a-propos-de-notre-equipe", {
+  locale: "fr-FR",
+  visibility: "public",
+});
+
+const fallbackPage = await cms.pages.findBySlug("a-propos-de-notre-equipe", {
+  locale: "ja-JP",
+  fallbackLocales: ["fr-FR", "en-US"],
+  visibility: "public",
+});
+```
+
+Fallbacks reuse the normalized slug in each listed locale. They do not search
+for an arbitrary translation or silently select the default locale. Fullstack
+client methods accept the same `locale` and ordered `fallbackLocales`; see
+[Next.js integration](/docs/cms/nextjs) or
+[TanStack Start integration](/docs/cms/tanstack-start).
+
+Localized singletons use locale options at the collection root; their
+`createTranslation(data, { locale, changeSummary? })` and
+`listLocaleVariants(query?)` methods do not take a document ID.

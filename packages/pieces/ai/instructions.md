@@ -78,17 +78,31 @@ authorize and control the lifetime of each preview URL.
 
 ## CMS authoring
 
-Use the CMS family (`CmsShell`, `ContentList`, `ContentEditor`,
-`ContentTypeBuilder`, `LocalizationEditor`, `RelationshipField`,
-`RevisionHistory`, `PublishScheduler`, `EditorialCalendar`, and
-`AuditLogViewer`, and `WebhookManagement`) only when the application already owns a CMS client/server
+Use the CMS family (`CmsShell`, `ContentList`, `ContentEditor`, `BlockEditor`,
+`LocalizationEditor`, `RelationshipField`, `RevisionHistory`,
+`PublishScheduler`, `EditorialCalendar`, `AuditLogViewer`, and
+`WebhookManagement`) only when the application already owns a CMS client/server
 integration. These Pieces accept caller-provided content, status, locale,
 revision, and audit data plus callbacks; they never fetch, authorize, schedule,
 or persist. `BlockEditor` edits serializable `{ type, fields }` blocks against
 caller-provided definitions. Use `ContentEditor.renderField` to compose
 application-specific controls such as `MediaField` or `RelationshipField`.
-CMS policy, validation, revision checks, and scheduler execution must still be
-enforced by the server.
+Define CMS schemas and operations in the application/server layer; these Pieces
+do not register or persist runtime schemas. Keep access policies, lifecycle
+hooks, validators, secrets, and authorization decisions server-side; pass only
+presentation-safe schema projections and data to the client. CMS policy,
+validation, revision checks, and scheduler execution must still be enforced by
+the server. Use the
+CMS/Fullstack guides for the verified persistence and lifecycle method
+contracts; do not infer server methods from these Pieces' callbacks.
+For configured collection clients, `ContentEditor` save/publish callbacks map
+to `update`/`publish`; `RevisionHistory` uses `listRevisions` and
+`restoreRevision`; `PublishScheduler` uses `schedulePublish`/`unschedule`; and
+`LocalizationEditor` uses `listLocaleVariants`/`createTranslation`. These
+lifecycle methods are available only when the collection configuration
+enables the corresponding feature. `ContentList` and remote
+`RelationshipField` search use collection query results that the host
+authorizes and projects into the Pieces view types.
 Use `CmsShell.breadcrumbs` for caller-owned navigation trails; the final UI
 breadcrumb is the current page and has no link.
 For server-driven content lists, use `ContentList.remote` with a controlled
@@ -100,19 +114,24 @@ bulk actions; return explicit successes and failures for every requested ID.
 Enable `ContentEditor.confirmDiscard` and `warnOnUnload` where appropriate;
 the host router must separately block client-side navigation while dirty. Include
 `onInvalidDraftChange` in that guard: built-in JSON fields keep invalid text
-locally and block save/publish until corrected or discarded. Custom renderers
-must track their own invalid drafts. `BlockEditor` and `LocalizationEditor`
-also expose `onInvalidDraftChange` for their built-in JSON editors; hosts must
+locally and block the component's save/publish callbacks until corrected or
+discarded. Custom renderers must track their own invalid drafts.
+`BlockEditor` and `LocalizationEditor` also expose `onInvalidDraftChange` for
+their built-in JSON editors; hosts must
 block save/navigation and avoid externally switching locales while invalid.
 For `RevisionHistory` field diffs, include the current revision in `revisions`
 and set `currentRevisionNumber`; the comparison does not cover metadata.
-Use `RevisionHistory.confirmRestore` when a restore needs explicit confirmation.
+`RevisionHistory` can display revisions and forward a caller callback; align
+any restore behavior with the verified CMS/Fullstack lifecycle contract.
 For server-backed relationship search, set `RelationshipField.searchMode` to
 `"remote"` and provide `onSearch`; the host supplies authorized results and
 must validate selected IDs again on the server.
 Use `WebhookManagement` with sanitized subscription and delivery projections;
-the host owns secret provisioning, authorization, fetching, worker scheduling,
-and stale-response handling. Never pass secret values or references.
+the browser client methods include `listWebhookSubscriptions`,
+`createWebhookSubscription`, `updateWebhookSubscription`,
+`listWebhookDeliveries`, `listWebhookAttempts`, and `retryWebhookDelivery`.
+The host owns secret provisioning, authorization, worker scheduling, and
+stale-response handling. Never pass secret values or references.
 `AuditLogViewer` can display authorized Media audit projections as well as CMS
 events; provide a stable ID and an empty resource ID when unavailable.
 

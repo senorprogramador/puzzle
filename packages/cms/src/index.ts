@@ -1,42 +1,143 @@
-export { CmsService } from "./service";
+export { defineCMS } from "./config/define-cms";
 export type {
-  CmsServiceOptions,
-  CmsListAuditEventsInput,
-  CmsListContentTypesInput,
-  CmsListChangeEventsInput,
-  CmsListMediaUsagesInput,
-  CmsListRevisionsInput,
-  CmsScheduledPublicationResult,
-} from "./service";
+  CmsCollectionRegistry,
+  CmsConfig,
+  DefineCmsInput,
+} from "./config/define-cms";
+export { toCmsPresentation } from "./config/presentation";
+export type { CmsPresentationConfig } from "./config/presentation";
+
+export { collection } from "./collections/collection";
+export type {
+  CollectionAccess,
+  CollectionAccessAction,
+  CmsCollectionAccessPolicy,
+  CmsCollectionAccessRequest,
+  CollectionDefinition,
+  CollectionFactory,
+  CollectionKind,
+  CollectionLocalization,
+  CmsCollectionHookEvent,
+  CmsCollectionHookOperation,
+  CmsCollectionHooks,
+  CmsCollectionPresentation,
+  CmsCollectionRuntimeOptions,
+  CmsPresentationBlock,
+  CmsPresentationCollection,
+  CmsPresentationField,
+  CmsPresentationFields,
+  CollectionOptions,
+} from "./collections/collection";
+export type {
+  CmsCollectionApi,
+  CmsCollectionService,
+  CmsCreateArguments,
+  CmsCreateOptions,
+  CmsCollectionRevision,
+  CmsDocument,
+  CmsMutationOptions,
+  CmsPurgeOptions,
+  CmsScheduleOptions,
+  CmsScheduledPublicationInput,
+  CmsSingletonApi,
+  CmsSingletonUpdateOptions,
+  CmsUpdateOptions,
+} from "./collections/collection-api";
+export type {
+  CmsCollectionFindInput,
+  CmsCollectionPage,
+  CmsCollectionReadOptions,
+  CmsFieldPath,
+  CmsEntryWhereNode,
+  CmsQueryFieldValue,
+  CmsSort,
+  CmsSortKey,
+  CmsWhere,
+  CmsWhereOperator,
+} from "./collections/query";
+
+export { createCms } from "./create-cms";
+export type {
+  CmsInstance,
+  CmsInstanceWithScheduler,
+  CmsEventsApi,
+  CmsRequestContext,
+  CmsSchedulerApi,
+  CmsScheduledResult,
+  CreateCmsOptions,
+} from "./create-cms";
+export { cmsLocalAccessPolicy } from "./create-cms";
 
 export {
-  ContentTypeRegistry,
-  assertMigrationMatches,
-  getBreakingSchemaChanges,
-  normalizeCmsSlug,
-  normalizeLocale,
-  validateContentFields,
-  validateContentTypeDefinition,
-} from "./schema";
+  fields,
+  toCmsFieldDefinition,
+  validateFieldMap,
+  validateFieldValue,
+} from "./fields";
 export type {
-  CmsFieldValidationResult,
-  CmsSchemaRegistryOptions,
-} from "./schema";
-
-export { signCmsWebhook, verifyCmsWebhook } from "./webhook-signature";
-export type {
-  CmsWebhookReplayStore,
-  CmsWebhookVerificationResult,
-} from "./webhook-signature";
-export { CMS_WEBHOOK_EVENTS, CmsWebhookService } from "./webhooks";
-export type {
-  CmsWebhookAttempt,
-  CmsWebhookDelivery,
-  CmsWebhookEventType,
-  CmsWebhookServiceOptions,
-  CmsWebhookSubscription,
-  CmsWebhookTransport,
-} from "./webhooks";
+  AnyFieldDefinition,
+  ArrayFieldDefinition,
+  ArrayFieldOptions,
+  BlockDefinition,
+  BlocksFieldOptions,
+  BlocksFieldDefinition,
+  BlocksValue,
+  BooleanFieldDefinition,
+  ComputedFieldOptions,
+  ComputedFieldDefinition,
+  CustomFieldOptions,
+  CustomFieldDefinition,
+  DateFieldDefinition,
+  DatetimeFieldDefinition,
+  EmailFieldDefinition,
+  FieldFactories,
+  FieldAccess,
+  FieldAccessCallback,
+  FieldAccessContext,
+  FieldDefinition,
+  FieldDescriptor,
+  FieldHasDefault,
+  FieldKind,
+  FieldMap,
+  FieldOptions,
+  FieldRequired,
+  FieldValidation,
+  FieldValidationContext,
+  FieldValidationContextInput,
+  FieldValidationIssue,
+  FieldValidator,
+  FieldValue,
+  FieldsCreateInput,
+  FieldsValue,
+  IsFieldRequired,
+  JsonFieldDefinition,
+  MediaFieldOptions,
+  MediaFieldDefinition,
+  MultiSelectFieldDefinition,
+  NumberFieldOptions,
+  NumberFieldDefinition,
+  ObjectFieldOptions,
+  ObjectFieldDefinition,
+  RelationshipFieldOptions,
+  RelationshipFieldDefinition,
+  RichTextFieldOptions,
+  RichTextFieldDefinition,
+  RuntimeCmsBlockDefinition,
+  RuntimeCmsFieldDefinition,
+  RuntimeCmsFieldType,
+  SelectFieldDefinition,
+  SelectFieldOptions,
+  SelectOption,
+  SelectValue,
+  SlugFieldOptions,
+  SlugFieldDefinition,
+  TextareaFieldOptions,
+  TextareaFieldDefinition,
+  TextFieldOptions,
+  TextFieldDefinition,
+  UrlFieldOptions,
+  UrlFieldDefinition,
+} from "./fields";
 
 export {
   CmsAuditError,
@@ -55,31 +156,33 @@ export type {
   CmsValidationIssue,
 } from "./errors";
 
-export {
-  CMS_FIELD_TYPES,
-} from "./types";
+export { signCmsWebhook, verifyCmsWebhook } from "./webhook-signature";
+export type {
+  CmsWebhookReplayStore,
+  CmsWebhookVerificationResult,
+} from "./webhook-signature";
+export { CMS_WEBHOOK_EVENTS, CmsWebhookService } from "./webhooks";
+export type {
+  CmsWebhookAttempt,
+  CmsWebhookDelivery,
+  CmsWebhookEventType,
+  CmsWebhookServiceOptions,
+  CmsWebhookSubscription,
+  CmsWebhookTransport,
+} from "./webhooks";
+
 export type {
   CmsAccessAction,
   CmsAccessPolicy,
   CmsAccessRequest,
   CmsActor,
   CmsAuditEvent,
-  CmsAuditResult,
-  CmsBlockDefinition,
   CmsChangeEvent,
   CmsChangeEventPage,
   CmsContentEntry,
   CmsContentRevision,
-  CmsContentTypeRecord,
   CmsContext,
-  CmsCreateEntryInput,
   CmsCustomFieldValidator,
-  CmsEntryFilter,
-  CmsEntryFilterOperator,
-  CmsEntryMutationInput,
-  CmsEntryPage,
-  CmsEntryQuery,
-  CmsEntrySort,
   CmsEntryStatus,
   CmsEntryView,
   CmsFieldDefinition,
@@ -87,25 +190,13 @@ export type {
   CmsFieldValidation,
   CmsFieldValidationContext,
   CmsFields,
-  CmsFindEntryInput,
-  CmsGetEntryInput,
   CmsMediaReferenceRequest,
   CmsMediaReferenceValidator,
-  CmsMediaUsage,
-  CmsPublishedSnapshot,
-  CmsRegisterContentTypeInput,
   CmsRelationshipConfig,
-  CmsResourceType,
-  CmsRestoreRevisionInput,
-  CmsRevisionAction,
   CmsScalar,
-  CmsScheduleEntryInput,
   CmsScheduledPublication,
-  CmsSchemaMigration,
   CmsScheduler,
-  CmsSelectOption,
-  CmsUpdateEntryInput,
+  CmsSchemaMigration,
   CmsValue,
   CmsVisibility,
-  ContentTypeDefinition,
 } from "./types";

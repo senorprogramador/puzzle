@@ -11,6 +11,9 @@ export type {
 
 export type {
   StorageComparison,
+  StorageFieldPath,
+  StorageFieldValue,
+  StorageScalarFieldPath,
   StorageWhere,
   StorageOrder,
   StorageQuery,
@@ -63,4 +66,8 @@ export {
   StorageAtomicityError,
 } from "./errors/storage.errors";
 
-export { validateQuery, validateWhere } from "./utils/query.utils";
+export {
+  validateFieldPath,
+  validateQuery,
+  validateWhere,
+} from "./utils/query.utils";

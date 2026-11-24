@@ -428,6 +428,11 @@ const components: TreeViewItem = {
           href: `${componentsFolder}/navigation`,
         },
         {
+          id: "pieces-dashboard-mobile-navigation",
+          label: "Dashboard Mobile Navigation",
+          href: `${folder}/dashboard-mobile-navigation`,
+        },
+        {
           id: "pieces-project",
           label: "Project",
           href: `${componentsFolder}/project`,
@@ -517,11 +522,6 @@ const components: TreeViewItem = {
           id: "pieces-block-editor",
           label: "BlockEditor",
           href: `${componentsFolder}/block-editor`,
-        },
-        {
-          id: "pieces-content-type-builder",
-          label: "ContentTypeBuilder",
-          href: `${componentsFolder}/content-type-builder`,
         },
         {
           id: "pieces-localization-editor",

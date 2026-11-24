@@ -52,7 +52,7 @@ const required = (name: string): string => {
   return value;
 };
 
-const eq = <T>(value: T) => ({ operator: "eq" as const, value });
+const eq = <const T>(value: T) => ({ operator: "eq" as const, value });
 
 const ensureSeedUser = async (
   storage: MongoStorageAdapter,

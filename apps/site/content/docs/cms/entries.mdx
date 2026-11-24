@@ -1,0 +1,136 @@
+---
+title: Entries, queries, and relationships
+description: Use inferred collection and singleton services for CRUD, typed filtering, pagination, and relationship validation.
+---
+
+`createCms` returns services keyed by the static registry. For the `articles`
+and `settings` keys in [the schema example](/docs/cms), the configured instance
+exposes `cms.articles` and `cms.settings`; methods do not accept tenant or
+actor IDs. The examples below use `cms`, the request-scoped instance created
+after trusted context resolution.
+
+## Find and query
+
+```ts
+const page = await cms.articles.find({
+  where: {
+    and: [
+      { featured: { equals: true } },
+      { title: { contains: "launch" } },
+    ],
+  },
+  sort: "-updatedAt",
+  limit: 20,
+  page: 1,
+  locale: "en-US",
+  visibility: "admin",
+});
+
+for (const article of page.items) {
+  console.log(article.id, article.title, article.revision);
+}
+```
+
+`find` returns a bounded page with `items`, `page`, `limit`, `nextCursor`, and
+`hasNextPage`. Query inputs are inferred from the collection's field keys and
+value types. `where` supports `equals`, `notEquals`, `contains`, `in`, `notIn`,
+`gt`, `gte`, `lt`, `lte`, and `exists`, with nested `and`/`or` groups. Validated
+field paths, tenant scope, visibility, filtering, sorting, and page bounds are
+sent to Storage; CMS does not load all entries and filter them in memory.
+
+`findById(id, { visibility })` reads by document ID. `findBySlug(slug, options)`
+is available only when the collection defines a slug field. Its options may
+include `locale`, `fallbackLocales`, and `visibility`. Fallback locales are
+tried in the caller's order using the same normalized slug; the CMS never
+selects an arbitrary or default locale. Public visibility returns the
+published snapshot only. The access policy is still evaluated for every read.
+
+## Create, update, and delete
+
+```ts
+const created = await cms.articles.create({
+  title: "First article",
+  summary: "A short introduction.",
+  featured: false,
+});
+
+const updated = await cms.articles.update(
+  created.id,
+  { title: "Updated article" },
+  {
+    expectedRevision: created.revision,
+    changeSummary: "Edited the title.",
+  },
+);
+
+await cms.articles.archive(updated.id, {
+  expectedRevision: updated.revision,
+  changeSummary: "Archived the article.",
+});
+```
+
+Create input is inferred from the field map: required fields without defaults
+are required and optional/defaulted fields are optional. A slug derived with
+`fields.slug({ from: "title" })` is generated when omitted; otherwise required
+slugs must be supplied. Updates are typed partial field objects. Use the
+current document `revision` as `expectedRevision` for writes that need
+optimistic concurrency; a stale revision is a conflict, not a successful
+overwrite. `delete` soft-deletes; `archive` is an explicit editorial action.
+Permanent removal is a separate, explicit `purge(id, { expectedRevision,
+changeSummary? })` operation. It requires the current revision, cancels any
+scheduled publication, scans current entries, published snapshots, and
+immutable revisions for incoming relationships, and atomically removes the
+entry, its revisions, and its own media-usage records. A relationship-capable
+schema does not block purge when there are no current or historical
+references. CMS relationship additions conditionally advance a per-target
+guard in the same batch as the source write; purge conditionally removes that
+guard with the target. A concurrent relationship write therefore either
+commits first and makes purge conflict or fails without leaving a dangling
+reference. Bounded-scan and storage-capability errors fail closed. Other
+entries' shared media usages remain; permanent asset deletion still needs the
+host's media-usage guard.
+
+Regular collections use their configured key for filtering and indexing.
+Storage adapters must support the atomicity, uniqueness, conditional-write,
+and query capabilities required by the requested operation. Unsupported
+capabilities fail closed.
+
+## Singleton collections
+
+`collection.singleton` creates one stable document per tenant and collection.
+It exposes `find`, `create`, `update`, `delete`, and `archive` without an entry
+ID or a list API:
+
+```ts
+const settings = await cms.settings.find();
+
+const updatedSettings = settings
+  ? await cms.settings.update(
+      { siteName: "Example Publishing" },
+      { expectedRevision: settings.revision },
+    )
+  : await cms.settings.create({ siteName: "Example Publishing" });
+```
+
+Singleton identity is derived from the configured collection and tenant; an
+arbitrary browser-provided ID is never used as authorization.
+`purge({ expectedRevision, locale?, changeSummary? })` permanently removes a
+specific singleton locale variant when localization is enabled; it is subject
+to the same relationship and media-usage protections.
+
+## Relationships
+
+Relationship fields contain entry IDs. The target collection keys are checked
+against the `defineCMS` registry at compile time, then validated at runtime for
+tenant, locale, and configured status rules. A multiple relationship stores an
+array of IDs; a single relationship stores one ID. Every read or mutation is
+still authorized independently—knowing a document ID is not permission.
+
+`RelationshipField` from Pieces can display caller-provided authorized search
+results. When using remote search, the host queries the configured collection,
+passes safe options to the component, and validates selected IDs again in CMS
+before persistence.
+
+For code-defined fields and relationship options, see
+[Collections and fields](/docs/cms/schema). For the browser client and
+framework routes, see the [Fullstack CMS API](/docs/fullstack/cms).

@@ -83,12 +83,15 @@ URLs; they do not include storage keys, tenant internals, processing errors,
 upload transport, or persistence.
 
 CMS authoring adds caller-data-driven admin compositions: `CmsShell`,
-`ContentList`, `ContentEditor`, `BlockEditor`, `ContentTypeBuilder`,
-`LocalizationEditor`, `RelationshipField`, `RevisionHistory`,
+`ContentList`, `ContentEditor`, `BlockEditor`, `LocalizationEditor`,
+`RelationshipField`, `RevisionHistory`,
 `PublishScheduler`, `EditorialCalendar`, `AuditLogViewer`, and
 `WebhookManagement`. These components
 do not fetch data, authorize actions, or persist content; the host application
-must use the CMS and Fullstack APIs for those responsibilities.
+must define schemas in `@puzzle-ui/cms` and use the CMS/Fullstack APIs for
+persistence and authorization. Keep access policies, lifecycle hooks,
+validators, and secret references on the server; pass only presentation-safe
+schema projections and authorized data to the browser.
 `ContentList` supports local filtering and pagination by default, or a
 caller-controlled `remote` query and cursor navigation for server-driven pages.
 The host owns server sorting, cursor history, authorization, and stale responses.
@@ -119,7 +122,7 @@ to compare use cases:
 
 ## API maturity
 
-All 132 canonical component APIs and their published aliases are **Stable**.
+All 131 canonical component APIs and their published aliases are **Stable**.
 Their documented contracts are intended to remain backward-compatible within
 a major version; breaking changes require a major release. Stable describes API
 compatibility, not production readiness or suitability for a particular

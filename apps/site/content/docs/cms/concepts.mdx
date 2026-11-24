@@ -1,0 +1,59 @@
+---
+title: CMS concepts
+description: Understand code-first schemas, collections, singleton records, revisions, request context, and the CMS-to-storage boundary.
+---
+
+## Static schema
+
+`defineCMS({ collections })` defines the content model in application code.
+Keys in the collection registry are stable service and route keys. A
+`collection(...)` contains zero or more entries; `collection.singleton(...)`
+defines one stable record per tenant and collection. The schema is not
+registered or edited at runtime.
+
+Each collection declares a field map. Field factories infer input and output
+types, validate nested values, and provide serializable metadata for authoring
+interfaces. Relationships refer to other keys in the same static registry.
+See [Collections and fields](/docs/cms/schema).
+
+## Entry data and lifecycle metadata
+
+CMS documents are flattened values: schema fields sit beside metadata such as
+`id`, `slug`, `locale`, `revision`, and `status`. They are not nested in a
+`fields` property. `createdAt` and `updatedAt` are added only when
+`timestamps: true`.
+
+With `drafts: true`, an entry's working draft and published snapshot are
+separate. Revisions are immutable history records. Public visibility returns
+the published snapshot, while admin visibility can read authorized draft
+content. Mutations use revision numbers to detect concurrent changes.
+
+## Request-scoped context
+
+`createCms` binds a tenant and optional actor to an instance. Resolve those
+values from trusted server state, not from entry IDs or browser request bodies.
+The global access policy and collection access policy both need to allow an
+operation. The instance is not a browser client or an admin UI.
+
+## Persistence and media
+
+`@puzzle-ui/cms` stores schema, entry, revision, audit, change-event, and media
+usage metadata through `@puzzle-ui/storage`. File bytes are handled separately
+through `@puzzle-ui/media` object storage. CMS media fields store asset-ID
+strings and can use a host validator to confirm tenant ownership.
+
+CMS requests only the Storage guarantees required by each operation. It fails
+closed when the adapter lacks a required capability rather than weakening
+atomicity or revision checks. See [Custom Storage adapters](/docs/cms/custom-storage).
+
+## Package boundaries
+
+- `@puzzle-ui/cms` defines and executes the domain model.
+- `@puzzle-ui/storage` provides database-neutral metadata contracts and
+  adapters.
+- `@puzzle-ui/fullstack` exposes authorized server routes, serializable
+  browser clients, and framework adapters.
+- `@puzzle-ui/pieces` provides caller-data-driven presentation components.
+
+Use the [API reference](/docs/cms/reference) for public runtime exports and
+feature-gated methods.

@@ -35,6 +35,13 @@ The default table prefix is `puzzle_`; set `tablePrefix` to change it. `D1Storag
 Collection index names may contain ASCII letters, numbers, underscores, and
 hyphens; unsafe SQL identifier characters are rejected.
 
+Queries support validated dotted paths through nested JSON objects for filters
+and sorting. `contains` performs case-insensitive substring matching on strings
+and exact scalar-element membership in arrays; it does not traverse array
+indexes or match object values inside arrays. D1 uses SQLite `lower()`, whose
+built-in case folding is ASCII-only. Filter values remain bound SQL parameters;
+field paths are validated before SQL expressions are generated.
+
 The package exports `D1StorageAdapter`, `D1StorageMigrationAdapter`, and the D1-like binding, statement, result, and options types. See the [storage guide](https://puzzle-ui.com/docs/storage) for query and migration examples, capability details, and production guidance.
 
 ## Development

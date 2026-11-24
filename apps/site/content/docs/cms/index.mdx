@@ -1,111 +1,125 @@
 ---
 title: Headless CMS
-description: Framework-neutral content schemas, validation, tenant-scoped entries, localization, revisions, publishing, and access policies.
+description: Define typed CMS collections and singletons in code, then bind request-scoped services to trusted context and Storage.
 ---
 
-`@puzzle-ui/cms` provides a framework-neutral content domain for applications
-that need configurable content types, entries, localized values, relationships,
-drafts, revisions, and publishing. It uses `@puzzle-ui/storage` for metadata
-and can validate media references through an injected policy.
+`@puzzle-ui/cms` is the framework-neutral schema, validation, querying, and
+editorial lifecycle layer for Puzzle. Define the schema in code with
+`defineCMS`, `collection`, and `fields`; the schema is the source of truth.
+Content types are not registered or mutated at runtime.
 
-The package does not provide a database, router, React admin interface, role
-management, or scheduler. The host application supplies persistence, identity,
-tenant context, authorization policy, and a scheduler for scheduled publishing.
+The package owns collections and singletons, typed field definitions,
+relationships, access policies, lifecycle hooks, drafts, revisions,
+localization, and publishing. It uses `@puzzle-ui/storage` for metadata and
+accepts asset-ID strings for media values. It does not provide a database,
+identity provider, HTTP router, admin UI, scheduler implementation, or media
+object storage.
 
-For caller-data-driven React administration compositions, use the optional
-[`@puzzle-ui/pieces` CMS authoring family](/docs/pieces/components/cms). Those
-components do not replace the CMS server policy, storage, revision checks, or
-scheduler.
-
-## Availability
-
-`@puzzle-ui/cms` is published to npm. The repository may contain a newer
-workspace version than the version currently tagged on npm, so check the
-package's npm page before using APIs introduced by a recent repository change.
-`@puzzle-ui/storage` and `@puzzle-ui/media` are also available from npm.
-
-Add `@puzzle-ui/media` as a workspace dependency when content types use media
-fields and the host application needs to validate or track asset references.
-
-## Define a content type
+## Code-first collections
 
 ```ts
-import { CmsService } from "@puzzle-ui/cms";
-import type { StorageAdapter } from "@puzzle-ui/storage";
+import { collection, defineCMS, fields } from "@puzzle-ui/cms";
 
-const cms = new CmsService({
-  storage: getStorageAdapter(),
-  accessPolicy: async ({ tenantId, actor, action }) =>
-    actor !== null && canEditContent(actor, tenantId, action),
-});
-
-const articleType = await cms.registerContentType({
-  tenantId: "tenant_1",
-  actor: { id: "editor_1" },
-  definition: {
-    slug: "article",
-    name: "Article",
-    version: 1,
-    locales: ["en-US", "fr-FR"],
-    defaultLocale: "en-US",
-    fields: [
-      { key: "title", type: "text", label: "Title", required: true, localized: true },
-      { key: "slug", type: "slug", label: "Slug", required: true, localized: true },
-    ],
+export const cmsConfig = defineCMS({
+  collections: {
+    articles: collection({
+      name: "Article",
+      description: "Editorial articles.",
+      version: 1,
+      drafts: true,
+      timestamps: true,
+      localization: {
+        locales: ["en-US", "fr-FR"],
+        defaultLocale: "en-US",
+      },
+      fields: {
+        title: fields.text({ label: "Title", required: true, localized: true }),
+        slug: fields.slug({ label: "Slug", from: "title", required: true, localized: true }),
+        summary: fields.textarea({ label: "Summary", localized: true }),
+        featured: fields.boolean({ label: "Featured", defaultValue: false }),
+      },
+    }),
+    settings: collection.singleton({
+      name: "Site settings",
+      fields: {
+        siteName: fields.text({ label: "Site name", required: true }),
+      },
+    }),
   },
 });
 ```
 
-The storage adapter must provide the atomic, conditional, and uniqueness
-capabilities needed by CMS mutations. Every operation receives tenant and
-actor context, and the supplied access policy must explicitly authorize it.
-Denied or unauthenticated operations must not be treated as successful reads
-or writes.
+`drafts` and `timestamps` are opt-in. `localization` is configured with the
+supported locale list and optional default locale. Collection keys (`articles`,
+`settings`) are stable API keys; changing a key or making a breaking field
+change requires a versioned migration. See [Collections and
+fields](/docs/cms/schema) for the complete field catalog and migration rules.
 
-## Entries and publishing
+## Request-scoped service
 
-`CmsService` validates fields against registered schemas, normalizes locales
-and slugs, checks relationship targets, and applies revision conditions to
-mutations. Use the returned revision as `expectedRevision` for subsequent
-updates, publishes, restores, and schedule operations; stale writes return a
-conflict rather than overwriting newer content.
+Create the service after resolving trusted identity and tenant context on the
+server. `createCms` binds context once; collection methods do not accept
+tenant or actor IDs from the caller.
 
-Public queries return only published snapshots. Admin reads are separately
-authorized. Scheduling requires an injected `CmsScheduler`; a timestamp alone
-does not publish an entry. Scheduled jobs are revision-bound, so a stale job
-cannot publish a newer draft.
+```ts
+import { createCms } from "@puzzle-ui/cms";
+import type {
+  CmsAccessPolicy,
+  CmsRequestContext,
+} from "@puzzle-ui/cms";
+import type { StorageAdapter } from "@puzzle-ui/storage";
 
-Media fields store asset IDs, not object keys or signed URLs. Supply
-`mediaReferenceValidator.assertCanReference` to verify tenant, access, and
-asset lifecycle before accepting a media value. The CMS service records media
-usage so applications can avoid deleting referenced assets.
+export const createRequestCms = (
+  config: typeof cmsConfig,
+  storage: StorageAdapter,
+  context: CmsRequestContext,
+  accessPolicy: CmsAccessPolicy,
+) =>
+  createCms({
+    config,
+    storage,
+    context,
+    accessPolicy,
+  });
+```
 
-## Change events
+`context` must come from the trusted server session, and `accessPolicy` must
+authorize the requested tenant, actor, action, and resource. When an
+application intentionally omits request context for local single-tenant use,
+the default scope is restricted to tenant `"default"` with actor `null`.
+Access is never inferred from an entry or asset ID.
 
-Set `emitChangeEvents: true` on every CMS writer to atomically store
-metadata-only events for successful mutations. An authorized server-side
-worker can page through `listChangeEvents` and call
-`acknowledgeChangeEvent` after durable processing; the policy must grant
-`change-event:read` and `change-event:ack`. Follow every cursor, including
-through empty filtered pages, and restart scans to find events created during
-a scan. Workers must coordinate and handle events idempotently: delivery can
-be repeated after a crash. The outbox alone does not deliver HTTP requests.
+## Guide
 
-## Webhook delivery
+- [Getting started](/docs/cms/getting-started)
+- [CMS concepts](/docs/cms/concepts)
+- [Build a blog](/docs/cms/blog)
+- [Collections and fields](/docs/cms/schema)
+- [Entries, queries, and relationships](/docs/cms/entries)
+- [Access policies](/docs/cms/access)
+- [Lifecycle hooks](/docs/cms/hooks)
+- [Drafts and revisions](/docs/cms/lifecycle)
+- [Localization and multilingual content](/docs/cms/multilingual)
+- [Scheduling](/docs/cms/scheduling)
+- [Previewing drafts](/docs/cms/preview)
+- [Schema migrations](/docs/cms/migrations)
+- [Multi-tenant setup](/docs/cms/multi-tenancy)
+- [Custom Storage adapters](/docs/cms/custom-storage)
+- [Media, change events, and webhooks](/docs/cms/media-webhooks)
+- [Next.js integration](/docs/cms/nextjs)
+- [TanStack Start integration](/docs/cms/tanstack-start)
+- [API reference](/docs/cms/reference)
 
-`signCmsWebhook` and `verifyCmsWebhook` separately provide HMAC-SHA256
-signatures for host-built transports. Verification requires an atomic replay
-store and supports a limited secret-rotation overlap. Couple replay
-reservation to durable processing. `CmsWebhookService` persists subscriptions,
-delivery retries, and history, but requires a host transport that enforces
-connection-time SSRF defenses and a server-side secret resolver. The host must
-schedule fanout and delivery workers. See the package README for the wire
-format, rotation, and transport requirements.
+[CMS authoring Pieces](/docs/pieces/components/cms) provide presentation
+components only; they do not fetch, authorize, or persist content.
 
-## Public API and boundaries
+## Availability
 
-The package exports its schema registry and validators, typed content and
-revision contracts, migration checks, errors, and `CmsService` from
-`@puzzle-ui/cms`. It is independent of React, Next.js, TanStack Start, and
-database vendors. See the [Media package](/docs/media) for object storage and
-the [Fullstack package](/docs/fullstack) for the application HTTP boundary.
+`@puzzle-ui/cms@0.18.0` is published to npm, but the code-first API documented
+here is a newer rewrite and is not yet released. Do not assume the published
+tarball contains these APIs. In this repository, add
+`"@puzzle-ui/cms": "workspace:*"` to the consuming workspace and install from
+the repository root to use the current code-first implementation.
+
+The package root is its only public entry point. Use public exports from
+`@puzzle-ui/storage` and `@puzzle-ui/media`; do not deep-import package source.

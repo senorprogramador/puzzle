@@ -64,18 +64,46 @@ own usage records do not include CMS-owned references; the guard must consult
 host domains such as CMS and must run before object deletion. Soft delete stays
 separate.
 
-CMS server routes require trusted tenant/actor context and explicit
-authorization. Keep admin reads/mutations separate from public published
-reads, preserve revision conditions, and configure a real scheduler before
-accepting scheduled publication. Client query invalidation runs after a
-successful mutation; if it fails, surface the committed-mutation error and
-refresh before continuing.
+Resolve trusted tenant/actor context for every CMS request, bind it to the
+request-scoped CMS instance, and separately authorize each route. Never accept
+context from browser input. Keep admin reads/mutations separate from public
+published reads. `createCmsServer` requires static `config`, Storage,
+`accessPolicy`, `scheduler`, `resolveContext`, and `authorize`. Content types
+come from static code configuration, not runtime
+registration. Collection options include opt-in drafts/timestamps,
+`localization: { locales, defaultLocale }`, access policies, and hooks.
+Collection clients expose `find`, `findById`, `findBySlug`, `create`, `update`,
+`delete`, and `purge`; `delete` is soft. Purge permanently removes with a revision check
+and checks current, published, and historical CMS relationships. Relationship
+additions and purge coordinate through an atomic per-target guard, preventing
+concurrent writes from leaving dangling references. A relationship-capable
+schema alone does not block purge when no current or historical references
+exist. Draft-enabled collections add
+`publish`, `unpublish`, `archive`, `listRevisions`, and `restoreRevision`.
+Configured schedulers add
+`schedulePublish`/`unschedule`; localized collections add
+`listLocaleVariants`/`createTranslation`. Singleton clients expose equivalent
+root-level operations without a document ID. Public reads use the
+separate `.public` client; never accept visibility, tenant, or actor settings
+from browser input. Refresh application state after mutations according to the
+exported client contract. Handle revision conflicts explicitly and refresh
+before retrying; never infer server authorization from browser state.
 
 Optional CMS webhook routes require a host-managed secret-reference selector,
 secret resolver, and SSRF-safe transport. Never accept or return secret
 references in browser contracts. Provision/rotate secrets server-side, supply
-tenant-scoped policy permissions, and schedule durable outbox and delivery
-workers separately; routes do not execute deliveries automatically.
+tenant-scoped policy permissions, and run the standalone `CmsWebhookService`
+fanout/delivery workers separately; routes do not execute deliveries. When
+`emitChangeEvents: true` on `createCmsServer` (or with webhook routes enabled),
+CMS writes metadata-only events. Fullstack does not expose the internal
+request-scoped instance, but it does expose authorized event routes:
+`GET /admin/change-events?first&after` and
+`POST /admin/change-events/:eventId/ack` with `{ expectedRevision }`.
+`listChangeEvents({ first?, after? })` returns sanitized DTOs without tenant
+IDs or fanout leases; `acknowledgeChangeEvent(eventId, expectedRevision)`
+returns void. A host may also use a separate authorized `createCms` instance
+for server-side event consumption. Feed IDs/revisions to fanout, which records
+deliveries and removes the consumed event; do not separately acknowledge it.
 
 The media client supports bounded single-PUT transfers and server-issued
 multipart part targets, progress, transient retry, pause/resume at safe

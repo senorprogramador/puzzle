@@ -47,6 +47,7 @@
     "apps/site": {
       "name": "@puzzle-ui/site",
       "dependencies": {
+        "@puzzle-ui/cms": "workspace:*",
         "@puzzle-ui/core": "workspace:*",
         "@puzzle-ui/hooks": "workspace:*",
         "@puzzle-ui/icons": "workspace:*",

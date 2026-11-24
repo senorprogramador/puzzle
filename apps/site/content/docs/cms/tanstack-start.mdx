@@ -1,0 +1,46 @@
+---
+title: TanStack Start integration
+description: Dispatch the Fullstack CMS route map through TanStack Start without moving server services into client code.
+---
+
+Use the framework-neutral `CmsServer` from `@puzzle-ui/fullstack/cms/server`
+and the adapter exported by `@puzzle-ui/fullstack/cms/tanstack`. The server
+must be configured with a static CMS schema, Storage adapter, scheduler,
+access policy, trusted context resolver, and route-level authorization. See
+the [Fullstack CMS guide](/docs/fullstack/cms) for those options.
+
+## Dispatch incoming requests
+
+`createTanStackCmsHandler` adapts a configured `CmsServer` into a
+`(request: Request) => Promise<Response>` function:
+
+```ts
+import { createTanStackCmsHandler } from "@puzzle-ui/fullstack/cms/tanstack";
+import { cmsServer } from "./cms-server";
+
+export const handleCmsRequest = createTanStackCmsHandler({ cms: cmsServer });
+```
+
+Register `handleCmsRequest` with the server-side route mechanism used by your
+TanStack Start application. The handler dispatches the same route map as the
+Next.js adapter; it does not add authentication, resolve tenant identity, or
+create a database connection.
+
+For applications that register individual route handlers,
+`createTanStackCmsRouteHandlers({ cms: cmsServer })` returns the shared
+`CmsRouteHandlerMap`. Keep that map on the server and use the framework route
+registration supported by the installed TanStack Start version.
+
+## Keep client and server imports separate
+
+Browser code imports `createCmsClient` from
+`@puzzle-ui/fullstack/cms/client`. Server code imports `createCmsServer` and
+the TanStack handler from their server and framework subpaths. Public reads
+use the separate `.public` client; admin and preview reads still require
+trusted authentication and authorization.
+
+Do not pass Storage adapters, access callbacks, scheduler implementations,
+webhook secrets, or raw CMS configuration to browser components. See
+[Multi-tenant setup](/docs/cms/multi-tenancy),
+[Previewing drafts](/docs/cms/preview), and the
+[Fullstack CMS API](/docs/fullstack/cms).

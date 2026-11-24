@@ -1,77 +1,63 @@
 import {
-  CmsError,
-  CmsService,
-  CmsWebhookService,
   CMS_WEBHOOK_EVENTS,
+  CmsWebhookService,
+  createCms,
   type CmsAccessAction,
-  type CmsAccessPolicy,
   type CmsContext,
-  type CmsContentTypeRecord,
-  type CmsCreateEntryInput,
-  type CmsEntryMutationInput,
-  type CmsEntryQuery,
-  type CmsEntryView,
-  type CmsFields,
-  type CmsFieldDefinition,
-  type CmsRegisterContentTypeInput,
-  type CmsResourceType,
-  type CmsRestoreRevisionInput,
-  type CmsScheduleEntryInput,
-  type CmsScheduledPublication,
-  type CmsServiceOptions,
-  type CmsUpdateEntryInput,
   type CmsVisibility,
-  type CmsWebhookEventType,
+  type CmsWebhookAttempt,
+  type CmsWebhookDelivery,
   type CmsWebhookServiceOptions,
   type CmsWebhookSubscription,
-  type CmsWebhookDelivery,
-  type CmsWebhookAttempt,
-  type ContentTypeDefinition,
 } from "@puzzle-ui/cms";
 import type {
-  CmsApiAdminEntry,
-  CmsApiAuditEvent,
-  CmsApiContentType,
-  CmsApiDate,
-  CmsApiEntryPage,
+  CmsApiDocument,
+  CmsApiChangeEvent,
+  CmsApiChangeEventPage,
   CmsApiError,
   CmsApiErrorCode,
-  CmsApiMediaUsage,
-  CmsApiPublishedSnapshot,
-  CmsApiPublication,
+  CmsApiMutationInput,
+  CmsApiPage,
+  CmsApiQueryInput,
   CmsApiRevision,
-  CmsApiScheduleEntryInput,
-  CmsApiWebhookSubscription,
-  CmsApiWebhookDelivery,
+  CmsApiRestoreRevisionInput,
+  CmsApiScheduledPublicationResult,
   CmsApiWebhookAttempt,
+  CmsApiWebhookDelivery,
+  CmsApiWebhookEventType,
+  CmsApiWebhookSubscription,
   CmsApiWebhookSubscriptionInput,
-  CmsPublishedEntryPage,
-  CmsPublishedEntry,
-  CmsRelationshipLookupResult,
-  CmsRelationshipOption,
 } from "../shared";
+
+type CmsFactoryOptions = Parameters<typeof createCms>[0];
 
 export type CmsRouteAccess = {
   readonly context: CmsContext;
   readonly action: CmsAccessAction;
-  readonly resource: CmsResourceType;
+  readonly resource: "entry" | "revision" | "webhook" | "changeEvent";
+  readonly collection: string;
   readonly request: Request;
   readonly resourceId?: string;
-  readonly visibility?: CmsVisibility;
+  readonly visibility: CmsVisibility;
 };
 
 export type CmsAuthorization = (
   access: CmsRouteAccess,
 ) => boolean | Promise<boolean>;
 
-export type CmsServerOptions = Omit<CmsServiceOptions, "scheduler"> & {
-  readonly scheduler: NonNullable<CmsServiceOptions["scheduler"]>;
-  readonly basePath?: string;
-  readonly resolveContext: (
-    request: Request,
-  ) => Promise<CmsContext | null> | CmsContext | null;
-  readonly authorize: CmsAuthorization;
-  readonly webhooks?: Omit<CmsWebhookServiceOptions, "storage" | "accessPolicy" | "clock" | "idGenerator"> & {
+export type CmsServerOptions<
+  Config extends CmsFactoryOptions["config"] = CmsFactoryOptions["config"],
+> = Omit<
+  CmsFactoryOptions,
+  "context" | "config" | "scheduler" | "accessPolicy"
+> & {
+  readonly config: Config;
+  readonly accessPolicy: NonNullable<CmsFactoryOptions["accessPolicy"]>;
+  readonly scheduler: NonNullable<CmsFactoryOptions["scheduler"]>;
+  readonly webhooks?: Omit<
+    CmsWebhookServiceOptions,
+    "storage" | "accessPolicy" | "clock" | "idGenerator"
+  > & {
     readonly resolveSecretRef: (input: {
       readonly context: CmsContext;
       readonly request: Request;
@@ -79,6 +65,11 @@ export type CmsServerOptions = Omit<CmsServiceOptions, "scheduler"> & {
       readonly subscriptionId?: string;
     }) => Promise<string>;
   };
+  readonly basePath?: string;
+  readonly resolveContext: (
+    request: Request,
+  ) => Promise<CmsContext | null> | CmsContext | null;
+  readonly authorize: CmsAuthorization;
 };
 
 export type CmsHttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
@@ -102,11 +93,18 @@ type OperationResult = {
   readonly status?: number;
 };
 
+type CmsRequestState = {
+  readonly context: CmsContext;
+  readonly cms: ReturnType<typeof createCms>;
+};
+
 type Operation = (
   request: Request,
   params: Readonly<Record<string, string>>,
-  context: CmsContext,
+  state: CmsRequestState,
 ) => Promise<OperationResult>;
+
+type DynamicCmsCollection = Record<string, unknown>;
 
 class CmsHttpError extends Error {
   constructor(
@@ -127,14 +125,13 @@ const noStoreHeaders = {
   Vary: "Cookie, Authorization",
 } as const;
 
+const identityKeys = new Set(["tenantId", "actor", "user", "permissions"]);
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
 const jsonResponse = (body: unknown, status = 200): Response =>
-  new Response(JSON.stringify(body), {
-    status,
-    headers: noStoreHeaders,
-  });
+  new Response(JSON.stringify(body), { status, headers: noStoreHeaders });
 
 const emptyResponse = (status: number, headers: HeadersInit = {}): Response =>
   new Response(null, {
@@ -142,33 +139,8 @@ const emptyResponse = (status: number, headers: HeadersInit = {}): Response =>
     headers: { ...noStoreHeaders, ...headers },
   });
 
-const apiDate = (value: Date | string): CmsApiDate =>
-  value instanceof Date ? value.toISOString() : new Date(value).toISOString();
-
-const publicEntry = (entry: CmsEntryView): CmsPublishedEntry => {
-  const snapshot = entry.publishedSnapshot;
-  if (!snapshot) throw new CmsHttpError(404, "NOT_FOUND", "Published content entry was not found.");
-  return {
-    id: entry.id,
-    contentType: entry.contentTypeSlug,
-    locale: snapshot.locale,
-    slug: snapshot.slug,
-    revision: snapshot.revisionNumber,
-    schemaVersion: snapshot.schemaVersion,
-    fields: snapshot.fields,
-    publishedAt: apiDate(snapshot.publishedAt),
-  };
-};
-
-const publicPage = (page: {
-  readonly items: readonly CmsEntryView[];
-  readonly nextCursor: string | null;
-  readonly hasNextPage: boolean;
-}): CmsPublishedEntryPage => ({
-  items: page.items.map(publicEntry),
-  nextCursor: page.nextCursor,
-  hasNextPage: page.hasNextPage,
-});
+const serializable = <T>(value: T): T =>
+  JSON.parse(JSON.stringify(value)) as T;
 
 const normalizeBasePath = (basePath: string | undefined): string => {
   const value = (basePath ?? "/api/cms").trim();
@@ -216,19 +188,6 @@ const matchRoute = (
   return null;
 };
 
-const parseJson = async (request: Request): Promise<Record<string, unknown>> => {
-  let value: unknown;
-  try {
-    value = await request.json();
-  } catch {
-    throw new CmsHttpError(400, "INVALID_REQUEST", "The request body must be valid JSON.");
-  }
-  if (!isRecord(value)) {
-    throw new CmsHttpError(400, "INVALID_REQUEST", "The request body must be a JSON object.");
-  }
-  return value;
-};
-
 const requiredString = (
   value: unknown,
   path: string,
@@ -253,25 +212,62 @@ const optionalString = (
 };
 
 const positiveInteger = (
-  value: unknown,
+  value: string | undefined,
   path: string,
   fallback: number,
   maximum: number,
 ): number => {
   if (value === undefined) return fallback;
-  const number = typeof value === "string" ? Number(value) : value;
-  if (!Number.isInteger(number) || Number(number) < 1 || Number(number) > maximum) {
-    throw new CmsHttpError(400, "INVALID_REQUEST", `${path} must be an integer from 1 to ${maximum}.`);
+  const number = Number(value);
+  if (!Number.isInteger(number) || number < 1 || number > maximum) {
+    throw new CmsHttpError(
+      400,
+      "INVALID_REQUEST",
+      `${path} must be an integer from 1 to ${maximum}.`,
+    );
   }
-  return Number(number);
+  return number;
 };
 
-const optionalNumber = (value: unknown, path: string): number | undefined => {
-  if (value === undefined) return undefined;
-  if (!Number.isInteger(value) || Number(value) < 1) {
-    throw new CmsHttpError(400, "INVALID_REQUEST", `${path} must be a positive integer.`);
+const parseJson = async (request: Request): Promise<Record<string, unknown>> => {
+  let value: unknown;
+  try {
+    value = await request.json();
+  } catch {
+    throw new CmsHttpError(400, "INVALID_REQUEST", "The request body must be valid JSON.");
   }
-  return Number(value);
+  if (!isRecord(value)) {
+    throw new CmsHttpError(400, "INVALID_REQUEST", "The request body must be a JSON object.");
+  }
+  return value;
+};
+
+const rejectClientIdentity = (record: Record<string, unknown>): void => {
+  if (Object.keys(record).some((key) => identityKeys.has(key))) {
+    throw new CmsHttpError(
+      400,
+      "INVALID_REQUEST",
+      "Tenant, actor, user, and permission values are resolved by the server.",
+    );
+  }
+};
+
+const assertNoIdentityFilters = (where: unknown): void => {
+  if (!isRecord(where)) {
+    throw new CmsHttpError(400, "INVALID_REQUEST", "where must be an object.");
+  }
+  for (const [key, value] of Object.entries(where)) {
+    if (identityKeys.has(key)) {
+      throw new CmsHttpError(
+        400,
+        "INVALID_REQUEST",
+        "Tenant, actor, user, and permission filters are not accepted.",
+      );
+    }
+    if ((key === "and" || key === "or") && Array.isArray(value)) {
+      value.forEach(assertNoIdentityFilters);
+    }
+  }
 };
 
 const readQueryValue = <T>(url: URL, name: string): T | undefined => {
@@ -284,52 +280,38 @@ const readQueryValue = <T>(url: URL, name: string): T | undefined => {
   }
 };
 
-const readQueryArray = <T>(url: URL, name: string): readonly T[] | undefined => {
-  const value = readQueryValue<unknown>(url, name);
-  if (value === undefined) return undefined;
-  if (!Array.isArray(value)) {
-    throw new CmsHttpError(400, "INVALID_REQUEST", `${name} must be a JSON array.`);
-  }
-  return value as readonly T[];
-};
-
-const readFilters = (url: URL): CmsEntryQuery["filters"] => {
-  const filters = readQueryArray<unknown>(url, "filters");
-  if (
-    filters?.some(
-      (filter) =>
-        !isRecord(filter) ||
-        typeof filter.field !== "string" ||
-        typeof filter.operator !== "string" ||
-        !Object.prototype.hasOwnProperty.call(filter, "value"),
-    )
-  ) {
-    throw new CmsHttpError(400, "INVALID_REQUEST", "filters contains an invalid entry.");
-  }
-  return filters as CmsEntryQuery["filters"];
-};
-
-const readOrderBy = (url: URL): CmsEntryQuery["orderBy"] => {
-  const orderBy = readQueryArray<unknown>(url, "orderBy");
-  if (
-    orderBy?.some(
-      (order) =>
-        !isRecord(order) ||
-        typeof order.field !== "string" ||
-        (order.direction !== "asc" && order.direction !== "desc"),
-    )
-  ) {
-    throw new CmsHttpError(400, "INVALID_REQUEST", "orderBy contains an invalid entry.");
-  }
-  return orderBy as CmsEntryQuery["orderBy"];
+const readQueryInput = (url: URL): CmsApiQueryInput => {
+  const where = readQueryValue<unknown>(url, "where");
+  if (where !== undefined) assertNoIdentityFilters(where);
+  const sort = url.searchParams.get("sort") ?? undefined;
+  const locale = url.searchParams.has("locale")
+    ? requiredString(url.searchParams.get("locale"), "locale", 100)
+    : undefined;
+  const after = optionalString(url.searchParams.get("after") ?? undefined, "after", 10_000);
+  return {
+    ...(where === undefined ? {} : { where: where as CmsApiQueryInput["where"] }),
+    ...(sort === undefined ? {} : { sort }),
+    limit: positiveInteger(url.searchParams.get("limit") ?? undefined, "limit", 25, 100),
+    page: positiveInteger(url.searchParams.get("page") ?? undefined, "page", 1, 100),
+    ...(after === undefined ? {} : { after }),
+    ...(locale === undefined ? {} : { locale }),
+  };
 };
 
 const readLocaleFallbacks = (url: URL): readonly string[] | undefined => {
-  const locales = readQueryArray<unknown>(url, "fallbackLocales");
-  if (locales?.some((locale) => typeof locale !== "string")) {
-    throw new CmsHttpError(400, "INVALID_REQUEST", "fallbackLocales must contain locale strings.");
+  const fallbackLocales = readQueryValue<unknown>(url, "fallbackLocales");
+  if (fallbackLocales === undefined) return undefined;
+  if (
+    !Array.isArray(fallbackLocales) ||
+    fallbackLocales.some((locale) => typeof locale !== "string")
+  ) {
+    throw new CmsHttpError(
+      400,
+      "INVALID_REQUEST",
+      "fallbackLocales must be an array of locale strings.",
+    );
   }
-  return locales as readonly string[] | undefined;
+  return fallbackLocales;
 };
 
 const requestContextIsValid = (context: CmsContext | null): context is CmsContext =>
@@ -343,10 +325,11 @@ const requestContextIsValid = (context: CmsContext | null): context is CmsContex
           context.actor.id.trim())),
   );
 
-const cmsErrorStatus = (code: CmsApiErrorCode): number => {
+const statusForCode = (code: string): number => {
   switch (code) {
     case "VALIDATION":
     case "SCHEMA":
+    case "INVALID_REQUEST":
       return 400;
     case "NOT_FOUND":
       return 404;
@@ -354,20 +337,16 @@ const cmsErrorStatus = (code: CmsApiErrorCode): number => {
     case "DUPLICATE":
       return 409;
     case "PERMISSION_DENIED":
+    case "FORBIDDEN":
       return 403;
+    case "UNAUTHENTICATED":
+      return 401;
     case "CAPABILITY":
       return 501;
     case "SCHEDULER":
       return 503;
-    case "AUDIT":
-    case "INTERNAL":
+    default:
       return 500;
-    case "UNAUTHENTICATED":
-      return 401;
-    case "FORBIDDEN":
-      return 403;
-    case "INVALID_REQUEST":
-      return 400;
   }
 };
 
@@ -378,114 +357,529 @@ const errorResponse = (error: unknown): Response => {
       error.status,
     );
   }
-  if (error instanceof CmsError) {
-    const issues = Array.isArray(error.details?.issues)
-      ? error.details.issues.filter(
-          (issue): issue is { path: string; message: string; code: string } =>
-            isRecord(issue) &&
-            typeof issue.path === "string" &&
-            typeof issue.message === "string" &&
-            typeof issue.code === "string",
-        )
-      : undefined;
-    return jsonResponse(
-      {
-        error: {
-          code: error.code,
-          message: error.message,
-          ...(issues?.length ? { issues } : {}),
-        },
-      } satisfies CmsApiError,
-      cmsErrorStatus(error.code),
-    );
-  }
+  const code =
+    isRecord(error) && typeof error.code === "string"
+      ? error.code
+      : "INTERNAL";
+  const recognized = [
+    "VALIDATION",
+    "SCHEMA",
+    "NOT_FOUND",
+    "CONFLICT",
+    "DUPLICATE",
+    "PERMISSION_DENIED",
+    "CAPABILITY",
+    "SCHEDULER",
+    "AUDIT",
+    "INTERNAL",
+    "UNAUTHENTICATED",
+    "FORBIDDEN",
+    "INVALID_REQUEST",
+  ].includes(code)
+    ? code as CmsApiErrorCode
+    : "INTERNAL";
+  const details = isRecord(error) && isRecord(error.details)
+    ? error.details
+    : undefined;
+  const issues = Array.isArray(details?.issues)
+    ? details.issues.filter(
+        (issue): issue is { path: string; code: string; message: string } =>
+          isRecord(issue) &&
+          typeof issue.path === "string" &&
+          typeof issue.code === "string" &&
+          typeof issue.message === "string",
+      )
+    : undefined;
+  const message =
+    error instanceof Error && recognized !== "INTERNAL"
+      ? error.message
+      : "The CMS request could not be completed.";
   return jsonResponse(
     {
       error: {
-        code: "INTERNAL",
-        message: "The CMS request could not be completed.",
+        code: recognized,
+        message,
+        ...(issues?.length ? { issues } : {}),
       },
     } satisfies CmsApiError,
-    500,
+    statusForCode(recognized),
   );
 };
 
-const apiAdminEntry = (entry: CmsEntryView): CmsApiAdminEntry =>
-  JSON.parse(JSON.stringify(entry)) as CmsApiAdminEntry;
-
-const apiContentType = (record: CmsContentTypeRecord): CmsApiContentType =>
-  JSON.parse(JSON.stringify(record)) as CmsApiContentType;
-
-const apiRevision = (record: unknown): CmsApiRevision =>
-  JSON.parse(JSON.stringify(record)) as CmsApiRevision;
-
-const apiAuditEvent = (record: unknown): CmsApiAuditEvent =>
-  JSON.parse(JSON.stringify(record)) as CmsApiAuditEvent;
-
-const apiWebhookSubscription = (record: CmsWebhookSubscription): CmsApiWebhookSubscription => {
-  const { tenantId: _tenantId, secretRef: _secretRef, createdAt, updatedAt, ...rest } = record;
-  return { ...rest, createdAt: apiDate(createdAt), updatedAt: apiDate(updatedAt), secretConfigured: true };
+const collectionDefinition = (
+  options: CmsServerOptions,
+  name: string,
+): Record<string, unknown> => {
+  const config = options.config as unknown as {
+    readonly collections?: Readonly<Record<string, unknown>>;
+  };
+  const definition = config.collections?.[name];
+  if (!isRecord(definition)) {
+    throw new CmsHttpError(404, "NOT_FOUND", "The configured CMS collection was not found.");
+  }
+  return definition;
 };
 
-const apiWebhookDelivery = (record: CmsWebhookDelivery): CmsApiWebhookDelivery => {
-  const { tenantId: _tenantId, leaseToken: _leaseToken, createdAt, updatedAt, nextAttemptAt, event, ...rest } = record;
+const hasSlugField = (definition: Readonly<Record<string, unknown>>): boolean =>
+  isRecord(definition.fields) &&
+  Object.values(definition.fields).some(
+    (field) => isRecord(field) && field.type === "slug",
+  );
+
+const collectionService = (
+  cms: ReturnType<typeof createCms>,
+  name: string,
+): DynamicCmsCollection => {
+  const service = (cms as unknown as Record<string, unknown>)[name];
+  if (!isRecord(service)) {
+    throw new CmsHttpError(404, "NOT_FOUND", "The configured CMS collection was not found.");
+  }
+  return service;
+};
+
+const invoke = async (
+  service: DynamicCmsCollection,
+  methodName: string,
+  ...args: readonly unknown[]
+): Promise<unknown> => {
+  const method = service[methodName];
+  if (typeof method !== "function") {
+    throw new CmsHttpError(404, "NOT_FOUND", "The CMS operation is not available for this collection.");
+  }
+  return Reflect.apply(method, service, [...args]) as Promise<unknown>;
+};
+
+const invokeScheduler = async (
+  cms: ReturnType<typeof createCms>,
+  publication: {
+    readonly entryId: string;
+    readonly scheduledRevisionNumber: number;
+    readonly publishAt: Date;
+    readonly timeZone: string;
+  },
+): Promise<unknown> => {
+  const scheduler = (cms as unknown as {
+    readonly $scheduler?: Readonly<Record<string, unknown>>;
+  }).$scheduler;
+  const method = scheduler?.publishScheduled;
+  if (typeof method !== "function") {
+    throw new CmsHttpError(501, "CAPABILITY", "The configured CMS does not support this operation.");
+  }
+  return Reflect.apply(method, scheduler, [publication]) as Promise<unknown>;
+};
+
+const invokeNamespace = async (
+  cms: ReturnType<typeof createCms>,
+  namespaceName: string,
+  methodName: string,
+  ...args: readonly unknown[]
+): Promise<unknown> => {
+  const namespaces = cms as unknown as Record<string, unknown>;
+  const namespace = namespaces[namespaceName];
+  if (!isRecord(namespace)) {
+    throw new CmsHttpError(501, "CAPABILITY", "The configured CMS does not support this operation.");
+  }
+  const method = namespace[methodName];
+  if (typeof method !== "function") {
+    throw new CmsHttpError(501, "CAPABILITY", "The configured CMS does not support this operation.");
+  }
+  return Reflect.apply(method, namespace, [...args]) as Promise<unknown>;
+};
+
+const publicMetadata = [
+  "id",
+  "slug",
+  "locale",
+  "publishedAt",
+] as const;
+const adminMetadata = [
+  ...publicMetadata,
+  "status",
+  "createdAt",
+  "updatedAt",
+  "revision",
+  "revisionNumber",
+  "scheduledAt",
+  "scheduledTimeZone",
+  "scheduledRevisionNumber",
+  "archivedAt",
+  "deletedAt",
+] as const;
+
+const apiDocument = (
+  options: CmsServerOptions,
+  collection: string,
+  value: unknown,
+  visibility: "admin" | "public",
+): CmsApiDocument => {
+  if (!isRecord(value)) {
+    throw new CmsHttpError(404, "NOT_FOUND", "The CMS document was not found.");
+  }
+  const serialized = serializable(value);
+  if (!isRecord(serialized) || typeof serialized.id !== "string") {
+    throw new CmsHttpError(500, "INTERNAL", "The CMS returned an invalid document.");
+  }
+  const definition = collectionDefinition(options, collection);
+  const fields = isRecord(definition.fields) ? definition.fields : {};
+  const result: Record<string, unknown> = {};
+  const metadata = visibility === "public" ? publicMetadata : adminMetadata;
+  for (const key of metadata) {
+    if (key in serialized) result[key] = serialized[key];
+  }
+  for (const key of Object.keys(fields)) {
+    if (identityKeys.has(key) || key in result || !(key in serialized)) continue;
+    result[key] = serialized[key];
+  }
+  return result as unknown as CmsApiDocument;
+};
+
+const apiAnyDocument = (
+  options: CmsServerOptions,
+  value: unknown,
+): CmsApiDocument => {
+  if (!isRecord(value)) {
+    throw new CmsHttpError(500, "INTERNAL", "The scheduler returned an invalid document.");
+  }
+  const serialized = serializable(value);
+  if (!isRecord(serialized) || typeof serialized.id !== "string") {
+    throw new CmsHttpError(500, "INTERNAL", "The scheduler returned an invalid document.");
+  }
+  const fields = new Set<string>();
+  const collections = (
+    options.config as unknown as {
+      readonly collections: Readonly<Record<string, unknown>>;
+    }
+  ).collections;
+  for (const definition of Object.values(collections)) {
+    if (isRecord(definition) && isRecord(definition.fields)) {
+      for (const key of Object.keys(definition.fields)) fields.add(key);
+    }
+  }
+  const source = isRecord(serialized.fields)
+    ? { ...serialized, ...serialized.fields }
+    : serialized;
+  const result: Record<string, unknown> = {};
+  for (const key of adminMetadata) {
+    if (key in source) result[key] = source[key];
+  }
+  for (const key of fields) {
+    if (identityKeys.has(key) || key in result || !(key in source)) continue;
+    result[key] = source[key];
+  }
+  return result as unknown as CmsApiDocument;
+};
+
+const apiScheduledPublicationResult = (
+  options: CmsServerOptions,
+  value: unknown,
+): CmsApiScheduledPublicationResult => {
+  if (!isRecord(value) || typeof value.published !== "boolean") {
+    throw new CmsHttpError(500, "INTERNAL", "The scheduler returned an invalid result.");
+  }
+  if (value.published === false) {
+    if (value.reason !== "stale" && value.reason !== "not-due") {
+      throw new CmsHttpError(500, "INTERNAL", "The scheduler returned an invalid status.");
+    }
+    return { published: false, reason: value.reason };
+  }
   return {
-    ...rest,
+    published: true,
+    entry: apiAnyDocument(options, value.entry),
+  };
+};
+
+const apiPage = (
+  options: CmsServerOptions,
+  collection: string,
+  value: unknown,
+  visibility: "admin" | "public",
+): CmsApiPage => {
+  if (!isRecord(value) || !Array.isArray(value.items)) {
+    throw new CmsHttpError(500, "INTERNAL", "The CMS returned an invalid collection page.");
+  }
+  return {
+    items: value.items.map((item) =>
+      apiDocument(options, collection, item, visibility),
+    ),
+    nextCursor: typeof value.nextCursor === "string" ? value.nextCursor : null,
+    hasNextPage: value.hasNextPage === true,
+    ...(typeof value.page === "number" ? { page: value.page } : {}),
+    ...(typeof value.limit === "number" ? { limit: value.limit } : {}),
+  };
+};
+
+const apiDate = (value: Date | string): string =>
+  value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+
+const apiRevision = (value: unknown): CmsApiRevision => {
+  if (!isRecord(value)) {
+    throw new CmsHttpError(500, "INTERNAL", "The CMS returned an invalid revision.");
+  }
+  const record = serializable(value);
+  if (!isRecord(record)) {
+    throw new CmsHttpError(500, "INTERNAL", "The CMS returned an invalid revision.");
+  }
+  const {
+    tenantId: _tenantId,
+    createdAt,
+    updatedAt,
+    ...publicRecord
+  } = record;
+  if (
+    !(createdAt instanceof Date || typeof createdAt === "string") ||
+    !(updatedAt instanceof Date || typeof updatedAt === "string")
+  ) {
+    throw new CmsHttpError(500, "INTERNAL", "The CMS returned invalid revision timestamps.");
+  }
+  return {
+    ...publicRecord,
+    createdAt: apiDate(createdAt),
+    updatedAt: apiDate(updatedAt),
+  } as unknown as CmsApiRevision;
+};
+
+const apiChangeEvent = (value: unknown): CmsApiChangeEvent => {
+  if (!isRecord(value)) {
+    throw new CmsHttpError(500, "INTERNAL", "The CMS returned an invalid change event.");
+  }
+  const record = serializable(value);
+  if (!isRecord(record)) {
+    throw new CmsHttpError(500, "INTERNAL", "The CMS returned an invalid change event.");
+  }
+  const {
+    tenantId: _tenantId,
+    fanoutLeaseUntil: _fanoutLeaseUntil,
+    occurredAt,
+    createdAt,
+    updatedAt,
+    ...publicEvent
+  } = record;
+  if (
+    typeof occurredAt !== "string" ||
+    typeof createdAt !== "string" ||
+    typeof updatedAt !== "string"
+  ) {
+    throw new CmsHttpError(500, "INTERNAL", "The CMS returned invalid event timestamps.");
+  }
+  return {
+    ...publicEvent,
+    occurredAt: apiDate(occurredAt),
+    createdAt: apiDate(createdAt),
+    updatedAt: apiDate(updatedAt),
+  } as unknown as CmsApiChangeEvent;
+};
+
+const apiChangeEventPage = (value: unknown): CmsApiChangeEventPage => {
+  if (!isRecord(value) || !Array.isArray(value.items)) {
+    throw new CmsHttpError(500, "INTERNAL", "The CMS returned an invalid change event page.");
+  }
+  return {
+    items: value.items.map(apiChangeEvent),
+    nextCursor: typeof value.nextCursor === "string" ? value.nextCursor : null,
+    hasNextPage: value.hasNextPage === true,
+  };
+};
+
+const apiWebhookSubscription = (
+  record: CmsWebhookSubscription,
+): CmsApiWebhookSubscription => {
+  const {
+    tenantId: _tenantId,
+    secretRef: _secretRef,
+    createdAt,
+    updatedAt,
+    ...publicRecord
+  } = record;
+  return {
+    ...publicRecord,
+    createdAt: apiDate(createdAt),
+    updatedAt: apiDate(updatedAt),
+    secretConfigured: true,
+  };
+};
+
+const apiWebhookDelivery = (
+  record: CmsWebhookDelivery,
+): CmsApiWebhookDelivery => {
+  const {
+    tenantId: _tenantId,
+    leaseToken: _leaseToken,
+    createdAt,
+    updatedAt,
+    nextAttemptAt,
+    event,
+    ...publicRecord
+  } = record;
+  return {
+    ...publicRecord,
     event: { ...event, occurredAt: apiDate(event.occurredAt) },
-    createdAt: apiDate(createdAt), updatedAt: apiDate(updatedAt), nextAttemptAt: apiDate(nextAttemptAt),
+    createdAt: apiDate(createdAt),
+    updatedAt: apiDate(updatedAt),
+    nextAttemptAt: apiDate(nextAttemptAt),
   };
 };
 
-const apiWebhookAttempt = (record: CmsWebhookAttempt): CmsApiWebhookAttempt => {
-  const { tenantId: _tenantId, createdAt, updatedAt, startedAt, completedAt, ...rest } = record;
+const apiWebhookAttempt = (
+  record: CmsWebhookAttempt,
+): CmsApiWebhookAttempt => {
+  const {
+    tenantId: _tenantId,
+    createdAt,
+    updatedAt,
+    startedAt,
+    completedAt,
+    ...publicRecord
+  } = record;
   return {
-    ...rest, createdAt: apiDate(createdAt), updatedAt: apiDate(updatedAt),
-    startedAt: apiDate(startedAt), completedAt: apiDate(completedAt),
+    ...publicRecord,
+    createdAt: apiDate(createdAt),
+    updatedAt: apiDate(updatedAt),
+    startedAt: apiDate(startedAt),
+    completedAt: apiDate(completedAt),
   };
 };
 
-const webhookSubscriptionInput = (body: Record<string, unknown>): CmsApiWebhookSubscriptionInput => {
+const webhookSubscriptionInput = (
+  body: Record<string, unknown>,
+): CmsApiWebhookSubscriptionInput => {
+  rejectClientIdentity(body);
   if ("secretRef" in body || "secret" in body) {
     throw new CmsHttpError(400, "INVALID_REQUEST", "Webhook secrets are managed by the host.");
   }
-  if (!Array.isArray(body.events) || !body.events.every(
-    (value): value is CmsWebhookEventType => CMS_WEBHOOK_EVENTS.some((event) => event === value),
-  )) {
-    throw new CmsHttpError(400, "INVALID_REQUEST", "events must contain supported webhook events.");
+  if (
+    !Array.isArray(body.events) ||
+    !body.events.every((value) =>
+      CMS_WEBHOOK_EVENTS.some((event) => event === value),
+    )
+  ) {
+    throw new CmsHttpError(400, "INVALID_REQUEST", "events contains an unsupported webhook event.");
   }
   if (typeof body.enabled !== "boolean") {
     throw new CmsHttpError(400, "INVALID_REQUEST", "enabled must be a boolean.");
   }
   return {
     endpoint: requiredString(body.endpoint, "endpoint", 2_048),
-    events: body.events,
+    events: body.events as readonly CmsApiWebhookEventType[],
     enabled: body.enabled,
   };
 };
 
-const apiMediaUsage = (record: unknown): CmsApiMediaUsage =>
-  JSON.parse(JSON.stringify(record)) as CmsApiMediaUsage;
-
-const findRelationshipField = (
-  definitions: readonly CmsFieldDefinition[],
-  path: readonly string[],
-): CmsFieldDefinition | undefined => {
-  const [head, ...tail] = path;
-  if (!head) return undefined;
-  for (const field of definitions) {
-    if (field.key !== head) continue;
-    if (!tail.length) return field;
-    const nested = field.fields
-      ? findRelationshipField(field.fields, tail)
-      : field.blocks
-        ? field.blocks
-            .map((block) => findRelationshipField(block.fields, tail))
-            .find((match) => match !== undefined)
-        : undefined;
-    if (nested) return nested;
+const dataFromBody = async (
+  request: Request,
+  requireData = true,
+): Promise<{
+  readonly data?: Record<string, unknown>;
+  readonly slug?: string;
+  readonly locale?: string;
+  readonly translationGroupId?: string;
+  readonly expectedRevision?: number;
+  readonly changeSummary?: string;
+}> => {
+  const body = await parseJson(request);
+  rejectClientIdentity(body);
+  if (body.data === undefined && !requireData) {
+    return {
+      ...(body.locale === undefined
+        ? {}
+        : { locale: requiredString(body.locale, "locale", 100) }),
+      ...(body.expectedRevision === undefined
+        ? {}
+        : { expectedRevision: expectedRevisionFromBody(body) }),
+      ...(body.changeSummary === undefined
+        ? {}
+        : { changeSummary: optionalString(body.changeSummary, "changeSummary") }),
+    };
   }
-  return undefined;
+  if (!isRecord(body.data)) {
+    throw new CmsHttpError(400, "INVALID_REQUEST", "data must be an object.");
+  }
+  rejectClientIdentity(body.data);
+  return {
+    data: body.data,
+    ...(body.slug === undefined ? {} : { slug: requiredString(body.slug, "slug") }),
+    ...(body.locale === undefined
+      ? {}
+      : { locale: requiredString(body.locale, "locale", 100) }),
+    ...(body.translationGroupId === undefined
+      ? {}
+      : {
+          translationGroupId: requiredString(
+            body.translationGroupId,
+            "translationGroupId",
+          ),
+        }),
+    ...(body.expectedRevision === undefined
+      ? {}
+      : { expectedRevision: expectedRevisionFromBody(body) }),
+    ...(body.changeSummary === undefined
+      ? {}
+      : { changeSummary: optionalString(body.changeSummary, "changeSummary") }),
+  };
 };
+
+const expectedRevisionFromBody = (body: Record<string, unknown>): number => {
+  const value = body.expectedRevision;
+  if (!Number.isInteger(value) || typeof value !== "number" || value < 1) {
+    throw new CmsHttpError(
+      400,
+      "INVALID_REQUEST",
+      "expectedRevision must be a positive integer.",
+    );
+  }
+  return value;
+};
+
+const mutationInputFromBody = (
+  body: Record<string, unknown>,
+): CmsApiMutationInput => {
+  rejectClientIdentity(body);
+  return {
+    expectedRevision: expectedRevisionFromBody(body),
+    ...(body.changeSummary === undefined
+      ? {}
+      : { changeSummary: optionalString(body.changeSummary, "changeSummary") }),
+  };
+};
+
+const mutationInputWithLocale = (
+  body: Record<string, unknown>,
+): CmsApiMutationInput & { readonly locale?: string } => ({
+  ...mutationInputFromBody(body),
+  ...(body.locale === undefined
+    ? {}
+    : { locale: requiredString(body.locale, "locale", 100) }),
+});
+
+const scheduleInputFromBody = (
+  body: Record<string, unknown>,
+): {
+  readonly expectedRevision: number;
+  readonly publishAt: Date;
+  readonly timeZone: string;
+  readonly changeSummary?: string;
+  readonly locale?: string;
+} => {
+  const mutation = mutationInputFromBody(body);
+  const publishAt = new Date(requiredString(body.publishAt, "publishAt", 100));
+  if (!Number.isFinite(publishAt.getTime())) {
+    throw new CmsHttpError(400, "INVALID_REQUEST", "publishAt must be a valid date.");
+  }
+  return {
+    ...mutation,
+    publishAt,
+    timeZone: requiredString(body.timeZone, "timeZone", 100),
+    ...(body.locale === undefined
+      ? {}
+      : { locale: requiredString(body.locale, "locale", 100) }),
+  };
+};
+
+const restoreInputFromBody = (
+  body: Record<string, unknown>,
+): CmsApiRestoreRevisionInput => ({
+  ...mutationInputFromBody(body),
+  revisionId: requiredString(body.revisionId, "revisionId"),
+});
 
 export const createCmsServer = (options: CmsServerOptions): CmsServer => {
   if (
@@ -495,657 +889,1123 @@ export const createCmsServer = (options: CmsServerOptions): CmsServer => {
   ) {
     throw new TypeError("CMS server requires context resolution and authorization callbacks.");
   }
+  if (typeof options.accessPolicy !== "function") {
+    throw new TypeError("CMS server requires an explicit CMS accessPolicy.");
+  }
   if (
     !options.scheduler ||
     typeof options.scheduler.schedule !== "function" ||
     typeof options.scheduler.cancel !== "function"
   ) {
-    throw new TypeError("CMS server routes support scheduling and require an explicit scheduler.");
+    throw new TypeError("CMS server lifecycle routes require an explicit scheduler.");
   }
-  if (typeof options.accessPolicy !== "function") {
-    throw new TypeError("CMS server requires an explicit CMS accessPolicy.");
+  if (!options.storage || !options.config) {
+    throw new TypeError("CMS server requires a code-first config and storage adapter.");
   }
-  if (!options.storage) {
-    throw new TypeError("CMS server requires a storage adapter.");
+  const config = options.config as unknown as {
+    readonly collections?: Readonly<Record<string, unknown>>;
+  };
+  if (!isRecord(config.collections)) {
+    throw new TypeError("CMS server requires a configured collections object.");
   }
-  if (options.webhooks && typeof options.webhooks.resolveSecretRef !== "function") {
-    throw new TypeError("Webhook routes require a host-managed secret reference resolver.");
-  }
-  if (options.webhooks && options.emitChangeEvents === false) {
-    throw new TypeError("Webhook routes require change-event emission.");
-  }
-
   const basePath = normalizeBasePath(options.basePath);
   const {
     basePath: _basePath,
     resolveContext,
     authorize,
-    accessPolicy,
     webhooks,
-    ...serviceOptions
+    ...factoryOptions
   } = options;
-  const cms = new CmsService({
-    ...serviceOptions,
-    ...(webhooks ? { emitChangeEvents: true } : {}),
-    accessPolicy: async (access) => (await accessPolicy(access)) === true,
-  });
+  if (webhooks && typeof webhooks.resolveSecretRef !== "function") {
+    throw new TypeError("Webhook routes require a host-managed secret reference resolver.");
+  }
+  if (webhooks && options.emitChangeEvents === false) {
+    throw new TypeError("Webhook routes require change-event emission.");
+  }
+  const changeEventsEnabled =
+    options.emitChangeEvents === true || webhooks !== undefined;
   const webhookService = webhooks
     ? new CmsWebhookService({
-        ...webhooks,
-        storage: serviceOptions.storage,
-        accessPolicy,
-        clock: serviceOptions.clock,
-        idGenerator: serviceOptions.idGenerator,
+        ...(({ resolveSecretRef: _resolveSecretRef, ...serviceOptions }) => serviceOptions)(webhooks),
+        storage: options.storage,
+        accessPolicy: options.accessPolicy,
+        ...(options.clock ? { clock: options.clock } : {}),
+        ...(options.idGenerator ? { idGenerator: options.idGenerator } : {}),
       })
     : null;
 
   const secure = (
-    action: CmsAccessAction,
-    resource: CmsResourceType,
+    collection: string,
+    action: CmsRouteAccess["action"],
+    resource: CmsRouteAccess["resource"],
+    visibility: "admin" | "public",
     operation: Operation,
-    options: {
-      readonly visibility?: CmsVisibility;
-      readonly resourceParam?: string;
-    } = {},
+    resourceParam?: string,
   ): CmsRouteHandler =>
     async (request, params) => {
       let context: CmsContext | null;
       try {
         context = await resolveContext(request);
       } catch {
-        throw new CmsHttpError(401, "UNAUTHENTICATED", "A valid actor and tenant context is required.");
+        throw new CmsHttpError(
+          401,
+          "UNAUTHENTICATED",
+          "A valid actor and tenant context is required.",
+        );
       }
       if (!requestContextIsValid(context)) {
-        throw new CmsHttpError(401, "UNAUTHENTICATED", "A valid actor and tenant context is required.");
+        throw new CmsHttpError(
+          401,
+          "UNAUTHENTICATED",
+          "A valid actor and tenant context is required.",
+        );
       }
-      const visibility = options.visibility ?? "admin";
       if (visibility === "admin" && context.actor === null) {
         throw new CmsHttpError(401, "UNAUTHENTICATED", "Authentication is required.");
       }
-      const access: CmsRouteAccess = {
-        context,
-        action,
-        resource,
-        request,
-        visibility,
-        ...(options.resourceParam && params[options.resourceParam]
-          ? { resourceId: params[options.resourceParam] }
-          : {}),
-      };
-      if ((await authorize(access)) !== true) {
-        throw new CmsHttpError(403, "FORBIDDEN", "The actor is not permitted to perform this operation.");
+      const resourceId = resourceParam ? params[resourceParam] : undefined;
+      if (
+        (await authorize({
+          context,
+          action,
+          resource,
+          collection,
+          request,
+          visibility,
+          ...(resourceId ? { resourceId } : {}),
+        })) !== true
+      ) {
+        throw new CmsHttpError(
+          403,
+          "FORBIDDEN",
+          "The actor is not permitted to perform this operation.",
+        );
       }
-      const result = await operation(request, params, context);
+      const cms = createCms({
+        ...factoryOptions,
+        config: options.config,
+        emitChangeEvents: changeEventsEnabled,
+        context,
+      });
+      const result = await operation(request, params, { context, cms });
       return jsonResponse(result.body, result.status);
     };
 
-  const routes: Record<string, Partial<Record<CmsHttpMethod, CmsRouteHandler>>> = {
-    "/admin/content-types": {
-      GET: secure("content-type:read", "contentType", async (request, _params, context) => {
-        const url = new URL(request.url);
-        const records = await cms.listContentTypes({
-          ...context,
-          first: positiveInteger(url.searchParams.get("first") ?? undefined, "first", 100, 500),
-        });
-        return { body: { contentTypes: records.map(apiContentType) } };
-      }),
-      POST: secure("content-type:register", "contentType", async (request, _params, context) => {
-        const body = await parseJson(request);
-        if (!isRecord(body.definition)) {
-          throw new CmsHttpError(400, "INVALID_REQUEST", "definition is required.");
-        }
-        const input: CmsRegisterContentTypeInput = {
-          ...context,
-          definition: body.definition as unknown as ContentTypeDefinition,
-          ...(body.expectedRevision === undefined
-            ? {}
-            : { expectedRevision: optionalNumber(body.expectedRevision, "expectedRevision") }),
-        };
-        const record = await cms.registerContentType(input);
-        return { body: { contentType: apiContentType(record) }, status: 201 };
-      }),
-    },
-    "/admin/content-types/:slug": {
-      GET: secure("content-type:read", "contentType", async (_request, params, context) => ({
-        body: {
-          contentType: apiContentType(
-            await cms.getContentType({ ...context, slug: requiredString(params.slug, "slug") }),
-          ),
+  const addEntryLifecycleRoute = (
+    collectionName: string,
+    collectionBase: string,
+    endpoint: string,
+    action: CmsAccessAction,
+    methodName: string,
+    parseInput: (body: Record<string, unknown>) => unknown,
+  ): void => {
+    routes[`${collectionBase}/:documentId/${endpoint}`] = {
+      POST: secure(
+        collectionName,
+        action,
+        "entry",
+        "admin",
+        async (request, params, { cms }) => {
+          const input = parseInput(await parseJson(request));
+          const documentId = requiredString(params.documentId, "documentId");
+          const args = methodName === "restoreRevision" && isRecord(input)
+            ? [
+                documentId,
+                requiredString(input.revisionId, "revisionId"),
+                {
+                  expectedRevision: input.expectedRevision,
+                  ...(input.changeSummary === undefined
+                    ? {}
+                    : { changeSummary: input.changeSummary }),
+                },
+              ]
+            : [documentId, input];
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            methodName,
+            ...args,
+          );
+          return {
+            body: {
+              document: apiDocument(options, collectionName, result, "admin"),
+            },
+          };
         },
-      })),
-    },
-    "/admin/entries": {
-      GET: secure("entry:read", "entry", async (request, _params, context) => {
-        const url = new URL(request.url);
-        const filters = readFilters(url);
-        const orderBy = readOrderBy(url);
-        const input: CmsEntryQuery = {
-          ...context,
-          contentType: requiredString(url.searchParams.get("contentType"), "contentType"),
-          visibility: "admin",
-          first: positiveInteger(url.searchParams.get("first") ?? undefined, "first", 25, 100),
-          ...(url.searchParams.has("locale")
-            ? { locale: requiredString(url.searchParams.get("locale"), "locale", 100) }
-            : {}),
-          ...(url.searchParams.has("search")
-            ? { search: optionalString(url.searchParams.get("search"), "search") }
-            : {}),
-          ...(url.searchParams.has("after")
-            ? { after: requiredString(url.searchParams.get("after"), "after", 10_000) }
-            : {}),
-          ...(filters ? { filters } : {}),
-          ...(orderBy ? { orderBy } : {}),
-        };
-        const page = await cms.listEntries(input);
-        return { body: { page: JSON.parse(JSON.stringify(page)) as CmsApiEntryPage } };
-      }),
-      POST: secure("entry:create", "entry", async (request, _params, context) => {
-        const body = await parseJson(request);
-        if (!isRecord(body.fields)) {
-          throw new CmsHttpError(400, "INVALID_REQUEST", "fields must be an object.");
-        }
-        const input: CmsCreateEntryInput = {
-          ...context,
-          contentType: requiredString(body.contentType, "contentType"),
-          locale: requiredString(body.locale, "locale", 100),
-          fields: body.fields as CmsFields,
-          ...(body.slug === undefined ? {} : { slug: requiredString(body.slug, "slug") }),
-          ...(body.translationGroupId === undefined
-            ? {}
-            : { translationGroupId: requiredString(body.translationGroupId, "translationGroupId") }),
-          ...(body.changeSummary === undefined
-            ? {}
-            : { changeSummary: optionalString(body.changeSummary, "changeSummary") }),
-        };
-        const entry = await cms.createEntry(input);
-        return { body: { entry: apiAdminEntry(entry) }, status: 201 };
-      }),
-    },
-    "/admin/entries/:entryId": {
+        "documentId",
+      ),
+    };
+  };
+
+  const addSingletonLifecycleRoute = (
+    collectionName: string,
+    collectionBase: string,
+    endpoint: string,
+    action: CmsAccessAction,
+    methodName: string,
+    parseInput: (body: Record<string, unknown>) => unknown,
+  ): void => {
+    routes[`${collectionBase}/${endpoint}`] = {
+      POST: secure(
+        collectionName,
+        action,
+        "entry",
+        "admin",
+        async (request, _params, { cms }) => {
+          const input = parseInput(await parseJson(request));
+          const args = methodName === "restoreRevision" && isRecord(input)
+            ? [
+                requiredString(input.revisionId, "revisionId"),
+                {
+                  expectedRevision: input.expectedRevision,
+                  ...(input.changeSummary === undefined
+                    ? {}
+                    : { changeSummary: input.changeSummary }),
+                  ...(input.locale === undefined
+                    ? {}
+                    : { locale: input.locale }),
+                },
+              ]
+            : [input];
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            methodName,
+            ...args,
+          );
+          return {
+            body: {
+              document: apiDocument(options, collectionName, result, "admin"),
+            },
+          };
+        },
+      ),
+    };
+  };
+
+  const routes: Record<string, Partial<Record<CmsHttpMethod, CmsRouteHandler>>> = {};
+  for (const collectionName of Object.keys(config.collections)) {
+    const base = `/collections/${encodeURIComponent(collectionName)}`;
+    const definition = collectionDefinition(options, collectionName);
+    const singleton = definition.kind === "singleton";
+    const slugLookup = !singleton && hasSlugField(definition);
+    const hasDrafts = definition.drafts === true;
+    const localized = isRecord(definition.localization);
+    routes[`/admin${base}`] = {
       GET: secure(
+        collectionName,
         "entry:read",
         "entry",
-        async (_request, params, context) => ({
-          body: {
-            entry: apiAdminEntry(
-              await cms.getEntry({
-                ...context,
-                entryId: requiredString(params.entryId, "entryId"),
-                visibility: "admin",
-              }),
-            ),
-          },
-        }),
-        { resourceParam: "entryId" },
+        "admin",
+        async (request, _params, { cms }) => {
+          const url = new URL(request.url);
+          if (singleton) {
+            const locale = url.searchParams.has("locale")
+              ? requiredString(url.searchParams.get("locale"), "locale", 100)
+              : undefined;
+            const result = await invoke(
+              collectionService(cms, collectionName),
+              "find",
+              { ...(locale === undefined ? {} : { locale }), visibility: "admin" },
+            );
+            return {
+              body: {
+                document: apiDocument(options, collectionName, result, "admin"),
+              },
+            };
+          }
+          const query = readQueryInput(url);
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "find",
+            { ...query, visibility: "admin" },
+          );
+          return { body: { page: apiPage(options, collectionName, result, "admin") } };
+        },
       ),
-      PATCH: secure(
+      POST: secure(
+        collectionName,
+        "entry:create",
+        "entry",
+        "admin",
+        async (request, _params, { cms }) => {
+          const {
+            data,
+            slug,
+            locale,
+            translationGroupId,
+            changeSummary,
+          } = await dataFromBody(request);
+          if (!singleton && !hasSlugField(definition) && !slug) {
+            throw new CmsHttpError(
+              400,
+              "INVALID_REQUEST",
+              "slug is required for collections without a slug field.",
+            );
+          }
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "create",
+            data!,
+            singleton
+              ? {
+                  ...(locale === undefined ? {} : { locale }),
+                  ...(translationGroupId === undefined ? {} : { translationGroupId }),
+                  ...(changeSummary === undefined ? {} : { changeSummary }),
+                }
+              : {
+                  ...(slug === undefined ? {} : { slug }),
+                  ...(locale === undefined ? {} : { locale }),
+                  ...(translationGroupId === undefined
+                    ? {}
+                    : { translationGroupId }),
+                  ...(changeSummary === undefined ? {} : { changeSummary }),
+                },
+          );
+          return {
+            body: { document: apiDocument(options, collectionName, result, "admin") },
+            status: 201,
+          };
+        },
+      ),
+    };
+    if (singleton) {
+      routes[`/admin${base}`]!.PATCH = secure(
+        collectionName,
         "entry:update",
         "entry",
-        async (request, params, context) => {
-          const body = await parseJson(request);
-          if (!isRecord(body.fields)) {
-            throw new CmsHttpError(400, "INVALID_REQUEST", "fields must be an object.");
+        "admin",
+        async (request, _params, { cms }) => {
+          const {
+            data,
+            locale,
+            expectedRevision,
+            changeSummary,
+          } = await dataFromBody(request);
+          if (expectedRevision === undefined) {
+            throw new CmsHttpError(400, "INVALID_REQUEST", "expectedRevision is required.");
           }
-          const input: CmsUpdateEntryInput = {
-            ...context,
-            entryId: requiredString(params.entryId, "entryId"),
-            expectedRevision: optionalNumber(body.expectedRevision, "expectedRevision")!,
-            fields: body.fields as CmsFields,
-            ...(body.slug === undefined ? {} : { slug: requiredString(body.slug, "slug") }),
-            ...(body.changeSummary === undefined
-              ? {}
-              : { changeSummary: optionalString(body.changeSummary, "changeSummary") }),
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "update",
+            data!,
+            {
+              expectedRevision,
+              ...(locale === undefined ? {} : { locale }),
+              ...(changeSummary === undefined ? {} : { changeSummary }),
+            },
+          );
+          return {
+            body: { document: apiDocument(options, collectionName, result, "admin") },
           };
-          return { body: { entry: apiAdminEntry(await cms.saveDraft(input)) } };
         },
-        { resourceParam: "entryId" },
-      ),
-      DELETE: secure(
+      );
+      routes[`/admin${base}`]!.DELETE = secure(
+        collectionName,
         "entry:delete",
         "entry",
-        async (request, params, context) => {
-          const body = await parseJson(request);
-          const input: CmsEntryMutationInput = {
-            ...context,
-            entryId: requiredString(params.entryId, "entryId"),
-            expectedRevision: optionalNumber(body.expectedRevision, "expectedRevision")!,
-            ...(body.changeSummary === undefined
-              ? {}
-              : { changeSummary: optionalString(body.changeSummary, "changeSummary") }),
-          };
-          return { body: { entry: apiAdminEntry(await cms.deleteEntry(input)) } };
-        },
-        { resourceParam: "entryId" },
-      ),
-    },
-    "/admin/entries/:entryId/publish": {
-      POST: secure(
-        "entry:publish",
-        "entry",
-        async (request, params, context) => ({
-          body: {
-            entry: apiAdminEntry(
-              await cms.publish({
-                ...context,
-                entryId: requiredString(params.entryId, "entryId"),
-                ...await mutationInput(request),
-              }),
-            ),
-          },
-        }),
-        { resourceParam: "entryId" },
-      ),
-    },
-    "/admin/entries/:entryId/unpublish": {
-      POST: secure(
-        "entry:unpublish",
-        "entry",
-        async (request, params, context) => ({
-          body: {
-            entry: apiAdminEntry(
-              await cms.unpublish({
-                ...context,
-                entryId: requiredString(params.entryId, "entryId"),
-                ...await mutationInput(request),
-              }),
-            ),
-          },
-        }),
-        { resourceParam: "entryId" },
-      ),
-    },
-    "/admin/entries/:entryId/schedule": {
-      POST: secure(
-        "entry:schedule",
-        "entry",
-        async (request, params, context) => {
-          const body = await parseJson(request);
-          const input: CmsScheduleEntryInput = {
-            ...context,
-            entryId: requiredString(params.entryId, "entryId"),
-            expectedRevision: optionalNumber(body.expectedRevision, "expectedRevision")!,
-            publishAt: new Date(requiredString(body.publishAt, "publishAt", 100)),
-            timeZone: requiredString(body.timeZone, "timeZone", 100),
-            ...(body.changeSummary === undefined
-              ? {}
-              : { changeSummary: optionalString(body.changeSummary, "changeSummary") }),
-          };
-          return { body: { entry: apiAdminEntry(await cms.schedulePublish(input)) } };
-        },
-        { resourceParam: "entryId" },
-      ),
-    },
-    "/admin/entries/:entryId/unschedule": {
-      POST: secure(
-        "entry:unschedule",
-        "entry",
-        async (request, params, context) => ({
-          body: {
-            entry: apiAdminEntry(
-              await cms.unschedule({
-                ...context,
-                entryId: requiredString(params.entryId, "entryId"),
-                ...await mutationInput(request),
-              }),
-            ),
-          },
-        }),
-        { resourceParam: "entryId" },
-      ),
-    },
-    "/admin/entries/:entryId/archive": {
-      POST: secure(
-        "entry:archive",
-        "entry",
-        async (request, params, context) => ({
-          body: {
-            entry: apiAdminEntry(
-              await cms.archive({
-                ...context,
-                entryId: requiredString(params.entryId, "entryId"),
-                ...await mutationInput(request),
-              }),
-            ),
-          },
-        }),
-        { resourceParam: "entryId" },
-      ),
-    },
-    "/admin/entries/:entryId/restore": {
-      POST: secure(
-        "entry:restore",
-        "entry",
-        async (request, params, context) => {
-          const body = await parseJson(request);
-          const input: CmsRestoreRevisionInput = {
-            ...context,
-            entryId: requiredString(params.entryId, "entryId"),
-            expectedRevision: optionalNumber(body.expectedRevision, "expectedRevision")!,
-            revisionId: requiredString(body.revisionId, "revisionId"),
-            ...(body.changeSummary === undefined
-              ? {}
-              : { changeSummary: optionalString(body.changeSummary, "changeSummary") }),
-          };
-          return { body: { entry: apiAdminEntry(await cms.restoreRevision(input)) } };
-        },
-        { resourceParam: "entryId" },
-      ),
-    },
-    "/admin/entries/:entryId/revisions": {
-      GET: secure(
-        "revision:read",
-        "revision",
-        async (request, params, context) => {
-          const url = new URL(request.url);
-          const revisions = await cms.listRevisions({
-            ...context,
-            entryId: requiredString(params.entryId, "entryId"),
-            first: positiveInteger(url.searchParams.get("first") ?? undefined, "first", 100, 500),
-          });
-          return { body: { revisions: revisions.map(apiRevision) } };
-        },
-        { resourceParam: "entryId" },
-      ),
-    },
-    "/admin/entries/:entryId/translations": {
-      GET: secure(
-        "entry:read",
-        "entry",
-        async (request, params, context) => {
-          const entry = await cms.getEntry({
-            ...context,
-            entryId: requiredString(params.entryId, "entryId"),
-            visibility: "admin",
-          });
-          const url = new URL(request.url);
-          const page = await cms.listEntries({
-            ...context,
-            contentType: entry.contentTypeSlug,
-            visibility: "admin",
-            first: positiveInteger(url.searchParams.get("first") ?? undefined, "first", 100, 100),
-            filters: [
-              {
-                field: "translationGroupId",
-                operator: "eq",
-                value: entry.translationGroupId,
+        "admin",
+        async (request, _params, { cms }) => {
+          const {
+            locale,
+            expectedRevision,
+            changeSummary,
+          } = await dataFromBody(request, false);
+          if (expectedRevision === undefined) {
+            throw new CmsHttpError(400, "INVALID_REQUEST", "expectedRevision is required.");
+          }
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "delete",
+            {
+              expectedRevision,
+              ...(locale === undefined ? {} : { locale }),
+              ...(changeSummary === undefined ? {} : { changeSummary }),
+            },
+          );
+          routes[`/admin${base}/permanent`] = {
+            DELETE: secure(
+              collectionName,
+              "entry:delete",
+              "entry",
+              "admin",
+              async (request, _params, { cms }) => {
+                const mutation = mutationInputWithLocale(await parseJson(request));
+                await invoke(
+                  collectionService(cms, collectionName),
+                  "purge",
+                  mutation,
+                );
+                return { body: { purged: true } };
               },
-            ],
-          });
-          return { body: { page: JSON.parse(JSON.stringify(page)) as CmsApiEntryPage } };
+            ),
+          };
+          return {
+            body: { document: apiDocument(options, collectionName, result, "admin") },
+          };
         },
-        { resourceParam: "entryId" },
-      ),
-    },
-    "/admin/relationships": {
-      GET: secure("entry:read", "entry", async (request, _params, context) => {
-        const url = new URL(request.url);
-        const contentType = requiredString(url.searchParams.get("contentType"), "contentType");
-        const fieldPath = requiredString(url.searchParams.get("fieldPath"), "fieldPath");
-        const record = await cms.getContentType({ ...context, slug: contentType });
-        const field = findRelationshipField(
-          record.fields,
-          fieldPath.split(".").filter(Boolean),
+      );
+      const singletonBase = `/admin${base}`;
+      addSingletonLifecycleRoute(
+        collectionName,
+        singletonBase,
+        "archive",
+        "entry:archive",
+        "archive",
+        mutationInputWithLocale,
+      );
+      if (hasDrafts) {
+        addSingletonLifecycleRoute(
+          collectionName,
+          singletonBase,
+          "publish",
+          "entry:publish",
+          "publish",
+          mutationInputWithLocale,
         );
-        if (field?.type !== "relationship" || !field.relation) {
-          throw new CmsHttpError(400, "INVALID_REQUEST", "fieldPath must identify a relationship field.");
-        }
-        const first = positiveInteger(url.searchParams.get("first") ?? undefined, "first", 25, 100);
-        const locale = url.searchParams.has("locale")
-          ? requiredString(url.searchParams.get("locale"), "locale", 100)
-          : undefined;
-        if (field.relation.sameLocale && !locale) {
-          throw new CmsHttpError(
-            400,
-            "INVALID_REQUEST",
-            "locale is required for same-locale relationships.",
+        addSingletonLifecycleRoute(
+          collectionName,
+          singletonBase,
+          "unpublish",
+          "entry:unpublish",
+          "unpublish",
+          mutationInputWithLocale,
+        );
+        addSingletonLifecycleRoute(
+          collectionName,
+          singletonBase,
+          "restore",
+          "entry:restore",
+          "restoreRevision",
+          restoreInputFromBody,
+        );
+        routes[`${singletonBase}/revisions`] = {
+          GET: secure(
+            collectionName,
+            "revision:read",
+            "revision",
+            "admin",
+            async (request, _params, { cms }) => {
+              const url = new URL(request.url);
+              const first = positiveInteger(
+                url.searchParams.get("first") ?? undefined,
+                "first",
+                100,
+                500,
+              );
+              const input = {
+                first,
+                ...(url.searchParams.has("locale")
+                  ? { locale: requiredString(url.searchParams.get("locale"), "locale", 100) }
+                  : {}),
+              };
+              const revisions = await invoke(
+                collectionService(cms, collectionName),
+                "listRevisions",
+                input,
+              );
+              if (!Array.isArray(revisions)) {
+                throw new CmsHttpError(500, "INTERNAL", "The CMS returned invalid revisions.");
+              }
+              return { body: { revisions: revisions.map(apiRevision) } };
+            },
+          ),
+        };
+        if (options.scheduler) {
+          addSingletonLifecycleRoute(
+            collectionName,
+            singletonBase,
+            "schedule",
+            "entry:schedule",
+            "schedulePublish",
+            scheduleInputFromBody,
+          );
+          addSingletonLifecycleRoute(
+            collectionName,
+            singletonBase,
+            "unschedule",
+            "entry:unschedule",
+            "unschedule",
+            mutationInputWithLocale,
           );
         }
-        const search = optionalString(url.searchParams.get("search") ?? undefined, "search");
-        const targetTypes = field.relation.targetTypes;
-        const pages = await Promise.all(
-          targetTypes.map(async (targetType) => ({
-            targetType,
-            page: await cms.listEntries({
-              ...context,
-              contentType: targetType,
-              ...(locale ? { locale } : {}),
-              ...(search ? { search } : {}),
-              visibility: "admin",
-              first,
-              filters: [
-                field.relation?.allowedStatuses
-                  ? {
-                      field: "status",
-                      operator: "in" as const,
-                      value: field.relation.allowedStatuses,
-                    }
-                  : {
-                      field: "status",
-                      operator: "ne" as const,
-                      value: "archived",
-                    },
-              ],
-            }),
-          })),
-        );
-        const items: CmsRelationshipOption[] = pages.flatMap(({ targetType, page }) =>
-          page.items.map((entry) => ({
-            contentType: targetType,
-            entry: apiAdminEntry(entry),
-          })),
-        );
-        return {
-          body: {
-            targetTypes,
-            items,
-          } satisfies CmsRelationshipLookupResult,
+      }
+      if (localized) {
+        routes[`${singletonBase}/translations`] = {
+          GET: secure(
+            collectionName,
+            "entry:read",
+            "entry",
+            "admin",
+            async (request, _params, { cms }) => {
+              const url = new URL(request.url);
+              const { locale: _locale, ...query } = readQueryInput(url);
+              const page = await invoke(
+                collectionService(cms, collectionName),
+                "listLocaleVariants",
+                query,
+              );
+              return {
+                body: { page: apiPage(options, collectionName, page, "admin") },
+              };
+            },
+          ),
+          POST: secure(
+            collectionName,
+            "entry:create",
+            "entry",
+            "admin",
+            async (request, _params, { cms }) => {
+              const { data, locale, changeSummary } = await dataFromBody(request);
+              if (!locale) {
+                throw new CmsHttpError(400, "INVALID_REQUEST", "locale is required.");
+              }
+              const result = await invoke(
+                collectionService(cms, collectionName),
+                "createTranslation",
+                data!,
+                { locale, ...(changeSummary === undefined ? {} : { changeSummary }) },
+              );
+              return {
+                body: { document: apiDocument(options, collectionName, result, "admin") },
+                status: 201,
+              };
+            },
+          ),
         };
-      }),
-    },
-    "/admin/audit": {
-      GET: secure("audit:read", "audit", async (request, _params, context) => {
-        const url = new URL(request.url);
-        const events = await cms.listAuditEvents({
-          ...context,
-          first: positiveInteger(url.searchParams.get("first") ?? undefined, "first", 100, 500),
-          ...(url.searchParams.has("resourceId")
-            ? { resourceId: requiredString(url.searchParams.get("resourceId"), "resourceId") }
-            : {}),
-        });
-        return { body: { events: events.map(apiAuditEvent) } };
-      }),
-    },
-    "/public/entries": {
+      }
+    }
+    if (!singleton) routes[`/admin${base}/:documentId`] = {
       GET: secure(
+        collectionName,
         "entry:read",
         "entry",
-        async (request, _params, context) => {
-          const url = new URL(request.url);
-          const filters = readFilters(url);
-          const orderBy = readOrderBy(url);
-          const query: CmsEntryQuery = {
-            ...context,
-            contentType: requiredString(url.searchParams.get("contentType"), "contentType"),
-            visibility: "public",
-            first: positiveInteger(url.searchParams.get("first") ?? undefined, "first", 25, 100),
-            ...(url.searchParams.has("locale")
-              ? { locale: requiredString(url.searchParams.get("locale"), "locale", 100) }
-              : {}),
-            ...(url.searchParams.has("search")
-              ? { search: optionalString(url.searchParams.get("search"), "search") }
-              : {}),
-            ...(url.searchParams.has("after")
-              ? { after: requiredString(url.searchParams.get("after"), "after", 10_000) }
-              : {}),
-            ...(filters ? { filters } : {}),
-            ...(orderBy ? { orderBy } : {}),
-          };
-          return { body: { page: publicPage(await cms.listEntries(query)) } };
+        "admin",
+        async (_request, params, { cms }) => {
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "findById",
+            requiredString(params.documentId, "documentId"),
+            { visibility: "admin" },
+          );
+          return { body: { document: apiDocument(options, collectionName, result, "admin") } };
         },
-        { visibility: "public" },
+        "documentId",
       ),
-    },
-    "/public/entries/:entryId": {
-      GET: secure(
-        "entry:read",
+      PATCH: secure(
+        collectionName,
+        "entry:update",
         "entry",
-        async (_request, params, context) => {
-          const entry = await cms.getEntry({
-            ...context,
-            entryId: requiredString(params.entryId, "entryId"),
-            visibility: "public",
-          });
-          return { body: { entry: publicEntry(entry) } };
+        "admin",
+        async (request, params, { cms }) => {
+          const {
+            data,
+            slug,
+            expectedRevision,
+            changeSummary,
+          } = await dataFromBody(request);
+          if (expectedRevision === undefined) {
+            throw new CmsHttpError(400, "INVALID_REQUEST", "expectedRevision is required.");
+          }
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "update",
+            requiredString(params.documentId, "documentId"),
+            data!,
+            {
+              expectedRevision,
+              ...(slug === undefined ? {} : { slug }),
+              ...(changeSummary === undefined ? {} : { changeSummary }),
+            },
+          );
+          return { body: { document: apiDocument(options, collectionName, result, "admin") } };
         },
-        { visibility: "public", resourceParam: "entryId" },
+        "documentId",
       ),
-    },
-    "/public/entries/by-slug/:contentType/:locale/:slug": {
+      DELETE: secure(
+        collectionName,
+        "entry:delete",
+        "entry",
+        "admin",
+        async (request, params, { cms }) => {
+          const mutation = mutationInputFromBody(await parseJson(request));
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "delete",
+            requiredString(params.documentId, "documentId"),
+            mutation,
+          );
+          return { body: { document: apiDocument(options, collectionName, result, "admin") } };
+        },
+        "documentId",
+      ),
+    };
+    if (!singleton) {
+      routes[`/admin${base}/:documentId/permanent`] = {
+        DELETE: secure(
+          collectionName,
+          "entry:delete",
+          "entry",
+          "admin",
+          async (request, params, { cms }) => {
+            const mutation = mutationInputFromBody(await parseJson(request));
+            await invoke(
+              collectionService(cms, collectionName),
+              "purge",
+              requiredString(params.documentId, "documentId"),
+              mutation,
+            );
+            return { body: { purged: true } };
+          },
+          "documentId",
+        ),
+      };
+    }
+    if (slugLookup) routes[`/admin${base}/by-slug/:slug`] = {
       GET: secure(
+        collectionName,
         "entry:read",
         "entry",
-        async (request, params, context) => {
+        "admin",
+        async (request, params, { cms }) => {
           const url = new URL(request.url);
+          const locale = url.searchParams.has("locale")
+            ? requiredString(url.searchParams.get("locale"), "locale", 100)
+            : undefined;
           const fallbackLocales = readLocaleFallbacks(url);
-          const entry = await cms.findEntry({
-            ...context,
-            contentType: requiredString(params.contentType, "contentType"),
-            locale: requiredString(params.locale, "locale", 100),
-            slug: requiredString(params.slug, "slug"),
-            ...(fallbackLocales ? { fallbackLocales } : {}),
-            visibility: "public",
-          });
-          return { body: { entry: publicEntry(entry) } };
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "findBySlug",
+            requiredString(params.slug, "slug"),
+            {
+              ...(locale === undefined ? {} : { locale }),
+              ...(fallbackLocales === undefined ? {} : { fallbackLocales }),
+              visibility: "admin",
+            },
+          );
+          return { body: { document: apiDocument(options, collectionName, result, "admin") } };
         },
-        { visibility: "public" },
       ),
-    },
-    "/scheduler/publications": {
-      POST: secure("entry:publish", "entry", async (request, _params, context) => {
+    };
+    if (!singleton) {
+      const adminCollectionBase = `/admin${base}`;
+      const itemBase = `${adminCollectionBase}/:documentId`;
+      addEntryLifecycleRoute(
+        collectionName,
+        adminCollectionBase,
+        "archive",
+        "entry:archive",
+        "archive",
+        mutationInputFromBody,
+      );
+      if (hasDrafts) {
+        addEntryLifecycleRoute(
+          collectionName,
+          adminCollectionBase,
+          "publish",
+          "entry:publish",
+          "publish",
+          mutationInputFromBody,
+        );
+        addEntryLifecycleRoute(
+          collectionName,
+          adminCollectionBase,
+          "unpublish",
+          "entry:unpublish",
+          "unpublish",
+          mutationInputFromBody,
+        );
+        addEntryLifecycleRoute(
+          collectionName,
+          adminCollectionBase,
+          "restore",
+          "entry:restore",
+          "restoreRevision",
+          restoreInputFromBody,
+        );
+        routes[`${itemBase}/revisions`] = {
+          GET: secure(
+            collectionName,
+            "revision:read",
+            "revision",
+            "admin",
+            async (request, params, { cms }) => {
+              const first = positiveInteger(
+                new URL(request.url).searchParams.get("first") ?? undefined,
+                "first",
+                100,
+                500,
+              );
+              const revisions = await invoke(
+                collectionService(cms, collectionName),
+                "listRevisions",
+                requiredString(params.documentId, "documentId"),
+                { first },
+              );
+              if (!Array.isArray(revisions)) {
+                throw new CmsHttpError(500, "INTERNAL", "The CMS returned invalid revisions.");
+              }
+              return { body: { revisions: revisions.map(apiRevision) } };
+            },
+            "documentId",
+          ),
+        };
+        if (options.scheduler) {
+          addEntryLifecycleRoute(
+            collectionName,
+            adminCollectionBase,
+            "schedule",
+            "entry:schedule",
+            "schedulePublish",
+            scheduleInputFromBody,
+          );
+          addEntryLifecycleRoute(
+            collectionName,
+            adminCollectionBase,
+            "unschedule",
+            "entry:unschedule",
+            "unschedule",
+            mutationInputFromBody,
+          );
+        }
+      }
+      if (localized) {
+        routes[`${itemBase}/translations`] = {
+          GET: secure(
+            collectionName,
+            "entry:read",
+            "entry",
+            "admin",
+            async (request, params, { cms }) => {
+              const url = new URL(request.url);
+              const { locale: _locale, ...query } = readQueryInput(url);
+              const limit = positiveInteger(
+                url.searchParams.get("first") ?? undefined,
+                "first",
+                query.limit ?? 25,
+                100,
+              );
+              const page = await invoke(
+                collectionService(cms, collectionName),
+                "listLocaleVariants",
+                requiredString(params.documentId, "documentId"),
+                { ...query, limit, visibility: "admin" },
+              );
+              return {
+                body: { page: apiPage(options, collectionName, page, "admin") },
+              };
+            },
+            "documentId",
+          ),
+          POST: secure(
+            collectionName,
+            "entry:create",
+            "entry",
+            "admin",
+            async (request, params, { cms }) => {
+              const { data, slug, locale, changeSummary } = await dataFromBody(request);
+              if (!locale) {
+                throw new CmsHttpError(400, "INVALID_REQUEST", "locale is required.");
+              }
+              const result = await invoke(
+                collectionService(cms, collectionName),
+                "createTranslation",
+                requiredString(params.documentId, "documentId"),
+                data!,
+                {
+                  locale,
+                  ...(slug === undefined ? {} : { slug }),
+                  ...(changeSummary === undefined ? {} : { changeSummary }),
+                },
+              );
+              return {
+                body: {
+                  document: apiDocument(options, collectionName, result, "admin"),
+                },
+                status: 201,
+              };
+            },
+            "documentId",
+          ),
+        };
+      }
+    }
+    routes[`/public${base}`] = {
+      GET: secure(
+        collectionName,
+        "entry:read",
+        "entry",
+        "public",
+        async (request, _params, { cms }) => {
+          const url = new URL(request.url);
+          if (singleton) {
+            const locale = url.searchParams.has("locale")
+              ? requiredString(url.searchParams.get("locale"), "locale", 100)
+              : undefined;
+            const result = await invoke(
+              collectionService(cms, collectionName),
+              "find",
+              { ...(locale === undefined ? {} : { locale }), visibility: "public" },
+            );
+            return {
+              body: {
+                document: apiDocument(options, collectionName, result, "public"),
+              },
+            };
+          }
+          const query = readQueryInput(url);
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "find",
+            { ...query, visibility: "public" },
+          );
+          return { body: { page: apiPage(options, collectionName, result, "public") } };
+        },
+      ),
+    };
+    if (!singleton) routes[`/public${base}/:documentId`] = {
+      GET: secure(
+        collectionName,
+        "entry:read",
+        "entry",
+        "public",
+        async (_request, params, { cms }) => {
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "findById",
+            requiredString(params.documentId, "documentId"),
+            { visibility: "public" },
+          );
+          return { body: { document: apiDocument(options, collectionName, result, "public") } };
+        },
+        "documentId",
+      ),
+    };
+    if (slugLookup) routes[`/public${base}/by-slug/:slug`] = {
+      GET: secure(
+        collectionName,
+        "entry:read",
+        "entry",
+        "public",
+        async (request, params, { cms }) => {
+          const url = new URL(request.url);
+          const locale = url.searchParams.has("locale")
+            ? requiredString(url.searchParams.get("locale"), "locale", 100)
+            : undefined;
+          const fallbackLocales = readLocaleFallbacks(url);
+          const result = await invoke(
+            collectionService(cms, collectionName),
+            "findBySlug",
+            requiredString(params.slug, "slug"),
+            {
+              ...(locale === undefined ? {} : { locale }),
+              ...(fallbackLocales === undefined ? {} : { fallbackLocales }),
+              visibility: "public",
+            },
+          );
+          return { body: { document: apiDocument(options, collectionName, result, "public") } };
+        },
+      ),
+    };
+  }
+
+  if (changeEventsEnabled) {
+    routes["/admin/change-events"] = {
+      GET: secure(
+        "change-events",
+        "change-event:read",
+        "changeEvent",
+        "admin",
+        async (request, _params, { cms }) => {
+          const url = new URL(request.url);
+          const first = positiveInteger(
+            url.searchParams.get("first") ?? undefined,
+            "first",
+            100,
+            500,
+          );
+          const after = optionalString(
+            url.searchParams.get("after") ?? undefined,
+            "after",
+            4_096,
+          );
+          const page = await invokeNamespace(cms, "events", "list", {
+            first,
+            ...(after === undefined ? {} : { after }),
+          });
+          return { body: apiChangeEventPage(page) };
+        },
+      ),
+    };
+    routes["/admin/change-events/:eventId/ack"] = {
+      POST: secure(
+        "change-events",
+        "change-event:ack",
+        "changeEvent",
+        "admin",
+        async (request, params, { cms }) => {
+          const input = mutationInputFromBody(await parseJson(request));
+          await invokeNamespace(
+            cms,
+            "events",
+            "acknowledge",
+            requiredString(params.eventId, "eventId"),
+            { expectedRevision: input.expectedRevision },
+          );
+          return { body: { acknowledged: true } };
+        },
+        "eventId",
+      ),
+    };
+  }
+
+  routes["/scheduler/publications"] = {
+    POST: secure(
+      "scheduler",
+      "entry:publish",
+      "entry",
+      "admin",
+      async (request, _params, { context, cms }) => {
         const body = await parseJson(request);
+        rejectClientIdentity(body);
         if (!isRecord(body.publication)) {
           throw new CmsHttpError(400, "INVALID_REQUEST", "publication is required.");
         }
-        const publicationBody = body.publication;
-        const entryId = requiredString(publicationBody.entryId, "publication.entryId");
-        const scheduledRevisionNumber = optionalNumber(
-          publicationBody.scheduledRevisionNumber,
-          "publication.scheduledRevisionNumber",
-        );
-        if (scheduledRevisionNumber === undefined) {
+        const input = body.publication;
+        const entryId = requiredString(input.entryId, "publication.entryId");
+        const revisionNumber = input.scheduledRevisionNumber;
+        if (
+          typeof revisionNumber !== "number" ||
+          !Number.isInteger(revisionNumber) ||
+          revisionNumber < 1
+        ) {
           throw new CmsHttpError(
             400,
             "INVALID_REQUEST",
-            "publication.scheduledRevisionNumber is required.",
+            "publication.scheduledRevisionNumber must be a positive integer.",
           );
         }
-        const publication: CmsScheduledPublication = {
-          id: `${entryId}:${scheduledRevisionNumber}`,
-          tenantId: context.tenantId,
+        const publishAt = new Date(
+          requiredString(input.publishAt, "publication.publishAt", 100),
+        );
+        if (!Number.isFinite(publishAt.getTime())) {
+          throw new CmsHttpError(
+            400,
+            "INVALID_REQUEST",
+            "publication.publishAt must be a valid date.",
+          );
+        }
+        const publication = {
           entryId,
-          scheduledRevisionNumber,
-          publishAt: new Date(requiredString(publicationBody.publishAt, "publication.publishAt", 100)),
-          timeZone: requiredString(publicationBody.timeZone, "publication.timeZone", 100),
+          scheduledRevisionNumber: revisionNumber,
+          publishAt,
+          timeZone: requiredString(input.timeZone, "publication.timeZone", 100),
         };
-        const result = await cms.publishScheduled({ ...context, publication });
+        const result = await invokeScheduler(cms, publication);
         return {
-          body: {
-            ...result,
-            ...(result.published
-              ? { entry: apiAdminEntry(result.entry) }
-              : {}),
-          },
+          body: apiScheduledPublicationResult(options, result),
         };
-      }),
-    },
+      },
+    ),
   };
+
   if (webhooks && webhookService) {
     const secretReference = async (
       input: Parameters<typeof webhooks.resolveSecretRef>[0],
     ): Promise<string> => {
       const value = await webhooks.resolveSecretRef(input);
       if (typeof value !== "string" || !value.trim() || value.length > 500) {
-        throw new TypeError("The host webhook secret reference resolver returned an invalid reference.");
+        throw new TypeError("The host secret reference resolver returned an invalid reference.");
       }
       return value;
     };
     routes["/admin/webhooks"] = {
-      GET: secure("webhook:read", "webhook", async (_request, _params, context) => ({
-        body: { subscriptions: (await webhookService.listSubscriptions(context)).map(apiWebhookSubscription) },
-      })),
-      POST: secure("webhook:manage", "webhook", async (request, _params, context) => {
-        const input = webhookSubscriptionInput(await parseJson(request));
-        await webhookService.assertCanManage(context);
-        const secretRef = await secretReference({ context, request, purpose: "create" });
-        const subscription = await webhookService.createSubscription({ ...context, ...input, secretRef });
-        return { status: 201, body: { subscription: apiWebhookSubscription(subscription) } };
-      }),
+      GET: secure(
+        "webhooks",
+        "webhook:read",
+        "webhook",
+        "admin",
+        async (_request, _params, { context }) => ({
+          body: {
+            subscriptions: (await webhookService.listSubscriptions(context))
+              .map(apiWebhookSubscription),
+          },
+        }),
+      ),
+      POST: secure(
+        "webhooks",
+        "webhook:manage",
+        "webhook",
+        "admin",
+        async (request, _params, { context }) => {
+          const input = webhookSubscriptionInput(await parseJson(request));
+          await webhookService.assertCanManage(context);
+          const secretRef = await secretReference({
+            context,
+            request,
+            purpose: "create",
+          });
+          const subscription = await webhookService.createSubscription({
+            ...context,
+            ...input,
+            secretRef,
+          });
+          return {
+            status: 201,
+            body: { subscription: apiWebhookSubscription(subscription) },
+          };
+        },
+      ),
     };
     routes["/admin/webhooks/:subscriptionId"] = {
-      GET: secure("webhook:read", "webhook", async (_request, params, context) => ({
-        body: {
-          subscription: apiWebhookSubscription(await webhookService.getSubscription({
-            ...context, subscriptionId: requiredString(params.subscriptionId, "subscriptionId"),
-          })),
+      GET: secure(
+        "webhooks",
+        "webhook:read",
+        "webhook",
+        "admin",
+        async (_request, params, { context }) => ({
+          body: {
+            subscription: apiWebhookSubscription(
+              await webhookService.getSubscription({
+                ...context,
+                subscriptionId: requiredString(params.subscriptionId, "subscriptionId"),
+              }),
+            ),
+          },
+        }),
+        "subscriptionId",
+      ),
+      PATCH: secure(
+        "webhooks",
+        "webhook:manage",
+        "webhook",
+        "admin",
+        async (request, params, { context }) => {
+          const subscriptionId = requiredString(params.subscriptionId, "subscriptionId");
+          const body = await parseJson(request);
+          const input = webhookSubscriptionInput(body);
+          const expectedRevision = positiveInteger(
+            body.expectedRevision === undefined
+              ? undefined
+              : String(body.expectedRevision),
+            "expectedRevision",
+            0,
+            Number.MAX_SAFE_INTEGER,
+          );
+          if (expectedRevision < 1) {
+            throw new CmsHttpError(400, "INVALID_REQUEST", "expectedRevision is required.");
+          }
+          if (body.rotateSecret !== undefined && typeof body.rotateSecret !== "boolean") {
+            throw new CmsHttpError(400, "INVALID_REQUEST", "rotateSecret must be a boolean.");
+          }
+          const current = await webhookService.getSubscription({
+            ...context,
+            subscriptionId,
+          });
+          await webhookService.assertCanManage({ ...context, subscriptionId });
+          if (current.revision !== expectedRevision) {
+            throw new CmsHttpError(
+              409,
+              "CONFLICT",
+              "The webhook subscription changed since it was read.",
+            );
+          }
+          const secretRef = body.rotateSecret === true
+            ? await secretReference({
+                context,
+                request,
+                purpose: "rotate",
+                subscriptionId,
+              })
+            : current.secretRef;
+          const subscription = await webhookService.updateSubscription({
+            ...context,
+            ...input,
+            subscriptionId,
+            expectedRevision,
+            secretRef,
+          });
+          return { body: { subscription: apiWebhookSubscription(subscription) } };
         },
-      }), { resourceParam: "subscriptionId" }),
-      PATCH: secure("webhook:manage", "webhook", async (request, params, context) => {
-        const subscriptionId = requiredString(params.subscriptionId, "subscriptionId");
-        const body = await parseJson(request);
-        const input = webhookSubscriptionInput(body);
-        const expectedRevision = optionalNumber(body.expectedRevision, "expectedRevision");
-        if (expectedRevision === undefined) {
-          throw new CmsHttpError(400, "INVALID_REQUEST", "expectedRevision is required.");
-        }
-        if (body.rotateSecret !== undefined && typeof body.rotateSecret !== "boolean") {
-          throw new CmsHttpError(400, "INVALID_REQUEST", "rotateSecret must be a boolean.");
-        }
-        const current = await webhookService.getSubscription({ ...context, subscriptionId });
-        await webhookService.assertCanManage({ ...context, subscriptionId });
-        if (current.revision !== expectedRevision) {
-          throw new CmsHttpError(409, "CONFLICT", "The webhook subscription changed since it was read.");
-        }
-        const secretRef = body.rotateSecret === true
-          ? await secretReference({ context, request, purpose: "rotate", subscriptionId })
-          : current.secretRef;
-        const subscription = await webhookService.updateSubscription({
-          ...context, ...input, subscriptionId, expectedRevision, secretRef,
-        });
-        return { body: { subscription: apiWebhookSubscription(subscription) } };
-      }, { resourceParam: "subscriptionId" }),
+        "subscriptionId",
+      ),
     };
     routes["/admin/webhooks/:subscriptionId/deliveries"] = {
-      GET: secure("webhook:read", "webhook", async (request, params, context) => {
-        const first = positiveInteger(new URL(request.url).searchParams.get("first") ?? undefined, "first", 100, 500);
-        const deliveries = await webhookService.listDeliveries({
-          ...context, subscriptionId: requiredString(params.subscriptionId, "subscriptionId"), first,
-        });
-        return { body: { deliveries: deliveries.map(apiWebhookDelivery) } };
-      }, { resourceParam: "subscriptionId" }),
+      GET: secure(
+        "webhooks",
+        "webhook:read",
+        "webhook",
+        "admin",
+        async (request, params, { context }) => {
+          const first = positiveInteger(
+            new URL(request.url).searchParams.get("first") ?? undefined,
+            "first",
+            100,
+            500,
+          );
+          const deliveries = await webhookService.listDeliveries({
+            ...context,
+            subscriptionId: requiredString(params.subscriptionId, "subscriptionId"),
+            first,
+          });
+          return { body: { deliveries: deliveries.map(apiWebhookDelivery) } };
+        },
+        "subscriptionId",
+      ),
     };
     routes["/admin/webhook-deliveries/:deliveryId/attempts"] = {
-      GET: secure("webhook:read", "webhook", async (request, params, context) => {
-        const first = positiveInteger(new URL(request.url).searchParams.get("first") ?? undefined, "first", 100, 500);
-        const attempts = await webhookService.listAttempts({
-          ...context, deliveryId: requiredString(params.deliveryId, "deliveryId"), first,
-        });
-        return { body: { attempts: attempts.map(apiWebhookAttempt) } };
-      }, { resourceParam: "deliveryId" }),
+      GET: secure(
+        "webhooks",
+        "webhook:read",
+        "webhook",
+        "admin",
+        async (request, params, { context }) => {
+          const first = positiveInteger(
+            new URL(request.url).searchParams.get("first") ?? undefined,
+            "first",
+            100,
+            500,
+          );
+          const attempts = await webhookService.listAttempts({
+            ...context,
+            deliveryId: requiredString(params.deliveryId, "deliveryId"),
+            first,
+          });
+          return { body: { attempts: attempts.map(apiWebhookAttempt) } };
+        },
+        "deliveryId",
+      ),
     };
     routes["/admin/webhook-deliveries/:deliveryId/retry"] = {
-      POST: secure("webhook:manage", "webhook", async (request, params, context) => {
-        const body = await parseJson(request);
-        const expectedRevision = optionalNumber(body.expectedRevision, "expectedRevision");
-        if (expectedRevision === undefined) {
-          throw new CmsHttpError(400, "INVALID_REQUEST", "expectedRevision is required.");
-        }
-        await webhookService.retryDelivery({
-          ...context, deliveryId: requiredString(params.deliveryId, "deliveryId"), expectedRevision,
-        });
-        return { body: { retried: true } };
-      }, { resourceParam: "deliveryId" }),
+      POST: secure(
+        "webhooks",
+        "webhook:manage",
+        "webhook",
+        "admin",
+        async (request, params, { context }) => {
+          const body = await parseJson(request);
+          rejectClientIdentity(body);
+          const expectedRevision = positiveInteger(
+            body.expectedRevision === undefined
+              ? undefined
+              : String(body.expectedRevision),
+            "expectedRevision",
+            0,
+            Number.MAX_SAFE_INTEGER,
+          );
+          if (expectedRevision < 1) {
+            throw new CmsHttpError(400, "INVALID_REQUEST", "expectedRevision is required.");
+          }
+          await webhookService.retryDelivery({
+            ...context,
+            deliveryId: requiredString(params.deliveryId, "deliveryId"),
+            expectedRevision,
+          });
+          return { body: { retried: true } };
+        },
+        "deliveryId",
+      ),
     };
   }
+
   const routeMap = Object.fromEntries(
     Object.entries(routes).map(([route, handlers]) => [
       `${basePath}${route}`,
@@ -1187,26 +2047,4 @@ export const createCmsServer = (options: CmsServerOptions): CmsServer => {
   };
 
   return { routes: routeMap, dispatch };
-
-  async function mutationInput(request: Request): Promise<
-    Pick<CmsEntryMutationInput, "expectedRevision" | "changeSummary">
-  > {
-    const body = await parseJson(request);
-    return {
-      expectedRevision: optionalNumber(body.expectedRevision, "expectedRevision")!,
-      ...(body.changeSummary === undefined
-        ? {}
-        : { changeSummary: optionalString(body.changeSummary, "changeSummary") }),
-    };
-  }
-};
-
-export type {
-  CmsApiDate,
-  CmsApiMediaUsage,
-  CmsApiPublishedSnapshot,
-  CmsApiScheduleEntryInput,
-  CmsApiPublication,
-  CmsPublishedEntryPage,
-  CmsPublishedEntry,
 };

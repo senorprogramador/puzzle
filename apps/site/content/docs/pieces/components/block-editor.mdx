@@ -7,7 +7,7 @@ import { Preview } from "@puzzle-ui/ui";
 import { BlockEditorExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
 import { BlockEditor } from "@puzzle-ui/pieces";
 
-`BlockEditor` edits arrays of serializable `{ type, fields }` values using caller-provided `CmsBlockDefinition` records. It never stores HTML as the canonical document. Use `renderBlock` to map known field definitions to specialized controls; otherwise fields remain editable as JSON.
+`BlockEditor` edits arrays of serializable `{ type, fields }` values using caller-provided `CmsBlockDefinition` records with keyed field descriptors. It never stores HTML as the canonical document. Use `renderBlock` to map known field definitions to specialized controls; otherwise fields remain editable as JSON.
 
 <Preview fit="device" code={`<BlockEditor label="Article blocks" definitions={blockDefinitions} value={blocks} onChange={setBlocks} />`}>
   <BlockEditorExample />
@@ -19,8 +19,8 @@ import { BlockEditor } from "@puzzle-ui/pieces";
 |---|---|---:|---|
 | `label` | `ReactNode` | Yes | — |
 | `definitions` | `readonly CmsBlockDefinition[]` | Yes | — |
-| `value` | `readonly CmsValue[]` | Yes | — |
-| `onChange` | `(value: CmsValue[]) => void` | Yes | — |
+| `value` | `readonly CmsBlockValue[]` | Yes | — |
+| `onChange` | `(value: CmsBlockValue[]) => void` | Yes | — |
 | `onInvalidDraftChange` | `(invalid: boolean) => void` | No | — |
 | `renderBlock` | `(definition, fields, onChange) => ReactNode` | No | JSON fields editor |
 | `disabled` | `boolean` | No | `false` |
@@ -32,7 +32,7 @@ import { BlockEditor } from "@puzzle-ui/pieces";
 
 <BlockEditor
   label="Page blocks"
-  definitions={contentType.fields.find((field) => field.key === "body")?.blocks ?? []}
+  definitions={blockDefinitions}
   value={blocks}
   onChange={setBlocks}
 />;

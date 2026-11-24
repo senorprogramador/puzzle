@@ -14,10 +14,12 @@ import {
   type StoragePage,
   type StorageQuery,
   type StorageRecord,
+  type StorageScalarFieldPath,
   type StorageUpdate,
   type StorageWhere,
   type StorageCapabilities,
   type StorageCapabilityReport,
+  validateFieldPath,
   validateQuery,
 } from "@puzzle-ui/storage";
 
@@ -39,6 +41,13 @@ type D1Row = {
 type CursorPayload = {
   readonly values: readonly unknown[];
 };
+
+const isCursorScalar = (value: unknown): boolean =>
+  value === null ||
+  typeof value === "string" ||
+  typeof value === "boolean" ||
+  (typeof value === "number" && Number.isFinite(value)) ||
+  (value instanceof Date && !Number.isNaN(value.getTime()));
 
 const DATE_MARKER = "__puzzle_storage_date__";
 
@@ -95,13 +104,38 @@ const deserialize = <T>(value: string): T =>
     return current;
   }) as T;
 
-const encodeCursor = (payload: CursorPayload): StorageCursor => ({
-  value: btoa(encodeURIComponent(JSON.stringify(payload))),
-});
+const encodeCursor = (payload: CursorPayload): StorageCursor => {
+  const values = payload.values.map((value) => value ?? null);
+
+  if (!values.every(isCursorScalar)) {
+    throw new StorageValidationError(
+      "D1 cursor sort values must be scalar values.",
+    );
+  }
+
+  return {
+    value: btoa(encodeURIComponent(JSON.stringify({ values }))),
+  };
+};
 
 const decodeCursor = (cursor: StorageCursor): CursorPayload => {
   try {
-    return JSON.parse(decodeURIComponent(atob(cursor.value))) as CursorPayload;
+    const payload = JSON.parse(
+      decodeURIComponent(atob(cursor.value)),
+    ) as unknown;
+
+    if (
+      typeof payload !== "object" ||
+      payload === null ||
+      Array.isArray(payload) ||
+      !("values" in payload) ||
+      !Array.isArray(payload.values) ||
+      !payload.values.every(isCursorScalar)
+    ) {
+      throw new Error("Invalid D1 cursor values.");
+    }
+
+    return { values: payload.values };
   } catch {
     throw new StorageValidationError("Invalid D1 cursor.");
   }
@@ -119,12 +153,16 @@ const quoteIdentifier = (value: string, allowHyphen = false): string => {
 };
 
 const jsonPath = (field: string): string => {
-  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(field)) {
-    throw new StorageValidationError(`Unsupported JSON field name: ${field}`);
-  }
-
-  return `$."${field}"`;
+  return `$${validateFieldPath(field)
+    .map((segment) => `.${JSON.stringify(segment)}`)
+    .join("")}`;
 };
+
+const isStoredRecordField = (field: string): boolean =>
+  field !== "id" &&
+  field !== "createdAt" &&
+  field !== "updatedAt" &&
+  field !== "revision";
 
 const sqlField = (field: string): string => {
   if (field === "id") return "id";
@@ -160,7 +198,73 @@ const buildComparison = (
     case "ne":
       return value === null
         ? { sql: `${column} IS NOT NULL`, values: [] }
-        : { sql: `${column} != ?`, values: [sqlValue(value)] };
+        : {
+            sql: `(${column} IS NULL OR ${column} != ?)`,
+            values: [sqlValue(value)],
+          };
+
+    case "contains": {
+      if (!isStoredRecordField(field)) {
+        return field === "id" && typeof value === "string"
+          ? {
+              sql: `instr(lower(${column}), lower(?)) > 0`,
+              values: [value],
+            }
+          : { sql: "0 = 1", values: [] };
+      }
+
+      const path = jsonPath(field);
+      const stringMatch =
+        typeof value === "string"
+          ? `(json_type(data, '${path}') = 'text' AND instr(lower(json_extract(data, '${path}')), lower(?)) > 0)`
+          : "0 = 1";
+
+      let arrayMatch: string;
+      let arrayValues: unknown[] = [];
+
+      if (value === null) {
+        arrayMatch = `EXISTS (
+          SELECT 1 FROM json_each(data, '${path}') AS __puzzle_contains
+          WHERE __puzzle_contains.type = 'null'
+        )`;
+      } else if (value instanceof Date) {
+        arrayMatch = `EXISTS (
+          SELECT 1 FROM json_each(data, '${path}') AS __puzzle_contains
+          WHERE __puzzle_contains.type = 'object'
+            AND json_extract(__puzzle_contains.value, '$."${DATE_MARKER}"') = ?
+        )`;
+        arrayValues = [value.toISOString()];
+      } else {
+        const type =
+          typeof value === "string"
+            ? "text"
+            : typeof value === "boolean"
+              ? value
+                ? "true"
+                : "false"
+              : typeof value === "number"
+                ? null
+                : "unsupported";
+
+        arrayMatch = `EXISTS (
+          SELECT 1 FROM json_each(data, '${path}') AS __puzzle_contains
+          WHERE ${
+            type === null
+              ? "__puzzle_contains.type IN ('integer', 'real') AND __puzzle_contains.value = ?"
+              : `__puzzle_contains.type = '${type}' AND __puzzle_contains.value = ?`
+          }
+        )`;
+        arrayValues = [typeof value === "boolean" ? Number(value) : value];
+      }
+
+      return {
+        sql: `(${stringMatch} OR (json_type(data, '${path}') = 'array' AND ${arrayMatch}))`,
+        values: [
+          ...(typeof value === "string" ? [value] : []),
+          ...arrayValues,
+        ],
+      };
+    }
 
     case "gt":
       return { sql: `${column} > ?`, values: [sqlValue(value)] };
@@ -176,7 +280,13 @@ const buildComparison = (
 
     case "exists":
       return {
-        sql: comparison.value ? `${column} IS NOT NULL` : `${column} IS NULL`,
+        sql: isStoredRecordField(field)
+          ? `json_type(data, '${jsonPath(field)}') IS ${
+              comparison.value ? "NOT " : ""
+            }NULL`
+          : comparison.value
+            ? `${column} IS NOT NULL`
+            : `${column} IS NULL`,
         values: [],
       };
 
@@ -191,12 +301,35 @@ const buildComparison = (
         };
       }
 
-      const placeholders = values.map(() => "?").join(", ");
-      const operator = comparison.operator === "in" ? "IN" : "NOT IN";
+      const includesNull = values.includes(null);
+      const scalarValues = values.filter((item) => item !== null);
+      const placeholders = scalarValues.map(() => "?").join(", ");
+      const hasScalarValues = scalarValues.length > 0;
+
+      if (comparison.operator === "in") {
+        const conditions = [
+          ...(includesNull ? [`${column} IS NULL`] : []),
+          ...(hasScalarValues
+            ? [`${column} IN (${placeholders})`]
+            : []),
+        ];
+
+        return {
+          sql: conditions.length ? `(${conditions.join(" OR ")})` : "0 = 1",
+          values: scalarValues.map(sqlValue),
+        };
+      }
 
       return {
-        sql: `${column} ${operator} (${placeholders})`,
-        values: values.map(sqlValue),
+        sql:
+          includesNull && hasScalarValues
+            ? `(${column} IS NOT NULL AND ${column} NOT IN (${placeholders}))`
+            : includesNull
+              ? `${column} IS NOT NULL`
+              : hasScalarValues
+                ? `(${column} IS NULL OR ${column} NOT IN (${placeholders}))`
+                : "1 = 1",
+        values: scalarValues.map(sqlValue),
       };
     }
 
@@ -221,7 +354,10 @@ const buildWhere = <T extends object>(
         buildWhere(item),
       );
 
-      if (nested.length === 0) continue;
+      if (nested.length === 0) {
+        if (field === "or") parts.push("0 = 1");
+        continue;
+      }
 
       parts.push(
         `(${nested
@@ -273,7 +409,7 @@ const buildOrderBy = <T extends StorageRecord>(
       }`,
   );
 
-  if (!items.some((item) => item.startsWith("id "))) {
+  if (!(orderBy ?? []).some((item) => item.field === "id")) {
     items.push("id ASC");
   }
 
@@ -302,14 +438,29 @@ const buildCursorWhere = <T extends StorageRecord>(
     const conditions: string[] = [];
 
     for (const [previous, prefix] of fields.slice(0, index).entries()) {
-      conditions.push(`${sqlField(prefix.field)} = ?`);
-      parameters.push(sqlValue(values[previous]));
+      const prefixValue = values[previous] ?? null;
+      conditions.push(
+        prefixValue === null
+          ? `${sqlField(prefix.field)} IS NULL`
+          : `${sqlField(prefix.field)} = ?`,
+      );
+      if (prefixValue !== null) parameters.push(sqlValue(prefixValue));
     }
 
     const operator = field.direction === "desc" ? "<" : ">";
 
-    conditions.push(`${sqlField(field.field)} ${operator} ?`);
-    parameters.push(sqlValue(values[index]));
+    const fieldValue = values[index] ?? null;
+
+    if (fieldValue === null) {
+      if (field.direction === "asc") {
+        conditions.push(`${sqlField(field.field)} IS NOT NULL`);
+      } else {
+        continue;
+      }
+    } else {
+      conditions.push(`${sqlField(field.field)} ${operator} ?`);
+      parameters.push(sqlValue(fieldValue));
+    }
 
     branches.push(`(${conditions.join(" AND ")})`);
   }
@@ -318,6 +469,18 @@ const buildCursorWhere = <T extends StorageRecord>(
     sql: `(${branches.join(" OR ")})`,
     values: parameters,
   };
+};
+
+const getRecordField = (record: StorageRecord, field: string): unknown => {
+  const [first, ...rest] = validateFieldPath(field);
+  let value: unknown = record;
+
+  for (const segment of [first, ...rest]) {
+    if (typeof value !== "object" || value === null) return undefined;
+    value = (value as Record<string, unknown>)[segment!];
+  }
+
+  return value;
 };
 
 const cleanChanges = <T extends StorageRecord>(
@@ -582,8 +745,10 @@ export class D1StorageAdapter implements StorageAdapter {
       );
     }
 
+    validateQuery(query);
+
     const orderBy = query.orderBy ?? [
-      { field: "id" as keyof T & string, direction: "asc" as const },
+      { field: "id" as StorageScalarFieldPath<T>, direction: "asc" as const },
     ];
 
     const base = buildWhere(query.where);
@@ -592,6 +757,14 @@ export class D1StorageAdapter implements StorageAdapter {
 
     if (query.after) {
       const cursor = decodeCursor(query.after);
+      const cursorFieldCount =
+        orderBy.length + (orderBy.some((item) => item.field === "id") ? 0 : 1);
+      if (
+        !Array.isArray(cursor.values) ||
+        cursor.values.length !== cursorFieldCount
+      ) {
+        throw new StorageValidationError("Invalid D1 cursor.");
+      }
       const after = buildCursorWhere(orderBy, cursor.values);
 
       whereSql = `(${whereSql}) AND ${after.sql}`;
@@ -616,17 +789,14 @@ export class D1StorageAdapter implements StorageAdapter {
 
     if (!cursorFields.includes("id")) cursorFields.push("id");
 
-    const nextCursor =
-      hasNextPage && last
-        ? encodeCursor({
-            values: cursorFields.map((field) => {
-              if (field === "id") return last.id;
-              if (field === "createdAt") return last.created_at;
-              if (field === "updatedAt") return last.updated_at;
-              if (field === "revision") return last.revision;
+    const lastRecord = last ? toRecord<T>(last) : null;
 
-              return deserialize<Record<string, unknown>>(last.data)[field];
-            }),
+    const nextCursor =
+      hasNextPage && lastRecord
+        ? encodeCursor({
+            values: cursorFields.map((field) =>
+              getRecordField(lastRecord, field),
+            ),
           })
         : null;
 

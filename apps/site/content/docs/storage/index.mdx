@@ -109,7 +109,23 @@ const page = await storage.findMany<Session>("sessions", {
 });
 ```
 
-The supported comparison operators are <code>eq</code>, <code>ne</code>, <code>in</code>, <code>notIn</code>, <code>gt</code>, <code>gte</code>, <code>lt</code>, <code>lte</code>, and <code>exists</code>. Queries also support ordering, limit, and offset. Cursor pagination uses <code>findPage</code> with a positive integer <code>first</code> and an opaque <code>after</code> cursor returned from the prior page. Both built-in adapters add a stable ID tie-breaker to cursor ordering.
+Filters and sorts also accept validated dotted paths through nested JSON objects:
+
+```ts
+type Post = StorageRecord & {
+  author: { displayName: string; roles: readonly string[] };
+};
+
+const matches = await storage.findMany<Post>("posts", {
+  where: {
+    "author.displayName": { operator: "contains", value: "ada" },
+    "author.roles": { operator: "contains", value: "editor" },
+  },
+  orderBy: [{ field: "author.displayName", direction: "asc" }],
+});
+```
+
+The supported comparison operators are <code>eq</code>, <code>ne</code>, <code>contains</code>, <code>in</code>, <code>notIn</code>, <code>gt</code>, <code>gte</code>, <code>lt</code>, <code>lte</code>, and <code>exists</code>. String <code>contains</code> is a case-insensitive substring match; for arrays it tests exact scalar-element membership. It does not match object values inside arrays, and dotted paths do not traverse array indexes. D1 uses SQLite <code>lower()</code>, whose built-in case folding is ASCII-only. Invalid or unsupported path segments are rejected. Queries also support ordering, limit, and offset. Cursor pagination uses <code>findPage</code> with a positive integer <code>first</code> and an opaque <code>after</code> cursor returned from the prior page. Both built-in adapters support dotted sort paths and add a stable ID tie-breaker to cursor ordering.
 
 ### Conditional writes and capabilities
 

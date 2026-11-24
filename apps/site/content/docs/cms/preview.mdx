@@ -1,0 +1,50 @@
+---
+title: Previewing drafts
+description: Read draft content through authenticated admin APIs while keeping public views published-only.
+---
+
+CMS has no built-in preview token, preview cookie, or framework-specific
+preview-mode switch. Preview is an application route that reads an authorized
+admin document. The application owns the preview session or token and must
+verify it before making the admin read.
+
+## Read the draft on the server
+
+With the core API, use an instance bound to the authenticated editor and call
+the admin visibility method:
+
+```ts
+const draft = await cms.posts.findBySlug("first-post", {
+  visibility: "admin",
+});
+```
+
+`findBySlug` requires a slug field. The `cms` instance must have trusted
+request context and an access policy that permits this read. Never expose an
+unauthenticated route that accepts an entry ID and returns admin content.
+
+With Fullstack, use the authorized admin collection client and keep public
+content on the separate `.public` client. Its server resolves context and
+authorizes each route; admin responses are `no-store`. See the
+[Fullstack CMS guide](/docs/fullstack/cms).
+
+## Keep preview separate from public rendering
+
+Public visibility returns only the published snapshot. A preview route may
+render the returned admin document for a verified editor, but it should not
+change the published snapshot or bypass access policies. Use normal
+revision-checked CMS writes to save or publish content.
+
+For an authoring UI, pass only a safe schema projection:
+
+```ts
+import { toCmsPresentation } from "@puzzle-ui/cms";
+
+const presentation = toCmsPresentation(cmsConfig);
+const postPresentation = presentation.collections.posts;
+```
+
+`toCmsPresentation` removes collection access/hooks and nested field
+`access`, `validate`, `compute`, and `is` callbacks. It does not fetch content,
+authorize a preview, or create a preview token. Keep raw server config and
+draft data behind the application's authenticated boundary.

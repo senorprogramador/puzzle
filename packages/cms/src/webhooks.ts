@@ -126,6 +126,12 @@ const collections = {
 const equal = <T>(value: T) => ({ operator: "eq" as const, value });
 
 const validateSubscription = (input: SubscriptionInput): void => {
+  if (
+    typeof input.endpoint !== "string" || input.endpoint.length === 0 ||
+    input.endpoint.length > 2_048 || /[\u0000-\u001f\u007f]/.test(input.endpoint)
+  ) {
+    throw new CmsValidationError([{ path: "endpoint", code: "invalid", message: "An absolute HTTPS endpoint is required." }]);
+  }
   let url: URL;
   try {
     url = new URL(input.endpoint);
@@ -134,7 +140,7 @@ const validateSubscription = (input: SubscriptionInput): void => {
   }
   if (
     url.protocol !== "https:" || !url.hostname || url.username || url.password ||
-    url.search || url.hash || input.endpoint.length > 2_048
+    url.search || url.hash
   ) {
     throw new CmsValidationError([{
       path: "endpoint", code: "invalid",
@@ -262,8 +268,13 @@ export class CmsWebhookService {
     this.#assertContext(input);
     await this.#authorize(input, "webhook:dispatch");
     this.#assertRevision(input.expectedRevision);
-    const storedEvent = await this.#options.storage.findById<CmsChangeEvent>(collections.changeEvents, input.eventId);
-    if (!storedEvent || storedEvent.tenantId !== input.tenantId) throw new CmsNotFoundError("Change event");
+    if (typeof input.eventId !== "string" || !input.eventId.trim()) {
+      throw new CmsValidationError([{ path: "eventId", code: "required", message: "A change event ID is required." }]);
+    }
+    const storedEvent = await this.#options.storage.findOne<CmsChangeEvent>(collections.changeEvents, {
+      where: { id: equal(input.eventId), tenantId: equal(input.tenantId) },
+    });
+    if (!storedEvent) throw new CmsNotFoundError("Change event");
     let event: CmsChangeEvent = storedEvent;
     if (event.revision !== input.expectedRevision) throw new CmsConflictError();
     await this.#authorize(input, "change-event:ack", event.id, event, "changeEvent");
@@ -542,8 +553,10 @@ export class CmsWebhookService {
     if (typeof id !== "string" || !id.trim()) {
       throw new CmsValidationError([{ path: "subscriptionId", code: "required", message: "A subscription ID is required." }]);
     }
-    const record = await this.#options.storage.findById<CmsWebhookSubscription>(collections.subscriptions, id);
-    if (!record || record.tenantId !== tenantId) throw new CmsNotFoundError("Webhook subscription");
+    const record = await this.#options.storage.findOne<CmsWebhookSubscription>(collections.subscriptions, {
+      where: { id: equal(id), tenantId: equal(tenantId) },
+    });
+    if (!record) throw new CmsNotFoundError("Webhook subscription");
     return record;
   }
 
@@ -551,13 +564,16 @@ export class CmsWebhookService {
     if (typeof id !== "string" || !id.trim()) {
       throw new CmsValidationError([{ path: "deliveryId", code: "required", message: "A delivery ID is required." }]);
     }
-    const record = await this.#options.storage.findById<CmsWebhookDelivery>(collections.deliveries, id);
-    if (!record || record.tenantId !== tenantId) throw new CmsNotFoundError("Webhook delivery");
+    const record = await this.#options.storage.findOne<CmsWebhookDelivery>(collections.deliveries, {
+      where: { id: equal(id), tenantId: equal(tenantId) },
+    });
+    if (!record) throw new CmsNotFoundError("Webhook delivery");
     return record;
   }
 
   #assertContext(input: CmsContext): void {
-    if (typeof input.tenantId !== "string" || !input.tenantId.trim() ||
+    if (!input || typeof input !== "object" ||
+        typeof input.tenantId !== "string" || !input.tenantId.trim() ||
         (input.actor !== null && (!input.actor || typeof input.actor.id !== "string" || !input.actor.id.trim()))) {
       throw new CmsValidationError([{ path: "context", code: "invalid", message: "A tenant and valid actor or null are required." }]);
     }

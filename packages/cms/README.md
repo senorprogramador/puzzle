@@ -1,162 +1,279 @@
 # `@puzzle-ui/cms`
 
-Framework-neutral content schema, validation, querying, revision, and publishing
-services for applications that provide an `@puzzle-ui/storage` adapter.
-The package does not provide a database, router, React UI, authentication
-system, scheduler, or media provider.
+Framework-neutral, code-first content schemas, validation, querying, editorial
+lifecycle, access policies, and media-reference tracking for applications that
+provide an `@puzzle-ui/storage` adapter. CMS does not provide a database,
+identity provider, HTTP router, React admin UI, scheduler implementation, or
+media object storage.
 
-## Availability and local workspace use
+## Availability
 
-`@puzzle-ui/cms` is not published to npm yet. External npm installation must
-wait until a release; do not use `npm install` or `bun add` for this package
-before then.
+`@puzzle-ui/cms@0.18.0` is published to npm. The current code-first API
+documented here is a newer rewrite and is not yet released; do not assume the
+npm tarball contains these APIs. In this repository, use
+`"@puzzle-ui/cms": "workspace:*"` and install from the repository root to
+consume the code-first implementation.
 
-To try it inside this repository, add `"@puzzle-ui/cms": "workspace:*"` to
-the consuming workspace's dependencies and run Bun from the repository root.
-The package is discovered by the existing `packages/*` workspace pattern.
-No workspace-pattern change is needed; this package task does not modify root
-manifests or lockfiles.
+The package root is its only public entry point. Use the public
+`@puzzle-ui/storage` contract for metadata persistence and the documented
+`@puzzle-ui/media` contracts for assets. Do not deep-import source files.
 
-```json
-{
-  "dependencies": {
-    "@puzzle-ui/cms": "workspace:*"
-  }
-}
-```
+## Define the schema in code
 
-## Configure the service
-
-Access policy is required and denies every action the host application does not
-explicitly allow. Tenant and actor context are supplied to every call.
+`defineCMS` accepts a static, keyed collection registry. Collection keys are
+the stable service API keys; singleton collections use a stable root document
+instead of a list. A schema is not registered or changed at runtime.
 
 ```ts
-import { CmsService } from "@puzzle-ui/cms";
-import type { StorageAdapter } from "@puzzle-ui/storage";
+import { collection, defineCMS, fields } from "@puzzle-ui/cms";
 
-const storage: StorageAdapter = getStorageAdapter();
-const cms = new CmsService({
-  storage,
-  accessPolicy: async ({ tenantId, actor, action }) =>
-    actor !== null && await canEditTenant(actor, tenantId, action),
-});
-
-const contentType = await cms.registerContentType({
-  tenantId: "tenant_1",
-  actor: { id: "user_1" },
-  definition: {
-    slug: "article",
-    name: "Article",
-    version: 1,
-    locales: ["en-US", "fr-FR"],
-    defaultLocale: "en-US",
-    fields: [
-      { key: "title", type: "text", label: "Title", required: true, localized: true },
-      { key: "path", type: "slug", label: "Slug", required: true, localized: true },
-    ],
+const config = defineCMS({
+  collections: {
+    articles: collection({
+      name: "Article",
+      description: "Editorial articles.",
+      version: 1,
+      drafts: true,
+      timestamps: true,
+      localization: {
+        locales: ["en-US", "fr-FR"],
+        defaultLocale: "en-US",
+      },
+      fields: {
+        title: fields.text({ label: "Title", required: true, localized: true }),
+        slug: fields.slug({ label: "Slug", from: "title", required: true, localized: true }),
+        summary: fields.textarea({ label: "Summary", localized: true }),
+        featured: fields.boolean({ label: "Featured", defaultValue: false }),
+        related: fields.relationship({
+          label: "Related articles",
+          target: "articles",
+          multiple: true,
+          sameLocale: true,
+          allowedStatuses: ["published"],
+        }),
+      },
+    }),
+    settings: collection.singleton({
+      name: "Site settings",
+      fields: {
+        siteName: fields.text({ label: "Site name", required: true }),
+      },
+    }),
   },
-});
-
-const draft = await cms.createEntry({
-  tenantId: "tenant_1",
-  actor: { id: "user_1" },
-  contentType: "article",
-  locale: "en-US",
-  fields: { title: "An example", path: "an-example" },
-});
-
-await cms.publish({
-  tenantId: "tenant_1",
-  actor: { id: "user_1" },
-  entryId: draft.id,
-  expectedRevision: draft.revision,
 });
 ```
 
-Use the `revision` returned from a read or mutation as `expectedRevision` for
-every update or lifecycle transition. Conflicts are reported rather than
-overwritten. Schema `version` is separate from the storage record revision.
-`saveDraft` replaces the complete field object; it is not a partial patch.
+`drafts` and `timestamps` are opt-in and default off. `localization` contains
+the supported locale list and optional default locale; there are no implicit
+locale fallbacks. Collection options also accept server-only `access` policies
+and `beforeChange`/`afterChange` hooks; never serialize those callbacks to a
+browser. See [Collections and fields](https://puzzle-ui.com/docs/cms/schema)
+for the field catalog, configuration options, access, hooks, and migrations.
 
-## Supported domain behavior
+### Field factories
 
-- Field types: text, textarea, rich text, number, boolean, date/datetime, slug,
-  select/multi-select, media asset ID, relationship, repeater, blocks, JSON,
-  and locale.
-- Required/default/min/max/pattern/allowed-value constraints, named custom
-  validators, nested validation, field localization, and explicit schema
-  compatibility checks.
-- Tenant-scoped content types and entries; canonical BCP 47 locales, explicit
-  fallback order, locale-specific slugs, relationship checks, and cursor pages.
-- `findEntry` applies fallbacks only when the caller provides them, looking for
-  the same normalized slug in each listed locale. It never picks an arbitrary
-  or default locale.
-- Search and arbitrary field filters operate on the tenant/type-scoped records
-  returned by Storage and are evaluated in memory. Configure database-level
-  query/index strategies in the host application for large collections.
-  Cursor pagination also sorts and filters this scoped result set in memory.
-- Immutable revision snapshots, draft/save, publish/unpublish, schedule/
-  unschedule, archive, soft delete, and restore-as-a-new-revision.
-- Audit events are persisted with successful mutations; denied policy checks
-  are also recorded. Field access can be restricted by policy callbacks.
-- An opt-in change-event outbox records metadata about successful content
-  mutations in the same atomic batch as the mutation.
-- Tenant-scoped media usage records track draft and published field references;
-  `listMediaUsages` supports safe asset cleanup checks.
-- Public reads return only the published snapshot. A scheduled update retains
-  an existing published snapshot until the scheduled revision is published.
-- Entry read and list calls require an explicit `visibility: "public"` or
-  `visibility: "admin"` choice; access policy still authorizes each operation
-  and can redact individual fields.
+The public `fields` factory catalog includes:
 
-## Storage requirements
+- Scalars: `text`, `textarea`, `number`, `boolean`, `date`, `datetime`,
+  `email`, and `url`.
+- Identifiers and choices: `slug`, `select`, and `multiSelect`.
+- Content and references: `media`, `relationship`, `richText`, and `json`.
+- Structured values: `array`, `object`, and `blocks`.
+- Server-derived values: `computed` and `custom`.
 
-`CmsService` registers its collections through the public
-`@puzzle-ui/storage` contract. Mutations require the adapter to report
-`atomicBatch` and `uniqueConstraints`; content type and entry updates
-additionally require `conditionalWrites`. Unsupported capabilities produce an
-error instead of a weaker write. Schema registration requires atomic batches
-and unique constraints.
+Field factories infer value types. Required fields without defaults are
+required in create input; updates are partial. Factories support field labels,
+required/default values, localization, validation metadata, and the
+type-specific options documented on [Fields](https://puzzle-ui.com/docs/cms/schema#field-factories).
+`toCmsFieldDefinition` converts a descriptor into its serializable schema
+definition. Custom validation, access, and computed callbacks are runtime
+server callbacks: do not persist or send them to client code.
 
-## Change-event outbox
+For authoring UIs, use `toCmsPresentation(config)` to derive a serializable
+`CmsCollectionPresentation`. It removes collection access/hooks and nested
+field access/validation/computed callbacks; do not pass the raw server config
+to a browser Piece.
 
-Set `emitChangeEvents: true` on every `CmsService` instance that writes the
-same CMS database to persist a metadata-only event atomically with each
-successful content-type or entry mutation. Events contain the tenant,
-resource and action, resource ID, time, and (for entries) revision number;
-they do not contain draft fields or secrets. Denied and no-op operations do
-not produce change events. If the event insert fails, the mutation fails too.
-Enabling the outbox additionally requires conditional writes and cursor
-pagination.
+## Create a request-scoped CMS instance
 
-An authorized server-side worker can call `listChangeEvents({ tenantId, actor,
-first, after })`, process the returned `items`, and call
-`acknowledgeChangeEvent({ tenantId, actor, eventId, expectedRevision })` only
-after it has durably handled the event. The access policy must allow
-`change-event:read` and `change-event:ack` for that worker. Both operations are
-tenant-scoped; each returned event also undergoes a record-level read check.
-Follow `nextCursor` whenever `hasNextPage` is true even if a page contains no
-visible items. Repeat scans from the beginning: event IDs are not ordered by
-commit time, so new events may appear before a previously returned cursor.
+Resolve tenant and actor from a trusted server session, then bind that context
+to one `createCms` instance. Collection methods never take caller-supplied
+tenant or actor IDs.
 
-Acknowledgement permanently removes the pending event. Multiple workers can
-observe the same event, and a worker can crash after handling but before
-acknowledging it. The host must coordinate workers and make handling
-idempotent; the outbox does not itself provide exactly-once processing.
-Continue draining outstanding events even if event emission is later disabled.
-Use one coordinated consumer for each outbox event: webhook fanout
-acknowledges the event after recording its deliveries, so an independent
-consumer must not acknowledge it first.
+```ts
+import { createCms } from "@puzzle-ui/cms";
+import type {
+  CmsAccessPolicy,
+  CmsRequestContext,
+  CreateCmsOptions,
+} from "@puzzle-ui/cms";
+import type { StorageAdapter } from "@puzzle-ui/storage";
 
-## Webhook delivery
+const allowSignedIn: CmsAccessPolicy = ({ actor }) => actor !== null;
 
-`CmsWebhookService` uses the same storage adapter as `CmsService` to maintain
-tenant-scoped subscriptions, delivery jobs, and attempt history. It requires
-atomic batches, conditional writes, and unique constraints. Configure a
-server-side `CmsWebhookTransport` and a secret resolver; there is deliberately
-no default HTTP transport. Subscription records contain a secret-manager
-reference, not the secret. Never expose the reference to untrusted clients or
-use a secret value as the reference.
+export const createRequestCms = (
+  storage: StorageAdapter,
+  context: CmsRequestContext,
+  mediaReferenceValidator: NonNullable<
+    CreateCmsOptions["mediaReferenceValidator"]
+  >,
+) =>
+  createCms({
+    config,
+    storage,
+    context,
+    accessPolicy: allowSignedIn,
+    mediaReferenceValidator,
+  });
+```
+
+When trusted `context` is supplied, `accessPolicy` is required. With no context,
+the local single-tenant default permits only tenant `"default"` with actor
+`null`; this is not a permissive multi-tenant policy. Production policies must
+check tenant membership, roles, and the requested action.
+
+Other `createCms` options include an explicit `CmsScheduler`, named custom
+validators, schema migrations, a clock, an ID generator, and opt-in
+`emitChangeEvents`. The scheduler and media-reference validator are needed
+only for operations that use them. Change events are metadata-only and written
+atomically. When enabled, the instance also exposes
+`cms.events.list({ first?, after? })` and
+`cms.events.acknowledge(eventId, { expectedRevision })`; both use its bound
+tenant/actor and access policy. This is a server-side worker API; do not send
+raw event records to browser clients.
+
+## Collections, queries, and singletons
+
+The configured instance is keyed by the schema; for the `articles` and
+`settings` keys above, the services are `cms.articles` and `cms.settings`.
+Document values are flattened schema fields plus CMS metadata; they are not
+stored in a nested `fields` object.
+
+```ts
+const page = await cms.articles.find({
+  where: { featured: { equals: true } },
+  sort: "-updatedAt",
+  limit: 20,
+  page: 1,
+  locale: "en-US",
+  visibility: "admin",
+});
+
+const article = await cms.articles.findBySlug("first-article", {
+  locale: "en-US",
+  fallbackLocales: ["fr-FR"],
+  visibility: "public",
+});
+
+const created = await cms.articles.create({
+  title: "First article",
+  summary: "A short introduction.",
+  featured: false,
+});
+
+const updated = await cms.articles.update(
+  created.id,
+  { title: "Updated article" },
+  { expectedRevision: created.revision, changeSummary: "Edited the title." },
+);
+```
+
+`find` applies `where`, sort, locale, and page bounds through Storage. Conditions
+include `equals`, `notEquals`, `contains`, `in`, `notIn`, ordered comparisons,
+and `exists`; nested `and`/`or` groups are supported. Query paths are checked
+against the configured schema. `findBySlug` requires a slug field; localized
+fallback locales are explicit and tried in caller-provided order. Public
+visibility returns only the published snapshot. Admin reads still require
+policy authorization.
+
+Collection services also expose `findById`, `delete` (soft delete), and
+`archive`. `purge(id, { expectedRevision, changeSummary? })` is a separate
+permanent-removal operation; it requires the current revision, scans current
+entries, published snapshots, and immutable revisions for incoming
+relationships, cancels scheduled publication, and atomically removes the
+entry, its revisions, and its own media-usage records. Relationship additions
+conditionally advance a per-target guard in the same batch as their content
+write. Purge conditionally removes that guard with the target, so a concurrent
+relationship write either commits first and makes purge conflict or loses and
+fails without creating a dangling reference. If no current or historical
+references exist, a relationship-capable schema alone does not block purge.
+Bounded-scan or storage-capability failures still fail closed.
+Other entries' shared media usages are preserved. `delete` and other
+conditional mutations should use the current `expectedRevision`; conflicts
+must be handled as a fresh-read/merge decision.
+A slug generated from a field may be omitted from create input; otherwise
+required fields are enforced from the schema.
+
+Singletons use the same schema and lifecycle rules but expose a stable document
+instead of a list. `cms.settings.find()` reads the singleton, while `create`,
+`update`, `delete`, and `archive` operate on that stable root without an entry
+ID. Singleton options include locale where localization is enabled.
+`purge({ expectedRevision, locale?, changeSummary? })` permanently removes
+the selected singleton locale variant.
+
+See [Entries, queries, and relationships](https://puzzle-ui.com/docs/cms/entries)
+for typed filters, cursor/page behavior, and relationship validation.
+
+## Access and lifecycle
+
+A global `CmsAccessPolicy` receives trusted tenant/actor context, resource, and
+action and returns a boolean or promise of a boolean. Collection `access` is a
+partial action-to-policy map; omitted local actions deny. Both the global and
+collection policy must allow an operation. Action aliases include `read`,
+`create`, `update`, `delete`, `publish`, `unpublish`, `schedule`, `unschedule`,
+`archive`, `restore`, `revisions`, and `translations`. Field reads map to
+`read`; field writes map to `create`, `update`, or `restore`.
+
+Collection hooks are server-side:
+
+- `beforeChange(event)` runs after authorization and before validation and
+  persistence; throwing vetoes the mutation.
+- `afterChange({ ...event, entry })` runs after commit. Its errors are
+  surfaced, but do not roll back a successful mutation.
+
+With `drafts: true`, collections support draft saves, publish/unpublish,
+revision listing, and restore-as-a-new-revision. Revisions are immutable;
+mutations use optimistic `expectedRevision` conditions. Public reads never
+return draft fields. A configured `CmsScheduler` enables `schedulePublish` and
+`unschedule`; a timestamp alone never publishes content. `publishAt` is an
+absolute instant and scheduling also requires an explicit IANA `timeZone`.
+
+When `localization` is configured, `createTranslation` creates a locale
+variant, `listLocaleVariants` lists variants for an entry, and `findBySlug`
+can try explicit `fallbackLocales`. Slugs are unique by tenant, collection,
+and locale; no arbitrary default-locale fallback is performed.
+
+The configured lifecycle methods and their full type signatures are listed in
+[Drafts, revisions, localization, and scheduling](https://puzzle-ui.com/docs/cms/lifecycle).
+
+## Media references
+
+CMS media values are asset-ID strings, not object keys or signed URLs. Supply a
+tenant-aware `CmsMediaReferenceValidator` when constructing the request
+instance; otherwise media references are rejected. CMS tracks draft and
+published media usage through Storage so a host can protect permanent asset
+deletion. Store file bytes through `@puzzle-ui/media` object-storage adapters,
+not CMS.
+
+## Change events and webhooks
+
+`emitChangeEvents: true` writes metadata-only change events atomically with
+successful mutations. When enabled,
+`cms.events.list({ first?, after? })` returns a `CmsChangeEventPage`;
+`cms.events.acknowledge(eventId, { expectedRevision })` acknowledges a durable
+event. The API is tenant/actor bound and uses the configured service access
+policy. Keep a custom consumer authorized and idempotent, acknowledge only
+after its work is durable, and do not expose raw event records to browser
+clients.
+
+`CmsWebhookService` remains a separate server-side root export. It requires a
+Storage adapter, explicit access policy, host transport, and server-side secret
+resolver; there is no default HTTP transport. Its worker operations include
+subscription management, `fanout`, delivery/attempt listing,
+`retryDelivery`, and `runNext`. Keep SSRF protections at connection time, keep
+secret values and references out of browser contracts, and make delivery
+processing idempotent. Fullstack's optional webhook routes expose sanitized
+client operations; they do not run delivery workers.
 
 ```ts
 import { CmsWebhookService } from "@puzzle-ui/cms";
@@ -164,107 +281,39 @@ import { CmsWebhookService } from "@puzzle-ui/cms";
 const webhooks = new CmsWebhookService({
   storage,
   accessPolicy,
-  transport: safeWebhookTransport,
-  resolveSecret: ({ tenantId, secretRef }) =>
-    secretManager.readBytes(tenantId, secretRef),
-});
-
-const subscription = await webhooks.createSubscription({
-  tenantId: "tenant_1",
-  actor: { id: "operator_1" },
-  endpoint: "https://hooks.example.com/content",
-  events: ["entry:publish", "entry:unpublish"],
-  enabled: true,
-  secretRef: "webhooks/content/current",
+  transport: hostWebhookTransport,
+  resolveSecret: hostSecretResolver,
 });
 ```
 
-Authorize `webhook:read`, `webhook:manage`, and `webhook:dispatch` explicitly
-in the host policy. The worker also needs `change-event:read` and
-`change-event:ack`. Periodically scan every page of the CMS outbox, call
-`fanout` with each event's ID and revision, and call `runNext` until it returns
-`null`. Schedule the worker to run again for delayed retries and expired
-leases; nothing runs automatically. Fanout uses subscriptions enabled when it
-scans them and records one job per matching subscription before acknowledging
-the event. A failed scan can already have recorded some jobs; retries are
-idempotent. Subscription changes concurrent with fanout take effect according
-to the scans that run, not the original mutation time.
+`storage`, `accessPolicy`, `hostWebhookTransport`, and `hostSecretResolver` are
+server-owned dependencies. Subscription management methods include
+`createSubscription`, `updateSubscription`, `listSubscriptions`,
+`getSubscription`, and `assertCanManage`; worker methods include `fanout`,
+`listDeliveries`, `listAttempts`, `retryDelivery`, and `runNext`. Each worker
+operation receives trusted tenant/actor input and must be authorized and
+idempotent. Drive `fanout` from `cms.events.list`; fanout records deliveries
+and removes the corresponding outbox event itself, so do not separately
+acknowledge an event after fanout. For other consumers, acknowledge only after
+durable processing with the event's current revision.
 
-Delivery is at least once, not exactly once. Workers use optimistic leases;
-expired attempts are recorded and may be sent again. A transport timeout,
-connection or secret-resolution error, invalid transport response, 408, 429,
-or 5xx is retried with bounded exponential delay; other non-2xx responses
-fail. `listDeliveries` and `listAttempts` expose
-authorized history; `retryDelivery` explicitly retries a failed job.
-Disabling a subscription cancels jobs when workers observe that it is
-disabled. Jobs already claimed by a worker may still be sent. Use synchronized
-clocks across workers and CMS instances.
+`signCmsWebhook` and `verifyCmsWebhook` sign the exact raw body with
+HMAC-SHA256. Verification requires a durable atomic replay store and up to
+three active secrets for rotation. Couple replay reservation to durable
+processing; these primitives do not provide outbound SSRF protection.
 
-Rotate secrets by updating the subscription's `secretRef` with
-`updateSubscription` and its expected revision. Pending jobs use the current
-subscription endpoint and secret at send time. Keep the previous receiver
-secret during the overlap, then remove it after the host's retry horizon.
-The host owns secret storage, delivery-history retention, and reconciliation.
+## Storage requirements
 
-## Webhook signatures
+CMS uses only public `@puzzle-ui/storage` contracts. Mutations that write a
+document and related revisions, audit events, outbox records, or media usage
+require the adapter capabilities those operations depend on; unsupported
+atomic batches, conditional writes, or uniqueness fail closed. Queries must
+push tenant, collection, visibility, filters, ordering, and page bounds to the
+adapter; CMS does not load an entire collection to filter or sort in memory.
 
-`signCmsWebhook` and `verifyCmsWebhook` provide a signing and verification
-primitive for hosts implementing their own webhook transport. They require
-Web Crypto, a cryptographically random secret of at least 32 bytes, a stable
-ASCII delivery ID, and the exact raw request body as bytes. The signature
-header is `t=<Unix milliseconds>,v1=<lowercase HMAC-SHA256 hex>`; the signed
-bytes are UTF-8 `v1.<timestamp>.<deliveryId>.` followed by the raw body.
-Transmit the delivery ID separately and keep the secret server-side.
-
-Verification accepts one to three active secrets to support a controlled
-rotation overlap. It rejects malformed signatures, timestamps outside the
-configured window (five minutes by default, at most 24 hours), changed bodies,
-and replayed delivery IDs. Pass a trusted, stable endpoint-specific `scope`
-and a durable `CmsWebhookReplayStore` that atomically records the
-`(scope, deliveryId)` pair until `expiresAt`; for duplicates the store must
-extend its expiry when the new expiry is later. The scope and delivery ID
-must each use 1–128 ASCII letters, numbers, underscores, or hyphens. The
-primitive accepts bodies up to 1 MiB.
-
-Replay reservation is not a substitute for application-level idempotency.
-Commit a durable processing handoff together with the replay reservation, or
-enclose verification and the durable application mutation in one transaction:
-otherwise a crash after verification can cause a legitimate retry to be
-rejected before its work was saved. Retain application idempotency records for
-the delivery retry horizon. Replay-store failures propagate and must not be
-treated as successful verification.
-
-These primitives do not send requests or protect outbound connections from
-SSRF. A host-provided transport must enforce safe HTTPS destination,
-connection-time DNS/IP validation, redirect, timeout, and response-size
-policies; syntax checks alone are not sufficient.
-
-Relationship fields contain entry IDs and are checked against tenant, target
-type, locale, and configured status rules. Media fields contain asset ID
-strings. To use them, pass `mediaReferenceValidator.assertCanReference`; without
-that callback, media asset values are rejected. CMS records draft and published
-usages in its own Storage collections and exposes them through
-`listMediaUsages`, guarded by the `media:usage-read` policy action. The CMS
-package does not import or assume a media runtime API.
-
-## Scheduling and migrations
-
-Scheduling requires an injected `CmsScheduler` with `schedule` and `cancel`
-methods. Retain the job passed to `CmsScheduler.schedule` and call
-`publishScheduled` with that exact job when it becomes due. Supply `publishAt`
-as an absolute `Date` and an
-explicit IANA `timeZone` for editorial display; the CMS does not infer a local
-timezone or convert wall-clock strings. Jobs are revision-bound and stale jobs
-are no-ops.
-Scheduler operations are external to the database transaction; errors are
-surfaced, and stale jobs cannot publish content after a conflicting edit.
-
-Breaking schema changes require a consecutive version increment and a
-`CmsSchemaMigration`. Register all required migration callbacks in
-`CmsServiceOptions.migrations` after process restart. Compatible additions
-(optional or defaulted fields) can pass through without a migration. Migration
-callbacks transform old field objects; restored and newly saved values are
-validated against the current schema.
+Breaking schema changes require a consecutive version increment and an
+explicit `CmsSchemaMigration`. Migration, validation, and custom-validator
+callbacks are runtime functions; register them again after process restart.
 
 ## Development
 
@@ -274,5 +323,5 @@ bun run test
 bun run build
 ```
 
-See `AGENTS.md` and `ai/instructions.md` for package boundaries and security
+See `AGENTS.md` and `ai/instructions.md` for security and persistence
 requirements.

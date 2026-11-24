@@ -39,7 +39,24 @@ const session = await storage.insert<Session>("sessions", {
 });
 ```
 
-`getConfiguredStorage` is your own adapter factory. Records have an ID, creation/update timestamps, and a revision. The query AST supports comparisons, nested boolean conditions, sorting, offset/limit, and cursor pagination. Conditional writes use expected revisions or update times; adapters advertise guarantees through capability reports. Migrations are explicit and versioned.
+`getConfiguredStorage` is your own adapter factory. Records have an ID, creation/update timestamps, and a revision. The query AST supports comparisons, nested boolean conditions, sorting, offset/limit, and cursor pagination. Filters and sorts can use validated dotted paths through nested JSON objects:
+
+```ts
+type Post = StorageRecord & {
+  author: { displayName: string; roles: readonly string[] };
+};
+
+const page = await storage.findMany<Post>("posts", {
+  where: {
+    "author.displayName": { operator: "contains", value: "ada" },
+    "author.roles": { operator: "contains", value: "editor" },
+  },
+  orderBy: [{ field: "author.displayName", direction: "asc" }],
+  limit: 25,
+});
+```
+
+`contains` is case-insensitive substring matching for strings and exact scalar-element membership for arrays. It does not match object values inside arrays or traverse array indexes in dotted paths. Path segments must be valid identifier names; malformed or unsupported paths are rejected. D1 uses SQLite `lower()`, which provides ASCII-only case folding. Conditional writes use expected revisions or update times; adapters advertise guarantees through capability reports. Migrations are explicit and versioned.
 
 ## Entry points
 

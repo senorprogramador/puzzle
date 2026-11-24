@@ -59,14 +59,20 @@ const publishStory = async (page, asset, title) => {
   )?.id, null, { timeout: 15_000 });
   const draft = await readOutput(page, "draft-preview");
   assert.equal(draft.status, "draft");
-  assert.equal(draft.fields.media, asset.id);
+  assert.equal(draft.media, asset.id);
   await page.getByRole("button", { name: "Publish", exact: true }).click();
   await page.waitForFunction(() => JSON.parse(
     document.querySelector('[data-testid="public-entry"]').textContent,
   )?.id, null, { timeout: 15_000 });
   const published = await readOutput(page, "public-entry");
-  assert.equal(published.fields.title, title);
-  assert.equal(published.fields.media, asset.id);
+  assert.equal(published.title, title);
+  assert.equal(published.media, asset.id);
+  const revisionsResponse = await fetch(
+    `${new URL(page.url()).origin}/api/cms/admin/collections/story/${draft.id}/revisions?first=10`,
+  );
+  assert.equal(revisionsResponse.status, 200);
+  const revisions = await revisionsResponse.json();
+  assert.ok(revisions.revisions.length >= 2);
 };
 
 for (const framework of ["next", "tanstack"]) {
@@ -127,8 +133,35 @@ for (const framework of ["next", "tanstack"]) {
         await delay(250);
       }
       if (!ready) throw new Error(`Framework did not become ready:\n${output}`);
-      const api = await fetch(`${base}/api/cms/admin/content-types`);
+      const api = await fetch(`${base}/api/cms/admin/collections/story`);
       assert.equal(api.status, 200, `${await api.text()}\n${output}`);
+      const outboxEntry = await fetch(`${base}/api/cms/admin/collections/story`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          data: { title: "Outbox smoke test" },
+          slug: "outbox-smoke-test",
+          locale: "en-US",
+        }),
+      });
+      assert.equal(outboxEntry.status, 201, await outboxEntry.text());
+      const eventPageResponse = await fetch(
+        `${base}/api/cms/admin/change-events?first=10`,
+      );
+      assert.equal(eventPageResponse.status, 200);
+      const eventPage = await eventPageResponse.json();
+      const createEvent = eventPage.items.find((event) => event.action === "entry:create");
+      assert.ok(createEvent);
+      assert.equal("tenantId" in createEvent, false);
+      const eventAck = await fetch(
+        `${base}/api/cms/admin/change-events/${createEvent.id}/ack`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ expectedRevision: createEvent.revision }),
+        },
+      );
+      assert.equal(eventAck.status, 200, await eventAck.text());
       browser = await chromium.launch({ headless: true });
       const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
       await page.route("**/api/auth/state", (route) =>

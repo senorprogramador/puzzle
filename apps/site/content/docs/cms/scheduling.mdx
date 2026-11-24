@@ -1,0 +1,68 @@
+---
+title: Scheduled publishing
+description: Schedule revision-bound publications with a host-provided durable scheduler and worker.
+---
+
+CMS defines the scheduling contract; the host supplies and operates the
+scheduler. Scheduling requires `drafts: true` and a `CmsScheduler` configured
+on `createCms`. A timestamp field alone never publishes content.
+
+## Schedule a publication
+
+`CmsScheduler` has `schedule(publication)` and `cancel(publication)` methods.
+The publication contains `entryId`, `scheduledRevisionNumber`, `publishAt`,
+and `timeZone`.
+
+```ts
+const scheduled = await cms.posts.schedulePublish(post.id, {
+  expectedRevision: post.revision,
+  publishAt: new Date("2035-02-01T10:00:00.000Z"),
+  timeZone: "Europe/Amsterdam",
+  changeSummary: "Schedule the release.",
+});
+
+await cms.posts.unschedule(scheduled.id, {
+  expectedRevision: scheduled.revision,
+});
+```
+
+`publishAt` is an absolute `Date`; `timeZone` is an explicit IANA timezone.
+The scheduled job is bound to the entry revision, so editing the entry after
+scheduling makes an old job stale rather than publishing newer content.
+
+## Run the due job
+
+The host persists scheduled jobs and calls the scheduler API when a job is
+due:
+
+```ts
+import type { CmsScheduledPublicationInput } from "@puzzle-ui/cms";
+
+if (
+  scheduled.scheduledAt === null ||
+  scheduled.scheduledRevisionNumber === null ||
+  scheduled.scheduledTimeZone === null
+) {
+  throw new Error("The document has no scheduled publication.");
+}
+
+const publication: CmsScheduledPublicationInput = {
+  entryId: scheduled.id,
+  scheduledRevisionNumber: scheduled.scheduledRevisionNumber,
+  publishAt: scheduled.scheduledAt,
+  timeZone: scheduled.scheduledTimeZone,
+};
+
+const result = await cms.$scheduler.publishScheduled(publication);
+```
+
+`cms.$scheduler` is present only when the instance is created with a
+`scheduler`. The result is either `{ published: true, entry }` or
+`{ published: false, reason: "stale" | "not-due" }`. The API uses the
+instance's bound tenant and actor; the job payload must not provide identity.
+
+When using Fullstack, the configured scheduler enables
+`POST /scheduler/publications`. Fullstack resolves the worker's context on the
+server. See the [Fullstack CMS guide](/docs/fullstack/cms) for its route
+contract and the [Multi-tenant setup](/docs/cms/multi-tenancy) for trusted
+worker identity.

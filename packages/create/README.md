@@ -45,6 +45,8 @@ With Tailwind enabled, the generated stylesheet registers `compact:`, `tablet:`,
 
 Puzzle's semantic color roles are also available as Tailwind colors with a `puzzle-` prefix, such as `bg-puzzle-primary`, `text-puzzle-primary-foreground`, and `border-puzzle-border`. These colors follow the active Theme, including local scopes and token overrides; Tailwind's default colors remain available. See the [color roles](https://puzzle-ui.com/docs/theme/colors#color-roles) for the full list.
 
+Other Puzzle theme tokens are available through `puzzle-`-prefixed utilities, including spacing (`p-puzzle-4`), radius (`rounded-puzzle-md`), elevation (`shadow-puzzle-elevation-2`), typography (`text-puzzle-body1`, `font-puzzle-heading`), layout (`max-w-puzzle-container`), and motion (`duration-puzzle-fast`). Border widths and z-index tokens are exposed as `border-width-puzzle-strong` and `z-puzzle-modal`. The utilities reference runtime theme variables, so token overrides are reflected automatically. See [Design Tokens](https://puzzle-ui.com/docs/theme/tokens) for the token groups.
+
 ## AI instructions
 
 The CLI can generate package-aware consumer instructions from locally installed Puzzle packages:

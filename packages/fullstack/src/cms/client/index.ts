@@ -1,34 +1,27 @@
 import type {
-  CmsApiAdminEntry,
-  CmsApiAuditEvent,
-  CmsApiContentType,
-  CmsApiDate,
-  CmsApiEntryMutationInput,
-  CmsApiEntryPage,
-  CmsApiEntryQuery,
+  CmsApiCreateOptions,
+  CmsApiDocument,
+  CmsApiChangeEventPage,
   CmsApiError,
   CmsApiErrorCode,
-  CmsApiFindPublishedInput,
-  CmsApiListAuditEventsInput,
-  CmsApiListContentTypesInput,
-  CmsApiListRevisionsInput,
-  CmsApiPublication,
-  CmsApiRegisterContentTypeInput,
-  CmsApiRestoreRevisionInput,
+  CmsApiPage,
+  CmsApiQueryInput,
+  CmsApiRecord,
   CmsApiRevision,
-  CmsApiScheduleEntryInput,
-  CmsApiUpdateEntryInput,
+  CmsApiSlugInput,
+  CmsApiMutationInput,
+  CmsApiRestoreRevisionInput,
+  CmsApiScheduleInput,
+  CmsApiSingletonCreateOptions,
+  CmsApiTranslationCreateOptions,
+  CmsApiUpdateOptions,
+  CmsApiWebhookAttempt,
+  CmsApiWebhookDelivery,
   CmsApiWebhookSubscription,
   CmsApiWebhookSubscriptionInput,
   CmsApiWebhookSubscriptionUpdateInput,
-  CmsApiWebhookDelivery,
-  CmsApiWebhookAttempt,
   CmsInvalidationKey,
-  CmsPublishedEntry,
-  CmsPublishedEntryPage,
   CmsQueryInvalidator,
-  CmsRelationshipLookupInput,
-  CmsRelationshipLookupResult,
 } from "../shared";
 
 export type CmsClientErrorOptions = {
@@ -81,127 +74,222 @@ export type CmsClientOptions = {
   readonly onInvalidate?: CmsQueryInvalidator;
 };
 
-export type CmsClient = {
-  listContentTypes(
-    input?: CmsApiListContentTypesInput,
+export type CmsCollectionClient = {
+  find(
+    input?: CmsApiQueryInput,
     options?: CmsClientRequestOptions,
-  ): Promise<readonly CmsApiContentType[]>;
-  getContentType(
+  ): Promise<CmsApiPage>;
+  findById(
+    id: string,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  findBySlug(
     slug: string,
+    input?: CmsApiSlugInput,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiContentType>;
-  registerContentType(
-    input: CmsApiRegisterContentTypeInput,
+  ): Promise<CmsApiDocument>;
+  create(
+    data: CmsApiRecord,
+    input?: CmsApiCreateOptions,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiContentType>;
-  listEntries(
-    input: CmsApiEntryQuery,
+  ): Promise<CmsApiDocument>;
+  update(
+    id: string,
+    data: CmsApiRecord,
+    input: CmsApiUpdateOptions,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiEntryPage>;
-  getEntry(
-    entryId: string,
+  ): Promise<CmsApiDocument>;
+  delete(
+    id: string,
+    input: CmsApiMutationInput,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
-  createEntry(
-    input: CmsApiEntryCreateInput,
+  ): Promise<CmsApiDocument>;
+  purge(
+    id: string,
+    input: CmsApiMutationInput,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
-  saveDraft(
-    entryId: string,
-    input: CmsApiUpdateEntryInput,
-    options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
-  deleteEntry(
-    entryId: string,
-    input: CmsApiEntryMutationInput,
-    options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
-  archiveEntry(
-    entryId: string,
-    input: CmsApiEntryMutationInput,
-    options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
-  restoreRevision(
-    entryId: string,
-    input: CmsApiRestoreRevisionInput,
-    options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
+  ): Promise<void>;
   publish(
-    entryId: string,
-    input: CmsApiEntryMutationInput,
+    id: string,
+    input: CmsApiMutationInput,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
+  ): Promise<CmsApiDocument>;
   unpublish(
-    entryId: string,
-    input: CmsApiEntryMutationInput,
+    id: string,
+    input: CmsApiMutationInput,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
+  ): Promise<CmsApiDocument>;
+  archive(
+    id: string,
+    input: CmsApiMutationInput,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
   schedulePublish(
-    entryId: string,
-    input: CmsApiScheduleEntryInput,
+    id: string,
+    input: CmsApiScheduleInput,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
+  ): Promise<CmsApiDocument>;
   unschedule(
-    entryId: string,
-    input: CmsApiEntryMutationInput,
+    id: string,
+    input: CmsApiMutationInput,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiAdminEntry>;
+  ): Promise<CmsApiDocument>;
   listRevisions(
-    input: CmsApiListRevisionsInput,
-    options?: CmsClientRequestOptions,
-  ): Promise<readonly CmsApiRevision[]>;
-  listLocaleVariants(
-    entryId: string,
+    id: string,
     first?: number,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsApiEntryPage>;
-  listRelationshipOptions(
-    input: CmsRelationshipLookupInput,
+  ): Promise<readonly CmsApiRevision[]>;
+  restoreRevision(
+    id: string,
+    input: CmsApiRestoreRevisionInput,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsRelationshipLookupResult>;
-  listAuditEvents(
-    input?: CmsApiListAuditEventsInput,
+  ): Promise<CmsApiDocument>;
+  listLocaleVariants(
+    id: string,
+    input?: Omit<CmsApiQueryInput, "locale">,
     options?: CmsClientRequestOptions,
-  ): Promise<readonly CmsApiAuditEvent[]>;
-  listWebhookSubscriptions(options?: CmsClientRequestOptions): Promise<readonly CmsApiWebhookSubscription[]>;
-  getWebhookSubscription(subscriptionId: string, options?: CmsClientRequestOptions): Promise<CmsApiWebhookSubscription>;
-  createWebhookSubscription(input: CmsApiWebhookSubscriptionInput, options?: CmsClientRequestOptions): Promise<CmsApiWebhookSubscription>;
-  updateWebhookSubscription(subscriptionId: string, input: CmsApiWebhookSubscriptionUpdateInput, options?: CmsClientRequestOptions): Promise<CmsApiWebhookSubscription>;
-  listWebhookDeliveries(subscriptionId: string, first?: number, options?: CmsClientRequestOptions): Promise<readonly CmsApiWebhookDelivery[]>;
-  listWebhookAttempts(deliveryId: string, first?: number, options?: CmsClientRequestOptions): Promise<readonly CmsApiWebhookAttempt[]>;
-  retryWebhookDelivery(deliveryId: string, expectedRevision: number, options?: CmsClientRequestOptions): Promise<void>;
-  getPublishedEntry(
-    entryId: string,
+  ): Promise<CmsApiPage>;
+  createTranslation(
+    id: string,
+    data: CmsApiRecord,
+    input: CmsApiTranslationCreateOptions,
     options?: CmsClientRequestOptions,
-  ): Promise<CmsPublishedEntry>;
-  findPublishedEntry(
-    input: CmsApiFindPublishedInput,
-    options?: CmsClientRequestOptions,
-  ): Promise<CmsPublishedEntry>;
-  listPublishedEntries(
-    input: CmsApiEntryQuery,
-    options?: CmsClientRequestOptions,
-  ): Promise<CmsPublishedEntryPage>;
-  publishScheduled(
-    publication: CmsApiPublication,
-    options?: CmsClientRequestOptions,
-  ): Promise<
-    | { readonly published: true; readonly entry: CmsApiAdminEntry }
-    | { readonly published: false; readonly reason: "stale" | "not-due" }
-  >;
-  invalidateQueries(keys: readonly CmsInvalidationKey[]): Promise<void>;
+  ): Promise<CmsApiDocument>;
+  readonly public: {
+    find(
+      input?: CmsApiQueryInput,
+      options?: CmsClientRequestOptions,
+    ): Promise<CmsApiPage>;
+    findById(
+      id: string,
+      options?: CmsClientRequestOptions,
+    ): Promise<CmsApiDocument>;
+    findBySlug(
+      slug: string,
+      input?: CmsApiSlugInput,
+      options?: CmsClientRequestOptions,
+    ): Promise<CmsApiDocument>;
+  };
 };
 
-export type CmsApiEntryCreateInput = Omit<
-  import("../shared").CmsApiCreateEntryInput,
-  "translationGroupId"
-> & {
-  readonly translationGroupId?: string;
+export type CmsSingletonClient = {
+  find(
+    input?: Pick<CmsApiQueryInput, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  create(
+    data: CmsApiRecord,
+    input?: CmsApiSingletonCreateOptions,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  update(
+    data: CmsApiRecord,
+    input: CmsApiMutationInput & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  delete(
+    input: CmsApiMutationInput & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  purge(
+    input: CmsApiMutationInput & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<void>;
+  publish(
+    input: CmsApiMutationInput & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  unpublish(
+    input: CmsApiMutationInput & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  archive(
+    input: CmsApiMutationInput & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  schedulePublish(
+    input: CmsApiScheduleInput & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  unschedule(
+    input: CmsApiMutationInput & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  listRevisions(
+    input?: { readonly first?: number } & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<readonly CmsApiRevision[]>;
+  restoreRevision(
+    revisionId: string,
+    input: CmsApiMutationInput & Pick<CmsApiCreateOptions, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  createTranslation(
+    data: CmsApiRecord,
+    input: Pick<CmsApiTranslationCreateOptions, "locale" | "changeSummary">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiDocument>;
+  listLocaleVariants(
+    input?: Omit<CmsApiQueryInput, "locale">,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiPage>;
+  readonly public: {
+    find(
+      input?: Pick<CmsApiQueryInput, "locale">,
+      options?: CmsClientRequestOptions,
+    ): Promise<CmsApiDocument>;
+  };
+};
+
+export type CmsClient = {
+  collection(name: string): CmsCollectionClient;
+  singleton(name: string): CmsSingletonClient;
+  listWebhookSubscriptions(
+    options?: CmsClientRequestOptions,
+  ): Promise<readonly CmsApiWebhookSubscription[]>;
+  getWebhookSubscription(
+    subscriptionId: string,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiWebhookSubscription>;
+  createWebhookSubscription(
+    input: CmsApiWebhookSubscriptionInput,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiWebhookSubscription>;
+  updateWebhookSubscription(
+    subscriptionId: string,
+    input: CmsApiWebhookSubscriptionUpdateInput,
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiWebhookSubscription>;
+  listWebhookDeliveries(
+    subscriptionId: string,
+    first?: number,
+    options?: CmsClientRequestOptions,
+  ): Promise<readonly CmsApiWebhookDelivery[]>;
+  listWebhookAttempts(
+    deliveryId: string,
+    first?: number,
+    options?: CmsClientRequestOptions,
+  ): Promise<readonly CmsApiWebhookAttempt[]>;
+  retryWebhookDelivery(
+    deliveryId: string,
+    expectedRevision: number,
+    options?: CmsClientRequestOptions,
+  ): Promise<void>;
+  listChangeEvents(
+    input?: { readonly first?: number; readonly after?: string },
+    options?: CmsClientRequestOptions,
+  ): Promise<CmsApiChangeEventPage>;
+  acknowledgeChangeEvent(
+    eventId: string,
+    expectedRevision: number,
+    options?: CmsClientRequestOptions,
+  ): Promise<void>;
+  invalidateQueries(keys: readonly CmsInvalidationKey[]): Promise<void>;
 };
 
 const encode = (value: string): string => encodeURIComponent(value);
 
-const queryString = (input: Readonly<Record<string, unknown>>): string => {
+const queryString = (input: object): string => {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(input)) {
     if (value === undefined) continue;
@@ -216,9 +304,6 @@ const queryString = (input: Readonly<Record<string, unknown>>): string => {
   return result ? `?${result}` : "";
 };
 
-const apiPath = (basePath: string, path: string): string =>
-  `${basePath}${path}`;
-
 const clientErrorFrom = (
   response: Response,
   body: unknown,
@@ -227,32 +312,64 @@ const clientErrorFrom = (
     typeof body === "object" && body !== null && "error" in body
       ? (body as CmsApiError).error
       : undefined;
+  const code =
+    typeof detail?.code === "string" &&
+    [
+      "VALIDATION",
+      "SCHEMA",
+      "NOT_FOUND",
+      "CONFLICT",
+      "DUPLICATE",
+      "PERMISSION_DENIED",
+      "CAPABILITY",
+      "SCHEDULER",
+      "AUDIT",
+      "INTERNAL",
+      "UNAUTHENTICATED",
+      "FORBIDDEN",
+      "INVALID_REQUEST",
+    ].includes(detail.code)
+      ? detail.code as CmsApiErrorCode
+      : "INTERNAL";
   return new CmsClientError(
     typeof detail?.message === "string"
       ? detail.message
       : "The CMS request failed.",
-    {
-      status: response.status,
-      code:
-        typeof detail?.code === "string"
-          ? detail.code
-          : "INTERNAL",
-    },
+    { status: response.status, code },
   );
+};
+
+const normalizeBasePath = (basePath: string | undefined): string => {
+  const value = (basePath ?? "/api/cms").trim();
+  if (
+    !value.startsWith("/") ||
+    value.startsWith("//") ||
+    value.includes("?") ||
+    value.includes("#")
+  ) {
+    throw new TypeError("basePath must be an absolute URL path.");
+  }
+  const normalized = `/${value.split("/").filter(Boolean).join("/")}`;
+  return normalized === "/" ? "" : normalized;
+};
+
+const assertDocumentData = (data: CmsApiRecord): void => {
+  if (
+    !data ||
+    typeof data !== "object" ||
+    Array.isArray(data) ||
+    ["tenantId", "actor", "user", "permissions"].some((key) =>
+      Object.hasOwn(data, key),
+    )
+  ) {
+    throw new TypeError("Tenant, actor, user, and permission values are resolved by the server.");
+  }
 };
 
 export const createCmsClient = (
   options: CmsClientOptions = {},
 ): CmsClient => {
-  const basePath = (options.basePath ?? "/api/cms").replace(/\/+$/, "");
-  if (
-    !basePath.startsWith("/") ||
-    basePath.startsWith("//") ||
-    basePath.includes("?") ||
-    basePath.includes("#")
-  ) {
-    throw new TypeError("basePath must be an absolute URL path.");
-  }
+  const basePath = normalizeBasePath(options.basePath);
   const fetcher = options.fetch ?? ((input, init) => fetch(input, init));
 
   const request = async <T>(
@@ -261,7 +378,7 @@ export const createCmsClient = (
   ): Promise<T> => {
     let response: Response;
     try {
-      response = await fetcher(apiPath(basePath, path), {
+      response = await fetcher(`${basePath}${path}`, {
         ...init,
         cache: "no-store",
         credentials: "same-origin",
@@ -317,229 +434,512 @@ export const createCmsClient = (
   });
 
   return {
-    async listContentTypes(input = {}, requestOptions) {
-      const result = await request<{ readonly contentTypes: readonly CmsApiContentType[] }>(
-        `/admin/content-types${queryString(input)}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.contentTypes;
+    collection(name) {
+      if (!name.trim()) throw new TypeError("collection name is required.");
+      const base = `/collections/${encode(name)}`;
+      const admin = `/admin${base}`;
+      const publicPath = `/public${base}`;
+
+      const readPage = async (
+        path: string,
+        input: CmsApiQueryInput | undefined,
+        requestOptions: CmsClientRequestOptions | undefined,
+      ): Promise<CmsApiPage> => {
+        const result = await request<{ readonly page: CmsApiPage }>(
+          `${path}${queryString(input ?? {})}`,
+          { signal: requestOptions?.signal },
+        );
+        return result.page;
+      };
+
+      const readDocument = async (
+        path: string,
+        requestOptions: CmsClientRequestOptions | undefined,
+      ): Promise<CmsApiDocument> => {
+        const result = await request<{ readonly document: CmsApiDocument }>(
+          path,
+          { signal: requestOptions?.signal },
+        );
+        return result.document;
+      };
+      const mutateLifecycle = async (
+        id: string,
+        action: string,
+        input: CmsApiMutationInput | CmsApiScheduleInput | CmsApiRestoreRevisionInput,
+        requestOptions: CmsClientRequestOptions | undefined,
+        invalidations: readonly CmsInvalidationKey[],
+      ): Promise<CmsApiDocument> => {
+        const result = await mutate<{ readonly document: CmsApiDocument }>(
+          `${admin}/${encode(id)}/${action}`,
+          json("POST", input, requestOptions?.signal),
+          invalidations,
+        );
+        return result.document;
+      };
+      return {
+        async find(input = {}, requestOptions) {
+          return readPage(admin, input, requestOptions);
+        },
+        async findById(id, requestOptions) {
+          return readDocument(`${admin}/${encode(id)}`, requestOptions);
+        },
+        async findBySlug(slug, input = {}, requestOptions) {
+          return readDocument(
+            `${admin}/by-slug/${encode(slug)}${queryString(input)}`,
+            requestOptions,
+          );
+        },
+        async create(data, input = {}, requestOptions) {
+          assertDocumentData(data);
+          const invalidations: CmsInvalidationKey[] = [
+            {
+              type: "admin-entries",
+              contentType: name,
+              ...(input.locale ? { locale: input.locale } : {}),
+            },
+            { type: "relationships", contentType: "*", fieldPath: "*" },
+          ];
+          const result = await mutate<{ readonly document: CmsApiDocument }>(
+            admin,
+            json("POST", { data, ...input }, requestOptions?.signal),
+            invalidations,
+          );
+          return result.document;
+        },
+        async update(id, data, input, requestOptions) {
+          assertDocumentData(data);
+          const result = await mutate<{ readonly document: CmsApiDocument }>(
+            `${admin}/${encode(id)}`,
+            json("PATCH", { data, ...input }, requestOptions?.signal),
+            [
+              { type: "admin-entries", entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+          return result.document;
+        },
+        async delete(id, input, requestOptions) {
+          const result = await mutate<{ readonly document: CmsApiDocument }>(
+            `${admin}/${encode(id)}`,
+            json("DELETE", input, requestOptions?.signal),
+            [
+              { type: "admin-entries", entryId: id },
+              { type: "public-entries", entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+          return result.document;
+        },
+        async purge(id, input, requestOptions) {
+          await mutate<{ readonly purged: true }>(
+            `${admin}/${encode(id)}/permanent`,
+            json("DELETE", input, requestOptions?.signal),
+            [
+              { type: "admin-entries", entryId: id },
+              { type: "public-entries", entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async publish(id, input, requestOptions) {
+          return mutateLifecycle(
+            id,
+            "publish",
+            input,
+            requestOptions,
+            [
+              { type: "admin-entries", entryId: id },
+              { type: "public-entries", entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+              { type: "audit", resourceId: id },
+            ],
+          );
+        },
+        async unpublish(id, input, requestOptions) {
+          return mutateLifecycle(
+            id,
+            "unpublish",
+            input,
+            requestOptions,
+            [
+              { type: "admin-entries", entryId: id },
+              { type: "public-entries", entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+              { type: "audit", resourceId: id },
+            ],
+          );
+        },
+        async archive(id, input, requestOptions) {
+          return mutateLifecycle(
+            id,
+            "archive",
+            input,
+            requestOptions,
+            [
+              { type: "admin-entries", entryId: id },
+              { type: "public-entries", entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async schedulePublish(id, input, requestOptions) {
+          return mutateLifecycle(
+            id,
+            "schedule",
+            input,
+            requestOptions,
+            [
+              { type: "admin-entries", entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async unschedule(id, input, requestOptions) {
+          return mutateLifecycle(
+            id,
+            "unschedule",
+            input,
+            requestOptions,
+            [
+              { type: "admin-entries", entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async listRevisions(id, first, requestOptions) {
+          const result = await request<{
+            readonly revisions: readonly CmsApiRevision[];
+          }>(
+            `${admin}/${encode(id)}/revisions${queryString({ first })}`,
+            { signal: requestOptions?.signal },
+          );
+          return result.revisions;
+        },
+        async restoreRevision(id, input, requestOptions) {
+          return mutateLifecycle(
+            id,
+            "restore",
+            input,
+            requestOptions,
+            [
+              { type: "admin-entries", entryId: id },
+              { type: "public-entries", entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async listLocaleVariants(id, input = {}, requestOptions) {
+          const result = await request<{ readonly page: CmsApiPage }>(
+            `${admin}/${encode(id)}/translations${queryString(input)}`,
+            { signal: requestOptions?.signal },
+          );
+          return result.page;
+        },
+        async createTranslation(id, data, input, requestOptions) {
+          assertDocumentData(data);
+          const result = await mutate<{ readonly document: CmsApiDocument }>(
+            `${admin}/${encode(id)}/translations`,
+            json("POST", { data, ...input }, requestOptions?.signal),
+            [
+              {
+                type: "admin-entries",
+                contentType: name,
+                locale: input.locale,
+              },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+          return result.document;
+        },
+        public: {
+          async find(input = {}, requestOptions) {
+            return readPage(publicPath, input, requestOptions);
+          },
+          async findById(id, requestOptions) {
+            return readDocument(`${publicPath}/${encode(id)}`, requestOptions);
+          },
+          async findBySlug(slug, input = {}, requestOptions) {
+            return readDocument(
+              `${publicPath}/by-slug/${encode(slug)}${queryString(input)}`,
+              requestOptions,
+            );
+          },
+        },
+      };
     },
-    async getContentType(slug, requestOptions) {
-      const result = await request<{ readonly contentType: CmsApiContentType }>(
-        `/admin/content-types/${encode(slug)}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.contentType;
-    },
-    async registerContentType(input, requestOptions) {
-      const result = await mutate<{ readonly contentType: CmsApiContentType }>(
-        "/admin/content-types",
-        json("POST", input, requestOptions?.signal),
-        [
-          { type: "content-types" },
-          { type: "admin-entries" },
-          { type: "public-entries" },
-        ],
-      );
-      return result.contentType;
-    },
-    async listEntries(input, requestOptions) {
-      const result = await request<{ readonly page: CmsApiEntryPage }>(
-        `/admin/entries${queryString(input)}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.page;
-    },
-    async getEntry(entryId, requestOptions) {
-      const result = await request<{ readonly entry: CmsApiAdminEntry }>(
-        `/admin/entries/${encode(entryId)}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.entry;
-    },
-    async createEntry(input, requestOptions) {
-      const result = await mutate<{ readonly entry: CmsApiAdminEntry }>(
-        "/admin/entries",
-        json("POST", input, requestOptions?.signal),
-        [
-          { type: "admin-entries", contentType: input.contentType, locale: input.locale },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
-        ],
-      );
-      return result.entry;
-    },
-    async saveDraft(entryId, input, requestOptions) {
-      const result = await mutate<{ readonly entry: CmsApiAdminEntry }>(
-        `/admin/entries/${encode(entryId)}`,
-        json("PATCH", input, requestOptions?.signal),
-        [
-          { type: "admin-entries", entryId },
-          { type: "revisions", entryId },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
-        ],
-      );
-      return result.entry;
-    },
-    async deleteEntry(entryId, input, requestOptions) {
-      const result = await mutate<{ readonly entry: CmsApiAdminEntry }>(
-        `/admin/entries/${encode(entryId)}`,
-        json("DELETE", input, requestOptions?.signal),
-        [
-          { type: "admin-entries", entryId },
-          { type: "public-entries", entryId },
-          { type: "revisions", entryId },
-          { type: "audit", resourceId: entryId },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
-        ],
-      );
-      return result.entry;
-    },
-    async archiveEntry(entryId, input, requestOptions) {
-      const result = await mutate<{ readonly entry: CmsApiAdminEntry }>(
-        `/admin/entries/${encode(entryId)}/archive`,
-        json("POST", input, requestOptions?.signal),
-        [
-          { type: "admin-entries", entryId },
-          { type: "public-entries", entryId },
-          { type: "revisions", entryId },
-          { type: "audit", resourceId: entryId },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
-        ],
-      );
-      return result.entry;
-    },
-    async restoreRevision(entryId, input, requestOptions) {
-      const result = await mutate<{ readonly entry: CmsApiAdminEntry }>(
-        `/admin/entries/${encode(entryId)}/restore`,
-        json("POST", input, requestOptions?.signal),
-        [
-          { type: "admin-entries", entryId },
-          { type: "public-entries", entryId },
-          { type: "revisions", entryId },
-          { type: "audit", resourceId: entryId },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
-        ],
-      );
-      return result.entry;
-    },
-    async publish(entryId, input, requestOptions) {
-      const result = await mutate<{ readonly entry: CmsApiAdminEntry }>(
-        `/admin/entries/${encode(entryId)}/publish`,
-        json("POST", input, requestOptions?.signal),
-        [
-          { type: "admin-entries", entryId },
-          { type: "public-entries", entryId },
-          { type: "revisions", entryId },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
-          { type: "audit", resourceId: entryId },
-        ],
-      );
-      return result.entry;
-    },
-    async unpublish(entryId, input, requestOptions) {
-      const result = await mutate<{ readonly entry: CmsApiAdminEntry }>(
-        `/admin/entries/${encode(entryId)}/unpublish`,
-        json("POST", input, requestOptions?.signal),
-        [
-          { type: "admin-entries", entryId },
-          { type: "public-entries", entryId },
-          { type: "revisions", entryId },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
-          { type: "audit", resourceId: entryId },
-        ],
-      );
-      return result.entry;
-    },
-    async schedulePublish(entryId, input, requestOptions) {
-      const result = await mutate<{ readonly entry: CmsApiAdminEntry }>(
-        `/admin/entries/${encode(entryId)}/schedule`,
-        json("POST", input, requestOptions?.signal),
-        [
-          { type: "admin-entries", entryId },
-          { type: "revisions", entryId },
-          { type: "audit", resourceId: entryId },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
-        ],
-      );
-      return result.entry;
-    },
-    async unschedule(entryId, input, requestOptions) {
-      const result = await mutate<{ readonly entry: CmsApiAdminEntry }>(
-        `/admin/entries/${encode(entryId)}/unschedule`,
-        json("POST", input, requestOptions?.signal),
-        [
-          { type: "admin-entries", entryId },
-          { type: "revisions", entryId },
-          { type: "audit", resourceId: entryId },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
-        ],
-      );
-      return result.entry;
-    },
-    async listRevisions(input, requestOptions) {
-      const { entryId, ...query } = input;
-      const result = await request<{ readonly revisions: readonly CmsApiRevision[] }>(
-        `/admin/entries/${encode(entryId)}/revisions${queryString(query)}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.revisions;
-    },
-    async listLocaleVariants(entryId, first, requestOptions) {
-      const result = await request<{ readonly page: CmsApiEntryPage }>(
-        `/admin/entries/${encode(entryId)}/translations${queryString({ first })}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.page;
-    },
-    async listRelationshipOptions(input, requestOptions) {
-      const result = await request<CmsRelationshipLookupResult>(
-        `/admin/relationships${queryString(input)}`,
-        { signal: requestOptions?.signal },
-      );
-      return result;
-    },
-    async listAuditEvents(input = {}, requestOptions) {
-      const result = await request<{ readonly events: readonly CmsApiAuditEvent[] }>(
-        `/admin/audit${queryString(input)}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.events;
+    singleton(name) {
+      if (!name.trim()) throw new TypeError("collection name is required.");
+      const base = `/collections/${encode(name)}`;
+      const admin = `/admin${base}`;
+      const publicPath = `/public${base}`;
+      const readDocument = async (
+        path: string,
+        requestOptions: CmsClientRequestOptions | undefined,
+      ): Promise<CmsApiDocument> => {
+        const result = await request<{ readonly document: CmsApiDocument }>(
+          path,
+          { signal: requestOptions?.signal },
+        );
+        return result.document;
+      };
+      const mutateSingletonLifecycle = async (
+        action: string,
+        input: CmsApiMutationInput | CmsApiScheduleInput,
+        requestOptions: CmsClientRequestOptions | undefined,
+        invalidationsFor: (id: string) => readonly CmsInvalidationKey[],
+      ): Promise<CmsApiDocument> => {
+        const result = await request<{ readonly document: CmsApiDocument }>(
+          `${admin}/${action}`,
+          json("POST", input, requestOptions?.signal),
+        );
+        await invalidate(invalidationsFor(result.document.id));
+        return result.document;
+      };
+
+      return {
+        async find(input = {}, requestOptions) {
+          return readDocument(
+            `${admin}${queryString(input)}`,
+            requestOptions,
+          );
+        },
+        async create(data, input = {}, requestOptions) {
+          assertDocumentData(data);
+          const result = await mutate<{ readonly document: CmsApiDocument }>(
+            admin,
+            json("POST", { data, ...input }, requestOptions?.signal),
+            [
+              {
+                type: "admin-entries",
+                contentType: name,
+                ...(input.locale ? { locale: input.locale } : {}),
+              },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+          return result.document;
+        },
+        async update(data, input, requestOptions) {
+          assertDocumentData(data);
+          const result = await mutate<{ readonly document: CmsApiDocument }>(
+            admin,
+            json("PATCH", { data, ...input }, requestOptions?.signal),
+            [
+              { type: "admin-entries", contentType: name },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+          return result.document;
+        },
+        async delete(input, requestOptions) {
+          const result = await mutate<{ readonly document: CmsApiDocument }>(
+            admin,
+            json("DELETE", input, requestOptions?.signal),
+            [
+              { type: "admin-entries", contentType: name },
+              { type: "public-entries", contentType: name },
+              { type: "audit" },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+          return result.document;
+        },
+        async purge(input, requestOptions) {
+          await mutate<{ readonly purged: true }>(
+            `${admin}/permanent`,
+            json("DELETE", input, requestOptions?.signal),
+            [
+              { type: "admin-entries", contentType: name },
+              { type: "public-entries", contentType: name },
+              { type: "audit" },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async publish(input, requestOptions) {
+          return mutateSingletonLifecycle(
+            "publish",
+            input,
+            requestOptions,
+            (id) => [
+              { type: "admin-entries", contentType: name, entryId: id },
+              { type: "public-entries", contentType: name, entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async unpublish(input, requestOptions) {
+          return mutateSingletonLifecycle(
+            "unpublish",
+            input,
+            requestOptions,
+            (id) => [
+              { type: "admin-entries", contentType: name, entryId: id },
+              { type: "public-entries", contentType: name, entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async archive(input, requestOptions) {
+          return mutateSingletonLifecycle(
+            "archive",
+            input,
+            requestOptions,
+            (id) => [
+              { type: "admin-entries", contentType: name, entryId: id },
+              { type: "public-entries", contentType: name, entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async schedulePublish(input, requestOptions) {
+          return mutateSingletonLifecycle(
+            "schedule",
+            input,
+            requestOptions,
+            (id) => [
+              { type: "admin-entries", contentType: name, entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async unschedule(input, requestOptions) {
+          return mutateSingletonLifecycle(
+            "unschedule",
+            input,
+            requestOptions,
+            (id) => [
+              { type: "admin-entries", contentType: name, entryId: id },
+              { type: "revisions", entryId: id },
+              { type: "audit", resourceId: id },
+              { type: "relationships", contentType: "*", fieldPath: "*" },
+            ],
+          );
+        },
+        async listRevisions(input = {}, requestOptions) {
+          const result = await request<{
+            readonly revisions: readonly CmsApiRevision[];
+          }>(
+            `${admin}/revisions${queryString(input)}`,
+            { signal: requestOptions?.signal },
+          );
+          return result.revisions;
+        },
+        async restoreRevision(revisionId, input, requestOptions) {
+          const result = await request<{ readonly document: CmsApiDocument }>(
+            `${admin}/restore`,
+            json("POST", { revisionId, ...input }, requestOptions?.signal),
+          );
+          await invalidate([
+            { type: "admin-entries", contentType: name, entryId: result.document.id },
+            { type: "public-entries", contentType: name, entryId: result.document.id },
+            { type: "revisions", entryId: result.document.id },
+            { type: "audit", resourceId: result.document.id },
+            { type: "relationships", contentType: "*", fieldPath: "*" },
+          ]);
+          return result.document;
+        },
+        async createTranslation(data, input, requestOptions) {
+          assertDocumentData(data);
+          const result = await request<{ readonly document: CmsApiDocument }>(
+            `${admin}/translations`,
+            json("POST", { data, ...input }, requestOptions?.signal),
+          );
+          await invalidate([
+            {
+              type: "admin-entries",
+              contentType: name,
+              locale: input.locale,
+            },
+            { type: "relationships", contentType: "*", fieldPath: "*" },
+          ]);
+          return result.document;
+        },
+        async listLocaleVariants(input = {}, requestOptions) {
+          const result = await request<{ readonly page: CmsApiPage }>(
+            `${admin}/translations${queryString(input)}`,
+            { signal: requestOptions?.signal },
+          );
+          return result.page;
+        },
+        public: {
+          async find(input = {}, requestOptions) {
+            return readDocument(
+              `${publicPath}${queryString(input)}`,
+              requestOptions,
+            );
+          },
+        },
+      };
     },
     async listWebhookSubscriptions(requestOptions) {
-      const result = await request<{ readonly subscriptions: readonly CmsApiWebhookSubscription[] }>(
-        "/admin/webhooks", { signal: requestOptions?.signal },
-      );
+      const result = await request<{
+        readonly subscriptions: readonly CmsApiWebhookSubscription[];
+      }>("/admin/webhooks", { signal: requestOptions?.signal });
       return result.subscriptions;
     },
     async getWebhookSubscription(subscriptionId, requestOptions) {
       const result = await request<{ readonly subscription: CmsApiWebhookSubscription }>(
-        `/admin/webhooks/${encode(subscriptionId)}`, { signal: requestOptions?.signal },
+        `/admin/webhooks/${encode(subscriptionId)}`,
+        { signal: requestOptions?.signal },
       );
       return result.subscription;
     },
     async createWebhookSubscription(input, requestOptions) {
       const result = await mutate<{ readonly subscription: CmsApiWebhookSubscription }>(
-        "/admin/webhooks", json("POST", input, requestOptions?.signal),
+        "/admin/webhooks",
+        json("POST", input, requestOptions?.signal),
         [{ type: "webhook-subscriptions" }, { type: "audit" }],
       );
       return result.subscription;
     },
     async updateWebhookSubscription(subscriptionId, input, requestOptions) {
       const result = await mutate<{ readonly subscription: CmsApiWebhookSubscription }>(
-        `/admin/webhooks/${encode(subscriptionId)}`, json("PATCH", input, requestOptions?.signal),
-        [{ type: "webhook-subscriptions" }, { type: "audit", resourceId: subscriptionId }],
+        `/admin/webhooks/${encode(subscriptionId)}`,
+        json("PATCH", input, requestOptions?.signal),
+        [
+          { type: "webhook-subscriptions" },
+          { type: "audit", resourceId: subscriptionId },
+        ],
       );
       return result.subscription;
     },
     async listWebhookDeliveries(subscriptionId, first, requestOptions) {
-      const result = await request<{ readonly deliveries: readonly CmsApiWebhookDelivery[] }>(
+      const result = await request<{
+        readonly deliveries: readonly CmsApiWebhookDelivery[];
+      }>(
         `/admin/webhooks/${encode(subscriptionId)}/deliveries${queryString({ first })}`,
         { signal: requestOptions?.signal },
       );
       return result.deliveries;
     },
     async listWebhookAttempts(deliveryId, first, requestOptions) {
-      const result = await request<{ readonly attempts: readonly CmsApiWebhookAttempt[] }>(
+      const result = await request<{
+        readonly attempts: readonly CmsApiWebhookAttempt[];
+      }>(
         `/admin/webhook-deliveries/${encode(deliveryId)}/attempts${queryString({ first })}`,
         { signal: requestOptions?.signal },
       );
@@ -549,44 +949,23 @@ export const createCmsClient = (
       await mutate<{ readonly retried: true }>(
         `/admin/webhook-deliveries/${encode(deliveryId)}/retry`,
         json("POST", { expectedRevision }, requestOptions?.signal),
-        [{ type: "webhook-deliveries" }, { type: "audit", resourceId: deliveryId }],
-      );
-    },
-    async getPublishedEntry(entryId, requestOptions) {
-      const result = await request<{ readonly entry: CmsPublishedEntry }>(
-        `/public/entries/${encode(entryId)}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.entry;
-    },
-    async findPublishedEntry(input, requestOptions) {
-      const query = queryString({
-        fallbackLocales: input.fallbackLocales,
-      });
-      const result = await request<{ readonly entry: CmsPublishedEntry }>(
-        `/public/entries/by-slug/${encode(input.contentType)}/${encode(input.locale)}/${encode(input.slug)}${query}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.entry;
-    },
-    async listPublishedEntries(input, requestOptions) {
-      const result = await request<{ readonly page: CmsPublishedEntryPage }>(
-        `/public/entries${queryString(input)}`,
-        { signal: requestOptions?.signal },
-      );
-      return result.page;
-    },
-    async publishScheduled(publication, requestOptions) {
-      return mutate(
-        "/scheduler/publications",
-        json("POST", { publication }, requestOptions?.signal),
         [
-          { type: "admin-entries", entryId: publication.entryId },
-          { type: "public-entries", entryId: publication.entryId },
-          { type: "revisions", entryId: publication.entryId },
-          { type: "audit", resourceId: publication.entryId },
-          { type: "relationships", contentType: "*", fieldPath: "*" },
+          { type: "webhook-deliveries" },
+          { type: "audit", resourceId: deliveryId },
         ],
+      );
+    },
+    async listChangeEvents(input = {}, requestOptions) {
+      return request<CmsApiChangeEventPage>(
+        `/admin/change-events${queryString(input)}`,
+        { signal: requestOptions?.signal },
+      );
+    },
+    async acknowledgeChangeEvent(eventId, expectedRevision, requestOptions) {
+      await mutate<{ readonly acknowledged: true }>(
+        `/admin/change-events/${encode(eventId)}/ack`,
+        json("POST", { expectedRevision }, requestOptions?.signal),
+        [{ type: "change-events" }],
       );
     },
     async invalidateQueries(keys) {

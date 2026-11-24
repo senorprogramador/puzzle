@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { Miniflare } from "miniflare";
 
+import { StorageValidationError } from "@puzzle-ui/storage";
 import { D1StorageMigrationAdapter, D1StorageAdapter } from "../src";
 import type { D1DatabaseLike } from "../src/d1.types";
 
@@ -8,7 +9,10 @@ import {
   runStorageAdapterConformance,
   runStorageMigrationConformance,
 } from "../../storage/tests/conformance";
-import { USERS_COLLECTION } from "../../storage/tests/conformance/storage-adapter.test-types";
+import {
+  USERS_COLLECTION,
+  type ConformanceUser,
+} from "../../storage/tests/conformance/storage-adapter.test-types";
 
 let miniflare: Miniflare;
 let storageDatabase: D1DatabaseLike;
@@ -111,6 +115,57 @@ describe("D1 index names", () => {
       indexes: [{ name: 'bad"; DROP TABLE test;--', fields: ["slug"] }],
     })).rejects.toThrow("Invalid SQL identifier");
     expect(await adapter.findById<IndexedRecord>(definition.name, "first")).not.toBeNull();
+  });
+});
+
+describe("D1 query path validation", () => {
+  it("rejects unsafe dotted filter and sort paths before issuing SQL", async () => {
+    const adapter = new D1StorageAdapter({ database: storageDatabase });
+
+    await expect(
+      adapter.findMany(USERS_COLLECTION, {
+        where: {
+          'name"); DROP TABLE users; --': {
+            operator: "eq",
+            value: "ignored",
+          },
+        },
+      } as never),
+    ).rejects.toBeInstanceOf(StorageValidationError);
+
+    await expect(
+      adapter.findMany(USERS_COLLECTION, {
+        orderBy: [
+          { field: "profile..name", direction: "asc" },
+        ],
+      } as never),
+    ).rejects.toBeInstanceOf(StorageValidationError);
+  });
+});
+
+describe("D1 cursor validation", () => {
+  it("rejects forged non-scalar values and mismatched cursor tuples", async () => {
+    const adapter = new D1StorageAdapter({ database: storageDatabase });
+    const encodeCursor = (values: readonly unknown[]) => ({
+      value: btoa(encodeURIComponent(JSON.stringify({ values }))),
+    });
+    const query = {
+      first: 1,
+      orderBy: [{ field: "profile.score" as const, direction: "asc" as const }],
+    };
+
+    for (const cursor of [
+      encodeCursor([{ nested: true }, "user-1"]),
+      encodeCursor([[1, 2], "user-1"]),
+      encodeCursor([10]),
+    ]) {
+      await expect(
+        adapter.findPage<ConformanceUser>(USERS_COLLECTION, {
+          ...query,
+          after: cursor,
+        }),
+      ).rejects.toBeInstanceOf(StorageValidationError);
+    }
   });
 });
 

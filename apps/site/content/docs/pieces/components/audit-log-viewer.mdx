@@ -11,6 +11,8 @@ import { AuditLogViewer } from "@puzzle-ui/pieces";
 It also accepts sanitized Media audit projections with `upload`, `asset`, or
 `folder` resources and `failure` results. Assign each event a stable ID and use
 an empty `resourceId` when the operation has not produced one.
+The Fullstack CMS client currently has no audit-query method; obtain these
+events from a separately authorized host source.
 
 <Preview fit="device" code={`<AuditLogViewer events={authorizedEvents} pageSize={10} />`}>
   <AuditLogViewerExample />
@@ -29,7 +31,7 @@ an empty `resourceId` when the operation has not produced one.
 ```tsx
 import { AuditLogViewer } from "@puzzle-ui/pieces";
 
-<AuditLogViewer events={await cmsClient.listAuditEvents({ resourceId: entryId })} />;
+<AuditLogViewer events={authorizedEvents} />;
 ```
 
 Search, resource/result filters, and pagination apply only to the supplied events.

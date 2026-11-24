@@ -81,6 +81,169 @@ const configureCss = async (filePath: string) => {
 @theme inline {
 ${colorRoles.map((role) => `  --color-puzzle-${role}: var(--puzzle-color-${role});`).join("\n")}
 }`;
+  const tokenMarker = "/* Puzzle design tokens */";
+  const spacingTokens = [
+    "0",
+    "px",
+    "0.5",
+    "1",
+    "1.5",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "8",
+    "10",
+    "12",
+    "16",
+    "20",
+    "24",
+  ];
+  const fontSizes = [
+    "xs",
+    "sm",
+    "base",
+    "lg",
+    "xl",
+    "2xl",
+    "3xl",
+    "4xl",
+    "5xl",
+    "6xl",
+  ];
+  const typographyRoles = [
+    "display1",
+    "display2",
+    "headline1",
+    "headline2",
+    "headline3",
+    "headline4",
+    "subtitle1",
+    "subtitle2",
+    "body1",
+    "body2",
+    "button",
+    "caption",
+    "overline",
+  ];
+  const fontWeights = ["normal", "medium", "semibold", "bold", "extrabold"];
+  const lineHeights = ["none", "tight", "snug", "normal", "relaxed", "loose"];
+  const letterSpacings = [
+    "tighter",
+    "tight",
+    "normal",
+    "wide",
+    "wider",
+    "widest",
+  ];
+  const fontGaps = [
+    "heading-stack-gap",
+    "heading-paragraph-gap",
+    "paragraph-gap",
+    "section-gap",
+  ];
+  const radii = ["none", "sm", "md", "lg", "xl", "2xl", "3xl", "full"];
+  const shadows = ["none", "xs", "sm", "md", "lg", "xl"];
+  const elevations = ["1", "2", "3", "4", "6", "8", "12", "16", "24"];
+  const containerSizes = ["container", "content", "prose"];
+  const motionDurations = ["fast", "normal", "slow"];
+  const motionEasings = ["standard", "in", "out"];
+  const zIndexes = [
+    "base",
+    "dropdown",
+    "sticky",
+    "navigation",
+    "overlay",
+    "modal",
+    "popover",
+    "toast",
+    "tooltip",
+  ];
+  const tokenAliases = [
+    ...spacingTokens.map(
+      (token) =>
+        `  --spacing-puzzle-${token}: var(--puzzle-space-${token});`,
+    ),
+    `  --spacing-puzzle-container-gutter: var(--puzzle-container-gutter);`,
+    ...fontGaps.map(
+      (token) =>
+        `  --spacing-puzzle-font-gap-${token}: var(--puzzle-font-gap-${token});`,
+    ),
+    ...radii.map(
+      (token) =>
+        `  --radius-puzzle-${token}: var(--puzzle-radius-${token});`,
+    ),
+    ...shadows.map(
+      (token) =>
+        `  --shadow-puzzle-${token}: var(--puzzle-shadow-${token});`,
+    ),
+    ...elevations.map(
+      (token) =>
+        `  --shadow-puzzle-elevation-${token}: var(--puzzle-elevation-${token});`,
+    ),
+    ...fontSizes.map(
+      (token) =>
+        `  --text-puzzle-${token}: var(--puzzle-font-size-${token});`,
+    ),
+    ...typographyRoles.map(
+      (token) =>
+        `  --text-puzzle-${token}: var(--puzzle-font-size-${token});`,
+    ),
+    ...["body", "heading", "accent", ...typographyRoles].map(
+      (token) =>
+        `  --font-puzzle-${token}: var(--puzzle-font-family-${token});`,
+    ),
+    ...fontWeights.map(
+      (token) =>
+        `  --font-weight-puzzle-${token}: var(--puzzle-font-weight-${token});`,
+    ),
+    ...lineHeights.map(
+      (token) =>
+        `  --leading-puzzle-${token}: var(--puzzle-font-line-height-${token});`,
+    ),
+    ...letterSpacings.map(
+      (token) =>
+        `  --tracking-puzzle-${token}: var(--puzzle-font-letter-spacing-${token});`,
+    ),
+    ...containerSizes.map(
+      (token) =>
+        `  --container-puzzle-${token}: var(--puzzle-${token}-width);`,
+    ),
+    `  --color-puzzle-overlay-backdrop: var(--puzzle-overlay-backdrop);`,
+    `  --blur-puzzle-overlay-backdrop: var(--puzzle-overlay-backdrop-blur);`,
+    ...motionEasings.map(
+      (token) =>
+        `  --ease-puzzle-${token}: var(--puzzle-easing-${token});`,
+    ),
+  ];
+  const tokenUtilities = [
+    ...zIndexes.map(
+      (token) => `@utility z-puzzle-${token} {
+  z-index: var(--puzzle-z-index-${token});
+}`,
+    ),
+    ...motionDurations.map(
+      (token) => `@utility duration-puzzle-${token} {
+  transition-duration: var(--puzzle-duration-${token});
+}`,
+    ),
+    `@utility border-width-puzzle {
+  border-width: var(--puzzle-border-width);
+}`,
+    `@utility border-width-puzzle-strong {
+  border-width: var(--puzzle-border-width-strong);
+}`,
+    `@utility border-style-puzzle {
+  border-style: var(--puzzle-border-style);
+}`,
+  ].join("\n\n");
+  const tokenTheme = `${tokenMarker}
+@theme inline {
+${tokenAliases.join("\n")}
+}
+
+${tokenUtilities}`;
   const existing = await readIfExists(filePath);
   let current = existing;
 
@@ -102,6 +265,10 @@ ${colorRoles.map((role) => `  --color-puzzle-${role}: var(--puzzle-color-${role}
 
   if (!current.includes(colorMarker)) {
     current += `${current.endsWith("\n") ? "\n" : "\n\n"}${colorTheme}\n`;
+  }
+
+  if (!current.includes(tokenMarker)) {
+    current += `${current.endsWith("\n") ? "\n" : "\n\n"}${tokenTheme}\n`;
   }
 
   if (current !== existing) {

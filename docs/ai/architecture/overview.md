@@ -141,7 +141,7 @@ flowchart LR
 
 ## Application architecture
 
-- **`apps/site` (`@puzzle-ui/site`):** the Fumadocs documentation site built on TanStack Start and Vite. It consumes the UI, Pieces, Theme, Hooks, Icons, and SEO packages.
+- **`apps/site` (`@puzzle-ui/site`):** the Fumadocs documentation site built on TanStack Start and Vite. It consumes CMS, UI, Pieces, Theme, Hooks, Icons, and SEO packages.
 - **`apps/playground` (`@puzzle-ui/playground`):** a client-side Vite reference website composed from UI and Pieces, alongside Storybook for isolated package examples. It has no SSR, database, or Auth; its production-preview browser suite exercises routes, interactions, runtime diagnostics, and responsive overflow.
 - **`apps/workspace-next` (`workspace-next`):** the Next.js App Router example, with server routes and browser UI backed by the shared Workspace packages and MongoDB adapter.
 - **`apps/workspace-tanstack` (`workspace-tanstack`):** the TanStack Start counterpart, using the same domain and UI packages.

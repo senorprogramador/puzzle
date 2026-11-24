@@ -30,6 +30,7 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
+    "@puzzle-ui/cms": "workspace:*",
     "@puzzle-ui/core": "workspace:*",
     "@puzzle-ui/hooks": "workspace:*",
     "@puzzle-ui/icons": "workspace:*",

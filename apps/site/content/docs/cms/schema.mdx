@@ -1,0 +1,155 @@
+---
+title: Collections and fields
+description: Define typed collection and singleton schemas, field validation, access policies, lifecycle hooks, and versioned migrations.
+---
+
+`defineCMS` receives a code-defined registry. Its keys are stable collection
+keys used by `createCms` and Fullstack routes; schemas are not registered or
+changed at runtime. Use `collection.singleton` when a tenant and collection
+have one stable settings document instead of a list.
+
+```ts
+import { collection, defineCMS, fields } from "@puzzle-ui/cms";
+import type { CmsAccessPolicy } from "@puzzle-ui/cms";
+
+const requireActor: CmsAccessPolicy = ({ actor }) => actor !== null;
+
+const articleFields = {
+  title: fields.text({ label: "Title", required: true, localized: true }),
+  slug: fields.slug({ label: "Slug", from: "title", required: true, localized: true }),
+  summary: fields.textarea({ label: "Summary", localized: true }),
+  featured: fields.boolean({ label: "Featured", defaultValue: false }),
+  hero: fields.media({ label: "Hero image" }),
+  related: fields.relationship({
+    label: "Related articles",
+    target: "articles",
+    multiple: true,
+    sameLocale: true,
+    allowedStatuses: ["published"],
+  }),
+};
+
+export const cmsConfig = defineCMS({
+  collections: {
+    articles: collection({
+      name: "Article",
+      description: "Editorial articles.",
+      version: 1,
+      drafts: true,
+      timestamps: true,
+      localization: {
+        locales: ["en-US", "fr-FR"],
+        defaultLocale: "en-US",
+      },
+      fields: articleFields,
+      access: {
+        read: requireActor,
+        create: requireActor,
+        update: requireActor,
+        delete: requireActor,
+        publish: requireActor,
+        unpublish: requireActor,
+        archive: requireActor,
+        restore: requireActor,
+        revisions: requireActor,
+        translations: requireActor,
+        schedule: requireActor,
+        unschedule: requireActor,
+      },
+      hooks: {
+        beforeChange: ({ fields }) => {
+          if (fields?.title === "") throw new Error("Article title cannot be empty.");
+        },
+        afterChange: ({ entry }) => {
+          console.info("Committed CMS entry", entry.id);
+        },
+      },
+    }),
+    settings: collection.singleton({
+      name: "Site settings",
+      fields: {
+        siteName: fields.text({ label: "Site name", required: true }),
+      },
+    }),
+  },
+});
+```
+
+`requireActor` is a minimal sample policy that denies anonymous requests. A
+production policy must also check tenant membership and role/action
+permissions. The global `accessPolicy` passed to `createCms` and a collection's
+local `access` callback are both evaluated; a request is allowed only when both
+allow it.
+
+## Collection options
+
+| Option | Behavior |
+|---|---|
+| `fields` | Keyed field map. Field keys are part of the inferred create/update and query types. |
+| `name`, `description`, `version` | Editorial labels and explicit schema version. |
+| `drafts` | Defaults to `false`. Enables the draft/published lifecycle, revisions, publish/unpublish, and restore. |
+| `timestamps` | Defaults to `false`. Adds `createdAt`/`updatedAt` metadata to documents when enabled. |
+| `localization` | `{ locales, defaultLocale? }`. Enables locale-specific entries, translations, and explicit fallback lookup. |
+| `access` | Partial action-to-policy map. Omitted actions deny. |
+| `hooks` | `beforeChange` veto and `afterChange` post-commit callbacks. |
+
+`CmsAccessPolicy` receives a `CmsAccessRequest` with trusted `tenantId`,
+`actor`, `resource`, and `action`, plus optional `visibility`, `resourceId`,
+`fieldPath`, and `record`. `user` is a compatibility alias for `actor`.
+Collection action aliases include `read`, `create`, `update`, `delete`,
+`publish`, `unpublish`, `schedule`, `unschedule`, `archive`, `restore`,
+`revisions`, and `translations`. Field reads map to `read`; field writes map to
+`create`, `update`, or `restore`.
+
+`beforeChange(event)` runs after authorization and before validation/persistence;
+throwing vetoes the mutation. `afterChange({ ...event, entry })` runs after the
+write commits. Its error is returned to the caller but cannot roll back the
+committed mutation. `CmsCollectionHookEvent` contains the operation, trusted
+context, content type, optional entry ID, typed submitted fields, and current
+value; `afterChange` additionally contains the committed `entry`.
+Hooks and access callbacks are runtime functions: keep them in server-only
+configuration and never send them to client components.
+
+## Field factories
+
+The public `fields` catalog includes:
+
+| Family | Factories |
+|---|---|
+| Scalars | `text`, `textarea`, `number`, `boolean`, `date`, `datetime`, `email`, `url` |
+| Identifiers and choices | `slug`, `select`, `multiSelect` |
+| Content and references | `media`, `relationship`, `richText`, `json` |
+| Structured values | `array`, `object`, `blocks` |
+| Server-derived | `computed`, `custom` |
+
+Factories preserve value types from the schema. Required fields without a
+default are required on create; updates are partial. Common metadata includes
+`label`, `required`, `defaultValue`, `localized`, validation rules, and optional
+server callbacks where supported. Field-specific options include select
+choices, nested object/array schemas, block definitions, slug sources, and
+relationship targets.
+
+<Callout type="warn">
+`media` values are asset IDs, not URLs or object keys. `relationship` targets
+must be collection keys from this registry; runtime validation still checks
+tenant, locale, and configured status rules.
+</Callout>
+
+The CMS root exports `FieldDescriptor`, `FieldDefinition`, `FieldValue`,
+`FieldsValue`, and `FieldsCreateInput` for schema-aware utilities. The named
+`toCmsFieldDefinition` helper converts a descriptor into its serializable CMS
+field definition. Use the `CmsCollectionPresentation` projection or
+`toCmsPresentation` before passing collection metadata to a browser Piece; the
+projection strips collection access/hooks and nested field access/validation/
+compute callbacks.
+
+## Compatibility and migrations
+
+`version` is the schema version, separate from a document's optimistic
+`revision`. Compatible optional/defaulted additions can be applied directly.
+Removing fields, changing field types, localization/constraints, or making a
+field newly required needs a consecutive version increment and a migration
+callback. Migrations are process callbacks: register them again after restart.
+See [Entries and queries](/docs/cms/entries) and the [package
+README](https://github.com/senorprogramador/puzzle/blob/main/packages/cms/README.md)
+for the persistence guarantees.

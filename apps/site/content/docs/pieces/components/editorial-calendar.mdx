@@ -7,7 +7,7 @@ import { Preview } from "@puzzle-ui/ui";
 import { EditorialCalendarExample } from "../../../../src/components/doc-examples/pieces/cms-workflows";
 import { EditorialCalendar } from "@puzzle-ui/pieces";
 
-`EditorialCalendar` groups scheduled items by the provided calendar timezone and presents month navigation, a status filter, and selectable entries. Pass the server-authorized schedule page; the component does not query or schedule entries.
+`EditorialCalendar` groups scheduled items by the provided calendar timezone and presents month navigation, a status filter, and selectable entries. Pass caller-provided schedule data; the component does not query or schedule entries.
 
 <Preview fit="device" code={`<EditorialCalendar items={scheduledItems} timeZone="Europe/Amsterdam" onSelectItem={openEntry} />`}>
   <EditorialCalendarExample />

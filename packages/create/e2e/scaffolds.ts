@@ -240,7 +240,7 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
     });
 
     if (scaffold.tailwind) {
-      it("compiles Puzzle and default Tailwind responsive and color utilities", async () => {
+      it("compiles Puzzle and default Tailwind responsive and theme utilities", async () => {
         let cssPath: string;
         switch (scaffold.framework) {
           case "next":
@@ -275,8 +275,12 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
         const colors = css.match(
           /\/\* Puzzle semantic colors \*\/\s*@theme inline\s*\{[^}]*\}/,
         )?.[0];
+        const tokens = css.match(
+          /\/\* Puzzle design tokens \*\/[\s\S]*$/,
+        )?.[0];
         expect(theme).toBeDefined();
         expect(colors).toBeDefined();
+        expect(tokens).toBeDefined();
         const output = await run(
           "bun",
           ["-e", `
@@ -284,12 +288,16 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
           import { compile } from "tailwindcss";
           import { BREAKPOINTS, DEFAULT_COLOR_SCHEME } from "@puzzle-ui/theme";
           const defaults = await readFile(new URL(import.meta.resolve("tailwindcss/theme.css")), "utf8");
-          const compiler = await compile(defaults + ${JSON.stringify(theme)} + ${JSON.stringify(colors)} + "\\n@tailwind utilities;");
+          const compiler = await compile(defaults + ${JSON.stringify(theme)} + ${JSON.stringify(colors)} + ${JSON.stringify(tokens)} + "\\n@tailwind utilities;");
           const roles = Object.keys(DEFAULT_COLOR_SCHEME.light).map((name) => name.replace(/[A-Z]/g, (letter) => "-" + letter.toLowerCase()));
           const classes = [
             ...[...Object.keys(BREAKPOINTS), "md", "lg"].map((name) => name + ":flex"),
             ...roles.map((name) => "bg-puzzle-" + name),
             "text-puzzle-primary-foreground", "border-puzzle-border", "bg-puzzle-primary/50", "bg-red-500",
+            "p-puzzle-4", "rounded-puzzle-md", "shadow-puzzle-elevation-2",
+            "text-puzzle-body1", "font-puzzle-heading", "max-w-puzzle-container",
+            "duration-puzzle-fast", "ease-puzzle-standard", "backdrop-blur-puzzle-overlay-backdrop",
+            "bg-puzzle-overlay-backdrop", "border-width-puzzle-strong", "z-puzzle-modal",
           ];
           console.log(JSON.stringify({ css: compiler.build(classes), breakpoints: BREAKPOINTS, roles }));
         `],
@@ -318,6 +326,21 @@ const describeScaffold = (scaffold: Scaffold, index: number) => {
           "color: var(--puzzle-color-primary-foreground);",
         );
         expect(result.css).toContain("border-color: var(--puzzle-color-border);");
+        for (const utility of [
+          ".p-puzzle-4",
+          ".rounded-puzzle-md",
+          ".shadow-puzzle-elevation-2",
+          ".text-puzzle-body1",
+          ".font-puzzle-heading",
+          ".max-w-puzzle-container",
+          ".duration-puzzle-fast",
+          ".ease-puzzle-standard",
+          ".backdrop-blur-puzzle-overlay-backdrop",
+          ".border-width-puzzle-strong",
+          ".z-puzzle-modal",
+        ]) {
+          expect(result.css).toContain(utility);
+        }
 
         if (scaffold.framework === "react" && !scaffold.auth) {
           const browser = await chromium.launch();

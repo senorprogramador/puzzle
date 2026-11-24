@@ -33,6 +33,12 @@ await storage.registerCollection({
 
 Use a replica set or sharded deployment for multi-document transactions. Pass the client and set `transactionsEnabled: true` to opt in; otherwise `atomicBatch` is not available. The default collection prefix is `puzzle_`; set `collectionPrefix` to change it. A `StorageIndex` with `expireAfterSeconds` creates a MongoDB TTL index; TTL deletion is asynchronous, so enforce security-sensitive expiry in application logic as well. Close the client during application shutdown.
 
+Queries support validated dotted paths through nested JSON objects for filters
+and sorting. `contains` performs case-insensitive substring matching on strings
+and exact scalar-element membership in arrays; it does not traverse array
+indexes or match object values inside arrays. Cursor pagination includes the
+ordered dotted-field values and a deterministic ID tie-breaker.
+
 `MongoStorageMigrationAdapter` stores versioned migration status and a shared migration lock in prefixed collections. See the [storage guide](https://puzzle-ui.com/docs/storage) for adapter guarantees, index behavior, migration options, and custom adapter testing.
 
 ## Development

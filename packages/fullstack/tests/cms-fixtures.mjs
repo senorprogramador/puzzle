@@ -1,18 +1,6 @@
-import { registerHooks } from "node:module";
-
-const cmsEntry = new URL("../../cms/dist/index.js", import.meta.url).href;
-
-registerHooks({
-  resolve(specifier, context, nextResolve) {
-    if (specifier === "@puzzle-ui/cms") {
-      return nextResolve(cmsEntry, context);
-    }
-    return nextResolve(specifier, context);
-  },
-});
-
 const { StorageConflictError, StorageDuplicateError } =
   await import("@puzzle-ui/storage");
+const { collection, defineCMS, fields } = await import("@puzzle-ui/cms");
 
 const clone = (value) => structuredClone(value);
 
@@ -22,19 +10,37 @@ const compare = (left, right) => {
   return leftValue === rightValue ? 0 : leftValue < rightValue ? -1 : 1;
 };
 
+const getPath = (record, path) =>
+  path.split(".").reduce((value, part) => value?.[part], record);
+
 const matchesWhere = (record, where = {}) =>
   Object.entries(where).every(([field, comparison]) => {
-    const value = record[field];
+    if (field === "and") return comparison.every((item) => matchesWhere(record, item));
+    if (field === "or") return comparison.some((item) => matchesWhere(record, item));
+    if (!comparison || typeof comparison !== "object" || !("operator" in comparison)) {
+      return getPath(record, field) === comparison;
+    }
+    const value = getPath(record, field);
     switch (comparison.operator) {
-      case "eq": return value === comparison.value;
-      case "ne": return value !== comparison.value;
+      case "eq":
+      case "equals": return value === comparison.value;
+      case "ne":
+      case "notEquals": return value !== comparison.value;
+      case "contains":
+        return typeof value === "string"
+          ? value.includes(comparison.value)
+          : Array.isArray(value) && value.includes(comparison.value);
       case "in": return comparison.value.includes(value);
       case "notIn": return !comparison.value.includes(value);
       case "exists": return Boolean(comparison.value) === (value !== undefined);
-      case "gt": return compare(value, comparison.value) > 0;
-      case "gte": return compare(value, comparison.value) >= 0;
-      case "lt": return compare(value, comparison.value) < 0;
-      case "lte": return compare(value, comparison.value) <= 0;
+      case "gt":
+      case "greaterThan": return compare(value, comparison.value) > 0;
+      case "gte":
+      case "greaterThanOrEqual": return compare(value, comparison.value) >= 0;
+      case "lt":
+      case "lessThan": return compare(value, comparison.value) < 0;
+      case "lte":
+      case "lessThanOrEqual": return compare(value, comparison.value) <= 0;
       default: return false;
     }
   });
@@ -76,7 +82,7 @@ class MemoryStorage {
       .filter((record) => matchesWhere(record, query.where));
     for (const order of [...(query.orderBy ?? [])].reverse()) {
       rows.sort((left, right) => {
-        const result = compare(left[order.field], right[order.field]);
+        const result = compare(getPath(left, order.field), getPath(right, order.field));
         return order.direction === "asc" ? result : -result;
       });
     }
@@ -90,7 +96,8 @@ class MemoryStorage {
       where: query.where,
       orderBy: [{ field: "id", direction: "asc" }],
     });
-    const rows = records.filter((record) => !query.after || record.id > query.after.value);
+    const after = typeof query.after === "string" ? query.after : query.after?.value;
+    const rows = records.filter((record) => !after || record.id > after);
     const items = rows.slice(0, query.first);
     const hasNextPage = rows.length > query.first;
     return {
@@ -214,6 +221,7 @@ export const createCmsFixture = async (options = {}) => {
   let allowed = options.allowed ?? true;
   let policyAllowed = options.policyAllowed ?? true;
   let nextId = 0;
+  let now = options.now ?? new Date("2026-01-01T00:00:00.000Z");
   const scheduler = {
     async schedule(publication) {
       calls.scheduled.push(clone(publication));
@@ -222,12 +230,15 @@ export const createCmsFixture = async (options = {}) => {
       calls.cancelled.push(clone(publication));
     },
   };
+  const config = options.config ?? articleConfig();
   const server = createCmsServer({
+    config,
     storage,
     accessPolicy: async (access) => {
       calls.policy.push({
         action: access.action,
         resource: access.resource,
+        collection: access.collection,
         tenantId: access.tenantId,
         actorId: access.actor?.id ?? null,
         visibility: access.visibility,
@@ -235,6 +246,7 @@ export const createCmsFixture = async (options = {}) => {
       return policyAllowed;
     },
     scheduler,
+    emitChangeEvents: options.emitChangeEvents,
     webhooks: options.webhooks,
     mediaReferenceValidator: options.mediaReferenceValidator,
     resolveContext: async () => context,
@@ -242,6 +254,7 @@ export const createCmsFixture = async (options = {}) => {
       calls.authorization.push({
         action: access.action,
         resource: access.resource,
+        collection: access.collection,
         tenantId: access.context.tenantId,
         actorId: access.context.actor?.id ?? null,
         visibility: access.visibility,
@@ -249,7 +262,7 @@ export const createCmsFixture = async (options = {}) => {
       });
       return allowed;
     },
-    clock: () => new Date("2026-01-01T00:00:00.000Z"),
+    clock: () => new Date(now),
     idGenerator: () => `cms-test-${++nextId}`,
   });
   return {
@@ -257,6 +270,7 @@ export const createCmsFixture = async (options = {}) => {
     scheduler,
     server,
     storage,
+    config,
     setContext(value) {
       context = value;
     },
@@ -265,6 +279,9 @@ export const createCmsFixture = async (options = {}) => {
     },
     setPolicy(value) {
       policyAllowed = value;
+    },
+    setNow(value) {
+      now = new Date(value);
     },
   };
 };
@@ -280,23 +297,76 @@ export const cmsRequest = (method, path, body) =>
         }),
   });
 
-export const articleDefinition = () => ({
-  slug: "article",
-  name: "Article",
-  version: 1,
-  locales: ["en-US", "fr-FR"],
-  defaultLocale: "en-US",
-  fields: [
-    { key: "title", type: "text", label: "Title", required: true, localized: true },
-    { key: "path", type: "slug", label: "Path", required: true, localized: true },
-    { key: "secretDraft", type: "text", label: "Draft-only field" },
-    {
-      key: "related",
-      type: "relationship",
-      label: "Related article",
-      relation: { targetTypes: ["article"], multiple: true },
-    },
-  ],
+export const articleConfig = () => defineCMS({
+  collections: {
+    article: collection({
+      name: "Article",
+      version: 1,
+      drafts: true,
+      timestamps: true,
+      localization: {
+        locales: ["en-US", "fr-FR"],
+        defaultLocale: "en-US",
+      },
+      fields: {
+        title: fields.text({
+          label: "Title",
+          required: true,
+          localized: true,
+        }),
+        path: fields.slug({
+          label: "Path",
+          required: true,
+          localized: true,
+        }),
+        secretDraft: fields.text({ label: "Draft-only field" }),
+        related: fields.relationship({
+          label: "Related article",
+          target: "article",
+          multiple: true,
+        }),
+      },
+    }),
+  },
+});
+
+export const storyConfig = () => defineCMS({
+  collections: {
+    story: collection({
+      name: "Story",
+      drafts: true,
+      timestamps: true,
+      localization: {
+        locales: ["en-US"],
+        defaultLocale: "en-US",
+      },
+      fields: {
+        title: fields.text({ label: "Title", required: true }),
+        media: fields.media({ label: "Media" }),
+      },
+    }),
+  },
+});
+
+export const settingsConfig = () => defineCMS({
+  collections: {
+    settings: collection.singleton({
+      name: "Settings",
+      drafts: true,
+      timestamps: true,
+      localization: {
+        locales: ["en-US", "fr-FR"],
+        defaultLocale: "en-US",
+      },
+      fields: {
+        siteName: fields.text({
+          label: "Site name",
+          required: true,
+          localized: true,
+        }),
+      },
+    }),
+  },
 });
 
 export const json = (response) => response.json();

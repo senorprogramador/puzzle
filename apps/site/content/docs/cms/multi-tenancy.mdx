@@ -1,0 +1,54 @@
+---
+title: Multi-tenant setup
+description: Resolve tenant identity from trusted server state and scope every CMS instance and authorization decision.
+---
+
+Create a CMS instance for the tenant and actor resolved by the host for the
+current request or worker. The instance binds that context; collection methods
+do not accept tenant IDs, actor IDs, or permission decisions.
+
+```ts
+import { createCms } from "@puzzle-ui/cms";
+import type { CmsAccessPolicy, CmsRequestContext } from "@puzzle-ui/cms";
+
+const accessPolicy: CmsAccessPolicy = ({ tenantId, actor }) =>
+  tenantId === "publisher-1" && actor?.id === "editor-7";
+
+const createTenantCms = (context: CmsRequestContext) => {
+  return createCms({
+    config: cmsConfig,
+    storage,
+    context,
+    accessPolicy,
+  });
+};
+```
+
+This fixed-ID policy is an API example, not a production membership model.
+Resolve context and membership from the host's trusted session/database. The
+`CmsRequestContext` accepts `tenantId` and either `actor` or its compatibility
+alias `user`, but not both.
+
+## Never trust browser identity
+
+Do not derive the context from request bodies, filters, route parameters, or a
+content record. Resolve tenant and actor from the authenticated session,
+validated host routing, or another trusted identity provider. A known entry
+or asset ID is not proof of permission.
+
+The global `CmsAccessPolicy` must authorize the requested tenant, action, and
+resource. A configured collection access policy is an additional restriction;
+both must allow the action. See [Access policies](/docs/cms/access).
+
+## Fullstack requests and workers
+
+`createCmsServer` calls the host's `resolveContext(request)` for each request
+and separately invokes route-level `authorize`. It binds the resolved context
+to the request-scoped CMS instance. The scheduler worker also resolves its
+tenant context on the server; never take tenant identity from the job body.
+
+For scheduled tasks, webhook delivery, and custom event consumers, create
+worker context from a trusted source and authorize it with the same care as
+interactive requests. See [Next.js integration](/docs/cms/nextjs),
+[TanStack Start integration](/docs/cms/tanstack-start), and
+[Scheduled publishing](/docs/cms/scheduling).
