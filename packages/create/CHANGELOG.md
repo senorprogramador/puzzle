@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/create` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.19.0 - 2026-11-24
+
+- Added Tailwind generation of Puzzle responsive variants (`compact:`, `tablet:`, `desktop:` and `hd:`), `puzzle-` semantic color utilities, and theme-token utilities for spacing, radius, elevation, typography, container sizes, z-index, motion and borders.
+- Fixed Tailwind setup to rethrow filesystem errors other than a missing file, and to add the missing Puzzle blocks to an existing stylesheet without duplicating them.
+
 ## 0.18.0 - 2026-11-23
 
 - No changes; version bumped in lockstep.

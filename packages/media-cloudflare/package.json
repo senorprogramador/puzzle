@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/media-cloudflare",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "Cloudflare R2 and Images adapters for Puzzle media contracts.",
   "homepage": "https://puzzle-ui.com/docs/media-cloudflare",
   "keywords": [
@@ -56,6 +56,6 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@puzzle-ui/media": "^0.18.0"
+    "@puzzle-ui/media": "^0.19.0"
   }
 }

@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/theme` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.19.0 - 2026-11-24
+
+- No changes; version bumped in lockstep.
+
 ## 0.18.0 - 2026-11-23
 
 - Adjusted shared theme CSS for the updated component styling.

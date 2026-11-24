@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/fullstack` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.19.0 - 2026-11-24
+
+- Breaking: rewrote the CMS client, shared contracts and server handlers around code-first collections and singletons, with flat JSON-safe `CmsApiDocument` records and `where`/`sort`/`limit`/`page`/`locale` queries.
+- Added a client API of `cms.collection(key)` and `cms.singleton(key)` with `find`, `create`, `update`, `delete`, `purge`, publishing, scheduling, revision, locale-variant and translation methods, and a separate `.public` client for published reads.
+- Added routes derived from the static CMS config, including a scheduler worker route that derives tenant context from the host, plus Next.js and TanStack Start handlers.
+- Added opt-in webhook management and change-event routes and client methods, with sanitized DTOs that never expose secrets, secret references or delivery lease tokens.
+
 ## 0.18.0 - 2026-11-23
 
 - No changes; version bumped in lockstep.

@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/icons",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "Iconify-powered React SVG icons for Puzzle applications",
   "homepage": "https://puzzle-ui.com/docs/icons",
   "keywords": [
@@ -51,7 +51,7 @@
   "dependencies": {
     "@iconify/react": "^6.0.3",
     "@iconify/utils": "^3.1.7",
-    "@puzzle-ui/core": "^0.18.0"
+    "@puzzle-ui/core": "^0.19.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

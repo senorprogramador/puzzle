@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/pieces` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.19.0 - 2026-11-24
+
+- Breaking: removed `ContentTypeBuilder`, its types, and its documentation page, because content types are now defined in code with `@puzzle-ui/cms`.
+- Updated the CMS authoring components (`ContentList`, `ContentEditor`, `BlockEditor`, `LocalizationEditor`, `RelationshipField`, `RevisionHistory` and the JSON field) to use the code-first CMS field and presentation model.
+- Added exported types `CmsCollectionPresentation`, `CmsFieldMap`, `CmsFieldRow`, `CmsFieldRows`, `FieldDescriptor`, `FieldValue` and `FieldsValue`.
+- Updated the CMS documentation and AI guidance for the code-first schema and presentation-safe schema projections.
+
 ## 0.18.0 - 2026-11-23
 
 - Changed `ConfirmAction` to use an `alertdialog`, support async `onConfirm` with a pending state and retry error message, and restore focus to the trigger on close.

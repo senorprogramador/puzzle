@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/i18n",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "Type-safe, SSR-safe internationalization primitives for React applications.",
   "homepage": "https://puzzle-ui.com/docs/multilingual",
   "keywords": [
@@ -215,7 +215,7 @@
     "prepack": "bun run build"
   },
   "peerDependencies": {
-    "@puzzle-ui/seo": "^0.18.0",
+    "@puzzle-ui/seo": "^0.19.0",
     "react": "^19.0.0",
     "react-router": "^7.0.0",
     "typescript": "^5.0.0",
@@ -240,7 +240,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
-    "@puzzle-ui/seo": "^0.18.0",
+    "@puzzle-ui/seo": "^0.19.0",
     "@types/node": "^26.6.6",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.3.0",

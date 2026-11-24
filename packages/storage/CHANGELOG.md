@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/storage` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.19.0 - 2026-11-24
+
+- Added validated dotted-path field filtering and sorting for nested JSON objects in the query AST, with exported scalar field-path types and path validation utilities.
+- Added case-insensitive substring and scalar array-element membership semantics to the `contains` operator, and extended the conformance tests to cover nested paths, null handling, and cursor pagination.
+
 ## 0.18.0 - 2026-11-23
 
 - No changes; version bumped in lockstep.

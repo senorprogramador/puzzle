@@ -3,6 +3,11 @@
 All notable changes to `@puzzle-ui/storage-mongodb` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.19.0 - 2026-11-24
+
+- Added support for nested dotted-path filters and sorts, and case-insensitive `contains` matching for strings and arrays.
+- Hardened cursor pagination with scalar-value validation and date-safe cursor encoding.
+
 ## 0.18.0 - 2026-11-23
 
 - No changes; version bumped in lockstep.

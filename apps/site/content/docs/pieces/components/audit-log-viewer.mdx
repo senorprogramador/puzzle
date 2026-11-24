@@ -35,8 +35,6 @@ import { AuditLogViewer } from "@puzzle-ui/pieces";
 ```
 
 Search, resource/result filters, and pagination apply only to the supplied events.
-The CMS API currently returns up to 500 recent events per request and supports
-filtering by resource ID, but does not provide audit-history cursor pagination.
 The component does not expose event details beyond the displayed actor, action,
 resource, result, and timestamp.
 
@@ -44,7 +42,7 @@ resource, result, and timestamp.
 
 The event list uses a semantic table with column headers and labeled filters. Denied operations remain visible and are distinguishable by text, not color alone.
 
-- [CMS audit API](/docs/fullstack/cms)
+- [Fullstack CMS API](/docs/fullstack/cms)
 - [Media audit hook](/docs/fullstack/media#audit-and-operations)
 - [CMS authoring overview](/docs/pieces/components/cms)
 

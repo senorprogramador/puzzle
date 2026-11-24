@@ -10,6 +10,58 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.19.0 - 2026-11-24
+
+### `@puzzle-ui/storage`
+
+- Added validated dotted-path field filtering and sorting for nested JSON objects in the query AST, with exported scalar field-path types and path validation utilities.
+- Added case-insensitive substring and scalar array-element membership semantics to the `contains` operator, and extended the conformance tests to cover nested paths, null handling, and cursor pagination.
+
+### `@puzzle-ui/cms`
+
+- Breaking: rewrote the package as a code-first CMS. Define schemas statically with `defineCMS`, `collection`, `collection.singleton` and the `fields` factories, replacing runtime content-type registration.
+- Added a request-scoped `createCms` instance that binds trusted tenant and actor context, with typed collection services for `find`, `findById`, `findBySlug`, `create`, `update`, `delete` and `purge`.
+- Added a typed field catalog covering text, number, boolean, date, slug, select, media, relationship, rich text, JSON, array, object, blocks, computed and custom fields, plus `toCmsFieldDefinition` for serializable field definitions.
+- Added opt-in drafts, timestamps, localization with explicit locale fallbacks, publishing, scheduling, archiving and revision restore, plus per-collection access policies and server-side `beforeChange`/`afterChange` hooks.
+- Added `toCmsPresentation` to derive a serializable, callback-free collection schema for authoring UIs.
+- Added schema-checked query paths, schema migrations, named custom validators, media-reference validation, relationship purge guards, and opt-in change events exposed through `cms.events`.
+- Hardened webhook handling: validated endpoint and event ID inputs, and made subscription, delivery and change-event lookups tenant-scoped at query time.
+- Added ADR-001 and rewrote the README and AI instructions for the code-first API; the new API is not yet published to npm.
+
+### `@puzzle-ui/ui`
+
+- Added `prefixIcon` and `suffixIcon` options to `AppBar` navigation items, accepting an icon name or a custom node, with matching layout styles.
+
+### `@puzzle-ui/pieces`
+
+- Breaking: removed `ContentTypeBuilder`, its types, and its documentation page, because content types are now defined in code with `@puzzle-ui/cms`.
+- Updated the CMS authoring components (`ContentList`, `ContentEditor`, `BlockEditor`, `LocalizationEditor`, `RelationshipField`, `RevisionHistory` and the JSON field) to use the code-first CMS field and presentation model.
+- Added exported types `CmsCollectionPresentation`, `CmsFieldMap`, `CmsFieldRow`, `CmsFieldRows`, `FieldDescriptor`, `FieldValue` and `FieldsValue`.
+- Updated the CMS documentation and AI guidance for the code-first schema and presentation-safe schema projections.
+
+### `@puzzle-ui/create`
+
+- Added Tailwind generation of Puzzle responsive variants (`compact:`, `tablet:`, `desktop:` and `hd:`), `puzzle-` semantic color utilities, and theme-token utilities for spacing, radius, elevation, typography, container sizes, z-index, motion and borders.
+- Fixed Tailwind setup to rethrow filesystem errors other than a missing file, and to add the missing Puzzle blocks to an existing stylesheet without duplicating them.
+
+### `@puzzle-ui/storage-d1`
+
+- Added support for nested dotted-path filters and sorts, case-insensitive `contains` matching for strings and arrays, and query validation.
+- Fixed null handling in `notEquals`, `in`, `notIn`, `exists` and cursor pagination.
+- Fixed an empty `or` group so it matches nothing, and added validation of cursor shape and scalar values.
+
+### `@puzzle-ui/storage-mongodb`
+
+- Added support for nested dotted-path filters and sorts, and case-insensitive `contains` matching for strings and arrays.
+- Hardened cursor pagination with scalar-value validation and date-safe cursor encoding.
+
+### `@puzzle-ui/fullstack`
+
+- Breaking: rewrote the CMS client, shared contracts and server handlers around code-first collections and singletons, with flat JSON-safe `CmsApiDocument` records and `where`/`sort`/`limit`/`page`/`locale` queries.
+- Added a client API of `cms.collection(key)` and `cms.singleton(key)` with `find`, `create`, `update`, `delete`, `purge`, publishing, scheduling, revision, locale-variant and translation methods, and a separate `.public` client for published reads.
+- Added routes derived from the static CMS config, including a scheduler worker route that derives tenant context from the host, plus Next.js and TanStack Start handlers.
+- Added opt-in webhook management and change-event routes and client methods, with sanitized DTOs that never expose secrets, secret references or delivery lease tokens.
+
 ## 0.18.0 - 2026-11-23
 
 ### `@puzzle-ui/theme`

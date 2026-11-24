@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.19.0 - 2026-11-24
+
+- Added `prefixIcon` and `suffixIcon` options to `AppBar` navigation items, accepting an icon name or a custom node, with matching layout styles.
+
 ## 0.18.0 - 2026-11-23
 
 - Added `role="alertdialog"` support to `Dialog` through a new `role` prop (defaults to `dialog`).
