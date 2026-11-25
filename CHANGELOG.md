@@ -31,6 +31,13 @@ Individual package changelogs contain their own history.
 - Changed upsert to reject a different explicit ID for a matched record with `StorageValidationError`. It now throws `StorageConflictError` if the matched record disappears before the update, instead of returning the stale record.
 - Fixed transactional batch inserts to resolve their IDs and documents before the transaction starts.
 
+### `@puzzle-ui/ui`
+
+- Added the controlled `ZodSchemaForm` at the optional `@puzzle-ui/ui/zod`
+  entry point for Zod 4 schemas, with automatic field rendering and validation.
+- Added URL semantics to `TextInput` and explicit nullable controlled values to
+  `NumberInput` through `onValueChange`.
+
 ## 0.19.1 - 2026-11-24
 
 ### `@puzzle-ui/ui`
