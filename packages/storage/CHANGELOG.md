@@ -3,6 +3,13 @@
 All notable changes to `@puzzle-ui/storage` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.20.0 - 2026-11-25
+
+- Added optional `id` on `StorageInsert`, so records can be inserted without an ID and adapters generate one.
+- Added the `resolveStorageId` helper, exported from `@puzzle-ui/storage`. It keeps explicit IDs, generates a Web Crypto UUID v4 when none is given, and rejects empty IDs with `StorageValidationError`. Custom adapters can use it.
+- Documented insert and upsert semantics: insert defaults missing timestamps to now and revision to 1, and upsert keeps the matched record's ID and `createdAt`. A different explicit ID on a matched record is rejected. Upsert is a read followed by a write, not concurrency-safe.
+- Updated the conformance kit to cover generated and explicit IDs, upsert behavior, and atomic batch inserts.
+
 ## 0.19.1 - 2026-11-24
 
 - No changes; version bumped in lockstep.

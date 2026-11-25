@@ -3,6 +3,12 @@
 All notable changes to `@puzzle-ui/storage-mongodb` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.20.0 - 2026-11-25
+
+- Added ID generation: inserts and upserts without an `id` get a UUID v4 from Web Crypto, and explicit IDs are preserved.
+- Changed upsert to reject a different explicit ID for a matched record with `StorageValidationError`. It now throws `StorageConflictError` if the matched record disappears before the update, instead of returning the stale record.
+- Fixed transactional batch inserts to resolve their IDs and documents before the transaction starts.
+
 ## 0.19.1 - 2026-11-24
 
 - No changes; version bumped in lockstep.

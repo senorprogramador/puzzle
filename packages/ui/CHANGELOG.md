@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/ui` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.20.0 - 2026-11-25
+
+- No changes; version bumped in lockstep.
+
 ## 0.19.1 - 2026-11-24
 
 - Fixed modal `Dialog` and `Drawer` losing input focus while typing in controlled inputs. `Backdrop` now calls the latest `onClose` handler without re-registering its overlay, so focus is no longer reset on each re-render.

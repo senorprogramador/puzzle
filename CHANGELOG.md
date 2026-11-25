@@ -10,6 +10,27 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.20.0 - 2026-11-25
+
+### `@puzzle-ui/storage`
+
+- Added optional `id` on `StorageInsert`, so records can be inserted without an ID and adapters generate one.
+- Added the `resolveStorageId` helper, exported from `@puzzle-ui/storage`. It keeps explicit IDs, generates a Web Crypto UUID v4 when none is given, and rejects empty IDs with `StorageValidationError`. Custom adapters can use it.
+- Documented insert and upsert semantics: insert defaults missing timestamps to now and revision to 1, and upsert keeps the matched record's ID and `createdAt`. A different explicit ID on a matched record is rejected. Upsert is a read followed by a write, not concurrency-safe.
+- Updated the conformance kit to cover generated and explicit IDs, upsert behavior, and atomic batch inserts.
+
+### `@puzzle-ui/storage-d1`
+
+- Added ID generation: inserts and upserts without an `id` get a UUID v4 from Web Crypto, and explicit IDs are preserved.
+- Changed upsert to validate the query first and to reject a different explicit ID for a matched record with `StorageValidationError`.
+- Fixed atomic batch inserts to read back the resolved ID, including generated ones.
+
+### `@puzzle-ui/storage-mongodb`
+
+- Added ID generation: inserts and upserts without an `id` get a UUID v4 from Web Crypto, and explicit IDs are preserved.
+- Changed upsert to reject a different explicit ID for a matched record with `StorageValidationError`. It now throws `StorageConflictError` if the matched record disappears before the update, instead of returning the stale record.
+- Fixed transactional batch inserts to resolve their IDs and documents before the transaction starts.
+
 ## 0.19.1 - 2026-11-24
 
 ### `@puzzle-ui/ui`

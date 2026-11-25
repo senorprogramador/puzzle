@@ -3,6 +3,12 @@
 All notable changes to `@puzzle-ui/storage-d1` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.20.0 - 2026-11-25
+
+- Added ID generation: inserts and upserts without an `id` get a UUID v4 from Web Crypto, and explicit IDs are preserved.
+- Changed upsert to validate the query first and to reject a different explicit ID for a matched record with `StorageValidationError`.
+- Fixed atomic batch inserts to read back the resolved ID, including generated ones.
+
 ## 0.19.1 - 2026-11-24
 
 - No changes; version bumped in lockstep.
