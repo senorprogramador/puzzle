@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/storage` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.21.0 - 2026-11-25
+
+- No changes; version bumped in lockstep.
+
 ## 0.20.0 - 2026-11-25
 
 - Added optional `id` on `StorageInsert`, so records can be inserted without an ID and adapters generate one.

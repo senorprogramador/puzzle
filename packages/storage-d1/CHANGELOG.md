@@ -3,6 +3,10 @@
 All notable changes to `@puzzle-ui/storage-d1` are documented in this file.
 Puzzle packages are released in lockstep; versions without package changes are noted as such.
 
+## 0.21.0 - 2026-11-25
+
+- No changes; version bumped in lockstep.
+
 ## 0.20.0 - 2026-11-25
 
 - Added ID generation: inserts and upserts without an `id` get a UUID v4 from Web Crypto, and explicit IDs are preserved.

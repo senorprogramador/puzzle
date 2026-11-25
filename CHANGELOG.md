@@ -10,6 +10,14 @@ Individual package changelogs contain their own history.
 
 ### Security
 
+## 0.21.0 - 2026-11-25
+
+### `@puzzle-ui/ui`
+
+- Added the controlled `ZodSchemaForm` at the optional `@puzzle-ui/ui/zod` entry point for Zod 4 schemas, with automatic field rendering and validation. Zod is an optional peer dependency and importing the package root does not load it.
+- Added URL semantics to `TextInput` through `type="url"`.
+- Added explicit nullable controlled values to `NumberInput`: `value` accepts `null` and the new `onValueChange` callback reports `null` when the field is cleared.
+
 ## 0.20.0 - 2026-11-25
 
 ### `@puzzle-ui/storage`

@@ -1,6 +1,6 @@
 {
   "name": "@puzzle-ui/cms",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Framework-neutral content schemas, entries, revisions, and publishing services for Puzzle.",
   "homepage": "https://puzzle-ui.com/docs/cms",
   "keywords": [
@@ -55,6 +55,6 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@puzzle-ui/storage": "^0.20.0"
+    "@puzzle-ui/storage": "^0.21.0"
   }
 }
