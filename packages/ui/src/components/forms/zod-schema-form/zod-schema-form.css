@@ -1,0 +1,77 @@
+.puzzle-zod-schema-form {
+  display: block;
+  inline-size: 100%;
+}
+
+.puzzle-zod-schema-form__object,
+.puzzle-zod-schema-form__group {
+  min-inline-size: 0;
+  margin: 0;
+}
+
+.puzzle-zod-schema-form__object--bordered {
+  border: 0;
+  border-inline-start: var(--puzzle-border-width, 1px) solid var(--puzzle-color-border);
+  border-radius: 0;
+}
+
+.puzzle-zod-schema-form__object--padded {
+  padding-block: var(--puzzle-space-2, 0.5rem);
+  padding-inline: var(--puzzle-space-2, 0.5rem) 0;
+}
+
+.puzzle-zod-schema-form__object-label,
+.puzzle-zod-schema-form__group-label {
+  margin-inline: 0;
+  padding-inline: 0;
+  font-weight: 600;
+}
+
+.puzzle-zod-schema-form__object-content {
+  min-inline-size: 0;
+  inline-size: 100%;
+}
+
+.puzzle-zod-schema-form__group {
+  padding: 0;
+  border: 0;
+}
+
+.puzzle-zod-schema-form__description {
+  margin: 0;
+  color: var(--puzzle-color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.puzzle-zod-schema-form__summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.puzzle-zod-schema-form__object--invalid {
+  border-color: var(--puzzle-color-danger, #b42318);
+}
+
+.puzzle-zod-schema-form__object-error,
+.puzzle-zod-schema-form__form-error,
+.puzzle-zod-schema-form__unsupported {
+  color: var(--puzzle-color-danger, #b42318);
+}
+
+.puzzle-zod-schema-form__error-list,
+.puzzle-zod-schema-form__diagnostics {
+  margin: 0;
+  padding-inline-start: var(--puzzle-space-4, 1rem);
+}
+
+.puzzle-zod-schema-form__unsupported {
+  display: grid;
+  gap: var(--puzzle-space-1, 0.25rem);
+  border-inline-start: var(--puzzle-border-width, 1px) solid currentColor;
+  padding-inline-start: var(--puzzle-space-3, 0.75rem);
+}
+
+.puzzle-zod-schema-form__diagnostics {
+  color: var(--puzzle-color-warning, #8a4b08);
+  font-size: 0.875rem;
+}

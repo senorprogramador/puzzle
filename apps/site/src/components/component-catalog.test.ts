@@ -126,9 +126,13 @@ describe("component catalog", () => {
       new URL("../../../../packages/ui/src/index.ts", import.meta.url),
       "utf8",
     );
+    const zodExports = readFileSync(
+      new URL("../../../../packages/ui/src/zod.ts", import.meta.url),
+      "utf8",
+    );
     const families = new Set(
-      [...exports.matchAll(/from "\.\/components\/([^"]+)"/g)].flatMap(
-        ([, modulePath]) => {
+      [...`${exports}\n${zodExports}`.matchAll(/from "\.\/components\/([^"]+)"/g)]
+        .flatMap(([, modulePath]) => {
           const [category, component] = (modulePath ?? "").split("/");
 
           if (!component) {
@@ -142,8 +146,7 @@ describe("component catalog", () => {
                 "forms/text-input",
               ]
             : [`${category}/${component}`];
-        },
-      ),
+        }),
     );
 
     expect(components.map((component) => component.href.slice("/docs/ui/".length)).sort())

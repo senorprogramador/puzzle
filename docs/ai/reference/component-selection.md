@@ -42,6 +42,10 @@ UI.
 - **Good fit:** A custom application form needs shared accessible controls.
   Compose UI primitives and keep validation, submission, and business rules in
   the application.
+- **Good fit:** A controlled application form should render from a Zod 4 object
+  schema with automatic fields and schema validation. Use `ZodSchemaForm` from
+  `@puzzle-ui/ui/zod`; install Zod 4 for that optional entry point and keep raw
+  values and submission in the application.
 - **Good fit:** A form repeats or nests caller-owned entries. Use `FieldArray`
   (or its `RepeaterField` alias) for accessible add/remove/order controls and
   render the nested inputs with the existing form primitives.

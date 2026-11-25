@@ -157,6 +157,11 @@ const forms: TreeViewItem = {
       href: `${folder}/forms/field-array`,
     },
     {
+      id: "ui-zod-schema-form",
+      label: "Zod Schema Form",
+      href: `${folder}/forms/zod-schema-form`,
+    },
+    {
       id: "ui-file-upload",
       label: "File Upload",
       href: `${folder}/forms/file-upload`,

@@ -5,7 +5,10 @@ Puzzle packages are released in lockstep; versions without package changes are n
 
 ## 0.20.0 - 2026-11-25
 
-- No changes; version bumped in lockstep.
+- Added the controlled `ZodSchemaForm` at the optional `@puzzle-ui/ui/zod`
+  entry point for Zod 4 schemas, with automatic field rendering and validation.
+- Added URL semantics to `TextInput` and explicit nullable controlled values to
+  `NumberInput` through `onValueChange`.
 
 ## 0.19.1 - 2026-11-24
 

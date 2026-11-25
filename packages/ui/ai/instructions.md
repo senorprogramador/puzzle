@@ -49,6 +49,12 @@ For repeatable or nested form rows, use the controlled `FieldArray` (also
 exported as `RepeaterField`) and keep field state and submission with the
 caller. Use `JsonEditor` for serialized JSON with parse/format actions and
 caller-provided validation; use `TextEditor` for rich text documents instead.
+For Zod 4 schema-driven forms, use `ZodSchemaForm` from
+`@puzzle-ui/ui/zod`; applications using this optional entry point must install
+Zod 4. Keep its controlled value on the schema input side and use successful
+validation results for parsed output. The application still owns updates,
+business logic, and submission; use `FieldArray` directly when a form only
+needs repeatable rows.
 JSON numbers outside JavaScript's finite range are rejected rather than
 formatted into `null`.
 TextEditor content is a serializable `TextDocument`; use its exported pure

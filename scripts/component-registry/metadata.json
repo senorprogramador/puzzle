@@ -190,7 +190,8 @@
         "./next/server": "src/components/utilities/rendering/next/server.tsx",
         "./tanstack/client": "src/components/utilities/rendering/tanstack/client.tsx",
         "./tanstack/server": "src/components/utilities/rendering/tanstack/server.tsx",
-        "./tanstack/shared": "src/components/utilities/rendering/tanstack/shared.ts"
+        "./tanstack/shared": "src/components/utilities/rendering/tanstack/shared.ts",
+        "./zod": "src/zod.ts"
       },
       "aliases": {
         "NextDeferredBoundary": "DeferredBoundary",

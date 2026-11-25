@@ -154,6 +154,13 @@ export const components = [
     description: "Manage controlled repeated and nested form fields.",
   },
   {
+    name: "Zod Schema Form",
+    href: "/docs/ui/forms/zod-schema-form",
+    icon: "lucide:braces",
+    description:
+      "Render controlled forms from Zod 4 schemas with typed values and async validation.",
+  },
+  {
     name: "File Upload",
     href: "/docs/ui/forms/file-upload",
     icon: "lucide:upload",

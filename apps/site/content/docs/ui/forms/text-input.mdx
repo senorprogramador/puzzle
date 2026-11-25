@@ -18,7 +18,7 @@ import { TextInput } from "@puzzle-ui/ui";
 
 ## Types and affixes
 
-`email` and `phone` provide default leading icons; `phone` renders a native `tel` input. `search` renders a native search input. Password fields include a show/hide button. Explicit `prefix` or `suffix` replaces the default affix; `null` removes it.
+`email` and `phone` provide default leading icons; `phone` renders a native `tel` input. `url` renders a native URL input, and `search` renders a native search input. Password fields include a show/hide button. Explicit `prefix` or `suffix` replaces the default affix; `null` removes it.
 
 <Preview
   hideDevices={true}
@@ -28,6 +28,7 @@ import { TextInput } from "@puzzle-ui/ui";
   <FormField label="Email"><TextInput type="email" placeholder="you@example.com" /></FormField>
   <FormField label="Password"><TextInput type="password" /></FormField>
   <FormField label="Phone"><TextInput type="phone" /></FormField>
+  <FormField label="Website"><TextInput type="url" placeholder="https://example.com" /></FormField>
   <FormField label="Website"><TextInput prefix="https://" suffix=".com" /></FormField>
 </Stack>
 `}
@@ -46,6 +47,9 @@ import { TextInput } from "@puzzle-ui/ui";
       <FormField label="Phone">
         <TextInput type="phone" />
       </FormField>
+      <FormField label="Website URL">
+        <TextInput type="url" placeholder="https://example.com" />
+      </FormField>
       <FormField label="Website">
         <TextInput prefix="https://" suffix=".com" />
       </FormField>
@@ -57,7 +61,7 @@ import { TextInput } from "@puzzle-ui/ui";
 
 | Prop                    | Type                                         | Default       | Description                                    |
 | ----------------------- | -------------------------------------------- | ------------- | ---------------------------------------------- |
-| `type`                  | `"text" \| "email" \| "password" \| "phone" \| "search"` | `"text"`      | Input purpose.                                 |
+| `type`                  | `"text" \| "email" \| "url" \| "password" \| "phone" \| "search"` | `"text"`      | Input purpose.                                 |
 | `prefix`, `suffix`      | `ReactNode`                                  | Type-specific | Leading and trailing content.                  |
 | `value`, `defaultValue` | Native input value                           | -             | Controlled or initial value.                   |
 | `onChange`              | `ChangeEventHandler<HTMLInputElement>`       | -             | Native change event.                           |

@@ -23,6 +23,12 @@ describe("TextInput", () => {
     );
   });
 
+  it("supports URL input semantics", () => {
+    render(<TextInput type="url" aria-label="Website" />);
+
+    expect(screen.getByLabelText("Website")).toHaveAttribute("type", "url");
+  });
+
   it("forwards change events and native attributes", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

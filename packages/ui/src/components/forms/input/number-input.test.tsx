@@ -25,6 +25,33 @@ describe("NumberInput", () => {
     expect(input.hasAttribute("aria-valuemax")).toBe(false);
   });
 
+  it("renders a controlled null value as empty", () => {
+    render(<NumberInput aria-label="Qty" value={null} />);
+
+    expect(screen.getByRole("spinbutton")).toHaveValue("");
+    expect(screen.getByRole("spinbutton")).not.toHaveAttribute("aria-valuenow");
+  });
+
+  it("reports an explicitly cleared controlled value without changing onChange", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const onValueChange = vi.fn();
+
+    render(
+      <NumberInput
+        aria-label="Qty"
+        value={5}
+        onChange={onChange}
+        onValueChange={onValueChange}
+      />,
+    );
+
+    await user.clear(screen.getByRole("spinbutton"));
+
+    expect(onValueChange).toHaveBeenLastCalledWith(null);
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it("steps with arrow keys and pages with PageUp/PageDown", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

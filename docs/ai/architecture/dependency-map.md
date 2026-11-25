@@ -54,7 +54,7 @@ Peer dependencies are supplied by consumers rather than bundled as package runti
 | `@puzzle-ui/icons` | Required `react` and `react-dom` 19. |
 | `@puzzle-ui/pieces` | Required `react` and `react-dom` 19. |
 | `@puzzle-ui/theme` | Required `react` and `react-dom` 19. |
-| `@puzzle-ui/ui` | Required `react` and `react-dom` 19. |
+| `@puzzle-ui/ui` | Required `react` and `react-dom` 19; optional `zod` 4 peer for the `/zod` entry point. |
 | `@puzzle-ui/workspace-ui` | Required `react` and `react-dom` 19. |
 | `@puzzle-ui/fullstack` | Required `react` and `react-dom` 19; optional peers `next` (15.x or 16.x) and `@tanstack/react-start` 1.x; the manifest marks these framework peers optional. |
 | `@puzzle-ui/seo` | `react` 19 is an optional peer. |
@@ -63,4 +63,4 @@ No workspace manifest currently declares entries in `optionalDependencies`. Full
 
 ## Other runtime dependencies
 
-Workspace-to-workspace edges do not include third-party package relationships. The package map lists the main external runtime dependencies and integrations, including ICU `intl-messageformat` in Multilingual, React/Fumadocs/TanStack in the site, Next.js or TanStack Start and MongoDB in the Workspace apps, SimpleWebAuthn in Auth/Fullstack, Iconify in Icons, MongoDB in its adapter, and Zod in Workspace. Consult each manifest for the complete direct dependency list and supported versions.
+Workspace-to-workspace edges do not include third-party package relationships. The package map lists the main external runtime dependencies and integrations, including ICU `intl-messageformat` in Multilingual, React/Fumadocs/TanStack in the site, Next.js or TanStack Start and MongoDB in the Workspace apps, SimpleWebAuthn in Auth/Fullstack, Iconify in Icons, MongoDB in its adapter, and Zod in Workspace and the optional UI `/zod` integration. Consult each manifest for the complete direct dependency list and supported versions.

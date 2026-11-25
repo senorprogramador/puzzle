@@ -1,0 +1,253 @@
+---
+title: Zod Schema Form
+description: Build controlled React forms from Zod 4 object schemas with typed partial values, validation, nested fields, groups, and custom renderers.
+---
+
+import { Preview, Section } from "@puzzle-ui/ui";
+import { ZodSchemaFormExample } from "../../../../src/components/doc-examples/ui/zod-schema-form";
+
+`ZodSchemaForm` renders a controlled form from a Zod 4 object schema. It maps
+supported fields to Puzzle UI controls, handles nested objects and arrays, and
+uses Zod to validate values. Your application still owns the controlled value
+and decides what to do with successfully parsed data.
+
+## Install and import
+
+Install Zod 4 alongside the UI package when using this optional integration:
+
+```sh
+npm install @puzzle-ui/ui zod
+```
+
+Import the form from its Zod-specific subpath. The core `@puzzle-ui/ui` entry
+does not require Zod:
+
+```tsx
+import { ZodSchemaForm } from "@puzzle-ui/ui/zod";
+import { z } from "zod";
+```
+
+The public type exports are `ZodSchemaFormProps`, `ZodSchemaFieldContext`,
+`ZodSchemaFieldRenderer`, and `ZodSchemaFormGroup`, also from
+`@puzzle-ui/ui/zod`.
+
+## Controlled form
+
+Pass the schema, a controlled value, and an `onChange` callback. The form
+accepts partial values so fields can start empty and be filled incrementally.
+Its `render` prop provides generated `fields`, `validate`, `resetValidation`,
+and the current validation state.
+
+<Preview align="start" code={`\
+<ZodSchemaFormExample />
+`}>
+  <Section>
+    <ZodSchemaFormExample />
+  </Section>
+</Preview>
+
+The example groups nested fields, customizes one field with a Puzzle UI
+control, validates on blur or on request, and displays controlled input
+separately from parsed output.
+
+```tsx
+import { useState } from "react";
+import { ZodSchemaForm } from "@puzzle-ui/ui/zod";
+import { z } from "zod";
+
+const schema = z.object({
+  name: z.string().trim().min(2),
+  email: z.email(),
+});
+
+type FormValue = { name?: string; email?: string };
+
+const ProfileForm = () => {
+  const [value, setValue] = useState<FormValue>({});
+
+  return (
+    <ZodSchemaForm
+      schema={schema}
+      value={value}
+      onChange={setValue}
+      validationMode="blur"
+      groups={[
+        {
+          id: "identity",
+          label: "Identity",
+          keys: ["name", "email"],
+          columns: 2,
+        },
+      ]}
+      render={({ fields, validate }) => (
+        <>
+          {fields}
+          <button
+            type="button"
+            onClick={async () => {
+              const result = await validate();
+              if (result.success) console.log(result.data);
+            }}
+          >
+            Validate and save
+          </button>
+        </>
+      )}
+    />
+  );
+};
+```
+
+The form does not submit data itself. Call `validate()` at the point your
+application is ready to act; only the success result contains parsed,
+validated data.
+
+## Values and parsed output
+
+`value` and `onChange` use `DeepPartial<z.input<typeof schema>>`: they represent
+the raw, caller-controlled input, not a parsed schema result. Missing values
+remain missing until Zod parses them. On success, `result.data` is
+`z.output<typeof schema>`, including Zod defaults, coercions, and transforms.
+For example, a string field transformed to a number remains a string in the
+controlled value and becomes a number in parsed output.
+
+Normalization used to choose controls does not run transforms, coercions, or
+refinements. Zod parsing runs when validation is requested or triggered.
+Keep the raw state for editing; use successful parsed data when a consumer
+needs the schema's output type.
+
+## Groups, nested objects, and arrays
+
+Use `groups` to organize top-level fields. Each group has an `id`, optional
+`label`, `description`, `columns`, and a `keys` list. Configure nested object
+layout with `objects`, keyed by object path; groups and object layouts adapt to
+available width. Object options include a label, description, groups, columns,
+border, padding, header visibility, and collapsible presentation.
+`unassignedFields` controls fields not listed in a group:
+`"after-groups"`, `"hide"`, or `"error"`.
+
+Supported arrays use Puzzle UI's `FieldArray` for controlled add/remove
+interactions. Nested objects render their fields recursively. Use field
+configuration to hide a field from view when it is conditionally irrelevant:
+hidden fields remain in the controlled value and are still validated.
+
+## Custom fields and metadata
+
+Use `fields` for a key/path-specific renderer or field overrides. A custom
+field renderer takes precedence over a renderer selected by `fieldTypes`.
+Renderers receive the value, path, key, label, description, required/optional
+and nullable state, constraints, validation messages, disabled/read-only
+state, and `onChange`. When rendering a custom control, associate its label,
+description, and error with the control and forward its disabled/read-only
+state.
+
+Use `fieldTypes` to provide a renderer for a field type across the form. Field
+configuration can also override the label or description, disable or make a
+field read-only, or set `hidden`.
+
+Zod 4 metadata can supply `label`, `title`, `description`, and `readOnly`
+values. String, number, and date constraints are exposed to field renderers
+where supported. Explicit field configuration is useful when a particular
+form needs presentation different from the schema metadata.
+
+## Props
+
+| Prop | Description |
+| --- | --- |
+| `schema` | Required Zod object schema used to render and validate the form. |
+| `value`, `onChange` | Controlled `DeepPartial<z.input<typeof schema>>` raw values and their change callback. |
+| `onValidationChange` | Receives validation `status`, `result`, `errors`, `isValid`, and `isValidating`. |
+| `validationMode` | `"change"`, `"blur"`, `"submit"`, `"touched"`, or a readonly array of modes. |
+| `validationDebounceMs` | Delay for scheduled validation after edits. |
+| `disabled`, `readOnly` | Form-wide interaction state; fields can also override these through configuration. |
+| `groups` | Groups with an `id`, optional `label`/`description`/`columns`, and top-level field `keys`. |
+| `fields` | Field-key/path configuration: `render`, `hidden`, `label`, `description`, `disabled`, or `readOnly`. |
+| `fieldTypes` | Map from field type to a custom `ZodSchemaFieldRenderer`. |
+| `objects` | Per-object layout configuration for groups, columns, border, padding, header, or collapsible presentation. |
+| `unassignedFields` | Controls ungrouped fields: `"after-groups"`, `"hide"`, or `"error"`. |
+| `render` | Render prop receiving `fields`, `validate`, `resetValidation`, and validation state. |
+| `className` | Class name for the form root. |
+| `aria-label`, `aria-labelledby`, `aria-describedby` | Accessible naming and description for the form. |
+
+Validation status is `"unvalidated"`, `"validating"`, `"valid"`, or
+`"invalid"`. A `ZodSchemaFormGroup` describes a group; renderer code can use
+the `ZodSchemaFieldContext` and `ZodSchemaFieldRenderer` types.
+
+## Validation and errors
+
+`validationMode` accepts `"change"`, `"blur"`, `"submit"`, or `"touched"`, or
+an array of modes. Use `validationDebounceMs` to delay scheduled validation
+after edits. Zod async refinements are supported; for remote checks, consider
+validating on blur or submit rather than on every change.
+
+Zod can validate relationships between fields. Attach a refinement to the
+object schema and set its issue path to the field that should receive the
+message:
+
+```tsx
+const credentialsSchema = z
+  .object({
+    email: z.email(),
+    confirmEmail: z.email(),
+  })
+  .refine((value) => value.email === value.confirmEmail, {
+    path: ["confirmEmail"],
+    message: "Email addresses do not match.",
+  });
+```
+
+`onValidationChange` receives `status`, `result`, `errors`, `isValid`, and
+`isValidating`. The render state also includes `touchedFields`,
+`unresolvedFields`, `validate`, and `resetValidation`. Validation results are
+discriminated:
+
+```tsx
+const result = await validate();
+if (result.success) {
+  console.log(result.data); // z.output<typeof schema>
+} else {
+  console.log(result.issues, result.messages["#/address/city"]);
+}
+```
+
+Failure results expose plain `issues` with paths and messages, plus a
+`messages` record keyed by URI-fragment JSON Pointers. The root key is `#`;
+for example, `#/address/city` identifies a nested field. Array indexes appear
+as path segments, such as `#/items/0/name`.
+
+## Disabled and read-only state
+
+Set `disabled` or `readOnly` on the form to apply that state to generated
+fields. Per-field configuration and schema metadata can set field-level
+read-only or disabled state. Read-only values remain part of controlled state
+and validation; disabled is for controls unavailable for interaction.
+
+## Supported schemas and limitations
+
+The default field mappings cover strings, email and URL strings, numbers,
+booleans, enums, literals, dates, nested objects, and arrays. The form schema
+must be a Zod object. A union, recursive schema, or other unsupported field
+shape cannot always be represented by a standard control; it receives an
+explicit fallback and a diagnostic in `unresolvedFields`. Provide a custom
+renderer where appropriate, or model the field with a supported shape.
+
+The generated controls are a starting point, not a complete design system for
+every Zod feature. For highly specialized widgets or schema-specific behavior,
+use `fields` or `fieldTypes`. Keep server-side validation authoritative for
+data submitted to a service.
+
+## Accessibility
+
+Keep visible, meaningful labels for generated controls. Custom renderers are
+responsible for connecting the provided label, description, and validation
+message to their control; use semantic form controls and preserve keyboard
+interaction. Use `aria-label`, `aria-labelledby`, and `aria-describedby` on
+the form when its purpose or context needs additional accessible naming.
+
+## Related documentation
+
+- [Form Field](/docs/ui/forms/form-field)
+- [FieldArray](/docs/ui/forms/field-array)
+- [Text Input](/docs/ui/forms/text-input)
+- [Select](/docs/ui/forms/select)
+- [UI component index](/docs/ui)

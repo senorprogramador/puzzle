@@ -21,10 +21,11 @@ type NumberInputProps = Omit<
   ComponentPropsWithoutRef<"input">,
   "type" | "value" | "defaultValue" | "onChange" | "step" | "min" | "max"
 > & {
-  value?: number;
+  value?: number | null;
   initialValue?: number;
 
   onChange?: (value: number) => void;
+  onValueChange?: (value: number | null) => void;
 
   min?: number;
   max?: number;
@@ -64,6 +65,7 @@ const NumberInput = ({
   value,
   initialValue = 0,
   onChange,
+  onValueChange,
 
   min,
   max,
@@ -103,17 +105,21 @@ const NumberInput = ({
 
   const allowsNegative = min === undefined || min < 0;
 
-  const [internalValue, setInternalValue] = useState(() =>
+  const [internalValue, setInternalValue] = useState<number | null>(() =>
     clamp(Number.isFinite(initialValue) ? initialValue : 0, min, max),
   );
 
-  const currentValue = clamp(isControlled ? value : internalValue, min, max);
+  const currentValue = isControlled
+    ? value === null
+      ? null
+      : clamp(value, min, max)
+    : internalValue;
 
   const [draft, setDraft] = useState(() =>
-    String(Number(currentValue.toFixed(digits))),
+    currentValue === null ? "" : String(Number(currentValue.toFixed(digits))),
   );
 
-  const currentValueRef = useRef(currentValue);
+  const currentValueRef = useRef<number | null>(currentValue);
   const focusedRef = useRef(false);
 
   const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -127,12 +133,32 @@ const NumberInput = ({
 
   useEffect(() => {
     if (!focusedRef.current) {
-      setDraft(String(Number(currentValue.toFixed(digits))));
+      setDraft(
+        currentValue === null
+          ? ""
+          : String(Number(currentValue.toFixed(digits))),
+      );
     }
   }, [currentValue, digits]);
 
   const commit = useCallback(
-    (nextValue: number) => {
+    (nextValue: number | null) => {
+      if (nextValue === null) {
+        if (currentValueRef.current === null) {
+          return;
+        }
+
+        currentValueRef.current = null;
+
+        if (!isControlled) {
+          setInternalValue(null);
+        }
+
+        setDraft("");
+        onValueChange?.(null);
+        return;
+      }
+
       const rounded = Math.round(clamp(nextValue, min, max) * factor) / factor;
 
       if (!Number.isFinite(rounded) || rounded === currentValueRef.current) {
@@ -148,14 +174,17 @@ const NumberInput = ({
       setDraft(String(rounded));
 
       onChange?.(rounded);
+      onValueChange?.(rounded);
     },
-    [factor, isControlled, max, min, onChange],
+    [factor, isControlled, max, min, onChange, onValueChange],
   );
 
   const changeBy = useCallback(
     (direction: Direction, amount = safeStep) => {
       const next =
-        Math.round((currentValueRef.current + direction * amount) * factor) /
+        Math.round(
+          ((currentValueRef.current ?? 0) + direction * amount) * factor,
+        ) /
         factor;
 
       commit(next);
@@ -259,8 +288,14 @@ const NumberInput = ({
 
     setDraft(nextDraft);
 
+    if (nextDraft.trim() === "") {
+      if (onValueChange) {
+        commit(null);
+      }
+      return;
+    }
+
     if (
-      nextDraft.trim() === "" ||
       nextDraft === "-" ||
       nextDraft === "." ||
       nextDraft === "-."
@@ -281,22 +316,31 @@ const NumberInput = ({
     const parsed = Number(draft.replace(",", "."));
 
     const nextValue =
-      draft.trim() !== "" && Number.isFinite(parsed)
+      draft.trim() !== "" &&
+      draft !== "-" &&
+      draft !== "." &&
+      draft !== "-." &&
+      Number.isFinite(parsed)
         ? clamp(Math.round(parsed * factor) / factor, min, max)
         : currentValueRef.current;
 
     commit(nextValue);
 
-    setDraft(String(Number(nextValue.toFixed(digits))));
+    setDraft(
+      nextValue === null
+        ? ""
+        : String(Number(nextValue.toFixed(digits))),
+    );
 
     onBlur?.(event);
   };
 
   useEffect(() => stopHold, [stopHold]);
 
-  const atMinimum = min !== undefined && currentValue <= min;
+  const numericValue = currentValue ?? 0;
+  const atMinimum = min !== undefined && numericValue <= min;
 
-  const atMaximum = max !== undefined && currentValue >= max;
+  const atMaximum = max !== undefined && numericValue >= max;
 
   const trimmedDraft = draft.trim();
   const draftIsIncomplete =
@@ -338,7 +382,7 @@ const NumberInput = ({
         {...inputProps}
         type="text"
         role="spinbutton"
-        aria-valuenow={currentValue}
+        aria-valuenow={currentValue ?? undefined}
         aria-valuemin={min}
         aria-valuemax={max}
         aria-invalid={draftIsInvalid || inputProps["aria-invalid"]}

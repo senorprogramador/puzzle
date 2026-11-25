@@ -695,6 +695,141 @@
         "family": "Video Upload"
       },
       "aliases": []
+    },
+    {
+      "name": "createValidationRunGuard",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "./zod"
+      ],
+      "category": "forms",
+      "subcategory": "zod-schema-form",
+      "description": "A composable part of Zod Schema Form. Render controlled forms from Zod 4 schemas with typed values and async validation.",
+      "documentation": "apps/site/content/docs/ui/forms/zod-schema-form.mdx",
+      "source": "packages/ui/src/components/forms/zod-schema-form/validation/validation-run-guard.ts",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Zod Schema Form"
+      },
+      "aliases": []
+    },
+    {
+      "name": "createZodSchemaValidator",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "./zod"
+      ],
+      "category": "forms",
+      "subcategory": "zod-schema-form",
+      "description": "A composable part of Zod Schema Form. Render controlled forms from Zod 4 schemas with typed values and async validation.",
+      "documentation": "apps/site/content/docs/ui/forms/zod-schema-form.mdx",
+      "source": "packages/ui/src/components/forms/zod-schema-form/validation/zod-schema-validator.ts",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Zod Schema Form"
+      },
+      "aliases": []
+    },
+    {
+      "name": "formatValidationPath",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "./zod"
+      ],
+      "category": "forms",
+      "subcategory": "zod-schema-form",
+      "description": "A composable part of Zod Schema Form. Render controlled forms from Zod 4 schemas with typed values and async validation.",
+      "documentation": "apps/site/content/docs/ui/forms/zod-schema-form.mdx",
+      "source": "packages/ui/src/components/forms/zod-schema-form/validation/validation-path.ts",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Zod Schema Form"
+      },
+      "aliases": []
+    },
+    {
+      "name": "normalizeZodObjectSchema",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "./zod"
+      ],
+      "category": "forms",
+      "subcategory": "zod-schema-form",
+      "description": "A composable part of Zod Schema Form. Render controlled forms from Zod 4 schemas with typed values and async validation.",
+      "documentation": "apps/site/content/docs/ui/forms/zod-schema-form.mdx",
+      "source": "packages/ui/src/components/forms/zod-schema-form/schema/normalize-zod-object-schema.ts",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Zod Schema Form"
+      },
+      "aliases": []
+    },
+    {
+      "name": "ZodSchemaForm",
+      "package": "@puzzle-ui/ui",
+      "entryPoints": [
+        "./zod"
+      ],
+      "category": "forms",
+      "subcategory": "zod-schema-form",
+      "description": "Render controlled forms from Zod 4 schemas with typed values and async validation.",
+      "documentation": "apps/site/content/docs/ui/forms/zod-schema-form.mdx",
+      "source": "packages/ui/src/components/forms/zod-schema-form/index.tsx",
+      "useCases": [
+        "data-entry"
+      ],
+      "pageTypes": [
+        "form"
+      ],
+      "capabilities": [
+        "interactive",
+        "data-entry"
+      ],
+      "composition": {
+        "kind": "primitive",
+        "family": "Zod Schema Form"
+      },
+      "aliases": []
     }
   ]
 }

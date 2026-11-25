@@ -40,6 +40,10 @@ yarn add @puzzle-ui/ui @puzzle-ui/theme
 React and React DOM 19 are peer dependencies and should already be installed
 in your application.
 
+`ZodSchemaForm` is available from the optional `@puzzle-ui/ui/zod` entry point.
+Install Zod 4 in applications that use it; importing the package root does not
+load or require Zod.
+
 To start a new project with Puzzle preconfigured, run
 [`npx @puzzle-ui/create`](https://puzzle-ui.com/docs/create).
 
@@ -68,7 +72,7 @@ export const App = () => (
 | Actions      | Button, ButtonGroup, ToggleGroup                                                                              |
 | Data display | Alert, Avatar, Badge, Card, EmptyState, Image, Paper, Progress, Rating, Skeleton                              |
 | Editors      | TextEditor, TextEditorToolbar, TextRenderer                                                                   |
-| Forms        | Autocomplete, Checkbox, ColorPicker, DatePicker, FileUpload, ImageUpload, VideoUpload, FormField, inputs, Radio, Select, Slider, Switch |
+| Forms        | Autocomplete, Checkbox, ColorPicker, DatePicker, FieldArray, FileUpload, ImageUpload, VideoUpload, FormField, ZodSchemaForm, inputs, Radio, Select, Slider, Switch |
 | Layout       | AppBar, AspectRatio, Container, Grid, GridItem, PageLayout, ResizablePanels, ScrollArea, Section, SectionHeader, Separator, Sidebar, Stack |
 | Navigation   | Accordion, Breadcrumbs, Carousel, Link, Pagination, SortableTree, Tabs, TreeView                              |
 | Overlays     | Command, ContextMenu, Dialog, Drawer, DropdownMenu, Notification, Popover, Tooltip                            |
