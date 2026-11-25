@@ -20,6 +20,13 @@ Runtime dependencies are `@puzzle-ui/storage` and `mongodb`. Keep MongoDB types 
 
 Report only real capabilities. Multi-document transactions require a replica set or sharded deployment and explicit opt-in. MongoDB TTL deletion is asynchronous, so applications must still enforce security-sensitive expiration. Keep migration locks/status in adapter-managed prefixed collections and preserve index behavior.
 
+Match the shared Storage ID semantics: accept an optional insert ID, preserve a
+non-empty explicit ID, or use `resolveStorageId` to generate the same Web Crypto
+UUID v4 as D1. Preserve existing IDs and `createdAt` on upsert; adapter
+metadata controls `updatedAt` and `revision`. A conflicting explicit ID is a
+validation error. Query-based upsert is read-then-write; do not imply that the
+capability guarantees atomicity.
+
 ## 6. Testing
 
 Tests under `tests/` include Storage conformance and adapter-specific regressions. `bun run test` uses `scripts/test-with-mongodb.sh`, which requires Docker and Docker Compose and starts an isolated replica set on a free port; `MONGODB_TEST_PORT` can select a port.
@@ -42,6 +49,7 @@ See [`README.md`](./README.md) and the [Storage adapter documentation](../../app
 - Do not rely on TTL cleanup for request-time authorization or expiry.
 - Do not use raw collection names in application code; use the adapter CRUD methods.
 - Do not treat MongoDB behavior as a change to the vendor-neutral contract.
+- Do not assume inserts require IDs or that query-based upsert is atomic.
 
 ## 10. Context-efficient workflow
 

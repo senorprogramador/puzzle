@@ -42,6 +42,14 @@ indexes or match object values inside arrays. D1 uses SQLite `lower()`, whose
 built-in case folding is ASCII-only. Filter values remain bound SQL parameters;
 field paths are validated before SQL expressions are generated.
 
+`StorageInsert` may omit `id`; the adapter uses the shared Web Crypto UUID v4
+generation rule while preserving explicit IDs. Returned records always have a
+non-empty ID. Insert defaults missing timestamps to now and revision to 1.
+Upsert preserves a matched record's ID and `createdAt`, manages `updatedAt` and
+revision, and rejects a different explicit ID. Upsert is a read followed by a
+write, not a concurrency-safe atomic operation; the `upsert` capability only
+indicates support for the operation.
+
 The package exports `D1StorageAdapter`, `D1StorageMigrationAdapter`, and the D1-like binding, statement, result, and options types. See the [storage guide](https://puzzle-ui.com/docs/storage) for query and migration examples, capability details, and production guidance.
 
 ## Development

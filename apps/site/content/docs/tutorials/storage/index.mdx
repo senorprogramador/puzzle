@@ -77,9 +77,12 @@ the short-lived CLI below.
 
 ### 1. Define and validate a record at the application boundary
 
-IDs are application-supplied strings, not necessarily MongoDB ObjectIds.
-Storage fills missing `createdAt`, `updatedAt`, and `revision` on insert;
-updates refresh the timestamp and increment the revision.
+`StorageRecord` always has a required ID, but `StorageInsert` allows the ID to
+be omitted. The adapters preserve explicit IDs or generate a cryptographically
+random UUID v4; every returned record has its ID. Missing `createdAt` and
+`updatedAt` default to the current time and missing `revision` defaults to 1.
+Explicit insert metadata is preserved. Updates preserve the ID and creation
+time, refresh `updatedAt`, and increment the revision.
 
 Collection `schema.validate` is metadata: the shipped adapters do **not** call
 it automatically. Validate untrusted input before a write. Types do not
@@ -114,7 +117,6 @@ export const createNotebook = (storage: StorageAdapter) => ({
   }),
   create: (ownerId: string, title: unknown) =>
     storage.insert<Note>("notes", {
-      id: crypto.randomUUID(),
       ownerId,
       title: noteTitle(title),
       archived: false,
@@ -146,9 +148,14 @@ export const createNotebook = (storage: StorageAdapter) => ({
   },
   upsertWelcome: (ownerId: string) =>
     storage.upsert<Note>("notes", {
-      where: { id: { operator: "eq", value: `welcome-${ownerId}` } },
+      where: {
+        ownerId: { operator: "eq", value: ownerId },
+        title: {
+          operator: "eq",
+          value: "Welcome to your notebook",
+        },
+      },
     }, {
-      id: `welcome-${ownerId}`,
       ownerId,
       title: "Welcome to your notebook",
       archived: false,
@@ -170,11 +177,15 @@ returns `false`. A found record with a stale revision throws
 
 ### 2. Understand upsert and deletion semantics
 
-Both adapters implement upsert as a lookup followed by update or insert.
-It is **not** an atomic database-native upsert. Use `upsertWelcome` only in a
-controlled sequential setup task. Concurrent creators can hit
-`StorageDuplicateError`; reload and resolve that conflict rather than treating
-it as an atomic counter or a once-only security operation.
+Both adapters implement upsert as a lookup followed by update or insert. When
+a match exists, upsert preserves its ID and `createdAt`, ignores supplied
+metadata, refreshes `updatedAt`, and increments `revision` once. A different
+explicit ID for a match is rejected. When none exists, the adapter generates
+an ID if omitted. Upsert is **not** an atomic database-native operation. Use
+`upsertWelcome` only in a controlled sequential setup task. Concurrent
+creators can create duplicates or hit `StorageDuplicateError` when a unique
+constraint applies; reload and resolve that conflict rather than treating
+upsert as an atomic counter or a once-only security operation.
 
 Deletion is physical, not a soft-delete flag: `delete` returns whether a record
 was deleted; repeating it returns `false`. `deleteMany` returns a count.

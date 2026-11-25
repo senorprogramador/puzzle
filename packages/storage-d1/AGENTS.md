@@ -22,6 +22,13 @@ Preserve the shared query AST, serialization, cursor, capability, and migration 
 
 Keep dotted JSON paths validated by the shared Storage query validator, generate SQL paths only from validated segments, and bind filter values as parameters. Preserve shared `contains` behavior: case-insensitive substring matching for strings and exact scalar membership for arrays. SQLite's built-in `lower()` is ASCII-only.
 
+Match shared Storage ID semantics: accept optional insert IDs, preserve
+non-empty explicit IDs, and otherwise use `resolveStorageId` to generate the
+same Web Crypto UUID v4 as MongoDB. Keep the resolved ID consistent across SQL
+and returned records. Upsert preserves a matched record's ID and `createdAt`,
+manages `updatedAt`/revision, rejects a conflicting explicit ID, and is
+read-then-write rather than concurrency-safe atomic behavior.
+
 ## 6. Testing
 
 Tests under `tests/` use Bun and run contract/conformance behavior against the D1 test environment. Keep adapter and migration tests isolated and cover the capabilities D1 actually advertises.
@@ -44,6 +51,7 @@ See [`README.md`](./README.md) and the [Storage adapter documentation](../../app
 - Do not run migration setup on every request.
 - Do not add unsupported TTL or transaction guarantees.
 - Do not bypass the shared `StorageAdapter` contract with D1-only methods in consumers.
+- Do not assume inserts require IDs or that query-based upsert is atomic.
 
 ## 10. Context-efficient workflow
 

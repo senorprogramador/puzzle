@@ -1,6 +1,7 @@
 import {
   StorageConflictError,
   StorageDuplicateError,
+  resolveStorageId,
 } from "@puzzle-ui/storage";
 
 import { StorageAuthManager } from "../../dist/index.js";
@@ -180,7 +181,16 @@ export class MemoryStorage {
         const records = this.getCollection(operation.collection);
 
         if (operation.type === "insert") {
-          const record = operation.record;
+          const input = operation.record;
+          const id = resolveStorageId(input.id);
+          const now = new Date();
+          const record = {
+            ...input,
+            id,
+            createdAt: input.createdAt ?? now,
+            updatedAt: input.updatedAt ?? now,
+            revision: input.revision ?? 1,
+          };
 
           this.assertUnique(operation.collection, record);
 
@@ -226,7 +236,7 @@ export class MemoryStorage {
             ...operation.changes,
             id: current.id,
             createdAt: current.createdAt,
-            updatedAt: operation.changes.updatedAt ?? new Date(),
+            updatedAt: new Date(),
             revision: current.revision + 1,
           };
 

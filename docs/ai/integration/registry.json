@@ -220,7 +220,7 @@
       ],
       "instructionDependencies": [],
       "documentationUrl": "https://puzzle-ui.com/docs/storage",
-      "contentHash": "fc3cfba6657c60056437390e757dbbdc39d58910f7226eddfc0f7a3d35939704"
+      "contentHash": "4f239721b87aec8296a12e2832a8cef1e63e5730f20d4e0593804030c8cd7f79"
     },
     {
       "name": "@puzzle-ui/storage-d1",
@@ -234,7 +234,7 @@
         "@puzzle-ui/storage"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/storage",
-      "contentHash": "fbb8737360c6be0710a587d96a396bfe6b82b84836dc76f9958ead914112271d"
+      "contentHash": "10d7b247c233a43ef03633a9a468e7c085d7d645868475c3d4d4a9968171ad95"
     },
     {
       "name": "@puzzle-ui/storage-mongodb",
@@ -248,7 +248,7 @@
         "@puzzle-ui/storage"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/storage",
-      "contentHash": "9616f007e3e15d0f8627368d2078b47c00d657989957f90a2fc2840b4d32c6f5"
+      "contentHash": "b69795f3a3eef6a86312f53a96d6db2aa2a3ac288b1058a7b72a1db7077c9726"
     },
     {
       "name": "@puzzle-ui/theme",

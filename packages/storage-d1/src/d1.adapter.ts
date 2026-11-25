@@ -15,12 +15,14 @@ import {
   type StorageQuery,
   type StorageRecord,
   type StorageScalarFieldPath,
+  type StorageInsert,
   type StorageUpdate,
   type StorageWhere,
   type StorageCapabilities,
   type StorageCapabilityReport,
   validateFieldPath,
   validateQuery,
+  resolveStorageId,
 } from "@puzzle-ui/storage";
 
 import type {
@@ -589,35 +591,24 @@ export class D1StorageAdapter implements StorageAdapter {
 
   private insertStatement<T extends StorageRecord>(
     collection: StorageCollectionName,
-    record: Parameters<StorageAdapter["insert"]>[1],
+    record: StorageInsert<T>,
   ): {
     sql: string;
     values: readonly unknown[];
     record: T;
   } {
-    const input = record as StorageRecord & {
-      id: string;
-      [key: string]: unknown;
-    };
-
+    const { id: providedId, createdAt, updatedAt, revision, ...data } = record;
+    const id = resolveStorageId(providedId);
     const now = new Date();
-    const createdAt = input.createdAt ?? now;
-    const updatedAt = input.updatedAt ?? now;
-    const revision = input.revision ?? 1;
-
-    const {
-      id,
-      createdAt: _createdAt,
-      updatedAt: _updatedAt,
-      revision: _revision,
-      ...data
-    } = input;
+    const resolvedCreatedAt = createdAt ?? now;
+    const resolvedUpdatedAt = updatedAt ?? now;
+    const resolvedRevision = revision ?? 1;
 
     const result = {
       id,
-      createdAt,
-      updatedAt,
-      revision,
+      createdAt: resolvedCreatedAt,
+      updatedAt: resolvedUpdatedAt,
+      revision: resolvedRevision,
       ...data,
     } as T;
 
@@ -627,9 +618,9 @@ export class D1StorageAdapter implements StorageAdapter {
         VALUES (?, ?, ?, ?, ?)`,
       values: [
         id,
-        createdAt.toISOString(),
-        updatedAt.toISOString(),
-        revision,
+        resolvedCreatedAt.toISOString(),
+        resolvedUpdatedAt.toISOString(),
+        resolvedRevision,
         serialize(data),
       ],
       record: result,
@@ -809,7 +800,7 @@ export class D1StorageAdapter implements StorageAdapter {
 
   async insert<T extends StorageRecord>(
     collection: StorageCollectionName,
-    record: Parameters<StorageAdapter["insert"]>[1],
+    record: StorageInsert<T>,
   ): Promise<T> {
     const statement = this.insertStatement<T>(collection, record);
 
@@ -824,11 +815,19 @@ export class D1StorageAdapter implements StorageAdapter {
   async upsert<T extends StorageRecord>(
     collection: StorageCollectionName,
     query: StorageQuery<T>,
-    record: Parameters<StorageAdapter["insert"]>[1],
+    record: StorageInsert<T>,
   ): Promise<T> {
+    validateQuery(query);
+
     const existing = await this.findOne<T>(collection, query);
 
     if (existing) {
+      if (record.id !== undefined && record.id !== existing.id) {
+        throw new StorageValidationError(
+          "Upsert cannot change the ID of an existing record.",
+        );
+      }
+
       const changes = {
         ...(record as Record<string, unknown>),
       } as StorageUpdate<T>;
@@ -1047,8 +1046,9 @@ export class D1StorageAdapter implements StorageAdapter {
 
     const statements: D1PreparedStatementLike[] = [];
     const resultIndexes: number[] = [];
+    const insertIds: (string | undefined)[] = [];
 
-    for (const operation of operations) {
+    for (const [operationIndex, operation] of operations.entries()) {
       const table = this.table(operation.collection);
 
       if (
@@ -1084,12 +1084,13 @@ export class D1StorageAdapter implements StorageAdapter {
       }
 
       if (operation.type === "insert") {
-        const statement = this.insertStatement<T>(
+        const statement = this.insertStatement(
           operation.collection,
           operation.record,
         );
 
         statements.push(this.prepare(statement.sql, statement.values));
+        insertIds[operationIndex] = statement.record.id;
 
         resultIndexes.push(statements.length - 1);
         continue;
@@ -1148,13 +1149,16 @@ export class D1StorageAdapter implements StorageAdapter {
         }
 
         if (operation.type === "insert") {
-          const input = operation.record as StorageRecord & {
-            id: string;
-          };
+          const id = insertIds[index];
+          if (!id) {
+            throw new StorageAtomicityError(
+              "D1 batch insert ID was not recorded.",
+            );
+          }
 
           const inserted = await this.findById<T>(
             operation.collection,
-            input.id,
+            id,
           );
 
           if (!inserted) {

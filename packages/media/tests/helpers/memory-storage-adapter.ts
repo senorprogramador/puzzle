@@ -2,6 +2,8 @@ import {
   DEFAULT_STORAGE_CAPABILITIES,
   StorageCapabilityError,
   StorageDuplicateError,
+  StorageValidationError,
+  resolveStorageId,
   type StorageAdapter,
   type StorageBatchOperation,
   type StorageBatchResult,
@@ -215,10 +217,13 @@ export class MemoryStorageAdapter implements StorageAdapter {
     input: StorageInsert<T>,
   ): Promise<T> {
     const target = this.collection(collection);
+    const id = resolveStorageId(input.id);
+    const now = new Date();
     const record = {
       ...input,
-      createdAt: input.createdAt ?? new Date(),
-      updatedAt: input.updatedAt ?? new Date(),
+      id,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
       revision: input.revision ?? 1,
     } as T;
     if (target.records.has(record.id)) {
@@ -237,6 +242,12 @@ export class MemoryStorageAdapter implements StorageAdapter {
   ): Promise<T> {
     const existing = await this.findOne<T>(collection, query);
     if (!existing) return this.insert<T>(collection, input);
+    if (input.id !== undefined && input.id !== existing.id) {
+      throw new StorageValidationError(
+        "Upsert cannot change the ID of an existing record.",
+      );
+    }
+
     const changes = input as StorageUpdate<T>;
     return (await this.update<T>(collection, existing.id, changes)) ?? existing;
   }
@@ -255,7 +266,7 @@ export class MemoryStorageAdapter implements StorageAdapter {
       ...changes,
       id: current.id,
       createdAt: current.createdAt,
-      updatedAt: changes.updatedAt ?? new Date(),
+      updatedAt: new Date(),
       revision: current.revision + 1,
     } as T;
     this.validateRecord(target.options, updated);

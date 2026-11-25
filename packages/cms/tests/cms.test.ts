@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import {
+  resolveStorageId,
   StorageConflictError,
   StorageDuplicateError,
   type StorageComparison,
@@ -119,12 +120,14 @@ class MemoryStorage {
     }
     const rows = this.collections.get(collection);
     if (!rows) throw new Error(`Unknown collection ${collection}`);
-    const id = String(input.id);
+    const id = resolveStorageId(input.id as string | undefined);
     if (rows.has(id)) throw new StorageDuplicateError("id");
+    const now = new Date();
     const record = {
       ...structuredClone(input),
-      createdAt: input.createdAt ?? new Date(),
-      updatedAt: input.updatedAt ?? new Date(),
+      id,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
       revision: input.revision ?? 1,
     };
     this.assertUnique(collection, record, id);
@@ -216,15 +219,17 @@ class MemoryStorage {
             throw new Error("Change event storage failed");
           }
           const record = operation.record!;
-          const id = String(record.id);
+          const id = resolveStorageId(record.id as string | undefined);
           if (rows.has(id)) throw new StorageDuplicateError("id");
-          this.assertUnique(operation.collection, record, id);
+          const now = new Date();
           const inserted = {
             ...structuredClone(record),
-            createdAt: record.createdAt ?? new Date(),
-            updatedAt: record.updatedAt ?? new Date(),
+            id,
+            createdAt: record.createdAt ?? now,
+            updatedAt: record.updatedAt ?? now,
             revision: record.revision ?? 1,
           };
+          this.assertUnique(operation.collection, inserted, id);
           rows.set(id, inserted);
           results.push({ type: "insert", record: structuredClone(inserted) });
           continue;

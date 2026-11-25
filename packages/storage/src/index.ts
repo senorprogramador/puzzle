@@ -71,3 +71,5 @@ export {
   validateQuery,
   validateWhere,
 } from "./utils/query.utils";
+
+export { resolveStorageId } from "./utils/storage-id.utils";

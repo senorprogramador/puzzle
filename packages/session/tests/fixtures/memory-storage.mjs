@@ -1,6 +1,7 @@
 import {
   StorageConflictError,
   StorageDuplicateError,
+  resolveStorageId,
 } from "@puzzle-ui/storage";
 
 export class MemoryStorage {
@@ -127,8 +128,9 @@ export class MemoryStorage {
 
   async insert(collection, record) {
     const records = this.collection(collection);
+    const id = resolveStorageId(record.id);
 
-    if (records.has(record.id)) {
+    if (records.has(id)) {
       throw new StorageDuplicateError("primary_key");
     }
 
@@ -164,6 +166,7 @@ export class MemoryStorage {
 
     const stored = {
       ...record,
+      id,
       createdAt: record.createdAt ?? now,
       updatedAt: record.updatedAt ?? now,
       revision: record.revision ?? 1,

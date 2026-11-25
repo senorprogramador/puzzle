@@ -1,5 +1,6 @@
 import type {
   StorageOrder,
+  StorageInsert,
   StorageQuery,
   StorageRecord,
   StorageWhere,
@@ -80,6 +81,31 @@ export const createUser = (
   },
   ...overrides,
 });
+
+const insertTypeContract = () => {
+  const generatedId: StorageInsert<ConformanceUser> = createUser();
+  const explicitId: StorageInsert<ConformanceUser> = {
+    id: "explicit-id",
+    ...createUser(),
+  };
+
+  return [generatedId, explicitId];
+};
+
+void insertTypeContract;
+
+const recordTypeContract = () => {
+  // @ts-expect-error StorageRecord always requires an ID.
+  const missingId: StorageRecord = {
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    revision: 1,
+  };
+
+  return missingId;
+};
+
+void recordTypeContract;
 
 export const createRecord = (
   id: string,

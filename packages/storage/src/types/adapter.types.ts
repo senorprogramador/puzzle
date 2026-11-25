@@ -15,8 +15,9 @@ import type {
 
 export type StorageInsert<T extends StorageRecord> = Omit<
   T,
-  "createdAt" | "updatedAt" | "revision"
+  "id" | "createdAt" | "updatedAt" | "revision"
 > & {
+  readonly id?: string;
   readonly createdAt?: Date;
   readonly updatedAt?: Date;
   readonly revision?: number;

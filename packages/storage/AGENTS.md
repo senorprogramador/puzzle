@@ -23,6 +23,14 @@ There are no runtime dependencies. Keep database drivers, framework packages, an
 
 Do not invent adapter methods or claim guarantees an implementation cannot provide. Keep query and migration semantics database-neutral, capability flags explicit, and conditional-write/revision behavior typed. Validate queries at the shared boundary. Use `StorageSchema` only as documented; it is not automatically invoked by D1 or Mongo adapters.
 
+`StorageRecord.id` remains required, while `StorageInsert<T>` makes only the ID
+and adapter metadata optional; record-specific fields retain their types.
+Adapters preserve explicit non-empty IDs or use the shared
+`resolveStorageId` helper. Insert defaults missing timestamps to now and
+revision to 1. Upsert preserves a matched record's ID and creation time,
+manages updatedAt/revision, and rejects a conflicting explicit ID. The
+`upsert` capability does not imply atomicity.
+
 ## 6. Testing
 
 The shared conformance suites cover CRUD/query semantics, serialization, revisions, constraints, pagination, batch atomicity, capabilities, and migrations. Adapter packages should run them against isolated real/test databases. Contract tests live under `tests/`.
@@ -44,6 +52,8 @@ See [`README.md`](./README.md) and the [Storage documentation](../../apps/site/c
 ## 9. Common mistakes
 
 - Do not put adapter-specific options or database types in shared contracts.
+- Do not weaken `StorageRecord` or `StorageUpdate` to support optional insert
+  IDs, and do not assume upsert is atomic.
 - Do not treat `StorageSchema` as automatic input validation.
 - Do not infer transactional or TTL guarantees from an adapter's name; inspect its reported capability and limitations.
 - Do not skip the conformance suite when changing adapter-facing contract semantics.

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import {
   StorageDuplicateError,
+  StorageValidationError,
   type StorageAdapter,
   type StorageInsert,
 } from "../../src";
@@ -15,6 +16,19 @@ export const runConstraintConformance = (
   reset: () => Promise<void>,
 ): void => {
   describe("unique constraint conformance", () => {
+    it("rejects empty explicit IDs", async () => {
+      await reset();
+
+      const adapter = await createAdapter();
+
+      await expect(
+        adapter.insert<ConformanceUser>(USERS_COLLECTION, {
+          id: "",
+          ...createUser(),
+        }),
+      ).rejects.toBeInstanceOf(StorageValidationError);
+    });
+
     it("rejects duplicate primary keys", async () => {
       await reset();
 

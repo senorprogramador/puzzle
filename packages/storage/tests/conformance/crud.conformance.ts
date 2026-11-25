@@ -1,5 +1,10 @@
 import { describe, expect, it } from "bun:test";
-import type { StorageAdapter, StorageInsert } from "../../src";
+import {
+  StorageDuplicateError,
+  StorageValidationError,
+  type StorageAdapter,
+  type StorageInsert,
+} from "../../src";
 import {
   createUser,
   USERS_COLLECTION,
@@ -14,15 +19,15 @@ export const runCrudConformance = (
     let adapter: StorageAdapter;
 
     const insertUser = async (
-      id: string,
+      id: string | undefined,
       overrides: Partial<ConformanceUser> = {},
     ) => {
       const user = createUser(overrides);
 
       return adapter.insert<ConformanceUser>(USERS_COLLECTION, {
-        id,
+        ...(id === undefined ? {} : { id }),
         ...user,
-      } as StorageInsert<ConformanceUser>);
+      });
     };
 
     it("inserts and reads a record by id", async () => {
@@ -41,6 +46,53 @@ export const runCrudConformance = (
       expect(found?.createdAt).toBeInstanceOf(Date);
       expect(found?.updatedAt).toBeInstanceOf(Date);
       expect(found?.revision).toBe(1);
+    });
+
+    it("generates unique, retrievable IDs and applies metadata defaults", async () => {
+      await reset();
+      adapter = await createAdapter();
+
+      const first = await adapter.insert<ConformanceUser>(
+        USERS_COLLECTION,
+        createUser(),
+      );
+      const second = await adapter.insert<ConformanceUser>(
+        USERS_COLLECTION,
+        createUser({ email: "bob@example.com" }),
+      );
+
+      expect(first.id).toBeTypeOf("string");
+      expect(first.id.length).toBeGreaterThan(0);
+      expect(second.id).not.toBe(first.id);
+      expect(first.createdAt).toBeInstanceOf(Date);
+      expect(first.updatedAt).toBeInstanceOf(Date);
+      expect(first.revision).toBe(1);
+      expect(
+        await adapter.findById<ConformanceUser>(USERS_COLLECTION, first.id),
+      ).toEqual(first);
+      expect(
+        await adapter.findById<ConformanceUser>(USERS_COLLECTION, second.id),
+      ).toEqual(second);
+    });
+
+    it("preserves explicit insert metadata", async () => {
+      await reset();
+      adapter = await createAdapter();
+      const createdAt = new Date("2020-01-02T03:04:05.000Z");
+      const updatedAt = new Date("2021-02-03T04:05:06.000Z");
+
+      const record = await adapter.insert<ConformanceUser>(USERS_COLLECTION, {
+        id: "metadata-preserved",
+        createdAt,
+        updatedAt,
+        revision: 4,
+        ...createUser(),
+      });
+
+      expect(record.id).toBe("metadata-preserved");
+      expect(record.createdAt).toEqual(createdAt);
+      expect(record.updatedAt).toEqual(updatedAt);
+      expect(record.revision).toBe(4);
     });
 
     it("returns null when a record does not exist", async () => {
@@ -185,6 +237,139 @@ export const runCrudConformance = (
 
       expect(record.id).toBe("user-1");
       expect(record.email).toBe("alice@example.com");
+    });
+
+    it("generates an ID when upserting a record with no match", async () => {
+      await reset();
+      adapter = await createAdapter();
+
+      const record = await adapter.upsert<ConformanceUser>(
+        USERS_COLLECTION,
+        {
+          where: {
+            normalizedEmail: {
+              operator: "eq",
+              value: "alice@example.com",
+            },
+          },
+        },
+        createUser(),
+      );
+
+      expect(record.id).toBeTypeOf("string");
+      expect(record.id.length).toBeGreaterThan(0);
+      expect(
+        await adapter.findById<ConformanceUser>(USERS_COLLECTION, record.id),
+      ).toEqual(record);
+    });
+
+    it("updates matching records without IDs and protects adapter metadata", async () => {
+      await reset();
+      adapter = await createAdapter();
+      const createdAt = new Date("2020-01-02T03:04:05.000Z");
+      const updatedAt = new Date("2021-02-03T04:05:06.000Z");
+      const existing = await adapter.insert<ConformanceUser>(
+        USERS_COLLECTION,
+        {
+          id: "upsert-existing",
+          createdAt,
+          updatedAt,
+          revision: 4,
+          ...createUser({ age: 30 }),
+        },
+      );
+      const attemptedCreatedAt = new Date("1990-01-01T00:00:00.000Z");
+      const attemptedUpdatedAt = new Date("1991-01-01T00:00:00.000Z");
+      const query = {
+        where: {
+          and: [
+            {
+              normalizedEmail: {
+                operator: "eq" as const,
+                value: "alice@example.com",
+              },
+            },
+            { age: { operator: "gte" as const, value: 21 } },
+          ],
+        },
+      };
+
+      const updated = await adapter.upsert<ConformanceUser>(
+        USERS_COLLECTION,
+        query,
+        {
+          createdAt: attemptedCreatedAt,
+          updatedAt: attemptedUpdatedAt,
+          revision: 99,
+          ...createUser({ name: "Updated Alice", age: 35 }),
+        },
+      );
+
+      expect(updated.id).toBe(existing.id);
+      expect(updated.createdAt).toEqual(createdAt);
+      expect(updated.updatedAt.getTime()).toBeGreaterThan(
+        existing.updatedAt.getTime(),
+      );
+      expect(updated.revision).toBe(existing.revision + 1);
+      expect(updated.name).toBe("Updated Alice");
+    });
+
+    it("rejects an explicit upsert ID that differs from the matched record", async () => {
+      await reset();
+      adapter = await createAdapter();
+      const existing = await insertUser("stable-upsert-id");
+
+      await expect(
+        adapter.upsert<ConformanceUser>(
+          USERS_COLLECTION,
+          {
+            where: {
+              normalizedEmail: {
+                operator: "eq",
+                value: existing.normalizedEmail,
+              },
+            },
+          },
+          {
+            id: "replacement-id",
+            ...createUser(),
+          },
+        ),
+      ).rejects.toBeInstanceOf(StorageValidationError);
+
+      expect(
+        await adapter.findById<ConformanceUser>(
+          USERS_COLLECTION,
+          existing.id,
+        ),
+      ).toEqual(existing);
+    });
+
+    it("maps an ID collision on an unmatched upsert to a duplicate error", async () => {
+      await reset();
+      adapter = await createAdapter();
+      await insertUser("already-used");
+
+      await expect(
+        adapter.upsert<ConformanceUser>(
+          USERS_COLLECTION,
+          {
+            where: {
+              normalizedEmail: {
+                operator: "eq",
+                value: "bob@example.com",
+              },
+            },
+          },
+          {
+            id: "already-used",
+            ...createUser({
+              email: "bob@example.com",
+              normalizedEmail: "bob@example.com",
+            }),
+          },
+        ),
+      ).rejects.toBeInstanceOf(StorageDuplicateError);
     });
 
     it("preserves query semantics for AND", async () => {

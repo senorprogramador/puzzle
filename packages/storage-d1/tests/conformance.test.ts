@@ -1,9 +1,16 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { Miniflare } from "miniflare";
 
-import { StorageValidationError } from "@puzzle-ui/storage";
+import {
+  StorageValidationError,
+  type StorageRecord,
+} from "@puzzle-ui/storage";
 import { D1StorageMigrationAdapter, D1StorageAdapter } from "../src";
-import type { D1DatabaseLike } from "../src/d1.types";
+import type {
+  D1DatabaseLike,
+  D1PreparedStatementLike,
+  D1ResultLike,
+} from "../src/d1.types";
 
 import {
   runStorageAdapterConformance,
@@ -87,6 +94,60 @@ runStorageMigrationConformance({
     }),
 
   reset: resetMigrationDatabase,
+});
+
+describe("D1 insert ID generation", () => {
+  it("binds the generated ID and metadata in the insert parameter order", async () => {
+    type InsertRecord = StorageRecord & { name: string };
+    const captured: { sql?: string; values?: readonly unknown[] } = {};
+    const statement: D1PreparedStatementLike = {
+      bind(...values) {
+        captured.values = values;
+        return statement;
+      },
+      first: async <T>() => null as T | null,
+      all: async <T>() => ({
+        success: true,
+        results: [] as T[],
+      }),
+      run: async <T>() => ({
+        success: true,
+        meta: { changes: 1 },
+      }),
+    };
+    const database: D1DatabaseLike = {
+      prepare(sql) {
+        captured.sql = sql;
+        return statement;
+      },
+      batch: async <T>() => [] as D1ResultLike<T>[],
+    };
+    const adapter = new D1StorageAdapter({ database });
+    const createdAt = new Date("2020-01-02T03:04:05.000Z");
+    const updatedAt = new Date("2021-02-03T04:05:06.000Z");
+
+    const record = await adapter.insert<InsertRecord>("generated_ids", {
+      name: "Ada",
+      createdAt,
+      updatedAt,
+      revision: 7,
+    });
+
+    expect(captured.sql).toContain(
+      "(id, created_at, updated_at, revision, data)",
+    );
+    expect(captured.values).toEqual([
+      record.id,
+      createdAt.toISOString(),
+      updatedAt.toISOString(),
+      7,
+      JSON.stringify({ name: "Ada" }),
+    ]);
+    expect(record.id.length).toBeGreaterThan(0);
+    expect(record.createdAt).toEqual(createdAt);
+    expect(record.updatedAt).toEqual(updatedAt);
+    expect(record.revision).toBe(7);
+  });
 });
 
 describe("D1 index names", () => {

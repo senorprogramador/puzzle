@@ -2,6 +2,7 @@ import { describe, expect, it } from "bun:test";
 
 import {
   StorageConflictError,
+  resolveStorageId,
   type StorageAdapter,
   type StorageBatchOperation,
   type StorageBatchResult,
@@ -239,7 +240,17 @@ const createAuthorizedStorage = (
           }
 
           if (operation.type === "insert") {
-            return { type: "insert", record: operation.record };
+            const now = new Date();
+            return {
+              type: "insert",
+              record: {
+                ...operation.record,
+                id: resolveStorageId(operation.record.id),
+                createdAt: operation.record.createdAt ?? now,
+                updatedAt: operation.record.updatedAt ?? now,
+                revision: operation.record.revision ?? 1,
+              } as T,
+            };
           }
 
           return { type: "delete", deleted: true };

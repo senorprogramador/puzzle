@@ -52,21 +52,56 @@ export const runAtomicBatchConformance = (
         {
           type: "insert",
           collection: USERS_COLLECTION,
-          record: {
-            id: "batch-2",
-            ...createUser({
-              name: "Batch Two",
-              email: "batch-2@example.com",
-              normalizedEmail: "batch-2@example.com",
-            }),
-          } as StorageInsert<ConformanceUser>,
+          record: createUser({
+            name: "Batch Two",
+            email: "batch-2@example.com",
+            normalizedEmail: "batch-2@example.com",
+          }),
+        },
+        {
+          type: "insert",
+          collection: USERS_COLLECTION,
+          record: createUser({
+            name: "Batch Three",
+            email: "batch-3@example.com",
+            normalizedEmail: "batch-3@example.com",
+          }),
         },
       ];
 
       const result = await adapter.atomicBatch(operations);
 
-      expect(result.results).toHaveLength(2);
-      expect(await adapter.count<ConformanceUser>(USERS_COLLECTION)).toBe(2);
+      expect(result.results).toHaveLength(3);
+      const inserted = result.results
+        .filter((item) => item.type === "insert")
+        .map((item) => item.record);
+      expect(inserted.map(({ id }) => id)).toEqual([
+        "batch-1",
+        expect.any(String),
+        expect.any(String),
+      ]);
+      const generatedRecords = inserted.slice(1);
+      expect(generatedRecords).toHaveLength(2);
+      const firstGenerated = generatedRecords[0];
+      const secondGenerated = generatedRecords[1];
+      if (!firstGenerated || !secondGenerated) {
+        throw new Error("Expected two generated batch records.");
+      }
+
+      expect(firstGenerated.id).not.toBe(secondGenerated.id);
+      expect(
+        await adapter.findById<ConformanceUser>(
+          USERS_COLLECTION,
+          firstGenerated.id,
+        ),
+      ).toEqual(firstGenerated);
+      expect(
+        await adapter.findById<ConformanceUser>(
+          USERS_COLLECTION,
+          secondGenerated.id,
+        ),
+      ).toEqual(secondGenerated);
+      expect(await adapter.count<ConformanceUser>(USERS_COLLECTION)).toBe(3);
     });
 
     it("rolls back all operations when any operation fails", async () => {

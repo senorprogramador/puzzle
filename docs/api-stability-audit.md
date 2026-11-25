@@ -388,9 +388,9 @@ commitment.
 | `@puzzle-ui/auth` | Stable | Storage-backed registration/sign-in, policy-aware user lookup, revocation, required enrollment, TOTP/recovery challenges, passkey provider and step-up contracts. Package tests and typecheck passed; within-major compatibility is committed. |
 | `@puzzle-ui/session` | Stable | Persistent session creation, validation/touch, rotation/revocation, cookie and CSRF helpers. Package tests and typecheck passed; within-major compatibility is committed. |
 | `@puzzle-ui/fullstack/auth/{client,server,shared,next,tanstack}` | Stable | Browser/public snapshot boundary, forms, HTTP route dispatch, cookie transport, and server initialization. Node, browser, and package typecheck passed; within-major compatibility is committed. |
-| `@puzzle-ui/storage` and `/testing` | Stable | Collection/query/CRUD/concurrency/capability contracts and public conformance kit. Both package tests and typecheck passed; behavior is additionally exercised by both adapter conformance suites and within-major compatibility is committed. |
-| `@puzzle-ui/storage-d1` | Stable | D1 configuration, CRUD, date serialization, conditional writes, uniqueness, atomic rollback, cursor pagination and migrations. Package tests and typecheck passed against Miniflare; within-major compatibility is committed. |
-| `@puzzle-ui/storage-mongodb` | Stable | MongoDB configuration and the same persistence/concurrency contracts. Conformance tests and typecheck passed against the package's Docker replica-set fixture; within-major compatibility is committed. |
+| `@puzzle-ui/storage` and `/testing` | Stable | Collection/query/CRUD/concurrency/capability contracts, optional insert IDs, shared ID resolution, and public conformance kit. Both package tests and typecheck passed; behavior is additionally exercised by both adapter conformance suites and within-major compatibility is committed. |
+| `@puzzle-ui/storage-d1` | Stable | D1 configuration, optional/generated insert IDs, CRUD, date serialization, conditional writes, uniqueness, atomic rollback, cursor pagination and migrations. Package tests and typecheck passed against Miniflare; within-major compatibility is committed. |
+| `@puzzle-ui/storage-mongodb` | Stable | MongoDB configuration, optional/generated insert IDs, and the same persistence/concurrency contracts. Conformance tests and typecheck passed against the package's Docker replica-set fixture; within-major compatibility is committed. |
 
 `bun run build` passed before these tests. Executing the tutorial package-export
 check then found that the declared `/testing` entry was missing from Storage's
@@ -408,8 +408,11 @@ documented component API remains Experimental.
 
 - Storage is a record persistence contract, not file/object storage or a
   database connection factory. Its shipped adapters are D1 and MongoDB only.
-  Collection `schema.validate` is metadata, not automatic runtime validation.
-  Upsert is a read followed by a write, not a concurrency-safe atomic upsert.
+  `StorageRecord.id` is required; `StorageInsert.id` is optional and adapters
+  generate a UUID v4 when omitted. Collection `schema.validate` is metadata,
+  not automatic runtime validation. Both shipped upserts are read-then-write;
+  the `upsert` capability indicates operation support, not concurrency-safe
+  atomic upsert.
   MongoDB Auth requires a transaction-capable deployment, `client`, and
   `transactionsEnabled: true`; D1 uses atomic batches, not interactive
   transactions.

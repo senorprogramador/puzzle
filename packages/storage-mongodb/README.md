@@ -39,6 +39,14 @@ and exact scalar-element membership in arrays; it does not traverse array
 indexes or match object values inside arrays. Cursor pagination includes the
 ordered dotted-field values and a deterministic ID tie-breaker.
 
+`StorageInsert` may omit `id`; the adapter uses the shared Web Crypto UUID v4
+generation rule while preserving explicit IDs. Returned records always have a
+non-empty ID. Insert defaults missing timestamps to now and revision to 1.
+Upsert preserves a matched record's ID and `createdAt`, manages `updatedAt` and
+revision, and rejects a different explicit ID. Upsert is a read followed by a
+write, not a concurrency-safe atomic operation; the `upsert` capability only
+indicates support for the operation.
+
 `MongoStorageMigrationAdapter` stores versioned migration status and a shared migration lock in prefixed collections. See the [storage guide](https://puzzle-ui.com/docs/storage) for adapter guarantees, index behavior, migration options, and custom adapter testing.
 
 ## Development

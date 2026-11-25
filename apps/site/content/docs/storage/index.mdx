@@ -82,6 +82,12 @@ const session = await storage.insert<Session>("sessions", {
 });
 
 const current = await storage.findById<Session>("sessions", session.id);
+
+const generatedSession = await storage.insert<Session>("sessions", {
+  userId: "user_123",
+  expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+});
+const generatedSessionId = generatedSession.id;
 ```
 
 <code>getConfiguredStorage</code> is an application-provided factory, not an export from the package. The adapter owns storage I/O and translates the shared types into its database's representation.
@@ -93,6 +99,38 @@ const current = await storage.findById<Session>("sessions", session.id);
 A <code>StorageRecord</code> has a string <code>id</code>, <code>createdAt</code>, <code>updatedAt</code>, and numeric <code>revision</code>; it may also have <code>revokedAt</code>. Record-specific fields may use strings, numbers, booleans, dates, nulls, or arrays/objects that the adapter can serialize. Successful inserts default missing timestamps to the current time and a missing revision to 1. Successful updates advance the revision and refresh <code>updatedAt</code>.
 
 A collection definition gives a name and may declare a type guard and indexes. An index lists one or more fields and can request uniqueness or TTL expiration. The <code>schema</code> property is typed metadata with a <code>validate</code> type guard; the shipped D1 and MongoDB adapters currently do not call it automatically, so validate untrusted input at your application boundary.
+
+<code>StorageRecord</code> always requires a non-empty <code>id</code>;
+<code>StorageInsert</code> makes only the insert ID optional while keeping
+record-specific fields required and typed. Both built-in adapters preserve an
+explicit ID or generate a cryptographically random Web Crypto UUID v4 when it
+is omitted. Returned insert and upsert records always contain the resolved ID.
+Empty explicit IDs are rejected. Adapters default missing
+<code>createdAt</code>/<code>updatedAt</code> to the current time and
+<code>revision</code> to <code>1</code>; explicit metadata is retained on
+insert.
+
+Upsert matches using the supplied query. If a record exists, the adapter
+preserves its ID and <code>createdAt</code>, ignores input metadata, updates
+record fields, refreshes <code>updatedAt</code>, and increments
+<code>revision</code> exactly once. A different explicit ID is rejected with
+<code>StorageValidationError</code>. If no record matches, upsert inserts with
+the explicit or generated ID. For example, callers can omit the ID:
+
+```ts
+type Preference = StorageRecord & { key: string; value: string };
+
+const preference = await storage.upsert<Preference>(
+  "preferences",
+  { where: { key: { operator: "eq", value: "theme" } } },
+  { key: "theme", value: "dark" },
+);
+```
+
+Both built-in adapters implement upsert as a read followed by a write; neither
+guarantees concurrency-safe atomic upsert. The <code>upsert</code> capability
+means the operation is supported, not that it is atomic. Enforce uniqueness
+and handle duplicate errors when concurrent calls must not create duplicates.
 
 ### Queries and pagination
 
@@ -139,7 +177,7 @@ An adapter may report <code>atomicBatch</code> only when the whole batch is all-
 | <code>atomicBatch</code> | A multi-operation batch is all-or-nothing. |
 | <code>conditionalWrites</code> | Expected revision or update time can guard a write. |
 | <code>uniqueConstraints</code> | Unique index guarantees are supported. |
-| <code>upsert</code> | The adapter supports the shared upsert operation. |
+| <code>upsert</code> | The adapter supports the shared read-then-write upsert operation; atomicity is not implied. |
 | <code>cursorPagination</code> | Cursor-based pages are supported. |
 | <code>migrations</code> | Durable migrations are supported. |
 | <code>ttlIndexes</code> | Index-based record expiration is supported. |
@@ -186,7 +224,15 @@ runStorageAdapterConformance({
 });
 ```
 
-The suite covers capability reporting, CRUD and upsert, query and serialization behavior (including dates and nulls), cursor pagination, conditional writes and revision conflicts, uniqueness, and atomic-batch rollback. Use <code>runStorageMigrationConformance</code> with a fixture containing <code>createMigrationAdapter</code> and <code>reset</code> callbacks for migration ordering, status, failure/retry, target versions, and concurrent runners. The fixture types allow an optional <code>dispose</code> callback; manage connection and container cleanup in your own test lifecycle.
+The suite covers capability reporting, generated and explicit insert IDs,
+insert/upsert metadata behavior, query and serialization (including dates and
+nulls), cursor pagination, conditional writes and revision conflicts,
+uniqueness, and atomic-batch rollback/results. Use
+<code>runStorageMigrationConformance</code> with a fixture containing
+<code>createMigrationAdapter</code> and <code>reset</code> callbacks for
+migration ordering, status, failure/retry, target versions, and concurrent
+runners. The fixture types allow an optional <code>dispose</code> callback;
+manage connection and container cleanup in your own test lifecycle.
 
 ## Cloudflare D1 adapter
 
@@ -329,7 +375,7 @@ The <code>StorageSchemaAdapter</code> interface describes collection and index d
 
 | Entry point | Public exports |
 | --- | --- |
-| <code>@puzzle-ui/storage</code> | Types: <code>StorageScalar</code>, <code>StorageRecord</code>, <code>StorageCollectionName</code>, <code>StorageField</code>, <code>StorageCollectionOptions</code>, <code>StorageCollection</code>, <code>StorageSchema</code>, <code>StorageIndex</code>, <code>StorageComparison</code>, <code>StorageWhere</code>, <code>StorageOrder</code>, <code>StorageQuery</code>, <code>StorageCursor</code>, <code>StorageCursorQuery</code>, <code>StoragePage</code>, <code>StorageCapabilities</code>, <code>StorageCapability</code>, <code>StorageCapabilityReport</code>, <code>StorageInsert</code>, <code>StorageUpdate</code>, <code>StorageCondition</code>, <code>StorageBatchOperation</code>, <code>StorageBatchResult</code>, <code>StorageAdapterOptions</code>, <code>StorageAdapter</code>, <code>StorageMigrationContext</code>, <code>StorageMigrationOperation</code>, <code>StorageMigration</code>, <code>StorageMigrationStatus</code>, <code>StorageMigrationRecord</code>, <code>StorageMigrationResult</code>, <code>StorageMigrationOptions</code>, <code>StorageMigrationAdapter</code>, <code>StorageSchemaRegistry</code>, <code>StorageIndexDefinition</code>, <code>StorageSchemaAdapter</code>. Runtime exports: <code>DEFAULT_STORAGE_CAPABILITIES</code>, <code>StorageError</code>, <code>StorageCapabilityError</code>, <code>StorageConflictError</code>, <code>StorageDuplicateError</code>, <code>StorageValidationError</code>, <code>StorageAtomicityError</code>, <code>validateQuery</code>, <code>validateWhere</code>. |
+| <code>@puzzle-ui/storage</code> | Types: <code>StorageScalar</code>, <code>StorageRecord</code>, <code>StorageCollectionName</code>, <code>StorageField</code>, <code>StorageCollectionOptions</code>, <code>StorageCollection</code>, <code>StorageSchema</code>, <code>StorageIndex</code>, <code>StorageComparison</code>, <code>StorageWhere</code>, <code>StorageOrder</code>, <code>StorageQuery</code>, <code>StorageCursor</code>, <code>StorageCursorQuery</code>, <code>StoragePage</code>, <code>StorageCapabilities</code>, <code>StorageCapability</code>, <code>StorageCapabilityReport</code>, <code>StorageInsert</code>, <code>StorageUpdate</code>, <code>StorageCondition</code>, <code>StorageBatchOperation</code>, <code>StorageBatchResult</code>, <code>StorageAdapterOptions</code>, <code>StorageAdapter</code>, <code>StorageMigrationContext</code>, <code>StorageMigrationOperation</code>, <code>StorageMigration</code>, <code>StorageMigrationStatus</code>, <code>StorageMigrationRecord</code>, <code>StorageMigrationResult</code>, <code>StorageMigrationOptions</code>, <code>StorageMigrationAdapter</code>, <code>StorageSchemaRegistry</code>, <code>StorageIndexDefinition</code>, <code>StorageSchemaAdapter</code>. Runtime exports: <code>DEFAULT_STORAGE_CAPABILITIES</code>, <code>StorageError</code>, <code>StorageCapabilityError</code>, <code>StorageConflictError</code>, <code>StorageDuplicateError</code>, <code>StorageValidationError</code>, <code>StorageAtomicityError</code>, <code>validateQuery</code>, <code>validateWhere</code>, <code>resolveStorageId</code>. |
 | <code>@puzzle-ui/storage/testing</code> | <code>runStorageAdapterConformance</code>, <code>runStorageMigrationConformance</code>. |
 | <code>@puzzle-ui/storage-d1</code> | <code>D1StorageAdapter</code>, <code>D1StorageMigrationAdapter</code>, <code>D1DatabaseLike</code>, <code>D1PreparedStatementLike</code>, <code>D1ResultLike</code>, <code>D1StorageAdapterOptions</code>, <code>D1StorageMigrationOptions</code>. |
 | <code>@puzzle-ui/storage-mongodb</code> | <code>MongoStorageAdapter</code>, <code>MongoStorageMigrationAdapter</code>, <code>MongoStorageAdapterOptions</code>, <code>MongoStorageMigrationOptions</code>. |

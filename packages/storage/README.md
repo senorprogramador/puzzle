@@ -37,9 +37,46 @@ const session = await storage.insert<Session>("sessions", {
   userId: "user_123",
   expiresAt: new Date(Date.now() + 60 * 60 * 1000),
 });
+
+const generatedSession = await storage.insert<Session>("sessions", {
+  userId: "user_123",
+  expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+});
+const generatedSessionId = generatedSession.id;
 ```
 
-`getConfiguredStorage` is your own adapter factory. Records have an ID, creation/update timestamps, and a revision. The query AST supports comparisons, nested boolean conditions, sorting, offset/limit, and cursor pagination. Filters and sorts can use validated dotted paths through nested JSON objects:
+`getConfiguredStorage` is your own adapter factory. `StorageRecord` always
+requires an ID; `StorageInsert` allows it to be omitted. Both built-in adapters
+preserve explicit IDs and otherwise assign a cryptographically random UUID v4
+using Web Crypto. Insert and upsert return a complete record with a non-empty
+ID. Custom adapters can use the shared `resolveStorageId` helper to apply the
+same rule.
+
+On insert, missing `createdAt` and `updatedAt` default to the current time and
+missing `revision` defaults to 1; explicitly supplied metadata is preserved.
+Updates preserve `id` and `createdAt`, set `updatedAt` themselves, and increment
+`revision` once. Upsert uses the query to find a record: when found, it keeps
+the existing ID and creation time, ignores supplied metadata, and performs one
+ordinary update. A different explicit ID for a match is rejected with
+`StorageValidationError`. When no record matches, upsert inserts and generates
+an ID if needed:
+
+```ts
+type Preference = StorageRecord & { key: string; value: string };
+
+const preference = await storage.upsert<Preference>(
+  "preferences",
+  { where: { key: { operator: "eq", value: "theme" } } },
+  { key: "theme", value: "dark" },
+);
+```
+
+Upsert is a read followed by a write, not a concurrency-safe atomic operation.
+The `upsert` capability indicates operation support only. Use unique constraints
+and handle duplicate errors when concurrent calls must not create duplicates.
+
+The query AST supports comparisons, nested boolean conditions, sorting,
+offset/limit, and cursor pagination. Filters and sorts can use validated dotted paths through nested JSON objects:
 
 ```ts
 type Post = StorageRecord & {
@@ -60,10 +97,14 @@ const page = await storage.findMany<Post>("posts", {
 
 ## Entry points
 
-- `@puzzle-ui/storage`: storage types, adapter and migration contracts, query validators, and storage errors.
+- `@puzzle-ui/storage`: storage types, adapter and migration contracts, query validators, ID resolution, and storage errors.
 - `@puzzle-ui/storage/testing`: Bun conformance suites for adapter and migration implementations.
 
-The conformance kit checks core CRUD/query semantics, serialization, revisions, constraints, pagination, batch atomicity, capabilities, and migration behavior. Adapters should run it against isolated test databases before release. `bun run typecheck` also checks the conformance sources with Bun test types.
+The conformance kit checks CRUD and query semantics, generated and explicit
+IDs, serialization, revisions, constraints, pagination, batch atomicity,
+capabilities, and migration behavior. Adapters should run it against isolated
+test databases before release. `bun run typecheck` also checks the conformance
+sources with Bun test types.
 
 `StorageSchema` provides an optional type-guard shape, but the shipped D1 and MongoDB adapters do not invoke it automatically; validate untrusted records at your application boundary.
 

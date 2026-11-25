@@ -1,4 +1,4 @@
-const { StorageConflictError, StorageDuplicateError } =
+const { StorageConflictError, StorageDuplicateError, resolveStorageId } =
   await import("@puzzle-ui/storage");
 const { collection, defineCMS, fields } = await import("@puzzle-ui/cms");
 
@@ -110,15 +110,18 @@ class MemoryStorage {
   async insert(collection, input) {
     const rows = this.collections.get(collection);
     if (!rows) throw new Error(`Unknown collection ${collection}`);
+    const id = resolveStorageId(input.id);
+    const now = new Date();
     const record = {
       ...clone(input),
-      createdAt: input.createdAt ?? new Date(),
-      updatedAt: input.updatedAt ?? new Date(),
+      id,
+      createdAt: input.createdAt ?? now,
+      updatedAt: input.updatedAt ?? now,
       revision: input.revision ?? 1,
     };
-    if (rows.has(record.id)) throw new StorageDuplicateError("id");
-    this.assertUnique(collection, record, record.id);
-    rows.set(record.id, record);
+    if (rows.has(id)) throw new StorageDuplicateError("id");
+    this.assertUnique(collection, record, id);
+    rows.set(id, record);
     return clone(record);
   }
 
@@ -146,16 +149,19 @@ class MemoryStorage {
         const rows = this.collections.get(operation.collection);
         if (!rows) throw new Error(`Unknown collection ${operation.collection}`);
         if (operation.type === "insert") {
-          const record = clone(operation.record);
-          if (rows.has(record.id)) throw new StorageDuplicateError("id");
-          this.assertUnique(operation.collection, record, record.id);
+          const input = clone(operation.record);
+          const id = resolveStorageId(input.id);
+          if (rows.has(id)) throw new StorageDuplicateError("id");
+          const now = new Date();
           const inserted = {
-            ...record,
-            createdAt: record.createdAt ?? new Date(),
-            updatedAt: record.updatedAt ?? new Date(),
-            revision: record.revision ?? 1,
+            ...input,
+            id,
+            createdAt: input.createdAt ?? now,
+            updatedAt: input.updatedAt ?? now,
+            revision: input.revision ?? 1,
           };
-          rows.set(record.id, inserted);
+          this.assertUnique(operation.collection, inserted, id);
+          rows.set(id, inserted);
           results.push({ type: "insert", record: clone(inserted) });
           continue;
         }

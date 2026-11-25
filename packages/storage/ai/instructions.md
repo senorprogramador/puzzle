@@ -6,10 +6,25 @@ implement a database.
 
 Install with `npm install @puzzle-ui/storage`. The public entry points are
 `@puzzle-ui/storage` and `@puzzle-ui/storage/testing`.
+`resolveStorageId` is a root runtime helper for adapter implementations.
 
 ```ts
 import type { StorageAdapter } from "@puzzle-ui/storage";
 ```
+
+`StorageRecord.id` is required. `StorageInsert<T>` allows its ID to be omitted
+without weakening record-specific field types. Adapters preserve supplied
+non-empty IDs or use `resolveStorageId` to generate a cryptographically random
+Web Crypto UUID v4. Successful insert/upsert results always include a
+non-empty ID. Missing `createdAt`/`updatedAt` default to now and missing
+`revision` defaults to 1; explicit insert metadata is preserved.
+
+Upsert uses the query to find a record. A match keeps its ID and `createdAt`,
+ignores supplied metadata, sets `updatedAt`, and increments `revision` exactly
+once. A different explicit ID for a match is rejected. No match inserts with
+the supplied ID or a generated one. Both built-in adapters use read-then-write
+semantics: the `upsert` capability indicates operation support, not atomicity
+or concurrency safety.
 
 Choose a database adapter separately and check the capabilities it actually
 reports. Use the shared query and migration contracts. Queries accept validated dotted

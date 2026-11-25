@@ -13,3 +13,10 @@ MongoDB TTL deletion is asynchronous; enforce security-sensitive expiry at
 request time. Do not infer transaction or atomicity support from the database
 name, or import private adapter paths. See the
 [Storage documentation](https://puzzle-ui.com/docs/storage).
+
+`StorageInsert` allows an omitted ID; preserve explicit non-empty IDs or use
+the shared `resolveStorageId` helper to generate the same Web Crypto UUID v4 as
+D1. Returned insert and batch records always contain the resolved ID. Upsert
+preserves a matched record's ID and `createdAt`, manages `updatedAt`/revision,
+and rejects a different explicit ID. Query-based upsert is read-then-write, so
+the `upsert` capability indicates operation support, not atomicity.

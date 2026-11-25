@@ -14,3 +14,11 @@ D1 does not provide native TTL indexes. Enforce expiry in application logic;
 do not claim TTL or transaction guarantees absent from the adapter contract.
 Do not import private implementation paths. See the
 [Storage documentation](https://puzzle-ui.com/docs/storage).
+
+`StorageInsert` allows an omitted ID; preserve explicit non-empty IDs or use
+the shared `resolveStorageId` helper to generate the same Web Crypto UUID v4 as
+MongoDB. Use the resolved ID consistently in SQL and returned insert/batch
+records. Upsert preserves a matched record's ID and `createdAt`, manages
+`updatedAt`/revision, and rejects a different explicit ID. Query-based upsert
+is read-then-write, so the `upsert` capability indicates operation support,
+not atomicity.

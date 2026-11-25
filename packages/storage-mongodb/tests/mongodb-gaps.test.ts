@@ -1,9 +1,10 @@
 import { describe, expect, it } from "bun:test";
-import type { Db } from "mongodb";
+import type { Db, MongoClient } from "mongodb";
 
 import {
   StorageDuplicateError,
   StorageValidationError,
+  type StorageInsert,
   type StorageRecord,
 } from "@puzzle-ui/storage";
 
@@ -37,8 +38,9 @@ const createMockDatabase = (initialDocuments: readonly Row[] = []) => {
     insertDocument?: Row;
     duplicateInsert?: boolean;
     insertError?: Error;
+    insertDocuments: Row[];
     pageDocuments: Row[];
-  } = { pageDocuments: [...initialDocuments] };
+  } = { insertDocuments: [], pageDocuments: [...initialDocuments] };
 
   const getRows = (name: string) => {
     let rows = collections.get(name);
@@ -96,6 +98,13 @@ const createMockDatabase = (initialDocuments: readonly Row[] = []) => {
         if (
           typeof filter._id === "object" &&
           filter._id !== null &&
+          "$eq" in filter._id
+        ) {
+          return rows.get(String((filter._id as { $eq: unknown }).$eq)) ?? null;
+        }
+        if (
+          typeof filter._id === "object" &&
+          filter._id !== null &&
           "$ne" in filter._id
         ) {
           const excluded = (filter._id as { $ne: string }).$ne;
@@ -105,6 +114,7 @@ const createMockDatabase = (initialDocuments: readonly Row[] = []) => {
       },
       insertOne: async (document: Row) => {
         calls.insertDocument = document;
+        calls.insertDocuments.push(document);
         if (calls.insertError) throw calls.insertError;
         if (calls.duplicateInsert) throw errorWithCode(11000);
         const id = String(document._id);
@@ -140,6 +150,10 @@ const createMockDatabase = (initialDocuments: readonly Row[] = []) => {
         const set = (update.$set ?? {}) as Row;
         const unset = (update.$unset ?? {}) as Record<string, unknown>;
         const updated: Row = { ...existing, ...set, _id: id };
+        const increments = (update.$inc ?? {}) as Record<string, number>;
+        for (const [field, amount] of Object.entries(increments)) {
+          updated[field] = Number(updated[field] ?? 0) + amount;
+        }
         for (const key of Object.keys(unset)) delete updated[key];
         if (!existing && options?.upsert) rows.set(id, updated);
         else if (existing) rows.set(id, updated);
@@ -212,6 +226,132 @@ describe("MongoStorageAdapter query and document gaps", () => {
       createdAt,
     });
     expect(fetched?.lastSeen).toBeInstanceOf(Date);
+  });
+
+  it("generates a UUID storage ID and stores it as Mongo _id", async () => {
+    const { database, calls, collections } = createMockDatabase();
+    const adapter = new MongoStorageAdapter({ database });
+
+    const inserted = await adapter.insert<TestRecord>("users", {
+      name: "Ada",
+      active: true,
+      lastSeen: new Date(),
+      profile: {
+        displayName: "Ada Lovelace",
+        score: 10,
+        publishedAt: new Date(),
+      },
+      tags: ["author"],
+    } satisfies StorageInsert<TestRecord>);
+
+    expect(inserted.id).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+    );
+    expect(calls.insertDocument?._id).toBe(inserted.id);
+    expect(
+      collections.get("puzzle_users")?.get(inserted.id)?._id,
+    ).toBe(inserted.id);
+    expect(
+      await adapter.findById<TestRecord>("users", inserted.id),
+    ).toEqual(inserted);
+  });
+
+  it("preserves the matched record ID and metadata during upsert", async () => {
+    const { database, collections } = createMockDatabase();
+    const adapter = new MongoStorageAdapter({ database });
+    const createdAt = new Date("2020-01-02T03:04:05.000Z");
+    const updatedAt = new Date("2021-02-03T04:05:06.000Z");
+    collections.set("puzzle_users", new Map([
+      [
+        "existing",
+        {
+          _id: "existing",
+          name: "Old",
+          active: true,
+          lastSeen: updatedAt,
+          profile: {
+            displayName: "Old",
+            score: 1,
+            publishedAt: updatedAt,
+          },
+          tags: [],
+          createdAt,
+          updatedAt,
+          revision: 3,
+        },
+      ],
+    ]));
+
+    const record = await adapter.upsert<TestRecord>(
+      "users",
+      { where: { id: { operator: "eq", value: "existing" } } },
+      {
+        name: "Updated",
+        active: false,
+        lastSeen: new Date(),
+        profile: {
+          displayName: "Updated",
+          score: 2,
+          publishedAt: new Date(),
+        },
+        tags: ["reviewer"],
+        createdAt: new Date("1990-01-01T00:00:00.000Z"),
+        updatedAt: new Date("1991-01-01T00:00:00.000Z"),
+        revision: 99,
+      },
+    );
+
+    expect(record.id).toBe("existing");
+    expect(record.createdAt).toEqual(createdAt);
+    expect(record.updatedAt.getTime()).toBeGreaterThan(updatedAt.getTime());
+    expect(record.revision).toBe(4);
+    expect(record.name).toBe("Updated");
+  });
+
+  it("reuses generated batch IDs when MongoDB retries a transaction callback", async () => {
+    const { database, calls, collections } = createMockDatabase();
+    const client = {
+      startSession: () => ({
+        withTransaction: async <T>(callback: () => Promise<T>) => {
+          await callback();
+          collections.get("puzzle_users")?.clear();
+          return callback();
+        },
+        endSession: async () => undefined,
+      }),
+    } as unknown as MongoClient;
+    const adapter = new MongoStorageAdapter({
+      database,
+      client,
+      transactionsEnabled: true,
+    });
+
+    const result = await adapter.atomicBatch<TestRecord>([
+      {
+        type: "insert",
+        collection: "users",
+        record: {
+          name: "Ada",
+          active: true,
+          lastSeen: new Date(),
+          profile: {
+            displayName: "Ada Lovelace",
+            score: 10,
+            publishedAt: new Date(),
+          },
+          tags: ["author"],
+        },
+      },
+    ]);
+
+    const inserted = result.results[0];
+    expect(inserted?.type).toBe("insert");
+    if (inserted?.type !== "insert") throw new Error("Expected insert result.");
+    expect(calls.insertDocuments.map(({ _id }) => _id)).toEqual([
+      inserted.record.id,
+      inserted.record.id,
+    ]);
+    expect(collections.get("puzzle_users")?.size).toBe(1);
   });
 
   it("translates nested boolean and comparison operators to Mongo filters", async () => {

@@ -31,6 +31,7 @@ import {
   validateFieldPath,
   validateQuery,
   type StorageInsert,
+  resolveStorageId,
 } from "@puzzle-ui/storage";
 
 import type { MongoStorageAdapterOptions } from "./mongodb.types";
@@ -178,11 +179,12 @@ const toRecord = <T extends StorageRecord>(
 };
 
 const toDocument = <T extends StorageRecord>(
-  record: Partial<T> & { id: string },
+  record: StorageInsert<T>,
 ): MongoRecord => {
-  const { id, createdAt, updatedAt, revision, ...data } =
-    record as StorageRecord & Document;
+  const { id: providedId, createdAt, updatedAt, revision, ...data } =
+    record as StorageInsert<T> & Document;
 
+  const id = resolveStorageId(providedId);
   const now = new Date();
 
   return {
@@ -601,9 +603,9 @@ export class MongoStorageAdapter implements StorageAdapter {
 
   async insert<T extends StorageRecord>(
     collection: StorageCollectionName,
-    record: Parameters<StorageAdapter["insert"]>[1],
+    record: StorageInsert<T>,
   ): Promise<T> {
-    const document = toDocument(record as StorageRecord & { id: string });
+    const document = toDocument(record);
 
     try {
       await this.collection(collection).insertOne(document);
@@ -623,13 +625,21 @@ export class MongoStorageAdapter implements StorageAdapter {
     const existing = await this.findOne<T>(collection, query);
 
     if (existing) {
+      if (record.id !== undefined && record.id !== existing.id) {
+        throw new StorageValidationError(
+          "Upsert cannot change the ID of an existing record.",
+        );
+      }
+
       const updated = await this.update<T>(
         collection,
         existing.id,
         record as StorageUpdate<T>,
       );
 
-      return updated ?? existing;
+      if (!updated) throw new StorageConflictError();
+
+      return updated;
     }
 
     return this.insert<T>(collection, record);
@@ -759,18 +769,19 @@ export class MongoStorageAdapter implements StorageAdapter {
 
     const session = this.client.startSession();
     const results: StorageBatchResult<T>["results"][number][] = [];
+    const insertDocuments = operations.map((operation) =>
+      operation.type === "insert" ? toDocument(operation.record) : null,
+    );
 
     try {
       await session.withTransaction(async () => {
         results.length = 0;
 
-        for (const operation of operations) {
+        for (const [index, operation] of operations.entries()) {
           const target = this.collection(operation.collection);
 
           if (operation.type === "insert") {
-            const document = toDocument(
-              operation.record as StorageRecord & { id: string },
-            );
+            const document = insertDocuments[index]!;
 
             await target.insertOne(document, { session });
 
