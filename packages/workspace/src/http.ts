@@ -4,7 +4,7 @@ import {
   type StorageAdapter,
   type StorageCursor,
 } from "@puzzle-ui/storage";
-import { z } from "zod";
+import * as z from "zod/v4";
 
 import {
   WorkspaceAccessError,
@@ -91,8 +91,9 @@ export type WorkspaceApiOptions = {
 };
 
 const noStore = { "Cache-Control": "no-store" };
-const acceptInvitationTokenSchema =
-  acceptWorkspaceInvitationInputSchema.pick({ token: true });
+const acceptInvitationTokenSchema = acceptWorkspaceInvitationInputSchema.pick({
+  token: true,
+});
 
 const json = (
   body: unknown,
@@ -149,9 +150,7 @@ const parseBody = async <T>(
 
   if (!parsed.success) {
     return {
-      response: invalidInput(
-        parsed.error.issues.map((issue) => issue.message),
-      ),
+      response: invalidInput(parsed.error.issues.map((issue) => issue.message)),
     };
   }
 
@@ -188,10 +187,7 @@ const mapError = (error: unknown): Response => {
     error instanceof StorageConflictError ||
     error instanceof StorageDuplicateError
   ) {
-    return json(
-      { error: { code: "CONFLICT", message: error.message } },
-      409,
-    );
+    return json({ error: { code: "CONFLICT", message: error.message } }, 409);
   }
 
   console.error("Workspace API request failed:", error);
@@ -331,17 +327,15 @@ const createHandler = (options: WorkspaceApiOptions) => {
             {
               error: {
                 code: "VERIFIED_EMAIL_REQUIRED",
-                message: "A verified email address is required to accept an invitation.",
+                message:
+                  "A verified email address is required to accept an invitation.",
               },
             },
             403,
           );
         }
 
-        const parsed = await parseBody(
-          request,
-          acceptInvitationTokenSchema,
-        );
+        const parsed = await parseBody(request, acceptInvitationTokenSchema);
         if ("response" in parsed) return parsed.response;
 
         const member = await acceptWorkspaceInvitation(
@@ -423,11 +417,7 @@ const createHandler = (options: WorkspaceApiOptions) => {
 
           return json(
             {
-              project: await createProject(
-                context,
-                workspaceId,
-                parsed.value,
-              ),
+              project: await createProject(context, workspaceId, parsed.value),
             },
             201,
           );
@@ -572,12 +562,7 @@ const createHandler = (options: WorkspaceApiOptions) => {
           if ("response" in parsed) return parsed.response;
 
           return json({
-            task: await updateTask(
-              context,
-              workspaceId,
-              taskId,
-              parsed.value,
-            ),
+            task: await updateTask(context, workspaceId, taskId, parsed.value),
           });
         }
 
@@ -620,11 +605,7 @@ const createHandler = (options: WorkspaceApiOptions) => {
 
         if (method === "DELETE") {
           return json({
-            member: await removeWorkspaceMember(
-              context,
-              workspaceId,
-              memberId,
-            ),
+            member: await removeWorkspaceMember(context, workspaceId, memberId),
           });
         }
 
@@ -723,10 +704,7 @@ const createHandler = (options: WorkspaceApiOptions) => {
       if (resource === "preferences" && segments.length === 4) {
         if (method === "GET") {
           return json({
-            preferences: await getNotificationPreferences(
-              context,
-              workspaceId,
-            ),
+            preferences: await getNotificationPreferences(context, workspaceId),
           });
         }
 
@@ -757,7 +735,9 @@ const createHandler = (options: WorkspaceApiOptions) => {
         const first = firstValue === null ? 20 : Number(firstValue);
 
         if (!Number.isInteger(first) || first < 1 || first > 100) {
-          return invalidInput(["The activity page size must be from 1 to 100."]);
+          return invalidInput([
+            "The activity page size must be from 1 to 100.",
+          ]);
         }
 
         const afterValue = url.searchParams.get("after");

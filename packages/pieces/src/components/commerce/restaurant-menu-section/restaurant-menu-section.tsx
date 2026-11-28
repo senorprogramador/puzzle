@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@puzzle-ui/core";
-import { Heading, Text } from "@puzzle-ui/ui";
+import { Heading, Select, Text } from "@puzzle-ui/ui";
 import { useId, useState } from "react";
 import { validateContentIds } from "../../content/shared";
 import {
@@ -68,6 +68,10 @@ const RestaurantMenuSection = ({
       ? filterId
       : null;
   const filterSelectId = `${instanceId}-dietary-filter`;
+  const allDishesOptionLabel =
+    typeof allDishesLabel === "string" || typeof allDishesLabel === "number"
+      ? String(allDishesLabel)
+      : "All dishes";
   const visibleMenus = menus.flatMap((menu, menuIndex) => {
     const categories = menu.categories.flatMap((category, categoryIndex) => {
       const dishes = category.dishes.filter(
@@ -117,20 +121,31 @@ const RestaurantMenuSection = ({
       {dietaryFilters.length ? (
         <div className="puzzle-restaurant-menu__filter">
           <label htmlFor={filterSelectId}>{filterLabel}</label>
-          <select
+          <Select
             id={filterSelectId}
             value={activeFilterId ?? ""}
-            onChange={(event) =>
-              handleFilterChange(event.currentTarget.value || null)
+            className="puzzle-restaurant-menu__filter-control"
+            options={[
+              { value: "", label: allDishesOptionLabel },
+              ...dietaryFilters.map((filter) => ({
+                id: filter.id,
+                value: filter.id,
+                label: filter.label,
+              })),
+            ]}
+            renderOption={(option) =>
+              option.value === "" ? allDishesLabel : option.label
             }
-          >
-            <option value="">{allDishesLabel}</option>
-            {dietaryFilters.map((filter) => (
-              <option key={filter.id} value={filter.id}>
-                {filter.label}
-              </option>
-            ))}
-          </select>
+            renderValue={(selected) => {
+              const option = Array.isArray(selected) ? selected[0] : selected;
+              return option?.value === ""
+                ? allDishesLabel
+                : option?.label ?? "";
+            }}
+            onChange={(nextFilterId) =>
+              handleFilterChange(nextFilterId || null)
+            }
+          />
         </div>
       ) : null}
 

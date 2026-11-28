@@ -160,9 +160,6 @@
 }
 
 .puzzle-dashboard-activity-feed__list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--puzzle-space-4, 1rem);
     margin: 0;
     padding: 0;
     list-style: none;

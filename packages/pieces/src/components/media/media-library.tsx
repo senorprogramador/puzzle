@@ -1,18 +1,19 @@
 "use client";
 
-import {
-  useMemo,
-  useState,
-  type FormEvent,
-  type ReactNode,
-} from "react";
+import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import {
   Autocomplete,
+  Button,
   DataTable,
   FileUpload,
+  FormField,
   Image,
   ImageUpload,
   MediaFrame,
+  Select,
+  Stack,
+  TextInput,
+  ToggleGroup,
   TreeView,
   VideoUpload,
 } from "@puzzle-ui/ui";
@@ -31,7 +32,6 @@ import {
   DEFAULT_MEDIA_LIBRARY_QUERY,
   filterAndSortMediaAssets,
   formatMediaDate,
-  formatMediaDuration,
   formatMediaFileSize,
   getMediaFolderPath,
 } from "./media.utils";
@@ -131,6 +131,7 @@ const MediaLibrary = ({
   onBulkAction,
   onSaveAsset,
   showDetailsPanel = false,
+  selectionActions,
   className,
   ...sectionProps
 }: MediaLibraryProps) => {
@@ -215,24 +216,20 @@ const MediaLibrary = ({
     () => filterAndSortMediaAssets(assets, query),
     [assets, query],
   );
-  const pageSize = Number.isInteger(query.pageSize) && query.pageSize > 0
-    ? query.pageSize
-    : DEFAULT_MEDIA_LIBRARY_QUERY.pageSize;
+  const pageSize =
+    Number.isInteger(query.pageSize) && query.pageSize > 0
+      ? query.pageSize
+      : DEFAULT_MEDIA_LIBRARY_QUERY.pageSize;
   const pageCount = Math.max(1, Math.ceil(filteredAssets.length / pageSize));
-  const requestedPage = Number.isInteger(query.page) && query.page > 0
-    ? query.page
-    : 1;
+  const requestedPage =
+    Number.isInteger(query.page) && query.page > 0 ? query.page : 1;
   const currentPage = Math.min(requestedPage, pageCount);
   const pageAssets = filteredAssets.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize,
   );
-  const selectedAssets = assets.filter((asset) =>
-    selection.includes(asset.id),
-  );
-  const selectedFolder = folders.find(
-    (folder) => folder.id === query.folderId,
-  );
+  const selectedAssets = assets.filter((asset) => selection.includes(asset.id));
+  const selectedFolder = folders.find((folder) => folder.id === query.folderId);
   const excludedFolderTargets = useMemo(() => {
     const excluded = new Set<string>();
     if (query.folderId) excluded.add(query.folderId);
@@ -266,7 +263,7 @@ const MediaLibrary = ({
   );
   const activeUploadKind = uploadKinds.includes(uploadKind)
     ? uploadKind
-    : uploadKinds[0] ?? "file";
+    : (uploadKinds[0] ?? "file");
   const isUploadAllowed = canUpload ?? uploadKinds.length > 0;
   const showUpload = isUploadAllowed && uploadKinds.length > 0;
   const tagOptions = useMemo(
@@ -296,7 +293,11 @@ const MediaLibrary = ({
       if (folderForm === "create" && folderName.trim()) {
         await onCreateFolder?.(folderName.trim(), query.folderId);
         setActionFeedback({ role: "status", message: "Folder created." });
-      } else if (folderForm === "rename" && query.folderId && folderName.trim()) {
+      } else if (
+        folderForm === "rename" &&
+        query.folderId &&
+        folderName.trim()
+      ) {
         await onRenameFolder?.(query.folderId, folderName.trim());
         setActionFeedback({ role: "status", message: "Folder renamed." });
       } else if (folderForm === "move" && query.folderId) {
@@ -323,7 +324,9 @@ const MediaLibrary = ({
         await onBulkAction([...selection], bulkAction),
         [...selection],
       );
-      const failedIds = new Set(result.failures.map((failure) => failure.assetId));
+      const failedIds = new Set(
+        result.failures.map((failure) => failure.assetId),
+      );
       updateSelection(selection.filter((assetId) => failedIds.has(assetId)));
       const successCount = result.succeededIds.length;
       const failureCount = result.failures.length;
@@ -403,7 +406,10 @@ const MediaLibrary = ({
           fallback={<span aria-hidden="true">Preview unavailable</span>}
         />
       ) : (
-        <span className="puzzle-media-library__preview-placeholder" aria-hidden="true">
+        <span
+          className="puzzle-media-library__preview-placeholder"
+          aria-hidden="true"
+        >
           {asset.kind}
         </span>
       )}
@@ -416,31 +422,40 @@ const MediaLibrary = ({
         const isSelected = selection.includes(asset.id);
         return (
           <li key={asset.id}>
-            <article
+            <Stack
+              as="article"
               className="puzzle-media-library__asset-card"
+              direction="col"
+              gap="sm"
               data-selected={isSelected || undefined}
             >
               {renderAssetPreview(asset)}
-              <div className="puzzle-media-library__asset-summary">
+              <Stack
+                className="puzzle-media-library__asset-summary"
+                direction="col"
+                gap="xs"
+              >
                 <h3 className="puzzle-media-library__asset-name">
                   {asset.displayName}
                 </h3>
                 <span className="puzzle-media-library__asset-meta">
                   {asset.kind} · {formatMediaFileSize(asset.size)}
                 </span>
-              </div>
+              </Stack>
               {selectionMode !== "none" ? (
-                <button
+                <Button
                   type="button"
+                  size="sm"
+                  variant={isSelected ? "secondary" : "outline"}
                   className="puzzle-media-library__select-toggle"
                   aria-label={`${isSelected ? "Deselect" : "Select"} ${asset.displayName}`}
                   aria-pressed={isSelected}
                   onClick={() => toggleSelection(asset.id)}
                 >
                   {isSelected ? "Selected" : "Select"}
-                </button>
+                </Button>
               ) : null}
-            </article>
+            </Stack>
           </li>
         );
       })}
@@ -471,16 +486,18 @@ const MediaLibrary = ({
       requestItems={async (start, end) => pageAssets.slice(start, end)}
       noContent="No assets found."
       renderCell={(asset) => [
-        <button
+        <Button
           key="name"
           type="button"
+          size="sm"
+          variant="link"
           className="puzzle-media-library__asset-select"
           aria-pressed={selection.includes(asset.id)}
           disabled={selectionMode === "none"}
           onClick={() => toggleSelection(asset.id)}
         >
           {asset.displayName}
-        </button>,
+        </Button>,
         asset.kind,
         asset.status,
         formatMediaFileSize(asset.size),
@@ -525,33 +542,50 @@ const MediaLibrary = ({
     >
       <div
         className="puzzle-media-library__layout"
-        data-has-folders={folders.length > 0 || onCreateFolder ? "true" : undefined}
+        data-has-folders={
+          folders.length > 0 || onCreateFolder ? "true" : undefined
+        }
       >
         {folders.length > 0 || onCreateFolder ? (
-          <aside className="puzzle-media-library__folders" aria-label="Folders">
-            <div className="puzzle-media-library__folder-heading">
+          <Stack
+            as="aside"
+            className="puzzle-media-library__folders"
+            direction="col"
+            gap="md"
+            aria-label="Folders"
+          >
+            <Stack
+              className="puzzle-media-library__folder-heading"
+              direction="row"
+              alignH="between"
+              alignV="center"
+              gap="md"
+            >
               <h2>Folders</h2>
               {onCreateFolder ? (
-                <button
+                <Button
                   type="button"
-                  className="puzzle-media-library__text-button"
+                  size="sm"
+                  variant="outline"
                   onClick={() => {
                     setFolderName("");
                     setFolderForm("create");
                   }}
                 >
                   New folder
-                </button>
+                </Button>
               ) : null}
-            </div>
-            <button
+            </Stack>
+            <Button
               type="button"
               className="puzzle-media-library__root-folder"
+              variant={query.folderId === null ? "secondary" : "outline"}
+              fullWidth
               aria-current={query.folderId === null ? "page" : undefined}
               onClick={() => updateQuery({ folderId: null, page: 1 })}
             >
               All media
-            </button>
+            </Button>
             {folderItems.length > 0 ? (
               <TreeView
                 aria-label="Media folders"
@@ -569,106 +603,156 @@ const MediaLibrary = ({
               <p className="puzzle-media-library__muted">No folders yet.</p>
             )}
             {selectedFolder && (onRenameFolder || onMoveFolder) ? (
-              <div className="puzzle-media-library__folder-actions">
+              <Stack
+                className="puzzle-media-library__folder-actions"
+                direction="row"
+                alignV="end"
+                gap="sm"
+              >
                 {onRenameFolder ? (
-                  <button
+                  <Button
                     type="button"
-                    className="puzzle-media-library__text-button"
+                    size="sm"
+                    variant="outline"
                     onClick={() => {
                       setFolderName(selectedFolder.name);
                       setFolderForm("rename");
                     }}
                   >
                     Rename folder
-                  </button>
+                  </Button>
                 ) : null}
                 {onMoveFolder ? (
-                  <button
+                  <Button
                     type="button"
-                    className="puzzle-media-library__text-button"
+                    size="sm"
+                    variant="outline"
                     onClick={() => setFolderForm("move")}
                   >
                     Move folder
-                  </button>
+                  </Button>
                 ) : null}
-              </div>
+              </Stack>
             ) : null}
             {folderForm ? (
-              <form
+              <Stack
+                as="form"
                 className="puzzle-media-library__folder-form"
+                direction="col"
+                gap="sm"
                 onSubmit={handleFolderFormSubmit}
               >
                 {folderForm === "move" ? (
-                  <label>
-                    <span>Move folder to</span>
-                    <select
+                  <FormField
+                    className="puzzle-media-library__control"
+                    label="Move folder to"
+                  >
+                    <Select<string>
+                      options={[
+                        { label: "Top level", value: "" },
+                        ...folders
+                          .filter(
+                            (folder) => !excludedFolderTargets.has(folder.id),
+                          )
+                          .map((folder) => ({
+                            label: folder.name,
+                            value: folder.id,
+                          })),
+                      ]}
                       value={folderTarget}
-                      onChange={(event) => setFolderTarget(event.currentTarget.value)}
-                    >
-                      <option value="">Top level</option>
-                      {folders
-                        .filter((folder) => !excludedFolderTargets.has(folder.id))
-                        .map((folder) => (
-                          <option key={folder.id} value={folder.id}>
-                            {folder.name}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
-                ) : (
-                  <label>
-                    <span>
-                      {folderForm === "create" ? "Folder name" : "New folder name"}
-                    </span>
-                    <input
-                      autoFocus
-                      required
-                      value={folderName}
-                      onChange={(event) => setFolderName(event.currentTarget.value)}
+                      onChange={(value) => setFolderTarget(value ?? "")}
                     />
-                  </label>
+                  </FormField>
+                ) : (
+                  <FormField
+                    className="puzzle-media-library__control"
+                    label={
+                      folderForm === "create"
+                        ? "Folder name"
+                        : "New folder name"
+                    }
+                    required
+                  >
+                    <TextInput
+                      autoFocus
+                      value={folderName}
+                      onChange={(event) =>
+                        setFolderName(event.currentTarget.value)
+                      }
+                    />
+                  </FormField>
                 )}
-                <div className="puzzle-media-library__inline-actions">
-                  <button
+                <Stack
+                  className="puzzle-media-library__inline-actions"
+                  direction="row"
+                  alignV="end"
+                  gap="sm"
+                >
+                  <Button
                     type="submit"
-                    className="puzzle-media-library__action-button"
+                    variant="primary"
                     disabled={isFolderPending}
                   >
                     {isFolderPending ? "Saving…" : "Save"}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
-                    className="puzzle-media-library__text-button"
+                    size="sm"
+                    variant="outline"
                     onClick={() => setFolderForm(null)}
                     disabled={isFolderPending}
                   >
                     Cancel
-                  </button>
-                </div>
-              </form>
+                  </Button>
+                </Stack>
+              </Stack>
             ) : null}
-          </aside>
+          </Stack>
         ) : null}
 
-        <div className="puzzle-media-library__main">
-          <header className="puzzle-media-library__header">
+        <Stack className="puzzle-media-library__main" direction="col" gap="md">
+          <Stack
+            as="header"
+            className="puzzle-media-library__header"
+            direction="row"
+            alignH="between"
+            alignV={{ mobile: "start", tablet: "center" }}
+            gap="md"
+          >
             <div>
-              <nav
+              <Stack
+                as="nav"
                 className="puzzle-media-library__breadcrumbs"
+                direction="row"
+                alignV="center"
+                gap="sm"
                 aria-label="Folder breadcrumbs"
               >
-                <button
+                <Button
                   type="button"
+                  size="sm"
+                  variant="link"
+                  className="puzzle-media-library__breadcrumb-link"
                   aria-current={query.folderId === null ? "page" : undefined}
                   onClick={() => updateQuery({ folderId: null, page: 1 })}
                 >
                   All media
-                </button>
+                </Button>
                 {folderPath.map((folder, index) => (
-                  <span key={folder.id} className="puzzle-media-library__breadcrumb">
+                  <Stack
+                    as="span"
+                    key={folder.id}
+                    className="puzzle-media-library__breadcrumb"
+                    direction="row"
+                    alignV="center"
+                    gap="sm"
+                  >
                     <span aria-hidden="true">/</span>
-                    <button
+                    <Button
                       type="button"
+                      size="sm"
+                      variant="link"
+                      className="puzzle-media-library__breadcrumb-link"
                       aria-current={
                         index === folderPath.length - 1 ? "page" : undefined
                       }
@@ -677,37 +761,38 @@ const MediaLibrary = ({
                       }
                     >
                       {folder.name}
-                    </button>
-                  </span>
+                    </Button>
+                  </Stack>
                 ))}
-              </nav>
+              </Stack>
               <h2>{currentFolder?.name ?? "Media library"}</h2>
               <p className="puzzle-media-library__muted">
-                {filteredAssets.length} asset{filteredAssets.length === 1 ? "" : "s"}
+                {filteredAssets.length} asset
+                {filteredAssets.length === 1 ? "" : "s"}
               </p>
             </div>
             {showUpload ? (
               <details className="puzzle-media-library__upload">
-                <summary className="puzzle-media-library__action-button">
+                <summary className="puzzle-media-library__upload-trigger">
                   Upload media
                 </summary>
                 <div className="puzzle-media-library__upload-content">
                   {uploadKinds.length > 1 ? (
-                    <label className="puzzle-media-library__control">
-                      <span>Upload type</span>
-                      <select
+                    <FormField
+                      className="puzzle-media-library__control"
+                      label="Upload type"
+                    >
+                      <Select<UploadKind>
+                        options={uploadKinds.map((kind) => ({
+                          value: kind,
+                          label: kind === "file" ? "Other files" : `${kind}s`,
+                        }))}
                         value={activeUploadKind}
-                        onChange={(event) =>
-                          setUploadKind(event.currentTarget.value as UploadKind)
-                        }
-                      >
-                        {uploadKinds.map((kind) => (
-                          <option key={kind} value={kind}>
-                            {kind === "file" ? "Other files" : `${kind}s`}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                        onChange={(kind) => {
+                          if (kind !== undefined) setUploadKind(kind);
+                        }}
+                      />
+                    </FormField>
                   ) : null}
                   {activeUploadKind === "image" && upload?.image ? (
                     <ImageUpload
@@ -716,7 +801,9 @@ const MediaLibrary = ({
                       onReject={(rejections) =>
                         setActionFeedback({
                           role: "alert",
-                          message: rejections.map((item) => item.message).join(" "),
+                          message: rejections
+                            .map((item) => item.message)
+                            .join(" "),
                         })
                       }
                     />
@@ -727,7 +814,9 @@ const MediaLibrary = ({
                       onReject={(rejections) =>
                         setActionFeedback({
                           role: "alert",
-                          message: rejections.map((item) => item.message).join(" "),
+                          message: rejections
+                            .map((item) => item.message)
+                            .join(" "),
                         })
                       }
                     />
@@ -738,7 +827,9 @@ const MediaLibrary = ({
                       onReject={(rejections) =>
                         setActionFeedback({
                           role: "alert",
-                          message: rejections.map((item) => item.message).join(" "),
+                          message: rejections
+                            .map((item) => item.message)
+                            .join(" "),
                         })
                       }
                     />
@@ -746,12 +837,14 @@ const MediaLibrary = ({
                 </div>
               </details>
             ) : null}
-          </header>
+          </Stack>
 
           <div className="puzzle-media-library__toolbar">
-            <label className="puzzle-media-library__control puzzle-media-library__search">
-              <span>Search media</span>
-              <input
+            <FormField
+              className="puzzle-media-library__control puzzle-media-library__search"
+              label="Search media"
+            >
+              <TextInput
                 type="search"
                 value={query.search}
                 placeholder="Search name, description, or tag"
@@ -759,46 +852,40 @@ const MediaLibrary = ({
                   updateQuery({ search: event.currentTarget.value, page: 1 })
                 }
               />
-            </label>
-            <label className="puzzle-media-library__control">
-              <span>Type</span>
-              <select
+            </FormField>
+            <FormField className="puzzle-media-library__control" label="Type">
+              <Select<MediaLibraryQuery["kind"]>
+                options={[
+                  { label: "All types", value: "all" },
+                  { label: "Images", value: "image" },
+                  { label: "Videos", value: "video" },
+                  { label: "Audio", value: "audio" },
+                  { label: "Documents", value: "document" },
+                  { label: "Other", value: "other" },
+                ]}
                 value={query.kind}
-                onChange={(event) =>
-                  updateQuery({
-                    kind: event.currentTarget.value as MediaLibraryQuery["kind"],
-                    page: 1,
-                  })
-                }
-              >
-                <option value="all">All types</option>
-                <option value="image">Images</option>
-                <option value="video">Videos</option>
-                <option value="audio">Audio</option>
-                <option value="document">Documents</option>
-                <option value="other">Other</option>
-              </select>
-            </label>
-            <label className="puzzle-media-library__control">
-              <span>Status</span>
-              <select
+                onChange={(kind) => {
+                  if (kind !== undefined) updateQuery({ kind, page: 1 });
+                }}
+              />
+            </FormField>
+            <FormField className="puzzle-media-library__control" label="Status">
+              <Select<MediaLibraryQuery["status"]>
+                options={[
+                  { label: "All statuses", value: "all" },
+                  { label: "Pending upload", value: "pending-upload" },
+                  { label: "Uploaded", value: "uploaded" },
+                  { label: "Processing", value: "processing" },
+                  { label: "Ready", value: "ready" },
+                  { label: "Failed", value: "failed" },
+                  { label: "Deleted", value: "deleted" },
+                ]}
                 value={query.status}
-                onChange={(event) =>
-                  updateQuery({
-                    status: event.currentTarget.value as MediaLibraryQuery["status"],
-                    page: 1,
-                  })
-                }
-              >
-                <option value="all">All statuses</option>
-                <option value="pending-upload">Pending upload</option>
-                <option value="uploaded">Uploaded</option>
-                <option value="processing">Processing</option>
-                <option value="ready">Ready</option>
-                <option value="failed">Failed</option>
-                <option value="deleted">Deleted</option>
-              </select>
-            </label>
+                onChange={(status) => {
+                  if (status !== undefined) updateQuery({ status, page: 1 });
+                }}
+              />
+            </FormField>
             <div className="puzzle-media-library__tag-filter">
               <Autocomplete
                 label="Tag"
@@ -811,27 +898,28 @@ const MediaLibrary = ({
                 onChange={(tag) => updateQuery({ tag: tag ?? null, page: 1 })}
               />
             </div>
-            <label className="puzzle-media-library__control">
-              <span>Sort by</span>
-              <select
+            <FormField
+              className="puzzle-media-library__control"
+              label="Sort by"
+            >
+              <Select<MediaLibraryQuery["sortBy"]>
+                options={[
+                  { label: "Name", value: "name" },
+                  { label: "Type", value: "kind" },
+                  { label: "Status", value: "status" },
+                  { label: "File size", value: "size" },
+                  { label: "Last updated", value: "updatedAt" },
+                ]}
                 value={query.sortBy}
-                onChange={(event) =>
-                  updateQuery({
-                    sortBy: event.currentTarget.value as MediaLibraryQuery["sortBy"],
-                    page: 1,
-                  })
-                }
-              >
-                <option value="name">Name</option>
-                <option value="kind">Type</option>
-                <option value="status">Status</option>
-                <option value="size">File size</option>
-                <option value="updatedAt">Last updated</option>
-              </select>
-            </label>
-            <button
+                onChange={(sortBy) => {
+                  if (sortBy !== undefined) updateQuery({ sortBy, page: 1 });
+                }}
+              />
+            </FormField>
+            <Button
               type="button"
-              className="puzzle-media-library__text-button"
+              size="sm"
+              variant="outline"
               aria-label={`Sort ${query.sortDirection === "asc" ? "descending" : "ascending"}`}
               onClick={() =>
                 updateQuery({
@@ -841,34 +929,40 @@ const MediaLibrary = ({
               }
             >
               {query.sortDirection === "asc" ? "Ascending" : "Descending"}
-            </button>
-            <div className="puzzle-media-library__view-toggle" role="group" aria-label="View mode">
-              <button
-                type="button"
-                aria-pressed={query.view === "grid"}
-                onClick={() => updateQuery({ view: "grid" })}
-              >
-                Grid
-              </button>
-              <button
-                type="button"
-                aria-pressed={query.view === "list"}
-                onClick={() => updateQuery({ view: "list" })}
-              >
-                List
-              </button>
-            </div>
+            </Button>
+            <ToggleGroup
+              className="puzzle-media-library__view-toggle"
+              type="single"
+              value={query.view}
+              required
+              spacing={4}
+              aria-label="View mode"
+              onValueChange={(view) => {
+                if (view === "grid" || view === "list") {
+                  updateQuery({ view });
+                }
+              }}
+            >
+              <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
+              <ToggleGroup.Item value="list">List</ToggleGroup.Item>
+            </ToggleGroup>
           </div>
 
           {selection.length > 0 ? (
-            <div className="puzzle-media-library__selection" aria-label="Selected assets">
-              <span>
-                {selection.length} selected
-              </span>
+            <Stack
+              className="puzzle-media-library__selection"
+              direction={{ mobile: "col", tablet: "col", desktop: "row" }}
+              alignV="center"
+              gap="md"
+              role="group"
+              aria-label="Selected assets"
+            >
+              <span>{selection.length} selected</span>
               {onCopyReference && selection.length === 1 ? (
-                <button
+                <Button
                   type="button"
-                  className="puzzle-media-library__text-button"
+                  size="sm"
+                  variant="outline"
                   onClick={async () => {
                     try {
                       await onCopyReference(selection[0]!);
@@ -885,69 +979,81 @@ const MediaLibrary = ({
                   }}
                 >
                   Copy reference
-                </button>
+                </Button>
               ) : null}
               {onSaveAsset && selection.length === 1 ? (
-                <button
+                <Button
                   type="button"
-                  className="puzzle-media-library__text-button"
+                  size="sm"
+                  variant="outline"
                   onClick={() => setDetailsOpen((open) => !open)}
                 >
                   {detailsOpen ? "Hide details" : "Details"}
-                </button>
+                </Button>
               ) : null}
               {onBulkAction ? (
-                <div className="puzzle-media-library__bulk-actions">
-                  <label className="puzzle-media-library__control">
-                    <span>Bulk action</span>
-                    <select
+                <Stack
+                  className="puzzle-media-library__bulk-actions"
+                  direction={{ mobile: "col", desktop: "row" }}
+                  alignV="center"
+                  gap="md"
+                >
+                  <FormField
+                    className="puzzle-media-library__control"
+                    label="Bulk action"
+                  >
+                    <Select<MediaLibraryBulkAction["type"]>
+                      options={[
+                        { label: "Move", value: "move" },
+                        { label: "Soft delete", value: "delete" },
+                        { label: "Restore", value: "restore" },
+                      ]}
                       value={bulkAction.type}
-                      onChange={(event) => {
-                        const type = event.currentTarget.value as MediaLibraryBulkAction["type"];
+                      onChange={(type) => {
+                        if (type === undefined) return;
                         setBulkAction(
                           type === "move"
                             ? { type, folderId: query.folderId }
                             : { type },
                         );
                       }}
-                    >
-                      <option value="move">Move</option>
-                      <option value="delete">Soft delete</option>
-                      <option value="restore">Restore</option>
-                    </select>
-                  </label>
+                    />
+                  </FormField>
                   {bulkAction.type === "move" ? (
-                    <label className="puzzle-media-library__control">
-                      <span>Destination</span>
-                      <select
+                    <FormField
+                      className="puzzle-media-library__control"
+                      label="Destination"
+                    >
+                      <Select<string>
+                        options={[
+                          { label: "Top level", value: "" },
+                          ...folders.map((folder) => ({
+                            label: folder.name,
+                            value: folder.id,
+                          })),
+                        ]}
                         value={bulkAction.folderId ?? ""}
-                        onChange={(event) =>
+                        onChange={(folderId) =>
                           setBulkAction({
                             type: "move",
-                            folderId: event.currentTarget.value || null,
+                            folderId: folderId || null,
                           })
                         }
-                      >
-                        <option value="">Top level</option>
-                        {folders.map((folder) => (
-                          <option key={folder.id} value={folder.id}>
-                            {folder.name}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
+                      />
+                    </FormField>
                   ) : null}
-                  <button
+                  <Button
                     type="button"
-                    className="puzzle-media-library__action-button"
+                    variant="primary"
                     disabled={isActionPending}
                     onClick={runBulkAction}
                   >
                     {isActionPending ? "Working…" : "Apply"}
-                  </button>
-                </div>
+                  </Button>
+                </Stack>
               ) : null}
-            </div>
+              {selectionActions}
+            </Stack>
           ) : null}
 
           {actionFeedback ? (
@@ -967,7 +1073,11 @@ const MediaLibrary = ({
           ) : null}
 
           {loading ? (
-            <p className="puzzle-media-library__state" role="status" aria-live="polite">
+            <p
+              className="puzzle-media-library__state"
+              role="status"
+              aria-live="polite"
+            >
               Loading media…
             </p>
           ) : error ? (
@@ -990,13 +1100,9 @@ const MediaLibrary = ({
                     : emptyDescription}
               </p>
               {hasFilters ? (
-                <button
-                  type="button"
-                  className="puzzle-media-library__action-button"
-                  onClick={resetFilters}
-                >
+                <Button type="button" variant="primary" onClick={resetFilters}>
                   Clear filters
-                </button>
+                </Button>
               ) : null}
             </div>
           ) : (
@@ -1010,42 +1116,48 @@ const MediaLibrary = ({
                   Loading more assets…
                 </p>
               ) : null}
-              <nav
+              <Stack
+                as="nav"
                 className="puzzle-media-library__pagination"
+                direction="row"
+                alignH="center"
+                alignV="center"
+                gap="md"
                 aria-label="Media library pages"
               >
-                <button
+                <Button
                   type="button"
-                  className="puzzle-media-library__text-button"
+                  size="sm"
+                  variant="outline"
                   disabled={currentPage <= 1 || loadingNextPage}
                   onClick={() => updateQuery({ page: currentPage - 1 })}
                 >
                   Previous
-                </button>
+                </Button>
                 <span aria-live="polite">
                   Page {currentPage} of {pageCount}
                 </span>
-                <button
+                <Button
                   type="button"
-                  className="puzzle-media-library__text-button"
+                  size="sm"
+                  variant="outline"
                   disabled={currentPage >= pageCount || loadingNextPage}
                   onClick={() => updateQuery({ page: currentPage + 1 })}
                 >
                   Next
-                </button>
-              </nav>
+                </Button>
+              </Stack>
             </div>
           )}
-        </div>
+        </Stack>
       </div>
       {detailsOpen && selectedAssets[0] && onSaveAsset ? (
         <AssetDetailsPanel
           asset={selectedAssets[0]}
           folders={folders}
-          onSave={(
-            assetId: string,
-            patch: MediaLibraryMetadataPatch,
-          ) => onSaveAsset(assetId, patch)}
+          onSave={(assetId: string, patch: MediaLibraryMetadataPatch) =>
+            onSaveAsset(assetId, patch)
+          }
           onClose={() => setDetailsOpen(false)}
         />
       ) : null}

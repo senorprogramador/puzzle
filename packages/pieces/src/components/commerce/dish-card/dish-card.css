@@ -72,10 +72,6 @@
 
 .puzzle-dish-card__badges,
 .puzzle-dish-card__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--puzzle-space-2, 0.5rem);
   min-width: 0;
 }
 

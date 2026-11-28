@@ -5,6 +5,7 @@ import {
   Text,
   TextInput,
   Select,
+  Stack,
 } from "@puzzle-ui/ui";
 import { useListFilter } from "@puzzle-ui/hooks";
 import type { ElementType } from "react";
@@ -118,7 +119,12 @@ const UseCasesSection = <C extends ElementType = "section">({
       variant={variant}
     >
       {filterable && items.length ? (
-        <div className="puzzle-use-cases__filters">
+        <Stack
+          className="puzzle-use-cases__filters"
+          direction="row"
+          gap="md"
+          wrap="wrap"
+        >
           <label>
             <span>Search use cases</span>
             <TextInput
@@ -141,7 +147,7 @@ const UseCasesSection = <C extends ElementType = "section">({
               onChange={(category) => setSelectedCategory(category ?? "")}
             />
           ) : null}
-        </div>
+        </Stack>
       ) : null}
       {filteredItems.length && variant === "tabs" ? (
         <Tabs className="puzzle-use-cases__tabs">

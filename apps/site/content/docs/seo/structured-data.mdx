@@ -90,7 +90,69 @@ const issues = validateSchemaNode(
 
 The generated registry includes Schema.org definitions and inherited properties. `createSchemaRegistry` accepts generated and custom definitions, extensions, and an `allowGeneratedOverrides` option; inspect `registry.getConflicts()` when composing definitions. React schema components are documented in [React Integration](/docs/seo/react); complete reports and rich-result profiles are covered in [Validation](/docs/seo/validation).
 
+## Optional Zod schemas
+
+For applications that want runtime validation through Zod, install Zod 4 and
+import the schemas from the dedicated subpath. The SEO root entry point does
+not import or re-export Zod.
+
+```bash
+npm install @puzzle-ui/seo zod
+```
+
+```ts
+import {
+  AdvertisingAgencySchema,
+  AuthorSchema,
+  BedAndBreakfastSchema,
+  ProductSchema,
+  RestaurantSchema,
+} from "@puzzle-ui/seo/zod";
+
+const result = RestaurantSchema.safeParse({
+  "@type": "Restaurant",
+  name: "The Garden Table",
+  servesCuisine: ["Modern European", "Vegetarian"],
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "1 Market Street",
+    addressLocality: "Amsterdam",
+  },
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday"],
+      opens: "09:00",
+      closes: "22:00",
+    },
+  ],
+  acceptsReservations: true,
+});
+
+if (result.success) {
+  const restaurant = result.data;
+}
+```
+
+The `/zod` entry point exports fixed-`@type` schemas for `WebSite`, `WebPage`,
+people and organizations, articles, FAQ pages, events, products and offers,
+local businesses, restaurants, lodging businesses, B&Bs, hotels, professional
+services, and common agency types. `WebsiteSchema` and `WebpageSchema` are
+convenience aliases; `BusinessSchema` accepts an `Organization` or
+`LocalBusiness`; `AuthorSchema` accepts a `Person`, `Organization`, or `@id`
+reference.
+
+Reusable sub-object schemas include `PostalAddressSchema`,
+`GeoCoordinatesSchema`, `ContactPointSchema`,
+`OpeningHoursSpecificationSchema`, `ImageObjectSchema`,
+`LocationFeatureSpecificationSchema`, ratings, menu items and sections,
+quantities, monetary amounts, shipping details, return policies, and
+breadcrumb items. The schemas accept additional properties to support
+Schema.org terms not explicitly modeled here. Related entities may be supplied
+as nested objects or as `{ "@id": "https://example.com/#node" }` references.
+
 ## Exports
 
 - `@puzzle-ui/seo/core`: `normalizeSeoId`, `createSeoNode`, `mergeSeoNodes`, `createSeoGraphBuilder`, `buildSeoGraph`, `resolveSeoReferences`, `validateSeoGraph`, `serializeSeoGraph`, `stringifySeoGraph` and graph types.
 - `@puzzle-ui/seo/schema`: `createSchemaRegistry`, `createDefaultSchemaRegistry`, `validateSchemaNode`, `SCHEMAORG_VERSION`, `SCHEMAORG_SOURCE_HASH`, `generatedSchemaDefinitions` and registry types.
+- `@puzzle-ui/seo/zod`: optional composable Zod 4 schemas for common Schema.org entities and nested objects.

@@ -40,12 +40,6 @@
   object-fit: cover;
 }
 
-.puzzle-accommodation-overview__badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--puzzle-space-2, 0.5rem);
-}
-
 .puzzle-accommodation-overview__copy {
   display: grid;
   align-content: start;

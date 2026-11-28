@@ -1,4 +1,4 @@
-import type * as z from "zod";
+import type * as z from "zod/v4";
 
 import { formatValidationPath } from "./validation-path";
 import type {
@@ -21,8 +21,9 @@ export const createZodSchemaValidator = <S extends z.ZodType>(
     }
 
     const issues: ValidationIssue[] = result.error.issues.map((issue) => ({
-      path: issue.path.map((segment): ValidationPathSegment =>
-        typeof segment === "symbol" ? String(segment) : segment,
+      path: issue.path.map(
+        (segment): ValidationPathSegment =>
+          typeof segment === "symbol" ? String(segment) : segment,
       ),
       message: issue.message,
       code: issue.code,

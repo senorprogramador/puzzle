@@ -297,14 +297,8 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
     throw new RangeError("validationDebounceMs must be a non-negative number.");
   }
 
-  const normalized = useMemo(
-    () => normalizeZodObjectSchema(schema),
-    [schema],
-  );
-  const validator = useMemo(
-    () => createZodSchemaValidator(schema),
-    [schema],
-  );
+  const normalized = useMemo(() => normalizeZodObjectSchema(schema), [schema]);
+  const validator = useMemo(() => createZodSchemaValidator(schema), [schema]);
   const schemaRef = useRef(schema);
   const valueRef = useRef(value);
   const validatorRef = useRef(validator);
@@ -319,10 +313,9 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
   validatorRef.current = validator;
   callbackRef.current = onValidationChange;
 
-  const [validationState, setValidationState] =
-    useState<ZodSchemaFormValidationState<Schema>>(() =>
-      toValidationState("unvalidated", null),
-    );
+  const [validationState, setValidationState] = useState<
+    ZodSchemaFormValidationState<Schema>
+  >(() => toValidationState("unvalidated", null));
   const validationStateRef = useRef(validationState);
   validationStateRef.current = validationState;
 
@@ -375,9 +368,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
   }, [clearScheduledValidation, publishValidationState]);
 
   const runValidation = useCallback(
-    async (
-      source: ValidationSource,
-    ): Promise<ValidationResult<Schema>> => {
+    async (source: ValidationSource): Promise<ValidationResult<Schema>> => {
       clearScheduledValidation();
 
       const currentSchema = schemaRef.current;
@@ -393,18 +384,14 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
       let result: ValidationResult<Schema>;
 
       try {
-        result = await currentValidator(
-          currentValue as z.input<Schema>,
-        );
+        result = await currentValidator(currentValue as z.input<Schema>);
       } catch (error) {
         if (
           guardRef.current.isCurrent(revision) &&
           schemaRef.current === currentSchema &&
           valueRef.current === currentValue
         ) {
-          publishValidationState(
-            toValidationState("unvalidated", null),
-          );
+          publishValidationState(toValidationState("unvalidated", null));
         }
 
         throw error;
@@ -427,10 +414,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
     [clearScheduledValidation, publishValidationState],
   );
 
-  const validate = useCallback(
-    () => runValidation("manual"),
-    [runValidation],
-  );
+  const validate = useCallback(() => runValidation("manual"), [runValidation]);
 
   const scheduleValidation = useCallback(
     (source: ValidationSource) => {
@@ -503,11 +487,9 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
       publishValidationState(toValidationState("unvalidated", null));
 
       onChange(
-        setValueAtPath(
-          valueRef.current,
-          path,
-          nextValue,
-        ) as DeepPartial<z.input<Schema>>,
+        setValueAtPath(valueRef.current, path, nextValue) as DeepPartial<
+          z.input<Schema>
+        >,
       );
     },
     [clearScheduledValidation, onChange, publishValidationState],
@@ -527,10 +509,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
         return next;
       });
 
-      if (
-        validationModes.has("blur") ||
-        validationModes.has("touched")
-      ) {
+      if (validationModes.has("blur") || validationModes.has("touched")) {
         scheduleValidation("blur");
       }
     },
@@ -547,10 +526,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
       return false;
     }
 
-    if (
-      latestSourceRef.current !== "blur" ||
-      !validationModes.has("touched")
-    ) {
+    if (latestSourceRef.current !== "blur" || !validationModes.has("touched")) {
       return true;
     }
 
@@ -588,8 +564,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
     const rawValue = getValueAtPath(valueRef.current, actualPath);
     const messages = getMessages(validationState.errors, actualPath);
     const visibleMessages = shouldShowError(actualPath) ? messages : [];
-    const disabledField =
-      disabled || fieldConfig?.disabled === true;
+    const disabledField = disabled || fieldConfig?.disabled === true;
     const readOnlyField =
       readOnly || descriptor.readOnly || fieldConfig?.readOnly === true;
     const required = !descriptor.optional && !descriptor.defaulted;
@@ -617,11 +592,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
         onChange: (nextValue) => emitFieldChange(actualPath, nextValue),
       };
 
-      return (
-        <Fragment key={pathKey}>
-          {renderer(context)}
-        </Fragment>
-      );
+      return <Fragment key={pathKey}>{renderer(context)}</Fragment>;
     }
 
     if (typeKey !== descriptor.type) {
@@ -659,8 +630,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
         case "email":
         case "url": {
           const multiline = descriptor.metadata.multiline === true;
-          const currentValue =
-            typeof rawValue === "string" ? rawValue : "";
+          const currentValue = typeof rawValue === "string" ? rawValue : "";
           const sharedProps = {
             value: currentValue,
             placeholder:
@@ -694,8 +664,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
           );
         }
         case "number": {
-          const numberValue =
-            typeof rawValue === "number" ? rawValue : null;
+          const numberValue = typeof rawValue === "number" ? rawValue : null;
           const integer = descriptor.constraints.integer === true;
 
           return (
@@ -843,9 +812,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
         : descriptor.type;
     const message = `${String(label)} (${pathKey}) is ${detectedType}: ${explanation} Register a renderer with fieldTypes or fields[path].render.`;
 
-    diagnostics.push(
-      diagnostic("unsupported_field", path, message),
-    );
+    diagnostics.push(diagnostic("unsupported_field", path, message));
 
     return (
       <div
@@ -874,15 +841,14 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
       : [];
     const constraintMin = descriptor.constraints.minLength ?? 0;
     const minItems = Math.max(0, Math.trunc(config?.minItems ?? constraintMin));
-    const maxItems =
-      config?.maxItems ?? descriptor.constraints.maxLength;
+    const maxItems = config?.maxItems ?? descriptor.constraints.maxLength;
     const hasStableObjectKeys =
-      items.length > 0 && items.every((item) => getStableItemId(item) !== undefined);
+      items.length > 0 &&
+      items.every((item) => getStableItemId(item) !== undefined);
     const getItemKey =
       config?.getItemKey ??
       (hasStableObjectKeys
-        ? (item: unknown, index: number) =>
-            getStableItemId(item) ?? index
+        ? (item: unknown, index: number) => getStableItemId(item) ?? index
         : undefined);
     const reorderable =
       getItemKey !== undefined && (config?.reorderable ?? true);
@@ -917,22 +883,18 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
     return (
       <FieldArray
         key={pathKey}
+        className="puzzle-zod-schema-form__array"
         label={label}
         description={description}
         error={fieldError}
         invalid={arrayMessages.length > 0}
         items={items}
-        onChange={(nextItems) =>
-          emitFieldChange(actualPath, nextItems)
-        }
+        onChange={(nextItems) => emitFieldChange(actualPath, nextItems)}
         createItem={
           config?.createItem ?? (() => createEmptyValue(descriptor.element))
         }
         getItemKey={getItemKey}
-        itemLabel={
-          config?.itemLabel ??
-          ((_item, index) => `Item ${index + 1}`)
-        }
+        itemLabel={config?.itemLabel ?? ((_item, index) => `Item ${index + 1}`)}
         minItems={minItems}
         maxItems={maxItems}
         reorderable={reorderable}
@@ -965,16 +927,15 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
     const description = config?.description ?? descriptor.description;
     const objectMessages =
       actualPath.length > 0 && shouldShowError(actualPath)
-      ? getMessages(validationState.errors, actualPath)
-      : [];
+        ? getMessages(validationState.errors, actualPath)
+        : [];
     const objectErrorId = `${generatedId}-${encodeURIComponent(pathKey)}-error`;
     const assignedKeys = new Set<string>();
     const grouped: {
       group: ZodSchemaFormGroup;
       descriptors: NormalizedZodDescriptor[];
     }[] = [];
-    const objectGroups =
-      actualPath.length === 0 ? groups : config?.groups;
+    const objectGroups = actualPath.length === 0 ? groups : config?.groups;
 
     visitedPaths.add(pathKey);
 
@@ -1044,54 +1005,53 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
       );
     };
 
-    const groupedContent = grouped.map(({ group, descriptors: entries }, groupIndex) => {
-      const groupLabelId = `${generatedId}-${encodeURIComponent(pathKey)}-${encodeURIComponent(group.id)}-${groupIndex}-label`;
-      const groupDescriptionId = `${groupLabelId}-description`;
+    const groupedContent = grouped.map(
+      ({ group, descriptors: entries }, groupIndex) => {
+        const groupLabelId = `${generatedId}-${encodeURIComponent(pathKey)}-${encodeURIComponent(group.id)}-${groupIndex}-label`;
+        const groupDescriptionId = `${groupLabelId}-description`;
 
-      return (
-        <fieldset
-          key={group.id}
-          className="puzzle-zod-schema-form__group"
-          aria-describedby={
-            group.description !== undefined ? groupDescriptionId : undefined
-          }
-        >
-          {group.label !== undefined && (
-            <legend
-              id={groupLabelId}
-              className="puzzle-zod-schema-form__group-label"
-            >
-              {group.label}
-            </legend>
-          )}
-          {group.description !== undefined && (
-            <p
-              id={groupDescriptionId}
-              className="puzzle-zod-schema-form__description"
-            >
-              {group.description}
-            </p>
-          )}
-          <Grid
-            columns={{
-              mobile: 1,
-              tablet: 1,
-              desktop: group.columns ?? config?.columns ?? 1,
-            }}
-            gap="md"
+        return (
+          <fieldset
+            key={group.id}
+            className="puzzle-zod-schema-form__group"
+            aria-describedby={
+              group.description !== undefined ? groupDescriptionId : undefined
+            }
           >
-            {entries.map(renderProperty)}
-          </Grid>
-        </fieldset>
-      );
-    });
+            {group.label !== undefined && (
+              <legend
+                id={groupLabelId}
+                className="puzzle-zod-schema-form__group-label"
+              >
+                {group.label}
+              </legend>
+            )}
+            {group.description !== undefined && (
+              <p
+                id={groupDescriptionId}
+                className="puzzle-zod-schema-form__description"
+              >
+                {group.description}
+              </p>
+            )}
+            <Grid
+              columns={{
+                mobile: 1,
+                tablet: 1,
+                desktop: group.columns ?? config?.columns ?? 2,
+              }}
+              gap="md"
+            >
+              {entries.map(renderProperty)}
+            </Grid>
+          </fieldset>
+        );
+      },
+    );
 
     const unassignedContent =
       unassignedFields === "hide" || ungrouped.length === 0 ? null : (
-        <Stack
-          className="puzzle-zod-schema-form__unassigned"
-          gap="md"
-        >
+        <Stack className="puzzle-zod-schema-form__unassigned" gap="md">
           {ungrouped.map(renderProperty)}
         </Stack>
       );
@@ -1139,15 +1099,15 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
           key={pathKey}
           open
           className={objectClassName}
-          aria-describedby={objectMessages.length > 0 ? objectErrorId : undefined}
+          aria-describedby={
+            objectMessages.length > 0 ? objectErrorId : undefined
+          }
         >
           <summary className="puzzle-zod-schema-form__summary">
             {label ?? "Object"}
           </summary>
           {description !== undefined && (
-            <p className="puzzle-zod-schema-form__description">
-              {description}
-            </p>
+            <p className="puzzle-zod-schema-form__description">{description}</p>
           )}
           {content}
         </details>
@@ -1162,7 +1122,9 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
           aria-label={
             !hasHeader && typeof label === "string" ? label : undefined
           }
-          aria-describedby={objectMessages.length > 0 ? objectErrorId : undefined}
+          aria-describedby={
+            objectMessages.length > 0 ? objectErrorId : undefined
+          }
           aria-invalid={objectMessages.length > 0 || undefined}
         >
           {hasHeader && label !== undefined && (
@@ -1171,9 +1133,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
             </legend>
           )}
           {description !== undefined && (
-            <p className="puzzle-zod-schema-form__description">
-              {description}
-            </p>
+            <p className="puzzle-zod-schema-form__description">{description}</p>
           )}
           {content}
         </fieldset>
@@ -1187,12 +1147,12 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
   const rootMessages = shouldShowError([])
     ? getMessages(validationState.errors, [])
     : [];
-  const unmappedMessages = validationState.result &&
-    !validationState.result.success
-    ? validationState.result.issues.filter(
-        (issue) => !visitedPaths.has(formatValidationPath(issue.path)),
-      )
-    : [];
+  const unmappedMessages =
+    validationState.result && !validationState.result.success
+      ? validationState.result.issues.filter(
+          (issue) => !visitedPaths.has(formatValidationPath(issue.path)),
+        )
+      : [];
   const touchedKeys = [...touchedFields];
   const formDiagnostics: ZodSchemaFormDiagnostic[] = [
     ...normalized.diagnostics,
@@ -1214,10 +1174,7 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
 
   return (
     <form
-      className={[
-        "puzzle-zod-schema-form",
-        className,
-      ]
+      className={["puzzle-zod-schema-form", className]
         .filter(Boolean)
         .join(" ")}
       aria-label={ariaLabel}
@@ -1252,9 +1209,11 @@ const ZodSchemaForm = <Schema extends z.ZodObject>({
           {diagnostics
             .filter((entry) => entry.code !== "unsupported_field")
             .map((entry, index) => (
-            <li key={`${entry.code}-${formatValidationPath(entry.path)}-${index}`}>
-              {entry.message}
-            </li>
+              <li
+                key={`${entry.code}-${formatValidationPath(entry.path)}-${index}`}
+              >
+                {entry.message}
+              </li>
             ))}
         </ul>
       )}

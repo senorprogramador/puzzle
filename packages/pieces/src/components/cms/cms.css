@@ -105,12 +105,16 @@
 
 .puzzle-cms-field input,
 .puzzle-cms-field select,
+.puzzle-cms-field .puzzle-select__trigger,
 .puzzle-cms-field textarea,
 .puzzle-cms-list__filters select,
+.puzzle-cms-list__filters .puzzle-select__trigger,
 .puzzle-cms-audit__filters input,
 .puzzle-cms-audit__filters select,
+.puzzle-cms-audit__filters .puzzle-select__trigger,
 .puzzle-cms-type-builder input,
 .puzzle-cms-type-builder select,
+.puzzle-cms-type-builder .puzzle-select__trigger,
 .puzzle-cms-relationship input,
 .puzzle-cms-webhooks input[type="url"] {
   min-height: 2.5rem;

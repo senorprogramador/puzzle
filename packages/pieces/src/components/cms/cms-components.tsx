@@ -18,7 +18,13 @@ import type {
   FieldValue,
   FieldsValue,
 } from "@puzzle-ui/cms";
-import { Breadcrumbs, DataTable, Dialog, JsonEditor } from "@puzzle-ui/ui";
+import {
+  Breadcrumbs,
+  DataTable,
+  Dialog,
+  JsonEditor,
+  Select,
+} from "@puzzle-ui/ui";
 import { DashboardShell } from "../dashboard";
 import { toDateTimeInputValue, toInstantInTimeZone } from "./time-zone.utils";
 import type {
@@ -258,37 +264,42 @@ export const ContentList = ({
         </label>
         <label>
           Status
-          <select
+          <Select<CmsEntryStatus | "all">
+            aria-label="Status"
             value={status}
-            onChange={(event) => {
-              const next = event.currentTarget.value as CmsEntryStatus | "all";
+            options={[
+              { value: "all", label: "All statuses" },
+              { value: "draft", label: "Draft" },
+              { value: "published", label: "Published" },
+              { value: "scheduled", label: "Scheduled" },
+              { value: "archived", label: "Archived" },
+            ]}
+            onChange={(next) => {
+              if (next === undefined) return;
               if (remote) remote.onQueryChange({ ...remote.query, status: next });
               else setStatus(next);
             }}
-          >
-            <option value="all">All statuses</option>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="archived">Archived</option>
-          </select>
+          />
         </label>
         {locales.length > 0 ? (
           <label>
             Locale
-            <select
+            <Select
+              aria-label="Locale"
               value={locale}
-              onChange={(event) => {
-                const next = event.currentTarget.value;
+              options={[
+                { value: "all", label: "All locales" },
+                ...locales.map((itemLocale) => ({
+                  value: itemLocale,
+                  label: itemLocale,
+                })),
+              ]}
+              onChange={(next) => {
+                if (next === undefined) return;
                 if (remote) remote.onQueryChange({ ...remote.query, locale: next });
                 else setLocale(next);
               }}
-            >
-              <option value="all">All locales</option>
-              {locales.map((itemLocale) => (
-                <option key={itemLocale} value={itemLocale}>{itemLocale}</option>
-              ))}
-            </select>
+            />
           </label>
         ) : null}
       </div>
@@ -573,31 +584,24 @@ const renderContentField = (
 
   if (field.type === "select" || field.type === "multiSelect") {
     const options = field.options ?? [];
+    const selectOptions = options.map((option, index) => ({
+      id: index,
+      value: option.value,
+      label: option.label,
+    }));
     if (field.type === "multiSelect") {
       const selected = Array.isArray(value) ? value : [];
       return (
         <label className="puzzle-cms-field" htmlFor={id}>
           <span>{field.label}{isRequired ? " *" : ""}</span>
-          <select
+          <Select
             {...common}
             multiple
-            value={selected.map((item) =>
-              options.findIndex((option) => Object.is(option.value, item)).toString()
-            )}
-            onChange={(event) =>
-              onChange(
-                Array.from(event.currentTarget.selectedOptions)
-                  .map((option) => options[Number(option.value)]?.value)
-                  .filter((item): item is string | number | boolean =>
-                    item !== undefined,
-                  ),
-              )
-            }
-          >
-            {options.map((option, index) => (
-              <option key={`${field.key}-${index}`} value={index}>{option.label}</option>
-            ))}
-          </select>
+            aria-label={field.label}
+            options={selectOptions}
+            value={selected}
+            onChange={onChange}
+          />
           {error ? <span id={errorId} role="alert">{error}</span> : null}
         </label>
       );
@@ -605,19 +609,16 @@ const renderContentField = (
     return (
       <label className="puzzle-cms-field" htmlFor={id}>
         <span>{field.label}{isRequired ? " *" : ""}</span>
-        <select
+        <Select
           {...common}
-          value={options.findIndex((option) => Object.is(option.value, value)).toString()}
-          onChange={(event) => {
-            const option = options[Number(event.currentTarget.value)];
-            if (option) onChange(option.value);
+          aria-label={field.label}
+          options={selectOptions}
+          value={options.find((option) => Object.is(option.value, value))?.value}
+          placeholder="Choose…"
+          onChange={(next) => {
+            if (next !== undefined) onChange(next);
           }}
-        >
-          <option value="-1">Choose…</option>
-          {options.map((option, index) => (
-            <option key={`${field.key}-${index}`} value={index}>{option.label}</option>
-          ))}
-        </select>
+        />
         {error ? <span id={errorId} role="alert">{error}</span> : null}
       </label>
     );
@@ -1626,16 +1627,20 @@ export const EditorialCalendar = ({
         <button type="button" aria-label="Next month" onClick={() => changeMonth(1)}>Next</button>
         <label>
           Status
-          <select
+          <Select<CmsEntryStatus | "all">
+            aria-label="Status"
             value={status}
-            onChange={(event) => setStatus(event.currentTarget.value as CmsEntryStatus | "all")}
-          >
-            <option value="all">All statuses</option>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="archived">Archived</option>
-          </select>
+            options={[
+              { value: "all", label: "All statuses" },
+              { value: "draft", label: "Draft" },
+              { value: "published", label: "Published" },
+              { value: "scheduled", label: "Scheduled" },
+              { value: "archived", label: "Archived" },
+            ]}
+            onChange={(next) => {
+              if (next !== undefined) setStatus(next);
+            }}
+          />
         </label>
       </header>
       {loading ? <p role="status">Loading schedule…</p> : null}
@@ -1746,25 +1751,37 @@ export const AuditLogViewer = ({
         </label>
         <label>
           Resource
-          <select value={resource} onChange={(event) => {
-            setResource(event.currentTarget.value);
-            setPage(1);
-          }}>
-            <option value="all">All resources</option>
-            {resources.map((item) => <option value={item} key={item}>{item}</option>)}
-          </select>
+          <Select
+            aria-label="Resource"
+            value={resource}
+            options={[
+              { value: "all", label: "All resources" },
+              ...resources.map((item) => ({ value: item, label: item })),
+            ]}
+            onChange={(next) => {
+              if (next === undefined) return;
+              setResource(next);
+              setPage(1);
+            }}
+          />
         </label>
         <label>
           Result
-          <select value={result} onChange={(event) => {
-            setResult(event.currentTarget.value);
-            setPage(1);
-          }}>
-            <option value="all">All results</option>
-            <option value="success">Success</option>
-            <option value="denied">Denied</option>
-            <option value="failure">Failure</option>
-          </select>
+          <Select
+            aria-label="Result"
+            value={result}
+            options={[
+              { value: "all", label: "All results" },
+              { value: "success", label: "Success" },
+              { value: "denied", label: "Denied" },
+              { value: "failure", label: "Failure" },
+            ]}
+            onChange={(next) => {
+              if (next === undefined) return;
+              setResult(next);
+              setPage(1);
+            }}
+          />
         </label>
       </div>
       {error ? <p role="alert">{error}</p> : null}

@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { LinearProgress, Heading, Text } from "@puzzle-ui/ui";
+import { Heading, LinearProgress, Stack, Text } from "@puzzle-ui/ui";
 
 import "./project.css";
 
@@ -35,21 +35,30 @@ export const ProjectProgress = ({
   const labelId = useId();
 
   return (
-    <div
+    <Stack
       className={["puzzle-project-progress", className]
         .filter(Boolean)
         .join(" ")}
+      direction="col"
+      gap="sm"
+      wrap="nowrap"
     >
-      <div className="puzzle-project-progress__header">
+      <Stack
+        className="puzzle-project-progress__header"
+        direction="row"
+        gap="sm"
+        wrap="nowrap"
+        alignH="between"
+      >
         <span id={labelId}>{label}</span>
         <span>{value}%</span>
-      </div>
+      </Stack>
       <LinearProgress
         className="puzzle-project-progress__bar"
         value={value}
         aria-labelledby={labelId}
       />
-    </div>
+    </Stack>
   );
 };
 
@@ -58,11 +67,15 @@ export const ProjectMembers = ({
   label = "Project members",
   className,
 }: ProjectMembersProps) => (
-  <ul
+  <Stack
+    as="ul"
     className={["puzzle-project-members", className]
       .filter(Boolean)
       .join(" ")}
     aria-label={label}
+    direction="row"
+    gap="sm"
+    wrap="wrap"
   >
     {members.map((member) => (
       <li className="puzzle-project-members__member" key={member.id}>
@@ -74,7 +87,7 @@ export const ProjectMembers = ({
         <span>{member.name}</span>
       </li>
     ))}
-  </ul>
+  </Stack>
 );
 
 export const ProjectCard = ({
@@ -113,7 +126,14 @@ export const ProjectCard = ({
       )}
       {members && <ProjectMembers members={members} />}
       {actions && (
-        <div className="puzzle-project-card__actions">{actions}</div>
+        <Stack
+          className="puzzle-project-card__actions"
+          direction="row"
+          gap="sm"
+          wrap="wrap"
+        >
+          {actions}
+        </Stack>
       )}
     </article>
   );

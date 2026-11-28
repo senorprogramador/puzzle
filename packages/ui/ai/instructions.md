@@ -54,7 +54,9 @@ For Zod 4 schema-driven forms, use `ZodSchemaForm` from
 Zod 4. Keep its controlled value on the schema input side and use successful
 validation results for parsed output. The application still owns updates,
 business logic, and submission; use `FieldArray` directly when a form only
-needs repeatable rows.
+needs repeatable rows. Groups default to two columns on desktop and one on
+mobile/tablet; a group's `columns` setting overrides the containing object's
+`columns` setting.
 JSON numbers outside JavaScript's finite range are rejected rather than
 formatted into `null`.
 TextEditor content is a serializable `TextDocument`; use its exported pure

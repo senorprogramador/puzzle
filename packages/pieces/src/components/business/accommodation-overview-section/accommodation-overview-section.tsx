@@ -4,6 +4,7 @@ import {
   Badge,
   Card,
   Heading,
+  Stack,
   Text,
 } from "@puzzle-ui/ui";
 import type { ElementType } from "react";
@@ -48,12 +49,17 @@ const AccommodationCard = ({
       />
     ) : null}
     {item.badges?.length || item.featured ? (
-      <div className="puzzle-accommodation-overview__badges">
+      <Stack
+        className="puzzle-accommodation-overview__badges"
+        direction="row"
+        gap="sm"
+        wrap="wrap"
+      >
         {item.featured ? <Badge content="Featured" color="primary" /> : null}
         {item.badges?.map((badge) => (
           <Badge key={badge.id} content={badge.content} />
         ))}
-      </div>
+      </Stack>
     ) : null}
     <div className="puzzle-accommodation-overview__copy">
       <Heading level="headline3" as="h3">

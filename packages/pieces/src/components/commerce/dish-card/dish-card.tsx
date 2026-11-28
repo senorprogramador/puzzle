@@ -1,5 +1,5 @@
 import { cn } from "@puzzle-ui/core";
-import { Badge, Card, Heading, Text } from "@puzzle-ui/ui";
+import { Badge, Card, Heading, Stack, Text } from "@puzzle-ui/ui";
 import { DietaryInformation } from "../dietary-information";
 import { formatMoney } from "../shared";
 import type { DishCardProps } from "./dish-card.types";
@@ -61,14 +61,20 @@ const DishCard = ({
         </div>
 
         {isFeatured || dish.popular ? (
-          <div className="puzzle-dish-card__badges">
+          <Stack
+            className="puzzle-dish-card__badges"
+            direction="row"
+            gap="sm"
+            wrap="wrap"
+            alignV="center"
+          >
             {isFeatured ? (
               <Badge content={featuredLabel} color="primary" />
             ) : null}
             {dish.popular ? (
               <Badge content={popularLabel} color="info" />
             ) : null}
-          </div>
+          </Stack>
         ) : null}
 
         {dish.description ? (
@@ -92,7 +98,15 @@ const DishCard = ({
           <div className="puzzle-dish-card__slot">{contentSlot}</div>
         ) : null}
         {actions != null ? (
-          <div className="puzzle-dish-card__actions">{actions}</div>
+          <Stack
+            className="puzzle-dish-card__actions"
+            direction="row"
+            gap="sm"
+            wrap="wrap"
+            alignV="center"
+          >
+            {actions}
+          </Stack>
         ) : null}
       </div>
     </Card>

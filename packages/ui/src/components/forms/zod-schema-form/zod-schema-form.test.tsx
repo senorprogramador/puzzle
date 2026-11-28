@@ -335,7 +335,6 @@ describe("ZodSchemaForm", () => {
                 id: "identity",
                 label: "Identity details",
                 keys: ["firstName", "email"],
-                columns: 2,
               },
             ],
           },
@@ -356,9 +355,15 @@ describe("ZodSchemaForm", () => {
       />,
     );
 
+    const identityGroup = screen.getByRole("group", {
+      name: "Identity details",
+    });
+    expect(identityGroup).toBeInTheDocument();
     expect(
-      screen.getByRole("group", { name: "Identity details" }),
-    ).toBeInTheDocument();
+      identityGroup
+        .querySelector<HTMLElement>(".puzzle-grid")
+        ?.style.getPropertyValue("--puzzle-grid-columns-desktop"),
+    ).toBe("repeat(2, minmax(0, 1fr))");
     expect(
       screen.getByRole("textbox", { name: "First name" }),
     ).toBeInTheDocument();

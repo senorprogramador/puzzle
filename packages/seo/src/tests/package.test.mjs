@@ -58,6 +58,7 @@ test("all public subpaths have explicit exports", async () => {
     "./core",
     "./context",
     "./schema",
+    "./zod",
     "./metadata",
     "./react",
     "./server",
@@ -93,6 +94,21 @@ test("React supports the declared optional peer dependency", async () => {
   assert.equal(manifest.peerDependencies.react, "^19.0.0");
 
   assert.equal(manifest.peerDependenciesMeta.react.optional, true);
+});
+
+test("Zod schemas are an optional peer isolated from the root API", async () => {
+  const manifest = await readManifest();
+
+  assert.equal(manifest.peerDependencies.zod, "^4.0.0");
+  assert.equal(manifest.peerDependenciesMeta.zod.optional, true);
+  assert.ok(manifest.devDependencies.zod);
+
+  const rootApi = await import(resolve(packageRoot, "dist/index.js"));
+  const zodApi = await import(resolve(packageRoot, "dist/zod/index.js"));
+
+  assert.equal("RestaurantSchema" in rootApi, false);
+  assert.equal("RestaurantSchema" in zodApi, true);
+  assert.equal("BedAndBreakfastSchema" in zodApi, true);
 });
 
 test("package has no unnecessary runtime dependencies", async () => {

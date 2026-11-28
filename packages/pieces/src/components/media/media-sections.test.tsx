@@ -134,6 +134,22 @@ describe("MediaLibrary", () => {
     expect(onSelectionChange).toHaveBeenLastCalledWith(["cover"]);
   });
 
+  it("renders caller-provided actions in the selected-assets toolbar", async () => {
+    const user = userEvent.setup();
+    render(
+      <MediaLibrary
+        assets={assets}
+        selectionActions={<button type="button">Custom action</button>}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "Select Cover image" }));
+
+    expect(screen.getByLabelText("Selected assets")).toContainElement(
+      screen.getByRole("button", { name: "Custom action" }),
+    );
+  });
+
   it("supports folders, status filters, and grid/list views", async () => {
     const user = userEvent.setup();
     render(<MediaLibrary assets={assets} folders={folders} />);
@@ -141,7 +157,9 @@ describe("MediaLibrary", () => {
     await user.click(screen.getByText("Video"));
     expect(screen.getByRole("heading", { name: "Video" })).toBeVisible();
 
-    await user.selectOptions(screen.getByLabelText("Status"), "processing");
+    const statusFilter = screen.getByRole("combobox", { name: "Status" });
+    await user.click(statusFilter);
+    await user.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}{Enter}");
     expect(screen.getByRole("button", { name: "Select Launch clip" })).toBeVisible();
 
     await user.click(screen.getByRole("button", { name: "List" }));
@@ -395,7 +413,7 @@ describe("MediaField", () => {
     expect(screen.getByText("Drop images here")).toBeVisible();
 
     await user.click(screen.getByRole("button", { name: "New folder" }));
-    await user.type(screen.getByLabelText("Folder name"), "Campaign");
+    await user.type(screen.getByRole("textbox", { name: "Folder name" }), "Campaign");
     await user.click(screen.getByRole("button", { name: "Save" }));
 
     expect(onCreateFolder).toHaveBeenCalledWith("Campaign", null);
@@ -417,14 +435,18 @@ describe("MediaField", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Rename folder" }));
-    const nameInput = screen.getByLabelText("New folder name");
+    const nameInput = screen.getByRole("textbox", { name: "New folder name" });
     await user.clear(nameInput);
     await user.type(nameInput, "Library");
     await user.click(screen.getByRole("button", { name: "Save" }));
     expect(onRenameFolder).toHaveBeenCalledWith("folder-media", "Library");
 
     await user.click(screen.getByRole("button", { name: "Move folder" }));
-    await user.selectOptions(screen.getByLabelText("Move folder to"), "");
+    const folderDestination = screen.getByRole("combobox", {
+      name: "Move folder to",
+    });
+    await user.click(folderDestination);
+    await user.keyboard("{Home}{Enter}");
     await user.click(screen.getByRole("button", { name: "Save" }));
     expect(onMoveFolder).toHaveBeenCalledWith("folder-media", null);
   });

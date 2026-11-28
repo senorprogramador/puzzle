@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { CmsEntryStatus } from "@puzzle-ui/cms";
+import { Select } from "@puzzle-ui/ui";
 import type { EditorialCalendarItem, EditorialCalendarProps } from "./cms.types";
 
 const dateKeyInTimeZone = (date: Date, timeZone: string) => {
@@ -74,16 +75,20 @@ export const EditorialCalendar = ({
         <button type="button" aria-label="Next month" onClick={() => changeMonth(1)}>Next</button>
         <label>
           Status
-          <select
+          <Select<CmsEntryStatus | "all">
+            aria-label="Status"
+            options={[
+              { value: "all", label: "All statuses" },
+              { value: "draft", label: "Draft" },
+              { value: "published", label: "Published" },
+              { value: "scheduled", label: "Scheduled" },
+              { value: "archived", label: "Archived" },
+            ]}
             value={status}
-            onChange={(event) => setStatus(event.currentTarget.value as CmsEntryStatus | "all")}
-          >
-            <option value="all">All statuses</option>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="archived">Archived</option>
-          </select>
+            onChange={(next) => {
+              if (next !== undefined) setStatus(next);
+            }}
+          />
         </label>
       </header>
       {loading ? <p role="status">Loading schedule…</p> : null}

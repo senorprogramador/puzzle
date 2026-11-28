@@ -148,10 +148,10 @@ describe("RestaurantMenuSection browser behavior", () => {
     await user.keyboard("{Enter}");
     expect(window.location.hash).toBe(categoryLink.getAttribute("href"));
 
-    await user.selectOptions(
+    await user.click(
       screen.getByRole("combobox", { name: "Filter by dietary preference" }),
-      "plant-based",
     );
+    await user.click(screen.getByRole("option", { name: "Plant-based" }));
     expect(screen.getAllByRole("article")).toHaveLength(24);
   });
 });

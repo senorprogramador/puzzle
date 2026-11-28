@@ -13,7 +13,7 @@
   font-weight: var(--puzzle-font-weight-semibold, 600);
 }
 
-.puzzle-restaurant-menu__filter select {
+.puzzle-restaurant-menu__filter .puzzle-restaurant-menu__filter-control {
   width: min(100%, 22rem);
   min-width: 0;
   padding: var(--puzzle-space-2, 0.5rem) var(--puzzle-space-3, 0.75rem);
@@ -24,7 +24,7 @@
   font: inherit;
 }
 
-.puzzle-restaurant-menu__filter select:focus-visible {
+.puzzle-restaurant-menu__filter .puzzle-restaurant-menu__filter-control:focus-visible {
   outline: var(--puzzle-border-width-strong, 2px) solid var(--puzzle-color-ring);
   outline-offset: var(--puzzle-space-1, 0.25rem);
 }

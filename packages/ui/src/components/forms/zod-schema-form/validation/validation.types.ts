@@ -1,4 +1,4 @@
-import type * as z from "zod";
+import type * as z from "zod/v4";
 
 export type ValidationPathSegment = string | number;
 export type ValidationPath = readonly ValidationPathSegment[];

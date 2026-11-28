@@ -2,7 +2,7 @@
 
 import { useId, useMemo, useRef, useState } from "react";
 import type { CmsEntryStatus } from "@puzzle-ui/cms";
-import { DataTable } from "@puzzle-ui/ui";
+import { DataTable, Select } from "@puzzle-ui/ui";
 import type { CmsEntryListItem, ContentListProps } from "./cms.types";
 import { errorMessage, entryTitle, formatDate } from "./cms.utils";
 
@@ -134,37 +134,42 @@ export const ContentList = ({
         </label>
         <label>
           Status
-          <select
+          <Select<CmsEntryStatus | "all">
+            aria-label="Status"
+            options={[
+              { value: "all", label: "All statuses" },
+              { value: "draft", label: "Draft" },
+              { value: "published", label: "Published" },
+              { value: "scheduled", label: "Scheduled" },
+              { value: "archived", label: "Archived" },
+            ]}
             value={status}
-            onChange={(event) => {
-              const next = event.currentTarget.value as CmsEntryStatus | "all";
+            onChange={(next) => {
+              if (next === undefined) return;
               if (remote) remote.onQueryChange({ ...remote.query, status: next });
               else setStatus(next);
             }}
-          >
-            <option value="all">All statuses</option>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="archived">Archived</option>
-          </select>
+          />
         </label>
         {locales.length > 0 ? (
           <label>
             Locale
-            <select
+            <Select
+              aria-label="Locale"
+              options={[
+                { value: "all", label: "All locales" },
+                ...locales.map((itemLocale) => ({
+                  value: itemLocale,
+                  label: itemLocale,
+                })),
+              ]}
               value={locale}
-              onChange={(event) => {
-                const next = event.currentTarget.value;
+              onChange={(next) => {
+                if (next === undefined) return;
                 if (remote) remote.onQueryChange({ ...remote.query, locale: next });
                 else setLocale(next);
               }}
-            >
-              <option value="all">All locales</option>
-              {locales.map((itemLocale) => (
-                <option key={itemLocale} value={itemLocale}>{itemLocale}</option>
-              ))}
-            </select>
+            />
           </label>
         ) : null}
       </div>

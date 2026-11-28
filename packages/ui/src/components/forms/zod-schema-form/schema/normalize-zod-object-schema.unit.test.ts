@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import * as z from "zod";
+import * as z from "zod/v4";
 
 import { normalizeZodObjectSchema } from "./index";
 
@@ -7,8 +7,11 @@ const findProperty = (
   schema: ReturnType<typeof normalizeZodObjectSchema>,
   name: string,
 ) => {
-  const property = schema.properties.find((candidate) => candidate.name === name);
-  if (property === undefined) throw new Error(`Missing normalized field "${name}".`);
+  const property = schema.properties.find(
+    (candidate) => candidate.name === name,
+  );
+  if (property === undefined)
+    throw new Error(`Missing normalized field "${name}".`);
   return property;
 };
 
@@ -198,9 +201,9 @@ describe("normalizeZodObjectSchema", () => {
       reason: "unsupported_schema",
     });
     expect(schema.diagnostics).toHaveLength(2);
-    expect(schema.diagnostics.every(({ severity }) => severity === "warning")).toBe(
-      true,
-    );
+    expect(
+      schema.diagnostics.every(({ severity }) => severity === "warning"),
+    ).toBe(true);
   });
 
   it("stops recursive lazy expansion and reports the recursive path", () => {

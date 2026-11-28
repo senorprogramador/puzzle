@@ -3,11 +3,17 @@
 import { useEffect, useId, useState } from "react";
 import {
   Autocomplete,
+  Button,
+  FormField,
   Image,
   ImageBox,
   ImageCropper,
   ImageHotspotEditor,
   MediaFrame,
+  Select,
+  Stack,
+  TextAreaInput,
+  TextInput,
 } from "@puzzle-ui/ui";
 import type {
   ImageHotspotEditorValue,
@@ -208,13 +214,18 @@ const AssetDetailsPanel = ({
           <h3 id={`${panelId}-variants`}>Variants</h3>
           <ul>
             {asset.variants.map((variant) => (
-              <li key={variant.id}>
+              <Stack
+                as="li"
+                key={variant.id}
+                direction="row"
+                gap="sm"
+              >
                 <span>{variant.name}</span>
                 <span>{variant.status}</span>
                 {variant.width && variant.height ? (
                   <span>{variant.width} × {variant.height}</span>
                 ) : null}
-              </li>
+              </Stack>
             ))}
           </ul>
         </section>
@@ -224,11 +235,16 @@ const AssetDetailsPanel = ({
           <h3 id={`${panelId}-usages`}>Used by</h3>
           <ul>
             {asset.usages.map((usage, index) => (
-              <li key={`${usage.resourceType}:${usage.resourceId}:${usage.fieldKey}:${index}`}>
+              <Stack
+                as="li"
+                key={`${usage.resourceType}:${usage.resourceId}:${usage.fieldKey}:${index}`}
+                direction="row"
+                gap="sm"
+              >
                 <span>{usage.resourceType}</span>
                 <span>{usage.resourceId}</span>
                 <span>{usage.fieldKey}</span>
-              </li>
+              </Stack>
             ))}
           </ul>
         </section>
@@ -276,29 +292,46 @@ const AssetDetailsPanel = ({
       className={`puzzle-asset-details ${className ?? ""}`}
       aria-labelledby={`${panelId}-title`}
     >
-      <header className="puzzle-asset-details__header">
+      <Stack
+        as="header"
+        className="puzzle-asset-details__header"
+        direction="row"
+        alignH="between"
+        alignV="start"
+        gap="md"
+      >
         <div>
           <h2 id={`${panelId}-title`}>Asset details</h2>
           <p>{asset.displayName}</p>
         </div>
         {onClose ? (
-          <button
+          <Button
             type="button"
-            className="puzzle-media-library__text-button"
+            size="sm"
+            variant="ghost"
             aria-label="Close asset details"
             onClick={onClose}
           >
             Close
-          </button>
+          </Button>
         ) : null}
-      </header>
+      </Stack>
 
-      <div className="puzzle-asset-details__tabs" role="tablist" aria-label="Asset details sections">
+      <Stack
+        className="puzzle-asset-details__tabs"
+        direction="row"
+        gap="sm"
+        wrap="nowrap"
+        role="tablist"
+        aria-label="Asset details sections"
+      >
         {(["details", "crop", "hotspots"] as const).map((tab) => (
-          <button
+          <Button
             key={tab}
             id={`${panelId}-tab-${tab}`}
             type="button"
+            size="sm"
+            variant="ghost"
             role="tab"
             aria-selected={activeTab === tab}
             aria-controls={`${panelId}-panel`}
@@ -306,9 +339,9 @@ const AssetDetailsPanel = ({
             onClick={() => setActiveTab(tab)}
           >
             {tab === "details" ? "Details" : tab === "crop" ? "Crop" : "Hotspots"}
-          </button>
+          </Button>
         ))}
-      </div>
+      </Stack>
 
       <div
         id={`${panelId}-panel`}
@@ -320,73 +353,66 @@ const AssetDetailsPanel = ({
           <>
             {renderDetails()}
             <div className="puzzle-asset-details__form">
-              <label>
-                <span>Display name</span>
-                <input
+              <FormField label="Display name">
+                <TextInput
                   value={draft.displayName ?? asset.displayName}
                   readOnly={!canEdit}
                   onChange={(event) =>
                     updateDraft({ displayName: event.currentTarget.value })
                   }
                 />
-              </label>
-              <label>
-                <span>Folder</span>
-                <select
+              </FormField>
+              <FormField label="Folder" disabled={!canEdit}>
+                <Select<string>
+                  options={[
+                    { label: "No folder", value: "" },
+                    ...folders.map((folder) => ({
+                      label: folder.name,
+                      value: folder.id,
+                    })),
+                  ]}
                   value={draft.folderId ?? ""}
-                  disabled={!canEdit}
-                  onChange={(event) =>
-                    updateDraft({ folderId: event.currentTarget.value || null })
+                  onChange={(folderId) =>
+                    updateDraft({ folderId: folderId || null })
                   }
-                >
-                  <option value="">No folder</option>
-                  {folders.map((folder) => (
-                    <option key={folder.id} value={folder.id}>
-                      {folder.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                <span>Alt text</span>
-                <input
+                />
+              </FormField>
+              <FormField label="Alt text">
+                <TextInput
                   value={draft.altText ?? ""}
                   readOnly={!canEdit}
                   onChange={(event) =>
                     updateDraft({ altText: event.currentTarget.value })
                   }
                 />
-              </label>
-              <label>
-                <span>Title</span>
-                <input
+              </FormField>
+              <FormField label="Title">
+                <TextInput
                   value={draft.title ?? ""}
                   readOnly={!canEdit}
                   onChange={(event) =>
                     updateDraft({ title: event.currentTarget.value })
                   }
                 />
-              </label>
-              <label>
-                <span>Caption</span>
-                <textarea
+              </FormField>
+              <FormField label="Caption">
+                <TextAreaInput
                   value={draft.caption ?? ""}
                   readOnly={!canEdit}
                   onChange={(event) =>
                     updateDraft({ caption: event.currentTarget.value })
                   }
                 />
-              </label>
-              <label>
-                <span>Description</span>
-                <textarea
+              </FormField>
+              <FormField label="Description">
+                <TextAreaInput
                   value={draft.description ?? ""}
                   readOnly={!canEdit}
                   onChange={(event) =>
                     updateDraft({ description: event.currentTarget.value })
                   }
                 />
-              </label>
+              </FormField>
               <Autocomplete
                 label="Tags"
                 multiple
@@ -412,24 +438,31 @@ const AssetDetailsPanel = ({
         </p>
       ) : null}
       {canEdit ? (
-        <div className="puzzle-asset-details__actions">
-          <button
+        <Stack
+          className="puzzle-asset-details__actions"
+          direction="row"
+          alignH="end"
+          alignV="center"
+          gap="md"
+        >
+          <Button
             type="button"
-            className="puzzle-media-library__text-button"
+            size="sm"
+            variant="outline"
             disabled={!isDirty || isSaving}
             onClick={cancel}
           >
             Cancel changes
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            className="puzzle-media-library__action-button"
+            variant="primary"
             disabled={!isDirty || isSaving}
             onClick={save}
           >
             {isSaving ? "Saving…" : "Save details"}
-          </button>
-        </div>
+          </Button>
+        </Stack>
       ) : null}
     </aside>
   );

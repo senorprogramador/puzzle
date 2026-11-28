@@ -19,7 +19,7 @@ import {
   ZodString,
   ZodType,
   ZodURL,
-} from "zod";
+} from "zod/v4";
 
 import type {
   NormalizedZodConstraints,
@@ -50,8 +50,7 @@ interface NormalizationContext {
 
 const EMPTY_CONSTRAINTS: NormalizedZodConstraints = Object.freeze({});
 
-const emptyPath = (): readonly NormalizedZodPathSegment[] =>
-  Object.freeze([]);
+const emptyPath = (): readonly NormalizedZodPathSegment[] => Object.freeze([]);
 
 const appendPath = (
   path: readonly NormalizedZodPathSegment[],
@@ -133,7 +132,11 @@ const readMetadata = (schema: SchemaNode): Metadata => {
 
   try {
     const metadata = cloneMetadataValue(schema.meta(), new WeakSet());
-    if (metadata === undefined || metadata === null || Array.isArray(metadata)) {
+    if (
+      metadata === undefined ||
+      metadata === null ||
+      Array.isArray(metadata)
+    ) {
       return Object.freeze({});
     }
 
@@ -144,7 +147,8 @@ const readMetadata = (schema: SchemaNode): Metadata => {
 };
 
 const mergeMetadata = (layers: readonly Metadata[]): Metadata => {
-  const merged: Record<string, NormalizedZodMetadataValue> = Object.create(null);
+  const merged: Record<string, NormalizedZodMetadataValue> =
+    Object.create(null);
 
   for (let index = 0; index < layers.length; index += 1) {
     const layer = layers[index];
@@ -165,14 +169,19 @@ const mergeMetadata = (layers: readonly Metadata[]): Metadata => {
   return Object.freeze(merged);
 };
 
-const getMetadataString = (metadata: Metadata, key: string): string | undefined => {
+const getMetadataString = (
+  metadata: Metadata,
+  key: string,
+): string | undefined => {
   const value = metadata[key];
   return typeof value === "string" ? value : undefined;
 };
 
 const getSchemaDescription = (schema: SchemaNode): string | undefined => {
   if (!(schema instanceof ZodType)) return undefined;
-  return typeof schema.description === "string" ? schema.description : undefined;
+  return typeof schema.description === "string"
+    ? schema.description
+    : undefined;
 };
 
 const makeBase = (
@@ -183,7 +192,8 @@ const makeBase = (
   const metadata = mergeMetadata(state.metadataLayers);
   const finalPathSegment = path.at(-1);
   const title = getMetadataString(metadata, "title");
-  const name = typeof finalPathSegment === "string" ? finalPathSegment : undefined;
+  const name =
+    typeof finalPathSegment === "string" ? finalPathSegment : undefined;
   const label =
     getMetadataString(metadata, "label") ??
     title ??
@@ -240,13 +250,7 @@ const makeUnsupported = (
 ): NormalizedZodDescriptor => {
   const sourceType = schema instanceof ZodType ? schema.type : "unknown";
   context.diagnostics.push(
-    makeDiagnostic(
-      reason,
-      "warning",
-      path,
-      message,
-      sourceType,
-    ),
+    makeDiagnostic(reason, "warning", path, message, sourceType),
   );
 
   return Object.freeze({
@@ -524,10 +528,17 @@ export const normalizeZodObjectSchema = (
     activeSchemas: new WeakSet(),
     diagnostics: [],
   };
-  const descriptor = normalizeNode(schema, emptyPath(), emptyWrapperState(), context);
+  const descriptor = normalizeNode(
+    schema,
+    emptyPath(),
+    emptyWrapperState(),
+    context,
+  );
 
   if (descriptor.type !== "object") {
-    throw new TypeError("normalizeZodObjectSchema requires a Zod object schema.");
+    throw new TypeError(
+      "normalizeZodObjectSchema requires a Zod object schema.",
+    );
   }
 
   return Object.freeze({

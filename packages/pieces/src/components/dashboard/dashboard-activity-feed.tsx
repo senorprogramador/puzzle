@@ -1,4 +1,4 @@
-import { Heading, Text } from "@puzzle-ui/ui";
+import { Heading, Stack, Text } from "@puzzle-ui/ui";
 import { useId } from "react";
 
 import "./dashboard.css";
@@ -63,7 +63,13 @@ export const DashboardActivityFeed = ({
           {emptyState}
         </div>
       ) : (
-        <ol className="puzzle-dashboard-activity-feed__list">
+        <Stack
+          as="ol"
+          className="puzzle-dashboard-activity-feed__list"
+          direction="col"
+          gap="md"
+          wrap="nowrap"
+        >
           {items.map((item) => (
             <li className="puzzle-dashboard-activity-feed__item" key={item.id}>
               {renderItem ? (
@@ -73,7 +79,7 @@ export const DashboardActivityFeed = ({
               )}
             </li>
           ))}
-        </ol>
+        </Stack>
       )}
     </section>
   );

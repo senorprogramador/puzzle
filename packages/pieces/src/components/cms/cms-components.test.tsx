@@ -113,6 +113,15 @@ const makeAuditEvent = (
   timestamp: new Date("2026-07-14T09:00:00.000Z"),
 });
 
+const chooseOption = async (
+  user: ReturnType<typeof userEvent.setup>,
+  label: string,
+  option: string,
+) => {
+  await user.click(screen.getByRole("combobox", { name: label }));
+  await user.click(screen.getByRole("option", { name: option }));
+};
+
 describe("CmsShell", () => {
   it("composes caller navigation and page content", () => {
     render(
@@ -157,7 +166,7 @@ describe("ContentList", () => {
     );
 
     expect(screen.getByRole("searchbox", { name: "Search content" })).toBeVisible();
-    await user.selectOptions(screen.getByLabelText("Status"), "published");
+    await chooseOption(user, "Status", "Published");
     expect(screen.getByText("Published article")).toBeVisible();
     expect(screen.queryByText("Draft article")).not.toBeInTheDocument();
 
@@ -201,12 +210,12 @@ describe("ContentList", () => {
     expect(screen.getByRole("button", { name: "Previous page" })).toBeDisabled();
     await user.click(screen.getByRole("button", { name: "Next page" }));
     expect(onNextPage).toHaveBeenCalledOnce();
-    await user.selectOptions(screen.getByLabelText("Status"), "published");
+    await chooseOption(user, "Status", "Published");
     expect(onQueryChange).toHaveBeenLastCalledWith({
       ...remote.query,
       status: "published",
     });
-    await user.selectOptions(screen.getByLabelText("Locale"), "fr-FR");
+    await chooseOption(user, "Locale", "fr-FR");
     expect(onQueryChange).toHaveBeenLastCalledWith({
       ...remote.query,
       locale: "fr-FR",
@@ -946,7 +955,7 @@ describe("AuditLogViewer", () => {
       id: "media-event", actorId: "editor", resource: "upload", resourceId: "",
       action: "upload:create", result: "failure", timestamp: "2026-01-01T00:00:00.000Z",
     }]} />);
-    await user.selectOptions(screen.getByLabelText("Result"), "failure");
+    await chooseOption(user, "Result", "Failure");
     expect(screen.getByText("upload:create")).toBeVisible();
     expect(screen.getByText("failure")).toBeVisible();
     expect(screen.getByRole("cell", { name: "upload" })).toBeVisible();
@@ -967,7 +976,7 @@ describe("AuditLogViewer", () => {
     expect(screen.getByText("Page 1 of 2")).toBeVisible();
     await user.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByText("denied")).toBeVisible();
-    await user.selectOptions(screen.getByLabelText("Result"), "success");
+    await chooseOption(user, "Result", "Success");
     expect(screen.getByText("success")).toBeVisible();
     expect(screen.queryByText("denied")).not.toBeInTheDocument();
   });

@@ -76,7 +76,6 @@ const ProfileForm = () => {
           id: "identity",
           label: "Identity",
           keys: ["name", "email"],
-          columns: 2,
         },
       ]}
       render={({ fields, validate }) => (
@@ -121,8 +120,10 @@ needs the schema's output type.
 Use `groups` to organize top-level fields. Each group has an `id`, optional
 `label`, `description`, `columns`, and a `keys` list. Configure nested object
 layout with `objects`, keyed by object path; groups and object layouts adapt to
-available width. Object options include a label, description, groups, columns,
-border, padding, header visibility, and collapsible presentation.
+available width. Groups default to two columns on desktop and one on mobile and
+tablet. A group's `columns` setting overrides the containing object's
+`columns` setting. Object options include a label, description, groups,
+columns, border, padding, header visibility, and collapsible presentation.
 `unassignedFields` controls fields not listed in a group:
 `"after-groups"`, `"hide"`, or `"error"`.
 
@@ -160,7 +161,7 @@ form needs presentation different from the schema metadata.
 | `validationMode` | `"change"`, `"blur"`, `"submit"`, `"touched"`, or a readonly array of modes. |
 | `validationDebounceMs` | Delay for scheduled validation after edits. |
 | `disabled`, `readOnly` | Form-wide interaction state; fields can also override these through configuration. |
-| `groups` | Groups with an `id`, optional `label`/`description`/`columns`, and top-level field `keys`. |
+| `groups` | Groups with an `id`, optional `label`/`description`/`columns` (two desktop columns by default; one on mobile/tablet), and top-level field `keys`. |
 | `fields` | Field-key/path configuration: `render`, `hidden`, `label`, `description`, `disabled`, or `readOnly`. |
 | `fieldTypes` | Map from field type to a custom `ZodSchemaFieldRenderer`. |
 | `objects` | Per-object layout configuration for groups, columns, border, padding, header, or collapsible presentation. |

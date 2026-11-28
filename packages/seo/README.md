@@ -32,9 +32,11 @@ export const App = () => (
 
 The root exports graph, React, validation, sitemap, robots, URL and testing
 utilities. The `core`, `context`, `schema`, `metadata`, `react`, `server`,
-`sitemap`, `robots`, `testing`, `validation`, `urls`, `next`, `tanstack` and
-`react-router` subpaths expose focused APIs. Import configuration, metadata
-resolver, schema registry and server handler functions from their subpaths.
+`sitemap`, `robots`, `testing`, `validation`, `urls`, `zod`, `next`, `tanstack`
+and `react-router` subpaths expose focused APIs. The optional `zod` subpath
+provides composable Schema.org schemas; install Zod 4 only when using it. Import
+configuration, metadata resolver, schema registry and server handler functions
+from their subpaths.
 
 The package provides:
 
@@ -760,6 +762,47 @@ bun run schema:check
 
 The check command verifies that the committed generated definitions
 match the pinned Schema.org source data.
+
+## Optional Zod schemas
+
+Install Zod 4 only if you need runtime parsing with the supplied schemas:
+
+```sh
+npm install @puzzle-ui/seo zod
+```
+
+The schemas are exported only from `@puzzle-ui/seo/zod`, so applications that
+do not use Zod do not need to install it:
+
+```ts
+import {
+  BedAndBreakfastSchema,
+  ProductSchema,
+  RestaurantSchema,
+  WebPageSchema,
+  WebSiteSchema,
+} from "@puzzle-ui/seo/zod";
+
+const restaurant = RestaurantSchema.parse({
+  "@type": "Restaurant",
+  name: "The Garden Table",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Amsterdam",
+  },
+  openingHoursSpecification: [
+    { "@type": "OpeningHoursSpecification", dayOfWeek: "Monday", opens: "09:00", closes: "22:00" },
+  ],
+});
+```
+
+The optional entry point includes reusable entity and sub-object schemas for
+addresses, coordinates, contact points, opening hours, images, ratings, menus,
+offers, shipping, return policies, and breadcrumbs. Domain schemas cover
+websites and pages, people and organizations, articles, products, restaurants,
+lodging and B&Bs, hotels, local businesses, and professional and specialty
+agencies. Objects accept additional Schema.org properties and relationships can
+be represented as nested nodes or `@id` references.
 
 ## Package scripts
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { Select } from "@puzzle-ui/ui";
 import type {
   LocaleOption,
   LocaleSwitcherPresentation,
@@ -60,21 +61,25 @@ const LocaleSwitcher = ({
           </ul>
         </nav>
       ) : (
-        <select
+        <Select
           className="puzzle-locale-switcher__select"
-          value={current?.id ?? ""}
+          value={current?.id}
+          options={locales.map((locale) => ({
+            id: locale.id,
+            value: locale.id,
+            label: locale.label,
+          }))}
+          placeholder=""
           aria-label={ariaLabel}
-          onChange={(event) => {
-            const option = locales.find((locale) => locale.id === event.target.value);
+          renderOption={(option) => {
+            const locale = locales.find((item) => item.id === option.value);
+            return <span lang={locale?.locale}>{option.label}</span>;
+          }}
+          onChange={(localeId) => {
+            const option = locales.find((locale) => locale.id === localeId);
             if (option) changeLocale(option, onLocaleChange);
           }}
-        >
-          {locales.map((locale) => (
-            <option value={locale.id} key={locale.id} lang={locale.locale}>
-              {locale.icon ? `${locale.label}` : locale.label}
-            </option>
-          ))}
-        </select>
+        />
       )}
     </div>
   );

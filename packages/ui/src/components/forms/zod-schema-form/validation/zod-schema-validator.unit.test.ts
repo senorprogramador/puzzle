@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { z } from "zod";
+import * as z from "zod/v4";
 
 import {
   createValidationRunGuard,
@@ -41,7 +41,10 @@ describe("Zod schema validation", () => {
 
   it("returns transformed values and defaults without mutating the input", async () => {
     const schema = z.object({
-      name: z.string().trim().transform((value) => value.toUpperCase()),
+      name: z
+        .string()
+        .trim()
+        .transform((value) => value.toUpperCase()),
       enabled: z.boolean().default(true),
     });
     const input = Object.freeze({ name: " Ada " });
@@ -132,14 +135,12 @@ describe("Zod schema validation", () => {
 
   it("lets callers ignore racing and invalidated validation runs", async () => {
     const pending = new Map<string, (value: string) => void>();
-    const schema = z
-      .string()
-      .transform(
-        (value) =>
-          new Promise<string>((resolve) => {
-            pending.set(value, resolve);
-          }),
-      );
+    const schema = z.string().transform(
+      (value) =>
+        new Promise<string>((resolve) => {
+          pending.set(value, resolve);
+        }),
+    );
     const validate = createZodSchemaValidator(schema);
     const guard = createValidationRunGuard();
 

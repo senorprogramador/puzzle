@@ -68,6 +68,16 @@
         "default": "./dist/schema/index.cjs"
       }
     },
+    "./zod": {
+      "import": {
+        "types": "./dist/zod/index.d.ts",
+        "default": "./dist/zod/index.js"
+      },
+      "require": {
+        "types": "./dist/zod/index.d.cts",
+        "default": "./dist/zod/index.cjs"
+      }
+    },
     "./metadata": {
       "import": {
         "types": "./dist/metadata/index.d.ts",
@@ -201,10 +211,14 @@
     "prepack": "bun run schema:check && tsdown"
   },
   "peerDependencies": {
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
     "react": {
+      "optional": true
+    },
+    "zod": {
       "optional": true
     }
   },
@@ -217,6 +231,7 @@
     "react-dom": "^19.0.0",
     "tsdown": "^0.23.1",
     "typescript": "^7.0.2",
+    "zod": "^4.6.7",
     "vitest": "5.1.1"
   }
 }

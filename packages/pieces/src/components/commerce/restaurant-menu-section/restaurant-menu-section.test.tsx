@@ -134,20 +134,20 @@ describe("RestaurantMenuSection", () => {
     );
 
     expect(screen.getByText("Aged cheese")).toBeVisible();
-    await user.selectOptions(
+    await user.click(
       screen.getByRole("combobox", { name: "Filter by dietary preference" }),
-      "plant-based",
     );
+    await user.click(screen.getByRole("option", { name: "Plant-based" }));
 
     expect(screen.getByText("Marinated olives")).toBeVisible();
     expect(screen.getByText("Garden bowl")).toBeVisible();
     expect(screen.queryByText("Aged cheese")).toBeNull();
     expect(onDietaryFilterChange).toHaveBeenLastCalledWith("plant-based");
 
-    await user.selectOptions(
+    await user.click(
       screen.getByRole("combobox", { name: "Filter by dietary preference" }),
-      "",
     );
+    await user.click(screen.getByRole("option", { name: "All dishes" }));
     expect(screen.getByText("Aged cheese")).toBeVisible();
     expect(onDietaryFilterChange).toHaveBeenLastCalledWith(null);
   });
@@ -165,10 +165,10 @@ describe("RestaurantMenuSection", () => {
     );
 
     expect(screen.queryByText("Aged cheese")).toBeNull();
-    await user.selectOptions(
+    await user.click(
       screen.getByRole("combobox", { name: "Filter by dietary preference" }),
-      "",
     );
+    await user.click(screen.getByRole("option", { name: "All dishes" }));
     expect(onDietaryFilterChange).toHaveBeenCalledWith(null);
     expect(screen.queryByText("Aged cheese")).toBeNull();
   });

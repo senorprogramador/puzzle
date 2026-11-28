@@ -1,7 +1,4 @@
 .puzzle-integrations__filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--puzzle-space-4, 1rem);
   margin-block-end: var(--puzzle-space-6, 1.5rem);
 }
 

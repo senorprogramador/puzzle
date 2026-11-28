@@ -7,7 +7,7 @@ import { Preview } from "@puzzle-ui/ui";
 import { MediaLibraryExample } from "../../../../src/components/doc-examples/pieces/media-workflows";
 import { MediaLibrary } from "@puzzle-ui/pieces";
 
-`MediaLibrary` is a responsive file-manager composition for application-owned media data. It reuses UI `TreeView`, `DataTable`, `Autocomplete`, `Image`, `MediaFrame`, `ImageUpload`, `VideoUpload`, and `FileUpload`; it does not implement a second tree, table, or uploader.
+`MediaLibrary` is a responsive file-manager composition for application-owned media data. It uses UI `Stack` for flexible layouts and `Button`, `FormField`, `Select`, `TextInput`, `TextAreaInput`, and `ToggleGroup` for controls, alongside `TreeView`, `DataTable`, `Autocomplete`, `Image`, `MediaFrame`, `ImageUpload`, `VideoUpload`, and `FileUpload`. It does not duplicate those UI primitives.
 
 <Preview fit="device" code={`<MediaLibrary assets={assets} folders={folders} selectionMode="multiple" onSelectionChange={setSelectedIds} />`}>
   <MediaLibraryExample />
@@ -32,6 +32,7 @@ import { MediaLibrary } from "@puzzle-ui/pieces";
 | `onCopyReference` | `(assetId: string) => void \| Promise<void>` | No | — |
 | `onBulkAction` | `(assetIds, action) => result \| void \| Promise<result \| void>` | No | — |
 | `onSaveAsset` / `showDetailsPanel` | Metadata callback / `boolean` | No | — / `false` |
+| `selectionActions` | `ReactNode` | No | — |
 
 `MediaLibraryAsset` is a client-safe projection containing public display metadata and optional previews. It excludes storage-object keys, tenant/audit internals, and processing errors. Set preview URLs explicitly from the caller; they are ephemeral authorized image or poster URLs, not asset references.
 Media previews request unoptimized rendering from configured framework image components, avoiding an image optimizer for these temporary URLs. The caller must still authorize each URL and control its lifetime.
@@ -64,11 +65,12 @@ Pass caller-owned `upload.image`, `upload.video`, or `upload.file` actions to en
 
 ### Responsive behavior, keyboard, and theming
 
-Folder navigation uses UI `TreeView` keyboard behavior. Native buttons and controls support keyboard selection and visible focus; the layout collapses to one column on narrow screens and wraps filters without horizontal overflow. Scoped CSS uses semantic `--puzzle-*` Theme tokens. Wrap the component in `Theme` for themed colors, spacing, borders, and typography.
+Folder navigation uses UI `TreeView` keyboard behavior. Puzzle UI buttons and form controls support keyboard interaction and visible focus; the layout collapses to one column on narrow screens and wraps filters without horizontal overflow. Scoped CSS uses semantic `--puzzle-*` Theme tokens. Wrap the component in `Theme` for themed colors, spacing, borders, and typography.
 
 ## Customization and composition
 
 Use `selectionMode="none"` for browse-only use or controlled `selectedAssetIds` when the parent owns the selection. Add `onSaveAsset` and `showDetailsPanel` to compose an `AssetDetailsPanel` for the single selected asset. Supply only actions the current user may perform; the component does not infer permissions or persist callbacks.
+Use `selectionActions` to render caller-owned controls beside the selection count and Details action.
 
 ## TypeScript example
 

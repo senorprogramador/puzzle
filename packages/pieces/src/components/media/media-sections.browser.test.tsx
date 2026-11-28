@@ -67,9 +67,63 @@ it("keeps the library responsive and supports keyboard selection", async () => {
   await user.keyboard("{Enter}");
   expect(onSelectionChange).toHaveBeenLastCalledWith(["cover"]);
 
-  await page.viewport(1280, 800);
+  const selection = container.querySelector<HTMLElement>(
+    ".puzzle-media-library__selection",
+  );
+  expect(selection).not.toBeNull();
+
+  for (const [width, direction] of [
+    [375, "column"],
+    [768, "column"],
+    [1280, "row"],
+  ] as const) {
+    await page.viewport(width, 800);
+    expect(getComputedStyle(selection!).flexDirection).toBe(direction);
+  }
+
   expect(getComputedStyle(layout).gridTemplateColumns.trim().split(/\s+/).length)
     .toBeGreaterThan(1);
+});
+
+it("opens and selects media filters with the Puzzle Select control", async () => {
+  await page.viewport(1280, 800);
+  const user = userEvent.setup();
+  render(<MediaLibrary {...libraryProps} />);
+
+  const statusFilter = screen.getByRole("combobox", { name: "Status" });
+  await user.click(statusFilter);
+  await screen.findByRole("listbox");
+  await user.click(await screen.findByRole("option", { name: "Processing" }));
+
+  expect(statusFilter).toHaveTextContent("Processing");
+  expect(screen.getByRole("heading", { name: "No matching assets" })).toBeVisible();
+});
+
+it("clips grid preview images to their media frame", async () => {
+  const asset: MediaLibraryAsset = {
+    ...assets[0]!,
+    previewUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80'%3E%3Crect width='120' height='80' fill='%23005799'/%3E%3C/svg%3E",
+  };
+  const { container } = render(<MediaLibrary assets={[asset]} />);
+  const frame = container.querySelector<HTMLElement>(
+    ".puzzle-media-library__asset-card .puzzle-media-frame__viewport",
+  );
+  const image = frame?.querySelector("img");
+
+  expect(frame).not.toBeNull();
+  expect(image).not.toBeNull();
+  await waitFor(() => expect(image).toHaveProperty("naturalWidth", 120));
+
+  for (const width of [375, 768, 1280]) {
+    await page.viewport(width, 900);
+    expect(getComputedStyle(frame!).overflow).toBe("hidden");
+
+    const card = frame!.closest(".puzzle-media-library__asset-card")!;
+    const cardBounds = card.getBoundingClientRect();
+    const frameBounds = frame!.getBoundingClientRect();
+    expect(frameBounds.left).toBeGreaterThanOrEqual(cardBounds.left);
+    expect(frameBounds.right).toBeLessThanOrEqual(cardBounds.right + 1);
+  }
 });
 
 it("uses the Drawer on narrow viewports and closes on Escape", async () => {

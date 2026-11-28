@@ -6,6 +6,7 @@ export default defineConfig({
     "src/core/index.ts",
     "src/context/index.ts",
     "src/schema/index.ts",
+    "src/zod/index.ts",
     "src/metadata/index.ts",
     "src/react/index.ts",
     "src/server/index.ts",

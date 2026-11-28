@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/v4";
 
 const storageRecordSchema = {
   id: z.string().min(1),
@@ -229,7 +229,11 @@ export const createWorkspaceInvitationInputSchema = z.object({
 });
 
 export const acceptWorkspaceInvitationInputSchema = z.object({
-  token: z.string().min(32).max(128).regex(/^[A-Za-z0-9_-]+$/),
+  token: z
+    .string()
+    .min(32)
+    .max(128)
+    .regex(/^[A-Za-z0-9_-]+$/),
   verifiedEmail: z
     .string()
     .trim()

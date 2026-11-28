@@ -161,6 +161,13 @@
         flex-direction: column;
     }
 
+    .puzzle-settings-section__header.puzzle-stack.direction-tablet-row,
+    .puzzle-settings-row.puzzle-stack.direction-tablet-row,
+    .puzzle-profile-header.puzzle-stack.direction-tablet-row,
+    .puzzle-security-method-card.puzzle-stack.direction-tablet-row {
+        flex-direction: column;
+    }
+
     .puzzle-settings-row__control {
         width: 100%;
     }

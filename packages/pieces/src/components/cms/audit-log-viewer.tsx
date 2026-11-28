@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import { Select } from "@puzzle-ui/ui";
 import type { AuditLogViewerProps } from "./cms.types";
 import { formatDate, dateTimeAttribute } from "./cms.utils";
 
@@ -59,25 +60,37 @@ export const AuditLogViewer = ({
         </label>
         <label>
           Resource
-          <select value={resource} onChange={(event) => {
-            setResource(event.currentTarget.value);
-            setPage(1);
-          }}>
-            <option value="all">All resources</option>
-            {resources.map((item) => <option value={item} key={item}>{item}</option>)}
-          </select>
+          <Select
+            aria-label="Resource"
+            value={resource}
+            options={[
+              { value: "all", label: "All resources" },
+              ...resources.map((item) => ({ value: item, label: item })),
+            ]}
+            onChange={(next) => {
+              if (next === undefined) return;
+              setResource(next);
+              setPage(1);
+            }}
+          />
         </label>
         <label>
           Result
-          <select value={result} onChange={(event) => {
-            setResult(event.currentTarget.value);
-            setPage(1);
-          }}>
-            <option value="all">All results</option>
-            <option value="success">Success</option>
-            <option value="denied">Denied</option>
-            <option value="failure">Failure</option>
-          </select>
+          <Select
+            aria-label="Result"
+            value={result}
+            options={[
+              { value: "all", label: "All results" },
+              { value: "success", label: "Success" },
+              { value: "denied", label: "Denied" },
+              { value: "failure", label: "Failure" },
+            ]}
+            onChange={(next) => {
+              if (next === undefined) return;
+              setResult(next);
+              setPage(1);
+            }}
+          />
         </label>
       </div>
       {error ? <p role="alert">{error}</p> : null}

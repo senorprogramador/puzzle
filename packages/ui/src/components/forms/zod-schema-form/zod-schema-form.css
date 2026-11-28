@@ -3,6 +3,31 @@
   inline-size: 100%;
 }
 
+.puzzle-zod-schema-form__array .puzzle-field-array__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.puzzle-zod-schema-form__array .puzzle-field-array__item-legend {
+  grid-column: 1 / -1;
+}
+
+.puzzle-zod-schema-form__array .puzzle-field-array__item-content {
+  grid-column: 1;
+}
+
+.puzzle-zod-schema-form__array .puzzle-field-array__item-actions {
+  grid-column: 2;
+  align-self: end;
+}
+
+.puzzle-zod-schema-form__array
+  .puzzle-field-array__item-actions
+  > .puzzle-button:last-child {
+  min-height: 2.5rem;
+}
+
 .puzzle-zod-schema-form__object,
 .puzzle-zod-schema-form__group {
   min-inline-size: 0;

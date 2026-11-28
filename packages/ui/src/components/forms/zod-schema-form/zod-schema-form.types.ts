@@ -1,5 +1,5 @@
-import type { FormEventHandler, Key, ReactNode } from "react";
-import type { z } from "zod";
+import type { ChangeEventHandler, Key, ReactNode } from "react";
+import type * as z from "zod/v4";
 
 import type {
   NormalizedZodConstraints,
@@ -53,9 +53,7 @@ type ZodSchemaFieldContext = {
   onChange: (value: unknown) => void;
 };
 
-type ZodSchemaFieldRenderer = (
-  context: ZodSchemaFieldContext,
-) => ReactNode;
+type ZodSchemaFieldRenderer = (context: ZodSchemaFieldContext) => ReactNode;
 
 type ZodSchemaFieldConfig = {
   render?: ZodSchemaFieldRenderer;
@@ -123,10 +121,8 @@ type ZodSchemaFormProps<Schema extends z.ZodObject> = {
   schema: Schema;
   value: DeepPartial<z.input<Schema>>;
   onChange: (value: DeepPartial<z.input<Schema>>) => void;
-  onSubmit?: FormEventHandler<HTMLFormElement>;
-  onValidationChange?: (
-    state: ZodSchemaFormValidationState<Schema>,
-  ) => void;
+  onSubmit?: ChangeEventHandler<HTMLFormElement>;
+  onValidationChange?: (state: ZodSchemaFormValidationState<Schema>) => void;
   validationMode?:
     | ZodSchemaFormValidationMode
     | readonly ZodSchemaFormValidationMode[];

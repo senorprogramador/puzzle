@@ -194,7 +194,7 @@
       ],
       "instructionDependencies": [],
       "documentationUrl": "https://puzzle-ui.com/docs/seo",
-      "contentHash": "398e02ac3529ba52ec4892a85649bfe9b5e59f6938084fa13e3bd1f12e0399e5"
+      "contentHash": "98f24eda854027719cb3f160529da211f521c60ae2ffa621f9d4b5d88001a068"
     },
     {
       "name": "@puzzle-ui/session",
@@ -276,7 +276,7 @@
         "@puzzle-ui/theme"
       ],
       "documentationUrl": "https://puzzle-ui.com/docs/ui",
-      "contentHash": "3fb2fccd28e198c49e8b301f92f170a0c84b67a58aaee9b9d93ef7fe6628195b"
+      "contentHash": "e3d55ae1b08087ab233c907fba8b559449961e614e462324859bd2972519cc0f"
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { Heading, Text } from "@puzzle-ui/ui";
+import { Heading, Stack, Text } from "@puzzle-ui/ui";
 import {
   cloneElement,
   isValidElement,
@@ -90,7 +90,15 @@ export const SettingsSection = ({
       data-variant={variant}
       aria-labelledby={titleId}
     >
-      <header className="puzzle-settings-section__header">
+      <Stack
+        as="header"
+        className="puzzle-settings-section__header"
+        direction={{ mobile: "col", tablet: "row" }}
+        gap="md"
+        wrap="nowrap"
+        alignH={{ mobile: "start", tablet: "between" }}
+        alignV={{ mobile: "start", tablet: "center" }}
+      >
         <div>
           <Heading level="headline2" as="h2" id={titleId} className="puzzle-settings-section__title">
             {title}
@@ -102,7 +110,7 @@ export const SettingsSection = ({
           )}
         </div>
         {actions}
-      </header>
+      </Stack>
       <div className="puzzle-settings-section__layout">
         {navigation ? (
           <nav
@@ -126,11 +134,15 @@ export const SettingsGroup = ({
   const titleId = useId();
 
   return (
-    <section
+    <Stack
+      as="section"
       className={["puzzle-settings-group", className]
         .filter(Boolean)
         .join(" ")}
       aria-labelledby={title ? titleId : undefined}
+      direction="col"
+      gap="md"
+      wrap="nowrap"
     >
       {title && (
         <Heading level="headline3" as="h3" id={titleId} className="puzzle-settings-group__title">
@@ -138,7 +150,7 @@ export const SettingsGroup = ({
         </Heading>
       )}
       <div className="puzzle-settings-group__content">{children}</div>
-    </section>
+    </Stack>
   );
 };
 
@@ -170,10 +182,15 @@ export const SettingsRow = ({
     : control;
 
   return (
-    <div
+    <Stack
       className={["puzzle-settings-row", className]
         .filter(Boolean)
         .join(" ")}
+      direction={{ mobile: "col", tablet: "row" }}
+      gap="md"
+      wrap="nowrap"
+      alignH={{ mobile: "start", tablet: "between" }}
+      alignV={{ mobile: "start", tablet: "center" }}
     >
       <div className="puzzle-settings-row__copy">
         {htmlFor ? (
@@ -197,18 +214,22 @@ export const SettingsRow = ({
       <div className="puzzle-settings-row__control">
         {enhancedControl}
       </div>
-    </div>
+    </Stack>
   );
 };
 
 export const FormActions = ({ children, className }: FormActionsProps) => (
-  <div
+  <Stack
     className={["puzzle-form-actions", className].filter(Boolean).join(" ")}
     role="group"
     aria-label="Form actions"
+    direction="row"
+    gap="sm"
+    wrap="wrap"
+    alignH="end"
   >
     {children}
-  </div>
+  </Stack>
 );
 
 export const ProfileHeader = ({
@@ -218,10 +239,16 @@ export const ProfileHeader = ({
   actions,
   className,
 }: ProfileHeaderProps) => (
-  <header
+  <Stack
+    as="header"
     className={["puzzle-profile-header", className]
       .filter(Boolean)
       .join(" ")}
+    direction={{ mobile: "col", tablet: "row" }}
+    gap="md"
+    wrap="nowrap"
+    alignH={{ mobile: "start", tablet: "between" }}
+    alignV={{ mobile: "start", tablet: "center" }}
   >
     {avatar && (
       <div className="puzzle-profile-header__avatar">{avatar}</div>
@@ -233,7 +260,7 @@ export const ProfileHeader = ({
     {actions && (
       <div className="puzzle-profile-header__actions">{actions}</div>
     )}
-  </header>
+  </Stack>
 );
 
 export const SecurityMethodCard = ({
@@ -244,10 +271,16 @@ export const SecurityMethodCard = ({
   action,
   className,
 }: SecurityMethodCardProps) => (
-  <article
+  <Stack
+    as="article"
     className={["puzzle-security-method-card", className]
       .filter(Boolean)
       .join(" ")}
+    direction={{ mobile: "col", tablet: "row" }}
+    gap="md"
+    wrap="nowrap"
+    alignH="start"
+    alignV={{ mobile: "start", tablet: "center" }}
   >
     {icon && (
       <div className="puzzle-security-method-card__icon" aria-hidden="true">
@@ -268,5 +301,5 @@ export const SecurityMethodCard = ({
     {action && (
       <div className="puzzle-security-method-card__action">{action}</div>
     )}
-  </article>
+  </Stack>
 );

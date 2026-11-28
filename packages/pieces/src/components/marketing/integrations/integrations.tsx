@@ -4,6 +4,7 @@ import {
   Text,
   TextInput,
   Select,
+  Stack,
 } from "@puzzle-ui/ui";
 import { useListFilter } from "@puzzle-ui/hooks";
 import type { ElementType } from "react";
@@ -135,7 +136,12 @@ const IntegrationsSection = <C extends ElementType = "section">({
       variant={variant}
     >
       {filterable && items.length ? (
-        <div className="puzzle-integrations__filters">
+        <Stack
+          className="puzzle-integrations__filters"
+          direction="row"
+          gap="md"
+          wrap="wrap"
+        >
           <label>
             <span>Search integrations</span>
             <TextInput
@@ -158,7 +164,7 @@ const IntegrationsSection = <C extends ElementType = "section">({
               onChange={(category) => setSelectedCategory(category ?? "")}
             />
           ) : null}
-        </div>
+        </Stack>
       ) : null}
       {filteredItems.length && variant === "categorized" ? (
         <div className="puzzle-integrations__groups">

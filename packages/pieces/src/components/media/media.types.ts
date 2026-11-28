@@ -219,6 +219,8 @@ export type MediaLibraryProps = Omit<
     patch: MediaLibraryMetadataPatch,
   ) => void | Promise<void>;
   showDetailsPanel?: boolean;
+  /** Additional controls rendered beside the selected-asset actions. */
+  selectionActions?: ReactNode;
 };
 
 export type MediaLibraryPropsForPicker = Omit<

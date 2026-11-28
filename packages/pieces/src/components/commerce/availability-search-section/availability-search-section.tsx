@@ -17,6 +17,7 @@ import {
   FormField,
   NumberInput,
   Select,
+  Stack,
 } from "@puzzle-ui/ui";
 import { MarketingSection } from "../../marketing/shared";
 import type {
@@ -469,7 +470,13 @@ const AvailabilitySearchSection = ({
             </FormField>
           ) : null}
 
-          <div className="puzzle-availability-search__options">
+          <Stack
+            className="puzzle-availability-search__options"
+            direction="row"
+            gap="0"
+            wrap="nowrap"
+            alignV="center"
+          >
             <Checkbox
               name="flexibleDates"
               label="My dates are flexible"
@@ -479,7 +486,7 @@ const AvailabilitySearchSection = ({
               }
               disabled={isDisabled}
             />
-          </div>
+          </Stack>
         </div>
 
         {statusError ? (
@@ -488,11 +495,17 @@ const AvailabilitySearchSection = ({
           </p>
         ) : null}
 
-        <div className="puzzle-availability-search__submit">
+        <Stack
+          className="puzzle-availability-search__submit"
+          direction="row"
+          gap="0"
+          wrap="nowrap"
+          alignH="end"
+        >
           <Button type="submit" disabled={isDisabled}>
             {isLoading ? loadingLabel : submitLabel}
           </Button>
-        </div>
+        </Stack>
       </form>
     </MarketingSection>
   );
