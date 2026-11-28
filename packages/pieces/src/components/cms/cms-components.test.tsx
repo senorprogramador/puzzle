@@ -119,7 +119,14 @@ const chooseOption = async (
   option: string,
 ) => {
   await user.click(screen.getByRole("combobox", { name: label }));
-  await user.click(screen.getByRole("option", { name: option }));
+  const optionElement = await waitFor(() => {
+    const element = Array.from(
+      document.querySelectorAll<HTMLElement>('[role="option"]'),
+    ).find((candidate) => candidate.getAttribute("aria-label") === option);
+    if (!element) throw new Error(`Select option "${option}" was not rendered.`);
+    return element;
+  });
+  fireEvent.click(optionElement);
 };
 
 describe("CmsShell", () => {

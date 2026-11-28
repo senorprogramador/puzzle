@@ -1,4 +1,10 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -7,6 +13,24 @@ import type {
   RestaurantMenuDietaryFilter,
 } from "../restaurant-menu.types";
 import { RestaurantMenuSection } from "./restaurant-menu-section";
+
+const chooseDietaryFilter = async (
+  user: ReturnType<typeof userEvent.setup>,
+  option: string,
+) => {
+  const combobox = screen.getByRole("combobox", {
+    name: "Filter by dietary preference",
+  });
+  await user.click(combobox);
+  const optionElement = await waitFor(() => {
+    const element = Array.from(
+      document.querySelectorAll<HTMLElement>('[role="option"]'),
+    ).find((candidate) => candidate.getAttribute("aria-label") === option);
+    if (!element) throw new Error(`Select option "${option}" was not rendered.`);
+    return element;
+  });
+  fireEvent.click(optionElement);
+};
 
 afterEach(cleanup);
 
@@ -134,20 +158,14 @@ describe("RestaurantMenuSection", () => {
     );
 
     expect(screen.getByText("Aged cheese")).toBeVisible();
-    await user.click(
-      screen.getByRole("combobox", { name: "Filter by dietary preference" }),
-    );
-    await user.click(screen.getByRole("option", { name: "Plant-based" }));
+    await chooseDietaryFilter(user, "Plant-based");
 
     expect(screen.getByText("Marinated olives")).toBeVisible();
     expect(screen.getByText("Garden bowl")).toBeVisible();
     expect(screen.queryByText("Aged cheese")).toBeNull();
     expect(onDietaryFilterChange).toHaveBeenLastCalledWith("plant-based");
 
-    await user.click(
-      screen.getByRole("combobox", { name: "Filter by dietary preference" }),
-    );
-    await user.click(screen.getByRole("option", { name: "All dishes" }));
+    await chooseDietaryFilter(user, "All dishes");
     expect(screen.getByText("Aged cheese")).toBeVisible();
     expect(onDietaryFilterChange).toHaveBeenLastCalledWith(null);
   });
@@ -165,10 +183,7 @@ describe("RestaurantMenuSection", () => {
     );
 
     expect(screen.queryByText("Aged cheese")).toBeNull();
-    await user.click(
-      screen.getByRole("combobox", { name: "Filter by dietary preference" }),
-    );
-    await user.click(screen.getByRole("option", { name: "All dishes" }));
+    await chooseDietaryFilter(user, "All dishes");
     expect(onDietaryFilterChange).toHaveBeenCalledWith(null);
     expect(screen.queryByText("Aged cheese")).toBeNull();
   });

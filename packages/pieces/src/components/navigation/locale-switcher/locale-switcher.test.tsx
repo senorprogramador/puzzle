@@ -1,4 +1,10 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { LocaleSwitcher } from "./index";
@@ -24,7 +30,14 @@ describe("LocaleSwitcher", () => {
     const select = screen.getByRole("combobox", { name: "Choose language" });
     expect(select).toHaveTextContent("English");
     await user.click(select);
-    await user.click(screen.getByRole("option", { name: "Nederlands" }));
+    const option = await waitFor(() => {
+      const element = Array.from(
+        document.querySelectorAll<HTMLElement>('[role="option"]'),
+      ).find((candidate) => candidate.getAttribute("aria-label") === "Nederlands");
+      if (!element) throw new Error("The Nederlands option was not rendered.");
+      return element;
+    });
+    fireEvent.click(option);
     expect(onLocaleChange).toHaveBeenCalledWith(locales[1]);
   });
 
