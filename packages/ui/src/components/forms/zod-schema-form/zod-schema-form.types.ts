@@ -1,4 +1,4 @@
-import type { ChangeEventHandler, Key, ReactNode } from "react";
+import type { FormEventHandler, Key, ReactNode } from "react";
 import type * as z from "zod/v4";
 
 import type {
@@ -121,7 +121,7 @@ type ZodSchemaFormProps<Schema extends z.ZodObject> = {
   schema: Schema;
   value: DeepPartial<z.input<Schema>>;
   onChange: (value: DeepPartial<z.input<Schema>>) => void;
-  onSubmit?: ChangeEventHandler<HTMLFormElement>;
+  onSubmit?: FormEventHandler<HTMLFormElement>;
   onValidationChange?: (state: ZodSchemaFormValidationState<Schema>) => void;
   validationMode?:
     | ZodSchemaFormValidationMode
